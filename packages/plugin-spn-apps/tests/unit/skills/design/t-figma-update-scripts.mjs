@@ -1,4 +1,4 @@
-// The scripts of a library update: `versions.js` and `instances.js` (the readings), `check-answers.mjs` (the saved
+// The scripts of a library update: `copy.js`, `property.js`, `sheet.js`, `header.js` and `cases.js` (the operations of the drawing), `versions.js` and `instances.js` (the readings), `check-answers.mjs` (the saved
 // answers proven by their hash), `apply-spec.js` (one unit's spec carried out on its set) and `check-specs.mjs` (the
 // specs checked against the readings, with no call to Figma).
 //
@@ -499,14 +499,481 @@ await guard(async () => {
     [short.removed.includes("size=MD"), whole.removed], [false, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"]]);
 });
 
+// ---- the stand-in of a tree that clones, appends and removes ------------------------------------
+
+let cloneCount = 0;
+const plantTree = (made) => {
+  made.appendChild = (child) => { if (child.parent && child.parent.children) child.parent.children = child.parent.children.filter((one) => one !== child); child.parent = made; made.children.push(child); };
+  made.remove = () => { if (made.parent) made.parent.children = made.parent.children.filter((one) => one !== made); };
+  return made;
+};
+// as in Figma: a clone is a copy of the layers, and it loses the ties of its layers to the set's properties
+const cloneOf = (source) => {
+  cloneCount += 1;
+  const copy = node(`clone${cloneCount}`, source.name, source.type, { key: `ckey${cloneCount}`, x: source.x, y: source.y, width: source.width, height: source.height, componentPropertyReferences: {} }, (source.children ?? []).map(cloneOf));
+  copy.parent = null;
+  copy.clone = () => cloneOf(copy);
+  return plantTree(copy);
+};
+const layer = (id, name, type, references = {}, children = []) => plantTree(node(id, name, type, { componentPropertyReferences: references, getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }], characters: type === "TEXT" ? "Hello" : undefined }, children));
+const treeVersion = (id, name, key, x, y, children) => {
+  const made = plantTree(version(id, name, key, 100, 40));
+  made.x = x; made.y = y;
+  for (const child of children) { child.parent = made; made.children.push(child); }
+  made.clone = () => cloneOf(made);
+  return made;
+};
+const treeSet = (versions, definitions = {}) => {
+  const made = componentSet("9:1", "DSBtn", "kset", versions, definitions);
+  plantTree(made);
+  made.x = 0; made.y = 0; made.width = 200; made.height = 140;
+  made.resize = (width, height) => { made.width = width; made.height = height; };
+  made.addComponentProperty = (name, type, value) => { const key = `${name}#9:${Object.keys(definitions).length + 1}`; definitions[key] = { type, defaultValue: value }; return key; };
+  return made;
+};
+const withFile = (page) => {
+  const figma = figmaFile([page]);
+  figma.currentPage = { id: "0:9" };
+  figma.setCurrentPageAsync = async (target) => { figma.switches += 1; figma.currentPage = target; };
+  return figma;
+};
+
+// ---- copy.js -------------------------------------------------------------------------------------
+
+console.log("\n=== copy.js — versions added as copies of their twin");
+const copyPage = () => {
+  const tied = () => [layer("l1", "frame", "FRAME", {}, [layer("l2", "icon", "FRAME", { visible: "show#1:0" })])];
+  const versions = [treeVersion("5:0", "size=SM, state=rest", "k0", 20, 20, tied()), treeVersion("5:1", "size=MD, state=rest", "k1", 20, 80, tied())];
+  const set = treeSet(versions);
+  return { page: pageNode("2:1", "Actions", [node("3:1", "Section", "SECTION", {}, [set])]), set, versions };
+};
+const copyOne = [{ from: { size: "MD" }, to: { size: "XS" } }];
+await guard(async () => {
+  const made = copyPage();
+  const dry = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: copyOne }, figmaFile([made.page]));
+  same("dry is the default: the copy is named with the twin's name, the set's new box is told, and nothing is made", [dry.dryRun, dry.made, dry.setBoxBefore, dry.setBoxAfter, dry.problems, made.set.children.length], [true, [["size=XS, state=rest", null, "size=MD, state=rest"]], [0, 0, 200, 140], [0, 0, 200, 228], [], 2]);
+  const applied = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: copyOne, dryRun: false }, figmaFile([made.page]));
+  const copy = made.set.children[2];
+  same("applied: the copy is a new component in the set, in a row 48 under everything the set holds, and the set grows to hold it",
+    [made.set.children.length, copy.name, copy.x, copy.y, copy.parent === made.set, applied.setBoxAfter, applied.made.map((one) => [one[0], one[2]])], [3, "size=XS, state=rest", 20, 168, true, [0, 0, 200, 228], [["size=XS, state=rest", "size=MD, state=rest"]]]);
+  same("applied: the tie that the clone lost is made again from the twin's, and the answer counts it", [copy.children[0].children[0].componentPropertyReferences, applied.tiedAgain], [{ visible: "show#1:0" }, 1]);
+  ok("applied: the twin and the other version are as they were", made.versions[1].children[0].children[0].componentPropertyReferences.visible === "show#1:0" && made.set.children[0].name === "size=SM, state=rest");
+  const again = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: copyOne, dryRun: false }, figmaFile([made.page]));
+  same("sent twice: the copy that stands is `stood` and nothing is made", [again.made, again.stood, made.set.children.length], [[], ["size=XS, state=rest"], 3]);
+});
+await guard(async () => {
+  const made = copyPage();
+  const hover = [{ from: { size: "MD" }, to: { state: "hover" } }];
+  await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: hover, dryRun: false }, figmaFile([made.page]));
+  const again = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: hover, dryRun: false }, figmaFile([made.page]));
+  same("a partial `from` that the earlier copy matches too still finds its one twin on a second send", [again.problems, again.stood, made.set.children.length], [[], ["size=MD, state=hover"], 3]);
+  const two = copyPage();
+  const several = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: [{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "SM" }, to: { size: "XS" } }, { from: { size: "MD" }, to: { size: "LG" } }], dryRun: false }, figmaFile([two.page]));
+  same("two copies of one send with one name refuse the unit, though they come from two twins", [several.problems.length > 0, two.set.children.length], [true, 2]);
+  const row = copyPage();
+  await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: [{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "MD" }, to: { size: "LG" } }], dryRun: false }, figmaFile([row.page]));
+  same("two copies: the second stands 48 right of the first and the set is wider by the same", [row.set.children.slice(2).map((one) => [one.name, one.x, one.y]), row.set.width], [[["size=XS, state=rest", 20, 168], ["size=LG, state=rest", 168, 168]], 348]);
+});
+await guard(async () => {
+  const check = async (copies, edit = () => {}) => {
+    const made = copyPage();
+    edit(made);
+    const answer = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies, dryRun: false }, figmaFile([made.page]));
+    return { answer, made };
+  };
+  const none = await check([{ from: { size: "XL" }, to: { size: "XS" } }]);
+  ok("a `from` that finds no version refuses the unit, changing nothing", /finds 0 versions/.test(none.answer.problems[0] ?? "") && none.made.set.children.length === 2, JSON.stringify(none.answer));
+  const many = await check([{ from: { state: "rest" }, to: { size: "XS" } }]);
+  ok("a `from` that finds two versions refuses the unit", /finds 2 versions/.test(many.answer.problems[0] ?? "") && many.made.set.children.length === 2, JSON.stringify(many.answer));
+  const unheld = await check([{ from: { size: "MD" }, to: { tone: "error" } }]);
+  ok("a `to` that names a property the twin does not hold refuses the unit", /holds no property tone/.test(unheld.answer.problems[0] ?? ""), JSON.stringify(unheld.answer));
+  const clash = await check([{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "SM" }, to: { size: "XS", state: "rest" } }, { from: { size: "MD" }, to: { size: "XS" } }]);
+  ok("two copies with one name refuse the unit, and not even the good copy is made", /two copies would be named/.test(clash.answer.problems.join(" ")) && clash.made.set.children.length === 2, JSON.stringify(clash.answer.problems));
+  const slotted = await check(copyOne, (made) => { made.versions[1].children[0].children.push(layer("l9", "body", "SLOT")); });
+  ok("a twin that holds a slot refuses the unit, because a clone turns a slot into a frame", /holds a slot/.test(slotted.answer.problems[0] ?? "") && slotted.made.set.children.length === 2, JSON.stringify(slotted.answer));
+  const wrong = await run("copy.js", { setId: "9:1", unit: "DSOther", copies: copyOne }, figmaFile([copyPage().page]));
+  ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
+});
+
+await guard(async () => {
+  const chain = [{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "XS" }, to: { state: "error" } }];
+  const made = copyPage();
+  const dry = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: chain }, figmaFile([made.page]));
+  same("a twin may be a copy planned earlier in the same list: dry names both, the second from the first", [dry.problems, dry.made.map((one) => [one[0], one[2]])], [[], [["size=XS, state=rest", "size=MD, state=rest"], ["size=XS, state=error", "size=XS, state=rest"]]]);
+  const applied = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: chain, dryRun: false }, figmaFile([made.page]));
+  const last = made.set.children[3];
+  same("real: the same names, the second cloned from the first, its tie made again from the version at the head of the chain", [applied.made.map((one) => one[0]), made.set.children.length, last.children[0].children[0].componentPropertyReferences, applied.tiedAgain], [dry.made.map((one) => one[0]), 4, { visible: "show#1:0" }, 2]);
+  const again = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: chain, dryRun: false }, figmaFile([made.page]));
+  same("sent twice: both stand, the second `from` finds the standing first copy", [again.problems, again.stood, made.set.children.length], [[], ["size=XS, state=rest", "size=XS, state=error"], 4]);
+  const slotted = copyPage();
+  slotted.versions[1].children[0].children.push(layer("l9", "body", "SLOT"));
+  const refused = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: chain, dryRun: false }, figmaFile([slotted.page]));
+  ok("the slot is read on the version at the head of the chain", /\[size=MD, state=rest\] holds a slot/.test(refused.problems[0] ?? "") && slotted.set.children.length === 2, JSON.stringify(refused));
+});
+
+// ---- property.js ---------------------------------------------------------------------------------
+
+console.log("\n=== property.js — a property added and a layer tied to it");
+const propertyPage = (extra = () => {}) => {
+  const first = treeVersion("5:0", "size=SM", "k0", 20, 20, [layer("l1", "frame", "FRAME", {}, [layer("l2", "empty state", "FRAME"), layer("l3", "label", "TEXT")])]);
+  const second = treeVersion("5:1", "size=MD", "k1", 20, 80, [layer("l4", "empty state", "FRAME")]);
+  const third = treeVersion("5:2", "size=LG", "k2", 20, 140, []);
+  extra({ first, second, third });
+  const definitions = {};
+  const set = treeSet([first, second, third], definitions);
+  return { page: pageNode("2:1", "Actions", [node("3:1", "Section", "SECTION", {}, [set])]), set, first, second, third, definitions };
+};
+const yesNo = { setId: "9:1", unit: "DSBtn", name: "empty", type: "BOOLEAN", layer: "empty state", ties: "visible", default: false };
+await guard(async () => {
+  const made = propertyPage();
+  const dry = await run("property.js", yesNo, figmaFile([made.page]));
+  same("dry is the default: the versions that would be tied are counted, those without the layer named, and nothing is added", [dry.dryRun, dry.wouldTie, dry.versionsWithoutLayer, dry.key, dry.problems, Object.keys(made.definitions)], [true, 2, ["size=LG"], null, [], []]);
+  const applied = await run("property.js", { ...yesNo, dryRun: false }, figmaFile([made.page]));
+  same("applied: the property is added with its default and the layer is tied to its full key in each version that holds it", [applied.key, applied.tied, made.definitions[applied.key], made.first.children[0].children[0].componentPropertyReferences, made.second.children[0].componentPropertyReferences], ["empty#9:1", 2, { type: "BOOLEAN", defaultValue: false }, { visible: "empty#9:1" }, { visible: "empty#9:1" }]);
+  const again = await run("property.js", { ...yesNo, dryRun: false }, figmaFile([made.page]));
+  same("sent twice: the property that stands is `stood`, tied to nothing again and added once", [again.stood, again.key, again.tied, Object.keys(made.definitions).length], [true, "empty#9:1", 0, 1]);
+});
+await guard(async () => {
+  const made = propertyPage();
+  const text = await run("property.js", { setId: "9:1", unit: "DSBtn", name: "caption", type: "TEXT", layer: "label", ties: "characters", default: null, dryRun: false }, figmaFile([made.page]));
+  same("a text property with no default takes the characters of the layer in the default version", [text.key, text.tied, made.definitions[text.key].defaultValue, made.first.children[0].children[1].componentPropertyReferences], ["caption#9:1", 1, "Hello", { characters: "caption#9:1" }]);
+  const refuse = async (changes, edit) => {
+    const fresh = propertyPage(edit);
+    const answer = await run("property.js", { ...yesNo, ...changes, dryRun: false }, figmaFile([fresh.page]));
+    return { answer, fresh };
+  };
+  const missing = await refuse({ layer: "nowhere" });
+  ok("no version holding the layer refuses, and nothing is added", /no version holds a layer named/.test(missing.answer.problems[0] ?? "") && Object.keys(missing.fresh.definitions).length === 0, JSON.stringify(missing.answer));
+  const twice = await refuse({}, ({ second }) => { second.children.push(layer("l8", "empty state", "FRAME")); });
+  ok("a version holding two layers of that name refuses", /holds 2 layers named/.test(twice.answer.problems[0] ?? "") && Object.keys(twice.fresh.definitions).length === 0, JSON.stringify(twice.answer));
+  const taken = await refuse({}, ({ first }) => { first.children[0].children[0].componentPropertyReferences = { visible: "other#1:1" }; });
+  ok("a layer already tied to another property by the same tie refuses", /tied to other#1:1 already/.test(taken.answer.problems[0] ?? ""), JSON.stringify(taken.answer));
+  const notText = await refuse({ type: "TEXT", ties: "characters", default: "x" });
+  ok("a text property that meets a layer that is no text refuses", /not a text/.test(notText.answer.problems[0] ?? ""), JSON.stringify(notText.answer));
+  const badDefault = await refuse({ default: "yes" });
+  ok("a default that does not fit the type refuses", /true or false/.test(badDefault.answer.problems[0] ?? ""), JSON.stringify(badDefault.answer));
+  const badTie = await refuse({ ties: "characters" });
+  ok("a tie that does not fit the type refuses", /ties `visible`/.test(badTie.answer.problems[0] ?? ""), JSON.stringify(badTie.answer));
+  const wrongType = propertyPage();
+  wrongType.definitions["empty#1:1"] = { type: "TEXT", defaultValue: "" };
+  const clash = await run("property.js", { ...yesNo, dryRun: false }, figmaFile([wrongType.page]));
+  ok("a property of that name and another type is a problem, and nothing is tied", /of the type TEXT/.test(clash.problems[0] ?? "") && wrongType.first.children[0].children[0].componentPropertyReferences.visible === undefined, JSON.stringify(clash));
+  const wrong = await run("property.js", { ...yesNo, unit: "DSOther" }, figmaFile([propertyPage().page]));
+  ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
+});
+
+// ---- header.js -----------------------------------------------------------------------------------
+
+console.log("\n=== header.js — the layout clauses of a header and its notes");
+const headerPage = (characters = "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading", withSet = true) => {
+  const text = (id, chars) => {
+    const made = node(id, "header · DSBtn", "TEXT", { characters: chars, getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }] });
+    made.insertCharacters = (index, added) => { made.characters = made.characters.slice(0, index) + added + made.characters.slice(index); };
+    made.deleteCharacters = (start, end) => { made.characters = made.characters.slice(0, start) + made.characters.slice(end); };
+    return made;
+  };
+  const header = text("4:0", characters);
+  const set = treeSet([treeVersion("5:0", "size=SM", "k0", 20, 20, [])]);
+  const section = node("3:1", "DSBtn", "SECTION", {}, withSet ? [header, set] : [header]);
+  return { page: pageNode("2:1", "Actions", [section]), header, section, text };
+};
+const layoutNew = "rows: size=SM (default), MD, LG · columns: state=rest (default)";
+const headerNotes = ["behaviour: loading", "behaviour: filter"];
+await guard(async () => {
+  const made = headerPage();
+  const dry = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes }, figmaFile([made.page]));
+  same("dry is the default: the header as it is and as it would be, and the text is not changed", [dry.dryRun, dry.was, dry.now, dry.stood, made.header.characters === dry.was],
+    [true, "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading", "DSBtn — a button · rows: size=SM (default), MD, LG · columns: state=rest (default) · behaviour: loading · behaviour: filter", false, true]);
+  const applied = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes, dryRun: false }, figmaFile([made.page]));
+  same("applied: the layout clauses are replaced, a note the header held is not written again, a new one ends it", made.header.characters, "DSBtn — a button · rows: size=SM (default), MD, LG · columns: state=rest (default) · behaviour: loading · behaviour: filter");
+  const again = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: headerNotes, dryRun: false }, figmaFile([made.page]));
+  same("sent twice: the header stands as it is", [again.stood, made.header.characters === applied.now], [true, true]);
+});
+await guard(async () => {
+  const notes = headerPage();
+  await run("header.js", { unit: "DSBtn", setId: "9:1", notes: ["tone: left to the developer"], dryRun: false }, figmaFile([notes.page]));
+  same("with no layout only the notes are written, as the last clauses", notes.header.characters, "DSBtn — a button · rows: size=SM (default), MD · columns: state=rest (default) · behaviour: loading · tone: left to the developer");
+  const lone = headerPage("DSBtn — one row of a list: a content · one row · behaviour: loading", false);
+  await run("header.js", { unit: "DSBtn", setId: null, pageId: "2:1", layout: "one column", notes: [], dryRun: false }, figmaFile([lone.page]));
+  same("a unit with no set is found by the section of the page named as the unit, and a description that begins with `one row` is no layout clause", lone.header.characters, "DSBtn — one row of a list: a content · one column · behaviour: loading");
+  const refuse = async (changes, characters) => {
+    const fresh = headerPage(characters);
+    const answer = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, notes: [], dryRun: false, ...changes }, figmaFile([fresh.page]));
+    return { answer, fresh };
+  };
+  const noLayout = await refuse({}, "DSBtn — a button · one component");
+  ok("a header with no layout clause to replace refuses, and the text stays", /holds no layout clause/.test(noLayout.answer.problems[0] ?? "") && noLayout.fresh.header.characters === "DSBtn — a button · one component", JSON.stringify(noLayout.answer));
+  const notLayout = await refuse({ layout: "rows: size=SM · behaviour: loading" });
+  ok("a layout that holds a clause that is no layout clause refuses", /is no layout clause/.test(notLayout.answer.problems[0] ?? ""), JSON.stringify(notLayout.answer));
+  const dotted = await refuse({ notes: ["a · b"] });
+  ok("a note that holds ` · ` refuses", /holds ·/.test(dotted.answer.problems[0] ?? ""), JSON.stringify(dotted.answer));
+  const two = headerPage();
+  two.section.children.push(two.text("4:9", "DSBtn — another"));
+  const doubled = await run("header.js", { unit: "DSBtn", setId: "9:1", layout: layoutNew, dryRun: false }, figmaFile([two.page]));
+  ok("two headers refuse", /2 headers begin with/.test(doubled.problems[0] ?? "") && two.header.characters.includes("rows: size=SM (default), MD ·"), JSON.stringify(doubled));
+  const wrong = await run("header.js", { unit: "DSOther", setId: "9:1", layout: layoutNew }, figmaFile([headerPage().page]));
+  ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
+});
+
+// ---- sheet.js ------------------------------------------------------------------------------------
+
+console.log("\n=== sheet.js — the sheet of cases, made in the unit's section");
+const sheetPage = (edit = () => {}) => {
+  const text = (id, name, chars, x, y, height = 20) => {
+    const made = plantTree(node(id, name, "TEXT", { characters: chars, x, y, width: 100, height, getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }] }));
+    made.clone = () => { cloneCount += 1; const copy = text(`t${cloneCount}`, made.name, made.characters, made.x, made.y, made.height); copy.parent = null; return copy; };
+    return made;
+  };
+  const set = treeSet([treeVersion("5:0", "size=SM", "k0", 20, 20, [])]);
+  set.x = 435; set.y = 148; set.width = 320; set.height = 164;
+  const header = text("4:0", "header · DSBtn", "DSBtn — a button · one row", 80, 80);
+  const usageLabel = text("4:1", "label · Usage", "Usage", 80, 392, 19);
+  const usage = node("4:2", "usage · DSBtn", "FRAME", { x: 435, y: 471, width: 320, height: 116 });
+  const section = plantTree(node("3:1", "DSBtn", "SECTION", { x: 0, y: 100, width: 2810, height: 667 }, []));
+  const parts = { text, set, header, usageLabel, usage, section };
+  edit(parts);
+  for (const child of [parts.header, parts.set, parts.usageLabel, parts.usage].filter(Boolean)) { child.parent = section; section.children.push(child); }
+  section.resizeWithoutConstraints = (width, height) => { section.width = width; section.height = height; };
+  return { page: pageNode("2:1", "Actions", [section]), ...parts };
+};
+const sheetFile = (made) => {
+  const figma = figmaFile([made.page]);
+  figma.createFrame = () => plantTree(node(`f${(cloneCount += 1)}`, "Frame", "FRAME", { x: 0, y: 0, width: 0, height: 0, fills: [], strokes: [] }));
+  return figma;
+};
+const sheetInputs = { unit: "DSBtn", setId: "9:1", pageId: "2:1" };
+await guard(async () => {
+  const made = sheetPage();
+  const dry = await run("sheet.js", sheetInputs, sheetFile(made));
+  same("dry is the default: the place of the sheet is told, under everything the section holds, left edge on the set, and nothing is made", [dry.dryRun, dry.stood, dry.box.slice(0, 2), dry.problems, made.section.children.length], [true, false, [435, 746], [], 4]);
+  const applied = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(made));
+  const sheet = made.section.children.find((child) => child.name === "DSBtn cases");
+  same("applied: a frame named `<Unit> cases` stands in the section as the sheets that stand do: a horizontal auto layout, 24 apart, no padding, white, clipping",
+    [sheet.type, sheet.layoutMode, sheet.itemSpacing, [sheet.paddingLeft, sheet.paddingTop], sheet.primaryAxisSizingMode, sheet.counterAxisSizingMode, sheet.clipsContent, sheet.fills[0].color, sheet.strokes, sheet.parent === made.section],
+    ["FRAME", "HORIZONTAL", 24, [0, 0], "AUTO", "AUTO", true, { r: 1, g: 1, b: 1 }, [], true]);
+  same("applied: the sheet's place, the answer and the section grown to hold it with 80 below", [[sheet.x, sheet.y], applied.sheet === sheet.id, applied.section, made.section.height], [[435, 746], true, "3:1", 827]);
+  const labels = made.section.children.filter((child) => child.type === "TEXT" && child.name !== "header · DSBtn" && child.name !== "label · Usage");
+  same("applied: the band label stands 79 above the sheet at the header's left, the sheet's label 16 above at its left, each a copy of a text of the section",
+    labels.map((label) => [label.name, label.characters, label.x, label.y]).sort(), [["label · Cases", "Cases", 80, 667], ["label · DSBtn cases — one component for each case", "DSBtn cases — one component for each case", 435, 710]]);
+  const again = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(made));
+  same("sent twice: the sheet that stands is `stood`, and nothing is made", [again.stood, again.sheet === sheet.id, made.section.children.length], [true, true, 7]);
+  const listed = sheetPage();
+  await run("sheet.js", { ...sheetInputs, label: "color=DEFAULT, PRIMARY", dryRun: false }, sheetFile(listed));
+  same("with a `label` the sheet's own label lists it after `<Unit> cases — `", listed.section.children.filter((child) => child.name.startsWith("label · DSBtn cases")).map((child) => child.characters), ["DSBtn cases — color=DEFAULT, PRIMARY"]);
+});
+await guard(async () => {
+  const stands = sheetPage();
+  stands.section.children.push(Object.assign(stands.text("4:7", "label · Cases", "Cases", 80, 700, 19), { parent: stands.section }));
+  await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(stands));
+  same("a band label that stands is not made again", stands.section.children.filter((child) => child.name === "label · Cases").length, 1);
+  const lone = sheetPage((parts) => { parts.set = null; });
+  lone.section.children.push(Object.assign(node("5:5", "DSBtn", "COMPONENT", { x: 435, y: 148, width: 100, height: 40 }), { parent: lone.section }));
+  const loneAnswer = await run("sheet.js", { unit: "DSBtn", setId: null, pageId: "2:1" }, sheetFile(lone));
+  same("a unit with no set: the section is the page's section named as the unit, and the sheet stands by the lone component", [loneAnswer.problems, loneAnswer.box.slice(0, 2)], [[], [435, 746]]);
+  const refuse = async (edit, changes = {}) => {
+    const fresh = sheetPage(edit);
+    const answer = await run("sheet.js", { ...sheetInputs, dryRun: false, ...changes }, sheetFile(fresh));
+    return { answer, fresh };
+  };
+  const noHeader = await refuse((parts) => { parts.header = null; });
+  ok("a section with no header to take the label's style from refuses, and makes nothing", /no header/.test(noHeader.answer.problems[0] ?? "") && noHeader.fresh.section.children.length === 3, JSON.stringify(noHeader.answer));
+  const noBand = await refuse((parts) => { parts.usageLabel = null; });
+  ok("a section with no band label to take the style of `Cases` from refuses", /no band label/.test(noBand.answer.problems[0] ?? ""), JSON.stringify(noBand.answer));
+  const noSection = await refuse(() => {}, { unit: "DSOther", setId: null });
+  ok("a unit with no set and no section of its name is refused", /no section named DSOther/.test(noSection.answer.refused ?? ""), JSON.stringify(noSection.answer));
+  const wrongPage = await refuse(() => {}, { pageId: "2:9" });
+  ok("a page that is none is refused", /is not a page/.test(wrongPage.answer.refused ?? ""), JSON.stringify(wrongPage.answer));
+});
+
+// ---- cases.js, the new inputs --------------------------------------------------------------------
+
+console.log("\n=== cases.js — text, modes and replaces, and a unit with no set");
+const newCasesPage = () => {
+  const instances = [];
+  const createInstance = () => {
+    const made = node(`i${instances.length}`, "instance", "INSTANCE");
+    made.set = null; made.modes = [];
+    made.componentProperties = {}; made.explicitVariableModes = {};
+    made.getMainComponentAsync = async () => base;
+    made.setProperties = (values) => { made.set = values; for (const [key, value] of Object.entries(values)) made.componentProperties[key] = { value }; };
+    made.setExplicitVariableModeForCollection = (collection, modeId) => { made.modes.push([collection.name, modeId]); made.explicitVariableModes[collection.id] = modeId; };
+    instances.push(made);
+    return made;
+  };
+  const base = version("5:0", "size=SM", "k0");
+  base.createInstance = createInstance;
+  const set = componentSet("9:1", "DSBtn", "kset", [base], {
+    size: { type: "VARIANT", defaultValue: "SM", variantOptions: ["SM"] },
+    "loading#1:0": { type: "BOOLEAN", defaultValue: false },
+    "label#1:2": { type: "TEXT", defaultValue: "x" },
+  });
+  const old = plantTree(node("4:1", "old=lone", "COMPONENT", { key: "oldkey", x: 20, y: 0, width: 100, height: 40 }, [plantTree(node("4:5", "frame", "FRAME"))]));
+  const sheet = plantTree(node("4:0", "DSBtn cases", "FRAME", { width: 300, height: 40, layoutMode: "HORIZONTAL" }, [old]));
+  const placed = node("6:1", "placed", "INSTANCE", { explicitVariableModes: { "VariableCollectionId:k/8:1": "8:2" } });
+  const section = node("3:1", "Section", "SECTION", {}, [set, sheet, placed]);
+  const figma = figmaFile([pageNode("2:1", "Actions", [section])]);
+  figma.variables = { getVariableCollectionByIdAsync: async (id) => (id === "VariableCollectionId:k/8:1" ? { id, name: "Hue", modes: [{ name: "DEFAULT", modeId: "8:2" }, { name: "SUCCESS", modeId: "8:5" }] } : null) };
+  const components = [];
+  figma.createComponent = () => { const component = plantTree(node(`c${components.length}`, "", "COMPONENT", { x: 0, y: 0, width: 80, height: 30 })); components.push(component); return component; };
+  return { figma, sheet, old, instances, components, set };
+};
+const oneCase = (changes) => ({ unit: "DSBtn", setId: "9:1", cases: [{ name: "loading=true", base: { size: "SM" }, props: { loading: true }, stands: false, ...changes }] });
+await guard(async () => {
+  const made = newCasesPage();
+  const dry = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }) }, made.figma);
+  same("dry: a `replaces` is told as [old name, new name, id], and the component and its children are as they were", [dry.replaced, dry.made, made.old.name, made.old.children.length], [[["old=lone", "loading=true", "4:1", "FRAME frame", "rebuild"]], [], "old=lone", 1]);
+  const applied = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }), dryRun: false }, made.figma);
+  same("applied: the component is kept with its id and key, loses its children, takes the case's name, holds the new instance, and stays where it was",
+    [made.old.id, made.old.key, made.old.name, made.old.children.length, made.old.children[0].set, made.old.x, made.old.y, made.sheet.children.length, made.components.length, applied.replaced, applied.made],
+    ["4:1", "oldkey", "loading=true", 1, { "loading#1:0": true }, 20, 0, 1, 0, [["old=lone", "loading=true", "4:1", "FRAME frame", "rebuild"]], []]);
+  const again = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }), dryRun: false }, made.figma);
+  same("sent twice: the case that stands is `stood`, and the instance is not made again", [again.stood, again.replaced, made.old.children.length], [["loading=true"], [], 1]);
+});
+await guard(async () => {
+  const gone = newCasesPage();
+  const none = await run("cases.js", { spec: oneCase({ replaces: "nothing here" }), dryRun: false }, gone.figma);
+  ok("a `replaces` that names nothing on the sheet is a problem, and the case is not made", /stands on the sheet as no component/.test(none.problems[0] ?? "") && none.made.length === 0 && gone.components.length === 0 && gone.old.name === "old=lone", JSON.stringify(none));
+  const twice = newCasesPage();
+  const spec = oneCase({ replaces: "old=lone" });
+  spec.cases.push({ name: "loading=false", base: { size: "SM" }, props: { loading: false }, stands: false, replaces: "old=lone" });
+  const claimed = await run("cases.js", { spec, dryRun: false }, twice.figma);
+  same("one component replaced by two cases: the second is a problem, and is made nowhere", [claimed.replaced.length, claimed.problems.length, twice.components.length], [1, 1, 0]);
+  const text = newCasesPage();
+  const texted = await run("cases.js", { spec: oneCase({ text: { label: "Open file" } }), dryRun: false }, text.figma);
+  same("a text property is set by its name, with its full key, together with the other properties", [text.instances[0].set, texted.problems], [{ "loading#1:0": true, "label#1:2": "Open file" }, []]);
+  const notText = await run("cases.js", { spec: oneCase({ text: { loading: "x" } }) }, newCasesPage().figma);
+  ok("a `text` that names a property that is no text is a problem", /not a text/.test(notText.problems[0] ?? ""), JSON.stringify(notText));
+  const swapped = await run("cases.js", { spec: oneCase({ swap: { endIcon: "DSIcon / SETTINGS" } }) }, newCasesPage().figma);
+  ok("a non-empty `swap` is a problem and the case is not made; an empty one is no problem", /swap is set by hand/.test(swapped.problems[0] ?? "") && swapped.made.length === 0, JSON.stringify(swapped));
+  const emptied = await run("cases.js", { spec: oneCase({ swap: {}, text: {}, modes: {} }) }, newCasesPage().figma);
+  same("an empty `swap`, `text` and `modes` change nothing about a case", [emptied.problems, emptied.made.map((one) => one[0])], [[], ["loading=true"]]);
+});
+await guard(async () => {
+  const mode = newCasesPage();
+  const dry = await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }) }, mode.figma);
+  same("dry: a mode that exists is no problem, and nothing is set", [dry.problems, mode.instances.length], [[], 0]);
+  await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }), dryRun: false }, mode.figma);
+  same("applied: the collection is found by its name among the instances of the section and the mode by its name, and set on the instance", mode.instances[0].modes, [["Hue", "8:5"]]);
+  const unknownMode = await run("cases.js", { spec: oneCase({ modes: { Hue: "PURPLE" } }), dryRun: false }, newCasesPage().figma);
+  ok("a mode the collection does not hold is a problem naming the modes it holds, and the case is not made", /holds no mode "PURPLE" \(it holds DEFAULT, SUCCESS\)/.test(unknownMode.problems[0] ?? "") && unknownMode.made.length === 0, JSON.stringify(unknownMode));
+  const unknownCollection = await run("cases.js", { spec: oneCase({ modes: { Tone: "left" } }), dryRun: false }, newCasesPage().figma);
+  ok("a collection that no instance carries is a problem, and the case is not made", /carries the collection "Tone"/.test(unknownCollection.problems[0] ?? "") && unknownCollection.made.length === 0, JSON.stringify(unknownCollection));
+});
+await guard(async () => {
+  const made = newCasesPage();
+  const lone = plantTree(node("8:1", "DSLone", "COMPONENT", { key: "lk", width: 10, height: 10 }));
+  Object.defineProperty(lone, "componentPropertyDefinitions", { get() { return { "open#2:0": { type: "BOOLEAN", defaultValue: false } }; } });
+  const instance = node("i9", "instance", "INSTANCE");
+  instance.setProperties = (values) => { instance.set = values; };
+  lone.createInstance = () => instance;
+  const sheet = plantTree(node("4:8", "DSLone cases", "FRAME", { width: 100, height: 40, layoutMode: "VERTICAL" }, []));
+  made.figma.root.children[0].children[0].children.push(lone, sheet);
+  lone.parent = sheet.parent = made.figma.root.children[0].children[0];
+  const everything = made.figma.getNodeByIdAsync;
+  made.figma.getNodeByIdAsync = async (id) => (id === "8:1" ? lone : id === "4:8" ? sheet : everything.call(made.figma, id));
+  const answer = await run("cases.js", { spec: { unit: "DSLone", setId: null, loneId: "8:1", cases: [{ name: "open=true", base: {}, props: { open: true }, stands: false }] }, dryRun: false }, made.figma);
+  same("a unit with no set: the case is an instance of the lone component, and the props are its own", [answer.problems, answer.made.map((one) => [one[0], one[2]]), instance.set], [[], [["open=true", "DSLone"]], { "open#2:0": true }]);
+  const wrongLone = await run("cases.js", { spec: { unit: "DSOther", setId: null, loneId: "8:1", cases: [] } }, made.figma);
+  ok("a lone component that is not the unit is refused", /is not the lone component DSOther/.test(wrongLone.refused ?? ""), JSON.stringify(wrongLone));
+});
+
+await guard(async () => {
+  const instanceIn = (made, main, extra = {}) => {
+    const instance = node("9:9", "DSBtn", "INSTANCE", { explicitVariableModes: {}, componentProperties: {}, getMainComponentAsync: async () => main, swapped: null, overridden: "Open file", ...extra });
+    instance.swapComponent = (target) => { instance.swapped = target.name; };
+    instance.setProperties = (values) => { instance.set = values; };
+    instance.parent = made.old;
+    made.old.children = [instance];
+    return instance;
+  };
+  const right = newCasesPage();
+  const held = instanceIn(right, right.set.children[0], { componentProperties: { "loading#1:0": { value: true } } });
+  const renamed = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }), dryRun: false }, right.figma);
+  same("a component that already holds the right instance is only renamed: the instance, its properties and the layout are not touched", [right.old.name, right.old.children[0] === held, held.set ?? null, held.swapped, renamed.replaced, renamed.problems], ["loading=true", true, null, null, [["old=lone", "loading=true", "4:1", "INSTANCE DSBtn", "rename"]], []]);
+  const same_ = await run("cases.js", { spec: oneCase({}), dryRun: false }, right.figma);
+  same("sent twice, or with the right component under the case's own name: `stood`, and nothing is named different", [same_.stood, same_.stoodDifferent], [["loading=true"], []]);
+  const other = newCasesPage();
+  const second = version("5:1", "size=MD", "k1");
+  second.parent = other.set; other.set.children.push(second);
+  const kept = instanceIn(other, second);
+  const keptAnswer = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }), dryRun: false }, other.figma);
+  same("a component that holds one instance of the unit keeps it: it is swapped to the base, takes the properties, and its overrides stay",
+    [other.old.children[0] === kept, kept.swapped, kept.set, kept.overridden, other.components.length, other.instances.length, keptAnswer.replaced], [true, "size=SM", { "loading#1:0": true }, "Open file", 0, 0, [["old=lone", "loading=true", "4:1", "INSTANCE DSBtn", "keep"]]]);
+  const dryKept = newCasesPage();
+  const dryHeld = instanceIn(dryKept, second);
+  const dryAnswer = await run("cases.js", { spec: oneCase({ replaces: "old=lone" }) }, dryKept.figma);
+  same("dry: what the component holds is told in the fourth item, and nothing is touched", [dryAnswer.replaced[0][3], dryHeld.swapped, dryKept.old.children[0] === dryHeld], ["INSTANCE DSBtn", null, true]);
+  const sameName = newCasesPage();
+  sameName.old.name = "loading=true";
+  const swapped = await run("cases.js", { spec: oneCase({ replaces: "loading=true" }), dryRun: false }, sameName.figma);
+  same("a component of the case's own name that is not right and is named by `replaces` is replaced: id and key kept, rebuilt", [swapped.replaced, swapped.stood, swapped.stoodDifferent, sameName.old.id, sameName.old.key, sameName.old.children.length, sameName.old.children[0].set], [[["loading=true", "loading=true", "4:1", "FRAME frame", "rebuild"]], [], [], "4:1", "oldkey", 1, { "loading#1:0": true }]);
+  const sameRight = newCasesPage();
+  sameRight.old.name = "loading=true";
+  const heldRight = node("9:8", "DSBtn", "INSTANCE", { explicitVariableModes: {}, componentProperties: { "loading#1:0": { value: true } }, getMainComponentAsync: async () => sameRight.set.children[0] });
+  heldRight.parent = sameRight.old;
+  sameRight.old.children = [heldRight];
+  const untouched = await run("cases.js", { spec: oneCase({ replaces: "loading=true" }), dryRun: false }, sameRight.figma);
+  same("the same input with a right component is `stood` and untouched", [untouched.stood, untouched.stoodDifferent, untouched.replaced, sameRight.old.children[0] === heldRight], [["loading=true"], [], [], true]);
+  const stoodWrong = newCasesPage();
+  stoodWrong.old.name = "loading=true";
+  const wrong = await run("cases.js", { spec: oneCase({}) }, stoodWrong.figma);
+  same("a component of the case's own name that is not right stays: `stood`, and named in `stoodDifferent` with what it holds", [wrong.stood, wrong.stoodDifferent, wrong.made], [["loading=true"], [["loading=true", "FRAME frame"]], []]);
+  const modeRight = newCasesPage();
+  const carried = instanceIn(modeRight, modeRight.set.children[0], { componentProperties: { "loading#1:0": { value: true } }, explicitVariableModes: { "VariableCollectionId:k/8:1": "8:5" } });
+  modeRight.old.name = "loading=true";
+  const modeAnswer = await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }) }, modeRight.figma);
+  const modeOther = await run("cases.js", { spec: oneCase({ modes: { Hue: "DEFAULT" } }) }, modeRight.figma);
+  same("a component is right only when its instance carries every wanted mode", [modeAnswer.stoodDifferent, modeOther.stoodDifferent.length, carried.name], [[], 1, "DSBtn"]);
+});
+
+// ---- bundle.mjs with the new scripts -------------------------------------------------------------
+
+console.log("\n=== bundle.mjs — the new scripts, each with two runs");
+await guard(async () => {
+  const folder = join(scratch, "bundle");
+  const send = (path, figma) => new AsyncFunction("figma", readFileSync(path, "utf8"))(figma);
+  const bundled = (script, runs, tag) => {
+    writeFileSync(join(folder, `${tag}.json`), JSON.stringify(runs));
+    const built = runNode("bundle.mjs", ["--script", script, "--inputs", join(folder, `${tag}.json`), "--out", join(folder, tag)]);
+    return { built, path: join(folder, `${tag}.js`) };
+  };
+  const copying = copyPage();
+  const copyRuns = bundled("copy.js", [{ setId: "9:1", unit: "DSBtn", copies: copyOne }, { setId: "9:1", unit: "DSBtn", copies: copyOne, dryRun: false }], "copy-two");
+  const copyFigma = withFile(copying.page);
+  const copyAnswer = await send(copyRuns.path, copyFigma);
+  same("copy.js in a bundle: a dry run then a real run, the page switched once, the copy made by the second", [copyRuns.built.exit, copyAnswer.runs, copyAnswer.answers[0].made[0][1], copyAnswer.answers[1].made.length, copyFigma.switches, copying.set.children.length], [0, 2, null, 1, 1, 3]);
+  const tying = propertyPage();
+  const propertyRuns = bundled("property.js", [yesNo, { ...yesNo, dryRun: false }], "property-two");
+  const propertyAnswer = await send(propertyRuns.path, withFile(tying.page));
+  same("property.js in a bundle: dry then real", [propertyAnswer.answers[0].key, propertyAnswer.answers[1].tied], [null, 2]);
+  const heading = headerPage();
+  const headerRuns = bundled("header.js", [{ unit: "DSBtn", setId: "9:1", layout: layoutNew }, { unit: "DSBtn", setId: "9:1", layout: layoutNew, dryRun: false }], "header-two");
+  const headerAnswer = await send(headerRuns.path, withFile(heading.page));
+  same("header.js in a bundle: dry then real", [headerAnswer.answers[0].now === headerAnswer.answers[1].now, heading.header.characters.includes("MD, LG")], [true, true]);
+  const sheeting = sheetPage();
+  const sheetRuns = bundled("sheet.js", [sheetInputs, { ...sheetInputs, dryRun: false }], "sheet-two");
+  const sheetFigma = sheetFile(sheeting);
+  sheetFigma.setCurrentPageAsync = async () => {};
+  const sheetAnswer = await send(sheetRuns.path, sheetFigma);
+  same("sheet.js in a bundle: dry then real", [sheetAnswer.answers[0].sheet, typeof sheetAnswer.answers[1].sheet], [null, "string"]);
+});
+for (const script of ["copy.js", "property.js", "sheet.js", "header.js"]) {
+  const folder = join(scratch, "bundle");
+  writeFileSync(join(folder, "one.json"), JSON.stringify([{}]));
+  const built = runNode("bundle.mjs", ["--script", script, "--inputs", join(folder, "one.json"), "--out", join(folder, `one-${script}`)]);
+  let parses = false;
+  try { new AsyncFunction("figma", readFileSync(join(folder, `one-${script}.js`), "utf8")); parses = true; } catch { parses = false; }
+  ok(`${script} makes a bundle that is a whole script, under the connector's limit`, built.exit === 0 && parses && readFileSync(join(folder, `one-${script}.js`), "utf8").length < 50000, built.said);
+}
+
 // ---- the texts the agent passes on --------------------------------------------------------------
 
 console.log("\n=== the texts the agent passes on");
-for (const script of ["cases.js", "labels.js"]) {
+for (const script of ["cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js"]) {
   ok(`${script} says in its header that it has not yet run against a file`, /NOT YET RUN AGAINST A FILE/.test(readFileSync(resolve(SCRIPTS, script), "utf8").split("\n").slice(0, 4).join("\n")));
   ok(`${script} is dry by default`, /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, script), "utf8")));
 }
-for (const script of ["versions.js", "instances.js", "apply-spec.js", "cases.js", "labels.js"]) {
+for (const script of ["versions.js", "instances.js", "apply-spec.js", "cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js"]) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} holds one INPUTS block and no console.log, no spnutils`, (body.match(/const INPUTS = \{/g) ?? []).length === 1 && INPUTS_BLOCK.test(body) && !body.includes("console.log") && !body.toLowerCase().includes("spnutils"));
   const block = INPUTS_BLOCK.exec(body)[0];
