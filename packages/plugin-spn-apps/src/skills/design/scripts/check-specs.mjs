@@ -12,6 +12,9 @@
 //   - every placed instance (DS 2, 3, 4 and 5) on a version that goes has a `move` rule, and the version
 //     the rule leads to is one that stays
 //   - each case in `cases` has a `base` that is a version that stays, by its name after the drop
+//   - for a set that loses a version or a property: its `header` is one `layout.js` lays out, every
+//     version that stays has a place of its own in it, and `layoutDefaults` (or else `defaults`) names a
+//     version that stays
 // Prints one line for each fault and a line of counts for each spec. Exit 1 when anything fails.
 //
 // A pattern is an object of `property: value`, where a value may be a list of values; a version matches
@@ -45,6 +48,62 @@ const cellsOf = (name) => Object.fromEntries(name.split(", ").map((cell) => {
 const nameOf = (cells) => Object.entries(cells).map(([property, value]) => `${property}=${value}`).join(", ");
 const matches = (cells, pattern) => Object.entries(pattern)
   .every(([property, value]) => (Array.isArray(value) ? value : [value]).map(String).includes(cells[property]));
+
+// The faults of a spec's `header` against the versions that stay, read as `layout.js` reads a header: clauses
+// joined by ` · `; `rows: ` and `columns: ` hold factors joined by ` x `, a factor holds cells joined by `, `,
+// a cell is `property=value` or a bare value taking the property before it, ` (default)` marks a default;
+// `one row` and `one column` are a side with one line; any other clause is a note. `layout.js` lays a set
+// out only when every property of the set is named once, each factor names one property, and every version
+// has a place of its own in the cross of the values. `layoutDefaults` (or else `defaults`) must give every
+// property a value, and one version that stays must carry them all: it stands at the top left.
+function headerFaults(spec, kept) {
+  if (typeof spec.header !== "string") return ["the spec gives no `header`"];
+  const sides = { rows: null, columns: null };
+  for (const clause of spec.header.split(" · ").map((part) => part.trim())) {
+    const side = clause === "one row" || clause.startsWith("rows: ") ? "rows" : clause === "one column" || clause.startsWith("columns: ") ? "columns" : null;
+    if (side === null) continue;
+    if (sides[side] !== null) return [`the header states the ${side} twice`];
+    sides[side] = [];
+    if (clause === "one row" || clause === "one column") continue;
+    for (const piece of clause.slice(side.length + 2).split(" x ")) {
+      let property = null;
+      const values = [];
+      for (const raw of piece.split(", ")) {
+        const cut = raw.indexOf("=");
+        if (cut > 0 && property !== null && raw.slice(0, cut).trim() !== property) return [`the header's ${side} hold cells of \`${property}\` and \`${raw.slice(0, cut).trim()}\` in one run, which \`layout.js\` does not lay out`];
+        if (cut > 0) property = raw.slice(0, cut).trim();
+        if (property === null) return [`the header's cell "${raw.trim()}" names no property`];
+        values.push((cut > 0 ? raw.slice(cut + 1) : raw).replace(/\s+\(default\)$/, "").trim());
+      }
+      sides[side].push({ property, values });
+    }
+  }
+  if (sides.rows === null && sides.columns === null) return ["the header states no layout"];
+  const found = [];
+  const stated = [...(sides.rows ?? []), ...(sides.columns ?? [])];
+  const properties = Object.keys(kept[0] ?? {});
+  for (const property of properties) {
+    const count = stated.filter((factor) => factor.property === property).length;
+    if (count !== 1) found.push(`the header names \`${property}\` ${count} times; \`layout.js\` needs it once`);
+  }
+  for (const factor of stated) {
+    if (!properties.includes(factor.property)) found.push(`the header names \`${factor.property}\`, which the set does not hold after the removal`);
+  }
+  if (found.length > 0) return found;
+  const places = new Set();
+  for (const cells of kept) {
+    const outside = stated.find((factor) => !factor.values.includes(cells[factor.property]));
+    if (outside) { found.push(`[${nameOf(cells)}] holds \`${outside.property}=${cells[outside.property]}\`, which the header does not state`); continue; }
+    const place = stated.map((factor) => cells[factor.property]).join("\u0000");
+    if (places.has(place)) found.push(`two versions take the place of [${nameOf(cells)}] in the header's grid`);
+    places.add(place);
+  }
+  const defaults = spec.layoutDefaults ?? spec.defaults ?? {};
+  const missing = properties.filter((property) => defaults[property] === undefined);
+  if (missing.length > 0) found.push(`no default for ${missing.map((property) => `\`${property}\``).join(", ")}: give \`layoutDefaults\`, the defaults of the set as it stands after the removal`);
+  else if (!kept.some((cells) => properties.every((property) => cells[property] === String(defaults[property])))) found.push("no version that stays carries every default, so none can stand at the top left");
+  return found;
+}
 
 // Every set of the versions readings, by node id.
 const sets = new Map();
@@ -93,6 +152,7 @@ for (const file of files) {
   }
   const keptNames = kept.map((version) => nameOf(dropped(version.cells)));
   if (new Set(keptNames).size !== keptNames.length) faults.push("two versions that stay have one name after the drop");
+  if (keptNames.includes("")) faults.push("the drop takes every property out of a version's name: a version of a set needs one, so keep one property and list the lone component under `needsDrawing`");
 
   // Each placed instance on a version that goes: where does it move?
   const goneByKey = new Map(gone.map((version) => [version.key, version]));
@@ -116,6 +176,9 @@ for (const file of files) {
       if (!full) faults.push(`case \`${one.name}\`: no version that stays matches its base`);
     }
   }
+
+  // A set that loses a version or a property is laid out again from its header, so the header is checked.
+  if (gone.length > 0 || (spec.dropProps ?? []).length > 0) faults.push(...headerFaults(spec, keptNames.map(cellsOf)));
 
   totals.today += versions.length; totals.stay += kept.length; totals.go += gone.length; totals.placed += placed;
   totals.cases += (spec.cases ?? []).filter((one) => !one.stands).length; totals.draw += (spec.needsDrawing ?? []).length;

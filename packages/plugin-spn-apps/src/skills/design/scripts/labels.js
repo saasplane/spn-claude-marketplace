@@ -19,9 +19,16 @@
 // It refuses, and changes nothing, when the header names no layout, when a side had no label to take the
 // style from, or when the versions of a row or a column do not share one value for a named property.
 
+//
+//   oldSetBox  the set's box [x, y, width, height] before `layout.js` laid it out (its answer's
+//              `setBoxBefore`). The labels that stood there are found beside that box: a set that
+//              shrank no longer reaches the labels of its old rows and columns, and they would be
+//              left standing. null reads them beside the set as it is now.
+
 const INPUTS = {
   setId: "",
   dryRun: true,
+  oldSetBox: null,
 };
 
 const set = await figma.getNodeByIdAsync(INPUTS.setId);
@@ -52,8 +59,9 @@ const defaults = cellsOf(set.defaultVariant.name);
 // The header is no label of a row or a column, though its layer may be named `label · `.
 const texts = home.children.filter((child) => child.type === "TEXT" && child.name.startsWith("label · ") && child !== header);
 const middle = (node, axis, size) => node[axis] + node[size] / 2;
-const oldRows = texts.filter((text) => text.x + text.width <= set.x && middle(text, "y", "height") >= set.y && middle(text, "y", "height") <= set.y + set.height);
-const oldColumns = texts.filter((text) => text.y + text.height <= set.y && text.y >= set.y - 80 && text.x >= set.x - 1 && text.x <= set.x + set.width);
+const [oldX, oldY, oldWidth, oldHeight] = INPUTS.oldSetBox ?? [set.x, set.y, set.width, set.height];
+const oldRows = texts.filter((text) => text.x + text.width <= oldX && middle(text, "y", "height") >= oldY && middle(text, "y", "height") <= oldY + oldHeight);
+const oldColumns = texts.filter((text) => text.y + text.height <= oldY && text.y >= oldY - 80 && text.x >= oldX - 1 && text.x <= oldX + oldWidth);
 
 const versions = set.children.filter((child) => child.type === "COMPONENT");
 const bands = (axis, size) => {

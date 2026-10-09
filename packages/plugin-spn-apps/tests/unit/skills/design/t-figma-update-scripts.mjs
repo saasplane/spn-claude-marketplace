@@ -189,7 +189,7 @@ console.log("\n=== apply-spec.js — one unit's spec carried out on its set");
 const spec = {
   unit: "DSBtn", setId: "9:1", remove: [{ authzDenied: "DISABLE" }], dropProps: ["authzDenied"],
   move: [{ from: { authzDenied: "DISABLE" }, set: { authzDenied: "ENABLE" } }],
-  header: "rows: size=SM (default), MD", expect: { versionsAfterRemoval: 2 },
+  defaults: { size: "SM" }, header: "rows: size=SM (default), MD", expect: { versionsAfterRemoval: 2 },
 };
 const specPage = () => {
   const versions = [
@@ -262,6 +262,21 @@ await guard(async () => {
   writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, expect: { versionsAfterRemoval: 4 } }));
   const count = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings, "DSBtn"]);
   ok("a unit named on the command line is checked alone, and a wrong expected count is named", count.exit === 1 && /2 versions stay, the spec expects 4/.test(count.said), count.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, header: "rows: size=SM (default), MD drawn once" }));
+  const prose = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("a header that words a value as `layout.js` cannot read it is named, exit 1", prose.exit === 1 && /\[size=MD\] holds `size=MD`, which the header does not state/.test(prose.said), prose.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, header: "one row · one column" }));
+  const unnamed = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("a header that does not name a property the set holds is named, exit 1", unnamed.exit === 1 && /the header names `size` 0 times/.test(unnamed.said), unnamed.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, defaults: { size: "XL" } }));
+  const noDefault = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("defaults that no version that stays carries are named, exit 1", noDefault.exit === 1 && /no version that stays carries every default/.test(noDefault.said), noDefault.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, defaults: { size: "XL" }, layoutDefaults: { size: "SM" } }));
+  const layoutDefault = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("`layoutDefaults` gives the default of the set as it stands after the removal, exit 0", layoutDefault.exit === 0, layoutDefault.said);
+  writeFileSync(join(specs, "DSBtn.json"), JSON.stringify({ ...spec, remove: [{ authzDenied: "DISABLE" }, { size: "MD" }], dropProps: ["authzDenied", "size"], expect: { versionsAfterRemoval: 1 } }));
+  const nameless = runNode("check-specs.mjs", ["--specs", specs, "--readings", readings]);
+  ok("a drop that leaves a version no property is named, exit 1", nameless.exit === 1 && /takes every property out of a version's name/.test(nameless.said), nameless.said);
   const usage = runNode("check-specs.mjs", []);
   same("with no folders it says how it is used and exits 2", usage.exit, 2);
 });
@@ -368,6 +383,13 @@ await guard(async () => {
   lost.home.children = lost.home.children.filter((child) => !child.name.startsWith("label · size"));
   const styleless = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([lost.page]));
   ok("a side with no label to take the style from is told, and nothing is changed", styleless.problems.some((text) => /no row label stood/.test(text)), JSON.stringify(styleless.problems));
+  // the set was laid out again and is now shorter than the rows its old labels stood beside
+  const shrunk = labelsPage();
+  shrunk.home.children.find((child) => child.id === "9:1").height = 60;
+  const short = await run("labels.js", { setId: "9:1" }, figmaFile([shrunk.page]));
+  const whole = await run("labels.js", { setId: "9:1", oldSetBox: [200, 100, 300, 200] }, figmaFile([shrunk.page]));
+  same("a set that shrank: `oldSetBox` finds the labels of the rows it no longer reaches, and without it they would be left standing",
+    [short.removed.includes("size=MD"), whole.removed], [false, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"]]);
 });
 
 // ---- the texts the agent passes on --------------------------------------------------------------
