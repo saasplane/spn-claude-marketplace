@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/04-resources/",
-      "seen": "01bfa493"
+      "seen": "ca56cf88"
     }
   ]
 }
@@ -100,7 +100,7 @@ Carry the application's own `{CODE}` prefix on every cache key you build, and fo
 
 The rule that matters most: **at-least-once delivery, so every consumer is idempotent.**
 
-Make each topic by your module's own migrations — the framework holds no list of topics — and expect publishing or subscribing to a topic no migration made to fail. Pair every topic with an error topic, provisioned together with it, so failed handling always lands somewhere you can inspect. **Put contract Events on the queue only — never Commands, never States.** Publish post-commit only; roll back and you emit nothing. Carry an idempotency key on a cross-module write request you send as an event.
+Make each topic by your module's own migrations — the framework holds no list of topics. A topic is to a queue what a table is to a database: the module that consumes it **MUST** make it by its own migration before anything publishes to it or subscribes to it. No broker and no client creates a missing topic, on a laptop as in a cloud, so publishing or subscribing to a topic that does not exist is an error that names the topic (RD.SUPPORT.APPS.178). Pair every topic with an error topic, provisioned together with it, so failed handling always lands somewhere you can inspect. **Put contract Events on the queue only — never Commands, never States.** Publish post-commit only; roll back and you emit nothing. Carry an idempotency key on a cross-module write request you send as an event.
 
 Make every consumer you write idempotent — short-circuit redelivered work through the event's request key before any effect, so the same event processed twice produces one outcome for you.
 

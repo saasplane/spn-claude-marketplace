@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/10-configuration.md",
-      "seen": "91b4811b"
+      "seen": "111a31bb"
     }
   ]
 }
@@ -106,7 +106,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **Which credential pair a connection opens is the service's choice at boot** — the migration pair for a migrate run, the read-only pair for reporting, the read-write pair otherwise. The store says what exists and never chooses.
 - **The database block's schema list is the grant published as data.** The first entry is the primary schema and the rest are appended to the search path, so unqualified reads resolve. An empty list fails boot with an explicit error.
 - **The application cache block also backs the lock provider.**
-- **The queue's client id derives from the declared code, and the topic list comes from the application's own declaration** — neither is an environment variable. Each declared topic gets a paired error topic built at boot.
+- **The queue's client id derives from the declared code, and a queue connection lists no topics** — no environment variable names either. Each module makes its topics by its own `*-queue-topics` migration, and each topic the migration makes gets a paired error topic. No setting turns automatic topic creation on: the service app's boot builds the provider with it off, so publishing or subscribing to a topic that does not exist is an error that names the topic (RD.SUPPORT.APPS.178).
 - **No bucket fact publishes for storage.** The bucket is the world's derived store name, and a key never names one.
 
 **The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved.

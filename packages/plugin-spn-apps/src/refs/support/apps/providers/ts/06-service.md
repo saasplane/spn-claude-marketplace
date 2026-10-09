@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "69c31d3e"
+      "seen": "e03f6ec0"
     }
   ]
 }
@@ -225,7 +225,7 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Let the listener rehydrate the originating actor** through the auth provider's `prepareAuthUser`, so authorization, context reads and audit stamping behave as they do online. The queue carries the base passport, so either kind of caller travels, a person acting in an organization or a person outside any, and a passport the identity module does not vouch for throws. Use the plain listener for a system topic with no actor.
 
-**A topic is pre-created by a migration.** Publishing or subscribing to an undeclared topic is an error, and the subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
+**A topic is made first by the consuming module's `*-queue-topics` migration, as a table is.** The service app's boot builds the queue provider with `allowAutoTopicCreation` set to `false`, and the broker does not create a topic either, so nothing makes a missing topic. Publishing or subscribing to a topic that does not exist is an error that names the connection and the topic (RD.SUPPORT.APPS.178). The subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
 
 **The queue re-enters the module through a deliberately ungated handler** that delegates to the private implementation, because the producer already authorized at request time. Keep it off the API surface, and say in a comment why it is ungated — an unexplained ungated public method reads as a security bug.
 
