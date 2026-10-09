@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "c906fb06"
+      "seen": "07a7f6de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "5c6bfe2f"
+      "seen": "2ea32f1d"
     }
   ]
 }
@@ -31,9 +31,9 @@ Read this before you add a token or a block to the library, or before you ask wh
 | A unit's section | the Figma section that holds one unit and everything the unit owns, named as the unit. It is a different thing from a block of the design system, which a unit's set draws |
 | Shared parts | the last section of a page, which holds a part that two or more units on the page use |
 
-## The files, by layer — 🔮
+## The files, by layer
 
-The design library holds one file for each layer of the design system that is drawn, and one for drafts. Five of the six layers are drawn: Core, Components, Widgets, Containers and Layouts. The sixth layer, App, has no file of its own: the choices of the theme are variables, so Core holds them, and the rest of the app's contract stays in words.
+A library holds one file for each layer that is drawn, and one for drafts. SaaS Plane's design system has five that are published (Core, Components, Widgets, Containers and Layouts) and one for drafts (Lab) that is never published, and the tool's inventories are of the published files. Five of the six layers are drawn: Core, Components, Widgets, Containers and Layouts. The sixth layer, App, has no file of its own: the choices of the theme are variables, so Core holds them, and the rest of the app's contract stays in words.
 
 | File | Holds | May use |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ The design library holds one file for each layer of the design system that is dr
 | Layouts | the layout, in each of its types | every file before it |
 | Lab | drafts of large changes | any published file |
 
-A file can use only what another file has published. SaaS Plane's own library is six files in Figma, in the **Design System** folder of the SaaS Plane team, and a link opens only for a person with a seat on that team:
+A file can use only what another file has published. SaaS Plane's own library is the five published files and the file for drafts, in the **Design System** folder of the SaaS Plane team, and a link opens only for a person with a seat on that team:
 
 | File | Its pages |
 | --- | --- |
@@ -57,15 +57,17 @@ A file can use only what another file has published. SaaS Plane's own library is
 
 Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
 
-## Color is a mode, and the rest are properties — 🔮
+The organisation of a library file that the book states holds for any library, the builder's and a partner's own: a page for a group, a section for a unit with its header, set, Usage, Cases and Parts, the distances, the names of labels and cases, and the checks before a publish. Which files a library is divided into is the builder's for its design system and a partner's own for a library of its own. A partner's library uses the builder's published library and never edits it.
+
+## Color is a mode, and the rest are properties
 
 In the design library, `color` is a variable mode. `variant`, `size` and the state are properties. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
 
-## What stays in words — 🔮
+## What stays in words
 
 The library holds the pictures, the properties and the variables. It draws every case a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the five formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
 
-## A value held worked out — 🔮
+## A value held worked out
 
 The primary ramp comes from one seed by a formula, and the radius of each size step comes from one base value. A variable of the library holds a value or a pointer to another variable, so the library holds the worked-out values, and the rule that produces them stays in words.
 
@@ -286,7 +288,7 @@ A developer does not work in the design library by hand.
 
 - **A unit changes: a prop, a value or a look.** The connector changes it, under the rules below, so that the library holds the same change for every version of the unit.
 - **A case the showcase shows is a unit with its prop values set.** Place it as instances of the unit, and never draw it as a new look. A case drawn as a new look would be a second look for the same unit.
-- **A use case, a page or a pattern built from units is not synchronised with a stack.** Compose it on request from the published library, in a file that is not a library file. It is never put into one of the six library files.
+- **A use case, a page or a pattern built from units is not synchronised with a stack.** Compose it on request from the published library, in a file that is not a library file. It is never put into one of the library files.
 
 ### A builder manages the library, and a partner uses it
 
@@ -575,6 +577,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, usage, cases and parts in a fixed order and at fixed distances |
 | `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |
 | `RD.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
+| `RD.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
 
 ## Proof
 
