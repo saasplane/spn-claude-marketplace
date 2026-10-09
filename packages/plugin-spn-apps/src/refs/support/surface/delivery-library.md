@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "3e679ebf"
+      "seen": "1541fcdd"
     }
   ]
 }
@@ -194,7 +194,7 @@ A rule of the comparison removes a gap only when a named fact proves it, such as
 
 | Rule | What it removes |
 | --- | --- |
-| Leave out what is not a unit | an icon drawn as a component, a private part whose name starts with a dot, a named part of a unit, and an item that a host draws once for each entry |
+| Leave out what is not a unit | an icon drawn as a component, a private part whose name starts with a dot, a named part of a unit, an item that a host draws once for each entry, and a case, which is told by its name: `property=value` cells joined by `, ` |
 | Read the props the stack declares | a prop that the stack declares as a text, a number, a list or an object, which the first reading did not see |
 | A shown state is a picture and never a prop | a state the library draws as a picture, counted by the first reading as a prop |
 | A switch of the library is the prop of the stack | a switch such as `close` for `onClose`, and a presence switch whose prop the stack derives |
@@ -433,7 +433,7 @@ These three rules and the layout rules above do not conflict, because they cover
 - **Whatever adds versions to a set MUST place them in the grid as the label's order gives, and MUST prove that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The connector's facts state that combined versions sit on one another.
 - **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out.
 - **A set MUST NOT be grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
-- **Where a property would multiply a set and the stack shows each of its values as one look, draw the values as cases on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is still a unit with its prop values set.
+- **Where a property would multiply a set and the stack shows each of its values as one look, draw the values as cases on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
 
 ### A label
 
@@ -470,7 +470,7 @@ header · DSProgress — the progress bar · rows: size=SM (default), XS, MD, LG
 
 - **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's usage, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
 - **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
-- **A case is not a unit and is never published as one.** It MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
+- **A case is not a unit and is never published as one.** A case is one drawing of a unit with some of its property values set, and it is named by the values it shows, as cells `property=value` joined by `, `. A comparison never counts a case as a unit. A case MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
 
 How the library keeps to the last rule is stated as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The files that hold cases are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
 
