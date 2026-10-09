@@ -243,6 +243,48 @@ await guard(async () => {
   ok("an instance with no rule is a problem: it stays, and the version it stands on is not removed", noRule.problems.length === 2 && noRule.removed === 1 && unmoved.set.children.length === 3, JSON.stringify([noRule.problems, noRule.removed]));
 });
 
+// ---- names.js ------------------------------------------------------------------------------------
+
+console.log("\n=== names.js — the names of a set's versions changed, and nothing else");
+const namesPage = () => {
+  const versions = [
+    version("5:0", "size=SM, validationType=none, selected=false, state=rest", "k0"), version("5:1", "size=SM, validationType=ERROR, selected=false, state=rest", "k1"),
+    version("5:2", "size=SM, validationType=none, selected=true, state=rest", "k2"), version("5:3", "size=MD, validationType=none, selected=false, state=rest", "k3"),
+  ];
+  const set = componentSet("9:1", "DSBtn", "kset", versions);
+  return { page: pageNode("2:1", "Actions", [node("3:1", "Section", "SECTION", {}, [set])]), set };
+};
+const nameOps = [{
+  renameProperty: { validationType: "tone" }, renameValue: [{ property: "tone", from: "ERROR", to: "error" }],
+  fold: [{ match: { selected: "true", state: "rest" }, set: { state: "selected" } }, { match: {}, set: { disabled: "false" } }], dropProperty: ["selected"],
+}];
+await guard(async () => {
+  const made = namesPage();
+  const dry = await run("names.js", { setId: "9:1", unit: "DSBtn", ops: nameOps }, figmaFile([made.page]));
+  same("dry is the default: it says how many names would change, and changes none", [dry.dryRun, dry.versions, dry.renamed, dry.problems, made.set.children[0].name], [true, 4, 4, [], "size=SM, validationType=none, selected=false, state=rest"]);
+  const applied = await run("names.js", { setId: "9:1", unit: "DSBtn", ops: nameOps, dryRun: false }, figmaFile([made.page]));
+  same("applied: a property and a value are renamed, a difference is folded into another property, a property is added last, and a property leaves",
+    made.set.children.map((one) => one.name),
+    ["size=SM, tone=none, state=rest, disabled=false", "size=SM, tone=error, state=rest, disabled=false", "size=SM, tone=none, state=selected, disabled=false", "size=MD, tone=none, state=rest, disabled=false"]);
+  same("applied: the versions keep their ids and keys, and the answer names the properties after", [made.set.children.map((one) => [one.id, one.key]), applied.propertiesAfter], [[["5:0", "k0"], ["5:1", "k1"], ["5:2", "k2"], ["5:3", "k3"]], ["size", "tone", "state", "disabled"]]);
+});
+await guard(async () => {
+  const lone = namesPage();
+  lone.set.children.forEach((one) => { one.name = one.name.replace("size=SM, ", "").replace("size=MD, ", "kind=wide, "); });
+  lone.set.children.forEach((one) => { one.name = one.name.replace("kind=wide, ", ""); });
+  lone.set.children[3].name = "validationType=none, selected=false, state=hover";
+  await run("names.js", { setId: "9:1", unit: "DSBtn", ops: [{ fold: [{ match: {}, set: { size: "SM" } }] }], dryRun: false }, figmaFile([lone.page]));
+  same("a property named `size` that the versions do not hold is added first in the name", lone.set.children[0].name, "size=SM, validationType=none, selected=false, state=rest");
+  const clash = namesPage();
+  const refused = await run("names.js", { setId: "9:1", unit: "DSBtn", ops: [{ dropProperty: ["selected"] }], dryRun: false }, figmaFile([clash.page]));
+  ok("two versions that would have one name refuse the change, and nothing is renamed", /two versions would be named/.test(refused.problems[0] ?? "") && clash.set.children[2].name.includes("selected=true"), JSON.stringify(refused.problems));
+  const uneven = namesPage();
+  const partly = await run("names.js", { setId: "9:1", unit: "DSBtn", ops: [{ fold: [{ match: { size: "MD" }, set: { extra: "yes" } }] }], dryRun: false }, figmaFile([uneven.page]));
+  ok("a property added to some versions only refuses the change", partly.problems.some((text) => /not all hold the same properties/.test(text)) && !uneven.set.children[3].name.includes("extra"), JSON.stringify(partly.problems));
+  const wrong = await run("names.js", { setId: "9:1", unit: "DSOther", ops: [] }, figmaFile([namesPage().page]));
+  ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
+});
+
 // ---- bundle.mjs ----------------------------------------------------------------------------------
 
 console.log("\n=== bundle.mjs — one call out of one script and several fillings of its inputs");
