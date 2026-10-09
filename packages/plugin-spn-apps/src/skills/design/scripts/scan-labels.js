@@ -1,42 +1,35 @@
-// The inventory of one page of a library file: what the agent keeps of it. It is not the scan (`scan-labels.js`,
-// `scan-placement.js`, `scan-properties.js` and `scan-sets.js` are the scan, one part for a call) and it is not the
-// inventory the tool takes in (`inventory.js` and `tokens.js` give that one).
+// The scan before a publish, part 1 of 4: the labels, the headers, and what each unit owes.
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and `return`, no
-// wrapper. Fill INPUTS, change nothing else. Never writes to the file.
+// wrapper. Fill INPUTS, change nothing else. Never writes to the file. It is one part of the scan before a publish:
+// the scan is sent as its parts, one for a call, because the whole was too large to send (the connector's limit for
+// a call is 50,000 characters). Each part reads the whole page it needs, holds the findings named below, and answers
+// with the same finding names and the same { count, items } for each as the whole scan gave. A page is clean when
+// every part says `clean`.
 //
 //   pageId null      lists the file's pages (id, name) and stops. No page switch.
-//   (The connector refuses a returned value over 20,480 bytes: keep `maxBytes` at 16000 or under. An inventory
-//   of a page of about 100 nodes takes three ranges, each continued from `next`.)
-//   The answer holds what the book's inventory holds for the agent's own work: the page, each set and lone component,
-//   each sheet of cases, each label with its layer name, full text and the unit it names, each usage, each section,
-//   each reference frame and every other node. Every node carries `index`, its place in the page's order (the walk
-//   down through the sections), `name`, its layer name, and, inside a section, `parent`, that section's id.
-//   `from` and `to` take a range of nodes by `index`, and the answer stops by itself before `maxBytes`, returning
-//   `next` to continue from.
+//   only: "<finding>" returns that finding's whole list instead, from `from`, at most `count` items and as many as
+//                    fit `answerBytes`; `next` continues. Only a finding this part holds can be asked of it.
+//   (The connector refuses a returned value over 20,480 bytes: `answerBytes` stays 18000 or under. The lists give up
+//   items, down to 3 and then to counts alone, the counts always whole; `shortened` says what was left out.)
 //
-// The form of a page is `sections` when its top level holds a section, `flat` when it holds nodes and no section (the
-// old form), `empty` when it holds nothing. A page is read in either form: the walk goes through sections, and
-// sections inside sections for parts, and stops at every other node.
+// Holds: labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels, unitsWithoutHeader, usagesNamingNoUnit, unitsWithoutCases, unitsWithoutUsage, emptyReading.
+//          It also answers `read`: what the page holds, counted by kind. `unitsWithoutCases` does not block. `unitsWithoutUsage` blocks:
+//          it names each top-level unit with no usage (a part owes none; a unit drawn as cases alone, with no component in its
+//          section, takes its first case for its usage). A scan that found no unit is not clean: `emptyReading` says so.
 //
-// Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the sections
-// above it). A set's versions carry their own box inside the set.
-//
-// A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a label (a text that is a
-// header, a row label, a column label or a band's label), a usage (`usage · ...`), a reference frame (a frame on a
-// page that holds no set and no component), or other. A header's layer is `header · <Unit>`; every other label's is
-// `label · <text>`, a sheet's label (`<unit> cases — ...`, part `sheet`) included, and it stands in the Cases band. A
-// usage's name begins with its unit's name.
-//
-// A row label belongs to the row it sits by and a column label to the column it sits by: the label's centre must lie
-// inside the span of one row (or column) of a set's versions, with the label beside the set (left or right of it for a
-// row, above or below for a column) and at most `labelReach` from it.
+// Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the
+// sections above it). A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a
+// label (a text that is a header, a row label, a column label or a band's label), a usage (`usage · ...`), a
+// reference frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray.
 
 const INPUTS = {
   pageId: null,
+  findingItems: 25,
+  answerBytes: 18000,
+  only: null,
   from: 0,
-  to: null,
-  maxBytes: 16000,
+  count: null,
   labelReach: 400,
 };
 
@@ -293,6 +286,18 @@ function unitOfUsage(node) {
 const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name)));
 // ---- the page's reading: end
 
+const PART = "labels";
+const NOT_BLOCKING = ["unitsWithoutCases"];
+
+function parseVersionName(name) {
+  const values = {};
+  for (const part of name.split(", ")) {
+    const cut = part.indexOf("=");
+    if (cut > 0) values[part.slice(0, cut)] = part.slice(cut + 1);
+  }
+  return values;
+}
+
 // One set, read once. The definitions come from the set, inside a try, because they throw from a
 // version. The default version is the one Figma reports; the top left is the one found by position.
 // One set, read once. The definitions come from the set, inside a try, because they throw from a
@@ -321,77 +326,144 @@ function readSet(set) {
   return { set, versions, definitions, readError, props, defaultVersion, topLeftVersion: topLeft?.name ?? null };
 }
 
-function hex(color) {
-  return "#" + [color.r, color.g, color.b]
-    .map((channel) => Math.round(channel * 255).toString(16).padStart(2, "0")).join("");
-}
-
-function groundOf(paints) {
-  if (paints === figma.mixed) return "mixed";
-  return paints.map((paint) => ({ type: paint.type, variableId: paint.boundVariables?.color?.id ?? null }));
-}
-
-function backgroundOf(node) {
-  const paints = node.backgrounds;
-  if (!paints || paints === figma.mixed) return null;
-  return paints.map((paint) => ({
-    type: paint.type, color: paint.color ? hex(paint.color) : null, opacity: paint.opacity ?? 1,
-  }));
-}
-
 const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", usage: "usages", section: "sections", reference: "references", other: "others" };
+const captions = entries.filter((entry) => entry.kind === "usage" && entry.node.type === "TEXT").length;
+const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
+read.usages -= captions;
+const SCAN_FACTS = { read: { topLevel: topLevel.length, ...read, usageLabels: captions } };
 
-function inventoryEntry(entry) {
-  const { node, kind, box, index } = entry;
-  const base = { kind, id: node.id, index, name: node.name, box, ...(entry.parentId ? { parent: entry.parentId } : {}) };
-  if (kind === "set") {
-    const read = readSet(node);
-    return {
-      ...base, props: read.props, readError: read.readError,
-      versionCount: read.versions.length, defaultVersion: read.defaultVersion, topLeftVersion: read.topLeftVersion,
-      ground: { fills: groundOf(node.fills), strokes: groundOf(node.strokes) },
-    };
+async function scanFindings() {
+  const defaultNotLabels = [];
+  for (const entry of sets) {
+    const read = readSet(entry.node);
+    const set = entry.node;
+    // The default each label names, against the default version Figma reports: the value before the mark.
+    const named = [];
+    for (const label of labelEntries) {
+      const belongs = (label.part === "header" && label.unit === set.name) || label.setId === set.id;
+      if (!belongs) continue;
+      const cut = label.text.indexOf(UNIT_SEPARATOR);
+      const body = label.part !== "header" ? label.text : cut > 0 ? label.text.slice(cut + UNIT_SEPARATOR.length) : "";
+      named.push(...defaultMarksOf(body));
+    }
+    if (named.length > 0 && read.defaultVersion !== null) {
+      // A long value may be named by its words before its first `: `, so the default carries both.
+      const carried = Object.values(parseVersionName(read.defaultVersion)).flatMap((value) => [value, value.split(": ")[0]]);
+      const wrong = named.filter((mark) => !mark.candidates.some((candidate) => carried.includes(candidate)));
+      if (wrong.length > 0) defaultNotLabels.push({ set: set.id, labelNames: wrong.map((mark) => mark.value), defaultVersion: read.defaultVersion });
+    }
   }
-  if (kind === "component") return { ...base, ground: { fills: groundOf(node.fills), strokes: groundOf(node.strokes) } };
-  if (kind === "sheet") {
-    const cases = node.children.filter((child) => !isSheetLabel(child));
-    return { ...base, cases: cases.map((child) => ({ name: child.name, kind: child.type })) };
-  }
-  if (kind === "label") {
-    const found = labelOf.get(entry);
-    return {
-      ...base, text: found.text, unit: found.unit, unitVia: found.via, part: found.part,
-      ...(found.form ? { form: found.form } : {}), ...(found.reason ? { reason: found.reason } : {}),
-    };
-  }
-  if (kind === "usage") return { ...base, nodeType: node.type, unit: unitOfUsage(node) };
-  if (kind === "section") return { ...base, nodeType: node.type, children: node.children.length };
-  return { ...base, nodeType: node.type };
+
+  // Only a header names a unit. A row label and a column label name values, so they are never "elsewhere".
+  const labelsUnitElsewhere = labelEntries.filter((label) => (label.part === "header" || label.part === "sheet") && !label.onPage)
+    .map((label) => ({ label: label.entry.node.id, unit: label.unit, text: label.text.slice(0, 80) }));
+  const labelLayerNames = labelEntries.flatMap((label) => {
+    const name = label.entry.node.name;
+    if (label.part === "header" && name.startsWith(HEADER_PREFIX)) {
+      return name === HEADER_PREFIX + label.unit ? [] : [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `header · ` and the unit's name" }];
+    }
+    if (label.part === "header" && form === "sections") return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name of a header is `header · ` and the unit's name" }];
+    if (!name.startsWith(LABEL_PREFIX)) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name has no `label · ` prefix" }];
+    if (name !== LABEL_PREFIX + label.text) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `label · ` and the text" }];
+    return [];
+  });
+  const labelsFormCannotSay = labelEntries.filter((label) => label.part === "header" && label.form === "cannot say" && sets.some((set) => set.node.name === label.unit))
+    .map((label) => ({ label: label.entry.node.id, unit: label.unit, reason: label.reason }));
+  // A unit whose versions draw everything it can show owes no sheet, so `unitsWithoutCases` is a count that does not
+  // block. A top-level unit owes a usage, which shows its primary use, so `unitsWithoutUsage` blocks. A part (a unit in a
+  // section inside a section, a name that starts with a dot, or a unit in `Shared parts`) owes neither.
+  const sectionNameOf = (id) => entries.find((candidate) => candidate.node.id === id)?.node.name ?? null;
+  const topUnits = form !== "sections" ? [] : [...unitEntryByName].filter(([name, entry]) =>
+    entry.parentId !== null && entry.depth < 2 && !name.startsWith(".") && sectionNameOf(entry.parentId) !== "Shared parts");
+  const unitsWithoutCases = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.parentId === entry.parentId &&
+    ((candidate.kind === "sheet" && candidate.node.name === name + SHEET_SUFFIX) || (candidate.kind === "component" && CASE_NAME.test(candidate.node.name)))))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  // A unit drawn as cases alone (a sheet, and no component in its section) takes its first case for its usage.
+  const drawnAsCasesAlone = (entry) => entry.kind === "sheet" && entry.node.children.some((child) => !isSheetLabel(child)) &&
+    !unitEntries.some((candidate) => candidate.parentId === entry.parentId);
+  const unitsWithoutUsage = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !entries.some((candidate) => candidate.kind === "usage" &&
+    candidate.parentId === entry.parentId && unitOfUsage(candidate.node) === name))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  // A set or a lone component is a unit, and a unit has a header. A case component is no unit.
+  const headed = new Set(labelEntries.filter((label) => label.part === "header").map((label) => label.unit));
+  const unitsWithoutHeader = [...unitEntryByName].filter(([name]) => !headed.has(name))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const usagesNamingNoUnit = entries.filter((entry) => entry.kind === "usage" && unitOfUsage(entry.node) === null)
+    .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
+  const kinds = (kind) => entries.filter((entry) => entry.kind === kind).length;
+  const emptyReading = kinds("set") + kinds("component") + kinds("sheet") === 0
+    ? [{ page: page.id, nodes: entries.length, why: "the scan found no set, no lone component and no sheet of cases, so it checked no unit" }]
+    : [];
+
+  return {
+    emptyReading, usagesNamingNoUnit, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
+    unitsWithoutHeader, unitsWithoutCases, unitsWithoutUsage,
+  };
 }
 
-
-// The inventory of a range of the page's nodes, in the order of the walk down through the sections. It stops before `budget` bytes and says where to go on. With
-// `allowFirst` false, not even the first node is taken when it does not fit.
-function inventory(budget, allowFirst) {
-  const from = INPUTS.from ?? 0;
-  const to = Math.min(INPUTS.to ?? entries.length, entries.length);
-  const groups = Object.fromEntries(Object.values(GROUP_OF).map((group) => [group, []]));
+const allFindings = await scanFindings();
+// ---- the answer's bounds: begin (this block is the same in every scan part)
+// `SCAN_FACTS` is what the part adds beside its findings; `allFindings` is every finding of the part, whole.
+function finding(items, limit) {
+  return { count: items.length, items: items.slice(0, limit) };
+}
+// UTF-8 bytes of the JSON, which is what the connector measures.
+const utf8Of = (value) => {
+  let bytes = 0;
+  for (const char of JSON.stringify(value)) { const code = char.codePointAt(0); bytes += code < 0x80 ? 1 : code < 0x800 ? 2 : code < 0x10000 ? 3 : 4; }
+  return bytes;
+};
+const scanShown = (limits) => {
+  const findings = {};
+  for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limits[name] ?? INPUTS.findingItems);
+  const blocking = Object.entries(allFindings).filter(([name]) => !NOT_BLOCKING.includes(name));
+  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, ...SCAN_FACTS, findings };
+};
+// The default scan answer, under `answerBytes`: the longest lists (by their items' bytes) give up an item at a time down
+// to 3, then every list goes to its count alone. The counts stay whole; `shortened` says what was left out and how to ask.
+function scanBounded() {
+  const limits = {};
+  const build = () => {
+    const scan = scanShown(limits);
+    const left = {};
+    for (const [name, one] of Object.entries(scan.findings)) if (one.count > one.items.length) left[name] = one.count - one.items.length;
+    if (Object.keys(left).length > 0) scan.shortened = { itemsLeftOut: left, askForOneWhole: 'run again with only: "<finding>" (and from, count to page it)' };
+    return scan;
+  };
+  let scan = build();
+  while (utf8Of(scan) > INPUTS.answerBytes) {
+    let worst = null;
+    let heaviest = 0;
+    for (const [name, one] of Object.entries(scan.findings)) {
+      const weight = one.items.length > 3 ? utf8Of(one.items) : 0;
+      if (weight > heaviest) { heaviest = weight; worst = name; }
+    }
+    if (worst !== null) limits[worst] = scan.findings[worst].items.length - 1;
+    else for (const name of Object.keys(allFindings)) limits[name] = 0;
+    const next = build();
+    if (worst === null && utf8Of(next) === utf8Of(scan)) break;
+    scan = next;
+  }
+  return scan;
+}
+// One finding's whole list, from `from`, `count` items at most (and as many as fit `answerBytes`); `next` continues.
+function onlyFinding(name) {
+  const items = allFindings[name];
+  if (items === undefined) return { error: `only names no finding of this part: ${name}`, findings: Object.keys(allFindings) };
+  const first = Math.min(INPUTS.from, items.length);
+  const shown = [];
   let used = 0;
   let next = null;
-  for (let index = from; index < to; index += 1) {
-    const item = inventoryEntry(entries[index]);
-    const size = JSON.stringify(item).length + 1;
-    const fits = used + size <= budget;
-    if (!fits && (used > 0 || !allowFirst)) { next = index; break; }
+  for (let index = first; index < items.length; index += 1) {
+    const size = utf8Of(items[index]) + 1;
+    if (shown.length >= (INPUTS.count ?? Infinity) || (shown.length > 0 && used + size > INPUTS.answerBytes)) { next = index; break; }
     used += size;
-    groups[GROUP_OF[entries[index].kind]].push(item);
+    shown.push(items[index]);
   }
-  return { range: [from, next ?? to], topLevelCount: topLevel.length, nodeCount: entries.length, next, ...groups };
+  return { finding: name, count: items.length, from: first, next, items: shown };
 }
-
-return {
-  page: { id: page.id, name: page.name, background: backgroundOf(page) },
-  form,
-  readAt: new Date().toISOString(),
-  inventory: inventory(INPUTS.maxBytes, true),
-};
+const answer = { part: PART, page: { id: page.id, name: page.name }, form, readAt: new Date().toISOString() };
+if (INPUTS.only !== null) answer.only = onlyFinding(INPUTS.only);
+else answer.scan = scanBounded();
+return answer;
+// ---- the answer's bounds: end

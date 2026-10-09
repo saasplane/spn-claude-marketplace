@@ -120,13 +120,48 @@ function file(pages) {
 const page = (id, name, children, backgrounds = [{ type: "SOLID", color: { r: 0.12, g: 0.12, b: 0.12 }, opacity: 1 }]) =>
   ({ id, name, children, backgrounds });
 
-async function run(script, inputs, figma) {
+async function runFile(script, inputs, figma) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   // an input the case does not give keeps the script's own default, as it does when an agent fills only some
   const defaults = new Function(`return ${INPUTS_BLOCK.exec(body)[0].slice("const INPUTS = ".length, -1)}`)();
   const filled = body.replace(INPUTS_BLOCK, () => `const INPUTS = ${JSON.stringify({ ...defaults, ...inputs })};`);
   return new AsyncFunction("figma", filled)(figma);
 }
+
+// The scan is sent as its parts, one for a call. `run("page.js", { report: "scan" })` sends every part and puts the
+// answers together as the whole scan answered before it was cut, so a case reads one scan. The findings stand in the
+// order the whole scan gave them; a page is clean when every part is.
+const SCAN_PARTS = ["scan-labels.js", "scan-placement.js", "scan-properties.js", "scan-sets.js"];
+const FINDING_ORDER = ["emptyReading", "usagesNamingNoUnit", "versionsOutside", "versionPairsMeeting", "topLevelPairsMeeting", "strays", "defaultNamedProperties", "unreadableSets", "setsOverLimit", "emptyVersions", "emptyCases",
+  "badCaseNames", "duplicateCaseNames", "labelsUnitElsewhere", "labelLayerNames", "labelsFormCannotSay", "defaultNotLabels",
+  "topLevelNotSection", "meetingInSection", "sectionOutOfOrder", "unitsWithoutHeader", "outsideUnitSection",
+  "childOutsideSection", "unitsWithoutCases", "unitsWithoutUsage", "propertyNotDrawn", "propertyClearedByNameAlone", "behaviourNamesHeldProperty", "versionNotWired", "versionDiffersFromDefault", "versionSlotIsFrame", "versionTiedToAnotherProperty", "propertyTiedToNothing", "usagesWithoutCaption", "partSectionTooWide"];
+const NOT_BLOCKING_ORDER = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"];
+async function runScan(inputs, figma) {
+  const answers = [];
+  for (const part of SCAN_PARTS) {
+    const answer = await runFile(part, inputs, figma);
+    if (answer.error || answer.pages) return answer;
+    answers.push(answer);
+  }
+  if (inputs.only) {
+    const held = answers.find((answer) => !answer.only.error);
+    return held ?? answers[0];
+  }
+  const scans = answers.map((answer) => answer.scan);
+  const findings = {};
+  for (const name of FINDING_ORDER) for (const scan of scans) if (name in scan.findings) findings[name] = scan.findings[name];
+  const left = Object.assign({}, ...scans.map((scan) => scan.shortened?.itemsLeftOut ?? {}));
+  return {
+    page: answers[0].page, form: answers[0].form, readAt: answers[0].readAt,
+    scan: {
+      clean: scans.every((scan) => scan.clean), notBlocking: NOT_BLOCKING_ORDER.filter((name) => scans.some((scan) => scan.notBlocking.includes(name))),
+      form: answers[0].form, propertyChecks: scans.find((scan) => scan.propertyChecks).propertyChecks, read: scans.find((scan) => scan.read).read, findings,
+      ...(Object.keys(left).length > 0 ? { shortened: { itemsLeftOut: left, askForOneWhole: scans.find((scan) => scan.shortened)?.shortened.askForOneWhole } } : {}),
+    },
+  };
+}
+const run = (script, inputs, figma) => (script === "page.js" && inputs.report === "scan" ? runScan(inputs, figma) : runFile(script, inputs, figma));
 
 // A 2 x 2 grid of versions, laid out as `size` on the rows and `state` on the columns.
 const grid = (prefix, order) => order.map(([size, state, x, y]) =>
@@ -502,22 +537,22 @@ await guard(async () => {
   const second = await inventoryOf(nodes, { from: 1, to: 3 });
   same("a range by place gives those nodes, with the places they hold", [second.labels[0].index, second.others[0].index, second.range], [1, 2, [1, 3]]);
 });
-// 7. `both` never overflows the answer's limit, and says what it cut
+// 7. a part's answer never overflows the limit, and says what it left out
 await guard(async () => {
   const many = Array.from({ length: 80 }, (_, index) => loose(`6:${index}`, `Rectangle ${index}`, [index * 50, 900, 10, 10]));
   const nodes = [buttonSet(tidy), buttonHeader(), ...many];
-  const both = await run("page.js", { pageId: "2:1", report: "both", maxBytes: 3500, findingItems: 25 }, file([page("2:1", "Big", nodes)]));
-  ok("a `both` answer is no longer than maxBytes", JSON.stringify(both).length <= 3500, String(JSON.stringify(both).length));
-  ok("it says what it cut: the scan's items, and where the inventory stopped", both.cut.scanItemsLeftOut.strays > 0 && both.cut.inventoryStoppedAt !== null, JSON.stringify(both.cut));
-  const small = await run("page.js", { pageId: "2:1", report: "both", maxBytes: 16000, findingItems: 25 }, file([page("2:1", "Small", [buttonSet(tidy), buttonHeader()])]));
-  same("a small page is whole, and cuts nothing", [small.inventory.next, small.cut.scanItemsLeftOut], [null, {}]);
+  const part = await runFile("scan-placement.js", { pageId: "2:1", answerBytes: 3500, findingItems: 25 }, file([page("2:1", "Big", nodes)]));
+  ok("a part's answer is no longer than answerBytes", Buffer.byteLength(JSON.stringify(part.scan), "utf8") <= 3500, String(JSON.stringify(part.scan).length));
+  ok("it says what it left out, the counts whole", part.scan.shortened.itemsLeftOut.strays > 0 && part.scan.findings.strays.count === 80, JSON.stringify(part.scan.shortened));
+  const small = await runFile("scan-placement.js", { pageId: "2:1" }, file([page("2:1", "Small", [buttonSet(tidy), buttonHeader()])]));
+  same("a small page is whole, and cuts nothing", small.scan.shortened, undefined);
 });
 // 8. an empty version is reported as empty, and is not a failure of the scan
 await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage — one row · columns: state=loading, rest", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -694,8 +729,9 @@ await guard(async () => {
   same("a section with no unit in it is an empty reading, not a clean page", [hollow.clean, hollow.findings.emptyReading.count, hollow.form], [false, 1, "sections"]);
   const reference = await run("page.js", { pageId: "2:1", report: "scan" }, file([page("2:1", "Choices", [{ id: "6:1", name: "§ 6.1", type: "FRAME", x: 0, y: 0, width: 100, height: 100, children: [{ id: "6:1:0", type: "TEXT" }] }])]));
   same("a page that holds no unit is not clean either", [reference.scan.clean, reference.scan.findings.emptyReading.count], [false, 1]);
-  const both = await run("page.js", { pageId: "2:1", report: "both", maxBytes: 16000 }, sectioned([]));
-  same("the answer says the form at its top, whichever report is asked", [both.form, both.scan.form], ["empty", "empty"]);
+  const forms = [];
+  for (const part of SCAN_PARTS) forms.push((await runFile(part, { pageId: "2:1" }, sectioned([]))).form);
+  same("every part says the form at the top of its answer", forms, ["empty", "empty", "empty", "empty"]);
 });
 
 await guard(async () => {
@@ -920,10 +956,13 @@ await guard(async () => {
   same("a property the header names in its behaviour clause is not named; the others still are", namesOf(await undrawn(behaves)), ["withStartIcon"]);
   const swapBehaviour = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: withStartIcon" });
   same("a swap is judged with its boolean named as behaviour", namesOf(await undrawn(swapBehaviour)), ["label", "withHeading"]);
-  const wrong = await scanSections([unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label, lazy" })]);
-  same("a name in the clause that is no property of the unit is its own finding, and does not block",
-    [wrong.findings.behaviourNamesNoProperty.items.map((item) => [item.unit, item.name]), wrong.notBlocking.includes("behaviourNamesNoProperty")], [[["DSButton", "lazy"]], true]);
-  const soundUnit = drawing(unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label" }), everyDrawn);
+  // The book: a property of behaviour has nothing to draw, so the set does not hold it, and the header names it.
+  const held = await scanSections([unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label, lazy" })]);
+  same("a name in the behaviour clause that the set holds as a property is the finding (it is drawn, so it is not behaviour), and does not block",
+    [held.findings.behaviourNamesHeldProperty.items.map((item) => [item.unit, item.name]), held.notBlocking.includes("behaviourNamesHeldProperty")], [[["DSButton", "label"]], true]);
+  same("a name the set does not hold (`lazy`) is what the rule asks, and is no finding",
+    (await scanSections([unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: lazy" })])).findings.behaviourNamesHeldProperty.count, 0);
+  const soundUnit = drawing(unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: lazy" }), everyDrawn);
   // every property is tied to a layer of the first version, so that propertyTiedToNothing has nothing to name
   soundUnit.children.find((child) => child.type === "COMPONENT_SET").children[0].children = Object.keys(iconDefinitions).filter((key) => iconDefinitions[key].type !== "VARIANT").map((key, at) => layer(`B:t${at}`, `layer ${at}`, "TEXT", { characters: key }));
   const sound = await scanSections([soundUnit]);
@@ -1263,7 +1302,7 @@ await guard(async () => {
   for (let at = 0; at < 5; at += 1) fewer.children.push(loose(`F:${at}`, `Rectangle ${at}`, [-100, 20 * at, 10, 10]));
   const whole = (await run("page.js", { pageId: "2:1", report: "scan" }, sectioned([fewer]))).scan;
   same("a page of few findings is not shortened", [whole.shortened, whole.findings.childOutsideSection.items.length], [undefined, 5]);
-  const small = (await asked({ answerBytes: 4000 })).scan;
+  const small = (await runFile("scan-placement.js", { pageId: "2:1", findingItems: 25, answerBytes: 4000 }, sectioned([many]))).scan;
   same("an answer over the limit is cut to under it, its counts whole, and says it was shortened",
     [utf8(small) <= 4000, small.findings.childOutsideSection.count, small.findings.childOutsideSection.items.length < 25, small.findings.childOutsideSection.items.length >= 3, small.shortened.itemsLeftOut.childOutsideSection > 0, small.shortened.askForOneWhole.includes("only")],
     [true, 40, true, true, true, true]);
@@ -1398,17 +1437,53 @@ await guard(async () => {
   same("the same instance standing outside every unit's set does", unitsNamed((await propertyScan(outside.unit)).propertyNotDrawn).includes("DSButton.withStartIcon"), false);
 });
 
+await guard(async () => {
+  // a text inside a sheet that is named as a label is the sheet's own label, not one of its cases (every part that walks a sheet knows the prefix)
+  const labelled = unitSection("B", "DSButton", [100, 100]);
+  labelled.children.find((child) => child.id === "B:sheet").children.push(text("B:in", "label · DSButton cases — rows: case=text", "DSButton cases — rows: case=text", [0, 0, 100, 20]));
+  const scan = await scanSections([labelled]);
+  same("a label inside a sheet is no case: no bad name, no empty case, no duplicate", [scan.findings.badCaseNames.count, scan.findings.emptyCases.count, scan.findings.duplicateCaseNames.count], [0, 0, 0]);
+});
+
 // ---- the texts ----------------------------------------------------------------------------------
 
 console.log("\n=== the texts the agent passes on");
-for (const script of ["page.js", "layout.js"]) {
+const PASSED_ON = ["page.js", ...SCAN_PARTS, "layout.js"];
+for (const script of PASSED_ON) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} holds one INPUTS block and no console.log, no spnutils`, (body.match(/const INPUTS = \{/g) ?? []).length === 1 && INPUTS_BLOCK.test(body) && !body.includes("console.log") && !body.toLowerCase().includes("spnutils"));
 }
-{
-  const between = (name) => { const body = readFileSync(resolve(SCRIPTS, name), "utf8"); return body.slice(body.indexOf("// ---- the book's label form: begin"), body.indexOf("// ---- the book's label form: end")); };
-  ok("the book's label form is one block, the same in page.js and layout.js", between("page.js").length > 500 && between("page.js") === between("layout.js"));
+// A part that reads an input its INPUTS block does not hold reads `undefined`, and a check built on it quietly finds nothing.
+for (const script of PASSED_ON) {
+  const body = readFileSync(resolve(SCRIPTS, script), "utf8");
+  const block = INPUTS_BLOCK.exec(body)[0];
+  const missing = [...new Set([...body.matchAll(/INPUTS\.(\w+)/g)].map((one) => one[1]))].filter((name) => !new RegExp(`\\n  ${name}:`).test(block));
+  same(`${script} holds, in its INPUTS block, every input it reads`, missing, []);
 }
+{
+  const between = (name, from, to) => { const body = readFileSync(resolve(SCRIPTS, name), "utf8"); return body.slice(body.indexOf(from), body.indexOf(to)); };
+  const labelForm = (name) => between(name, "// ---- the book's label form: begin", "// ---- the book's label form: end");
+  ok("the book's label form is one block, the same in page.js, layout.js and the parts that read labels",
+    labelForm("page.js").length > 500 && ["layout.js", "scan-labels.js", "scan-placement.js", "scan-properties.js"].every((name) => labelForm(name) === labelForm("page.js")));
+  const reading = (name) => between(name, "// ---- the page's reading: begin", "// ---- the page's reading: end");
+  ok("the page's reading is one block, the same in page.js and the three parts that read the page's nodes",
+    reading("page.js").length > 5000 && ["scan-labels.js", "scan-placement.js", "scan-properties.js"].every((name) => reading(name) === reading("page.js")));
+  const bounds = (name) => between(name, "// ---- the answer's bounds: begin", "// ---- the answer's bounds: end");
+  ok("the answer's bounds are one block, the same in every part of the scan", bounds(SCAN_PARTS[0]).length > 1500 && SCAN_PARTS.every((name) => bounds(name) === bounds(SCAN_PARTS[0])));
+}
+// The connector refuses a call over 50,000 characters, and a script an agent writes out is stopped or cut off when it is near
+// that. Each script is sent whole, so each stays well under half the limit once its comments are taken out.
+const withoutComments = (body) => body.split("\n").map((line) => line.replace(/(^|\s)\/\/ .*$/, "").trimEnd()).filter((line) => line.trim() !== "").join("\n");
+for (const script of ["page.js", ...SCAN_PARTS]) {
+  const body = readFileSync(resolve(SCRIPTS, script), "utf8");
+  ok(`${script} is under 50,000 characters (${body.length}) and under 21,000 without its comments (${withoutComments(body).length})`, body.length < 50000 && withoutComments(body).length < 21000);
+}
+await guard(async () => {
+  // the parts together hold every finding the whole scan held, each in one part, under the same name
+  const held = [];
+  for (const part of SCAN_PARTS) held.push(...Object.keys((await runFile(part, { pageId: "2:1" }, sectioned([]))).scan.findings));
+  same("every finding of the whole scan is held by exactly one part", [...held].sort(), [...FINDING_ORDER].sort());
+});
 ok("layout.js is dry by default", /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, "layout.js"), "utf8")));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — figma scripts` : `\n  all ${total} passed — figma scripts`);

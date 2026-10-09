@@ -92,6 +92,13 @@ async function run(inputs, figma) {
   return new AsyncFunction("figma", filled)(figma);
 }
 
+async function runFile(script, inputs, figma) {
+  const body = readFileSync(resolve(SCRIPTS, script), "utf8");
+  const defaults = new Function(`return ${INPUTS_BLOCK.exec(body)[0].slice("const INPUTS = ".length, -1)}`)();
+  const filled = body.replace(INPUTS_BLOCK, () => `const INPUTS = ${JSON.stringify({ ...defaults, ...inputs })};`);
+  return new AsyncFunction("figma", filled)(figma);
+}
+
 // A unit's section as a person leaves it: everything a little off its place. The set stands at (150, 140), 200 x 100;
 // a row label ends 10 px left of it, level with its first row; a column label ends on its top.
 function unitSection({ stray = false } = {}) {
@@ -223,6 +230,35 @@ await guard(async () => {
   strayText.parent = figma.page;
   const proof = await run({ mode: "prove" }, figma);
   same("a node at the page's top level that is no section fails the proof", proof.fails.includes("top level holds non-sections: S:stray"), true);
+});
+
+console.log("\n=== align.js and the scan measure a part's section the same way");
+// The book: a thing is judged by what it draws as well as by its box, and the section is as large as its content and its
+// padding. `align.js` sets a part's section to the content's right edge, with what the content draws beyond it, and
+// `scan-placement.js` names a part's section with more than the padding empty at its right by the same reading.
+const withPart = (drawsPast) => {
+  const unit = unitSection();
+  const icon = version("P:icon", ".DSIcon", [80, 128, 48, 48]);
+  icon.bleed = [0, 0, drawsPast, 0];
+  unit.children.push(
+    text("P:bp", "label · Parts", "Parts", [50, 700, 100, 20]),
+    section("P:sec", ".DSIcon", [50, 740, 400, 300], [text("P:head", "header · .DSIcon", ".DSIcon — one component", [80, 80, 40, 20]), icon]),
+  );
+  return unit;
+};
+const tooWideOf = async (figma) => (await runFile("scan-placement.js", { pageId: "2:1" }, figma)).scan.findings.partSectionTooWide.items.map((item) => [item.id, item.emptyAtRight]);
+await guard(async () => {
+  const figma = await applied(withPart(100));
+  const part = at(figma, "P:sec");
+  same("align sets a part's section to its content, what it draws past its box included: the content line 130 + 48 + 100 + 80", part.width, 358);
+  same("the proof passes, and the scan names no part's section too wide", [(await run({ mode: "prove" }, figma)).fails, await tooWideOf(figma)], [[], []]);
+  part.width += 150;
+  same("150 empty at the right: align fails the width, and the scan names the section with 150 more than the padding allows (230 empty)",
+    [(await run({ mode: "prove" }, figma)).fails.some((one) => one.startsWith("width of .DSIcon")), await tooWideOf(figma)], [true, [["P:sec", 230]]]);
+});
+await guard(async () => {
+  const figma = await applied(withPart(0));
+  same("a part's content that draws within its box: the section is 130 + 48 + 80, and both agree", [at(figma, "P:sec").width, (await run({ mode: "prove" }, figma)).fails, await tooWideOf(figma)], [258, [], []]);
 });
 
 console.log("\n=== the text the agent passes on");
