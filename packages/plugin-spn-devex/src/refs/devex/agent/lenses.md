@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "041795d1"
+      "seen": "3d793113"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "24e9795f"
+      "seen": "4130fd55"
     }
   ]
 }
@@ -85,7 +85,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 
 ### A view is shown in its own voice
 
-**Show a view as a speaker: its name, then what it said, as a colleague would say it out loud — MUST** (`RD.DEVEX.AGENT.090`). Use short full sentences and everyday words, with one idea in each sentence. Never give a summary of what "the views" thought. This is the form, in a reply and on a card:
+**Show a view as a speaker: its name, then what it said, as a colleague would say it out loud — MUST** (`RD.DEVEX.AGENT.090`). Use short full sentences and everyday words, with one idea in each sentence. Never give a summary of what "the views" thought. This is the form in a reply:
 
 > **Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost.
 >
@@ -95,11 +95,25 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | --- | --- |
 | **The name** | the role's plain name in bold, with a colon: *Architect*, *Lead*, *Partner*, *Product* |
 | **The words** | a few short full sentences, in everyday words, with one idea in each. The view says what it objects to or what it would add, and why. *We* and *let's* are fine. Never a slogan or a maxim: a line that sounds like a saying tells the developer nothing they can answer |
-| **No objection** | a view with none says so in its own line, such as *I have no objection* |
-| **How it was made** | say it in brackets when that matters: *(spoken by the one agent)* or *(a fresh agent)* |
+| **No objection** | in a reply, a view with none says so in its own line, such as *I have no objection*. On a card, name the views with nothing to add together in one line |
+| **How it was made** | say it in brackets when that matters: *(spoken by the one agent)* or *(a fresh agent)*. On a card, the line before the views says it |
 | **Disagreement** | two views that disagree stand as two lines, one under the other. Do not blend them |
 
 **One line before the views says which ones you brought, and why those.** The views follow it, one line each. A sentence such as *the views agreed that the name is fine* says nothing the developer can answer: it has no owner and no words of its own. The whole reply follows the same voice (`refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved*).
+
+**On a card, a view is one or two plain sentences — MUST** (`RD.DEVEX.AGENT.090`). A card already states the problem in its Why and the facts in its What, so a view on a card says only what those two parts do not say. Give its reason in words a developer can follow without opening the code. Name no option by its letter, because on a card the options come after the views. A harder question may take a sentence or two more. This is the form on a card:
+
+> **Views** — four fresh views: the architect, the server developer, the partner and product.
+>
+> **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used.
+>
+> **Product:** A person never sees the request key, so a version kept there tells them nothing.
+>
+> **Server developer and Partner:** No objection.
+
+**Shorten a view's words for the card, and keep its name and its meaning — MUST.** A fresh view still writes what it has to say in full. Keep those whole words in the arc's notes, in `notes/N<nnn>/views/`, and do not link them from the card. The voice is the same on a card as in a reply: a colleague speaking, in short full sentences, and never a slogan. Two views that disagree still stand as two lines. A view's whole words on a card say the Why and the What a second time, and the developer must read the problem again to find the one new reason.
+
+**A card or a suggestion put in chat follows the same order and the same shortness.** In an ordinary reply that is not a card, a view may still say what it objects to at the length the point needs. `refs/devex/workspace/docs/decision-cards.md` § *The card* states the card's parts and their order.
 
 ### The architect's view answers for the structure of the system, and of the work on it
 

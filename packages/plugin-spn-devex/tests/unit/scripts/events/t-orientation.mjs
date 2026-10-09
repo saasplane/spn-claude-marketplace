@@ -569,6 +569,8 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     ["a view is shown in its own voice, as a colleague would say it, never a slogan",
       ["in its own voice", "as a colleague would say them out loud, in short full sentences and everyday words, never a slogan",
        "Never sum up what \"the views\" thought"]],
+    ["on a card a view is one or two sentences, and names no option by its letter",
+      ["On a card, a view is one or two sentences", "names no option by its letter"]],
     ["a reply reads as one person talking to another",
       ["Write every reply as one person talking to another", "full sentences", "no clipped one-line verdicts", "Use a table only for facts that are a table"]],
     ["a shape-setting decision is put to the developer before it is built",

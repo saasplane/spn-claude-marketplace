@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "813fc6a9"
+      "seen": "f3e03521"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -74,8 +74,8 @@ the views said, as a suggestion or as a card.
 
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put a
 suggestion, `S<n>`: in chat only, numbered per window, never written to a file, and read by no hook. A
-suggestion is a whole card, with the same parts as the card below: what, why, a lettered options table,
-the views that spoke, and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
+suggestion is a whole card, with the same parts as the card below and in the same order: why, what,
+the views that spoke, a lettered options table, and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
 sections, each with its own cards. Once the answer settles the shape, the arc row
 is written, and anything still open becomes the page's next `Q<n>` card, in the shape below.
 
@@ -92,12 +92,20 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | Part | What it carries |
 | --- | --- |
 | **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. An `S<n>` suggestion put in chat before an arc row exists has a card's parts, is not a page card, and never reaches a page. The summary names the **choice**, not the topic |
-| **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
-| **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
+| **Why** | Comes first and stands by itself. The problem in plain words, and what it costs to leave as is: the failure it causes. It does not lean on a detail that What has not given yet. It names which of the three reasons makes the choice the developer's. Never *"for consistency"*. On the page its label is `Why it matters` |
+| **What** | The facts that back the Why, concretely: the file, the rule, what is there today, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
+| **Views** | Short. One line says who spoke, why those views, and how each was made. Then each view has its name in bold and its reason in one or two plain sentences that a developer can follow without opening the code. A view says only what Why and What do not already say. It names no option by its letter, because the options come after it. A harder question may take a sentence or two more. Views with nothing to add are named together in one line. Two views that disagree still stand as two lines. Such as: **Views** — four fresh views: the architect, the server developer, the partner and product. **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used. **Product:** A person never sees the request key, so a version kept there tells them nothing. **Server developer and Partner:** No objection. You shorten a view's words for the card, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`, and do not link it from the card. The voice is unchanged: a colleague speaking, in short full sentences, never a slogan, and never a summary of what "the views" thought (`RD.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
-| **Views** | One line on who spoke and why those views. Then each view in its own voice: its name in bold, and what it said, as a colleague would say it out loud, in short full sentences and everyday words, never a slogan. Such as: **Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost. **Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one. A view with no objection says so in its own line. Never a summary of what "the views" thought (`RD.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
-| **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it |
+| **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it. It may name the views it rests on, in a clause |
 | **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked in the card on the approach page and never in the preview, which holds no card. A code fragment is written to its stack's own naming and code standards (decision RD.DEVEX.WORKSPACE.235) |
+
+**The parts come in that order — MUST** (`RD.DEVEX.WORKSPACE.242`): the number and summary, Why, What,
+Views, Options, the recommendation, and the preview. Every page already runs Why, What, How, so a card
+that opens with Why reads as the page around it does. The views come before the options, so the
+developer knows what each role saw before weighing the choices.
+
+**A card or a suggestion put in chat follows the same order and the same shortness.** In an ordinary
+reply that is not a card, a view may still say what it objects to at the length the point needs.
 
 **A card on the page is an open card, so it carries a recommendation and no `Decision` field.** A
 field saying the card is open says nothing, and a field left empty is a blank somebody feels they
@@ -107,10 +115,12 @@ should fill. An answered card leaves the page: its answer folds into the section
 one shape — MUST** (`RD.DEVEX.WORKSPACE.147`, `RD.DEVEX.WORKSPACE.216`). The markup is
 `<div class="sds-open"><h4 id="q<n>">`. The number is lower case in the `id`, and it is written
 `Q<n>` for a reader. Each part's label is a `span.sds-key`, the options are a table inside the card,
-the views are one more labelled block after the options and before the recommendation, and the
-recommendation is a `div.sds-recommended`. The views block is the label, one paragraph on who spoke
-and why, and then one paragraph for each view, opening with its name in `<strong>`:
-`<p><strong>Architect:</strong> …</p>`. A decided card is a `div.sds-card`. The checks
+the views are one more labelled block after What and before the options table, and the
+recommendation is a `div.sds-recommended`. The labels come in the order `Why it matters`, `What`,
+`Views`, `Options`. The views block is the label, one paragraph on who spoke, why those and how each
+was made, and then one short paragraph for each view, opening with its name in `<strong>`:
+`<p><strong>Architect:</strong> …</p>`. Views with nothing to add share one paragraph:
+`<p><strong>Server developer and Partner:</strong> No objection.</p>`. A decided card is a `div.sds-card`. The checks
 find an open card by this shape and by nothing else. So a card written in another shape makes a page
 look as if it has no questions.
 

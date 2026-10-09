@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e5235be7"
+      "seen": "0378ec3f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "4f361906"
+      "seen": "8cf10c92"
     }
   ]
 }
@@ -187,8 +187,8 @@ with what the views said, as a suggestion or as a card. `refs/devex/agent/agent.
 
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put
 a suggestion to the developer: `S<n>`, in chat only, numbered per window, never written to a file, and
-no hook reads it. A suggestion is a whole card, as a question is: what, why, lettered options, the
-views that spoke, and the one you recommend. When one reply holds both, put the questions and the suggestions in two sections,
+no hook reads it. A suggestion is a whole card, as a question is: why, what, the views that spoke, lettered
+options, and the one you recommend, in that order and with each view kept short. When one reply holds both, put the questions and the suggestions in two sections,
 each with its own cards. Once the answer settles the shape, write the arc row, and anything still open becomes the page's next
 `Q<n>` card, on the page, which the hooks check ([a number is a promise](#ideating-is-free-executing-is-not-a-number-is-a-promise)).
 
@@ -205,20 +205,23 @@ the developer's to make**, and the three reasons are what *the developer's* mean
 would weigh, a cost they would accept, a scope they would widen: those are cards, and nothing runs
 past them.
 
-**A design question is put as an expert would put it.** The card keeps its parts — What, Why,
-Options, Views and Recommendation ([`docs/decision-cards.md`](docs/decision-cards.md)) — and fills
+**A design question is put as an expert would put it.** The card keeps its parts — Why, What,
+Views, Options and Recommendation, in that order ([`docs/decision-cards.md`](docs/decision-cards.md)) — and fills
 them this way:
 
-- **What** starts from what exists, with the file and the line, and says what changes.
-- **Why** names which of the three reasons makes the choice the developer's.
+- **Why** comes first and stands by itself. It states the problem in plain words and what it costs
+  to leave it alone, and it names which of the three reasons makes the choice the developer's.
+- **What** backs the Why with the facts. It starts from what exists, with the file and the line,
+  and says what changes.
+- **Views** says in one line who spoke, why those, and how each was made. Then each view gives its
+  reason in one or two plain sentences, and names no option by its letter. You shorten a view's
+  words for the card and keep its name and its meaning (`refs/devex/agent/lenses.md` § *A view is shown in
+  its own voice*).
 - **Each option's trade-off** is set against the book, against industry practice with a named
   source — OWASP ASVS, NIST 800-63, the twelve-factor app, a pattern's own literature — and against
   the domain's usual workflow. Each lens names the references it judges against
   ([`refs/devex/agent/lenses/`](../agent/lenses/README.md)).
-- **Views** says who spoke and why those, and then each view says what it objected to, in its own
-  voice: its name, and what it said in short full sentences (`refs/devex/agent/lenses.md` § *A view is shown in
-  its own voice*).
-- **The Recommendation** cites what decides it.
+- **The Recommendation** cites what decides it, and may name the views it rests on.
 
 **An answer lands in the arc's notes in the same turn — MUST.** An answer to a card, or any point the
 developer makes in review, lands in three places before the turn ends: the card, answered and
@@ -948,9 +951,9 @@ ones that matter. Two or three sentences and a full stop is a complete reply.
 nobody answers.
 
 **When you need an answer, every open item is a decision card.** The shape is defined once, in
-[`refs/devex/workspace/docs/decision-cards.md`](docs/decision-cards.md): number and summary, what,
-why it matters, a lettered options table, a recommendation with its reasoning, and a preview where
-the decision is a shape. Follow it whenever a person owes a decision, and in full whenever one asks
+[`refs/devex/workspace/docs/decision-cards.md`](docs/decision-cards.md): number and summary, why it
+matters, what, the views that spoke, a lettered options table, a recommendation with its reasoning,
+and a preview where the decision is a shape, in that order. Follow it whenever a person owes a decision, and in full whenever one asks
 to see the open questions or the open cards. A sentence beginning *"two things I did not act on"* is
 the exact failure it prevents.
 

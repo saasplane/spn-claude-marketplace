@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "8165c88f"
+      "seen": "2a21a43b"
     }
   ]
 }
@@ -178,7 +178,7 @@ The first two groups are a table of **# · Recommendation · Closes · Done when
 
 **No Decided by column and no Effort column**: the group heading says who decides, and Closes says what an action is worth.
 
-**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *What*, *Why it needs you* and the *Options*, and a closing line with the option you would take. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied: one line on who spoke and why, then each view in its own voice, as a colleague would say it out loud, such as *"**Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one."*
+**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *What*, *Why it needs you* and the *Options*, and a closing line with the option you would take. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied. It sits after the card's Why and What and before its options: one line on who spoke and why, then each view's reason in one or two plain sentences, as a colleague would say it out loud, such as *"**Product:** A person never sees the request key, so a version kept there tells them nothing."*
 
 ## Who decides — MUST
 
