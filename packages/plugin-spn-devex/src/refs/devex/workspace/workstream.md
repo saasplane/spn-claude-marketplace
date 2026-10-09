@@ -625,7 +625,7 @@ generated client among them; it does not run a client's contract tier, which cal
 service, and it names that tier as not run. Outside a release, run a whole tier only when one of
 these holds:
 
-- the changed package is imported by nodes outside the order;
+- what the changed package publishes changed, and nodes outside the order import it;
 - a test configuration, a global setup or a runner file changed;
 - a spec or a source file was renamed, moved or deleted;
 - the version of a dependency moved;

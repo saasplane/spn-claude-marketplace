@@ -57,7 +57,7 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
      A TEST COMMAND IS SELECTIVE. It carries its selection after `--`, written by hand from the Files of the rows it
      proves. Its green is the named behaviour ids read as SUCCESS from the run's file: never an exit code, and never
      a count of a whole tier. A whole tier is a row here only where the Traps name which of the five cases holds:
-     the changed package is imported by nodes outside the order; a test config, a global setup or a runner file
+     what the changed package publishes changed, and nodes outside the order import it; a test config, a global setup or a runner file
      changed; a spec or source file was renamed, moved or deleted; a dependency's version moved; the developer asks. -->
 
 | Check | Command (run from) | Before (at pin) | Green after | Artifact | Cache |

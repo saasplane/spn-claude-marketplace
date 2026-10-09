@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "34ef49ae"
+      "seen": "5d190e92"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
@@ -69,7 +69,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.245",
-      "seen": "2293781c"
+      "seen": "99b1d164"
     }
   ]
 }
@@ -238,7 +238,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 
 | The case | Why a selection is not enough |
 | --- | --- |
-| the changed package is imported by nodes outside the order | their cases can break, and the order's selection does not name them |
+| what the changed package publishes changed, and nodes outside the order import it | their cases can break, and the order's selection does not name them. A change that stays behind what the package publishes is proved by the package's own cases |
 | a test configuration, a global setup or a runner file changed | every case of the tier stands on it |
 | a spec or a source file was renamed, moved or deleted | a selection written from the old names can match nothing, and a stale build can fail a case nobody touched |
 | the version of a dependency moved | every case that reaches the dependency last passed against the old version |
