@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "2ea32f1d"
+      "seen": "2e30ff33"
     }
   ]
 }
@@ -31,6 +31,32 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 13. **Take one picture for each set or sheet, and look at it.** Headings: "How the connector's work is carried out", and "What the agent reads and keeps".
 14. **Scan the whole file last, with `skills/design/scripts/page.js` set to report the scan, one call for each page.** The script reads a page of either form (nodes at its top level, or inside sections) and says which in `form`; a page where it found no unit answers `emptyReading`, never `clean`. Beside the findings of old it reports a top-level node that is no section, things inside a section that meet, a thing outside its unit's section, a section whose pieces stand out of order, a unit with no header, a usage that names no unit, and a child that lies outside its section's box (by its box or by what it draws, with the side and the px); it blocks on a top-level unit with no usage (a unit drawn as cases alone, with no component in its section, takes its first case for its usage) and on a boolean, swap or text property that nothing on the page draws off its default and that the header does not name after `behaviour: `; it counts, without blocking, the top-level units that have no sheet of cases (a unit whose versions draw everything owes none), and names a property that the clause names and the unit does not have; and it reads a sheet's label apart from a header and a default mark by the words of a value before its first `: `. Heading: "Before a publish".
 15. **Tell the developer what changed, what still differs from the web and was left, and that the publish is theirs.** Where the file has taken a library's update, read its sets again and run the layout proof and the scan again before you say anything is whole. Headings: "Before a publish", and "The connector's facts", under A library's update.
+
+## Adding a property, a value or versions to a set
+
+Step 6 and step 8 say what a set must hold. These steps say how one is grown, in order. Each has its reason after it. Headings in the reference: "Versions that are added are laid out", "A label", "The form of a label", "A sheet of cases, and a case", and "The connector's facts".
+
+1. **Read the set again just before the first change.** A writer may have changed it since the inventory was read.
+2. **Work out the versions the set will hold, and say so.** One more property multiplies them, and 1,000 is the limit.
+3. **Give a new property a default value that draws what stands.** The versions that are there are then the look of the default, only the other values are new drawings, and no placed instance changes.
+4. **Make each new version as a copy of its nearest twin, and change only what its value changes.** Name it `property=value, property=value`, with no comma inside a value. A copy made inside a set loses its property ties, and a slot in it becomes a plain frame, so compare each copy with its twin and tie it again.
+5. **Keep the default at the top left.** The default version is the one at the top left of the grid, and not the first child. Change it by changing places in the grid, and read it back before and after.
+6. **Rename a property or a value in the versions' names.** The versions keep their ids and keys, so nothing placed breaks.
+7. **Grow the set, its section and its sheet so that nothing meets.** A copy lands on the version it was made from, and a section that is too small leaves a thing outside it. Then run the layout script, dry first.
+8. **Set a label's text and its layer name in one step.** The layer is `label · ` and the text, so a script reads the unit from the label.
+9. **Name a case `property=value`, with no comma inside a value,** and keep the name unique on its sheet.
+10. **Make the unit's header name the new property.** Its layout clause and its default marks must say what the set now holds, or the scan reports the header as wrong.
+11. **Take the hashes of the set before and after, and list every difference.** A difference that your order did not name is a finding to report, not to keep.
+12. **Do only what your order names, and report the rest.** A writer that meets a fault outside its order writes it down and leaves it. The permission check refuses a call that changes a library when the order did not name the change.
+
+## The measure and the pace
+
+- **A library is brought to the web by its properties, its values, its defaults and its states, and by nothing clipped or overlapping.** This is the book's own rule: "A property that changes what is visibly there MUST be drawn", and a state a unit can be in MUST be drawn (step 8). Anything finer than that is listed in the report and not drawn. The developer decided this on 2026-10-09.
+- **One writer takes a page whole, and a page is scanned once, when it is finished.** Two agents never change one library file at once. Scanning after each set costs a read of the page each time and proves what the last set's proof already returned.
+
+## A child agent
+
+A child agent that sends `use_figma` cannot read the connector's own skill. Hand it `skills/design/steps/connector-rules.md`, and the order for its work. It sends nothing the order does not name.
 
 Never edit the body of any script: fill its inputs and pass the rest as it is.
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "2ea32f1d"
+      "seen": "2e30ff33"
     }
   ]
 }
@@ -324,6 +324,8 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Every call | No state lives between calls | it passes the ids of an earlier call as text in the script |
 | Every call | A call names the skills it follows | it passes the skill names on every call, and the skill for changing a library on a call that changes a set, a version, a variable or a style |
 | Every call | An error says whether the call may run again | it reads that answer, runs the call again if it is safe, and reads the file first if it is not |
+| Every call | A child agent cannot read the connector's own skill resource | the plugin's skill carries the rules a child needs, and the child is given that file |
+| Every call | The permission check refuses a call that changes a library when the order did not name the change | a writer does only what its order names, and reports the rest |
 | Pages | A call starts on the file's first page, every time | a script does not assume the page it worked on before |
 | Pages | Moving to a page is an async call, and a switch loads the file again | a script switches page once and never inside a loop over pages |
 | Pages | Work on several pages is several calls | it sends one call for each page, and calls that only read may be sent together |
@@ -337,12 +339,16 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Writing | A colour runs from 0 to 1, and its opacity sits on the paint | it writes the three channels with no alpha, and sets the opacity on the paint |
 | Writing | Fills and strokes are read-only lists | it copies the list, changes the copy and assigns it back |
 | Writing | A paint bound to a variable is a new paint | it assigns the new paint back |
+| Writing | An opacity set on a paint that is bound to a variable draws opaque | it sets the opacity on the layer |
 | Writing | A text cannot change before its fonts are loaded | it loads the text's own fonts first, then changes it |
 | Writing | A new node lands at the corner of its page | it places the node clear of what the page holds |
 | Writing | A child must be in its parent before it is set to hug or fill | it appends the child first, and sets the size before the sizing modes |
 | Writing | A variable or a style that fits is better than a plain value | it binds fills, strokes, padding, radius and gap to a variable where one fits, and uses a plain value only where the work names one |
 | Writing | Versions combined into a set sit on one another | it lays them out in a grid and resizes the set before the set is read or shown |
 | Writing | A comma inside a version's value splits its name | a value never holds a comma, or the set breaks |
+| Writing | A copy of a version made inside a set (`clone()`) loses its property ties, and a slot in it becomes a plain frame | it compares each copy with its twin and ties it again |
+| Writing | A set's default version is the one at its top left, not the first in its list of children | it changes the default by changing places in the grid, and reads the default back |
+| Writing | A variant property and its values are named by the versions' names, and the versions keep their ids and keys when the names change | it renames a property or a value by renaming it in the name of every version |
 | Writing | An id cannot be guessed | it reads an id from an earlier answer and never makes one up |
 | Writing | A name's beginning can match more than one node | it cleans up only by exact id |
 | Composing a sheet | A part moved across calls can fail with no error and leave a node with no parent | it makes the wrapper frame first, builds each part inside it, and fetches the wrapper by id at the start of each script |
@@ -455,6 +461,7 @@ These three rules and the layout rules above do not conflict, because they cover
 
 - **Whatever adds versions to a set MUST place them in the grid as the label's order gives, and MUST prove that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The connector's facts state that combined versions sit on one another.
 - **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out.
+- **The default value of a property that is added MUST draw what the set draws now.** The versions that stand are then the look of the default, only the other values are new drawings, and no instance already placed changes.
 - **A set MUST NOT be grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
 - **Where a property would multiply a set and the stack shows each of its values as one look, draw the values as cases on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
 
