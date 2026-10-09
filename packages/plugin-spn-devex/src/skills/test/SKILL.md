@@ -32,12 +32,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "d1b8f7cc"
+      "seen": "7e4c5549"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
-      "seen": "e1089233"
+      "seen": "e03d4ac4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/02-tests.md",
@@ -249,18 +249,17 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 - **For a partner, a whole tier means a whole tier of their own nodes.** A failure that points into a published package is a report to the platform, and not a wider run. A version move of the platform or of the toolchain runs every tier of every node, under one run name.
 - **An arc's `PROOF` row runs again, on clean trees, what the arc's rows touched.** It runs no whole tier unless one of the five cases holds.
 
-## After a run: stamp the rows, then read them against the runs
+## After a run: stamp the rows
 
 **Every run is named, and `spnutils` runs a tier and writes that run's file, never a row** (`RD.DEVEX.UTILS.071`). Give a name to every test command: `spnutils apps test <tier> <run> <package>`, `spnutils infra test <run> [package]`. While you code, that is the working name of the selective loop, and the fresh name for the run you stamp from. A full pass gives every tier of the pass one name, such as `full-1001`. The run writes `tests/.output/<tier>/runs/<run>.json`, and a journey phase writes `<run>.<phase>.json`, so one run name never overwrites itself across phases. A reused name replaces that one file and no other, and each tier keeps its 20 newest. What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
 spn-devex behaviours stamp check <run> .        # what it would change
 spn-devex behaviours stamp write <run> .        # Status and Updated at, from that run
-spn-devex behaviours check .                    # a SUCCESS row the run it cites contradicts
 spn-devex behaviours coverage show . --json     # the tests report's measurement
 ```
 
-The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes `Updated at` as `<time> · <run>`, so a row names the run that proved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The proof check reads each `SUCCESS` row against the run its `Updated at` cites; a row citing a run whose file is not on disk is counted, never judged. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.
+The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes `Updated at` as `<time> · <run>`, so a row names the run that proved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The run's name in `Updated at` is a label: it tells a reader which run last proved the row, and when. A run file is temporary output, so nothing requires it to be kept and you may delete it at any time. Nothing checks a row against its run file after the stamp. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.
 
 ## Code coverage is reported, never enforced
 

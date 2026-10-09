@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b7a74c9b"
+      "seen": "587be20f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",

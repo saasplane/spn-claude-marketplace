@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b7a74c9b"
+      "seen": "587be20f"
     }
   ],
   "decisions": [
@@ -160,8 +160,8 @@ name is required**: build one while you work, such as `full-1001`, and give ever
 the same name. A reused name replaces that one file, and each tier keeps its 20 newest. What that run
 means for the documents is the agent's own work, through plugin scripts:
 `spn-devex behaviours stamp write <run> <repo>` reads only that run's files and writes `Status` and
-`Updated at` as `<time> · <run>`, the proof check reads each row against the run it cites, and
-coverage and the reports read the stamped rows only.
+`Updated at` as `<time> · <run>`, and coverage and the reports read the stamped rows only. The run's
+name is a label, and nothing checks a row against its run file after the stamp.
 
 ## `infra` — the estate
 

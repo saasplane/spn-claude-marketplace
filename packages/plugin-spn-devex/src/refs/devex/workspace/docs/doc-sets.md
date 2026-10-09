@@ -25,7 +25,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "affa1f12"
+      "seen": "44de9ce7"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -257,7 +257,7 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.DE
 | `README.md` | identity and orientation | what this repository is, and the map of what sits under it |
 | `01-purpose` | why the repository exists | explains and persuades. Carries **no rules** — normative language here is a defect. It answers four questions — the problem it ends, the payoff of solving that once, what you get, and who it is for — and the check reads for the four answers, never for a file count |
 | `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
-| `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. `Updated at` is the instant the run finished, in UTC, then ` · ` and the run's name — `2026-09-30T18:54:19Z · full-1001` — and the proof check reads the run it names. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
+| `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. `Updated at` is the instant the run finished, in UTC, then ` · ` and the run's name — `2026-09-30T18:54:19Z · full-1001`. The run's name is a label, and nothing checks the row against that run's file. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
 | `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (RD.DEVEX.WORKSPACE.106), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DEVEX.WORKSPACE.098 · RD.DEVEX.WORKSPACE.133; see the altitude note below) |
 | `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
