@@ -178,6 +178,31 @@ one("an Open card carrying no options table",
   write(APPROACH, CLEAN + `<section id="s4"><h2>Open</h2><div class="sds-open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>`),
   "reports", "carries no options table");
 
+// A card in an approach page's Open carries a part named Views (RD.DEVEX.WORKSPACE.242, Q50 B). The
+// check reads that the labelled block is there, and never what it says.
+{
+  const VIEWS = `<span class="sds-key">Views</span>\n<p>Architect and partner, because the choice changes what a partner builds on. Architect: the platform must not name a service built on it. Partner: no objection.</p>`;
+  const openCard = (views, title = "Q1 &middot; a question") => CLEAN + `<section id="s4"><h2>Open</h2><div class="sds-open"><h4 id="q1">${title}</h4>
+<span class="sds-key">Options</span>
+<div class="sds-scroll"><table><thead><tr><th></th><th>Option</th></tr></thead><tbody><tr><td><strong>A</strong></td><td>one way</td></tr><tr><td><strong>B</strong></td><td>another way</td></tr></tbody></table></div>
+${views}
+<div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div></div></section>`;
+  one("an Open card carrying its Views part", write(APPROACH, openCard(VIEWS)), "silent");
+  one("known-bad: an Open card with no Views part", write(APPROACH, openCard("")), "reports", "carries no Views part");
+  const { openCards } = await import("../../../../src/scripts/checks/doc-check.ts");
+  for (const [what, got, expected] of [
+    ["a card without the part draws one RULE finding", openCards(openCard("")).filter(([severity, message]) => severity === "RULE" && message.includes("Views")).length, 1],
+    ["and nothing else, so the page's other parts are not reported beside it", openCards(openCard("")).length, 1],
+    ["a card with the part draws none", openCards(openCard(VIEWS)).length, 0],
+    ["known-bad: the word in the card's title or its prose is not the part",
+      openCards(openCard("<p>The views differ on this one.</p>", "Q1 &middot; whose Views count")).length, 1],
+    ["a card with no options table and no Views part is told both", openCards(openCard("").replace(/(<span class="sds-key">Options<\/span>\n)<div class="sds-scroll">[\s\S]*?<\/div>/, "$1")).length, 2],
+    ["a Deferred card is not asked for the part",
+      openCards(openCard("").replace("<h2>Open</h2>", "<h2>Deferred</h2>").replace("&mdash;</div>", "&mdash; It comes back when the release lands.</div>")).length, 0],
+  ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  Views — ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
+}
+
 one("a Deferred card naming no trigger",
   write(APPROACH, CLEAN + `<section id="s5"><h2>Deferred</h2><div class="sds-open"><h4 id="q2">Q2 &middot; a parked thing</h4><p>You leave this one alone.</p></div></section>`),
   "reports", "names no trigger");

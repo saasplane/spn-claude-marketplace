@@ -895,7 +895,7 @@ console.log("\n=== reply-shape — a reply given while a card is open opens with
   const PROGRESS = "Row 6d landed: the reply check reads Needs you.\n\n```diff\n+ if (open.length && !opensWithNeedsYou(reply))\n```";
   const needsYou = (reply, open) => checkReplyShape(reply, open).filter((warning) => warning.check === "needs-you");
   for (const [what, got, expected] of [
-    ["an open card and no Needs you is reported", needsYou(PROGRESS, ["Q356"]).length, 1],
+    ["a reply that waits over an open card, with no Needs you, is reported", needsYou(PROGRESS, ["Q356"]).length, 1],
     ["the finding names the open card", needsYou(PROGRESS, ["Q356"]).filter((w) => w.message.includes("Q356")).length, 1],
     ["an open card with a Needs you heading first is clean", needsYou(`## Needs you\n\nQ356 · the card in full.\n\n## Progress\n\n${PROGRESS}`, ["Q356"]).length, 0],
     ["an open card with a bold Needs you line first is clean", needsYou(`**Needs you:** Q356 · the card in full.\n\n${PROGRESS}`, ["Q356"]).length, 0],
@@ -910,9 +910,83 @@ console.log("\n=== reply-shape — a reply given while a card is open opens with
        console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
 }
 
+console.log("\n=== reply-shape — Needs you is owed in two cases only: a card raised, or the agent waits (RD.DEVEX.WORKSPACE.189, Q49 B)");
+{
+  const { checkReplyShape, workRuns } = await import("../../../../src/scripts/events/stop.ts");
+  const PROGRESS = "Row 6d landed: the reply check reads the arcs' rows.";
+  const RUNS = true;
+  const of = (check) => (reply, open, raised, running) =>
+    checkReplyShape(reply, open, raised, new Map(), running).filter((warning) => warning.check === check);
+  const needsYou = of("needs-you"), shape = of("reply-shape");
+  const LINE = "Q401 · which way does the drawer go — recommendation is B — on the approach page.";
+  const STEPS = (state, status = "RUNNING") => `# N3 — a subject\n\nStatus: **${status}**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | the split check | by hand | its suite | ${state} |\n\n## Log\n\n- **2026-10-09 — go.**\n`;
+  const MARK = "in progress 2026-10-09 14:32 +05:30";
+  const arcs = (name, text, extra = {}) => workspace(name, {
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: CARD, names: ["N3-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`]: text, ...extra });
+  const marked = arcs("m14-row-in-progress", STEPS(MARK));
+  const out = arcs("m14-row-order-out", STEPS(MARK),
+    { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N3/orders/02-the-split-check.md`]: "# Order 02 — N3 row 2: the split check\n" });
+  for (const [what, got, expected] of [
+    ["a progress reply over an older card, while a row is in progress, owes nothing", needsYou(PROGRESS, ["Q356"], [], RUNS).length, 0],
+    ["while a row is in progress, a Needs you part that leaves an older card out is not reported",
+      needsYou(`## Needs you\n\nQ402 · another question — on the page.\n\n## Progress\n\n${PROGRESS}`, ["Q401", "Q402"], [], RUNS).length, 0],
+    ["known-bad: a row in progress does not excuse a card this reply raised", needsYou(PROGRESS, ["Q356"], ["Q356"], RUNS).length, 1],
+    ["known-bad: a raised card named in one line under Needs you is reported while a row is in progress too",
+      needsYou(`## Needs you\n\nQ404 · one line.\n\n${PROGRESS}`, ["Q404"], ["Q404"], RUNS).length, 1],
+    ["known-bad: with no row in progress, an older card the reply does not name is reported", needsYou(PROGRESS, ["Q401"], [], !RUNS).length, 1],
+    ["one line that names an older card and its recommended letter does not ask for the whole card",
+      shape(`## Needs you\n\n${LINE}\n\n## Progress\n\n${PROGRESS}`, ["Q401"], [], !RUNS).length, 0],
+    ["the same line in a progress reply does not ask for the whole card either", shape(`${PROGRESS}\n\n${LINE}`, ["Q401"], [], RUNS).length, 0],
+    ["known-bad: the same line for a card this reply raised asks for the whole card",
+      shape(`## Needs you\n\n${LINE}\n\n## Progress\n\n${PROGRESS}`, ["Q401"], ["Q401"], !RUNS).length, 1],
+    ["known-bad: a choice put on another line, with no card behind it, still asks for the whole card",
+      shape(`## Needs you\n\n${LINE}\n\n## Progress\n\n${PROGRESS}\n\nPick B and we move on.`, ["Q401"], [], !RUNS).length, 1],
+    ["work runs while a row of this window's arcs is marked in progress", workRuns(marked, everyone(marked)) ? 1 : 0, 1],
+    ["work still runs while that row's order is out with an agent", workRuns(out, everyone(out)) ? 1 : 0, 1],
+    ["a row in progress in a workstream that is not this window's is not this window's work", workRuns(marked, new Set()) ? 1 : 0, 0],
+    ["no row in progress means the agent waits", (() => { const root = arcs("m14-row-landed", STEPS("LANDED — `def5678`")); return workRuns(root, everyone(root)) ? 1 : 0; })(), 0],
+    ["a row left in progress in an arc that has landed is history, not work that runs",
+      (() => { const root = arcs("m14-row-in-landed-arc", STEPS(MARK, "LANDED")); return workRuns(root, everyone(root)) ? 1 : 0; })(), 0],
+  ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
+
+  // FINDING, CONFIRMED AND NOT FIXED HERE (024 N009, the plan's Findings). A suggestion is `S<n>`, and
+  // the number the check reads is `Q<n>` only, so a suggestion carrying every part of a card is told
+  // its number is missing. The fix is a row of its own; when it lands, this case changes on purpose.
+  const SUGGESTION = "### S3 · which way does the drawer go?\n\n**What** — the drawer in `shell.tsx:40`, kept or moved.\n\n" +
+    "**Why** — the choice is yours: it changes what a user sees.\n\n| | Option | Trade-off |\n| --- | --- | --- |\n" +
+    "| **A** | keep it | nothing moves |\n| **B** | move it | a sweep of six screens |\n\nRecommendation: A, because nothing breaks. Say A or B.";
+  const told = checkReplyShape(SUGGESTION).filter((warning) => warning.check === "reply-shape");
+  n += 1; const pinned = told.length === 1 && told[0].message.includes("**the number**") && !told[0].message.includes("**What**");
+  if (!pinned) failed += 1;
+  console.log(`  ${pinned ? "PASS" : "FAIL"}  finding: a whole suggestion S<n> that names a letter is told its number is missing, and nothing else`);
+}
+
+console.log("\n=== stop — the hook reads this window's arc rows to tell a progress reply from a reply that waits (Q49 B)");
+{
+  const IN_PROGRESS = `# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | a thing | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | another thing | by hand | its suite | in progress 2026-10-09 14:32 +05:30 |\n\n## Log\n\n- **2026-10-09 — go.**\n`;
+  const running = (name) => workspace(name, {
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: CARD, names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: IN_PROGRESS });
+  one("a progress reply over an older card, while a row is in progress, is silent",
+    running("m14-hook-progress"), "silent", { reply: "Row 1 landed.", parity: false, why: "Q49 B" });
+  one("one line for an older card that names its recommended letter is silent",
+    build("m14-hook-letter", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: CARD, names: ["N1-a-subject.md"] } }),
+    "silent", { session: "m14-letter", edit: () => {},
+                reply: "## Needs you\n\nQ1 · a real question — recommendation is A — on the approach page.\n\n## Progress\n\nRow 1 landed.",
+                parity: false, why: "Q49 B" });
+}
+
 console.log("\n=== stop — the hook reads the open cards off the page for Needs you");
 
-one("known-bad: a reply over an open card that opens with progress",
+one("known-bad: a reply that waits over an open card (no row in progress) and opens with progress",
   build("m13-needs-you-bad", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: CARD, names: ["N1-a-subject.md"] } }),
   "warns", { says: "does not open with **Needs you**", reply: "Row 6d landed.\n\nQ1 is open on the page.", parity: false, why: "a new check" });
 
@@ -1472,7 +1546,7 @@ ${tableOf(cyclesOf(folder))}
     check("[MKT.SCRIPTS.108] it reads no class of the page: it does not say that Open carries no card", !/\[stopped-no-card\]/.test(out) && !/\[cards-in-arcs\]/.test(out), out);
     check("[MKT.SCRIPTS.108] and it does not name the command that refuses such a page", !/\[page-stale\]/.test(out), out);
     check("[MKT.SCRIPTS.108] the card of such a page is still read by its id, so the reply is still asked to open with Needs you",
-      /\[needs-you\] A card is open — `001-a-subject`: Q1/.test(out), out);
+      /\[needs-you\] `001-a-subject`: Q1 /.test(out) && out.includes("does not open with **Needs you**"), out);
     const again = stop(built, "o-own");
     check("[MKT.SCRIPTS.108] the page is named once in a session: the next Stop does not name it again", !/\[own-copy\]/.test(again), again);
     check("[MKT.SCRIPTS.108] another session that writes to the workstream is told once too",

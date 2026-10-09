@@ -312,6 +312,23 @@ export function inProgressSteps(arc: string, now = Date.now(), out: Set<string> 
     .map((step) => `step ${step.id} — ${step.what.slice(0, 70)} (${markedAgo(step.state ?? "", now)})`);
 }
 
+/**
+ * Whether work still runs in this window: a row of an arc in one of its workstreams is marked
+ * `in progress` (RD.DEVEX.WORKSPACE.189). The Stop event says nothing about whether the agent now
+ * waits, so the mark is how a progress reply is told from a reply that waits.
+ *
+ * A row whose order is out with an agent counts here, though `inProgressSteps` leaves it out: that
+ * agent is the work that runs. An arc whose status is terminal does not count, because a mark left
+ * in a finished arc is history, and it would hide the open cards for as long as the arc stays open.
+ *
+ * @param mine  the workstreams this window works on; a row in any other is another window's work
+ */
+export function workRuns(root: string, mine: Set<string>): boolean {
+  return openArcs(root, mine)
+    .filter((arc) => !TERMINAL.has(statusOf(arc)))
+    .some((arc) => (stepsOf(read(arc)) ?? []).some((step) => step.state !== null && isInProgress(step.state)));
+}
+
 const REPORT_SUFFIX = "-report.md";
 // The rows an order is for, as its first heading names them: `# Order 04a — N006 row 4: …`, or for an
 // order that carries several, `rows 0, 1 and 2` or `rows 0 to 2`.
@@ -1092,8 +1109,13 @@ const REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
 //
 // Stripping fences does not weaken the real check: a card's options are a markdown TABLE, never a
 // fence, so every genuine card survives this unchanged.
-const asking = (reply: string) =>
-  ASKS.test(withoutFences(reply).split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
+//
+// THE ONE LINE OF AN OLDER CARD IS A REFERENCE TOO (RD.DEVEX.WORKSPACE.189). It may name the letter
+// the agent recommends, and reading that as an ask demanded the whole card the **Needs you** check
+// forbids. So a line that names a card open before this turn is set aside whole, and the rest is read.
+const asking = (reply: string, older: string[] = []) =>
+  ASKS.test(withoutFences(reply).split("\n").filter((line) => !older.some((card) => namesCard(line, card))).join("\n")
+    .split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
 
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
@@ -1132,9 +1154,10 @@ function missingParts(reply: string): string[] {
   return out;
 }
 
-// THE REPLY OPENS WITH WHAT NEEDS YOU (RD.DEVEX.WORKSPACE.189). While a card is open, the reply's
-// first non-blank line is `## Needs you`, `**Needs you**` or a plain `Needs you:` line. With no card
-// open the part is left out, so a reply is only read for it while a card is open.
+// THE REPLY OPENS WITH WHAT NEEDS YOU IN TWO CASES (RD.DEVEX.WORKSPACE.189): it raises a card, or the
+// agent waits while a card is open. Its first non-blank line is then `## Needs you`, `**Needs you**`
+// or a plain `Needs you:` line. A progress reply owes no such part, and neither does a reply with no
+// card open.
 const NEEDS_YOU = /^[ \t]{0,3}(?:#{1,6}[ \t]*)?(?:\*\*|__)?[ \t]*Needs you\b/i;
 // WHERE THE NEEDS YOU PART ENDS: the progress heading, or a rule. A card's own `### Q<n>` heading sits
 // inside the part, so a heading ends it only when it names the progress.
@@ -1168,57 +1191,69 @@ function putsInFull(text: string, card: string): boolean {
 }
 
 /**
- * The reply's shape: a decision it puts carries the whole card, and a reply given while a card is
- * open opens with **Needs you**, which holds each card this turn raised in full, once, and names
- * every card still open from an earlier reply in one line (RD.DEVEX.WORKSPACE.189).
+ * The reply's shape: a decision it puts carries the whole card, and **Needs you** opens a reply in
+ * two cases only (RD.DEVEX.WORKSPACE.189). A reply that raises a card holds it there in full, once.
+ * A reply that waits names each card still open from an earlier reply in one line. A progress reply
+ * owes nothing for a card already read.
  *
  * A CARD IS PUT IN FULL ONCE. This asked for every open card in full in every reply, and one card
  * was repeated five or six times; one reply carried it twice, once in its body and once at the top
  * where this check then asked for it. Only a card the turn raised is asked for whole, and only at
  * the top; an older card is a line naming it.
  *
- * @param open    the cards open on the approach pages; read from the workspace at `root` in the hook,
- *                and empty when not given, so a reply is then read for the card's parts alone
- * @param raised  the open cards this turn raised — open now and not open at the session's last Stop;
- *                empty when there is no last Stop to compare with, and then every card is an older one
+ * AND THE ONE LINE IS OWED ONLY WHEN THE AGENT WAITS. Asked for in every reply, the same lines opened
+ * reply after reply while the work ran, and a new card arrived under a heading the developer had
+ * learned to pass over.
+ *
+ * @param open     the cards open on the approach pages; read from the workspace at `root` in the hook,
+ *                 and empty when not given, so a reply is then read for the card's parts alone
+ * @param raised   the open cards this turn raised — open now and not open at the session's last Stop;
+ *                 empty when there is no last Stop to compare with, and then every card is an older one
+ * @param running  whether a row of this window's arcs is in progress (`workRuns`); the reply is then a
+ *                 progress reply, and otherwise it is a reply that waits
  */
 export function checkReplyShape(reply: string, open: string[] = [], raised: string[] = [],
-                                where: Map<string, string[]> = new Map()): Warning[] {
+                                where: Map<string, string[]> = new Map(), running = false): Warning[] {
   const out: Warning[] = [];
   const fresh = open.filter((card) => raised.includes(card));
   const older = open.filter((card) => !raised.includes(card));
-  const oneLine = "each card still open from an earlier reply is one line — its number, its question, and where it is";
-  if (open.length && !opensWithNeedsYou(reply))
-    out.push({ check: "needs-you", message:
-      `A card is open — ${cardList(open.slice(0, 4), where)} — and the reply does not open with **Needs you**. ` +
-      `Every reply while work runs opens with what needs you, then the progress — MUST (RD.DEVEX.WORKSPACE.189). ` +
-      (fresh.length ? `A card raised in this reply goes there in full once (${fresh.join(" · ")}); ` : "") +
-      `${oneLine}. Do not repeat a card already put in full.` });
-  else if (open.length) {
+  // The cards a reply that waits still owes one line each; a progress reply owes none.
+  const owed = running ? [] : older;
+  const many = (cards: string[]) => cards.length > 1;
+  if (!opensWithNeedsYou(reply)) {
+    if (fresh.length)
+      out.push({ check: "needs-you", message:
+        `${cardList(fresh, where)} ${many(fresh) ? "were" : "was"} raised in this reply, and the reply does not open with **Needs you**. ` +
+        `Put ${many(fresh) ? "each" : "it"} in full under **Needs you** at the top, once` +
+        (owed.length ? `, and name ${cardList(owed.slice(0, 4), where)} there in one line each` : "") +
+        ` (RD.DEVEX.WORKSPACE.189).` });
+    else if (owed.length)
+      out.push({ check: "needs-you", message:
+        `No row of this window's arcs is in progress, so this reply waits, and it does not open with **Needs you** while ` +
+        `${cardList(owed.slice(0, 4), where)} ${many(owed) ? "are" : "is"} open. Open the reply with **Needs you** and name each ` +
+        `open card in one line: its number, its question, and where it is (RD.DEVEX.WORKSPACE.189).` });
+  } else if (open.length) {
     const part = needsYouPart(reply);
     const notWhole = fresh.filter((card) => !putsInFull(part, card));
     if (notWhole.length)
       out.push({ check: "needs-you", message:
-        `${cardList(notWhole, where)} ${notWhole.length > 1 ? "were" : "was"} raised in this reply and ${notWhole.length > 1 ? "are" : "is"} not ` +
-        `in full under **Needs you** at its top. A card is put in full once, at the top of the reply that raises it, and ` +
-        `never again in its body — MUST (RD.DEVEX.WORKSPACE.189). Do not repeat it now: from your next reply it is ` +
-        `one line — its number, its question, and where it is — and the full card stays on the approach page.` });
-    const unnamed = older.filter((card) => !namesCard(part, card));
+        `${cardList(notWhole, where)} ${many(notWhole) ? "were" : "was"} raised in this reply and ${many(notWhole) ? "are" : "is"} not ` +
+        `in full under **Needs you** at its top. A card goes there in full once; do not repeat it now, and from the next ` +
+        `reply that waits it is one line (RD.DEVEX.WORKSPACE.189).` });
+    const unnamed = owed.filter((card) => !namesCard(part, card));
     if (unnamed.length)
       out.push({ check: "needs-you", message:
-        `${cardList(unnamed.slice(0, 4), where)} ${unnamed.length > 1 ? "are" : "is"} still open and the **Needs you** part does not ` +
-        `name ${unnamed.length > 1 ? "them" : "it"}. ${oneLine[0].toUpperCase()}${oneLine.slice(1)}, before the progress — ` +
-        `MUST (RD.DEVEX.WORKSPACE.189). Never the full card again: that stays on the approach page.` });
+        `${cardList(unnamed.slice(0, 4), where)} ${many(unnamed) ? "are" : "is"} still open and the **Needs you** part does not ` +
+        `name ${many(unnamed) ? "them" : "it"}. Add one line for each: its number, its question, and where it is; the full ` +
+        `card stays on the approach page (RD.DEVEX.WORKSPACE.189).` });
   }
-  if (!asking(reply)) return out;
+  if (!asking(reply, older)) return out;
   const missing = missingParts(reply);
   if (!missing.length) return out;
   out.push({ check: "reply-shape", message:
-    "Your reply puts a decision and the card is not whole. Missing: " + missing.join(" · ") + ". " +
-    "A card put to a person in chat follows the same layout a document uses — MUST — and it assumes " +
-    "**no memory of this session**, because people decide days later (refs/devex/workspace/docs/decision-cards.md). " +
-    "Write it in full in the reply, with the detail to decide from, and put the same card on the " +
-    "approach page." });
+    "Your reply asks for a choice by its letter and the card is not whole. Missing: " + missing.join(" · ") + ". " +
+    "Write the whole card once in this reply, in the layout the approach page uses, and put the same card on that page " +
+    "(refs/devex/workspace/docs/decision-cards.md)." });
   return out;
 }
 
@@ -1464,7 +1499,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const wroteAnywhere = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc)) || visits.has(workstreamOf(arc))));
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
-      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where)),
+      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where, workRuns(root, mine))),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),

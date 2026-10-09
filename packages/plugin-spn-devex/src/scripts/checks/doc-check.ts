@@ -735,8 +735,15 @@ function cards(body: string): Array<[string, string]> {
   return out;
 }
 
+// The Views part of a card: the labelled block `<span class="sds-key">Views</span>`. Only that label
+// is read, so the word in a card's prose is not the part, and what the part says is never judged.
+const VIEWS_PART = /<[a-z][a-z0-9]*\b[^>]*class="(?:[^"]*\s)?sds-key(?:\s[^"]*)?"[^>]*>\s*Views\s*:?\s*<\//i;
+
 /**
  * Open and Deferred carry cards in the agreed shape (refs/decision-cards.md).
+ *
+ * A card in Open with no Views part does not say whether any other role read the choice
+ * (RD.DEVEX.WORKSPACE.242). A Deferred card is not asked for it.
  *
  * A card with no options is a status update; one with no recommendation makes the reader do the
  * analysis twice; a deferred one with no trigger is a question nobody will bring back. All three read
@@ -755,6 +762,9 @@ export function openCards(text: string): Finding[] {
         out.push(["RULE", `Open card "${name}" carries no options table — a card with no options is a status update (refs/decision-cards.md)`]);
       else if (!/recommend|(?:→|&rarr;|&#8594;)\s*(?:<[^>]+>)*\s*\**[A-D]\b/i.test(rest))
         out.push(["RULE", `Open card "${name}" carries no recommendation — the reader does the analysis twice (refs/decision-cards.md)`]);
+      if (!VIEWS_PART.test(rest))
+        out.push(["RULE", `Open card "${name}" carries no Views part. Add \`<span class="sds-key">Views</span>\` and a paragraph after the ` +
+          `options: who spoke, why those views, and what each objected to (RD.DEVEX.WORKSPACE.242)`]);
     }
   const deferred = section(text, "Deferred");
   if (deferred !== null)
