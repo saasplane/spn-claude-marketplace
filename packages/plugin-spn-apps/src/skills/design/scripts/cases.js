@@ -8,7 +8,8 @@
 //
 // A sheet is the frame named `<Unit> cases` in the unit's section. A case is a component on it, named as
 // the spec names it, that holds one instance of the unit with the case's `props` set. A case whose name
-// already stands on the sheet is left as it is. What this script does not do, and reports in `problems`:
+// already stands on the sheet is left as it is. On a sheet with no auto layout the new cases stand in a
+// row of their own under the cases that are there. What this script does not do, and reports in `problems`:
 // make a sheet where the unit has none, set a swap property, and write the sheet's label.
 //
 //   spec    the spec's `unit`, `setId` and `cases` (each with `name`, `base`, `props`, `stands`)
@@ -47,6 +48,16 @@ if (!sheet && wanted.length > 0) {
   return done;
 }
 
+// On a sheet that lays nothing out by itself, a new case would land on the sheet's corner, on a case that
+// stands there. The new cases take a row of their own under everything the sheet holds, 48 apart, and a
+// sheet that is a frame grows to hold them. A sheet with auto layout places them itself.
+const CASE_GAP = 48;
+const placesItself = sheet && "layoutMode" in sheet && sheet.layoutMode && sheet.layoutMode !== "NONE";
+const stoodBefore = sheet ? [...sheet.children] : [];
+const rowLeft = stoodBefore.length > 0 ? Math.min(...stoodBefore.map((child) => child.x)) : 0;
+const rowTop = stoodBefore.length > 0 ? Math.max(...stoodBefore.map((child) => child.y + child.height)) + CASE_GAP : 0;
+let nextLeft = rowLeft;
+
 for (const one of wanted) {
   if (sheet.children.some((child) => child.name === one.name)) { done.stood.push(one.name); continue; }
   const base = versions.find((version) => matches(cellsOf(version.name), one.base || {}));
@@ -74,6 +85,15 @@ for (const one of wanted) {
       instance.setProperties(values);
     } catch (error) {
       done.problems.push(`${one.name}: made, but its properties were refused (${String(error.message || error).slice(0, 120)})`);
+    }
+    if (!placesItself) {
+      component.x = nextLeft;
+      component.y = rowTop;
+      nextLeft += component.width + CASE_GAP;
+      const width = Math.max(sheet.width, component.x + component.width);
+      const height = Math.max(sheet.height, component.y + component.height);
+      if (sheet.type === "FRAME") sheet.resize(width, height);
+      if (sheet.type === "SECTION") sheet.resizeWithoutConstraints(width, height);
     }
     done.made.push([one.name, component.id, base.name]);
   } else {

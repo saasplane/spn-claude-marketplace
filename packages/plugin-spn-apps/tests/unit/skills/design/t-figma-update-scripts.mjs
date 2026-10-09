@@ -358,8 +358,11 @@ const casesPage = (sheetType = "FRAME") => {
     "loading#1:0": { type: "BOOLEAN", defaultValue: false },
     "startIcon#1:1": { type: "INSTANCE_SWAP", defaultValue: "x" },
   });
-  const sheet = node("4:0", "DSBtn cases", sheetType, {}, [node("4:1", "already=true", "COMPONENT")]);
-  sheet.appendChild = (child) => { child.parent = sheet; sheet.children.push(child); };
+  // a sheet with no auto layout, as most sheets of the library are: a new child lands on its corner
+  const sheet = node("4:0", "DSBtn cases", sheetType, { width: 300, height: 40 }, [node("4:1", "already=true", "COMPONENT", { x: 20, y: 0, width: 100, height: 40 })]);
+  sheet.appendChild = (child) => { child.parent = sheet; child.x = 0; child.y = 0; sheet.children.push(child); };
+  sheet.resize = (width, height) => { sheet.width = width; sheet.height = height; };
+  sheet.resizeWithoutConstraints = sheet.resize;
   const section = node("3:1", "Section", "SECTION", {}, [set, sheet]);
   return { page: pageNode("2:1", "Actions", [section]), sheet, instances };
 };
@@ -367,13 +370,15 @@ const madeComponents = [];
 await guard(async () => {
   const made = casesPage();
   const figma = figmaFile([made.page]);
-  figma.createComponent = () => { const component = node(`c${madeComponents.length}`, "", "COMPONENT"); component.appendChild = (child) => { child.parent = component; component.children.push(child); }; madeComponents.push(component); return component; };
+  figma.createComponent = () => { const component = node(`c${madeComponents.length}`, "", "COMPONENT", { x: 0, y: 0, width: 80, height: 30 }); component.appendChild = (child) => { child.parent = component; component.children.push(child); }; madeComponents.push(component); return component; };
   const dry = await run("cases.js", { spec: caseSpec }, figma);
   same("dry is the default: what it would make is listed with the version each stands on, and nothing is made", [dry.dryRun, dry.made, made.sheet.children.length, madeComponents.length], [true, [["loading=true", null, "size=SM"]], 1, 0]);
   same("dry: a case that stands on the sheet, a swap, a missing base and a property the set lacks are told apart", [dry.made.map((one) => one[0]), dry.stood, dry.problems.map((text) => text.split(":")[0])], [["loading=true"], ["already=true"], ["withIcon", "nowhere", "unheld"]]);
   const applied = await run("cases.js", { spec: caseSpec, dryRun: false }, figma);
   same("applied: a component of the case's name is made on the sheet, holding one instance of the base with the property set by its full key", [applied.made.map((one) => [one[0], one[2]]), made.sheet.children.map((child) => child.name), madeComponents[0].name, made.instances[0].set], [[["loading=true", "size=SM"]], ["already=true", "loading=true"], "loading=true", { "loading#1:0": true }]);
   same("applied: the component lays its instance out", [madeComponents[0].layoutMode, madeComponents[0].children.length], ["VERTICAL", 1]);
+  same("applied: on a sheet with no auto layout the new case stands in a row of its own under the cases that are there, and the sheet grows to hold it",
+    [madeComponents[0].x, madeComponents[0].y, made.sheet.width, made.sheet.height], [20, 88, 300, 118]);
 });
 await guard(async () => {
   const made = casesPage("SECTION");
