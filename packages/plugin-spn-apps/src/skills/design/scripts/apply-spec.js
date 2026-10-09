@@ -132,7 +132,9 @@ if (INPUTS.steps.includes("header") && !done.more && spec.header && onSetPage) {
   } else {
     // The unit and ` — ` come first, so the first clause is the one after them (`rows: ...` of `DSButton — rows: ...`).
     const prefix = spec.unit + " — ";
-    const isLayout = (clause) => /^(rows: |columns: |one row|one column)/.test(clause);
+    // `one row` and `one column` are a layout clause only when they are the whole clause: a description
+    // may begin with the same words (`one row of a DSList: …`).
+    const isLayout = (clause) => /^(rows: |columns: )/.test(clause) || /^(one row|one column)$/.test(clause.trim());
     const clauses = header.characters.slice(prefix.length).split(" · ");
     const first = clauses.findIndex(isLayout);
     let last = first;

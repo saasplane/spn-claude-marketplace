@@ -234,8 +234,12 @@ await guard(async () => {
   ok("a spec whose expected count is not what would stay is refused, with nothing changed", /2 versions would stay, the spec expects 3/.test(refused.refused ?? "") && made.set.children.length === 4, JSON.stringify(refused));
   const wrong = await run("apply-spec.js", { spec: { ...spec, unit: "DSOther" } }, figma);
   ok("a set that is not the spec's unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
+  const described = specPage();
+  described.header.characters = "DSBtn — one row of a list: a content · one row · columns: size=SM (default), MD · behaviour: loading";
+  await run("apply-spec.js", { spec, dryRun: false, steps: ["header"] }, figmaFile([described.page]));
+  same("a description that begins with `one row` is no layout clause: it stays, and the clauses after it are replaced", described.header.characters, "DSBtn — one row of a list: a content · rows: size=SM (default), MD · behaviour: loading");
   const unmoved = specPage();
-  const noRule = await run("apply-spec.js", { spec: { ...spec, move: [] }, dryRun: false, steps: ["move", "remove"] }, figmaFile([unmoved.page]));
+  const noRule =await run("apply-spec.js", { spec: { ...spec, move: [] }, dryRun: false, steps: ["move", "remove"] }, figmaFile([unmoved.page]));
   ok("an instance with no rule is a problem: it stays, and the version it stands on is not removed", noRule.problems.length === 2 && noRule.removed === 1 && unmoved.set.children.length === 3, JSON.stringify([noRule.problems, noRule.removed]));
 });
 
