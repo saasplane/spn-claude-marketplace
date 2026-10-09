@@ -790,7 +790,7 @@ await guard(async () => {
   const noHeader = await refuse((parts) => { parts.header = null; });
   ok("a section with no header to take the label's style from refuses, and makes nothing", /no header/.test(noHeader.answer.problems[0] ?? "") && noHeader.fresh.section.children.length === 3, JSON.stringify(noHeader.answer));
   const noBand = await refuse((parts) => { parts.usageLabel = null; });
-  ok("a section with no band label to take the style of `Cases` from refuses", /no band label/.test(noBand.answer.problems[0] ?? ""), JSON.stringify(noBand.answer));
+  ok("a page with no band label anywhere to take the style of `Cases` from refuses, and makes nothing", /neither the section nor the page holds a band label/.test(noBand.answer.problems[0] ?? "") && noBand.fresh.section.children.length === 3, JSON.stringify(noBand.answer));
   const noSection = await refuse(() => {}, { unit: "DSOther", setId: null });
   ok("a unit with no set and no section of its name is refused", /no section named DSOther/.test(noSection.answer.refused ?? ""), JSON.stringify(noSection.answer));
   const wrongPage = await refuse(() => {}, { pageId: "2:9" });
@@ -1046,6 +1046,31 @@ await guard(async () => {
   lone.page.children = [outerLone]; outerLone.parent = lone.page; lone.section.parent = outerLone;
   const deep = await run("sheet.js", { unit: "DSBtn", setId: null, pageId: "2:1" }, sheetFile(lone));
   same("a unit with no set: the section named as the unit is found inside another section", [deep.problems, deep.section], [[], "3:1"]);
+});
+
+await guard(async () => {
+  const own = sheetPage();
+  const ownAnswer = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(own));
+  same("the style of `Cases` comes from the section's own band label when it has one", ownAnswer.bandStyleFrom, "4:1");
+  const inParent = sheetPage((parts) => { parts.usageLabel = null; });
+  const parentBand = inParent.text("7:1", "label · Parts", "Parts", 80, 50);
+  const outer = plantTree(node("3:0", "DSAll", "SECTION", { x: 0, y: 0, width: 3000, height: 1000 }, [inParent.section, parentBand]));
+  inParent.page.children = [outer]; outer.parent = inParent.page; inParent.section.parent = outer; parentBand.parent = outer;
+  const fromParent = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(inParent));
+  const cases = inParent.section.children.find((child) => child.name === "label · Cases");
+  same("a section with no band label takes the style from its parent section's: the copy stands in the unit's section", [fromParent.problems, fromParent.bandStyleFrom, Boolean(cases), cases && cases.parent === inParent.section], [[], "7:1", true, true]);
+  const another = sheetPage((parts) => { parts.usageLabel = null; });
+  const neighbour = plantTree(node("3:8", "DSOther", "SECTION", { x: 0, y: 900, width: 2810, height: 300 }, []));
+  const otherBand = another.text("8:1", "label · Usage", "Usage", 80, 300, 19);
+  otherBand.parent = neighbour; neighbour.children.push(otherBand);
+  neighbour.parent = another.page; another.page.children.push(neighbour);
+  const dry = await run("sheet.js", sheetInputs, sheetFile(another));
+  const fromOther = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(another));
+  same("a section with no band label takes the style from another section of the page", [dry.problems, dry.bandStyleFrom, fromOther.bandStyleFrom, another.section.children.some((child) => child.name === "label · Cases")], [[], "8:1", "8:1", true]);
+  const stands = sheetPage();
+  stands.section.children.push(Object.assign(stands.text("4:7", "label · Cases", "Cases", 80, 700, 19), { parent: stands.section }));
+  const standing = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(stands));
+  same("when `label · Cases` stood already, bandStyleFrom is a copy of the section's own band label or null", standing.bandStyleFrom, null);
 });
 
 // ---- the texts the agent passes on --------------------------------------------------------------

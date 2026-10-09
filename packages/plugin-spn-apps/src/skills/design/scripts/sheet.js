@@ -19,7 +19,9 @@
 // stand with it, as they do on a sheet that is there: the band label `label · Cases`, 79 above the sheet
 // at the left of the header, and the sheet's own label `<Unit> cases — ...`, 16 above the sheet at its
 // left. Each is a copy of a text of the section, so it has that text's style: the header for the sheet's
-// label, a band label (`Usage` or `Parts`) for `Cases`.
+// label, a band label for `Cases`: the section's own `Usage` or `Parts`, or else the first band label (`Usage`,
+// `Cases`, `Parts`) of the page, the unit's parent sections first. The answer's `bandStyleFrom` is the id of
+// the text copied, or null when `label · Cases` stood already.
 // A sheet that stands is `stood`, and nothing is made. It refuses, changing nothing, when the set is not in
 // a section, when the section has no header or no text to take the labels' style from, or when it has
 // nothing to set the sheet's left edge by.
@@ -76,11 +78,30 @@ if (standing) {
 const texts = section.children.filter((child) => child.type === "TEXT");
 const header = texts.find((child) => child.characters.startsWith(INPUTS.unit + " — "));
 const bandStands = texts.some((child) => child.name === BAND_NAME);
-const bandTemplate = texts.find((child) => child.name === "label · Usage" || child.name === "label · Parts");
+const BAND_NAMES = ["label · Usage", "label · Cases", "label · Parts"];
+// With none in the unit's section, a band label of the same page is copied: the unit's parent sections' own
+// children first (nearest first), then the sections of the whole page, walked at any depth.
+const bandIn = (parent) => parent.children.find((child) => child.type === "TEXT" && BAND_NAMES.includes(child.name));
+const bandElsewhere = () => {
+  for (let up = section.parent; up && up.type === "SECTION"; up = up.parent) {
+    const found = bandIn(up);
+    if (found) return found;
+  }
+  const walk = (parent) => {
+    for (const child of parent.children) {
+      if (child.type !== "SECTION" || child === section) continue;
+      const found = bandIn(child) || walk(child);
+      if (found) return found;
+    }
+    return null;
+  };
+  return walk(page);
+};
+const bandTemplate = bandStands ? null : texts.find((child) => child.name === "label · Usage" || child.name === "label · Parts") || bandElsewhere();
 const anchor = set || section.children.find((child) => child.type === "COMPONENT" && child.name === INPUTS.unit)
   || [...section.children].filter((child) => child.type !== "TEXT").sort((first, second) => first.x - second.x)[0];
 if (!header) problems.push(`the section ${INPUTS.unit} holds no header to take the sheet label's style from`);
-if (!bandStands && !bandTemplate) problems.push("the section holds no band label (Usage or Parts) to take the style of `Cases` from");
+if (!bandStands && !bandTemplate) problems.push("neither the section nor the page holds a band label (Usage, Cases or Parts) to take the style of `Cases` from");
 if (!anchor) problems.push("the section holds nothing to set the sheet's left edge by");
 if (problems.length > 0) return { unit: INPUTS.unit, dryRun: INPUTS.dryRun, problems, stood: false, sheet: null, section: section.id, box: null };
 
@@ -88,7 +109,7 @@ const bottom = section.children.length > 0 ? Math.max(...section.children.map((c
 const sheetLeft = anchor.x;
 const sheetTop = bottom + UNDER;
 const sectionBefore = boxOf(section);
-const done = { unit: INPUTS.unit, dryRun: INPUTS.dryRun, problems, stood: false, sheet: null, section: section.id, box: [sheetLeft, sheetTop, 0, 0], sectionBox: sectionBefore };
+const done = { unit: INPUTS.unit, dryRun: INPUTS.dryRun, problems, stood: false, sheet: null, section: section.id, box: [sheetLeft, sheetTop, 0, 0], sectionBox: sectionBefore, bandStyleFrom: bandTemplate ? bandTemplate.id : null };
 if (INPUTS.dryRun) return done;
 
 const sheet = figma.createFrame();
