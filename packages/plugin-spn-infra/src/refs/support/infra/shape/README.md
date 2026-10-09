@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md",
-      "seen": "3c2463ff"
+      "seen": "db0b01f7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -52,9 +52,9 @@ Two lists sit at the top of every declaration, because a declaration has to say 
 
 ### What an environment's row writes
 
-An environment declares very little: its `setup`, `region` and `networkIndex`, then its `workload`, `size`, `hosting`, `firewall` and `deploy` trigger. `env` and the cloud's own region are computed at resolve and never declared.
+An environment declares very little: its `setup`, `region` and `networkIndex`, then its `workload`, `size`, `hosting` and `deploy` trigger. `env` and the cloud's own region are computed at resolve and never declared.
 
-`SPEstateFirewallType` says **what web firewall the environment's public load balancer has** — `NONE` or `COUNT`. **Every environment writes it, and it has no default — MUST** (`RD.SUPPORT.INFRA.117`). An environment that left it out would stand a public load balancer with no firewall and nothing would say so. `COUNT` stands one that records each match and lets the request through. No value makes the firewall refuse a request, because a rule is counted first, so a false match is seen before it refuses a real person.
+**The row holds nothing for the web firewall — MUST** (`RD.SUPPORT.INFRA.117`). The blueprint builds one on every cluster's public load balancer, as it builds the two gateways and the two load balancers. So an environment has nothing to choose, and no environment stands without one.
 
 ## What a company brings, and what is created for it
 

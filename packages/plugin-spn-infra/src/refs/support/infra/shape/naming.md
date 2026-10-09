@@ -3,12 +3,12 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md",
-      "seen": "bce4b3f6"
+      "seen": "7905545a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "8871d377"
+      "seen": "b6dbcd41"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
@@ -50,7 +50,7 @@ remote port        {env}-{app}-remote.internal.{spd}   {app} = the application's
 gateway            {env}-gateway.{spd} · {env}-gateway.internal.{spd}   each gateway's own host; a route's host points at it
 module services    {env}-{module}-{service}.{spd}   the estate owns the namespace; the module names its services
 platform documents {env}-{world}-docs.{spd}
-storage API        {env}-{world}-storage.{spd}  CLUSTER only — the engine's S3 API via the ingress, TLS from the zone wildcard
+storage API        {env}-{world}-storage.{spd}  CLUSTER only — the engine's S3 API, a route on a gateway, TLS from the zone wildcard
 tenant             {env}-{tenant}.{spd}         canonical; a pretty name is a site entry; a route, never a record
 custom domain      customer-owned               outside the zone, its own certificate
 ```
@@ -79,9 +79,9 @@ Written by blueprints into each **resource world's own seat**. **Every configura
 {SPC}_{MODULE}_{APP}_{FACT}                         per-consumer minted pair, secret half — DMO_IDP_SPLT_CLIENT_ID (RD.SUPPORT.INFRA.057)
 ```
 
-**Two senses of "world", ruled** (glossary). The **connection world** is the `{WORLD}` token above — APP · MIGRATION · {SCHEMA}, what a connection opens. The **resource world** is the prefix/hostname token — `{spc}` · space code · module code, who owns the engines. A space's family publishes under the space's own prefix (`SAS_RESOURCE_DB_*`), same format, its seat's path.
+**Two senses of "world", ruled** (glossary). The **connection world** is the `{WORLD}` token above — APP · MIGRATION · {SCHEMA}, what a connection opens. The **resource world** is the prefix/hostname token — `{spc}` · space code · module code, who owns the engines. A space's family publishes under the space's own prefix, which is the platform's code and then the space's (`DMO_SAS_RESOURCE_DB_*` for the space `sas` of `dmo`, `RD.SUPPORT.INFRA.112`), same format, its seat's path.
 
-Pairs per purpose the engine stands — db and queue `USER_RW`/`_RO`/`_MIGRATION`, cache `RW`/`RO`. Values are `{group}_{purpose}` full-word: `app_rw` · `app_ro` · `app_migration`, the migration block `migration_*`, a dedicated schema `{schema}_*`. Which pair a connection opens is the service's choice at boot. `ADM` is ledger-held, published to no application. Storage adds `PUBLIC_ENDPOINTS` (the public read path — the access class, never `CDN`-spelled). The seal block, designed and not published yet (RD.SUPPORT.INFRA.109), carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER` and `_{PROVIDER}_KEY_ID` and nothing else: the key id is plain and read from the cloud by the apply, no pair and no `ENDPOINTS` publish, and locally the block is the selector alone, `LOCAL`. `SEAL` joins the `connections` tokens when the seal is built.
+Pairs per purpose the engine stands — db and queue `USER_RW`/`_RO`/`_MIGRATION`, cache `RW`/`RO`. Values are `{group}_{purpose}` full-word: `app_rw` · `app_ro` · `app_migration`, the migration block `migration_*`, a dedicated schema `{schema}_*`. Which pair a connection opens is the service's choice at boot. `ADM` is ledger-held, published to no application. Storage adds `PUBLIC_ENDPOINTS` (the public read path — the access class, never `CDN`-spelled). The seal block (RD.SUPPORT.INFRA.109) carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER` and `_{PROVIDER}_KEY_ID` and nothing else: the key id is plain and read from the cloud by the apply, no pair and no `ENDPOINTS` publish, and locally the block is the selector alone, `LOCAL`. `SEAL` is one of the `connections` tokens, and an application whose estate row lists the `SEAL` grant receives the block (RD.SUPPORT.INFRA.110).
 
 - A published key never spells a product, a rendering, an app token, or a module of the code that reads it (`RD.SUPPORT.INFRA.111`): the tenant edge's facts publish as `{SPC}_PLATFORM_INTEGRATION_EDGE_*`, and the identity module reads its own `{SPC}_IAM_EDGE_*`. A key that would repeat identically in every environment's rung belongs one rung up. A key a machine wants to write into the app plane belongs in a rung above, under a grammar name.
 - **A published fact is always a literal**; only dev-authored app-plane values carry `${…}` references — one direction, one pass, unknown references refuse by name. A published endpoint is **write-once**.

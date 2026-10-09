@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
-      "seen": "c9a10952"
+      "seen": "80d31878"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
@@ -159,7 +159,7 @@ A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and
 | its `remotePort` | `+200`–`249` | the service's port plus 100 |
 | a web deployment's `port` | `+300`–`399` | in app-row order from `+300` |
 
-`spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. The same number is the port the deployment listens on in the cloud, so it is chosen once.
+`spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. A deployment's `port` and its `remotePort` are also the ports it listens on in the cloud, so each is chosen once. **Its `healthPort` is a machine's number, and a cloud does not read it.** In a cloud the health listener's port is the setting `{SPC}_HEALTH_PORT`, and it is `8010` unless a team wrote another number (`RD.SUPPORT.INFRA.048`). The key sits under the prefix the service starts with, which for a service in a space is the space's whole prefix. The deploy render supplies `8010` where nobody wrote one, writes the number into what the pod is given, and points the pod's probes at it.
 
 ### A remote port is always private
 
@@ -246,10 +246,10 @@ The gateway's limit counts calls to the whole deployment from one address and st
 
 ### A web firewall on the public load balancer
 
-An environment's internet-facing load balancer is given one web firewall, declared on the environment in the key `firewall`, covering every public deployment behind it (`RD.SUPPORT.INFRA.117`).
+The internet-facing load balancer of every cluster carries one web firewall, covering every public deployment behind it — MUST (`RD.SUPPORT.INFRA.117`).
 
-- **The key holds `NONE` or `COUNT`, and every environment writes it — MUST.** `COUNT` stands the firewall and `NONE` stands none. The key has no default, so an environment that leaves it out is refused and never stands an unguarded load balancer in silence.
-- **It holds three of the cloud's rule groups** (common rules, known bad inputs, address reputation), **and it counts only.** Each match is recorded with the rule's name and the request is let through. No value of the key makes the firewall refuse.
+- **The blueprint builds it, as it builds the two gateways and the two load balancers.** It stands in every environment, and no estate file declares it: an environment's row holds nothing for it. So no environment can stand an unguarded public load balancer, and two environments never differ in it.
+- **It holds three of the cloud's rule groups** (common rules, known bad inputs, address reputation), **and it counts only.** Each match is recorded with the rule's name and the request is let through. Nothing in an estate file makes the firewall refuse a request.
 - **One deployment is treated differently by a rule limited to its host**, inside the one firewall.
 - **Nothing is attached to the internal load balancer**, and a public web application is not covered, because it is a bundle served from the edge.
 
@@ -267,7 +267,6 @@ An environment's internet-facing load balancer is given one web firewall, declar
 | two deployments of one application declaring a remote port | the application's code has no single remote address to name |
 | a deployment labelled `gateway`, or with a label ending `-remote` | it takes a gateway's own record, or answers on another application's private address |
 | a gateway rate limit with a window that is not 1, 60, 3600 or 86400 seconds | the manifest declares a limit the gateway cannot count |
-| an environment with no `firewall` key | a public load balancer could stand with no firewall and nothing would say so |
 | a shape omitting a fact every deployment declares | a new shape arrived carrying an exemption, and reviews stopped reading the same way |
 | exposure inferred rather than declared | something is reachable from somewhere nobody chose |
 | exposure exceeding its namespace | an application granted itself reach the level above never allowed |

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "e03f6ec0"
+      "seen": "679c29d9"
     }
   ]
 }
@@ -94,9 +94,9 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Which class a service builds — MUST:** a service that mounts the identity module, or signs people in, builds `SPAuthProviderIAMIssuer` (it verifies a token and reads the session cache itself, signs tokens and a passport's proof, and checks one); a service that holds the identity module remotely builds `SPAuthProviderIAMVerifier` (its `prepareAuthSession` asks the identity module, one remote call for each request that carries a token, and a request with no token asks nobody); a service with no identity module builds `SPAuthProviderDefault` (no session for any token); a service with an identity system of its own writes its own class. `SPAuthProviderIAM` is the abstract base both share. The Verifier has no method that saves or ends a session and its config has no place for a secret, so a service cannot be set up to sign by mistake; a service that mounts the identity module with any other provider refuses to start; a newly scaffolded service builds `SPAuthProviderDefault`, and the step that adds the identity module writes the Issuer or the Verifier in its place.
 
-**Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes: `ISPAuthProviderIAMHandler` (`verifyAuthPassport`, which throws when refused; `getCaptchaConfig`), extended by `ISPAuthProviderIAMIssuerHandler` (`resolveAuthUserPrincipal`, `resolveAuthUserIdentity`) and `ISPAuthProviderIAMVerifierHandler` (`verifyAuthToken`). The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`, the Verifier's `{ handler }`. The identity module's contract offers `verifyAuthToken`, `verifyAuthPassport` (throws `COMMON_UNAUTHENTICATED` when the signature does not hold or the caller is no longer allowed; never answers nothing), `getCaptchaConfig` and `verifyCaptchaInput` on `IIAMSessionService`, and `getSystemAuthUser` on `IIAMPrincipalService`.
+**Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes: `ISPAuthProviderIAMHandler` (`verifyAuthPassport`, which throws when refused; `getCaptchaConfig`), extended by `ISPAuthProviderIAMIssuerHandler` (`resolveAuthUserPrincipal`, `resolveAuthUserIdentity`) and `ISPAuthProviderIAMVerifierHandler` (`verifyAuthToken`). The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`, the Verifier's `{ handler }`. The identity module's contract offers `verifyAuthToken` (it answers a state, `AuthTokenVerification`, whose `authSession` is the live session behind the token, or `null` when the token or the session is no longer good; the Verifier's handler reads that member), `verifyAuthPassport` (throws `COMMON_UNAUTHENTICATED` when the signature does not hold or the caller is no longer allowed; never answers nothing), `getCaptchaConfig` and `verifyCaptchaInput` on `IIAMSessionService`, and `getSystemAuthUser` on `IIAMPrincipalService`.
 
-**A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed.
+**A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed. Nobody signed the system caller in, so it has no session to save: the Issuer signs it with `signAuthUser(authUser: SPIAMAuthUserUnsigned): SPIAMAuthUser`, which caches nothing and which only the identity module calls.
 
 - **Only the identity module signs a passport and checks the signature — MUST**, with the secret it holds; no key goes to any other service.
 - **A proof is signed when a session is made**, at sign-in and when a person switches organization, not on every request; a renewal keeps the session's proof unless the cache entry is gone.
@@ -147,7 +147,7 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **The masking is in the read path, not the caller**, so a new controller or a forgotten select cannot leak it. **The unmasked read has a different name**, so the audit question becomes who calls the `*Internal` method, which you can grep for.
 
-**An integration's constructor config holds credentials in plain, for use, and stays flat.** Today the service reads them from the stored entity's `internal` as they were written. Once the seal is built, the stored `internal` is one sealed string, and the service opens it before it builds that config.
+**An integration's constructor config holds credentials in plain, for use, and stays flat.** The stored entity's `internal` is one sealed string. The service opens it with the seal before it builds that config, and seals it again before it saves the row.
 
 ## Search
 

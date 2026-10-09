@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/",
-      "seen": "2d21f122"
+      "seen": "9d126b22"
     }
   ]
 }
@@ -69,7 +69,7 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 
 **A deployment may ask three things of its route** (`RD.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address. Its window is `1`, `60`, `3600` or `86400` seconds, and it is one count across every proxy pod, kept in the environment's own cache (`RD.SUPPORT.INFRA.118` · `RD.SUPPORT.INFRA.120`). A route's own limit is declared in code and counts calls to one route from one caller.
 
-**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), declared on the environment in the key `firewall`, covering every public deployment behind it. The key holds `NONE` or `COUNT`; every environment writes it and it has no default. `COUNT` stands the firewall with three rule groups, each counting only. `NONE` stands none, and no value makes one refuse a request. Nothing is attached to the internal load balancer, and a public web application is not covered.
+**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), covering every public deployment behind it. The blueprint builds it on every cluster's public load balancer, as it builds the two gateways and the two load balancers. It stands in every environment, and no estate file declares it. It holds three rule groups, each counting only. Nothing is attached to the internal load balancer, and a public web application is not covered.
 
 ## Namespace is a blast radius; exposure is declared with the namespace as its ceiling
 

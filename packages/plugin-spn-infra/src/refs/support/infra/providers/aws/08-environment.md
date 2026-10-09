@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md",
-      "seen": "46ae43a1"
+      "seen": "490b2ed3"
     }
   ]
 }
@@ -30,7 +30,7 @@
 
 **Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see [`04-addressing.md`](04-addressing.md).
 
-**The environment's row states its workload, hosting, size and firewall, and every name is derived.** The workload is `PROD` or `NP` and sets the posture. The hosting is `MANAGED` or `CLUSTER` and says who runs the engines; `CLUSTER` is refused under `PROD`. The size is one of `XS`, `SM`, `MD`, `LG` and `XL`. The cluster is `{env}-cluster`, and the second VPC is the data VPC, which has no route out.
+**The environment's row states its workload, hosting and size, and every name is derived.** The workload is `PROD` or `NP` and sets the posture. The hosting is `MANAGED` or `CLUSTER` and says who runs the engines; `CLUSTER` is refused under `PROD`. The size is one of `XS`, `SM`, `MD`, `LG` and `XL`. The cluster is `{env}-cluster`, and the second VPC is the data VPC, which has no route out.
 
 **Act 3 stands three namespaces and two gateways, and no deployment has an ingress or a load balancer of its own** (`RD.SUPPORT.INFRA.115`). The namespaces are `prd`, `plt` and `vnd`, and `prd` is the only one that may hold a `PUBLIC` deployment. Each namespace refuses every caller by default and admits only what a rule names.
 
@@ -49,7 +49,7 @@
 - **A route's host is given a record that points at its gateway's host**, so no route names a load balancer.
 - **A deployment's rate limit is one count across a gateway's proxy pods**, kept in the environment's own cache (`RD.SUPPORT.INFRA.120`).
 
-**Act 3 stands the web firewall when the environment's row says `COUNT`** (`RD.SUPPORT.INFRA.117`). It is one regional web ACL, `{env}-gateway-public`, attached to the public load balancer alone, with a default action that allows. It holds `AWSManagedRulesAmazonIpReputationList`, `AWSManagedRulesKnownBadInputsRuleSet` and `AWSManagedRulesCommonRuleSet`, each set to count. Under `NONE` no ACL stands. The compute step has no default for `firewall` and waits for it.
+**Act 3 stands the web firewall on the public load balancer, in every environment** (`RD.SUPPORT.INFRA.117`). It is one regional web ACL, `{env}-gateway-public`, attached to the public load balancer alone, with a default action that allows. It holds `AWSManagedRulesAmazonIpReputationList`, `AWSManagedRulesKnownBadInputsRuleSet` and `AWSManagedRulesCommonRuleSet`, each set to count. No estate file declares the ACL, and the internal load balancer carries none.
 
 **A role is named `{group}_{purpose}`, with the purpose in full**: `migration`, `rw` and `ro`. `_mig` is refused. The grant matrix is generated once for each world, the platform's own and each space. A space's keys start `{SPC}_{SPACE}_` and the world token in its hosts is `{spc}-{space}` (`RD.SUPPORT.INFRA.112`).
 

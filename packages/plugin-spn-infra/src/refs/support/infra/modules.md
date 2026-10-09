@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
-      "seen": "7dec63d9"
+      "seen": "2ba60a33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
-      "seen": "88a9dab4"
+      "seen": "db67da25"
     }
   ]
 }
@@ -179,9 +179,9 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **Every block exports one credential pair per purpose its engine stands** — `USER_*`/`PASSWORD_*`, full-word purposes. **Which pair a connection opens is the service's own choice at boot; `ADM` stays ledger-held, published to no application.** Provider-specific facts nest under the product that answered, so each variant carries exactly its own; provider tokens come from a closed list, decomposed by matching known values rather than by splitting on a separator.
 
-**The seal publishes a block of the same shape, with less in it** (`RD.SUPPORT.INFRA.109`). The seal is the family a service calls to encrypt a stored secret before it saves the row, and its key is the environment's key for stored secrets. Its block carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER`, which key holder answered, and `{SPC}_RESOURCE_SEAL_APP_{PROVIDER}_KEY_ID`, the id of that key. The id is not a secret, so it sits on the plain half, and nobody types it: the environment apply reads it from the cloud and publishes it. The block exports no credential pair, because the service calls the key holder as its own workload identity, and no endpoints key, because the estate owns no record for a key holder. **The seal block is designed and not published yet.**
+**The seal publishes a block of the same shape, with less in it** (`RD.SUPPORT.INFRA.109`). The seal is the family a service calls to encrypt a stored secret before it saves the row, and its key is the environment's key for stored secrets. Its block carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER`, which key holder answered, and `{SPC}_RESOURCE_SEAL_APP_{PROVIDER}_KEY_ID`, the id of that key. The id is not a secret, so it sits on the plain half, and nobody types it: the environment apply reads it from the cloud and publishes it. The block exports no credential pair, because the service calls the key holder as its own workload identity, and no endpoints key, because the estate owns no record for a key holder. **The environment's blueprint publishes the seal block when it stands the key.**
 
-**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone. `SEAL` joins the family tokens when the seal is built: an application that lists it receives the seal block, and its workload role receives the right to use the environment's key for stored secrets; an application that does not list it receives neither.
+**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone. `SEAL` is one of the family tokens: an application whose estate row lists the `SEAL` grant receives the seal block, and its workload role receives the right to use the environment's key for stored secrets (`RD.SUPPORT.INFRA.110`); an application whose row does not list it receives neither.
 
 **A space's family lands under its own prefix, one level further down** (`RD.SUPPORT.INFRA.112`). The platform's prefix is `{SPC}_` and a space's is `{SPC}_{SPACE}_`: `DMO_RESOURCE_DB_APP_POSTGRESQL_HOST` for the platform `dmo`, `DMO_SAS_RESOURCE_DB_APP_POSTGRESQL_HOST` for its space `sas`. **A prefix is one word for a platform and two words for a space — MUST**; the blueprint refuses a key under a world's path that does not start with that world's prefix. The world token in a host name matches the prefix (`{spc}-{space}`), a space's code differs from the other spaces' of its platform, and a service in a space starts its own keys with the two-word code. An application bound to no space composes the platform's blocks; bound to a space, that space's; bound to a space with `"platform": true`, both, each under its own prefix. No other application reads across a world boundary by composition, because the derivation never offers it those keys.
 

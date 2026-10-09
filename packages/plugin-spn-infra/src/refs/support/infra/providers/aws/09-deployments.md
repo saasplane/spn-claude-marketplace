@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/09-deployments.md", "seen": "e6ad504a" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/09-deployments.md",
+      "seen": "f68d6f6b"
+    }
   ]
 }
 -->
@@ -15,7 +18,7 @@
 
 ## What to do instead
 
-**An app joins an environment by registering, never by being deployed at.** `spnutils infra app up` registers the app against the layers already standing — its schemas, its certificate binding, its ingress entry. Locally that is the whole story, and the local provider does it today.
+**An app joins an environment by registering, never by being deployed at.** `spnutils infra app up` registers the app against the layers already standing — its schemas, its certificate binding, and its route: an entry of the local ingress on a machine, and a route on a gateway in a cloud. Locally that is the whole story, and the local provider does it today.
 
 **On AWS, a release rides the delivery pipeline.** The pipeline assumes its deploy role through [`03-session.md`](03-session.md), reads the image the control center's registry already holds, and promotes the digest that was built once. No estate command puts code into an environment.
 

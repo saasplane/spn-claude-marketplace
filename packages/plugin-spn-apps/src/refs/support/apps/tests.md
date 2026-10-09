@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "9d313a6b"
+      "seen": "77a71f1e"
     }
   ]
 }
@@ -106,7 +106,7 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 - **A cited row is proven by the node that owns it.** A web module citing a domain row does not re-prove it; it proves only what a screen can fail.
 - **Two cases may cite one id**, and the row then takes the worse of the two outcomes — a behaviour with one failing proof is not proven.
 
-**A `SUCCESS` row MUST resolve to a case that ran.** A row with no case behind it reads `PLANNED`; a row whose case the last whole run of its tier did not reach reads `PENDING`. A selective run is not such a run: it leaves a row it does not name as it found it. Neither is green, and they are different findings that call for different work: *nothing cites this id yet* means a case is owed; *a case exists and the run did not reach it* means the suite is owed a run. Telling a developer to write a case that already exists is the worst thing a check can say, so the two are never collapsed into one.
+**A `SUCCESS` row MUST resolve to a case that ran.** A row with no case behind it reads `PLANNED`, and a whole run of its tier sets a row it did not name back to `PLANNED`. A row whose case the run met and could not run reads `PENDING`. A selective run is not a whole run: it leaves a row it does not name as it found it. Neither is green, and they are different findings that call for different work: *no case of the run names this id* means a case is owed, or the run did not carry it; *a case exists and the run could not run it* means the case is owed a run that can. Telling a developer to write a case that already exists is the worst thing a check can say, so the two are never collapsed into one.
 
 ## Status sync: a title scan, run at prerelease, that goes both ways
 

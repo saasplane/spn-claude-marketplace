@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "Every moment gets a plain, warm line",
-      "seen": "da42ac58"
+      "seen": "b3ae09f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -13,7 +13,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "b4becba7"
+      "seen": "0254f037"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",

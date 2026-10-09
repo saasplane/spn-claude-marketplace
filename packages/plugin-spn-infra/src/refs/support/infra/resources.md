@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
-      "seen": "9ca2e43a"
+      "seen": "e2bcb7ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
-      "seen": "a9da1d57"
+      "seen": "eb53d73e"
     }
   ]
 }
@@ -121,7 +121,7 @@ Storage is the one engine whose *provider* is derived rather than declared — a
 
 **Two vocabularies, two jobs.** The declared value (`mtype`) names what stays true across every rendering; the published provider (`_PROVIDER`) names what actually answered. For the other three engines they coincide — a Postgres container and a managed Postgres are both `POSTGRES`. Storage is the one place they part, and an application switches on the published value in its integrations layer, exactly as it already does for the others.
 
-**A cluster-hosted engine a browser must reach is exposed by the environment's own ingress, and never by another product.** Storage is the one engine with that need, because a presigned link is signed against a host the browser resolves — so a cluster-hosted environment carries a storage host of its own, a route to the engine's interface with transport security from the zone's wildcard certificate. Under managed hosting no such row exists, because the provider's own endpoint already answers. An environment is containers throughout or managed services throughout, never a mixture.
+**A cluster-hosted engine a browser must reach is exposed by a route on a gateway of the environment, and never by another product.** Storage is the one engine with that need, because a presigned link is signed against a host the browser resolves — so a cluster-hosted environment carries a storage host of its own, a route to the engine's interface with transport security from the zone's wildcard certificate. Under managed hosting no such row exists, because the provider's own endpoint already answers. An environment is containers throughout or managed services throughout, never a mixture.
 
 ## Storage's key grammar
 
