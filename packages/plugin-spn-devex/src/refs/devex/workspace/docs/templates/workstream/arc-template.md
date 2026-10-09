@@ -1,5 +1,6 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § An instruction is recorded before it is executed · § A prompt while an arc runs · § An arc's status says which of eight states it is in
-     This file carries rules it does not own. The chapter above is the source of truth.
+     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § When a whole tier runs
+     This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- AN ARC IS THE INDEX AND THE STATE; ITS PLAN IS THE WORK ORDER. What each row changes, exactly, lives in
@@ -44,7 +45,8 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
      DOCS · CODE (with its tests) · GENERATED · RELEASE · PROOF; rows run in chain order by repository, then by
      altitude. What names the files, or "plan § k" — and every "plan § k" has that section. Mechanism is by hand ·
      script · command · agents (order <nn>). Acceptance cites a row of the plan's Commands table and its count:
-     `command` → before → after — never a sentence. A GENERATED row's acceptance is "no diff on a second run".
+     `command` → before → after — never a sentence. A row proven by tests names behaviour ids, read as SUCCESS from a
+     named run's file: never an exit code, never a count of a whole tier. A GENERATED row's acceptance is "no diff on a second run".
      A RELEASE row's acceptance names a consumer install (the published packages, no overrides), never only the
      tool's version. A row inserted mid-run takes a letter suffix (4b). State follows the chapter: empty (not
      started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ⏸ held on Q<n> (waits on that open card; not runnable until it is answered) · ✅ landed — `<commit>` — <the acceptance's result line> ·
@@ -55,7 +57,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 | 0 | — | DOCS | write `notes/N{{nnn}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
 | 1 | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
 | 2 | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
-| {{n}} | — | PROOF | re-run every gate above in one pass, cache off, after the last write; and the consumer install | command | each Commands row → its after, in one run | |
+| {{n}} | — | PROOF | on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install | command | each Commands row → its after, and each named id → `SUCCESS` in that run's file | |
 
 ## Before you write LANDED
 

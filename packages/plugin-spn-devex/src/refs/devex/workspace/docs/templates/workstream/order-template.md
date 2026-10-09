@@ -1,5 +1,6 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules
-     This file carries rules it does not own. The chapter above is the source of truth.
+     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § The selective loop — what runs while work is under way
+     This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- AN ORDER IS ONE DELEGATED EXECUTION: a child session in this workspace, or a window of its own in another
@@ -34,12 +35,22 @@ Every other file belongs to another agent. If you must touch one, stop and say s
 
 ## Loop
 
-Documents first, then source, then the changed cases run alone until they pass, then the whole level once, then the
-stamp. A case written to fail first is one narrow run on the unchanged code. No source or test file changes while a
+Documents first, then source. Then run the cases of what you touched, under the working run name, until they pass. Then
+run every case the step touched once more under the fresh run name, and stamp the rows from that run. Run no whole
+tier. A case written to fail first is one narrow run on the unchanged code. No source or test file changes while a
 test run for this repository is in flight.
 
+| | |
+| --- | --- |
+| **Touched** | {{the behaviour ids the capability page of the changed code claims; and every caller's cases where a contract state or a generated client changed}} |
+| **Selection** | `spnutils apps test {{tier}} {{run}} {{package}} -- {{the runner's own selection, written from the plan's list of files}}`; for an estate package, `spnutils infra test {{run}} {{package}}` |
+| **Working run name** | `{{name}}`, reused by every run made while coding |
+| **Fresh run name** | `{{name}}`, used once, for the run the rows are stamped from |
+| **Stamp** | `spn-devex behaviours stamp write {{fresh run name}} {{repo}}`, and never with `--reach repository` |
+
 Take no baseline where `00-facts.md` holds a run on the pinned commit: its number is your *Before*. Run the gates once,
-at the end of each step.
+at the end of each step. A whole test tier is not one of them, unless one of the five cases holds and the order names
+which.
 
 ## Steps
 
@@ -49,7 +60,8 @@ at the end of each step.
 
 | Check | Command | Before | After | Artifact |
 | --- | --- | --- | --- | --- |
-| {{from the plan's Commands table}} | `{{command}}` | {{exit · count, from `00-facts.md` where it holds a run on the pin}} | {{exit · count}} | `{{path}}` {{changes how}} |
+| {{a gate that is not a test tier, from the plan's Commands table}} | `{{command}}` | {{exit · count, from `00-facts.md` where it holds a run on the pin}} | {{exit · count}} | `{{path}}` {{changes how}} |
+| the behaviour ids | {{the selection above, under the fresh run name}} | {{each id's `Status` in its row today}} | {{each named id}} → `SUCCESS`, read from the run file; an id the run does not name is *nothing proves this* | `tests/.output/{{tier}}/runs/{{fresh run name}}.json` |
 | known bad | {{the new case run against the unchanged code}} | — | {{red, and the line it prints}} | — |
 
 ## Never
@@ -67,7 +79,8 @@ is not a report artifact. The reply is at most 15 lines, and the file at most 40
 coordinator reads both from git.
 
 **Steps:** {{each step: done · not done, and why}}.
-**Gates run:** each as `command` → exit {{code}} · {{counts}} · cache {{off · hit}}.
+**Gates run:** each as `command` → exit {{code}} · {{counts}} · cache {{off · hit}}. A test run as its run file, and each
+named id → {{`SUCCESS` · its status · *nothing proves this*}}.
 **Decided, and not in the order:** {{each decision in one line, or none}}.
 **Left:** {{what is not done · register text for the coordinator · what was found and not changed · nothing}}.
 **Needs the developer:** {{a card, or none}}.

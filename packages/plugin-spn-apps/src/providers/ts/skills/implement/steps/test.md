@@ -90,13 +90,38 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
   **A row's `Tier` equals the tier of the case that proves it.** A run writes only the rows declaring the tier it ran, so a `CONTRACT` row whose only case runs at integration stays unproved. Where they differ, read the case and correct the side that is wrong. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
 - Fixtures that construct jsonb-persisted contract objects must be updated in the same change as any required-field addition to those types.
 
+## The selective loop — run the cases of what you touched
+
+**While you work, run the cases of what you touched, and no whole tier** (foundation decision RD.DEVEX.WORKSPACE.207). The `test` skill, § The selective loop, states the rule: what counts as touched, the two run names, the stamp, and acceptance as named behaviour ids. This step is how TypeScript writes the selection.
+
+**The selection follows `--`, and its words are the runner's own.** `spnutils apps test` hands everything after `--` to the runner unchanged, so a selection is written for the runner of that tier.
+
+| Tier | Runner | Select by file | Select by behaviour id in the title |
+| --- | --- | --- | --- |
+| unit, in a node project · integration · contract | Jest | `-- <path or pattern>` | `-- -t "<id>"` |
+| unit, in a web project | Vitest | `-- <path or pattern>` | `-- -t "<id>"` |
+| component | Playwright CT | `-- <path or pattern>` | `-- -g "<id>"` |
+
+```bash
+spnutils apps test contract <working> <client> -- tests/contract/<mod>    # while coding: one module's contract cases, the working name reused
+spnutils apps test contract <fresh> <client> -- tests/contract/<mod>      # once they pass: the run the rows are stamped from
+spn-devex behaviours stamp write <fresh> <repo>                           # never with --reach repository
+```
+
+- **A selection that matches no file exits clean.** Every runner is given `--passWithNoTests`, so a mistyped path passes. Read each named id as `SUCCESS` from `tests/.output/<tier>/runs/<run>.json`, and report an id the file does not name as *nothing proves this*.
+- **A contract or integration selection still pays the tier's global setup.** Only the cases are fewer.
+- **A changed contract state or a regenerated client touches every caller's cases**, so its selection names each caller's folder, not only the module that changed.
+
 ## Commands
+
+**A whole tier is for the full pass before a release, or for one of the five cases the `test` skill names.** The first three lines below run a whole tier.
 
 ```bash
 npx nx run-many -t test:unit --all --run <run>   # every unit suite, under one run name
-npx nx run <project>:test:unit --run <run>       # one project
-npx nx run <client>:test:contract --run <run>    # the contract tier, against a live service
+npx nx run <project>:test:unit --run <run>       # one project's whole unit tier
+npx nx run <client>:test:contract --run <run>    # the whole contract tier, against a live service
 pnpm --filter <project> test unit <run>          # the same, through the node's own script
+spnutils apps test <tier> <run> <package> -- <selection>   # the selective loop: the cases of what you touched
 spnutils apps test journey <run> <node>          # the sweep; --phase serialized and --phase window are separate runs under the same name
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```

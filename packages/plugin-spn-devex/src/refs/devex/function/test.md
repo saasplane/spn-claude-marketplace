@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/05-test.md",
-      "seen": "765f6a12"
+      "seen": "c575ecc4"
     }
   ]
 }
@@ -55,5 +55,7 @@
 **A full-repository run fixes what keeps a row unproved before it writes the report**: a row whose tier is not its case's tier, a runner that wrote no run file, a case its tier binds that carries no id, and a red case. What the run cannot fix is named in the report with the reason.
 
 **Run the tier that owns the rule you changed.** A change to a refusal needs the tier where refusals actually run; the cheaper tiers pass straight over it.
+
+**How much of a tier runs is the tests group's to say, and this stage routes there.** While work is under way, the agent runs the cases of what it touched. A whole tier runs before a release, or in one of five named cases. The `test` skill states both, in § The selective loop and § When a whole tier runs: what counts as touched, how the runs are named and stamped, and the five cases.
 
 **Data, isolation, and what a case may destroy** are decided before the case is written, because a case that destroys shared state fails the next run rather than its own.

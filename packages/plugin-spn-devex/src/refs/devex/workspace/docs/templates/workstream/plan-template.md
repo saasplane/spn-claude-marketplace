@@ -1,5 +1,6 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it · § A step names every surface the change reaches, and how you would know · § Documents first, and the order they are written in
-     This file carries rules it does not own. The chapter above is the source of truth.
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it · § A step names every surface the change reaches, and how you would know · § Documents first, and the order they are written in · § An order is one delegated execution, and every order follows the same rules
+     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § When a whole tier runs
+     This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- A PLAN IS WRITTEN JUST BEFORE ITS ARC RUNS (row 0), BY READING WHAT EXISTS FIRST. It holds no question: a
@@ -52,11 +53,17 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
 <!-- One home for every command a row or order proves with. Green is the exit code AND the count, never the
      runner's summary line alone, which a cached or replayed run prints too. Artifact is what must change on disk
      (a file, its mtime, a hash, a marker) — verify it, not the runner. Cache is `off` unless the row says why a
-     cache hit is acceptable. Before is filled in row 0 by running the command at the pin. -->
+     cache hit is acceptable. Before is filled in row 0 by running the command at the pin.
+     A TEST COMMAND IS SELECTIVE. It carries its selection after `--`, written by hand from the Files of the rows it
+     proves. Its green is the named behaviour ids read as SUCCESS from the run's file: never an exit code, and never
+     a count of a whole tier. A whole tier is a row here only where the Traps name which of the five cases holds:
+     the changed package is imported by nodes outside the order; a test config, a global setup or a runner file
+     changed; a spec or source file was renamed, moved or deleted; a dependency's version moved; the developer asks. -->
 
 | Check | Command (run from) | Before (at pin) | Green after | Artifact | Cache |
 | --- | --- | --- | --- | --- | --- |
 | {{name}} | `{{command}}` ({{folder}}) | {{exit · count}} | {{exit 0 · exact count, skipped 0}} | `{{path}}` {{changes how}} | off |
+| {{the cases rows k touch}} | `spnutils apps test {{tier}} {{run}} {{package}} -- {{selection}}` ({{folder}}) | {{each id's `Status` today}} | {{each named id}} → `SUCCESS` in the run's file | `tests/.output/{{tier}}/runs/{{run}}.json` | off |
 
 ## Rows
 
@@ -74,7 +81,8 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
 | 1 | {{nn name}} | {{repo}} | {{child here · own window}} | {{rows}} | `{{paths, listed}}` | {{Opus 5 · Sonnet 5}} | {{order or row}} | {{what the developer sees first · —}} |
 
 **Order of work:** {{which waves run in parallel, the hard edges, the ~5-agent limit}}. An order's gates are evidence
-of its own files only; the arc's PROOF row re-runs them all.
+of its own files only; the arc's PROOF row runs again, on clean trees, what the rows touched, and no whole tier unless
+one of the five cases holds.
 
 ## Findings, and where each goes
 

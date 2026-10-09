@@ -30,6 +30,11 @@
       "seen": "300e384f"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "section": "The selective loop — what runs while work is under way",
+      "seen": "d1b8f7cc"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
       "seen": "e1089233"
@@ -55,6 +60,16 @@
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.181",
       "seen": "0cde0770"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.207",
+      "seen": "eb1784c0"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.245",
+      "seen": "2293781c"
     }
   ]
 }
@@ -181,9 +196,62 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 - **Run journey tests on a quiesced system.** Building, provisioning, or resetting concurrently produces timeouts that read as failures and are not.
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out, revoking a device or changing a credential destroys the session other cases are working in, and worker isolation cannot help because the damage is server-side. Classify by what a case flips — nothing, its own throwaway data, a shared session, or global state — and let that decide both where it runs and when.
 
+## The selective loop: run the cases of what you touched
+
+**While work is under way, run the cases of what you touched, and no whole tier — MUST** (`RD.DEVEX.WORKSPACE.207`). A whole tier answers a question about every row a node holds, and a change to one module asks about a few of them. The loop holds for unit, component, contract and integration, in every kind. Journeys stay outside it, because they need a quiesced running stack.
+
+**Count what you touched in behaviour rows, never in folders.** The capability page that claims the changed code names the rows it realizes, and each row names its cases through the id in their titles.
+
+| What changed | What it touched |
+| --- | --- |
+| the source of a module | the rows its capability page claims, and the cases that carry their ids |
+| a contract state | those rows, and the cases of every caller of the state |
+| a generated client | the cases of every node that calls through the client |
+
+**Write the selection in the order, by hand, from the plan's list of files.** No command derives it. Pass it to the runner after `--`:
+
+```bash
+spnutils apps test <tier> <run> <package> -- <the runner's own selection>
+spnutils infra test <run> <package>          # an estate package is selected whole
+```
+
+Everything after `--` reaches the runner unchanged, so the words are the runner's own, and the stack's plugin says what they are. A path given to the runner is allowed here, because the node's own configuration has already decided which cases the node owns. The selection only picks, among those, the ones this change touched.
+
+**Use two run names for a step.**
+
+| Run name | Used for | Why |
+| --- | --- | --- |
+| one working name, reused | every selective run made while coding | a reused name replaces its own file, so the 20 files a tier keeps are not spent on small runs |
+| one fresh name, used once | one run over every case the step touched, once they pass | this is the run the rows are stamped from, and each row's `Updated at` names it |
+
+**Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names and leaves every other row as it is. `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says how old that proof is.
+
+**State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
+
+## When a whole tier runs
+
+**A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
+
+**Before a release, the full pass is a named step.** Run the owed tiers of the nodes the release publishes, whole and once, with the services up. Ask for the release go only after that pass. The release command and its own gates stay as they are.
+
+**Outside a release, run a whole tier only in these five cases:**
+
+| The case | Why a selection is not enough |
+| --- | --- |
+| the changed package is imported by nodes outside the order | their cases can break, and the order's selection does not name them |
+| a test configuration, a global setup or a runner file changed | every case of the tier stands on it |
+| a spec or a source file was renamed, moved or deleted | a selection written from the old names can match nothing, and a stale build can fail a case nobody touched |
+| the version of a dependency moved | every case that reaches the dependency last passed against the old version |
+| the developer asks | the developer's word needs no second reason |
+
+- **A failure that points outside the touched area is your judgement.** Say what you saw, and say that the choice to widen the run was yours.
+- **A flake stays a finding until it is proven environmental.** A wider run is never the way to set one aside.
+- **For a partner, a whole tier means a whole tier of their own nodes.** A failure that points into a published package is a report to the platform, and not a wider run. A version move of the platform or of the toolchain runs every tier of every node, under one run name.
+- **An arc's `PROOF` row runs again, on clean trees, what the arc's rows touched.** It runs no whole tier unless one of the five cases holds.
+
 ## After a run: stamp the rows, then read them against the runs
 
-**Every run is named, and `spnutils` runs a tier and writes that run's file, never a row** (`RD.DEVEX.UTILS.071`). Choose one name for the sitting, such as `full-1001`, and give it to every test command: `spnutils apps test <tier> <run> <package>`, `spnutils infra test <run> [package]`. The run writes `tests/.output/<tier>/runs/<run>.json`, and a journey phase writes `<run>.<phase>.json`, so one run name never overwrites itself across phases. A reused name replaces that one file and no other, and each tier keeps its 20 newest. What the run means for the documents is yours, through this plugin's scripts:
+**Every run is named, and `spnutils` runs a tier and writes that run's file, never a row** (`RD.DEVEX.UTILS.071`). Give a name to every test command: `spnutils apps test <tier> <run> <package>`, `spnutils infra test <run> [package]`. While you code, that is the working name of the selective loop, and the fresh name for the run you stamp from. A full pass gives every tier of the pass one name, such as `full-1001`. The run writes `tests/.output/<tier>/runs/<run>.json`, and a journey phase writes `<run>.<phase>.json`, so one run name never overwrites itself across phases. A reused name replaces that one file and no other, and each tier keeps its 20 newest. What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
 spn-devex behaviours stamp check <run> .        # what it would change

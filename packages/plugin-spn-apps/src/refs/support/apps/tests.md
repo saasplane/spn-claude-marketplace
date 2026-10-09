@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "21c01b30"
+      "seen": "c1ae8560"
     }
   ]
 }
@@ -106,7 +106,7 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 - **A cited row is proven by the node that owns it.** A web module citing a domain row does not re-prove it; it proves only what a screen can fail.
 - **Two cases may cite one id**, and the row then takes the worse of the two outcomes — a behaviour with one failing proof is not proven.
 
-**A `SUCCESS` row MUST resolve to a case that ran.** A row with no case behind it reads `PLANNED`; a row whose case the last run did not reach reads `PENDING`. Neither is green, and they are different findings that call for different work: *nothing cites this id yet* means a case is owed; *a case exists and the run did not reach it* means the suite is owed a run. Telling a developer to write a case that already exists is the worst thing a check can say, so the two are never collapsed into one.
+**A `SUCCESS` row MUST resolve to a case that ran.** A row with no case behind it reads `PLANNED`; a row whose case the last whole run of its tier did not reach reads `PENDING`. A selective run is not such a run: it leaves a row it does not name as it found it. Neither is green, and they are different findings that call for different work: *nothing cites this id yet* means a case is owed; *a case exists and the run did not reach it* means the suite is owed a run. Telling a developer to write a case that already exists is the worst thing a check can say, so the two are never collapsed into one.
 
 ## Status sync: a title scan, run at prerelease, that goes both ways
 
@@ -119,6 +119,36 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 **One status value is never written by the sync: `PROMISE`.** That value belongs to the foundation book alone, where a row says what the standards make possible and carries no tier and no status. A row here that read `PROMISE` beside a tier and a status would be two grammars in one line.
 
 **There is no `skipped` status.** A case that could not run says so as its own finding — an admission rather than a silence — and that is a different fact again from *nothing cites this id yet* or *a case exists and the run did not reach it*.
+
+## The selective loop: what runs while work is under way
+
+**While work is under way, run the cases of what you touched, and no whole tier — MUST** (`RD.DEVEX.WORKSPACE.207`). The loop holds for `UNIT`, `COMPONENT`, `CONTRACT` and `INTEGRATION`, in every kind. `JOURNEY` stays outside it, because a journey needs a quiesced running stack.
+
+**Count what a change touched in behaviour rows, never in folders.** The capability page that claims the changed code names the rows it realizes, and each row names its cases through the id in their titles. One row can be realized by a server module, a web module and the application that hosts them.
+
+| What changed | What it touched |
+| --- | --- |
+| the source of a module | the rows its capability page claims, and the cases that carry their ids |
+| a contract state | those rows, and the cases of every caller of the state |
+| a generated client | the cases of every node that calls through the client |
+
+**Write the selection in the order, by hand, from the plan's list of files, and pass it to the runner after `--`**: `spnutils apps test <tier> <run> <package> -- <the runner's own selection>`. Everything after `--` reaches the runner unchanged, so the words are the runner's own; the stack's test step shows them. A path given to the runner is allowed here, because the node's own configuration has already decided which cases the node owns, and the selection only picks among those.
+
+**Use one working run name while coding, and one fresh name for the run you stamp from.** Every selective run of one node reuses the working name, so each replaces the one before it and the 20 files a tier keeps are not spent on small runs. One run with a fresh name, over every case the step touched, comes last.
+
+**Stamp the rows from the freshly named run, and never with `--reach repository`.** The stamp writes the rows the run names and leaves every other row as it is, and each stamped row's `Updated at` names the run. `--reach repository` says the run was the whole of its tiers and sets every row it did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran.
+
+**State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code, because the runner exits clean when a selection matches no case. It is never a count of a whole tier, because only a whole run can meet one. Report a selection that matched no case as *nothing proves this*.
+
+**A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). The full pass is a named step before a release: the owed tiers of the nodes the release publishes, whole and once, with the services up, and the release go is asked after it. The release command is unchanged. Outside a release, a whole tier runs when:
+
+- the changed package is imported by nodes outside the order;
+- a test configuration, a global setup or a runner file changed;
+- a spec or a source file was renamed, moved or deleted;
+- the version of a dependency moved;
+- the developer asks.
+
+A failure that points outside the touched area is your judgement, and you say it as that. A flake stays a finding until it is proven environmental. **For a partner, a whole tier means a whole tier of their own nodes**: a failure that points into a published package is a report to the platform, and a version move of the platform or of the toolchain runs every tier of every node under one run name. An arc's `PROOF` row runs again, on clean trees, what the arc's rows touched, and no whole tier unless one of the five cases holds.
 
 ## What a run owes
 

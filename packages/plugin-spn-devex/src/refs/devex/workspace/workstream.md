@@ -17,17 +17,17 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "0378ec3f"
+      "seen": "357db085"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
-      "seen": "e75d3742"
+      "seen": "6d032bae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "6c15a4dc"
+      "seen": "90931274"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -594,14 +594,52 @@ hand-back is not a report artifact: it has no template, no header and no section
 `report` skill applies to it.
 
 **An order states its loop, and the loop is fixed — MUST** (`RD.DEVEX.WORKSPACE.207`). Documents come
-first, then source, then the changed cases run alone until they pass, then the whole level once, then
-the stamp. A case written to fail first is one narrow run on the unchanged code, never a whole level.
-No source or test file changes while a test run for that repository is in flight.
+first, and then source. Then run the cases of what the change touched, and run them again until they
+pass. One run with a fresh name, over every case the step touched, comes last, and you stamp the
+behaviour rows from that run. Run no whole tier inside the loop. A case written to fail first is one
+narrow run on the unchanged code. No source or test file changes while a test run for that repository
+is in flight.
+
+**The loop is selective, and these are its parts.** The `test` skill, § The selective loop, states
+each one in full.
+
+| Part | What you do |
+| --- | --- |
+| what was touched | count it in behaviour rows: the capability page that claims the changed code names the rows, and the rows name their cases. A changed contract state or a generated client touches every caller's cases |
+| the selection | write it in the order, by hand, from the plan's list of files. Pass it after `--` on `spnutils apps test <tier> <run> <package>`. An estate package is selected whole, through `spnutils infra test <run> <package>` |
+| the tiers | unit, component, contract and integration, in every kind. Journeys stay outside the loop |
+| the run names | while coding, every selective run of one node reuses one working run name. One run with a fresh name, over every case the step touched, is the run you stamp from |
+| the stamp | `spn-devex behaviours stamp write <run> <repo>` from the freshly named run. It leaves a row the run does not name as it is. Never pass `--reach repository` for a selective run |
+
+**An order states its acceptance as named behaviour ids, and never as a count of a whole tier —
+MUST.** The order names the ids its change must prove, and the selection that runs their cases. Read
+each id as `SUCCESS` from the run file. An exit code is not acceptance, because the runner exits clean
+when a selection matches no case. A count of a whole tier is not acceptance either, because only a
+whole run can meet it. Report a selection that matched no case in these words: *nothing proves this*.
+
+**A whole tier runs before a release, or in one of five named cases — MUST**
+(`RD.DEVEX.WORKSPACE.245`). Before a release, the full pass is a named step: run the owed tiers of
+the nodes the release publishes, whole and once, with the services up, and ask for the release go only
+after it. The release command is unchanged. Outside a release, run a whole tier only when one of
+these holds:
+
+- the changed package is imported by nodes outside the order;
+- a test configuration, a global setup or a runner file changed;
+- a spec or a source file was renamed, moved or deleted;
+- the version of a dependency moved;
+- the developer asks.
+
+A failure that points outside the touched area is your judgement: say what you saw, and say that the
+choice was yours. A flake stays a finding until it is proven environmental.
+
+**An arc's `PROOF` row runs again, on clean trees, what the arc's rows touched — MUST.** It runs no
+whole tier unless one of the five cases holds.
 
 **An order takes no baseline of its own where a run on the same commit exists — MUST.** The arc's
 `00-facts.md` holds what each gate printed at the pin, and the *Before* number comes from there. Where
 no run on that commit exists, run the gate once before you change anything. **Run the gates once, at
-the end of each step.** Inside a step, run only the changed cases.
+the end of each step.** Inside a step, run only the cases of what you touched. A whole test tier is
+not one of an order's gates, unless one of the five cases holds.
 
 **An agent launches no child agent — MUST.** A child can go on writing after its parent has reported,
 so the coordinator reads a tree that is still moving. Every order says so under *Never*.
