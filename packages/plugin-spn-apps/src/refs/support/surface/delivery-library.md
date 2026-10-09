@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "1541fcdd"
+      "seen": "5c6bfe2f"
     }
   ]
 }
@@ -59,7 +59,7 @@ Core holds the variables in collections, and each is one setting of the book: `R
 
 ## Color is a mode, and the rest are properties — 🔮
 
-In the design library, `color` is a variable mode. `variant`, `size` and the state are properties. `color` stays a prop on every stack, and a design read back turns the mode into the prop.
+In the design library, `color` is a variable mode. `variant`, `size` and the state are properties. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
 
 ## What stays in words — 🔮
 
@@ -143,6 +143,8 @@ An inventory is read to one of three depths, and each is a reading of its own.
 **An inventory is not a record of every layer.** It holds no entry for every layer of every version, because the facts the snapshot keeps are reduced from them inside Figma. It holds no count of where each variable is used across the whole file. That count is made for one variable, through the connector, when a change needs it, such as removing the variable.
 
 **The `counts` key MUST be written last, after the data.** It is what proves a file whole. The command that takes an inventory in counts what the file holds and compares it with the file's own `counts`. **It MUST refuse a file with no `counts`, a file whose counts differ from what it holds, and a file of an unknown `inventoryVersion`, and it MUST name the file.**
+
+**The command's checks cannot tell a slip in copying.** The connector returns the answers as text, and the agent writes them to files. The counts and the shape of each unit pass a changed value, such as a list `["FIXED"]` written for `["FIXED","HUG"]`, or a name with a leading space. So before the inventory is taken in, the agent proves each unit by a short hash. The same script is sent again, wrapped in a function with its body unchanged, and it returns for each unit an eight-character hash of the unit with its keys sorted. A program computes the same hash from the answer file and compares by the unit's index, following `next` until each page is whole. A unit that differs is read again alone and corrected. A change in the file between the two readings is told from a slip in copying, and the newer reading is taken. The hash proves the file against a second reading of the same connector, so a change made and undone between the two readings is outside it.
 
 **Every library file MUST have an inventory taken in before the library's snapshot is written.** A unit in one file is bound to a variable of another, so no file can be read alone. With one missing, the command names it and writes no snapshot.
 
@@ -328,6 +330,7 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Reading | A set holds its property definitions and a version does not | it never reads the definitions from a version, and optional chaining does not make that safe |
 | Reading | Only some kinds of node have some properties | it checks the node's kind before it reads such a property |
 | Reading | A picture of a node comes back in the answer | it asks the node for it, and sets the scale when the default size is too small |
+| Reading | The connector returns an inventory's answers as text, and the agent writes them to files | it proves each unit by a hash, as "The inventory" states, because a slip in copying passes the counts |
 | Writing | A call that changes the file must say what it changed | it returns every id made or changed |
 | Writing | A colour runs from 0 to 1, and its opacity sits on the paint | it writes the three channels with no alpha, and sets the opacity on the paint |
 | Writing | Fills and strokes are read-only lists | it copies the list, changes the copy and assigns it back |
@@ -345,6 +348,24 @@ Read this list before you work in a library file by the connector. Each is a fac
 | Composing a sheet | An instance holds its text in a text property | it sets the text through that property, reading the exact key from the instance, and sets the text of a layer only where no property holds it |
 | Composing a sheet | A variable or a style of another library file is not in the local lists | it finds one through a layer of this file that uses it, or imports it by key |
 | Composing a sheet | A picture of a whole case cannot be edited | it never places one as a fill or a layer, and builds the case from layers |
+| Composing a sheet | A group whose members are joined (`attached`) places its members and draws nothing on them | it sets the joined look on each member instance, as the next rows state |
+| Composing a sheet | The joined look is overrides on each member instance: the inner corners square and the shared border dropped | the first member gets the radii of its inner side at 0; a middle member gets all four radii at 0 and no stroke on the side it shares; the last gets the radii of its inner side at 0 and no stroke on the shared side |
+| Composing a sheet | A member put in new has none of those overrides, and a group of one needs none | it sets them on each new member of a group of two or more, and reads the radii and stroke weights back |
+| Composing a sheet | The web joins members by the group's own CSS on its direct children, and neither the group nor a member has a property for it in the file | it draws the joined look by overrides, in a button group and in a toggle group alike, and has read no other unit that joins members |
+| Slots | `createSlot()` on a version adds a slot property to the version's set | it makes a frame a slot in one call: it makes the slot, ties it to the set's own slot property, and deletes the added property |
+| Slots | A call that throws leaves the file as it was, which was so each time the file was read after a throw | it makes the call throw unless exactly one slot property was added, no layer is tied to it, and the set's definitions, the version's key and the version's look are as they were at the start |
+| Slots | Naming the new slot layer renames the added property | it reads the added property's key again just before the delete, because the key kept from right after `createSlot()` is stale and the delete throws |
+| Slots | A new slot keeps the x and y that `createSlot()` gave it after it is put into an auto layout parent | it sets the slot absolute, sets its x and y to the frame's old x and y, and sets it back to auto |
+| Slots | A new slot has a stroke of weight 1 on all four sides, counted in layout | it copies the four sides' weights, the dash pattern, whether strokes count in layout and the effects from the frame, because copying one stroke weight makes every side 1 and moves the children |
+| Slots | Copying a frame's values onto a slot loses the frame's variable bindings | it reads the frame's bound fields before the frame goes, binds each one again on the slot, and compares the bindings with the twin version's slot |
+| Slots | The frame is gone once the slot replaces it | it finds a binding lost earlier only by comparing the slot with the twin version's slot at the same path |
+| Slots | On a set of hundreds of versions each add and delete of a slot property walks every version, about 11 seconds for each layer on a set of 850 versions | it makes the slot by copying the twin version's slot into the version, which adds no property, and the copy keeps the twin's ties |
+| Slots | A call longer than about 90 seconds can lose its answer or be cut | it keeps each call to about eight layers on such a set, and reads the file to see what was done |
+| Slots | A copied slot is proven against a slot made the first way | it compares every field of the copy with a slot of the same size made by `createSlot()`, except its position, which follows the version's size |
+| A library's update | A file takes a library's published update only when the update is accepted in that file in Figma, and the connector cannot accept it | it asks the developer to accept it, and reads the file's instances again afterwards |
+| A library's update | An outdated Figma desktop app can list the update and not take it, so the file's instances stand on the library's earlier state; this was seen once, and the update took after the app was updated and restarted | it compares a set's versions and properties in the file with the library's published set, and asks the developer to update the app and restart it when they differ |
+| A library's update | After an update is accepted, a nested component may have changed size, and a layout can then fail its own proof with no change in the file's own sets; this was seen in one file, where a usage became 8 px shorter and the component that shrank was not found | it reads the file's sets and runs the layout proof and the scan again, and mends a layout that fails with the alignment script, its plan read first |
+| A library's update | A library's publish carries components and styles, and a change to the canvas alone gives Figma nothing to publish, which was seen once, in a file whose sets were unchanged | it does not ask for a publish after a label, a sheet or a section is moved, and it reads a set's publish state to see whether anything is left to carry |
 | What the connector cannot do | It cannot save a named version | a person saves it before the connector's first change in a file |
 | What the connector cannot do | It cannot load all pages at once | it works on one page at a time |
 | What the connector cannot do | It cannot set plugin data | it keeps its notes outside the file |
@@ -439,7 +460,7 @@ These three rules and the layout rules above do not conflict, because they cover
 
 A set, a lone component and a sheet each have a header label. A row of a set may have a row label.
 
-- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, or `header · ` followed by the unit's name for a header, and the text takes one of the three forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
+- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, or `header · ` followed by the unit's name for a header, and the text takes one of the three forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A label's layer name equals `label · ` and the label's whole text, so a change to the text changes the name in the same call. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
 - **A label MUST sit inside its unit's section, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label outside its unit's section, or on a page other than its unit's, is a defect, and an agent that finds one reports it. "A file's pages are the showcase's groups, and a unit is one section" states where in the section each label stands.
 
 ### The form of a label
@@ -470,7 +491,7 @@ header · DSProgress — the progress bar · rows: size=SM (default), XS, MD, LG
 
 - **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's usage, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
 - **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
-- **A case is not a unit and is never published as one.** A case is one drawing of a unit with some of its property values set, and it is named by the values it shows, as cells `property=value` joined by `, `. A comparison never counts a case as a unit. A case MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
+- **A case is not a unit and is never published as one.** A case is one drawing of a unit with some of its property values set, and it is named by the values it shows, as cells `property=value` joined by `, `. A name is unique on its sheet, and no cell holds a second `=` or a comma. A comparison never counts a case as a unit. A case MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
 
 How the library keeps to the last rule is stated as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The files that hold cases are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
 
@@ -481,7 +502,7 @@ How the library keeps to the last rule is stated as far as the book can state it
 
 ### What a library file owes of a unit
 
-A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. The Usage band is the part of the library that the showcase's own Usage is proven against: both draw the one use of the unit that an app would really have. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
+A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. The Usage band is the part of the library that the showcase's own Usage is proven against: both draw the one use of the unit that an app would really have. A usage is drawn from the showcase's source for its props, labels and values, and checked against a picture of the running showcase. Where a reading of the source and the picture differ, the picture is right. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
 
 - **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
 - **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. Each is drawn by a version of the set, or by a case named `<property>=<value>` on the version where the property draws. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
