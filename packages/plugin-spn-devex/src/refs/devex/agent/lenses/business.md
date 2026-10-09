@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "94feba57"
+      "seen": "cfffd7b1"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
@@ -20,7 +20,7 @@
 
 **Judged against, beside the book:** the domain's usual workflow and its common commercial practice — how comparable products are sold, billed and supported. A business option is weighed against the practice a buyer already expects.
 
-**Convened** when a change alters what a platform charges for, what a customer is entitled to, or what an account can be moved between. Never worn while writing code — this lens has no code of its own.
+**Convened** when a change alters what a platform charges for, what a customer is entitled to, or what an account can be moved between. Never worn while writing code — this lens has no code of its own. It also speaks as a view in a discussion about a shape, where a concept's boundary or direction is decided; the view of a lens that blocks nothing is advice.
 
 ## What it checks
 

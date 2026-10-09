@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "46840166"
+      "seen": "1a75cdcd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "10f96eb0"
+      "seen": "46931c8e"
     }
   ]
 }
@@ -67,10 +67,15 @@ already answers costs the developer's attention for nothing.
 change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
 What they make possible later is one line, *later, not now*, never a construct or an option of its own.
 
+**One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check
+or the direction of a dependency — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide it alone only where you
+can name the rule that settles it. Otherwise put it to the developer before it is built, with what
+the views said, as a suggestion or as a card.
+
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put a
 suggestion, `S<n>`: in chat only, numbered per window, never written to a file, and read by no hook. A
-suggestion is a whole card, with the same parts as the card below: what, why, a lettered options table
-and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
+suggestion is a whole card, with the same parts as the card below: what, why, a lettered options table,
+the views that spoke, and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
 sections, each with its own cards. Once the answer settles the shape, the arc row
 is written, and anything still open becomes the page's next `Q<n>` card, in the shape below.
 
@@ -90,6 +95,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
 | **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
+| **Views** | Who spoke, why those views, and what each one objected to. A view with no objection says so. The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it |
 | **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked in the card on the approach page and never in the preview, which holds no card. A code fragment is written to its stack's own naming and code standards (decision RD.DEVEX.WORKSPACE.235) |
 
@@ -101,7 +107,8 @@ should fill. An answered card leaves the page: its answer folds into the section
 one shape — MUST** (`RD.DEVEX.WORKSPACE.147`, `RD.DEVEX.WORKSPACE.216`). The markup is
 `<div class="sds-open"><h4 id="q<n>">`. The number is lower case in the `id`, and it is written
 `Q<n>` for a reader. Each part's label is a `span.sds-key`, the options are a table inside the card,
-and the recommendation is a `div.sds-recommended`. A decided card is a `div.sds-card`. The checks
+the views are one more labelled block after the options and before the recommendation, and the
+recommendation is a `div.sds-recommended`. A decided card is a `div.sds-card`. The checks
 find an open card by this shape and by nothing else. So a card written in another shape makes a page
 look as if it has no questions.
 
@@ -157,10 +164,13 @@ names the card. Rows the answer cannot change keep running.
 
 **A card is shown in full once, at the top of the reply that raises it — MUST**
 (`RD.DEVEX.WORKSPACE.189`). It goes under **Needs you** at the start of that reply, in markdown, and
-never again in the body of the same reply. While it stays open, each later reply names it in one line
-— its number, its question, and where it is — before the progress. The full card stays on the
-approach page. `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you,
-then what moved* holds that shape.
+never again in the body of the same reply. A reply opens with **Needs you** only when a new question
+arrives in it, or when the work is done or blocked and you now wait. Then each open card is named in
+one line — its number, its question, and where it is — and that line is complete, also when it names
+the letter you recommend. A progress reply, sent while a row of this window's arcs is in progress,
+carries no such part and repeats no open card. The full card stays on the approach page.
+`refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what
+moved* holds that shape.
 
 **The cards named there are those of the workstream you are working on — MUST**
 (`RD.DEVEX.WORKSPACE.197`). A card on another workstream's page belongs to the window that works

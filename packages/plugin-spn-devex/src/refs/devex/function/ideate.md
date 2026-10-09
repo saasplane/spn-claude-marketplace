@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9bcedab1"
+      "seen": "cc127ea7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
@@ -150,18 +150,28 @@ An argument closes by being consumed: the half that outlives it is a register ro
 
 ## Who is in the room, and who can still block
 
-| Section | Convene |
-| --- | --- |
-| the boundary, and why the thing exists | `BUSINESS` · `PRODUCT` · `LEAD` |
-| who it serves, and what they can do | `PRODUCT` |
-| the domains, the surfaces, the shape | `ARCHITECT` |
-| an open question | whichever lens the question belongs to |
+**Which views take part, and how many, is one rule, and this phase keeps no list of its own.** A lens takes part in a discussion about a shape as a view, at any moment of a workstream and not only while a concept is written. `refs/devex/agent/lenses.md` states the rule: the views follow what is being decided, and their number follows the signs of complexity. A concept's boundary, and why the thing exists, is a decision about direction, so it starts from the group that rule names for direction, and the business manager's view joins it.
 
 **Wearing a lens while drafting is not reviewing through it.** The context that drafted a design contains every justification for it, so it agrees with itself — the architect's lens is convened over the draft as well as worn while writing it, because the reviewer who can still block is the one who did not write the thing.
 
 **The architect's lens blocks on a new mechanism reachable from more than one module**, and the block clears when a register row names what that mechanism was weighed against. Below that threshold the lens advises, and advice declined is dropped.
 
 **The `UX` lens is worn where a page is designed.**
+
+**The lead orders pieces of work against each other, and the architect orders the steps inside one.** The engineering leader's view asks whether this is the right work, in the right order among other work, at the right size. The architect's view takes one piece of work and sets the order its steps run in.
+
+### Structure comes before content, and outside knowledge is marked
+
+**Before the agent produces content, it designs the structure that content will live in and shows it to the developer — MUST** (`RD.DEVEX.AGENT.088`). Content is what fills a structure: screens, modules, pages. The structure is the units, their names and their grouping, and the pattern each unit follows. Content made first fixes a structure nobody designed.
+
+**While a shape is discussed, the agent says how known platforms solve the same problem, and it marks each such statement.** It brings this without being asked, and it uses the words of the platform's own domain.
+
+| Mark | Means |
+| --- | --- |
+| *verified* | the agent read the source in this session, and names it |
+| *not verified* | the agent states it from what it knows, and has read no source for it |
+
+A statement about another platform that carries no mark reads as a fact, and nobody can tell whether it was checked.
 
 ## What this phase hands on, and what it never does
 

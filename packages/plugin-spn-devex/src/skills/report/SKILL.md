@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "500e5386"
+      "seen": "87912c24"
     }
   ]
 }
@@ -178,7 +178,7 @@ The first two groups are a table of **# · Recommendation · Closes · Done when
 
 **No Decided by column and no Effort column**: the group heading says who decides, and Closes says what an action is worth.
 
-**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *What*, *Why it needs you* and the *Options*, and a closing line with the option you would take. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`).
+**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *What*, *Why it needs you* and the *Options*, and a closing line with the option you would take. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, who spoke and why, which is added when the card is copied.
 
 ## Who decides — MUST
 

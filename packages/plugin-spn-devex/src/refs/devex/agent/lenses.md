@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "94feba57"
+      "seen": "cfffd7b1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "822bbc3e"
+      "seen": "8f3232dc"
     }
   ]
 }
@@ -35,6 +35,69 @@
 **A panel reports; the writing context acts.** The panel does not edit, and it does not decide what happens next.
 
 **A panel never invents a rule.** A finding with no owning chapter behind it is a suggestion, and it is reported as one.
+
+## A view in a discussion about a shape
+
+**A lens also takes part in a discussion about a shape, as a view — MUST** (`RD.DEVEX.AGENT.084`). The agent stays one agent. `refs/devex/agent/agent.md` says what a view is. This section says how a view differs from a worn lens and a convened one, which views speak, how many, and how each one is made.
+
+| | Worn | A view | Convened |
+| --- | --- | --- | --- |
+| When | mid-task, while the work is written | while a shape is discussed with the developer, before anything is built on it | after, over a scope that already exists |
+| What it reads | the work in hand | the proposal's own words, and the developer's | the work itself, never a summary of it |
+| What it produces | better work | objections and additions, each named by its view | a verdict and findings |
+| May it block | no | only when a fresh agent makes it, and only where its lens file says so | where its lens file says so |
+
+**A view does not replace the review.** A view speaks before a draft exists, and the convened lens still reads the draft when there is one.
+
+### Which views speak, and how many
+
+**The agent picks the views from what is being decided, and their number from the signs of complexity — MUST** (`RD.DEVEX.AGENT.085`). It judges both by itself, and it does not ask the developer which views to bring. The first table is a starting map, not a fixed list.
+
+| What is being decided | The views to start from |
+| --- | --- |
+| direction, boundaries, who owns what | `LEAD` · `ARCHITECT` · `PARTNER` · `PRODUCT` |
+| the shape of a contract, a name | `ARCHITECT` · `SERVER_DEV` or `WEB_DEV` · `PARTNER` |
+| how it is built and proved | `ARCHITECT` · `SERVER_DEV` · `QA` · `INFRA` · `TRUST` |
+| what a person reads or sees | `VOICE` · `UX`, and `ARCHITECT` when a boundary moves |
+
+A sign of complexity is one of these, each read from the change itself: the choice **crosses a repository**, it **changes what a partner builds on**, or it **sets a pattern others will follow**.
+
+| The choice shows | The views | The passes |
+| --- | --- | --- |
+| no sign | the one view that owns the question | one sentence |
+| one sign | the architect's view and the owning view | one |
+| two signs or more | the starting group for what is being decided, with product and partner among them | one, and a second after the developer's answer |
+
+**More views, or more passes, need the developer's word.** A choice inside one place that brings every view costs the developer a wait and a long reply for a decision one sentence settles. **The agent says which views it brought, and why those.** One line is enough. On a card, that line is the card's *Views* part.
+
+### How a view is made
+
+**Below two signs, the one agent speaks from the view's lens file, in one sentence when there is no sign. From two signs up, each view is a fresh agent. Whenever a view's word is to count as a review that can block a gate, it is a fresh agent — MUST** (`RD.DEVEX.AGENT.086`). A worn lens is never a review. The reply says which way each view was made.
+
+| | The one agent reads the lens file | A fresh agent speaks |
+| --- | --- | --- |
+| Used for | a choice with fewer than two signs | a choice with two signs or more, and any view whose word is to count as a review that can block a gate (only a lens that may block can) |
+| What it knows | the whole conversation | only what it is handed: the proposal's own words, and the developer's. There is no file yet |
+| How independent | the least. The agent that prefers a design also argues against it | the most. It has not read the agent's own reasons |
+| May it block | no. It is a worn lens | yes, where its lens file says so |
+
+**A view that the one agent makes is advice, whatever lens it reads.** The context that wrote a proposal cannot block it, and it cannot pass it either.
+
+### The architect's view answers for the structure of the system, and of the work on it
+
+**The architect's view follows a change through every place it lands, and it designs how the work on it is laid out and ordered — MUST** (`RD.DEVEX.AGENT.087`).
+
+| The architect's view answers for | What it asks |
+| --- | --- |
+| structure before content | are the units, their names and their grouping designed, before anything is put in them? |
+| ownership and direction | who owns this, and which way does the dependency point? |
+| every place a change lands | each repository, the estate and the cloud, the local stack, the book and the plugin |
+| new or existing | is this a pattern the system already has? |
+| the build | does the code that was written still match the design? |
+| what the work needs written | what goes on the approach page, in a preview, in a sample, in the plan and in an order, and how detailed each one is |
+| the order of execution | what order makes the whole work cheapest? |
+
+**The lead orders pieces of work against each other, and the architect orders the steps inside one.** The lead's view asks whether this is the right work, in the right order among other work, at the right size. The architect's view takes one piece of work as given and orders its steps. It orders the work and does not write what each step contains.
 
 ## What a lens may block
 

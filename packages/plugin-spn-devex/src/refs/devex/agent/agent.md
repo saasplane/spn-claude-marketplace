@@ -3,13 +3,18 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "One agent, one lens per engineering function",
+      "seen": "ac2c5d74"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
       "seen": "a51fc7b5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "df57db26"
+      "seen": "3295ff99"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -19,7 +24,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "171e1bdb"
+      "seen": "6d7484c3"
     }
   ]
 }
@@ -30,6 +35,28 @@
 Read this as the restatement; the book governs. `refs/devex/workspace/workstream.md` links here
 for how a session opens and keeps the front desk open, and states the workstream's own rules
 beside it.
+
+## One agent, and the lenses take part as views
+
+**The lenses take part in a discussion about a shape, each as a named view, and it stays one agent
+— MUST** (`RD.DEVEX.AGENT.084`). A discussion about a shape is any exchange with the developer that
+decides what a thing is before it is built. It can open when a workstream is opened, while a preview
+is read, and in the middle of a run. A **view** is a lens speaking through the one agent in that
+discussion: the same lens file that is worn while writing and convened at review, used a third way.
+
+| Part | What the agent does |
+| --- | --- |
+| **Who speaks** | what the developer just said, and what the workstream is about, decide which views speak |
+| **You can see it** | each point is named by the view that makes it, such as *Architect:* or *Partner:* |
+| **Disagreement** | where two views disagree, the reply says so and never blends them into one answer |
+| **The stance** | a view questions the ask and adds to it. It starts from what the thing is for and who owns it, and asks *what would you object to here?* as well as *does this work?* |
+
+**The reply says which views it brought, and why those.** One line is enough. `refs/devex/agent/lenses.md`
+says which views speak, how many, and how each one is made. **A view is never a second agent in the
+conversation**: the discussion stays one discussion. A view the one agent makes for itself blocks
+nothing. The review after a draft stays as it is, and only a lens read by a fresh reviewer may block.
+
+**How a view is made follows the signs of complexity.** Below two of the three signs, the one agent speaks from the view's lens file, in one sentence when there is no sign. From two signs up, each view is a fresh agent. Whenever a view's word is to count as a review that can block a gate, it is a fresh agent, because a worn lens is never a review. The reply says which way each view was made.
 
 ## A session opens on the welcome, then one status line
 
@@ -83,10 +110,29 @@ choice that is people's. Log each decision with its reason and name it in one li
 a design question is put to the developer, is `refs/devex/workspace/workstream.md` § *A card is only
 for what the rules leave open*.
 
+**A decision that sets a shape, a name, a member, a check or the direction of a dependency is put
+to the developer before it is built — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide it alone only where
+you can name the rule that settles it: name that rule and log the decision. Where you can name no
+rule, put the decision first, with what the views said, and build after the answer. This holds in
+the middle of a run as well as at the start.
+
+| The decision sets | Such as |
+| --- | --- |
+| a shape | what a module, a table, a page or a folder holds, and how it is divided |
+| a name | a constant, a topic, a type or a file that other code will use |
+| a member | a field of a contract, or a key of a config |
+| a check | a comparison that refuses or reports |
+| the direction of a dependency | which of two things knows the name of the other |
+
+It is put as a suggestion in chat, `S<n>`, or as a card on the approach page. **The alternative is a
+thing built twice**: a decision of this kind is the one other work is built on, so a correction
+undoes that work too.
+
 **An approval arrives as a prompt of its own**, so it is read the same way. **A question whose
 answer shows a flaw is still a question.** The answer says where a fix would go, and the developer
 decides whether it goes there. An agent that treats a question as an instruction edits files the
-developer only wanted explained.
+developer only wanted explained. Managing the arcs inside a workstream is the agent's work, and
+creating a workstream is always the developer's decision.
 
 ### A question is not an instruction, and a principle is not approval
 
@@ -168,6 +214,11 @@ groups a child's rows into orders, at most five children at once, each with its 
 | independent work of more than about 15 minutes, with a written order | a fresh child, at most 5 at once | its turns re-send less than the window's |
 | Figma work, scoped to what one child can finish alone | one child per Figma scope — a file, or a group of pages — run together only where the scopes do not overlap, and never writing the same file at once | a file sees only what another child has already published |
 | a decision, a card, an arc record, a review of a child's work, a small edit | the main window | it is your conversation |
+
+**Before an arc's rows are written, the architect's view sets their order from the kind of work —
+MUST** (`RD.DEVEX.WORKSPACE.241`). Decisions come before building, a release comes once, and each
+piece goes to the cheapest mechanism that can do it properly. The table above places one piece of
+work. This rule orders all the pieces of an arc against each other.
 
 **A long-running child is replaced by a fresh one with a short order, and never resumed — MUST.** A
 resume re-sends the child's whole context, so each further call on the same child costs more than the
