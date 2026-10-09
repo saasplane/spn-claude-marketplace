@@ -24,6 +24,11 @@
 // after the layout. A label the form cannot say lays out nothing: it returns `mode: "refused"` with the
 // reason. This script lays out an axis only when every cell of one factor names one property.
 //
+// `ignore` is a list of node ids of the home that the check of nodes that meet leaves out: a pair is left out
+// when EITHER of its two nodes is ignored. It is for the set's old row and column labels, which `labels.js`
+// removes and writes again right after the layout, so what they meet does not stop it. The answer's
+// `ignored` counts the ignored nodes the home holds; with `ignore` empty nothing is left out.
+//
 // Before anything moves it checks the plan: no version outside the set, no two versions meeting,
 // no two nodes of the home meeting, and the version at the top left carrying `defaults` (every
 // property of the set, as the stack gives them). A failed check moves nothing. The answer holds the
@@ -39,6 +44,7 @@ const INPUTS = {
   gap: null,
   resize: true,
   mayMove: [],
+  ignore: [],
   clearance: 100,
   listMoves: 50,
 };
@@ -299,7 +305,10 @@ const outside = placements.filter((placement) =>
   placement.box[0] + placement.box[2] > plannedSet[2] || placement.box[1] + placement.box[3] > plannedSet[3])
   .map((placement) => placement.version.id);
 const versionPairs = pairsThatMeet(placements.map((placement) => ({ id: placement.version.id, box: placement.box })));
-const topLevelPairs = pairsThatMeet([...topLevel.map((entry) => ({ id: entry.id, box: entry.box })), { id: set.id, box: plannedSet }]);
+// A pair with an ignored node in it is left out: that node is about to be removed, so what it meets does not matter.
+const isIgnored = (id) => INPUTS.ignore.includes(id);
+const withoutIgnored = (pairs) => pairs.filter(([first, second]) => !isIgnored(first) && !isIgnored(second));
+const topLevelPairs = withoutIgnored(pairsThatMeet([...topLevel.map((entry) => ({ id: entry.id, box: entry.box })), { id: set.id, box: plannedSet }]));
 const plannedTopLeft = topLeftOf(placements.map((placement) => ({ name: placement.version.name, x: placement.box[0], y: placement.box[1] })));
 const plannedValues = parseVersionName(plannedTopLeft.name);
 const wrongDefaults = Object.keys(INPUTS.defaults).filter((property) => plannedValues[property] !== INPUTS.defaults[property])
@@ -324,6 +333,7 @@ const summary = {
   understood,
   setBoxPlanned: plannedSet,
   defaultPlanned: plannedTopLeft.name,
+  ignored: topLevel.filter((entry) => isIgnored(entry.id)).length,
   counts: { versions: versions.length, versionsToMove: moves.length, nodesToMove: nodeMoves.length },
   moves: moves.slice(0, INPUTS.listMoves).map((placement) => [placement.version.id, placement.box[0], placement.box[1]]),
   nodeMoves: nodeMoves.map((entry) => [entry.id, entry.box[0], entry.box[1]]),
@@ -346,7 +356,7 @@ const after = set.children.filter((child) => child.type === "COMPONENT");
 const outsideAfter = after.filter((version) =>
   version.x < 0 || version.y < 0 || version.x + version.width > set.width || version.y + version.height > set.height).length;
 const versionPairsAfter = pairsThatMeet(after.map((version) => ({ id: version.id, box: boxOf(version) }))).length;
-const topLevelPairsAfter = pairsThatMeet(home.children.map((node) => ({ id: node.id, box: boxOf(node) }))).length;
+const topLevelPairsAfter = withoutIgnored(pairsThatMeet(home.children.map((node) => ({ id: node.id, box: boxOf(node) })))).length;
 return {
   ...summary,
   mode: "applied",

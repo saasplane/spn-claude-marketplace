@@ -8,7 +8,7 @@
 //   unit    the unit's name
 //   setId   the unit's set, or null for a unit with no set
 //   pageId  the page the call works on; with no set, the unit's section is the section of this page named
-//           as the unit
+//           as the unit, found at any depth of sections
 //   label   a text; the sheet's own label is `<Unit> cases — <label>` (the sheets that stand list their
 //           cases there). With no label it is `<Unit> cases — one component for each case`
 //
@@ -41,9 +41,20 @@ if (INPUTS.setId) {
   if (!set || set.type !== "COMPONENT_SET" || set.name !== INPUTS.unit) return { refused: `${INPUTS.setId} is not the set ${INPUTS.unit}` };
   section = set.parent;
   if (!section || section.type !== "SECTION") return { refused: `the set ${INPUTS.unit} does not stand in a section` };
-  if (section.parent !== page) return { refused: `the set ${INPUTS.unit} is not on the page ${INPUTS.pageId}` };
+  let up = section;
+  while (up && up.type !== "PAGE") up = up.parent;
+  if (up !== page) return { refused: `the set ${INPUTS.unit} is not on the page ${INPUTS.pageId}` };
 } else {
-  section = page.children.find((child) => child.type === "SECTION" && child.name === INPUTS.unit) || null;
+  const inside = (parent) => {
+    for (const child of parent.children) {
+      if (child.type !== "SECTION") continue;
+      if (child.name === INPUTS.unit) return child;
+      const deeper = inside(child);
+      if (deeper) return deeper;
+    }
+    return null;
+  };
+  section = inside(page);
   if (!section) return { refused: `the page holds no section named ${INPUTS.unit}` };
 }
 await figma.setCurrentPageAsync(page);

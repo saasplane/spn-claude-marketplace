@@ -844,7 +844,11 @@ await guard(async () => {
 await guard(async () => {
   const gone = newCasesPage();
   const none = await run("cases.js", { spec: oneCase({ replaces: "nothing here" }), dryRun: false }, gone.figma);
-  ok("a `replaces` that names nothing on the sheet is a problem, and the case is not made", /stands on the sheet as no component/.test(none.problems[0] ?? "") && none.made.length === 0 && gone.components.length === 0 && gone.old.name === "old=lone", JSON.stringify(none));
+  same("a `replaces` that names no component of the sheet makes the case new and lists it in `nothingToReplace`; no problem", [none.problems, none.nothingToReplace, none.made.map((one) => one[0]), gone.components.length, gone.old.name], [[], ["loading=true"], ["loading=true"], 1, "old=lone"]);
+  const frame = newCasesPage();
+  frame.sheet.children.push(Object.assign(node("4:6", "a frame", "FRAME"), { parent: frame.sheet }));
+  const notComponent = await run("cases.js", { spec: oneCase({ replaces: "a frame" }), dryRun: false }, frame.figma);
+  ok("a `replaces` that names something on the sheet that is no component stays a problem, the case is not made", /stands on the sheet as no component/.test(notComponent.problems[0] ?? "") && notComponent.made.length === 0 && frame.components.length === 0, JSON.stringify(notComponent));
   const twice = newCasesPage();
   const spec = oneCase({ replaces: "old=lone" });
   spec.cases.push({ name: "loading=false", base: { size: "SM" }, props: { loading: false }, stands: false, replaces: "old=lone" });
@@ -1016,6 +1020,33 @@ for (const script of ["copy.js", "property.js", "sheet.js", "header.js"]) {
   try { new AsyncFunction("figma", readFileSync(join(folder, `one-${script}.js`), "utf8")); parses = true; } catch { parses = false; }
   ok(`${script} makes a bundle that is a whole script, under the connector's limit`, built.exit === 0 && parses && readFileSync(join(folder, `one-${script}.js`), "utf8").length < 50000, built.said);
 }
+
+await guard(async () => {
+  const made = labelsPage();
+  for (const [id, name, y] of [["4:7", "label · Usage", 150], ["4:8", "label · Cases", 200], ["4:9", "label · DSBtn cases — size=SM", 220]]) {
+    const band = made.home.children.find((child) => child.id === "4:1");
+    const copy = band.clone(); copy.id = id; copy.name = name; copy.characters = name.slice(8); copy.x = 40; copy.y = y; copy.parent = made.home; made.home.children.push(copy);
+  }
+  const dry = await run("labels.js", { setId: "9:1" }, figmaFile([made.page]));
+  same("a band label and a sheet's own label beside the set are no row label, and are not removed", dry.removed, ["size=SM (default)", "size=MD", "state=rest (default)", "state=hover"]);
+  await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([made.page]));
+  same("after the real call they still stand", ["label · Usage", "label · Cases", "label · DSBtn cases — size=SM"].map((name) => made.home.children.some((child) => child.name === name)), [true, true, true]);
+});
+
+await guard(async () => {
+  const made = sheetPage();
+  const outer = node("3:0", "DSAll", "SECTION", { x: 0, y: 0, width: 3000, height: 1000 }, [made.section]);
+  made.page.children = [outer];
+  outer.parent = made.page; made.section.parent = outer;
+  const nested = await run("sheet.js", { ...sheetInputs, dryRun: false }, sheetFile(made));
+  ok("a unit whose section stands inside another section is found: the page is reached by walking up", nested.problems.length === 0 && typeof nested.sheet === "string" && made.section.children.some((child) => child.name === "DSBtn cases"), JSON.stringify(nested));
+  const lone = sheetPage((parts) => { parts.set = null; });
+  lone.section.children.push(Object.assign(node("5:5", "DSBtn", "COMPONENT", { x: 435, y: 148, width: 100, height: 40 }), { parent: lone.section }));
+  const outerLone = node("3:0", "DSAll", "SECTION", { x: 0, y: 0, width: 3000, height: 1000 }, [lone.section]);
+  lone.page.children = [outerLone]; outerLone.parent = lone.page; lone.section.parent = outerLone;
+  const deep = await run("sheet.js", { unit: "DSBtn", setId: null, pageId: "2:1" }, sheetFile(lone));
+  same("a unit with no set: the section named as the unit is found inside another section", [deep.problems, deep.section], [[], "3:1"]);
+});
 
 // ---- the texts the agent passes on --------------------------------------------------------------
 

@@ -13,6 +13,7 @@
 // values its versions share for the properties the header's `rows:` clause names, and a column's the
 // same for `columns:`; a value that is the default carries ` (default)`. A side keeps the form its labels
 // had: `property=value` where they named the property, the bare values joined by ` · ` where they did not.
+// A band label and a sheet's own label are never a row or a column label, whatever they stand beside.
 // The book's distances: a row label ends 24 left of the set, centred on its row; a column label stands 16
 // above the set, its left edge at its column's left.
 //
@@ -57,8 +58,11 @@ const rowProperties = propertiesOf("rows: ");
 const columnProperties = propertiesOf("columns: ");
 const defaults = cellsOf(set.defaultVariant.name);
 
-// The header is no label of a row or a column, though its layer may be named `label · `.
-const texts = home.children.filter((child) => child.type === "TEXT" && child.name.startsWith("label · ") && child !== header);
+// The header is no label of a row or a column, though its layer may be named `label · `. Neither is a band
+// label (`label · Usage`, `Cases`, `Parts`) nor a sheet's own label (`label · <Unit> cases — ...`).
+const BAND_NAMES = ["label · Usage", "label · Cases", "label · Parts"];
+const texts = home.children.filter((child) => child.type === "TEXT" && child.name.startsWith("label · ") && child !== header
+  && !BAND_NAMES.includes(child.name) && !child.name.includes(" cases — "));
 const middle = (node, axis, size) => node[axis] + node[size] / 2;
 const [oldX, oldY, oldWidth, oldHeight] = INPUTS.oldSetBox ?? [set.x, set.y, set.width, set.height];
 const oldRows = texts.filter((text) => text.x + text.width <= oldX && middle(text, "y", "height") >= oldY && middle(text, "y", "height") <= oldY + oldHeight);

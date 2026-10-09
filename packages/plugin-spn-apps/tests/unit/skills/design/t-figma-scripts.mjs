@@ -361,6 +361,22 @@ const positions = (set) => set.children.map((child) => [child.id, child.x, child
 }
 {
   const set = buttonSet(swapped);
+  const first = componentSet("3:a", "OldLabelA", [600, 0, 100, 100], [version("3:a1", "size=SM", 10, 10)]);
+  const second = componentSet("3:b", "OldLabelB", [650, 0, 100, 100], [version("3:b1", "size=SM", 10, 10)]);
+  const figma = () => file([page("2:1", "Actions", [set, first, second, buttonHeader()])]);
+  const refused = await run("layout.js", layoutInputs({ dryRun: false }), figma());
+  same("two nodes that meet each other and that it does not move refuse, as before; ignored is 0", [refused.mode, refused.checks.topLevelPairsMeeting, refused.ignored], ["refused", 1, 0]);
+  const both = await run("layout.js", layoutInputs({ dryRun: false, ignore: ["3:a", "3:b"] }), figma());
+  same("the same two in `ignore` do not stop it, the answer counts them, and the proof leaves them out", [both.mode, both.ignored, both.verified.topLevelPairsMeeting], ["applied", 2, 0]);
+  const one = await run("layout.js", layoutInputs({ dryRun: true, ignore: ["3:a"] }), figma());
+  same("a pair is left out when either of its two nodes is ignored", [one.mode, one.ignored, one.checks.topLevelPairsMeeting], ["dry", 1, 0]);
+  const near = componentSet("2:set", "DSInput", [200, 0, 100, 100], [version("2:a", "size=SM", 10, 10)]);
+  const wide = buttonSet(swapped, [0, 0, 100, 100]);
+  const stillMeets = await run("layout.js", layoutInputs({ dryRun: true, ignore: ["3:a"] }), file([page("2:1", "Actions", [wide, near, buttonHeader()])]));
+  same("an ignored id that is in no pair leaves a real pair refusing", [stillMeets.mode, stillMeets.checks.topLevelPairsMeeting > 0], ["refused", true]);
+}
+{
+  const set = buttonSet(swapped);
   const before = positions(set);
   for (const [reason, header] of [
     ["no label names the set", labelText("1:label", "DSOther — one row", [0, -30, 300, 20])],

@@ -27,8 +27,10 @@
 //                     that holds exactly one instance of the unit keeps that instance: it is swapped to the
 //                     base when its main component differs, then takes the properties and the modes, and its
 //                     text overrides and the component's layout stay; only a component that holds anything
-//                     else has its children removed. A name that matches nothing on the sheet, or one that
-//                     another case of the call replaces too, is a problem and that case is not made. Every
+//                     else has its children removed. A name that matches no component of the sheet is not a
+//                     problem: the case is made new, as a case with no `replaces`, and its name is listed in
+//                     `nothingToReplace`. A name that matches something on the sheet that is no component, or
+//                     one that another case of the call replaces too, is a problem and that case is not made. Every
 //                     `replaced` entry ends with what the component held and with `rename`, `keep` or
 //                     `rebuild`, so a dry answer shows what a real call would remove
 //           swap      a non-empty one is a problem and the case is not made
@@ -72,7 +74,7 @@ const definitions = target.componentPropertyDefinitions;
 const keyOf = (property) => Object.keys(definitions).find((key) => key === property || key.startsWith(property + "#"));
 const versions = isSet ? target.children.filter((child) => child.type === "COMPONENT") : [target];
 
-const done = { unit: spec.unit, dryRun: INPUTS.dryRun, sheet: sheet ? sheet.id : null, made: [], stood: [], stoodDifferent: [], replaced: [], problems: [] };
+const done = { unit: spec.unit, dryRun: INPUTS.dryRun, sheet: sheet ? sheet.id : null, made: [], stood: [], stoodDifferent: [], nothingToReplace: [], replaced: [], problems: [] };
 const wanted = (spec.cases || []).filter((one) => !one.stands);
 if (!sheet && wanted.length > 0) {
   done.problems.push(`no sheet named "${spec.unit} cases": ${wanted.length} cases not made`);
@@ -198,7 +200,8 @@ for (const one of wanted) {
   let how = "new";
   if (!unknown && one.replaces) {
     replaced = sheet.children.find((child) => child.type === "COMPONENT" && child.name === one.replaces) || null;
-    if (!replaced) unknown = `\`replaces\` names "${one.replaces}", which stands on the sheet as no component`;
+    if (!replaced && sheet.children.some((child) => child.name === one.replaces)) unknown = `\`replaces\` names "${one.replaces}", which stands on the sheet as no component`;
+    else if (!replaced) done.nothingToReplace.push(one.name);
     else if (claimed.has(replaced.id)) unknown = `"${one.replaces}" is replaced by an earlier case of this call`;
     else claimed.add(replaced.id);
   }
