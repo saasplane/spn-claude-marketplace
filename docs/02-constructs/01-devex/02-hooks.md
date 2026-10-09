@@ -79,6 +79,8 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.
 
+The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.
+
 ### A call about to run
 
 One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches.
@@ -91,6 +93,12 @@ One script, matched to shell commands alone. It reads the command that just ran,
 
 One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes.
 
+A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.
+
+- **A reply owes *Needs you* at its top in two cases.** A reply that raises a card holds the card there in full, once. A reply that waits names every card open from an earlier reply in one line. A progress reply owes no line for an older card.
+- **While work runs, only a finding about the reply sends the agent back.** That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
+- **A handover block is asked for once.** After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.
+
 ### The payload, and what a hook reads from it
 
 The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add.
@@ -98,6 +106,8 @@ The harness writes the event to standard input as JSON. `readPayload` parses it,
 ### The verdict is a return value
 
 A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent.
+
+**The developer is shown a refusal, and advice goes to the agent alone.** A refusal stops a call, so the developer needs to know why the work stopped. Advice lets the call go on, and the agent is the one who can act on it, so nothing of it is put in the developer's pane. A soft finding of the doc standard is advice. The dispatcher says it once for a file in a window, and says it again when the finding changes, because it is then a different finding.
 
 ### One process, and the order inside it
 
@@ -148,6 +158,10 @@ This page answers which moments exist, how a script claims one, what it is hande
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is the one construct read from disk on its next run, with no fresh window owed | MUST |
 | `RD.DEVEX.UTILS.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
 | `RD.DEVEX.WORKSPACE.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
+| `RD.DEVEX.AGENT.089` | the rules a reply must follow reach the agent once, at session start, as short lines that each point at the reference holding the rule | MUST |
+| `RD.DEVEX.AGENT.092` | a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window | MUST |
+| `RD.DEVEX.WORKSPACE.189` | a reply opens with *Needs you* when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on | MUST |
+| `RD.DEVEX.WORKSPACE.244` | while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held | MUST |
 | [RD.DEVEX.002](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
