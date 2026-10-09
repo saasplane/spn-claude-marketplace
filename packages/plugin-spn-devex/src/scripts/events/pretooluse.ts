@@ -29,7 +29,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { emit, readPayload, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
-import { recordWrites } from "../lib/window.ts";
+import { alreadyTold, fromWorkspace, recordWrites } from "../lib/window.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
@@ -245,6 +245,21 @@ export function bindingPaths(payload: Payload): string[] {
   return paths;
 }
 
+/**
+ * Whether this window has already heard this doc-standard finding about this file
+ * (RD.DEVEX.AGENT.092). The same finding about one file is said once; a changed finding is said again.
+ * A call that names no file, or a window with no session id, is never silenced.
+ */
+function docFindingHeard(payload: Payload, path: string, finding: string): boolean {
+  if (!path || !payload.session_id) return false;
+  try {
+    const cwd = payload.cwd ?? process.cwd();
+    const root = workspaceRoot(cwd);
+    if (!root) return false;
+    return alreadyTold(root, payload.session_id, `doc-check|${fromWorkspace(root, resolve(cwd, path))}`, finding);
+  } catch { return false; }
+}
+
 export function dispatch(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
 
@@ -289,6 +304,7 @@ export function dispatch(payload: Payload): Verdict {
     catch { continue; }                             // a check that throws is skipped, never fatal
     if (!verdict) continue;
     if (verdict.deny) return verdict;               // the first refusal is the answer
+    if (verdict.note && check.run === checkDoc && docFindingHeard(payload, path, verdict.note)) continue;
     if (verdict.note) notes.push(verdict.note);
   }
   return notes.length ? { note: notes.join("\n\n") } : null;

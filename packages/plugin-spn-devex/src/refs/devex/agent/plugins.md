@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "676770be"
+      "seen": "166cec18"
     }
   ]
 }
@@ -219,7 +219,7 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 
 ## Who a hook's line is for
 
-**A hook shows the developer a refusal, and gives its advice to the agent alone — MUST** (`RD.DEVEX.AGENT.092`). A refusal stops a tool call, and the developer sees it. Advice lets the call go on: a soft finding of the doc standard, or a reminder. Advice goes to the agent as context, and nothing of it is shown on the developer's screen. In a hook's output, `additionalContext` is the agent's channel and `systemMessage` is the developer's, so advice is written to the first alone.
+**A hook shows the developer a refusal, and gives its advice to the agent alone — MUST** (`RD.DEVEX.AGENT.092`). A refusal stops a tool call, and the developer sees it. Advice lets the call go on: a soft finding of the doc standard, or a reminder. Advice goes to the agent as context, and nothing of it is shown on the developer's screen. In a hook's output, `additionalContext` is the agent's channel and `systemMessage` is the developer's, so advice is written to the first alone. A soft finding of the doc standard is said once for a file in a window, and a finding that changes is said again.
 
 ## What breaks if you skip this
 

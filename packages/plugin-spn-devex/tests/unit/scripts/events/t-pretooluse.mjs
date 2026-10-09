@@ -89,12 +89,30 @@ one("generated build output is refused too",
   { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "dist", "generated", "thing.ts"), content: "x" } },
   "deny", { says: "generated build output" });
 
+// ONCE FOR A FILE IN A WINDOW (RD.DEVEX.AGENT.092): the same doc finding about one file is said once
+// to a window with a session id, a second file is said, and a second window hears it again.
+function onceForAFile(shown) {
+  const session = `t-once-${process.pid}-${Date.now()}`;
+  const ask = (name, id) => shown({ tool_name: "Write", session_id: id, tool_input: {
+    file_path: join(capabilitiesDir(docsOf(PROBE_REPO)), "01-devex", "04-workspace", "04-docs", name),
+    content: "# A chapter\n\nYou will find five decisions here. You read each one and you move on.\n" } })[1];
+  const first = ask("probe.md", session), second = ask("probe.md", session);
+  const otherFile = ask("probe-two.md", session), otherWindow = ask("probe.md", `${session}-b`);
+  return [
+    ["a doc finding is said the first time", Boolean(first)],
+    ["the same finding about the same file is not said again", second === undefined],
+    ["the same finding about another file is said", Boolean(otherFile)],
+    ["another window hears it", Boolean(otherWindow)],
+  ];
+}
+
 {
   // WHO A LINE IS FOR (RD.DEVEX.AGENT.092). `systemMessage` is the developer's pane: advice never
   // reaches it, and a refusal does.
   const shown = (payload) => {
     const out = execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`],
       { input: JSON.stringify(payload), encoding: "utf8", cwd: `${WORKSPACE}` }).trim();
+    if (!out) return [undefined, undefined];
     const parsed = JSON.parse(out.split("\n").filter(Boolean).at(-1));
     return [parsed.systemMessage, parsed.hookSpecificOutput?.additionalContext];
   };
@@ -107,6 +125,7 @@ one("generated build output is refused too",
     ["advice reaches the agent", Boolean(adviceRead)],
     ["advice is not shown to the developer", adviceShown === undefined],
     ["a refusal is shown to the developer", Boolean(refusalShown)],
+    ...onceForAFile(shown),
   ]) {
     n += 1;
     if (!ok) failed += 1;
