@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "07a7f6de"
+      "seen": "f2495643"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "84fd06dc"
+      "seen": "3006ffac"
     }
   ]
 }
@@ -88,18 +88,18 @@ Level 1 finds most gaps. Level 2 finds a value that differs. Level 3 is read onl
 
 ## The gaps
 
-A gap is one difference between the library's snapshot and a stack's. Its kind is one of six, and the list is closed:
+The comparison asks one question: does the stack support everything the library asks for? A gap is a unit, a property or a value that the library holds and the stack does not. What the stack holds beyond the library is not a gap; it is kept in the record and shown as one count, because a stack always holds more than the library draws. Only SaaS Plane's own design library is compared this way. Its kind is one of six, and the list is closed:
 
 | Kind | What it means |
 | --- | --- |
-| `UNIT_ABSENT` | a unit that one side holds and the other does not |
-| `PROP_ABSENT` | a prop that one side holds and the other does not |
-| `VALUE_ABSENT` | a value of a closed list that one side offers and the other does not, missing or extra; `lacks` says which side is without it |
+| `UNIT_ABSENT` | a unit that the library holds and the stack does not |
+| `PROP_ABSENT` | a prop that the library holds and the stack does not |
+| `VALUE_ABSENT` | a value of a closed list that the library offers and the stack does not; a value only the stack offers is counted, and is no gap |
 | `VALUE_DIFFERS` | the same token or measure with another value, by more than half a pixel |
-| `TOKEN_ABSENT` | a token that one side holds and the other does not |
+| `TOKEN_ABSENT` | a token that the library holds and the stack does not |
 | `NAME_UNMAPPED` | a name the naming map does not know, so no comparison was possible |
 
-One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` or `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A view of one line for each gap is written from the record and is never edited.
+One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A view of one line for each gap is written from the record and is never edited.
 
 The view stays short by five rules. A `UNIT_ABSENT` line replaces every line under that unit. Many `VALUE_ABSENT` gaps on one prop become one line with a list. What could not be compared is a count in the footer and never a line. Level 3 is written only for the units that levels 1 and 2 flagged. **A person and a model read the gaps, and never the library.**
 
@@ -187,7 +187,7 @@ A gap that has been looked at and accepted stays a true difference between the l
 | `accepted` | one entry for each accepted gap, with its `key`, the key of the gap, and its `reason`, one sentence that says why the difference stays |
 | `counts` | written last: `accepted` |
 
-**A key matches a gap exactly.** The key of a gap is its `path`, such as `DSImage.width` or `roles.scrim-backdrop.DARK`. For a `VALUE_ABSENT` gap it is the `path`, then `=`, then the value, such as `DSInput.type=EMAIL`. The value is the gap's `stack` when `lacks` is `LIBRARY`, and its `library` otherwise. Each key is compared as written, with case, and a prefix never matches: `DSImage.width` does not take `DSImage.widthStep`. A difference that is meant for several gaps names each one.
+**A key matches a gap exactly.** The key of a gap is its `path`, such as `DSImage.width` or `roles.scrim-backdrop.DARK`. For a `VALUE_ABSENT` gap it is the `path`, then `=`, then the value, such as `DSInput.type=EMAIL`. The value is the gap's `library`. Each key is compared as written, with case, and a prefix never matches: `DSImage.width` does not take `DSImage.widthStep`. A difference that is meant for several gaps names each one.
 
 - **The command that takes the record in MUST refuse, and name, an entry with no reason, a key that two entries hold, a file whose counts differ from its entries, and a file of an unknown `acceptedVersion`.** It writes nothing when it refuses.
 - **The list of gaps leaves out a gap whose key is accepted, and counts it.** The record of the gaps holds the count as `accepted`, beside `rulesApplied`, and the view says it in the footer. The footer also names a key that matches no gap, so that an acceptance that no longer applies is seen.
@@ -262,7 +262,7 @@ The folder is `~/.spnutils/surface/`. It holds what the tool takes in and what t
 
 ## Changing the library
 
-The web's design system is the baseline, and the library is brought to it. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. The agent changes the library through the Figma connector and in no other way.
+The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. The agent changes the library through the Figma connector and in no other way.
 
 | Step | What happens |
 | --- | --- |
@@ -463,7 +463,7 @@ These three rules and the layout rules above do not conflict, because they cover
 - **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out. A property that is not the size, a state or the shared `variant` is not added to the set at all, because it is drawn as a case, as "Which property is a variant and which is a case" states.
 - **The default value of a property that is added MUST draw what the set draws now.** The versions that stand are then the look of the default, only the other values are new drawings, and no instance already placed changes.
 - **A set MUST NOT be grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
-- **A property of the web unit that is not the size, a state, the shared `variant` or a look drawn once is drawn as a case on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
+- **A property of the web unit that is not the size, a state, the shared `variant`, a look drawn once, a prop of forms of the block itself or a property a named unit keeps crossed is drawn as a case on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
 
 ### A label
 
@@ -528,10 +528,12 @@ A showcase is the running catalogue that a stack proves its realization with, an
 A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the page of the unit in the showcase, where a developer already looks for each of them (RD.SUPPORT.SURFACE.038). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (RD.SUPPORT.SURFACE.039).
 
 - **The library MUST follow the sections of the unit's page in the showcase.** Each property is drawn where the showcase shows it, and the table below says what the library holds for each section.
-- **A set MUST cross its size, its states and the shared `variant`, and no other property.** A designer who picks a unit picks a size, a state and a look. The showcase's Sizes tabs show every variant at each size, so the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
+- **A set MUST cross its size, its states and the shared `variant`, and it MAY cross two more kinds of property, which are stated below. It MUST NOT cross any other property.** A designer who picks a unit picks a size, a state and a look. The showcase's Sizes tabs show every variant at each size, so the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
 - **`disabled` MUST stay a property of its own and MUST NOT be a value of `state`.** A caller sets `disabled`, and a person or the system puts the unit in a state.
 - **Each tab of Cases, and of a section of the unit's own, MUST be one case on the unit's sheet of cases.** The Cases section holds each icon or place of the unit and every choice that a caller makes with a prop. A section of the unit's own, such as the looks and the pinned parts of `DSTable`, is read the same way.
 - **Colors MUST be a mode, shown by one case.** The case sets the mode on the instance, and the instance shows every variant, as the showcase's Colors tabs do.
+- **A set MAY cross a prop that takes a vocabulary whose values are forms of the block itself.** `type` of `DSTimePicker`, `attached` of `DSToggleGroup` and `sort` of a table's header cell are such props, and the library carries each under the same name and the same values as the web.
+- **A set MAY cross a property that a named unit keeps crossed, and the book names that property for the unit, with its reason.** The reason is always that the values combine into forms a person must see together. The property is crossed for its own unit only; on any other unit it is a case. "A property a named unit keeps crossed" lists them.
 - **A look that no property can produce MUST be a version drawn once, crossed with nothing, and its case MUST be an instance of that version.** `type` of `DSSkeleton` has six values and each is a look that no other property can draw, so the set holds six versions and a version for each pair with the size would draw the same look again.
 - **A pair of values that the web cannot be in MUST be left out, and a pair MUST keep a version only where it draws something that neither value draws alone.** A disabled row of a list is not under the pointer, so `DSList.Item` has no hover version for it. A checked radio that is disabled shows a mark in the disabled look, so `DSRadio` keeps that pair.
 - **Usage MUST stay the usage, and Props MUST draw nothing.**
@@ -557,6 +559,25 @@ The section places a property, and a short list of questions then decides only h
 | Is it a free number? | the property on the instance, set to one value | `maxHeight=160` of `DSCodeBlockView` |
 
 A property that changes nothing a person can see in any state is drawn by no case, and the unit's header names it in the clause `behaviour: `.
+
+#### A property a named unit keeps crossed
+
+| Library file | Unit | Property | Reason |
+| --- | --- | --- | --- |
+| DS 3-Widgets | `DSWFilterField` | `kind` | each kind of field is a different control, and a person must see the field of every kind next to the others |
+| DS 3-Widgets | `DSWFilterBar` | `narrow` | a narrow bar folds its fields away and a wide bar shows them inline, so the two forms must be seen together |
+| DS 3-Widgets | `.DSWDataTableEmpty` | `filtered` | a table empty because no record exists and a table empty because the filter left none say different things |
+| DS 4-Containers | `.DSContainerFrames` | `frames` | the parts a frame holds decide where its edges and fills fall, and every combination of parts is a form of the frame |
+| DS 4-Containers | `DSContainer.Header` | `flush` | a part with its inset and a part without it are two forms of the part |
+| DS 4-Containers | `DSContainer.Content` | `flush` | the same reason as for the header |
+| DS 4-Containers | `DSContainer.Footer` | `flush` | the same reason as for the header |
+| DS 5-Layouts | `DSLayoutNavNode` | `open` | an open group shows its children and a shut group does not |
+| DS 5-Layouts | `DSLayoutNavNode` | `inGroup` | an item inside a group sits indented under it, and an item outside a group does not |
+| DS 5-Layouts | `DSLayoutNavNode` | `inMenu` | an item drawn in a menu is a row of the menu and not of the rail |
+| DS 5-Layouts | `DSLayout` | `open` | the rail is open or shut, and the page beside it is placed differently in each |
+| DS 5-Layouts | `DSLayout` | `narrow` | a narrow screen moves the navigation into a sheet and a dock, so the whole page changes its form |
+| DS 5-Layouts | `DSLayout` | `flush` | the main area with its inset and without it are two forms of the page |
+| DS 5-Layouts | `DSLayout` | `side` | the side the navigation sits on moves the main area to the other side |
 
 ### A unit with no look of its own
 

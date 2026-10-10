@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "84fd06dc"
+      "seen": "3006ffac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
@@ -84,7 +84,7 @@ The design library holds one file for each layer of the design system that is dr
 - **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own, and the library draws no `extent` variant; the instance placed on the canvas decides it.
 - **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
 - **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
-- **A set crosses its size, its states and the shared `variant`, and no other property.** Every other property of the web unit is a case on the unit's sheet, found by the section of the unit's page in the showcase that shows it (Cases, and a section of the unit's own); a hue is a mode on the instance; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
+- **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason (the table "A property a named unit keeps crossed" in `refs/support/surface/delivery-library.md`).** Every other property of the web unit is a case on the unit's sheet, found by the section of the unit's page in the showcase that shows it (Cases, and a section of the unit's own); a hue is a mode on the instance; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
 
 ## When the library does not hold a block
 

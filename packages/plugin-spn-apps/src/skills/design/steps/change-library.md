@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "84fd06dc"
+      "seen": "3006ffac"
     }
   ]
 }
@@ -70,7 +70,7 @@ Read this walk when a unit has a spec (one JSON file for the unit: `unit`, `setI
 5. **Write the labels again with `labels.js`, dry first, with `oldSetBox` set to the `setBoxBefore` of the layout.** It reads the rows and columns from where the versions now stand, and refuses when the header names no layout or a row holds two values for a named property. Without `oldSetBox` it looks for the old labels beside the set as it is now, and the labels of rows a smaller set no longer reaches are left standing.
 6. **Make the cases with `cases.js`, dry first.** It makes what the set's own properties can produce and reports in `problems` what it cannot (a swap, a missing sheet); draw those by hand.
 7. **Place the page with `align.js`, mode `plan` first and then `run`.**
-8. **Scan the page once, at its end, with the four parts of the scan.** `crossedBeyondTheRule` blocks a set that crosses a property outside the rule. `passedByException` in `scan-sets.js` counts the sets that pass only because a property is a known exception awaiting the developer's ruling; report that number.
+8. **Scan the page once, at its end, with the four parts of the scan.** `crossedBeyondTheRule` blocks a set that crosses a property outside the rule. `passedByException` in `scan-sets.js` counts the sets that pass only because a property is a known exception awaiting the developer's ruling, or because the book names the property for that unit (the table "A property a named unit keeps crossed", kept in `PROPERTIES_A_UNIT_KEEPS_CROSSED`, which passes a property for its own unit only); report that number.
 
 ## The measure and the pace
 

@@ -22,7 +22,8 @@
 // multiply it, when it holds a variant property outside that rule and some value of it other than the default is held by more than
 // one version. A property whose every other value is held by exactly one version is drawn once and passes. A property in
 // `PROPERTIES_A_SPEC_KEEPS_CROSSED` is a known exception, awaiting the developer's ruling: it is not named, and the answer's
-// `passedByException` counts the sets that pass only because of that list.
+// `passedByException` counts the sets that pass only because of that list. A property in `PROPERTIES_A_UNIT_KEEPS_CROSSED`, a
+// list of unit name to property names that the book states, passes for its own unit only and is counted the same way.
 //
 // `versionNotWired` blocks: in a set of more than one version, a layer path that holds a `componentPropertyReferences` entry
 // (`characters`, `visible`, `mainComponent`, `slotContentId`) in any version, on a node of one type, is wired for that kind; a
@@ -79,6 +80,20 @@ const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
   "attached", "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
   "percent", "placement", "shape", "sort", "type", "valueType",
 ];
+// Properties that the book names for one unit, with a reason (the table "A property a named unit keeps crossed" in the delivery
+// library chapter). Unlike the list above, a pair here is admitted to the rule, for its own unit only: the same property on any
+// other unit is still named. `passedByException` counts a set that passes only because of this list too.
+const PROPERTIES_A_UNIT_KEEPS_CROSSED = {
+  DSWFilterField: ["kind"],
+  DSWFilterBar: ["narrow"],
+  ".DSWDataTableEmpty": ["filtered"],
+  ".DSContainerFrames": ["frames"],
+  "DSContainer.Header": ["flush"],
+  "DSContainer.Content": ["flush"],
+  "DSContainer.Footer": ["flush"],
+  DSLayoutNavNode: ["open", "inGroup", "inMenu"],
+  DSLayout: ["open", "narrow", "flush", "side"],
+};
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const SCAN_FACTS = { passedByException: 0 };
 const LABEL_PREFIX = "label · ";
@@ -367,7 +382,7 @@ function crossedBeyondTheRuleOf(read) {
     const defaultValue = read.props[property]?.default !== undefined ? String(read.props[property].default) : fallback[property];
     const multiplying = [...counts].filter(([value, count]) => value !== defaultValue && count > 1);
     if (multiplying.length === 0) continue;
-    if (PROPERTIES_A_SPEC_KEEPS_CROSSED.includes(property)) { excused = true; continue; }
+    if (PROPERTIES_A_SPEC_KEEPS_CROSSED.includes(property) || PROPERTIES_A_UNIT_KEEPS_CROSSED[read.set.name]?.includes(property)) { excused = true; continue; }
     items.push({
       set: read.set.id, setName: read.set.name.slice(0, 80), property: property.slice(0, 80), default: String(defaultValue).slice(0, 40),
       multiplying: multiplying.slice(0, 5).map(([value, count]) => `${value} x${count}`.slice(0, 40)),
