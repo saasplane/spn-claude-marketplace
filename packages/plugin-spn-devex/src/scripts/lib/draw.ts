@@ -64,8 +64,15 @@ export type SkeletonItem = {
   tabs?: string[]; chosen?: number;
   /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. */
   icon?: "close" | "add" | "menu" | "search" | "more" | "previous" | "next" | "select" | "checkbox" | "bell" | "person" | "default";
-  /** What bars stand in for; `lines` counts them, and the indexes in `headings` are shorter, taller heading bars. */
-  standin?: "rows" | "cards" | "field" | "list"; lines?: number; headings?: number[];
+  /** What bars stand in for; `lines` counts them, and the indexes in `headings` are shorter, taller heading bars.
+   *  A `table` shows sample values in place of bars: `columns` are the words of its head row, and `cells` a few rows.
+   *  A cell is a word, or an item that is plain words, a note, an icon or a control. A column with an empty head
+   *  holds the actions of a row, and stands at the end. */
+  standin?: "rows" | "cards" | "field" | "list" | "table"; lines?: number; headings?: number[];
+  columns?: string[]; cells?: (string | SkeletonItem)[][];
+  /** A line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it;
+   *  and `end`, what stands at the end of the line. */
+  item?: { media?: string; title: string; description?: string; end?: SkeletonItem[] };
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
@@ -1597,13 +1604,17 @@ const SKEL_BADGE_DROP = 8, SKEL_SWITCH_DROP = 12;
 const SKEL_INLINE_ICON = 14;
 /** The width a view is drawn at, for each screen class. It stands for the class, and is never a size on a screen. */
 const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 704, TABLET: 480, MOBILE: 320 };
-const SKEL_STANDINS = ["rows", "cards", "field", "list"];
+const SKEL_STANDINS = ["rows", "cards", "field", "list", "table"];
+/** A table's head row, and the room a body row has above and below its tallest cell. */
+const SKEL_TABLE_HEAD = 24, SKEL_TABLE_ROW_PAD = 8;
+/** The two lines of an item: its title, and its description under it. */
+const SKEL_ITEM_LINE = 18;
 const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"];
 
-type SkelKind = "frame" | "spacer" | "slot" | "standin" | "control" | "icon" | "place" | "plain" | "note";
+type SkelKind = "frame" | "spacer" | "slot" | "item" | "standin" | "control" | "icon" | "place" | "plain" | "note";
 /** Which shape an item is; `null` is the thing the spec refuses. A tag with no other claim is a named place. */
 const skelKind = (it: SkeletonItem): SkelKind | null =>
-  it.frame ? "frame" : it.spacer ? "spacer" : it.slot !== undefined ? "slot"
+  it.frame ? "frame" : it.spacer ? "spacer" : it.slot !== undefined ? "slot" : it.item !== undefined ? "item"
     : it.standin !== undefined || it.lines !== undefined ? "standin"
     : it.control !== undefined ? "control" : it.icon !== undefined ? "icon"
     : it.tag !== undefined ? "place" : it.text !== undefined ? "plain" : it.note !== undefined ? "note" : null;
@@ -1632,6 +1643,31 @@ const skelTabWords = (it: SkeletonItem) => (Array.isArray(it.tabs) ? it.tabs.map
 const skelTabW = (it: SkeletonItem, word: string) => skelInlineIconW(it) + skelWordW(word);
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
+/** A cell of a table as an item: a word is a note, and anything else is the item it is given as. */
+const skelCell = (cell: string | SkeletonItem | undefined): SkeletonItem => (typeof cell === "string" ? { note: cell } : cell ?? { note: "" });
+const SKEL_CELL_KINDS: (SkelKind | null)[] = ["plain", "note", "icon", "control"];
+/** The width each column of a table needs: its head word, or its widest cell. */
+function skelTableColumns(it: SkeletonItem, h: number): number[] {
+  const columns = Array.isArray(it.columns) ? it.columns : [];
+  const rows = Array.isArray(it.cells) ? it.cells : [];
+  return columns.map((head, c) => Math.max(skelWordW(String(head)), ...rows.map((row) => skelFixedWidth(skelCell(row[c]), h))));
+}
+const skelTableW = (it: SkeletonItem, h: number): number => {
+  const widths = skelTableColumns(it, h);
+  return SKEL_PAD * 2 + widths.reduce((t, w) => t + w, 0) + SKEL_GAP * Math.max(0, widths.length - 1);
+};
+const skelTableRowH = (h: number) => h + SKEL_TABLE_ROW_PAD * 2;
+const skelTableH = (it: SkeletonItem, h: number) => SKEL_PAD + SKEL_TABLE_HEAD + (Array.isArray(it.cells) ? it.cells.length : 0) * skelTableRowH(h) + SKEL_LABEL_GAP;
+/** The width of what stands at the end of an item line, with the gaps between its parts. */
+const skelItemEndW = (it: SkeletonItem, h: number): number => {
+  const end = it.item?.end ?? [];
+  return end.reduce((t, e) => t + skelFixedWidth(e, h), 0) + SKEL_LABEL_GAP * Math.max(0, end.length - 1);
+};
+const skelItemWordsW = (it: SkeletonItem) => Math.max(skelWordW(it.item?.title ?? ""), skelWordW(it.item?.description ?? ""));
+const skelItemW = (it: SkeletonItem, h: number): number =>
+  (it.item?.media !== undefined ? h + SKEL_LABEL_GAP : 0) + skelItemWordsW(it) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+const skelItemH = (it: SkeletonItem, h: number) => (it.item?.description !== undefined ? Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP) : h);
+
 /** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
 function skelFixedWidth(it: SkeletonItem, h: number): number {
   switch (skelKind(it)) {
@@ -1639,7 +1675,8 @@ function skelFixedWidth(it: SkeletonItem, h: number): number {
     case "note": return skelWordW(it.note!);
     case "place": return it.fill ? 0 : Math.max(it.text !== undefined ? skelTextW(it.text) : 0, skelTagW(it.tag!), SKEL_PAD * 2);
     case "slot": return it.fill ? 0 : Math.max(skelTagW(it.slot!), SKEL_PAD * 2);
-    case "standin": return it.fill ? 0 : SKEL_LINES_W;
+    case "standin": return it.standin === "table" ? (it.fill ? 0 : skelTableW(it, h)) : it.fill ? 0 : SKEL_LINES_W;
+    case "item": return it.fill ? 0 : skelItemW(it, h);
     case "icon": return h + (it.text !== undefined ? SKEL_LABEL_GAP + skelWordW(it.text) : 0);
     case "control": {
       const text = it.text ?? "";
@@ -1669,9 +1706,11 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
   if (kind === "frame") return skelFrameHeight(it.frame!, slot);
   let h = slot;
   if (kind === "place" && it.text !== undefined) h = slot + SKEL_TAG_H;
+  if (kind === "item") h = skelItemH(it, slot);
   if (kind === "standin") {
     const count = Math.max(1, it.lines ?? 3);
-    if (it.standin === "cards") h = SKEL_CARD_H;
+    if (it.standin === "table") h = skelTableH(it, slot);
+    else if (it.standin === "cards") h = SKEL_CARD_H;
     else if (it.standin === "field") h = SKEL_HEAD_BAR + SKEL_LABEL_GAP + slot;
     else h = SKEL_PAD + count * SKEL_BAR_STEP - SKEL_LABEL_GAP + SKEL_PAD;
   }
@@ -1714,44 +1753,43 @@ const skelGapAfter = (row: SkeletonRow, i: number) =>
 const skelRowGaps = (row: SkeletonRow) =>
   row.items.slice(0, -1).reduce((t, _, i) => t + skelGapAfter(row, i), 0);
 /** A row's own minimum width: room for each item, the gaps between them, and a framed row's own pad.
- *  A frame with a fraction asks the row to be wide enough that its share holds it. A spec with one frame
- *  adds that to what the other items need. A view is `exact`: the other items ask the row to be wide
- *  enough that what the fractions leave holds them, and the row needs the larger of the two, because a
- *  view is held against the width of its screen class and a sum would refuse an arrangement that fits. */
-function skelRowMinWidth(row: SkeletonRow, ctl: number, exact = false): number {
+ *  A frame with a fraction asks the row to be wide enough that its share holds it, and the other items
+ *  ask it to be wide enough that what the fractions leave holds them. The row needs the larger of the
+ *  two, never their sum: a sum asks for more than the row uses, and draws a figure wider than its page. */
+function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
   // A FILL OR A FRAME STILL NEEDS ROOM FOR WHAT IT HOLDS.
   const fractionOf = (it: SkeletonItem): number | undefined =>
     skelKind(it) === "frame" && it.frame!.width ? WIDTH_FRACTIONS[it.frame!.width] : undefined;
   const need = (it: SkeletonItem): number => {
     const kind = skelKind(it);
     if (kind === "spacer") return 0;
-    if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl, exact);
+    if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl);
+    if (kind === "standin" && it.standin === "table") return skelTableW(it, ctl);
+    if (kind === "item") return skelItemW(it, ctl);
     if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
     if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
     if (kind === "control" && it.fill && !skelOwnWidth(it)) return it.control === "field" ? SKEL_FIELD_W : skelTextW(it.text ?? "");
     return skelFixedWidth(it, ctl);
   };
-  let shares = 0, forShares = 0, summed = 0, others = 0;
+  let shares = 0, forShares = 0, others = 0;
   for (const it of row.items) {
     const fraction = fractionOf(it);
     if (fraction === undefined) { others += need(it); continue; }
-    const forShare = Math.ceil(need(it) / fraction);
-    shares += fraction; summed += forShare;
-    forShares = Math.max(forShares, forShare);
+    shares += fraction;
+    forShares = Math.max(forShares, Math.ceil(need(it) / fraction));
   }
   const rest = others + skelRowGaps(row);
   const framed = row.framed ? SKEL_GAP * 2 : 0;
-  if (!exact) return summed + rest + framed;
   return Math.max(forShares, shares > 0 && shares < 1 ? Math.ceil(rest / (1 - shares)) : rest) + framed;
 }
 /** A frame's own minimum width: its padding, its label column, and its widest row's need. */
-function skelFrameMinWidth(frame: SkeletonFrame, inherited: number, exact = false): number {
+function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   const ctl = skelSizeH(frame, inherited);
   const labelCol = skelLabelCol(frame);
   const head = Math.max(frame.label ? Math.ceil(frame.label.length * SKEL_W_TITLE) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
     frame.label && frame.note ? Math.ceil(frame.note.length * SKEL_W_NOTE) : 0);
-  if (frame.frames !== undefined) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl, exact)));
-  const rows = Math.max(0, ...(frame.rows ?? []).map((r) => skelRowMinWidth(r, ctl, exact)));
+  if (frame.frames !== undefined) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
+  const rows = Math.max(0, ...(frame.rows ?? []).map((r) => skelRowMinWidth(r, ctl)));
   return SKEL_PAD * 2 + Math.max(head, (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
 
@@ -1777,7 +1815,7 @@ function skelRowWidths(row: SkeletonRow, available: number, ctl: number, finding
   let fixed = 0;
   row.items.forEach((it, i) => {
     const kind = skelKind(it);
-    if (kind === null) { findings.push("an item that is none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `spacer` or `frame`"); return; }
+    if (kind === null) { findings.push("an item that is none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `item`, `spacer` or `frame`"); return; }
     if (kind === "frame") {
       const w = it.frame!.width;
       if (w !== undefined && WIDTH_FRACTIONS[w] === undefined)
@@ -1848,6 +1886,29 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     out.push(...skelMarks(undefined, ix, iy, iw, ih));
     out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.tag!)}</text>`);
     if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${Math.round(iy + SKEL_TAG_H + (ih - SKEL_TAG_H) / 2 + 4)}">${esc(it.text)}</text>`);
+    return;
+  }
+  if (kind === "item") {
+    // THE LINE OF AN ITEM: its media at the start, its title with its description under it, and what stands at its end.
+    const item = it.item!;
+    if (typeof item.title !== "string" || !item.title) findings.push("an item line carries its `title`, and this one carries none");
+    let wx = ix;
+    if (item.media !== undefined) {
+      if (!SKEL_ICONS.includes(item.media)) findings.push(`an item's \`media\` is \`${item.media}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+      out.push(skelRect("sds-skel-control", ix, mid - h / 2, h, h));
+      out.push(...skelGlyph(item.media, ix + h / 2, mid, Math.round(h / 2)));
+      wx = ix + h + SKEL_LABEL_GAP;
+    }
+    const two = item.description !== undefined;
+    out.push(`  <text class="sds-label" x="${r2(wx)}" y="${Math.round(two ? mid - 3 : mid + 4)}">${esc(item.title ?? "")}</text>`);
+    if (two) out.push(`  <text class="sds-code" x="${r2(wx)}" y="${Math.round(mid + SKEL_ITEM_LINE - 3)}">${esc(item.description!)}</text>`);
+    let ex = ix + iw - skelItemEndW(it, h);
+    for (const part of item.end ?? []) {
+      const partKind = skelKind(part), pw = skelFixedWidth(part, h);
+      if (!SKEL_CELL_KINDS.includes(partKind)) findings.push("the end of an item line holds words, a note, an icon or a control");
+      else skelDrawLeaf(part, partKind!, ex, mid - h / 2, pw, h, h, h, findings, out);
+      ex += pw + SKEL_LABEL_GAP;
+    }
     return;
   }
   if (kind === "icon") {
@@ -1930,6 +1991,38 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   const kindOf = it.standin ?? "rows";
   if (!SKEL_STANDINS.includes(kindOf)) findings.push(`a stand-in is \`${kindOf}\`, and a skeleton draws ${SKEL_STANDINS.join(" · ")}`);
   const bar = (x: number, y: number, w: number, hh: number) => skelRect("sds-skel-bar", x, y, w, hh);
+  if (kindOf === "table") {
+    // A TABLE WITH SAMPLE VALUES: a head row of words, a line under it, and a few rows of cells. The room over is
+    // shared by the columns that hold data; a column with an empty head holds the actions of a row and stands at the end.
+    const columns = Array.isArray(it.columns) ? it.columns.map(String) : [];
+    const rows = Array.isArray(it.cells) ? it.cells : [];
+    if (!columns.length) { findings.push("a table names the words of its head row in `columns`, and this one names none"); return; }
+    const widths = skelTableColumns(it, h);
+    const data = columns.map((head, c) => (head === "" ? -1 : c)).filter((c) => c >= 0);
+    const over = Math.max(0, iw - skelTableW(it, h));
+    if (data.length) for (const c of data) widths[c] += over / data.length;
+    const left: number[] = [];
+    let cx = ix + SKEL_PAD;
+    widths.forEach((w, c) => { left.push(cx); cx += w + SKEL_GAP; });
+    if (!data.length) left.forEach((_, c) => { left[c] += over; });
+    const headY = iy + SKEL_PAD;
+    columns.forEach((head, c) => { if (head) out.push(`  <text class="sds-label" x="${r2(left[c])}" y="${Math.round(headY + 12)}">${esc(head)}</text>`); });
+    out.push(`  <path class="sds-skel-control" d="M${r2(ix + SKEL_PAD)} ${r2(headY + SKEL_TABLE_HEAD - 4)} H${r2(ix + iw - SKEL_PAD)}"/>`);
+    rows.forEach((row, r) => {
+      if (!Array.isArray(row)) { findings.push("a row of a table is a list of cells, one for each column"); return; }
+      if (row.length > columns.length) findings.push(`a row of a table holds ${row.length} cells, and the table has ${columns.length} columns`);
+      const top = headY + SKEL_TABLE_HEAD + r * skelTableRowH(h) + SKEL_TABLE_ROW_PAD;
+      row.slice(0, columns.length).forEach((given, c) => {
+        const cell = skelCell(given), cellKind = skelKind(cell);
+        if (cellKind === "note" && cell.note === "") return;
+        if (!SKEL_CELL_KINDS.includes(cellKind)) { findings.push("a cell of a table is a word, a note, an icon or a control"); return; }
+        const cw = skelFixedWidth(cell, h);
+        const at = columns[c] === "" ? left[c] + widths[c] - cw : left[c];
+        skelDrawLeaf(cell, cellKind!, at, top, cw, h, h, h, findings, out);
+      });
+    });
+    return;
+  }
   if (kindOf === "cards") {
     const cardW = (iw - SKEL_GAP * (count - 1)) / count;
     for (let c = 0; c < count; c++) {
@@ -1985,9 +2078,8 @@ function skelContainerFindings(frame: SkeletonFrame, parts: SkeletonFrame[], fin
  *  sizes itself from its own rows instead. `named` counts the named boundaries that hold this one.
  *  `inherited` is the control height of the frame that holds this one, and a `bare` part leaves its
  *  marks to the container that holds it. `canvas` is the width an outer frame is drawn at: the grid's
- *  content width for a spec with one frame, and the width of its screen class for a view, which is also
- *  measured `exact`. */
-function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: number | undefined, findings: string[], out: string[], forcedH?: number, named = 0, inherited = SKEL_DEFAULT_H, bare = false, canvas = SKEL_CANVAS, exact = false): void {
+ *  content width for a spec with one frame, and the width of its screen class for a view. */
+function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: number | undefined, findings: string[], out: string[], forcedH?: number, named = 0, inherited = SKEL_DEFAULT_H, bare = false, canvas = SKEL_CANVAS): void {
   const root = forcedW === undefined;
   skelOldFields(frame, findings);
   if (frame.size !== undefined && SKEL_CONTROL_H[frame.size] === undefined)
@@ -2002,8 +2094,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const labelCol = skelLabelCol(frame);
   const rowContentW = forcedW !== undefined
     ? Math.max(0, forcedW - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0))
-    : Math.max(SKEL_MIN_W, canvas - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0), ...rows.map((r) => skelRowMinWidth(r, ctl, exact)));
-  const w = forcedW !== undefined ? forcedW : isContainer ? Math.max(canvas - SKEL_PAD * 2, skelFrameMinWidth(frame, inherited, exact)) : SKEL_PAD * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rowContentW;
+    : Math.max(SKEL_MIN_W, canvas - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0), ...rows.map((r) => skelRowMinWidth(r, ctl)));
+  const w = forcedW !== undefined ? forcedW : isContainer ? Math.max(canvas - SKEL_PAD * 2, skelFrameMinWidth(frame, inherited)) : SKEL_PAD * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rowContentW;
   // A FRAME IN A ROW STANDS AS TALL AS THE ROW, so a rail and the main area beside it end on one line.
   const natural = skelFrameHeight(frame, inherited);
   const h = Math.max(natural, forcedH ?? 0);
@@ -2129,13 +2221,13 @@ function skelDrawViews(views: SkeletonView[], findings: string[], out: string[])
   let x = left, y = 24, lineH = 0;
   for (const view of drawn) {
     const stands = SKEL_VIEW_W[view.viewport];
-    const needs = skelFrameMinWidth(view.frame, SKEL_DEFAULT_H, true);
+    const needs = skelFrameMinWidth(view.frame, SKEL_DEFAULT_H);
     if (needs > stands)
       findings.push(`the \`${view.viewport}\` view needs ${needs} across, and its class stands at ${stands}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`);
     const w = Math.max(stands, needs);
     if (x > left && x + w > left + SKEL_CANVAS) { x = left; y += lineH + SKEL_GAP; lineH = 0; }
     out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(view.viewport)}</text>`);
-    skelDrawFrame(view.frame, x, y + SKEL_TAG_H, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, false, stands, true);
+    skelDrawFrame(view.frame, x, y + SKEL_TAG_H, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, false, stands);
     lineH = Math.max(lineH, SKEL_TAG_H + skelFrameHeight(view.frame, SKEL_DEFAULT_H));
     x += w + SKEL_GAP;
   }

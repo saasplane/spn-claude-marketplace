@@ -579,7 +579,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     draw({ kind: "skeleton", frame: { rows: [{ items: [
       { frame: { tag: "a", width: "2/5", rows: [{ items: [{ text: "x" }] }] } }, { control: "button", text: "y", fill: true }] }] } }).findings, says("`2/5`"));
   one("an item that is none of the shapes a skeleton has is a finding",
-    draw({ kind: "skeleton", frame: { rows: [{ items: [{}] }] } }).findings, says("none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `spacer` or `frame`"));
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{}] }] } }).findings, says("none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `item`, `spacer` or `frame`"));
 
   // 1 · the marks: classes of the stylesheet, and no colour in the drawing
   const marks = judge({ kind: "skeleton", frame: { rows: [{ items: [
@@ -777,6 +777,40 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const beside = [{ frame: { tag: "groups", width: "1/3", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "items", rows: [{ items: [{ text: "Project" }] }] } }];
   one("a view measures a share exactly: a third beside the rest fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", beside) }] }).findings, none);
   one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
+
+  // 14 · a table that takes sample cells
+  const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)">([^<]*)<`, "g"))].map((m) => [Number(m[1]), Number(m[2]), m[3]]);
+  const table = (extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "State", ""],
+    cells: [["Dana Lee", "dana@acme.com", "", { icon: "more" }], ["Omar Haddad", "omar@acme.com", { control: "badge", text: "Invited" }, { icon: "more" }]], ...extra }] }] } });
+  one("a table with sample cells draws without a finding", table().findings, none);
+  one("its head row is the words of its columns, and an empty head draws no word", texts(table().svg, "sds-label").map((t) => t[2]).join(), "Name,Email,State");
+  one("a cell stands under the head of its column", texts(table().svg, "sds-code").filter((t) => t[2] === "dana@acme.com" || t[2] === "omar@acme.com").map((t) => t[0]),
+    (g) => g.length === 2 && g[0] === g[1] && g[0] === texts(table().svg, "sds-label")[1][0]);
+  one("a cell may be a badge, drawn as a badge is", rect(table().svg, "sds-skel-control").some((r) => r[3] === 24), true);
+  one("a column with an empty head holds the actions of a row, at the end of the table", rect(table().svg, "sds-skel-control").filter((r) => r[2] === 32 && r[3] === 32),
+    (g) => g.length === 2 && g[0][0] === g[1][0] && g[0][0] + 32 === 24 + 1052 - 16 - 16);
+  one("a table with no `columns` is a finding", table({ columns: undefined }).findings, says("names the words of its head row in `columns`"));
+  one("a row with more cells than columns is a finding that counts both", table({ columns: ["Name"] }).findings, says("holds 4 cells, and the table has 1 columns"));
+  one("a cell that is a frame is a finding", table({ cells: [[{ frame: { rows: [] } }]] }).findings, says("a cell of a table is a word, a note, an icon or a control"));
+  one("a table too wide for a phone is refused by the view", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "Role", "State"], cells: [["Omar Haddad", "omar@acme.com", "Member", "Invited"]] }] }] } }] }).findings, says("its class stands at 320"));
+
+  // 15 · an item line
+  const line = (item, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ item, fill: true, ...extra }] }] } });
+  const full = line({ media: "person", title: "Dana Lee", description: "Admin", end: [{ control: "badge", text: "Invited" }, { icon: "more" }] });
+  one("an item line draws without a finding", full.findings, none);
+  one("its title is heavy and its description is quiet", [texts(full.svg, "sds-label").map((t) => t[2]).join(), texts(full.svg, "sds-code").map((t) => t[2]).includes("Admin")].join(), "Dana Lee,true");
+  one("the description stands under the title, at the same start", [texts(full.svg, "sds-label")[0], texts(full.svg, "sds-code").find((t) => t[2] === "Admin")], (g) => g[0][0] === g[1][0] && g[1][1] > g[0][1]);
+  one("the words start after the media", texts(full.svg, "sds-label")[0][0], 24 + 16 + 32 + 8);
+  one("what stands at its end ends at the end of the line", rect(full.svg, "sds-skel-control").map((r) => r[0] + r[2]), (g) => Math.max(...g) === 24 + 1052 - 16);
+  one("an item with a description stands taller than one without", rect(full.svg, "sds-box")[0][3] > rect(line({ title: "Dana Lee" }).svg, "sds-box")[0][3], true);
+  one("an item with no media starts its words at the start of the line", texts(line({ title: "Dana Lee" }).svg, "sds-label")[0][0], 24 + 16);
+  one("an item with no title is a finding", line({ media: "person" }).findings, says("carries its `title`"));
+  one("a media the set lacks is a finding that names the default", line({ media: "rocket", title: "x" }).findings, says("`default`"));
+  one("a frame at the end of an item line is a finding", line({ title: "x", end: [{ frame: { rows: [] } }] }).findings, says("the end of an item line holds"));
+
+  // 16 · one estimate of width, for every spec
+  const shared = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", width: "1/4", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "b", rows: [{ items: [{ control: "field", text: "x" }, { control: "button", text: "Go" }] }] } }] }] } };
+  one("a spec with one frame is no wider than the grid where its shares fit it", outer(draw(shared).svg)[0][2], 1052);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

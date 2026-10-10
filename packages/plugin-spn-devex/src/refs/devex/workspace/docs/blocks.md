@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "c2fd0acc"
+      "seen": "8b366a3f"
     }
   ]
 }
@@ -244,14 +244,15 @@ shares.
 | `tag` | the name on a component, a part or a slot's dotted boundary |
 | `control` | `button` · `field` · `select` · `checkbox` · `switch` · `tabs` · `badge` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group. A `switch` takes `on`; `tabs` takes the words as `tabs` and the place of the chosen one as `chosen`, counted from 0; a `badge` and `tabs` may take an `icon` |
 | `views` | one screen at several screen classes, in place of `frame`: a list of views, each with a `viewport` of `DESKTOP`, `TABLET` or `MOBILE` and a whole `frame` of its own |
-| `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing |
+| `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing; and `table`, which takes `columns`, the words of its head row, and `cells`, a few rows of sample values |
+| `item` | a line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it; and `end`, what stands at the end of the line |
 | `icon` | a small square holding the name of one plain shape the drawer draws itself, or its default |
 | `spacer` | free room: the items after it sit at the end of the row |
 | `height` | a region standing taller than what it holds, in rows |
 
 A skeleton takes neither `tone` nor `em`; a `map` takes both.
 
-**A skeleton takes its own guidelines, apart from the grid every other figure shares.** Padding inside a boundary is 16px, and the gap between parts, in a row or down a frame, is 24px. A control's height follows its own component's size step: 28 · 32 · 36 · 40 · 44px for `XS` · `SM` · `MD` · `LG` · `XL`. A name sits on a 20px line, at its boundary's own corner, and an icon beside a word sits on that same centre line. A stand-in's rhythm is a 6px bar and an 8px heading bar, stepping 14px to the next. A badge stands 8px lower than a control and a switch's track 12px lower, each centred on the row's line. A view is drawn 704 · 480 · 320px wide for `DESKTOP` · `TABLET` · `MOBILE`, the views stand 24px apart, and a view that would pass the grid's content width starts a new line. Inside the outer frame a named boundary nests no deeper than two; a third level is drawn as its own skeleton. The check asks four things of a skeleton alone: a component, a part or a slot boundary carries a name; a control carries no tag; a named boundary nests no deeper than two; and a view fits the width of its class.
+**A skeleton takes its own guidelines, apart from the grid every other figure shares.** Padding inside a boundary is 16px, and the gap between parts, in a row or down a frame, is 24px. A control's height follows its own component's size step: 28 · 32 · 36 · 40 · 44px for `XS` · `SM` · `MD` · `LG` · `XL`. A name sits on a 20px line, at its boundary's own corner, and an icon beside a word sits on that same centre line. A stand-in's rhythm is a 6px bar and an 8px heading bar, stepping 14px to the next. A badge stands 8px lower than a control and a switch's track 12px lower, each centred on the row's line. A table's head row is 24px with a line under it, and a body row gives its tallest cell 8px above and below. An item's title and its description stand on two 18px lines. A view is drawn 704 · 480 · 320px wide for `DESKTOP` · `TABLET` · `MOBILE`, the views stand 24px apart, and a view that would pass the grid's content width starts a new line. Inside the outer frame a named boundary nests no deeper than two; a third level is drawn as its own skeleton. The check asks four things of a skeleton alone: a component, a part or a slot boundary carries a name; a control carries no tag; a named boundary nests no deeper than two; and a view fits the width of its class.
 
 ```dg
 { "kind": "skeleton",
@@ -265,6 +266,21 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
     { "frame": { "rows": [
       { "items": [{ "icon": "menu" }, { "spacer": true }, { "slot": "utilityActions" }] },
       { "items": [{ "frame": { "tag": "children", "fill": true, "rows": [] } }] }] } }] }] } }
+```
+
+**A table may carry sample values in place of bars, and a line may be drawn as an item.** Bars say that a part holds many of one thing, and nothing about what one of them is. Where a reader must see that, the skeleton shows a few rows of sample values. A table stand-in takes the words of its head row and a few rows of cells; a cell is a word, a badge, an icon or another control, and a column with an empty head holds the actions of a row and stands at the end. An item line is the library's item: its media at the start, its title with its description under it, and what stands at its end. Bars stay for running text, and for a part whose data the page does not need to show.
+
+```dg
+{ "kind": "skeleton",
+  "caption": "The same records as a table with sample cells at a desktop, and as item lines on a phone.",
+  "views": [
+    { "viewport": "DESKTOP", "frame": { "label": "Users", "rows": [
+      { "items": [{ "standin": "table", "fill": true, "columns": ["Name", "Email", "State", ""],
+        "cells": [[{ "icon": "person", "text": "Dana Lee" }, "dana@acme.com", "", { "icon": "more" }],
+                  [{ "icon": "person", "text": "Omar Haddad" }, "omar@acme.com", { "control": "badge", "text": "Invited" }, { "icon": "more" }]] }] }] } },
+    { "viewport": "MOBILE", "frame": { "label": "Users", "rows": [
+      { "items": [{ "item": { "media": "person", "title": "Dana Lee", "description": "Admin", "end": [{ "icon": "more" }] }, "fill": true }] },
+      { "items": [{ "item": { "media": "person", "title": "Omar Haddad", "description": "Member", "end": [{ "control": "badge", "text": "Invited" }, { "icon": "more" }] }, "fill": true }] }] } }] }
 ```
 
 **A skeleton may hold a view of one screen for each screen class.** The classes are the surface's own, `DESKTOP`, `TABLET` and `MOBILE`, so a skeleton makes no second set of names. What changes between two classes is the arrangement: parts stack, a table becomes a list, and a list at the side becomes a step of its own. So each view is a whole frame of its own, and none is derived from another. The views are drawn in one figure in one order, desktop, then tablet, then phone, each under the name of its class, whatever order the spec lists them in. A view's width stands for its class and is never a size on a screen; a view whose frame needs more room than its class has is a finding. One sentence before the figure and one caption after it serve all the views.
