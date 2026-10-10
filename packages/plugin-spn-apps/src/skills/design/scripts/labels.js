@@ -1,5 +1,4 @@
 // The row and column labels of one set, written again from the set's grid after the set has changed.
-// NOT YET RUN AGAINST A FILE: only its stand-in test has run it. Send it dry first and read what it says.
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else. DRY IS THE DEFAULT: with `dryRun: true` it

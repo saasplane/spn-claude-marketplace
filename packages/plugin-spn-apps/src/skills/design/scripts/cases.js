@@ -1,5 +1,4 @@
 // Makes the cases of one unit's spec that the unit's own properties can produce, on the unit's sheet.
-// NOT YET RUN AGAINST A FILE: only its stand-in test has run it. Send it dry first and read what it says.
 //
 // Passed to the Figma connector's `use_figma` as it is, or through `bundle.mjs` for the units of a page. A
 // plain script with top-level `await` and `return`, no wrapper. Fill INPUTS, change nothing else. DRY IS THE

@@ -1106,7 +1106,7 @@ await guard(async () => {
 
 console.log("\n=== the texts the agent passes on");
 for (const script of ["cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js"]) {
-  ok(`${script} says in its header that it has not yet run against a file`, /NOT YET RUN AGAINST A FILE/.test(readFileSync(resolve(SCRIPTS, script), "utf8").split("\n").slice(0, 4).join("\n")));
+  ok(`${script} does not claim in its header that it is unproven`, !/NOT YET RUN AGAINST A FILE/.test(readFileSync(resolve(SCRIPTS, script), "utf8").split("\n").slice(0, 4).join("\n")));
   ok(`${script} is dry by default`, /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, script), "utf8")));
 }
 for (const script of ["versions.js", "instances.js", "apply-spec.js", "cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js"]) {

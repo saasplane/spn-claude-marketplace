@@ -1,5 +1,4 @@
 // Adds versions to a set as copies of their nearest twin, and ties again what each copy lost.
-// NOT YET RUN AGAINST A FILE: only its stand-in test has run it. Send it dry first and read what it says.
 //
 // Passed to the Figma connector's `use_figma` as it is, or through `bundle.mjs` for the sets of a page. A
 // plain script with top-level `await` and `return`, no wrapper. Fill INPUTS, change nothing else. DRY IS
