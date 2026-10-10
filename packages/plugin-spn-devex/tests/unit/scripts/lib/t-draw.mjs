@@ -723,6 +723,60 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("`off` is not read, and the finding names `note`", oldFields.findings, says("no longer reads `off`"));
   one("nothing is drawn by guessing: no tone class reaches the drawing", oldFields.svg, (g) => !g.includes("sds-tone-"));
   one("an old `warn` is a finding that names the new field", draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "x", warn: true }] }] } }).findings, says("no longer reads `warn`"));
+
+  // 12 · a switch, a row of tabs and a badge: state by position and weight, never by a colour
+  const row = (...items) => draw({ kind: "skeleton", frame: { rows: [{ items }] } });
+  const circles = (g) => [...g.matchAll(/<circle class="([^"]+)" cx="([\d.]+)"/g)].map((m) => [m[1], Number(m[2])]);
+  const switches = row({ control: "switch", text: "Off" }, { control: "switch", text: "On", on: true });
+  one("a switch draws without a finding", switches.findings, none);
+  one("a switch that is on has its knob at the end of its track, and solid", circles(switches.svg)[1], (g) => g[0].includes("sds-skel-glyph-solid"));
+  one("a switch that is off has its knob at the start of its track, and hollow", circles(switches.svg)[0], (g) => !g[0].includes("solid"));
+  one("the two knobs stand at different places in their tracks", row({ control: "switch" }, { control: "switch", on: true }).svg,
+    (g) => { const track = rect(g, "sds-skel-control"), knob = circles(g); return knob[0][1] - track[0][0] < track[0][2] / 2 && knob[1][1] - track[1][0] > track[1][2] / 2; });
+  one("a switch's track stands 12 lower than a control", rect(switches.svg, "sds-skel-control")[0][3], 20);
+  const tabs = row({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
+  one("a row of tabs draws without a finding", tabs.findings, none);
+  one("the chosen tab alone is heavy", [...tabs.svg.matchAll(/<text class="sds-label"[^>]*>([^<]+)</g)].map((m) => m[1]).join(), "SMS");
+  one("the chosen tab alone has a line under it", (tabs.svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);
+  one("with no `chosen`, the first tab is the chosen one", row({ control: "tabs", tabs: ["A", "B"] }).svg, (g) => g.includes('<text class="sds-label"') && /sds-label"[^>]*>A</.test(g));
+  one("a `chosen` the row lacks is a finding that counts the tabs", row({ control: "tabs", tabs: ["A", "B"], chosen: 2 }).findings, says("has 2 tabs, counted from 0"));
+  one("a row of tabs with no words is a finding", row({ control: "tabs" }).findings, says("names its words in `tabs`"));
+  const badge = row({ control: "badge", text: "Published v2" }, { control: "button", text: "Publish" });
+  one("a badge draws without a finding", badge.findings, none);
+  one("a badge stands 8 lower than the button beside it", rect(badge.svg, "sds-skel-control").map((r) => r[3]).join(), "24,32");
+  one("a badge and a button share the row's centre line", rect(badge.svg, "sds-skel-control"), (g) => g[0][1] + g[0][3] / 2 === g[1][1] + g[1][3] / 2);
+  one("a badge with `main` is a finding: it is never something to press", row({ control: "badge", text: "x", main: true }).findings, says("never takes the weight of a main action"));
+  one("a badge with no word is a finding", row({ control: "badge" }).findings, says("carries its word in `text`"));
+  one("a badge and a tab may carry an icon, drawn with no square around it", row({ control: "badge", text: "Platform", icon: "default" }, { control: "tabs", tabs: ["Email"], icon: "default" }),
+    (g) => g.findings.length === 0 && (g.svg.match(/<circle class="sds-skel-glyph /g) ?? []).length === 2 && rect(g.svg, "sds-skel-control").length === 1);
+  one("an icon the set lacks, on a badge, is a finding that names the default", row({ control: "badge", text: "x", icon: "rocket" }).findings, says("`default`"));
+  one("the three carry no tag, as every control", row({ control: "switch", tag: "name" }).findings, says("a control carries no tag"));
+  one("none of the three takes the rest of its row with `fill`", rect(row({ control: "badge", text: "x", fill: true }).svg, "sds-skel-control")[0][2], (g) => g < 60);
+
+  // 13 · a view for each screen class, in one figure
+  const frameOf = (label, items = [{ text: "Members" }]) => ({ label, rows: [{ items }] });
+  const views = draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("Phone") }, { viewport: "DESKTOP", frame: frameOf("Desk") }] });
+  const outer = (g) => rect(g, "sds-box");
+  one("a spec with `views` draws without a finding", views.findings, none);
+  one("each view is one outer frame", outer(views.svg).length, 2);
+  one("the views are drawn desktop first, whatever order the spec lists them in", [...views.svg.matchAll(/<text class="sds-note"[^>]*>([A-Z]+)</g)].map((m) => m[1]).join(), "DESKTOP,MOBILE");
+  one("a view's width stands for its class", outer(views.svg).map((r) => r[2]).join(), "704,320");
+  one("a desktop and a phone view stand on one line, 24 apart", outer(views.svg), (g) => g[0][1] === g[1][1] && g[1][0] - (g[0][0] + g[0][2]) === 24);
+  one("a figure of views is a skeleton the figure check reads by the skeleton's own rules", views.svg, (g) => g.startsWith('<svg class="sds-drawing sds-skeleton"') && checkFigures(g).length === 0);
+  const three = draw({ kind: "skeleton", views: ["TABLET", "MOBILE", "DESKTOP"].map((viewport) => ({ viewport, frame: frameOf(viewport) })) });
+  one("a view that would pass the grid's width starts a new line: the tablet stands under the desktop", outer(three.svg), (g) => g.length === 3 && g[1][0] === g[0][0] && g[1][1] > g[0][1] + g[0][3] && g[2][1] === g[1][1]);
+  one("a figure of three views is no wider than the grid", three.svg, (g) => Number(g.match(/viewBox="[-\d.]+ [-\d.]+ ([\d.]+)/)[1]) <= 1056);
+  one("`frame` beside `views` is a finding", draw({ kind: "skeleton", frame: frameOf("x"), views: [{ viewport: "MOBILE", frame: frameOf("y") }] }).findings, says("`frame` or `views`, never both"));
+  one("a viewport that is no screen class is refused by name", draw({ kind: "skeleton", views: [{ viewport: "WATCH", frame: frameOf("x") }] }).findings, says("`WATCH`"));
+  one("two views of one class are a finding", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("x") }, { viewport: "MOBILE", frame: frameOf("y") }] }).findings, says("one view for a screen class"));
+  one("a view with no frame is a finding", draw({ kind: "skeleton", views: [{ viewport: "MOBILE" }] }).findings, says("has no `frame`"));
+  one("`views` holding no view is a finding, not an empty canvas", draw({ kind: "skeleton", views: [] }), (g) => g.svg === "" && says("holds no view")(g.findings));
+  const wide = [{ control: "field", text: "Search members" }, { control: "button", text: "Invite a member" }, { control: "button", text: "Export" }];
+  one("a view whose frame needs more than its class has is a finding that names both widths", draw({ kind: "skeleton", views: [{ viewport: "MOBILE", frame: frameOf("x", wide) }] }).findings, says("and its class stands at 320"));
+  one("the same row fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", wide) }] }).findings, none);
+  const beside = [{ frame: { tag: "groups", width: "1/3", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "items", rows: [{ items: [{ text: "Project" }] }] } }];
+  one("a view measures a share exactly: a third beside the rest fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", beside) }] }).findings, none);
+  one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

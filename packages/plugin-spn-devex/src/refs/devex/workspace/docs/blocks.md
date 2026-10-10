@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "4afebe89"
+      "seen": "c2fd0acc"
     }
   ]
 }
@@ -229,9 +229,9 @@ Each sub-component stands where it stands on the screen: the start or the end of
 | a frame's own look | a background for `raised`, a solid line for `bordered`, neither for `flat` | the parts of one frame, together. Never a colour that stands for one place against another |
 | a control, a title or a stand-in | nothing of its own | see below |
 
-A **control** carries no tag and takes its own size: the height its real component has at the size step drawn, never stretched to its row and never shrunk to a label's line. A **title** is plain text, never a tagged box and never `em`. **Sample values fill the rest**: a title, a button, a field or a record carries a value a real screen could show, and where the content is many of one thing a stand-in shows the kind with no name. An **icon** is a small square holding one of a small set of plain line shapes the drawer draws itself, with one default where none fits; a skeleton shows no icon of the library.
+A **control** carries no tag and takes its own size: the height its real component has at the size step drawn, never stretched to its row and never shrunk to a label's line. **Its state is told by position and by weight, never by a colour**: a switch's knob stands at the end of its track when it is on and at the start when it is off; the chosen tab is heavier and has a line under it; a badge is a small framed word, lower than a button and never with the weight of a main action, so nobody reads it as something to press. A **title** is plain text, never a tagged box and never `em`. **Sample values fill the rest**: a title, a button, a field or a record carries a value a real screen could show, and where the content is many of one thing a stand-in shows the kind with no name. An **icon** is a small square holding one of a small set of plain line shapes the drawer draws itself, with one default where none fits; a skeleton shows no icon of the library. So the icon of an enum, the icon of one of its values and a brand's mark are all the default: a skeleton says that an icon is there, never which one. A badge and a tab may carry an icon before their word, with no square around it.
 
-One outer `frame`: a box with an optional `label` (its title), `look`, `note` and `tag`, holding `rows` top to
+One outer `frame`, or `views` and never both: a box with an optional `label` (its title), `look`, `note` and `tag`, holding `rows` top to
 bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame
 shares.
 
@@ -242,7 +242,8 @@ shares.
 | `note` | muted text, no box |
 | `slot` | one block whose text is its own name, with nothing drawn inside it |
 | `tag` | the name on a component, a part or a slot's dotted boundary |
-| `control` | `button` · `field` · `select` · `checkbox` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group |
+| `control` | `button` · `field` · `select` · `checkbox` · `switch` · `tabs` · `badge` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group. A `switch` takes `on`; `tabs` takes the words as `tabs` and the place of the chosen one as `chosen`, counted from 0; a `badge` and `tabs` may take an `icon` |
+| `views` | one screen at several screen classes, in place of `frame`: a list of views, each with a `viewport` of `DESKTOP`, `TABLET` or `MOBILE` and a whole `frame` of its own |
 | `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing |
 | `icon` | a small square holding the name of one plain shape the drawer draws itself, or its default |
 | `spacer` | free room: the items after it sit at the end of the row |
@@ -250,7 +251,7 @@ shares.
 
 A skeleton takes neither `tone` nor `em`; a `map` takes both.
 
-**A skeleton takes its own guidelines, apart from the grid every other figure shares.** Padding inside a boundary is 16px, and the gap between parts, in a row or down a frame, is 24px. A control's height follows its own component's size step: 28 · 32 · 36 · 40 · 44px for `XS` · `SM` · `MD` · `LG` · `XL`. A name sits on a 20px line, at its boundary's own corner, and an icon beside a word sits on that same centre line. A stand-in's rhythm is a 6px bar and an 8px heading bar, stepping 14px to the next. Inside the outer frame a named boundary nests no deeper than two; a third level is drawn as its own skeleton. The check asks three things of a skeleton alone: a component, a part or a slot boundary carries a name; a control carries no tag; and a named boundary nests no deeper than two.
+**A skeleton takes its own guidelines, apart from the grid every other figure shares.** Padding inside a boundary is 16px, and the gap between parts, in a row or down a frame, is 24px. A control's height follows its own component's size step: 28 · 32 · 36 · 40 · 44px for `XS` · `SM` · `MD` · `LG` · `XL`. A name sits on a 20px line, at its boundary's own corner, and an icon beside a word sits on that same centre line. A stand-in's rhythm is a 6px bar and an 8px heading bar, stepping 14px to the next. A badge stands 8px lower than a control and a switch's track 12px lower, each centred on the row's line. A view is drawn 704 · 480 · 320px wide for `DESKTOP` · `TABLET` · `MOBILE`, the views stand 24px apart, and a view that would pass the grid's content width starts a new line. Inside the outer frame a named boundary nests no deeper than two; a third level is drawn as its own skeleton. The check asks four things of a skeleton alone: a component, a part or a slot boundary carries a name; a control carries no tag; a named boundary nests no deeper than two; and a view fits the width of its class.
 
 ```dg
 { "kind": "skeleton",
@@ -264,6 +265,24 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
     { "frame": { "rows": [
       { "items": [{ "icon": "menu" }, { "spacer": true }, { "slot": "utilityActions" }] },
       { "items": [{ "frame": { "tag": "children", "fill": true, "rows": [] } }] }] } }] }] } }
+```
+
+**A skeleton may hold a view of one screen for each screen class.** The classes are the surface's own, `DESKTOP`, `TABLET` and `MOBILE`, so a skeleton makes no second set of names. What changes between two classes is the arrangement: parts stack, a table becomes a list, and a list at the side becomes a step of its own. So each view is a whole frame of its own, and none is derived from another. The views are drawn in one figure in one order, desktop, then tablet, then phone, each under the name of its class, whatever order the spec lists them in. A view's width stands for its class and is never a size on a screen; a view whose frame needs more room than its class has is a finding. One sentence before the figure and one caption after it serve all the views.
+
+```dg
+{ "kind": "skeleton",
+  "caption": "On a desktop the list of groups stays in view beside the items. On a phone the items are a step of their own.",
+  "views": [
+    { "viewport": "DESKTOP", "frame": { "label": "Custom fields", "rows": [{ "items": [
+      { "frame": { "tag": "groups", "width": "1/3", "rows": [{ "items": [{ "standin": "list", "lines": 4, "fill": true }] }] } },
+      { "frame": { "tag": "items", "rows": [
+        { "items": [{ "text": "Project" }, { "control": "badge", "text": "4 fields" }, { "spacer": true }, { "control": "button", "text": "Add field", "main": true }] },
+        { "items": [{ "standin": "rows", "lines": 4, "fill": true }] }] } }] }] } },
+    { "viewport": "MOBILE", "frame": { "label": "Project", "rows": [
+      { "items": [{ "icon": "previous", "text": "Custom fields" }, { "spacer": true }, { "icon": "add" }] },
+      { "items": [{ "control": "tabs", "tabs": ["Fields", "Tags"], "chosen": 0 }] },
+      { "items": [{ "standin": "list", "lines": 4, "fill": true }] },
+      { "items": [{ "control": "switch", "text": "Required", "on": true }] }] } }] }
 ```
 
 **No connector, ever.** Where a part sits is the whole claim, so a skeleton never draws an arrow.
