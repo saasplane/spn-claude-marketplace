@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "357db085"
+      "seen": "c0a95f7d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "8ed587e2"
+      "seen": "3f63cbff"
     }
   ]
 }
@@ -412,7 +412,7 @@ or two plain lines, and none of them is a system report.
 | you decide something the rules settle | the decision and its reason, in one line |
 | you put a card to them | the choice, its recommendation, and what waits on it meanwhile — in full once, at the top of that reply, and in one line only in a reply that ends the work or stops it; the page keeps the same card |
 | you hand them a page | the full path to the file, to open in a browser; you publish nothing unless they ask |
-| you ask to close a workstream | a few warm paragraphs first, with no table: that the work is finished, what was delivered, what was learned, and thanks. Then the question |
+| you ask to close a workstream | a titled message first, with no table: *What was delivered*, *What was learned* and *Thank you* each their own heading with their own icon, bulleted where there is more than one thing. Then the question |
 | a session ends | what landed, what is next, and thanks, with no handover unless they ask for one |
 
 A reply written as a list of tool output has stopped talking to the developer, and a reader who
@@ -924,12 +924,14 @@ a subject of two to four words, such as `N002-bound-handoff.md`. The heading ins
 phrase that names the cycle. One number names one file, and every note of the arc sits inside
 `notes/N<nnn>/`.
 
-**A close is a milestone, and you say so before you ask — MUST** (`RD.DEVEX.WORKSPACE.206`). Write a
-few short paragraphs and no table: that the work is finished, what was delivered in terms of what the
-developer can now do, what was learned, and thanks for what they decided along the way. Measure every
-number from the arcs and the close report. Separate the paragraphs with a `&nbsp;` line, as the welcome
-does, and never put them in a quote block. Then ask. Before the folder moves, the page gets its closed
-masthead and a closing block with what was delivered and learned.
+**A close is a milestone, and you say so before you ask — MUST** (`RD.DEVEX.WORKSPACE.206`). Open with
+a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party
+icon. Under it, *What was delivered*, *What was learned* and *Thank you* each get their own heading
+with their own icon — the first two lead with their icon, *Thank you* trails with 👍 — and each holds
+one bullet per distinct thing, or a single line where there is only one thing to say. Measure every
+number from the arcs and the close report. Separate the heading and every section with a `&nbsp;`
+line, as the welcome does, and never put them in a quote block. Then ask. Before the folder moves, the
+page gets its closed masthead and a closing block in the same shape.
 
 ## Nothing is published unless the developer asks
 
