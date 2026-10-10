@@ -5,7 +5,7 @@
 // The two scripts for the connector run here as the connector runs them, on a stand-in of the parts of the Figma API
 // they use. The two `.mjs` files run as Node runs them, on folders written here.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -1102,6 +1102,153 @@ await guard(async () => {
   same("when `label · Cases` stood already, bandStyleFrom is a copy of the section's own band label or null", standing.bandStyleFrom, null);
 });
 
+// ---- operations-calls.mjs, operations-check.mjs and operations-versions.mjs ---------------------
+
+console.log("\n=== the operations of a page — operations-calls.mjs, operations-check.mjs, operations-versions.mjs");
+const operationsFixture = () => {
+  const root = join(scratch, `operations-${++folderCount}`);
+  for (const name of ["ops", "specs", "readings", "out"]) mkdirSync(join(root, name), { recursive: true });
+  const unitRow = (at, id, key, name, count) => ["U", at, id, key, name, "SET", count];
+  const versionRow = (at, place, key, name) => ["V", at, place, key, name, 100, 40];
+  writeFileSync(join(root, "readings", "versions-actions.json"), JSON.stringify([{ rows: [
+    unitRow(0, "9:1", "kset1", "DSBtn", 4), versionRow(0, 0, "k0", "size=SM, state=rest"), versionRow(0, 1, "k1", "size=SM, state=hover"), versionRow(0, 2, "k2", "size=MD, state=rest"), versionRow(0, 3, "k3", "size=MD, state=hover"),
+    unitRow(1, "9:2", "kset2", "DSTag", 1), versionRow(1, 0, "t0", "tone=a"),
+  ] }]));
+  const lines = (count) => Array.from({ length: count }, (_, at) => ({ what: `line ${at}`, why: "because" }));
+  writeFileSync(join(root, "specs", "DSBtn.json"), JSON.stringify({ unit: "DSBtn", setId: "9:1", remove: [{ state: "hover" }], defaults: { size: "SM", state: "idle" }, needsDrawing: lines(5) }));
+  writeFileSync(join(root, "specs", "DSTag.json"), JSON.stringify({ unit: "DSTag", setId: "9:2", keep: [{ tone: "a" }], needsDrawing: lines(3) }));
+  writeFileSync(join(root, "ops", "DSBtn.json"), JSON.stringify({ unit: "DSBtn", setId: "9:1", ops: [
+    { op: "names", lines: [0], renameValue: [{ property: "state", from: "rest", to: "idle" }] },
+    { op: "copy", lines: [1], from: { size: "SM" }, to: [{ size: "LG" }], look: null },
+    { op: "property", lines: [2], name: "loading", type: "BOOLEAN", default: false, layer: "spinner", ties: "visible" },
+    { op: "sheet", lines: [3] },
+    { op: "case", lines: [3], name: "loading=true", proves: "Content: loading", base: { size: "SM" }, props: { loading: true }, replaces: "the lone component `loading=true` that stands on the sheet today is replaced by this instance" },
+    { op: "header", layout: "rows: state=idle (default) · columns: size=SM (default), MD, LG", notes: ["behaviour: loading"] },
+  ], choices: [], compose: [], nothing: [{ lines: [4], why: "the set holds it already" }] }));
+  writeFileSync(join(root, "ops", "DSTag.json"), JSON.stringify({ unit: "DSTag", setId: "9:2", ops: [
+    { op: "case", lines: [0], name: "tone=b", proves: "Content: tone", base: { tone: "a" }, props: { tone: "b" }, replaces: "the one on the sheet is swapped for this, whatever it is" },
+  ], choices: [], compose: [], nothing: [{ lines: [1], why: "stands" }] }));
+  writeFileSync(join(root, "plan.json"), JSON.stringify([
+    { page: "Actions", pageId: "2:1", units: [{ unit: "DSBtn", changes: true }] },
+    { page: "Tags & Chips", pageId: "2:2", units: [{ unit: "DSTag", changes: false }] },
+  ]));
+  return root;
+};
+const callsArguments = (root, stage, page) => [stage, ...(page ? ["--page", page] : []), "--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "--plan", join(root, "plan.json"), "--out", join(root, "out")];
+const hashOfLines = (lines) => fnv([...lines].sort().join("\n"));
+
+{
+  const root = operationsFixture();
+  const prepared = runNode("operations-calls.mjs", callsArguments(root, "prepare", "Actions"));
+  const page = join(root, "out", "actions");
+  const written = readdirSync(page).sort();
+  ok("prepare writes a dry file and a real file for each step the page has, the two reads and expected.json", prepared.exit === 0 && ["01-read.js", "02-names-dry.js", "03-names-real.js", "04-copy-dry.js", "05-copy-real.js", "06-property-dry.js", "07-property-real.js", "08-header-dry.js", "09-header-real.js", "14-sheet-dry.js", "15-sheet-real.js", "16-cases-dry.js", "17-cases-real.js", "18-read.js", "expected.json"].every((name) => written.includes(name)), `${prepared.said} ${written.join(" ")}`);
+  const inputsOf = (name) => JSON.parse(readFileSync(join(page, `${name}.inputs.json`), "utf8"));
+  same("a copy is made from its twin with every cell, and the dry file runs dry", [inputsOf("04-copy-dry")[0].copies, inputsOf("04-copy-dry")[0].dryRun, inputsOf("05-copy-real")[0].dryRun], [[{ from: { size: "SM", state: "idle" }, to: { size: "LG" } }], true, false]);
+  same("the read asks for the versions of a set that gains copies", inputsOf("01-read"), [{ setId: "9:1", listVersions: true }]);
+  same("the case takes the place of the lone component its usual sentence names", inputsOf("16-cases-dry")[0].spec.cases[0].replaces, "loading=true");
+  const expected = JSON.parse(readFileSync(join(page, "expected.json"), "utf8"))["9:1"];
+  same("expected.json holds the versions that stand, the copies, and the hash of the starting state", [expected.today, expected.count, expected.copies, expected.stood, expected.hashBefore, expected.defaultAfter], [2, 3, ["size=LG, state=idle"], ["k0=size=SM, state=idle", "k2=size=MD, state=idle"], hashOfLines(["k0=size=SM, state=rest", "k2=size=MD, state=rest"]), "size=SM, state=idle"]);
+  ok("the bundled file is a whole script that parses and holds the page's switch once", /^const startedAtOfBundle/.test(readFileSync(join(page, "04-copy-dry.js"), "utf8")) && (() => { try { new AsyncFunction("figma", readFileSync(join(page, "04-copy-dry.js"), "utf8")); return true; } catch { return false; } })());
+
+  // layout: reads read.json and writes the layout and label files for the set whose names change
+  const readAnswer = (overrides) => JSON.stringify({ script: "read-sets.js", runs: 1, of: 1, stopped: null, answers: [{ setId: "9:1", hash: expected.hashBefore, count: 2, box: [0, 0, 300, 100], padding: [20, 30], gap: 40, labels: 3, mayMove: [], setLabels: [], ...overrides }] });
+  writeFileSync(join(page, "read.json"), readAnswer({}));
+  const laidOut = runNode("operations-calls.mjs", callsArguments(root, "layout", "Actions"));
+  same("layout writes layout and labels files, dry and real, from a read that is the starting state", [laidOut.exit, ["10-layout-dry.js", "11-layout-real.js", "12-labels-dry.js", "13-labels-real.js"].every((name) => readdirSync(page).includes(name))], [0, true]);
+  same("the layout run carries the defaults, padding and gap as read", (({ defaults, padding, gap }) => ({ defaults, padding, gap }))(inputsOf("10-layout-dry")[0]), { defaults: { size: "SM", state: "idle" }, padding: 20, gap: 40 });
+  writeFileSync(join(page, "read.json"), readAnswer({ hash: "deadbeef", count: 9 }));
+  const changed = runNode("operations-calls.mjs", callsArguments(root, "layout", "Actions"));
+  ok("layout stops on a set that is not the state the calls expect, and writes nothing", changed.exit === 1 && /FAULT DSBtn/.test(changed.said) && /nothing written/.test(changed.said), changed.said);
+
+  // check: a true after-read passes, a wrong key is named
+  const afterAnswer = (versions, overrides = {}) => JSON.stringify({ script: "read-sets.js", runs: 1, of: 1, stopped: null, answers: [{ setId: "9:1", count: 3, default: "size=SM, state=idle", header: "DSBtn — rows: state=idle (default) · columns: size=SM (default), MD, LG · behaviour: loading", versions, ...overrides }] });
+  writeFileSync(join(page, "after.json"), afterAnswer([["k0", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]]));
+  const whole = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
+  ok("check passes a true after-read, new keys included", whole.exit === 0 && /whole DSBtn: 3 versions/.test(whole.said), whole.said);
+  writeFileSync(join(page, "after.json"), afterAnswer([["kX", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]]));
+  const wrongKey = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
+  ok("check names a version that stood and is not under its key", wrongKey.exit === 1 && /FAULT DSBtn: 1 versions that stood are not under their key and name, first k0=size=SM, state=idle/.test(wrongKey.said), wrongKey.said);
+  writeFileSync(join(page, "after.json"), afterAnswer([["k0", "size=SM, state=idle"], ["k2", "size=MD, state=idle"], ["n1", "size=LG, state=idle"]], { default: "size=MD, state=idle", header: "DSBtn — rows: x" }));
+  const wrongDefault = runNode("operations-calls.mjs", callsArguments(root, "check", "Actions"));
+  ok("check names a wrong default and a header without the layout clause", wrongDefault.exit === 1 && /the default is \[size=MD, state=idle\], not \[size=SM, state=idle\]/.test(wrongDefault.said) && /the header does not hold the layout clause/.test(wrongDefault.said), wrongDefault.said);
+}
+{
+  const root = operationsFixture();
+  const stopped = runNode("operations-calls.mjs", callsArguments(root, "prepare", "Tags & Chips"));
+  ok("prepare stops on a replaces that only a decision can settle, naming the unit, the case and the way out, and writes nothing", stopped.exit === 2 && /DSTag: case tone=b holds a `replaces` sentence that is not the usual one/.test(stopped.said) && /irregularReplaces/.test(stopped.said) && !existsSync(join(root, "out", "tags-chips")), stopped.said);
+  const decisions = join(root, "decisions.json");
+  writeFileSync(decisions, JSON.stringify({ irregularReplaces: { "DSTag|tone=b": { name: "tone=a", reason: "the lone component tone=a is replaced" } } }));
+  const lone = runNode("operations-calls.mjs", [...callsArguments(root, "prepare", "Tags & Chips"), "--decisions", decisions]);
+  ok("with the decision the case is carried, and a set's case needs no lone id", lone.exit === 0 && JSON.parse(readFileSync(join(root, "out", "tags-chips", "16-cases-dry.inputs.json"), "utf8"))[0].spec.cases[0].replaces === "tone=a", lone.said);
+  writeFileSync(decisions, JSON.stringify({ irregularReplaces: { "DSTag|tone=b": { hand: true, reason: "no script makes it" } } }));
+  const byHand = runNode("operations-calls.mjs", [...callsArguments(root, "prepare", "Tags & Chips"), "--decisions", decisions]);
+  ok("a case given to the hand is left out with its reason, and no cases file is written", byHand.exit === 0 && /left out: DSTag: case tone=b goes to the hand \(no script makes it\)/.test(byHand.said) && !readdirSync(join(root, "out", "tags-chips")).includes("16-cases-dry.js"), byHand.said);
+  const pointed = join(root, "ops", "DSTag.json");
+  const tag = JSON.parse(readFileSync(pointed, "utf8"));
+  delete tag.ops[0].replaces; tag.ops[0].why = "the case on the sheet is repointed to this one";
+  writeFileSync(pointed, JSON.stringify(tag));
+  const unrepointed = runNode("operations-calls.mjs", callsArguments(root, "prepare", "Tags & Chips"));
+  ok("a case that says it is repointed stops until the decisions name the component", unrepointed.exit === 2 && /DSTag: case tone=b says it is repointed and is not decided in repointed/.test(unrepointed.said), unrepointed.said);
+
+  // a copy that brings in a property no version holds
+  const buttons = join(root, "ops", "DSBtn.json");
+  const button = JSON.parse(readFileSync(buttons, "utf8"));
+  button.ops[1].to = [{ size: "LG", inline: "true" }];
+  writeFileSync(buttons, JSON.stringify(button));
+  const undecided = runNode("operations-calls.mjs", callsArguments(root, "prepare", "Actions"));
+  ok("prepare stops on a copy that adds a property no version holds, naming the unit and the property, and writes nothing", undecided.exit === 1 && /FAULT: DSBtn: a copy adds inline/.test(undecided.said) && /nothing written/.test(undecided.said) && !existsSync(join(root, "out", "actions")), undecided.said);
+  writeFileSync(decisions, JSON.stringify({ addedByCopy: { DSBtn: { inline: "false" } } }));
+  const decided = runNode("operations-calls.mjs", [...callsArguments(root, "prepare", "Actions"), "--decisions", decisions]);
+  const names = JSON.parse(readFileSync(join(root, "out", "actions", "02-names-dry.inputs.json"), "utf8"))[0].ops;
+  same("with the decision a names fold adds the property to every version before the copies", [decided.exit, names[names.length - 1].fold], [0, [{ match: {}, set: { inline: "false" } }]]);
+  tag.ops[0].replaces = "the lone component `tone=a` that stands on the sheet today is replaced by this instance";
+  writeFileSync(pointed, JSON.stringify(tag));
+  const summary = runNode("operations-calls.mjs", ["summary", "--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "--plan", join(root, "plan.json"), "--decisions", decisions]);
+  ok("summary prints a line for each page and changes nothing", summary.exit === 0 && /Actions \(2:1\): 1 of 1 units with operations \(DSBtn\)/.test(summary.said) && /2 pages/.test(summary.said), summary.said);
+  same("with no arguments it says how it is used and exits 2", runNode("operations-calls.mjs", []).exit, 2);
+}
+{
+  const root = operationsFixture();
+  const checked = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
+  ok("operations-check counts a sound file: its lines, operations, versions after, no faults", checked.exit === 0 && /DSBtn.json: 5 lines, 6 operations, 0 choices, 0 to compose, 1 nothing owed, 3 versions after, 0 faults/.test(checked.said) && /operations by kind: names 1, copy 1, property 1, sheet 1, case 1, default 0, header 1/.test(checked.said), checked.said);
+  const buttons = join(root, "ops", "DSBtn.json");
+  const sound = JSON.parse(readFileSync(buttons, "utf8"));
+  const broken = JSON.parse(JSON.stringify(sound));
+  broken.ops[1].from = { size: "XL" };
+  broken.ops[2].type = "NUMBER";
+  broken.ops[4].modes = { Hue: "PURPLE" };
+  broken.ops[5].layout = "rows: state=idle (default) · columns: size=SM (default), MD";
+  broken.nothing = [];
+  writeFileSync(buttons, JSON.stringify(broken));
+  const modes = join(root, "modes.json");
+  writeFileSync(modes, JSON.stringify({ Hue: ["DEFAULT", "SUCCESS"] }));
+  const faulty = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "--modes", modes, "DSBtn"]);
+  ok("operations-check names a faulty file: an unaccounted line, a twin that is not there, a property of a wrong type, a mode that does not exist", faulty.exit === 1 && /line 4 is not accounted for/.test(faulty.said) && /no version matches its twin \{"size":"XL"\}/.test(faulty.said) && /needs name, type BOOLEAN or TEXT/.test(faulty.said) && /Hue has no mode PURPLE/.test(faulty.said), faulty.said);
+  const withoutModes = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
+  ok("without --modes a mode is not checked", !/has no mode/.test(withoutModes.said), withoutModes.said);
+  writeFileSync(buttons, JSON.stringify(sound));
+  const late = JSON.parse(JSON.stringify(sound));
+  late.ops[5].layout = "rows: state=idle (default) · columns: size=SM (default), MD";
+  writeFileSync(buttons, JSON.stringify(late));
+  const header = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
+  ok("operations-check names a version the header does not state", header.exit === 1 && /header: \[size=LG, state=idle\] holds `size=LG`, which it does not state/.test(header.said), header.said);
+  rmSync(buttons);
+  const missing = runNode("operations-check.mjs", ["--ops", join(root, "ops"), "--specs", join(root, "specs"), "--readings", join(root, "readings"), "DSBtn"]);
+  ok("a unit with lines owed and no file is named", missing.exit === 1 && /DSBtn.json: NO FILE, 5 lines owed/.test(missing.said), missing.said);
+  same("with no arguments it says how it is used and exits 2", runNode("operations-check.mjs", []).exit, 2);
+}
+await guard(async () => {
+  const shared = await import(resolve(SCRIPTS, "operations-versions.mjs"));
+  const sets = new Map([["9:1", [{ key: "a", name: "state=rest" }, { key: "b", name: "state=hover" }]]]);
+  const spec = { setId: "9:1", remove: [{ state: "hover" }] };
+  same("versionsAfter adds a folded `size` first in the name and another property last, and a copy after the versions that stand", shared.versionsAfter(sets, spec, [
+    { op: "names", fold: [{ match: {}, set: { inline: "false", size: "SM" } }] },
+    { op: "copy", from: { state: "rest" }, to: [{ size: "LG" }] },
+  ]).map(shared.nameOf), ["size=SM, state=rest, inline=false", "size=LG, state=rest, inline=false"]);
+  same("readSets reads the keys and names of a unit's versions", shared.standingOf(sets, spec), [{ key: "a", cells: { state: "rest" } }]);
+});
+
 // ---- the texts the agent passes on --------------------------------------------------------------
 
 console.log("\n=== the texts the agent passes on");
@@ -1109,21 +1256,25 @@ for (const script of ["cases.js", "labels.js", "copy.js", "property.js", "sheet.
   ok(`${script} does not claim in its header that it is unproven`, !/NOT YET RUN AGAINST A FILE/.test(readFileSync(resolve(SCRIPTS, script), "utf8").split("\n").slice(0, 4).join("\n")));
   ok(`${script} is dry by default`, /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, script), "utf8")));
 }
-for (const script of ["versions.js", "instances.js", "apply-spec.js", "cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js"]) {
+for (const script of ["versions.js", "instances.js", "apply-spec.js", "cases.js", "labels.js", "copy.js", "property.js", "sheet.js", "header.js", "read-sets.js"]) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} holds one INPUTS block and no console.log, no spnutils`, (body.match(/const INPUTS = \{/g) ?? []).length === 1 && INPUTS_BLOCK.test(body) && !body.includes("console.log") && !body.toLowerCase().includes("spnutils"));
   const block = INPUTS_BLOCK.exec(body)[0];
   const missing = [...new Set([...body.matchAll(/INPUTS\.(\w+)/g)].map((one) => one[1]))].filter((name) => !new RegExp(`\\n  ${name}:`).test(block));
   same(`${script} holds, in its INPUTS block, every input it reads`, missing, []);
 }
-for (const script of ["versions.js", "instances.js"]) {
+for (const script of ["versions.js", "instances.js", "read-sets.js"]) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} writes nothing to the file`, !/\.(createFrame|createComponent|createText|appendChild|remove|swapComponent|insertCharacters|deleteCharacters)\(|\.name = /.test(body));
 }
 ok("apply-spec.js is dry by default", /const INPUTS = \{[^}]*dryRun: true/.test(readFileSync(resolve(SCRIPTS, "apply-spec.js"), "utf8")));
-for (const script of ["check-answers.mjs", "check-specs.mjs"]) {
+for (const script of ["check-answers.mjs", "check-specs.mjs", "operations-check.mjs", "operations-versions.mjs"]) {
   const body = readFileSync(resolve(SCRIPTS, script), "utf8");
   ok(`${script} reads files and writes at most the one it is given: no process spawned, no network, no folder of a workstream`, !/child_process|\bfetch\(|node:https?|node:net|XMLHttpRequest|\.spndevex|workstreams|import\.meta\.url/.test(body));
+}
+{
+  const body = readFileSync(resolve(SCRIPTS, "operations-calls.mjs"), "utf8");
+  ok("operations-calls.mjs spawns only node, never spnutils, reaches no network, and names no workstream folder or library file", !/spnutils|\bfetch\(|node:https?|node:net|XMLHttpRequest|\.spndevex|workstreams|import\.meta\.url/.test(body) && body.split("execFileSync(").length === 2);
 }
 rmSync(scratch, { recursive: true, force: true });
 
