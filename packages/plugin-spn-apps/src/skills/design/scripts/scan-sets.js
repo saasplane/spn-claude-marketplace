@@ -69,15 +69,15 @@ const SHARED_VARIANT_PROPERTY = "variant";
 // A state is what a unit is in, as the showcase's States section states it (default, disabled, working, error, empty, read
 // only, open, checked, selected, no permission). A choice that a caller makes with a prop is a case, never a state.
 const STATE_PROPERTIES = [
-  "checked", "current", "disabled", "empty", "expanded", "filled", "indeterminate", "pressed", "selected", "state", "validationType",
+  "checked", "current", "disabled", "empty", "expanded", "filled", "indeterminate", "loading", "pressed", "selected", "state", "validationType",
 ];
 // Properties that a recorded spec of the library update keeps crossed, each a KNOWN EXCEPTION to the rule. Every name in this
 // list is to be ruled on by the developer: it either leaves the list (its unit draws it as a case on the sheet) or is
 // admitted to the rule. The scan therefore does NOT catch these names yet; `passedByException` counts the sets that pass only
 // because of this list, so the gap is visible in every scan.
 const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
-  "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
-  "percent", "placement", "shape", "type", "valueType",
+  "attached", "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
+  "percent", "placement", "shape", "sort", "type", "valueType",
 ];
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const SCAN_FACTS = { passedByException: 0 };

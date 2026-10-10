@@ -1490,6 +1490,14 @@ console.log("\n=== page.js — a set crossed beyond the rule");
     same("a set that is named is not counted as passed by exception, and a clean set counts none", [caught.passedByException, (await partOf(["size=SM", "size=MD"])).passedByException], [0, 0]);
     const book = await partOf(["size=SM, bordered=false", "size=SM, bordered=true", "size=SM, bordered=maybe", "size=MD, bordered=false", "size=MD, bordered=true", "size=MD, bordered=maybe"].map((name) => name.replace("bordered", "caller")));
     same("a caller's choice that is in neither list is named", book.findings.crossedBeyondTheRule.items.map((item) => item.property), ["caller"]);
+    const loading = await partOf(["size=SM, loading=false", "size=SM, loading=true", "size=MD, loading=false", "size=MD, loading=true"]);
+    same("loading is a state: a set that crosses it with its size is no finding and is not counted as passed by exception", [loading.findings.crossedBeyondTheRule.count, loading.passedByException], [0, 0]);
+    const attached = await partOf(["size=SM, attached=false", "size=SM, attached=true", "size=MD, attached=false", "size=MD, attached=true"]);
+    same("attached is a known exception: a set that crosses it with its size is no finding, and the answer counts the set", [attached.findings.crossedBeyondTheRule.items.length, attached.passedByException], [0, 1]);
+    const sort = await partOf(["size=SM, sort=none", "size=SM, sort=asc", "size=SM, sort=desc", "size=MD, sort=none", "size=MD, sort=asc", "size=MD, sort=desc"]);
+    same("sort is a known exception: a set that crosses it with its size is no finding, and the answer counts the set", [sort.findings.crossedBeyondTheRule.items.length, sort.passedByException], [0, 1]);
+    const flavour = await partOf(["size=SM, flavour=a", "size=SM, flavour=b", "size=SM, flavour=c", "size=MD, flavour=a", "size=MD, flavour=b", "size=MD, flavour=c"]);
+    same("control: a made-up property crossed with the size is named", flavour.findings.crossedBeyondTheRule.items.map((item) => item.property), ["flavour"]);
   });
 }
 
