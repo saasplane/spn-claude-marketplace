@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "d11c69c6"
+      "seen": "1de51133"
     }
   ],
   "decisions": [
@@ -97,6 +97,7 @@ The question it holds: *can this person finish what they came to do, and do they
 - **The surface answers with the design system's own blocks.** A loading picture or a failure picture that the page drew itself is a finding. So is anything a person needs that only hover reaches (interaction § Feedback, recovery and interruption, § Input, by kind of surface).
 - **The look comes from the theme, and never from the page.** A color, a padding, a margin, a radius or a gap set by hand is the finding (layout and container § What a container refuses · `RD.SUPPORT.APPS.150`). In a design, it is a color that binds no variable, or a copy of a block that is no longer an instance (design system § The capability set).
 - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. `CUSTOM` is a value of `color` that means the caller owns the colour, and the one named way a page sets a colour outside the theme. A hue that means success on one page and decoration on the next is a finding (standards § What a surface is judged by · names § The three shared names).
+- **A prop that takes a vocabulary carries the book's name and the book's values.** A clock drawn as a switch under a name of the designer's own, where the book states `TWELVE_HOUR` or `TWENTY_FOUR_HOUR`, is a finding. So is a value the vocabulary does not hold (names § A prop that takes a vocabulary is stated with its values · `RD.SUPPORT.SURFACE.041`).
 - **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block of the page. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible — no block takes the key and shows nothing (design library § Each shared state has one picture · `RD.SUPPORT.APPS.142`).
 - **An icon beside a text takes the icon size of that text's own size step, and the two sit on one centre line.** An `XS` text takes the `XS` icon; an icon one step off, or sitting above or below the line of its text, is a finding (names and core § The scale · `RD.SUPPORT.SURFACE.008`).
 - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark. A page built from the design system's blocks inherits all of it. A control the page built owes all of it on its own (accessibility § The baseline).

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "f70db3b6"
+      "seen": "858b564f"
     }
   ]
 }
@@ -51,6 +51,72 @@ Keep each of the three names for its one meaning, on every block — a block tak
 
 A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. `DSTable` takes `hoverable`, yes or no and no by default, for whether a body row takes the table's row-hover fill under the pointer; a selected row, and a row that holds an open menu, keep their fill whichever way it is set. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
+## A prop that takes a vocabulary is stated with its values — ✅
+
+A design and its code agree on a prop only when they agree on what it takes. Without the values, a designer draws the clock of a time picker as a switch under a name of the designer's own, and the stack has to be corrected afterwards. Four rules keep the design library and every stack to the values.
+
+- **A prop whose values are a vocabulary is stated with its values.** A long code list may be stated by the vocabulary's name and the place its values are stated, as the icons are. The first table below holds the vocabularies of the design system, and the second holds the shared ones.
+- **The design library carries such a prop under the same name and the same values, and every stack takes it under the same name and the same values.** This is the rule that a name is the contract, applied to the values of a prop.
+- **A vocabulary is either the design system's own or a shared one of the platform.** The design system's own is `DS<Component><Word>Type`, and it drops the component where several blocks take it, as `DSOrientationType` does. A shared one is `SP…Type`. It is realized once, in the Support contract, so that a service and a surface use the same values, and a design system never defines a shared one again.
+- **A unit or a prop of the design library follows one order: the construct in the book, then the library in Figma as its visual proof, then each stack, then the showcase.** Each step follows the one before it. A component that belongs to one app does not follow this order.
+
+**The design system's own vocabularies.** A yes-or-no prop takes no vocabulary. The default is the value shown with "when unset".
+
+| Block | Prop | Values | Vocabulary |
+| --- | --- | --- | --- |
+| `DSAlert` · `DSToast` | `color` | `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType`, limited to these four |
+| `DSText` | `typography` | `HEADING_XL` to `HEADING_XS` · `TITLE_XL` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
+| `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
+| `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
+| `DSLink` · `DSText` | `tone` | `DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
+| `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
+| `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
+| `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
+| `DSIcon` | `iconSize` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5` | `DSIconSizeType` |
+| `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
+| `DSTabs` | `type` | `DEFAULT` · `LINE` · `BADGE` | `DSTabsType` |
+| `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
+| `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
+| `DSButton` | `type` | `SUBMIT` · `BUTTON`, `BUTTON` when unset | `DSButtonType` |
+| `DSButtonGroup` · `DSTabs` · `DSSeparator` | `orientation` | `HORIZONTAL` · `VERTICAL`, `HORIZONTAL` when unset | `DSOrientationType` |
+| `DSButton` · `DSLink` · `DSMenubar` · `DSDropdownMenu` | `authzDenied` | `HIDE` · `DISABLE`, `HIDE` when unset | `DSAuthzDeniedType` |
+| `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorPlacement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
+| `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorExpandedIcon` · `indicatorCollapsedIcon` | an icon of the core's icons, `CHEVRON_UP` open and `CHEVRON_DOWN` closed when unset | `DSIconType` |
+| `DSAddressView` | `layout` | `BLOCK` · `INLINE`, `BLOCK` when unset | `DSAddressViewLayoutType` |
+| `DSCodeBlockView` | `language` | `PLAIN` · `JSON` · `JAVASCRIPT` · `TYPESCRIPT` · `JSX` · `TSX` · `HTML` · `CSS` · `SHELL`; unset or `PLAIN` draws no highlighting | `DSCodeLanguageType` |
+| `DSCodeBlockView` · `DSJSONView` · `DSJSONControl` | `mode` | `LIGHT` · `DARK`; unset, it follows the app theme | `DSThemeModeType` |
+| `DSInput` | `type` | `TEXT` · `NUMBER` · `PASSWORD` · `EMAIL` · `TEL` · `COLOR`, `TEXT` when unset | `DSInputType` |
+| `DSInput` | `mode` (the keyboard a touch device offers) | `NONE` · `TEXT` · `DECIMAL` · `NUMERIC` · `TEL` · `SEARCH` · `EMAIL` · `URL`, `TEXT` when unset | `DSInputModeType` |
+| `DSTimePicker` | `type` (the clock; required) | `TWENTY_FOUR_HOUR` · `TWELVE_HOUR` | `DSTimePickerType` |
+| `DSDateTimePicker` | `timeFormat` (the clock of the time part) | `TWENTY_FOUR_HOUR` · `TWELVE_HOUR`, `TWENTY_FOUR_HOUR` when unset | `DSTimePickerType` |
+| `DSTimePicker` | `intervalMinutes` | `MIN_15` · `MIN_30` · `MIN_60`, `MIN_15` when unset | `DSTimePickerIntervalType` |
+| `DSDateTimePicker` | `minuteStep` (the values are numbers) | `15` · `30` · `60`, `15` when unset | `DSDateTimeMinuteStepType` |
+| `DSImagePicker` | `mode` (required) | `VIEW` · `EDIT` | `DSImagePickerModeType` |
+| `DSAttachment` · `DSAttachmentMulti` | `acceptedFileTypes` (a list of these) | `TEXT` · `DOC` · `EXCEL` · `CSV` · `IMAGES` · `PDF` · `ZIP` | `IDSAttachmentType` |
+| Every entry control | `validationType` | `ERROR`; unset, no error is drawn | `DSEntryControlValidationType` |
+| `DSToast` | `placement` | `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT`, `TOP_RIGHT` when unset | `DSToastPlacementType` |
+| `DSHScroll` | `arrowType` | `DEFAULT` · `PRIMARY` · `OVERLAY`, `DEFAULT` when unset | `DSHScrollArrowType` |
+| `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
+| `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
+| `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
+| `DSPopover` · `DSHoverCard` · `DSTooltip` · `DSDropdownMenu` | `placement` (`DSPopover` requires it; the others open at `BOTTOM`, `TOP` and `BOTTOM_LEFT` when unset, in that order) | `LEFT` · `RIGHT` · `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT` · `RIGHT_TOP` · `RIGHT_BOTTOM` · `LEFT_TOP` · `LEFT_BOTTOM` | `DSPlacementType` |
+| `DSContextMenu` | `placement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
+| `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
+| `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
+
+**The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
+
+| Block | Prop | Vocabulary | Values |
+| --- | --- | --- | --- |
+| `DSDatePicker` · `DSDateRangePicker` | `format` | `SPDateFormatType` | `US_STANDARD` · `EUROPEAN_STANDARD` · `EUROPEAN_DASH` · `ISO_8601` · `GERMAN_STANDARD` · `SHORT_MONTH` · `FULL_MONTH` |
+| `DSFormatDate` · `DSFormatDateTime` | `dateFormat` | `SPDateFormatType` | the values of the row above |
+| `DSFormatTime` · `DSFormatDateTime` | `timeFormat` | `SPTimeFormatType` | `HH_MM` · `HH_MM_SS` · `HH_MM_DAY_FORMAT` · `HH_MM_SS_DAY_FORMAT` |
+| `DSFormatNumber` | `numberFormat` | `SPNumberFormatType` | `US_STANDARD` · `EUROPEAN_STANDARD` · `FRENCH_STANDARD` · `NO_SEPARATOR` · `INTEGER_COMMA` · `INTEGER_PLAIN` |
+| `DSFormatCurrency` | `currencyCode` | `SPCurrencyCodeType` | `USD` · `EUR` · `GBP` · `INR` · `JPY` · `CAD` · `AUD` · `CHF` · `CNY` · `BRL` · `MXN` · `SEK` · `AED` · `SGD` |
+| `DSAddressForm` | `format` | `SPAddressFormatType` | `DEFAULT` · `US` · `IN` · `UK`, or a partial address configuration in their place |
+
+A format prop that is not set takes the person's preference from the app context. `DSFormatTime` falls back to `HH_MM` when the person has no time preference, and `DSAddressForm` derives its format from the selected country.
+
 ## The six layers — ✅
 
 | Design-system layer | Holds | May use |
@@ -76,7 +142,7 @@ A block drawn from data is a host and an item: one item serves every host that t
 
 ## Boundary
 
-This ref states which three props mean one thing everywhere, what kind every other prop is, which six layers a block is built from, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
+This ref states which three props mean one thing everywhere, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
 
 ## Binds
 
@@ -86,6 +152,10 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
+| `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |
+| `RD.SUPPORT.SURFACE.041` | the design library carries such a prop, and every stack takes it, under the same name and the same values |
+| `RD.SUPPORT.SURFACE.042` | a vocabulary is the design system's own or a shared one of the platform, and a shared one is realized once in the Support contract |
+| `RD.SUPPORT.SURFACE.043` | a unit or a prop of the design library follows the order construct, Figma, stack, showcase |
 | `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |
 | `RD.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RD.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "f70db3b6"
+      "seen": "858b564f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -58,7 +58,7 @@ The design library holds one file for each layer of the design system that is dr
 | --- | --- |
 | The page | one top frame, named as the page. It holds the theme: light or dark, and the look of the containers |
 | A block | an instance of the library component of the same name |
-| A prop with a closed set of values | the property of the same name, set to the same value |
+| A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement or a format is never drawn under a name or a switch of the designer's own |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
