@@ -58,8 +58,12 @@ export type SkeletonItem = {
   slot?: string;
   /** A control at the size of its component, on one line. `main` tells the main action by weight, never by colour. */
   control?: "button" | "field" | "select" | "checkbox" | "switch" | "tabs" | "badge" | "pager"; main?: boolean;
-  /** A switch's sample value: its knob stands at the end of the track when it is on, and at the start when it is off. */
+  /** A switch's sample value: its knob stands at the end of the track when it is on, and at the start when it is off.
+   *  On an icon it makes the icon a mark, and `on: false` draws the default mark empty: a thing that is there
+   *  to be set up, and is not yet. */
   on?: boolean;
+  /** An icon that is a mark and not an action: it stands for a thing or a person, and is drawn in a circle. */
+  mark?: boolean;
   /** The words of a row of tabs, and the place of the chosen one, counted from 0. */
   tabs?: string[]; chosen?: number;
   /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. */
@@ -91,7 +95,7 @@ export type SkeletonRow = { label?: string; framed?: boolean; items: SkeletonIte
  *  line between its parts), or both, and `rounded` or square. `size` is a size step, `XS` to `XL`, that every
  *  control inside reads its height from; the default is `SM`. */
 export type SkeletonFrame = {
-  label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat"; tag?: string; height?: number; fill?: boolean;
+  label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat" | "card"; tag?: string; height?: number; fill?: boolean;
   frames?: string[]; raised?: boolean; bordered?: boolean; rounded?: boolean;
   size?: "XS" | "SM" | "MD" | "LG" | "XL";
 };
@@ -1596,14 +1600,20 @@ const SKEL_CANVAS = 1052;
 // fraction: nothing would set the frame's own width, and 0 is not a figure.
 const SKEL_MIN_W = 200;
 
-const SKEL_LOOKS = ["raised", "bordered", "flat"];
+const SKEL_LOOKS = ["raised", "bordered", "flat", "card"];
+/** A card's head: its title on one line, or its title with a note under it. */
+const SKEL_CARD_HEAD_ONE = 40, SKEL_CARD_HEAD_TWO = 58;
+/** The default mark is a small filled circle, this much lower than a control. */
+const SKEL_MARK_DROP = 12;
 const SKEL_CONTROLS = ["button", "field", "select", "checkbox", "switch", "tabs", "badge", "pager"];
 /** A badge stands this much lower than a control, and a switch's track this much, each on the row's centre line. */
 const SKEL_BADGE_DROP = 8, SKEL_SWITCH_DROP = 12;
 /** An icon before the word of a badge or a tab: a plain shape with no square around it. */
 const SKEL_INLINE_ICON = 14;
 /** The width a view is drawn at, for each screen class. It stands for the class, and is never a size on a screen. */
-const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 704, TABLET: 480, MOBILE: 320 };
+// THE DESKTOP TAKES THE GRID'S WIDTH, and the tablet and the phone share the next line, three parts to two, with
+// the gap between them: 617 + 24 + 411 is the grid's 1052.
+const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 1052, TABLET: 617, MOBILE: 411 };
 const SKEL_STANDINS = ["rows", "cards", "field", "list", "table"];
 /** A table's head row, and the room a body row has above and below its tallest cell. */
 const SKEL_TABLE_HEAD = 24, SKEL_TABLE_ROW_PAD = 8;
@@ -1740,6 +1750,7 @@ const skelParts = (frame: SkeletonFrame): SkeletonFrame[] =>
 function skelHead(frame: SkeletonFrame): number {
   const tag = frame.tag ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   if (!frame.label) return Math.max(tag, SKEL_PAD);
+  if (frame.look === "card") return tag + (frame.note ? SKEL_CARD_HEAD_TWO : SKEL_CARD_HEAD_ONE);
   return tag + (frame.note ? SKEL_H_TWO : SKEL_H_ONE);
 }
 /** The left column every row of a frame shares, sized to the widest row label — or none at all. */
@@ -1841,6 +1852,8 @@ const skelPath = (cls: string, points: [number, number][][]) =>
 /** A frame's marks. The outer frame is the drawing's own edge; a part is a surface, a border or neither, and a part with no border of its own shows the dotted boundary. */
 function skelMarks(look: string | undefined, x: number, y: number, w: number, h: number): string[] {
   if (look === "bordered") return [skelRect("sds-skel-border", x, y, w, h)];
+  // A CARD IS A THIN, ROUNDED OUTLINE with nothing behind it: a part with a title of its own, as a page draws one.
+  if (look === "card") return [skelRect("sds-skel-control", x, y, w, h, SKEL_ROUND)];
   if (look === "flat") return [skelRect("sds-skel-guide", x, y, w, h)];
   return [skelRect("sds-skel-surface", x, y, w, h), skelRect("sds-skel-guide", x, y, w, h)];
 }
@@ -1871,6 +1884,20 @@ function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
   }
 }
 
+/**
+ * An icon in its slot, a square of side `h` about `(cx, cy)`. AN ACTION KEEPS ITS SQUARE, since it is pressed,
+ * and an icon is an action unless the spec says it is a mark. A MARK IS DRAWN IN A CIRCLE: it stands for a
+ * thing or a person, as a picture or a logo does. The default mark is a small filled circle, or an empty one
+ * where `on` is false, as a provider that is there to be set up and is not yet; any other mark is a circle that
+ * holds its shape.
+ */
+function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean, on?: boolean): string[] {
+  const circle = (cls: string, r: number) => `  <circle class="${cls}" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(r)}"/>`;
+  if (!mark) return [skelRect("sds-skel-control", cx - h / 2, cy - h / 2, h, h), ...skelGlyph(name, cx, cy, Math.round(h / 2))];
+  if (name === "default") return [circle(on === false ? "sds-skel-control" : "sds-skel-bar", (h - SKEL_MARK_DROP) / 2)];
+  return [circle("sds-skel-control", h / 2), ...skelGlyph(name, cx, cy, Math.round(h / 2))];
+}
+
 /** One item that is a leaf (a control, an icon, a slot, plain words, a stand-in), drawn at `(ix, iy)`, `iw` wide and `ih` tall. */
 function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, iw: number, ih: number, boxH: number, h: number, findings: string[], out: string[]): void {
   const mid = iy + ih / 2;
@@ -1895,8 +1922,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     let wx = ix;
     if (item.media !== undefined) {
       if (!SKEL_ICONS.includes(item.media)) findings.push(`an item's \`media\` is \`${item.media}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
-      out.push(skelRect("sds-skel-control", ix, mid - h / 2, h, h));
-      out.push(...skelGlyph(item.media, ix + h / 2, mid, Math.round(h / 2)));
+      out.push(...skelIcon(item.media, ix + h / 2, mid, h, true));
       wx = ix + h + SKEL_LABEL_GAP;
     }
     const two = item.description !== undefined;
@@ -1913,8 +1939,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   }
   if (kind === "icon") {
     if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
-    out.push(skelRect("sds-skel-control", ix, iy, h, h));
-    out.push(...skelGlyph(it.icon!, ix + h / 2, mid, Math.round(h / 2)));
+    out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, it.mark === true || it.on !== undefined, it.on));
     if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
     return;
   }
