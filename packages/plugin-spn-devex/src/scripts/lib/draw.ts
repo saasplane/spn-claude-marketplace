@@ -89,7 +89,8 @@ export type SkeletonItem = {
 };
 /** A row runs left to right. `label` names the place, in a column every row of the frame shares;
  *  `framed` puts the row's items inside one box, as an example sits in its frame. */
-export type SkeletonRow = { label?: string; framed?: boolean; items: SkeletonItem[] };
+/** `chosen`, in a container: this row is the chosen line of a list, and a band is drawn behind it. */
+export type SkeletonRow = { label?: string; framed?: boolean; chosen?: boolean; items: SkeletonItem[] };
 /** A frame is a box, with an optional title (`label`) and `note`, holding rows top to bottom. A
  *  frame nested in a row may carry `width` — a fraction of the row, or absent for what is left. Its `look` is
  *  `raised` (a surface), `bordered` (a solid line) or `flat` (neither), and `fill` takes the height left in its column.
@@ -1621,7 +1622,8 @@ const SKEL_LOOKS = ["raised", "bordered", "flat", "card", "container"];
 const SKEL_CONTAINER_HEAD = 48;
 /** A card's head: its title on one line, or its title with a note under it. */
 const SKEL_CARD_HEAD_ONE = 40, SKEL_CARD_HEAD_TWO = 58;
-/** A mark that tells a state, set up or not, is small: this much lower than a control. A mark that stands for a thing is as tall as one. */
+/** A mark that tells a state, set up or not, is small: this much lower than a control. A mark that stands for a thing is as tall as one,
+ *  and it stays so where it also tells that thing's state: a spec says `mark` and `on` together for it. */
 const SKEL_MARK_DROP = 12;
 const SKEL_CONTROLS = ["button", "field", "select", "checkbox", "switch", "tabs", "badge", "pager"];
 /** A badge stands this much lower than a control, and a switch's track this much, each on the row's centre line. */
@@ -1714,7 +1716,9 @@ const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 16;
 const SKEL_W_FACT = 5.9;
 /** A BADGE ON THE LINE OF FACTS IS AS TALL AS THE WORDS BESIDE IT, and not as tall as a badge that stands alone. */
 const SKEL_FACT_BADGE = 16, SKEL_FACT_CTL = SKEL_FACT_BADGE + 8;
-const skelFactW = (fact: string | SkeletonItem, _h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_FACT) : skelFixedWidth(fact, SKEL_FACT_CTL));
+/** A word on the facts line is measured letter by letter, since capitals and digits are wider than small letters and a dot must not touch the word before it. */
+const skelFactTextW = (words: string) => Math.ceil([...words].reduce((t, c) => t + (/[A-Z0-9@]/.test(c) ? 7.4 : /[mwMW]/.test(c) ? 9.2 : /[iljt.,:;' ]/.test(c) ? 3.6 : SKEL_W_FACT + 0.3), 0));
+const skelFactW = (fact: string | SkeletonItem, _h: number) => (typeof fact === "string" ? skelFactTextW(fact) : skelFixedWidth(fact, SKEL_FACT_CTL));
 function skelItemFactsW(it: SkeletonItem, h: number): number {
   const facts = skelItemFacts(it);
   return facts.reduce((t: number, fact, i) => t + skelFactW(fact, h)
@@ -2044,7 +2048,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   }
   if (kind === "icon") {
     if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
-    out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, it.mark === true || it.on !== undefined, it.on, it.on !== undefined ? h - SKEL_MARK_DROP : h));
+    out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, it.mark === true || it.on !== undefined, it.on, it.on !== undefined && it.mark !== true ? h - SKEL_MARK_DROP : h));
     if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
     return;
   }
@@ -2323,6 +2327,12 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const dividers = skelDividers(frame);
   rows.forEach((row, rowIndex) => {
     const rh = heights[rowIndex];
+    // THE CHOSEN LINE OF A LIST IS A BAND across the outline, from the line above it to the line under it.
+    if (surface && row.chosen) {
+      const bandTop = rowIndex === 0 ? y + skelContainerHead(frame) : rowY - SKEL_GAP / 2;
+      const bandEnd = rowIndex === rows.length - 1 ? y + h : rowY + rh + SKEL_GAP / 2;
+      out.push(skelRect("sds-skel-surface", x, bandTop, w, bandEnd - bandTop, 0));
+    }
     // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline.
     if (surface && dividers.has(rowIndex))
       out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w)}"/>`);

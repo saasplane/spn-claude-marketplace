@@ -881,6 +881,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("an item with a description and no facts keeps itemOfTwo lines", texts(line({ title: "x", description: "y" }).svg, "sds-note").map((t) => t[2]), (g) => g.length === 1 && g[0] === "y");
   const listWithLines = card({ look: "container", label: "Users", divided: true, rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }, { items: [{ item: { title: "Li Wei" }, fill: true }] }, { items: [{ item: { title: "Omar" }, fill: true }] }] });
   one("a divided container has a line between each itemOfTwo of its rows", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
+  const radius = (g) => [...g.matchAll(/<circle[^>]* r="([\d.]+)"/g)].map((m) => Number(m[1]));
+  one("a mark that is a thing and tells its state is as tall as a control, and one that only tells a state is small",
+    [radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", mark: true, on: true, text: "Google" }] }] }).svg)[0], radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", on: true }] }] }).svg)[0]], (g) => g[0] > g[1]);
+  const listWithChosen = card({ look: "container", label: "Groups", divided: true, rows: [{ chosen: true, items: [{ item: { title: "Authentication" }, fill: true }] }, { items: [{ item: { title: "Billing" }, fill: true }] }] });
+  one("the chosen line of a list is a band across the outline, from its top to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "sds-skel-surface"), outline(listWithChosen.svg)[0]],
+    (g) => g[0] === 0 && g[1].length === 1 && g[1][0][0] === g[2][0] && g[1][0][2] === g[2][2] && g[1][0][1] === g[2][1]);
   one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
   one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
