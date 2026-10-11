@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "5cf4a447"
+      "seen": "0919eca2"
     }
   ]
 }
@@ -34,7 +34,7 @@
 
 ## Routes, overlays and the session a container reads
 
-**The route as data and the overlay with an address are built in the Support stack.** `@saasplane/support-web-ts` holds the first and `@saasplane/support-web-ds-ts` the second, and the sample app of the stack uses both. **The provider a partner mounts and `usePlatformSession` are named and not built yet**, and so is the callback after a save. Read the installed package before you use a name: a package you installed may be older than this ref. The rules behind the names are in `../../shape.md` and `../../module/README.md` in this plugin.
+**The route as data and the overlay with an address are built in the Support stack.** `@saasplane/support-web-ts` holds the first and `@saasplane/support-web-ds-ts` the second, and the sample app of the stack uses both. The Platform's nine web modules declare their routes as `<MOD>_ROUTES`, and its pages show an entry with `useDSOverlayRoute`. **The provider a partner mounts and `usePlatformSession` are built in the Platform's `@saasplane/support-web-ui-ts`.** The callback after a save is built on the Platform's entry containers as a required prop, `onSaved`. No test proves any of these yet. Read the installed package before you use a name: a package you installed may be older than this ref. The rules behind the names are in `../../shape.md` and `../../module/README.md` in this plugin.
 
 **A route as data** lives in `@saasplane/support-web-ts`, in `utils/route.ts`, with no router inside (`RD.SUPPORT.APPS.186`, `RD.SUPPORT.APPS.189`).
 
@@ -58,9 +58,9 @@ None of these imports a router or reads `window.location`. The app hands them th
 | Shown while the address matches | `useDSOverlayRoute(match, renderer, onClose)`. It shows the overlay while `match` is not `null`, removes it when `match` turns to `null`, and calls `onClose` when the person closes it (`RD.SUPPORT.APPS.196`). The match comes from the app's own router | proposed |
 | The part after `#` | the app's own `navigate`: an address that begins with `#` goes to the router's reader of that part (`RD.SUPPORT.APPS.197`) | proposed |
 
-**An edit container's callback after a save** is the prop `onSaved?`. It is proposed (`RD.SUPPORT.APPS.184`).
+**An edit container's callback after a save** is the prop `onSaved?`. It is proposed (`RD.SUPPORT.APPS.184`). The Platform's entry containers take `onSaved` as a required prop, so the page that places one always decides the next move.
 
-**The provider a partner mounts** is the platform's, in `@saasplane/support-web-ui-ts`, because it calls the platform's client (`RD.SUPPORT.APPS.199`, `RD.SUPPORT.APPS.200`).
+**The provider a partner mounts** is the platform's, in `@saasplane/support-web-ui-ts`, because it calls the platform's client. There `AppRoot` mounts it with both design-system contexts beneath it (`RD.SUPPORT.APPS.199`, `RD.SUPPORT.APPS.200`).
 
 | What | TypeScript | State |
 | --- | --- | --- |
