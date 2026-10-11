@@ -627,7 +627,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("an icon is an action, and sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "sds-skel-control").length === 12 && rect(g, "sds-skel-control").every((r) => r[2] === 32 && r[3] === 32));
   const roundMarks = (g) => [...g.matchAll(/<circle class="(sds-skel-bar|sds-skel-control)" cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)].map((m) => [m[1], Number(m[4])]);
   const marked = draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "person", mark: true }, { icon: "default", mark: true }, { icon: "default", on: false }, { icon: "more" }] }] } });
-  one("a mark is drawn in a circle: a person as wide as a control, the default as a small filled circle, and empty where `on` is false", roundMarks(marked.svg).map((m) => m.join(":")).join(), "sds-skel-control:16,sds-skel-bar:10,sds-skel-control:10");
+  one("a mark is drawn in a circle: one that stands for a thing or a person is as wide as a control, and one that tells a state is small, and empty where `on` is false", roundMarks(marked.svg).map((m) => m.join(":")).join(), "sds-skel-control:16,sds-skel-bar:16,sds-skel-control:10");
   one("a mark has no square, and the action beside it keeps its own", rect(marked.svg, "sds-skel-control").length, 1);
   one("a mark keeps the room of a control, so marks and actions share one rhythm", rect(marked.svg, "sds-skel-control")[0][0], 24 + 16 + 3 * (32 + 4));
   one("icons are line shapes of the stylesheet, with no transform", icons.svg, (g) => g.includes("sds-skel-glyph") && !g.includes("transform"));
@@ -803,14 +803,15 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const line = (item, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ item, fill: true, ...extra }] }] } });
   const full = line({ media: "person", title: "Dana Lee", description: "Admin", end: [{ control: "badge", text: "Invited" }, { icon: "more" }] });
   one("an item line draws without a finding", full.findings, none);
-  one("its title is heavy and its description is quiet", [texts(full.svg, "sds-label").map((t) => t[2]).join(), texts(full.svg, "sds-code").map((t) => t[2]).includes("Admin")].join(), "Dana Lee,true");
-  one("the description stands under the title, at the same start", [texts(full.svg, "sds-label")[0], texts(full.svg, "sds-code").find((t) => t[2] === "Admin")], (g) => g[0][0] === g[1][0] && g[1][1] > g[0][1]);
-  one("the words start after the media", texts(full.svg, "sds-label")[0][0], 24 + 16 + 32 + 8);
-  one("the media of a person is a circle, and no square", [roundMarks(full.svg)[0].join(":"), rect(full.svg, "sds-skel-control").filter((r) => r[0] === 40).length].join(), "sds-skel-control:16,0");
+  one("its title is heavy and its description is quiet", [texts(full.svg, "sds-title").map((t) => t[2]).join(), texts(full.svg, "sds-note").map((t) => t[2]).includes("Admin")].join(), "Dana Lee,true");
+  one("the description stands under the title, at the same start", [texts(full.svg, "sds-title")[0], texts(full.svg, "sds-note").find((t) => t[2] === "Admin")], (g) => g[0][0] === g[1][0] && g[1][1] > g[0][1]);
+  one("the media is as tall as the two lines beside it, and the words start after it", texts(full.svg, "sds-title")[0][0], 24 + 16 + 40 + 8);
+  one("beside a title alone the media is as tall as a control", texts(line({ media: "person", title: "Dana Lee" }).svg, "sds-title")[0][0], 24 + 16 + 32 + 8);
+  one("the media of a person is a circle, and no square", [roundMarks(full.svg)[0].join(":"), rect(full.svg, "sds-skel-control").filter((r) => r[0] === 40).length].join(), "sds-skel-control:20,0");
   one("what is pressed at the end of an item keeps its square", rect(full.svg, "sds-skel-control").some((r) => r[2] === 32 && r[3] === 32), true);
   one("what stands at its end ends at the end of the line", rect(full.svg, "sds-skel-control").map((r) => r[0] + r[2]), (g) => Math.max(...g) === 24 + 1052 - 16);
   one("an item with a description stands taller than one without", rect(full.svg, "sds-box")[0][3] > rect(line({ title: "Dana Lee" }).svg, "sds-box")[0][3], true);
-  one("an item with no media starts its words at the start of the line", texts(line({ title: "Dana Lee" }).svg, "sds-label")[0][0], 24 + 16);
+  one("an item with no media starts its words at the start of the line", texts(line({ title: "Dana Lee" }).svg, "sds-title")[0][0], 24 + 16);
   one("an item with no title is a finding", line({ media: "person" }).findings, says("carries its `title`"));
   one("a media the set lacks is a finding that names the default", line({ media: "rocket", title: "x" }).findings, says("`default`"));
   one("a frame at the end of an item line is a finding", line({ title: "x", end: [{ frame: { rows: [] } }] }).findings, says("the end of an item line holds"));
@@ -823,7 +824,20 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a card's title is drawn as a title, in the heavy weight", titled.svg, (g) => /<text class="sds-title"[^>]*>Sign-in</.test(g));
   one("a card's head is lower than the head of a frame with a title", rect(titled.svg, "sds-box")[0][3] < rect(card({ tag: "x", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] }).svg, "sds-box")[0][3] - 16, true);
   one("a card with neither a title nor a tag is a finding", card({ look: "card", rows: [] }).findings, says("carries no name"));
-  one("a look the skeleton lacks still names the four it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card"));
+
+  // 15c · a container on a surface: its header above, its content and its footer inside a thin outline
+  const boxed = card({ look: "container", label: "Sign-in", note: "By app", actions: [{ control: "button", text: "Set our own" }],
+    rows: [{ items: [{ text: "Account" }] }], footer: [{ items: [{ note: "Follows the default" }] }] });
+  const outline = (g) => [...g.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="8"/g)].map((m) => m.slice(1).map(Number));
+  one("a container draws without a finding", boxed.findings, none);
+  one("its title stands above its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), outline(boxed.svg)[0]],
+    (g) => g[0][1] < g[2][1] && g[1][1] < g[2][1] && g[0][0] === g[2][0]);
+  one("its actions stand at the end of its header, above the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === outline(boxed.svg)[0][0] + outline(boxed.svg)[0][2] && g[1] + g[3] <= outline(boxed.svg)[0][1]);
+  one("its content stands inside the outline", texts(boxed.svg, "sds-label").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
+  one("its footer begins under a line across the outline", boxed.svg, (g) => /<path class="sds-skel-control" d="M[\d.]+ [\d.]+ H[\d.]+"\/>/.test(g) && texts(g, "sds-code").some((t) => t[2] === "Follows the default"));
+  one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
+  one("a frame at the end of a container's header is a finding", card({ look: "container", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a container's header"));
+  one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
 
   // 16 · one estimate of width, for every spec
   const shared = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", width: "1/4", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "b", rows: [{ items: [{ control: "field", text: "x" }, { control: "button", text: "Go" }] }] } }] }] } };
