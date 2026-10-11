@@ -863,10 +863,17 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { label: "Directories", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ item: { title: "Acme Okta", meta: ["SAML"] }, fill: true }] }] }] } }] }] });
   one("a card with a part of content draws without a finding", stepped.findings, none);
   one("a container's title, a card's, a part's and an item's are four steps, largest first", ["Sign-in", "Account", "Directories", "Acme Okta"].map((w) => stepOf(stepped.svg, w)),
-    (g) => g.join("|") === "font-size:17px|font-size:15px|font-size:13px|font-size:12px;font-weight:500");
+    (g) => g.join("|") === "font-size:20px|font-size:15px|font-size:13px|font-size:12px;font-weight:500");
   one("the title of a part is heavy and an item's title is of medium weight", [stepOf(stepped.svg, "Directories"), stepOf(stepped.svg, "Acme Okta")], (g) => !g[0].includes("font-weight") && g[1].includes("font-weight:500"));
   const headed = draw({ kind: "skeleton", frame: { label: "Organization", rows: [{ items: [{ item: { media: "default", title: "SaaS Plane Platform", meta: ["platform"] }, fill: true }] }] } });
-  one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "font-size:17px");
+  one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "font-size:20px");
+  const flushed = card({ look: "container", label: "Orders", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer"], cells: [["ORD-1", "Acme"], ["ORD-2", "Blue"]] }] }] });
+  one("a flush table draws its lines from one edge of the container's outline to the other", [flushed.findings.length, outline(flushed.svg)[0], [...flushed.svg.matchAll(/<path class="sds-skel-(?:control|border)" d="M([\d.]+) [\d.]+ H([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])])],
+    (g) => g[0] === 0 && g[2].length === 2 && g[2].every((l) => l[0] === g[1][0] && l[1] === g[1][0] + g[1][2]));
+  one("the head row of a flush table is a band, with its words in capitals", [flushed.svg.includes('class="sds-skel-surface"'), texts(flushed.svg, "sds-note").map((t) => t[2])], (g) => g[0] && g[1].includes("ORDER") && g[1].includes("CUSTOMER"));
+  const cardWithMark = card({ look: "card", label: "Email", media: "default", rows: [{ items: [{ note: "SendGrid" }] }] });
+  one("a card with a mark draws it before its title, and the title starts after it", [cardWithMark.findings.length, (cardWithMark.svg.match(/<circle/g) ?? []).length, texts(cardWithMark.svg, "sds-title").find((t) => t[2] === "Email")[0], texts(card({ look: "card", label: "Email", rows: [{ items: [{ note: "SendGrid" }] }] }).svg, "sds-title").find((t) => t[2] === "Email")[0]],
+    (g) => g[0] === 0 && g[1] === 1 && g[2] === g[3] + 30);
   one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
   one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));

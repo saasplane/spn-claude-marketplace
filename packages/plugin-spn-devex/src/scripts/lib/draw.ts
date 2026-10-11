@@ -62,6 +62,10 @@ export type SkeletonItem = {
    *  On an icon it makes the icon a mark, and `on: false` draws the default mark empty: a thing that is there
    *  to be set up, and is not yet. */
   on?: boolean;
+  /** On a table stand-in: its lines reach the outline of the container it is the content of. */
+  flush?: boolean;
+  /** Set by the drawer and never written in a spec: where the edge above a flush table is. */
+  edgeTop?: number;
   /** An icon that is a mark and not an action: it stands for a thing or a person, and is drawn in a circle. */
   mark?: boolean;
   /** The words of a row of tabs, and the place of the chosen one, counted from 0. */
@@ -106,6 +110,8 @@ export type SkeletonFrame = {
    *  as several parts, each with a title of its own, its actions at the end of that title, and its rows. */
   actions?: SkeletonItem[]; footer?: SkeletonRow[];
   sections?: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }[];
+  /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
+  media?: string;
 };
 /** One screen at one screen class: a whole frame of its own, never derived from another view. A spec
  *  holds `views` in place of `frame`, and the views are drawn in one figure. */
@@ -1687,7 +1693,8 @@ const skelItemEndW = (it: SkeletonItem, h: number): number => {
  *  a card's a step under it, and the title of a part of the content a step under that, all three heavy. An item's
  *  title names one thing among the content, so it is smaller and of medium weight. A step is told by size and
  *  weight together, and the size is written on the word, since the stylesheet has one size for a title. */
-const SKEL_STEP_CONTAINER = 17, SKEL_STEP_CARD = 15, SKEL_STEP_PART = 13, SKEL_STEP_ITEM = 12;
+const SKEL_CARD_MARK = 22;
+const SKEL_STEP_CONTAINER = 20, SKEL_STEP_CARD = 15, SKEL_STEP_PART = 13, SKEL_STEP_ITEM = 12;
 const skelStepW = (words: string, step: number) => Math.ceil(words.length * SKEL_W_TITLE * step / SKEL_STEP_PART);
 const skelStepText = (words: string, step: number, x: number, y: number) =>
   `  <text class="sds-title" x="${r2(x)}" y="${Math.round(y)}" style="font-size:${step}px${step === SKEL_STEP_ITEM ? ";font-weight:500" : ""}">${esc(words)}</text>`;
@@ -1860,7 +1867,7 @@ function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
 function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   const ctl = skelSizeH(frame, inherited);
   const labelCol = skelLabelCol(frame);
-  const head = Math.max(frame.label ? skelStepW(frame.label, frame.look === "container" ? SKEL_STEP_CONTAINER : frame.look === "card" ? SKEL_STEP_CARD : SKEL_STEP_PART) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
+  const head = Math.max(frame.label ? skelStepW(frame.label, frame.look === "container" ? SKEL_STEP_CONTAINER : frame.look === "card" ? SKEL_STEP_CARD : SKEL_STEP_PART) + (frame.look === "card" && frame.media !== undefined ? SKEL_CARD_MARK + SKEL_LABEL_GAP : 0) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
     frame.label && frame.note ? Math.ceil(frame.note.length * SKEL_W_NOTE) : 0);
   // A CONTAINER'S HEADER HOLDS ITS ACTIONS AT THE END, so its title and its actions must both fit across.
   const headActions = frame.look === "container" && frame.actions?.length
@@ -2112,8 +2119,19 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     widths.forEach((w, c) => { left.push(cx); cx += w + SKEL_GAP; });
     if (!data.length) left.forEach((_, c) => { left[c] += over; });
     const headY = iy + SKEL_PAD;
-    columns.forEach((head, c) => { if (head) out.push(`  <text class="sds-label" x="${r2(left[c])}" y="${Math.round(headY + 12)}">${esc(head)}</text>`); });
-    out.push(`  <path class="sds-skel-control" d="M${r2(ix + SKEL_PAD)} ${r2(headY + SKEL_TABLE_HEAD - 4)} H${r2(ix + iw - SKEL_PAD)}"/>`);
+    // THE HEAD ROW OF A FLUSH TABLE IS A BAND, with its words small and in capitals, as the library's table draws it.
+    // The band begins at the edge above the table, the outline or the line over its part, and its words stand at its middle.
+    const headLine = headY + SKEL_TABLE_HEAD - 4, bandTop = it.flush ? it.edgeTop ?? iy : iy;
+    if (it.flush) out.push(skelRect("sds-skel-surface", ix - SKEL_PAD, bandTop, iw + SKEL_PAD * 2, headLine - bandTop, 0));
+    columns.forEach((head, c) => { if (head) out.push(it.flush
+      ? `  <text class="sds-note" x="${r2(left[c])}" y="${Math.round((bandTop + headLine) / 2 + 4)}" style="letter-spacing:.06em;font-weight:600">${esc(head.toUpperCase())}</text>`
+      : `  <text class="sds-label" x="${r2(left[c])}" y="${Math.round(headY + 12)}">${esc(head)}</text>`); });
+    // A FLUSH TABLE REACHES THE OUTLINE OF ITS CONTAINER: the line under its head row and a line under each row
+    // run from edge to edge, as a table does that is the whole of a container's content.
+    const lineFrom = it.flush ? ix - SKEL_PAD : ix + SKEL_PAD, lineTo = it.flush ? ix + iw + SKEL_PAD : ix + iw - SKEL_PAD;
+    out.push(`  <path class="sds-skel-control" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD - 4)} H${r2(lineTo)}"/>`);
+    if (it.flush) for (let r = 1; r < rows.length; r++)
+      out.push(`  <path class="sds-skel-control" d="M${r2(lineFrom)} ${r2(headY + SKEL_TABLE_HEAD + r * skelTableRowH(h) - 2)} H${r2(lineTo)}"/>`);
     rows.forEach((row, r) => {
       if (!Array.isArray(row)) { findings.push("a row of a table is a list of cells, one for each column"); return; }
       if (row.length > columns.length) findings.push(`a row of a table holds ${row.length} cells, and the table has ${columns.length} columns`);
@@ -2221,8 +2239,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const surface = frame.look === "container" && !root;
   if (surface) {
     const headH = skelContainerHead(frame);
-    if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x, y + (frame.note ? 16 : 22)));
-    if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x}" y="${y + 33}">${esc(frame.note)}</text>`);
+    if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x, y + (frame.note ? 17 : 23)));
+    if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x}" y="${y + 34}">${esc(frame.note)}</text>`);
     const actions = frame.actions ?? [];
     let ax = x + w - (actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * Math.max(0, actions.length - 1));
     const actionsTop = y + (headH - SKEL_LABEL_GAP * 2 - ctl) / 2;
@@ -2238,7 +2256,10 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   else if (!bare && !isContainer && !surface) out.push(...skelMarks(frame.look, x, y, w, h));
   const tagH = frame.tag ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   if (frame.tag) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.tag)}</text>`);
-  if (frame.label && !surface) out.push(frame.look === "card" ? skelStepText(frame.label, SKEL_STEP_CARD, x + SKEL_PAD, y + tagH + 26)
+  // A CARD MAY CARRY A MARK BEFORE ITS TITLE, for the kind of thing the card is about.
+  const cardMark = frame.look === "card" && frame.media !== undefined ? SKEL_CARD_MARK + SKEL_LABEL_GAP : 0;
+  if (cardMark) out.push(...skelIcon(frame.media!, x + SKEL_PAD + SKEL_CARD_MARK / 2, y + tagH + 21, SKEL_CARD_MARK, true, undefined, SKEL_CARD_MARK));
+  if (frame.label && !surface) out.push(frame.look === "card" ? skelStepText(frame.label, SKEL_STEP_CARD, x + SKEL_PAD + cardMark, y + tagH + 26)
     : `  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
   if (frame.label && frame.note && !surface) out.push(`  <text class="sds-code" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
 
@@ -2289,6 +2310,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     if (surface && dividers.has(rowIndex))
       out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w)}"/>`);
     if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
+    // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the outline where it is the first row, or the line over its part.
+    if (surface) for (const it of row.items ?? []) if (it.standin === "table" && it.flush)
+      it.edgeTop = rowIndex === 0 ? y + skelContainerHead(frame) : dividers.has(rowIndex) ? rowY - SKEL_GAP / 2 : undefined;
 
     let innerX = itemsX, innerY = rowY, innerW = rowContentW;
     if (row.framed) {
