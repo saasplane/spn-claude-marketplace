@@ -18,7 +18,7 @@
 -->
 ---
 name: design
-description: Design a page of a SaaS Plane app from the blocks of the design system. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words or in Figma. It picks the layout, decides the containers, chooses the pattern for each task, and then the blocks. It states the page as a tree of named blocks with their props. With the Figma connector it draws that tree from the published libraries. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
+description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words or in Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it picks the layout, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries. For a library change, step 6, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
 ---
 
 # design — a page, from its layout down to its blocks
