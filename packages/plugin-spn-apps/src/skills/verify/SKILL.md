@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "29f7a544"
+      "seen": "59b48104"
     }
   ]
 }
@@ -96,7 +96,7 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
    - **Go down the pattern's tree by layer**: the containers, then the widgets, then the components. Each line of the tree is on the page, built with the unit the tree names. A part the page built for itself is a finding. So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
    - **Check each rule of content with its reviewer's check** in `refs/support/surface/standards-core.md`: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
    - **Type a search that matches a record on another page of the list.** A search that finds nothing ran in the page, and that is a finding (`RD.SUPPORT.SURFACE.070`).
-   - **A difference the refs list under *Not there yet* is a gap of the unit, and not a finding on the page.** `architecture-widgets.md` and `architecture-containers.md` list them. Report it as a gap, with the unit. A private copy that a page built to close such a gap is a finding.
+   - **A difference the refs list under *Not there yet* is a gap of the unit, and not a finding on the page.** `architecture-widgets.md` lists them. Report it as a gap, with the unit. A private copy that a page built to close such a gap is a finding.
    - **Say where a finding rests on a proposed rule.** The refs mark each proposed rule.
    - **Report the pattern by name, the screen classes you looked at, and each finding with its rule id.** Name each screen class you did not look at.
 

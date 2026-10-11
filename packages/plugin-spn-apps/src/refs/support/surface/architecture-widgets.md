@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "e77d1488"
+      "seen": "ea247030"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "89d80782"
+      "seen": "9bf5f6dc"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Widgets construct (`docs/02-constructs/02-support/03-surface/07-architecture-widgets.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/07-architecture-widgets/`). Widgets is the seventh of thirteen Surface constructs.
 
-Read this before you place a data table or a filter bar, or before you decide whether a new block should be a widget or a composed page. **The thing to unlearn: a widget is not just a bigger component.** A component is the smallest block; a widget is built *from* components, for one purpose, and placed as a whole — a page never reaches inside it to rearrange its parts.
+Read this before you place a data table, a filter bar or a list beside its detail, or before you decide whether a new block should be a widget or a composed page. **The thing to unlearn: a widget is not just a bigger component.** A component is the smallest block; a widget is built *from* components, for one purpose, and placed as a whole — a page never reaches inside it to rearrange its parts.
 
 ## Terms
 
@@ -29,7 +29,7 @@ A widget's task states are the task state of `standards-interaction.md`, and thi
 
 ## What makes a block a widget — 🔮
 
-A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **passes that size to every part inside it** — a page sets one size for the whole widget, and never dresses its parts separately. Surface has two widgets today.
+A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **passes that size to every part inside it** — a page sets one size for the whole widget, and never dresses its parts separately. Surface has three widgets: `DSWDataTable`, `DSWFilterBar` and `DSWListDetail`.
 
 ## DSWDataTable — 🔮
 
@@ -67,7 +67,7 @@ The records take one of three layouts, and the data decides which. The widget is
 - **Many groups that a person searches MUST be in the `LIST` layout, and never in `TABLE`** (`RD.SUPPORT.SURFACE.069`). A group is read by its name, as a line, and the groups stand in a narrow part of the page. A person picks one group and does not compare groups across columns.
 - **A line of the `LIST` layout MUST follow the rules of content of `standards-core.md`.** Its state is a badge on the line of facts, the normal state shows none, and a line stands between each two lines. The widget draws the line between each two lines itself. What a line holds is the page's renderer, so the badge and its place are the page's to write.
 
-**Not there yet.** The widget draws the layouts a page lists, and it reads no device type today. So it does not change to `LIST` on a phone by itself. A page that lists `TABLE` alone shows a table on a phone.
+**What the widget does.** The widget draws the layouts a page lists, and it reads no device type. The page chooses, and the widget follows what the page lists each time it draws: the layout a person chose while the page still lists it, and the first of the list otherwise. So the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone, and the widget shows the list at once when the screen becomes a phone. The widget does not change to `LIST` by itself. A page that lists `TABLE` alone shows a table on a phone.
 
 ### A search and a filter go to the server
 
@@ -94,7 +94,9 @@ A row is read until a person chooses to change it.
 - **A value changed in a table MUST be changed in its cell** (`RD.SUPPORT.SURFACE.072`). Nothing opens over the page, and the page holds no form.
 - **One row MUST be changed at a time.** So one value is saved at a time, and a person always knows what a save will write.
 
-**Not there yet.** `DSWDataTable` has no cell that turns into a box with a save action. A cell today draws what the column's renderer gives it. The web stack adds this cell by its own change.
+**What the widget does.** `DSWDataTable` does this for a value that is text. A page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout: `getValue(record)`, `onSave(record, value)` and an optional `placeholder`. The widget then adds the action that opens a row, first among the actions at the end of the row. It draws the box and the two actions, keeps one row open at a time, and closes a row that is open when a person opens another, without saving it. After a save it reads its page again. A save that fails keeps the box open with what was typed, and says why. The renderer of the `LIST` layout gets `isEditing` as its second argument, so it leaves the value's own line out of the row that is open. A second column with `edit` in one layout is refused.
+
+**Not there yet.** A value of another kind, such as a choice or a date, is not changed in a cell.
 
 ## DSWFilterBar — 🔮
 
@@ -119,13 +121,25 @@ The bar has one form, read from its start to its end. A person who has used one 
 - **At a tablet the bar MUST hold fewer fields in view, and the rest wait behind the action that shows them.** A tablet has less width than a desktop, so fewer boxes fit across it.
 - **On a phone the bar MUST be one button that says how many filters are on, such as *Filters (2)*, with the action that clears them beside it.** A phone has no room for a row of boxes. One button keeps the records in view. Its number tells a person that the records are narrowed before they open anything.
 
-**What the widget does today.** `DSWFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. On a phone it is the one button already: the button opens the fields in a drawer from the bottom of the screen. With no filter on, the button reads *Filters* and the clear action is not shown.
+**What the widget does.** `DSWFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. It draws the filter icon in a round shape, as tall as the fields beside it. It keeps in view the fields a page marks `primary`, and beside them a number of the others: up to `moreLimit` at a desktop, three unless the page sets it, and up to `moreLimitTablet` at a tablet, one unless the page sets it. So the bar holds fewer fields at a tablet by itself. On a phone it is the one button: the button opens the fields in a drawer from the bottom of the screen. With no filter on, the button reads *Filters* and the clear action is not shown.
 
-**Not there yet.** Two things differ today. The widget draws the filter icon plain, with no round shape around it. And it keeps the same fields in view at a desktop and a tablet: the fields a page marks `primary`, and up to `moreLimit` others, three unless the page sets it. So the bar does not hold fewer fields at a tablet by itself.
+## DSWListDetail — 🔮
+
+Places a list and the detail of its chosen row. It is the widget for a page of groups and their items, whose rules are in `architecture-containers.md`.
+
+| Part | Holds |
+| --- | --- |
+| Its list | what the page gives it as `list`, such as a container that holds the groups |
+| Its detail | what the page gives it as `detail` for the chosen row, such as a container that holds the items of the chosen group. With none, the list is shown alone |
+| The way back | `backAnchor`, the address of the list, which the page gives it once |
+
+- At a desktop both parts are in view: the list in a narrow column at the start, and the detail beside it.
+- On a tablet and on a phone one part is shown at a time: the detail where there is one, and the list otherwise. While the detail stands alone, the `DSContainer.Header` in it draws the way back on its title line.
+- The widget holds no data and does not know which row is chosen. The chosen row is in the address. The page reads it there, and gives the widget a detail or none.
 
 ## Boundary
 
-This ref states what makes a block a widget, and what `DSWDataTable` and `DSWFilterBar` are built from. It stops at the edge of the widget. It does not state what a component is — that is `architecture-components.md`. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`.
+This ref states what makes a block a widget, and what `DSWDataTable`, `DSWFilterBar` and `DSWListDetail` are built from. It stops at the edge of the widget. It does not state what a component is — that is `architecture-components.md`. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`.
 
 ## Binds
 

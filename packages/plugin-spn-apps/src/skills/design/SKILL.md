@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "e071e8a6"
+      "seen": "4b706b5f"
     }
   ]
 }
@@ -228,7 +228,7 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **Hold each small thing to its rule of content** (`standards-core.md`). A state is a `DSBadge` on the line of facts under the title, before the other facts, and the normal state shows none. The end of a line holds its actions and nothing else. A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
 - **Give `DSWDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSWFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
-- **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` and `architecture-containers.md` say so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
+- **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
 - **Leave `size` unset**, unless one block must differ. A block takes the size that the container, the widget or the `DSScope` above it passes on, and then the app's.
@@ -291,8 +291,7 @@ Find · Read   DSWDataTable   idle: the filters, with no search asked yet
                              failed: what went wrong, and the search offered again
                              denied: the page says that the person has no permission
 Move          New order      working: shown on the button · failed: the place says that it cannot be shown
-Missing       DSWDataTable does not change to LIST on a phone by itself yet, so the page lists both layouts
-              DSWDataTable cannot hand its paging to the container's footer yet, so the paging stands at the foot of the table
+Missing       nothing. The page reads the device and lists LIST on a phone, and gives the table a place in the container's footer for its paging
 ```
 
 ## 7. Draw it in Figma — only where the window holds the connector

@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "29f7a544"
+      "seen": "59b48104"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "89d80782"
+      "seen": "9bf5f6dc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "7438b353"
+      "seen": "ea814e26"
     }
   ],
   "decisions": [
@@ -96,16 +96,22 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSWDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
 - **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 
-**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-widgets.md` and `architecture-containers.md` say plainly what each unit does not do today, under *Not there yet*. Today that is:
+**A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-widgets.md` and `architecture-containers.md` state each one.
+
+| The pattern asks | What the page writes |
+| --- | --- |
+| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSWDataTable` reads no device type, and follows the layouts its page lists each time it draws |
+| the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
+| a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
+| a way back on the title line | the page gives `DSContainer.Header` a `backAnchor`, or places the two parts with `DSWListDetail`, which gives it to the header |
+| a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
+| fewer fields in the filter bar at a tablet | nothing. `DSWFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
+
+**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-widgets.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
 
 | The unit | What it does not do yet |
 | --- | --- |
-| `DSWDataTable` | it reads no device type, so it does not change to its `LIST` layout on a phone by itself |
-| `DSWDataTable` | it has no cell that turns into a box with a save action, which Change in place, in a list needs |
-| `DSWDataTable` | it cannot hand its paging to the footer of the container, so the paging stands at the foot of the table |
-| `DSWFilterBar` | it draws its filter icon plain, and it keeps the same fields in view at a desktop and a tablet |
-| `DSSheet` | it reads no device type, so it does not take the full screen on a phone by itself |
-| `DSContainer.Header` | it has no way back before the title, which Groups and their items needs on a tablet and a phone |
+| `DSWDataTable` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
 | a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
 
 - **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.

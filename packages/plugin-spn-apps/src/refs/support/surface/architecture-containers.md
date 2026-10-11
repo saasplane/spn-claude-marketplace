@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "7438b353"
+      "seen": "ea814e26"
     }
   ]
 }
@@ -65,7 +65,7 @@ Here is how the parts serve the pages most apps have.
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
 | A dashboard | flat | raised, holding widgets that show numbers | none |
 
-**Not there yet.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSWDataTable` draws its paging in a footer of its own today, inside the content part. It has no setting that hands the paging to the container's footer. Until it has one, the footer of a listing stays empty and the paging stands at the foot of the table.
+**What the units do.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSWDataTable` hands its paging to a place the page gives it. The page puts an element in `DSContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no container, because a widget is a layer before the container. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -135,7 +135,7 @@ An entry is a form a person fills in to add or change something. A small or a me
 - **An entry MUST be one container, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
 - **That the actions stand in the footer is proposed, and not yet confirmed.** The reason is that the container already has a footer for the actions that end its work. A person then finds them in the same place in a dialog, in a sheet and on the full screen.
 
-**Not there yet.** `DSSheet` reads no device type today, and at the side it takes at most 95% of the width of the screen. So it does not take the full screen on a phone by itself.
+**What the unit does.** `DSSheet` does this by itself. It reads the device, and on a phone it takes the full screen, whatever side and extent the page gave it, with no scrim around it. So a page writes nothing for it. At a tablet and a desktop the sheet stands at its side, and takes at most 95% of the width of the screen.
 
 ### A large form
 
@@ -162,7 +162,7 @@ Some pages hold things in groups: the fields of each record type, or the actions
 
 Where the groups are few and fixed, the page needs no swap. Each group is a container of its own, one under another on one page, and nothing is hidden.
 
-**Not there yet.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has no way back today: it places its first block at the start and its last block at the end, and it has no place before the title. The web stack adds it by its own change.
+**What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has a small place for it before the title: a page gives the header a `backAnchor`, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. `DSWListDetail` is the widget that places the two parts: both at a desktop, and one at a time on a tablet and a phone. The page gives it the address of the groups once, as its `backAnchor`. While the items stand alone, the header of the container that holds them takes that address as its way back, and the page writes nothing more. `architecture-widgets.md` states the widget.
 
 ## Boundary
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "29f7a544"
+      "seen": "59b48104"
     }
   ]
 }
@@ -187,7 +187,7 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### Find in a list
 
 - **When.** The data grows as people work, and a person comes often, to find one record. A record that has things of its own opens as a page. A record of a few facts and nothing else opens as a look beside the list.
-- **Container.** One `DSContainer`. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records. Its footer holds the paging. `DSWDataTable` cannot hand its paging to the container yet, so today the table draws its own paging.
+- **Container.** One `DSContainer`. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSWDataTable` a place in the footer, and the table draws its paging there.
 - **Widget.** `DSWFilterBar` and `DSWDataTable`, in the layout that step 2 chose.
 - **Component.** `DSDrawer`, for the look of a small record beside its list.
 - **On a tablet and a phone.** A tablet keeps `TABLE` with fewer columns, and its filter bar holds fewer boxes. On a phone the data table is in its `LIST` layout, and the filter bar is one button that says how many filters are on. The look of a small record is a screen of its own on a phone.
@@ -377,7 +377,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 
 - **No check reads a page for its pattern.** A review names the pattern and reads the page beside its spec.
 - **Where the actions of a footer stand is not settled.** The specs draw them at the end of a footer in An entry over the page, and at the start in An entry that is a page.
-- **A unit does not yet do everything a pattern asks of it.** `architecture-widgets.md` and `architecture-containers.md` say plainly what each unit does not do today.
+- **A unit does not yet do everything a pattern asks of it.** No unit draws a strip of steps, and a value that is not text is not changed in a cell. `architecture-widgets.md` says plainly what a unit does not do, under *Not there yet*.
 
 ## Boundary
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "5cb907c5"
+      "seen": "a65d4c9e"
     }
   ]
 }
@@ -79,7 +79,7 @@ Three things show a record and its facts on most pages: a line for the record, a
 
 ### The item line
 
-The item line, `DSItem`, shows one thing as a line.
+The item line, `DSItem`, shows one thing as a line. With `selected` it is the chosen one of its list, and a band stands behind it; a row of `DSList` takes `selected` the same way.
 
 | Part of the item line | Holds | Its prop on `DSItem` |
 | --- | --- | --- |

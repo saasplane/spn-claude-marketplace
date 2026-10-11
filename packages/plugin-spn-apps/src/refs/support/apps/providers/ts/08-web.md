@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "d9327276"
+      "seen": "5cf4a447"
     }
   ]
 }
@@ -34,7 +34,7 @@
 
 ## Routes, overlays and the session a container reads
 
-**Every name in this part is named and not built yet.** None is in a released package today, so read the installed package before you use one. The rules behind the names are in `../../shape.md` and `../../module/README.md` in this plugin.
+**The route as data and the overlay with an address are built in the Support stack.** `@saasplane/support-web-ts` holds the first and `@saasplane/support-web-ds-ts` the second, and the sample app of the stack uses both. **The provider a partner mounts and `usePlatformSession` are named and not built yet**, and so is the callback after a save. Read the installed package before you use a name: a package you installed may be older than this ref. The rules behind the names are in `../../shape.md` and `../../module/README.md` in this plugin.
 
 **A route as data** lives in `@saasplane/support-web-ts`, in `utils/route.ts`, with no router inside (`RD.SUPPORT.APPS.186`, `RD.SUPPORT.APPS.189`).
 
