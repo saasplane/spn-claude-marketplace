@@ -2180,7 +2180,8 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
         const cell = skelCell(given), cellKind = skelKind(cell);
         if (cellKind === "note" && cell.note === "") return;
         if (!SKEL_CELL_KINDS.includes(cellKind)) { findings.push("a cell of a table is a word, a note, an icon or a control"); return; }
-        const cw = skelFixedWidth(cell, h);
+        // A box in a cell that takes `fill` is as wide as its column, so the action that saves it stands beside it.
+        const cw = cell.fill && columns[c] !== "" ? widths[c] : skelFixedWidth(cell, h);
         const at = columns[c] === "" ? left[c] + widths[c] - cw : left[c];
         skelDrawLeaf(cell, cellKind!, at, top, cw, h, h, h, findings, out);
       });

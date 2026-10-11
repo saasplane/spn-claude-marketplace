@@ -669,6 +669,10 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a field that is read is lower than one that is entered", [reading, named], ([read, entered]) => height(read) < height(entered));
   one("a value that is a state is a badge under its title", standin("field", { label: "Bank", text: "Waiting", read: true, control: "badge" }).svg, (g) => g.includes(">Waiting<") && rect(g, "sds-skel-control").length === 1);
   one("a field that is read and has no title is a finding", standin("field", { text: "8 hours", read: true }).findings, says("carries its title in `label`"));
+  // A row of a table that is being changed: its box takes the width of its column, and the action that saves it stands beside it.
+  const edited = draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Text", "German", ""], cells: [["Sign in", "Anmelden", ""], ["Sign out", { control: "field", text: "Abmelden", fill: true }, { icon: "checkbox" }]] }] }] } });
+  one("a box in a cell that takes fill is as wide as its column, and the action of the row stands beside it", [edited.findings.length, rect(edited.svg, "sds-skel-control")],
+    ([found, boxes]) => found === 0 && boxes.length === 2 && boxes[0][2] > 300 && boxes[1][0] - (boxes[0][0] + boxes[0][2]) <= 24);
   const choices = (words) => ({ items: words.map((text) => (text ? { control: "checkbox", text, fill: true } : { spacer: true })) });
   one("the choices of a set stand in columns, and a shorter row keeps them", draw({ kind: "skeleton", frame: { rows: [choices(["Members", "Roles", "Directory"]), choices(["Custom domain", "Sign-in policy", ""])] } }).svg,
     (g) => { const x = rect(g, "sds-skel-control").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
