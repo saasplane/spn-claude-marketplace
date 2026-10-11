@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "c718cfe8"
+      "seen": "8fb6e073"
     }
   ]
 }
@@ -244,7 +244,7 @@ shares.
 | `tag` | the name on a component, a part or a slot's dotted boundary |
 | `control` | `button` · `field` · `select` · `checkbox` · `switch` · `tabs` · `badge` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group. A `switch` takes `on`; `tabs` takes the words as `tabs` and the place of the chosen one as `chosen`, counted from 0; a `badge` and `tabs` may take an `icon` |
 | `views` | one screen at several screen classes, in place of `frame`: a list of views, each with a `viewport` of `DESKTOP`, `TABLET` or `MOBILE` and a whole `frame` of its own |
-| `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing; and `table`, which takes `columns`, the words of its head row, and `cells`, a few rows of sample values |
+| `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing; and `table`, which takes `columns`, the words of its head row, and `cells`, a few rows of sample values. A `field` with a `label` is the field of a form as the library's form field lays it out: its title above its control, never beside it; `info`, the mark of its help at the end of the title's line; `text`, the sample value; `control: "select"`; and one line under the control, its `error` in the failure colour or else its `description`, whose room is kept where it has neither. The checkboxes of one set each take `fill`, so they stand in columns, and a shorter row is filled with spacers. A `field` with a `label` and `read` is a field that is read, as the library's data unit shows it: its value in `text` under its title, with no box, the title heavier than the value and lighter in tone and the mark of its help beside the title, the value as plain words or as a badge with `control: "badge"`; a title never stands beside its value. A container, a card or a part whose rows are all item lines takes `divided`: the lines of a list have a line between each two, and a card draws those lines only, with none between its parts |
 | `item` | a line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it; `meta`, several facts on that line, each a word or a badge; and `end`, what stands at the end of the line |
 | `icon` | a small square holding the name of one plain shape the drawer draws itself, or its default. With `mark`, or with `on`, it is a mark and is drawn in a circle; `on: false` draws the default mark empty |
 | `spacer` | free room: the items after it sit at the end of the row |

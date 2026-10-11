@@ -646,6 +646,32 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     (g) => { const b = rect(g, "sds-skel-bar"); return b.length === 3 && b[0][2] < b[1][2] && b[0][3] > b[1][3]; });
   one("a card grid is cards, each with bars", standin("cards").svg, (g) => rect(g, "sds-skel-control").length === 3 && rect(g, "sds-skel-bar").length === 9);
   one("a form field is its label above its field", standin("field").svg, (g) => rect(g, "sds-skel-bar").length === 1 && rect(g, "sds-skel-control").length === 1);
+  // A field with its own words is the library's form field: its title above its control, the mark of its help
+  // at the end of the title's line, and one line under the control.
+  const named = standin("field", { label: "Name", text: "Nightly export", info: true }).svg;
+  const control = (g) => rect(g, "sds-skel-control")[0];
+  one("a field with a label shows the word and no bar", named, (g) => g.includes(">Name<") && g.includes(">Nightly export<") && rect(g, "sds-skel-bar").length === 0);
+  one("the mark of a field's help stands at the end of the title's line", named, (g) => { const c = control(g); const cx = Number(/<circle class="sds-skel-glyph" cx="([\d.]+)"/.exec(g)?.[1]); return Math.abs(cx - (c[0] + c[2] - 6)) < 1; });
+  one("a field with no info draws no mark", standin("field", { label: "Name" }).svg, (g) => !g.includes("<circle"));
+  const described = standin("field", { label: "Starts on", description: "In the time zone of the organization" }).svg;
+  const refused = standin("field", { label: "Time", description: "In 24 hours", error: "Enter a time from 00:00 to 23:59" }).svg;
+  one("a description stands under the control, in no failure colour", described, (g) => g.includes(">In the time zone of the organization<") && !g.includes("--sds-fail"));
+  one("an error takes the place of the description, in the failure colour, on its line and on the control", refused,
+    (g) => g.includes(">Enter a time from 00:00 to 23:59<") && !g.includes(">In 24 hours<") && (g.match(/--sds-fail/g) ?? []).length === 2);
+  const height = (g) => Number(/viewBox="[\d.]+ [\d.]+ [\d.]+ ([\d.]+)"/.exec(g)?.[1]);
+  one("a field keeps the room of the line under its control where it has neither", [named, refused], ([plain, failed]) => height(plain) === height(failed));
+  one("a field drawn as a select carries the select's mark", standin("field", { label: "Owner", text: "Dana Lee", control: "select" }).svg, (g) => g.includes("sds-skel-glyph"));
+  // A field that is read is the library's data unit: its value under its title, with no box.
+  const reading = standin("field", { label: "Session", text: "8 hours", read: true }).svg;
+  one("a field that is read shows its title and its value, and no box", reading, (g) => g.includes(">Session<") && g.includes(">8 hours<") && rect(g, "sds-skel-control").length === 0);
+  one("the title of a field that is read is heavier and lighter in tone than its value", reading, (g) => /class="sds-note"[^>]*font-weight:600">Session</.test(g) && /class="sds-title"[^>]*font-weight:400">8 hours</.test(g));
+  one("the mark of a read field's help stands beside its title, and not at the end of the line", standin("field", { label: "Session", text: "8 hours", read: true, info: true }).svg, (g) => Number(/<circle class="sds-skel-glyph" cx="([\d.]+)"/.exec(g)?.[1]) < 200);
+  one("a field that is read is lower than one that is entered", [reading, named], ([read, entered]) => height(read) < height(entered));
+  one("a value that is a state is a badge under its title", standin("field", { label: "Bank", text: "Waiting", read: true, control: "badge" }).svg, (g) => g.includes(">Waiting<") && rect(g, "sds-skel-control").length === 1);
+  one("a field that is read and has no title is a finding", standin("field", { text: "8 hours", read: true }).findings, says("carries its title in `label`"));
+  const choices = (words) => ({ items: words.map((text) => (text ? { control: "checkbox", text, fill: true } : { spacer: true })) });
+  one("the choices of a set stand in columns, and a shorter row keeps them", draw({ kind: "skeleton", frame: { rows: [choices(["Members", "Roles", "Directory"]), choices(["Custom domain", "Sign-in policy", ""])] } }).svg,
+    (g) => { const x = rect(g, "sds-skel-control").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
   one("list entries are a mark and a bar each", standin("list").svg, (g) => rect(g, "sds-skel-bar").length === 6);
   one("a stand-in the skeleton lacks is refused by name", standin("tree").findings, says("`tree`"));
 
@@ -887,6 +913,9 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const listWithChosen = card({ look: "container", label: "Groups", divided: true, rows: [{ chosen: true, items: [{ item: { title: "Authentication" }, fill: true }] }, { items: [{ item: { title: "Billing" }, fill: true }] }] });
   one("the chosen line of a list is a band across the outline, from its top to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "sds-skel-surface"), outline(listWithChosen.svg)[0]],
     (g) => g[0] === 0 && g[1].length === 1 && g[1][0][0] === g[2][0] && g[1][0][2] === g[2][2] && g[1][0][1] === g[2][1]);
+  const cardWithList = draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [{ rows: [{ items: [{ control: "switch", text: "Open" }] }] },
+    { label: "Directories", divided: true, rows: [{ items: [{ item: { title: "Acme Okta" }, fill: true }] }, { items: [{ item: { title: "Acme Entra" }, fill: true }] }, { items: [{ item: { title: "Acme Ping" }, fill: true }] }] }] } }] }] } });
+  one("a list in a card has a line between each two of its rows, and no line above the part", [cardWithList.findings.length, (cardWithList.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
   one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
   one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));

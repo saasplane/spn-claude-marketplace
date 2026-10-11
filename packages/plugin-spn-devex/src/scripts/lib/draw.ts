@@ -78,6 +78,14 @@ export type SkeletonItem = {
    *  holds the actions of a row, and stands at the end. */
   standin?: "rows" | "cards" | "field" | "list" | "table"; lines?: number; headings?: number[];
   columns?: string[]; cells?: (string | SkeletonItem)[][];
+  /** On a `field` stand-in: the field of a form with its own words. `label` is its title, `info` puts the mark of
+   *  its help at the end of the title's line, `text` is the sample value in its control, and `control: "select"`
+   *  draws that control as a select. Under the control stands one line, its `error` or else its `description`,
+   *  and the room of that line is kept where a field has neither. */
+  label?: string; info?: boolean; description?: string; error?: string;
+  /** On a `field` stand-in with a `label`: the field is read and not entered, as the library's data unit shows it.
+   *  Its value stands under its title with no box, as plain words, or as a badge with `control: "badge"`. */
+  read?: boolean;
   /** A line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it;
    *  `meta`, several facts on the line under the title, each a word or a badge; and `end`, what stands at the end
    *  of the line. */
@@ -1768,6 +1776,15 @@ function skelFixedWidth(it: SkeletonItem, h: number): number {
   }
 }
 
+/** A form field's title line, and the one line under its control: its error, or else its description. A field
+ *  with its own words keeps the room of that line where it has neither, so the fields of a row stand level. */
+const skelFieldHeadH = (it: SkeletonItem) => (it.label !== undefined ? SKEL_ITEM_LINE : SKEL_HEAD_BAR);
+const skelFieldBelow = (it: SkeletonItem): string | undefined => it.error ?? it.description;
+const skelFieldBelowH = (it: SkeletonItem) => (it.label !== undefined || skelFieldBelow(it) !== undefined ? SKEL_PACK_GAP + SKEL_ITEM_LINE : 0);
+const SKEL_FAIL = "var(--sds-fail)";
+/** The height of the value of a field that is read: a line of words, or a badge of the size it has among facts. */
+const SKEL_READ_LINE = 20;
+
 /** An item's own height: its slot, its tag's line above its words, its bars, or the rows it asks for. */
 function skelItemHeight(it: SkeletonItem, slot: number): number {
   const kind = skelKind(it);
@@ -1779,7 +1796,7 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
     const count = Math.max(1, it.lines ?? 3);
     if (it.standin === "table") h = skelTableH(it, slot);
     else if (it.standin === "cards") h = SKEL_CARD_H;
-    else if (it.standin === "field") h = SKEL_HEAD_BAR + SKEL_LABEL_GAP + slot;
+    else if (it.standin === "field") h = it.read ? skelFieldHeadH(it) + SKEL_PACK_GAP + SKEL_READ_LINE : skelFieldHeadH(it) + SKEL_LABEL_GAP + slot + skelFieldBelowH(it);
     else h = SKEL_PAD + count * SKEL_BAR_STEP - SKEL_LABEL_GAP + SKEL_PAD;
   }
   return Math.max(h, (it.height ?? 0) * slot);
@@ -1810,22 +1827,24 @@ const skelSectionRows = (section: { label?: string; actions?: SkeletonItem[]; ro
 const skelRows = (frame: SkeletonFrame): SkeletonRow[] =>
   frame.look !== "container" && frame.look !== "card" ? frame.rows ?? []
     : [...(frame.sections ?? []).flatMap(skelSectionRows), ...(frame.rows ?? []), ...(frame.footer ?? [])];
-/** The rows of a container that begin under a line: each part of its content after the first, and its footer. */
+/** The rows of a container that begin under a line: each part of its content after the first, and its footer.
+ *  A card has no line between its parts; it has only the lines of a list it holds. */
 function skelDividers(frame: SkeletonFrame): Set<number> {
   const at = new Set<number>();
-  if (frame.look !== "container") return at;
+  if (frame.look !== "container" && frame.look !== "card") return at;
+  const parts = frame.look === "container";
   let index = 0;
   // THE ROWS OF A PART THAT IS `divided` HAVE A LINE BETWEEN EACH TWO, as the lines of a list in a data table do.
   (frame.sections ?? []).forEach((section, order) => {
-    if (order > 0) at.add(index);
+    if (parts && order > 0) at.add(index);
     const count = skelSectionRows(section).length, own = (section.rows ?? []).length;
     if (section.divided) for (let r = count - own + 1; r < count; r++) at.add(index + r);
     index += count;
   });
-  if ((frame.rows ?? []).length && index > 0) at.add(index);
+  if (parts && (frame.rows ?? []).length && index > 0) at.add(index);
   if (frame.divided) for (let r = 1; r < (frame.rows ?? []).length; r++) at.add(index + r);
   index += (frame.rows ?? []).length;
-  if (frame.footer?.length && index > 0) at.add(index);
+  if (parts && frame.footer?.length && index > 0) at.add(index);
   return at;
 }
 /** Whether a container drawn for a surface has a header: a title, or actions. */
@@ -2180,8 +2199,39 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     return;
   }
   if (kindOf === "field") {
-    out.push(bar(ix, iy, Math.min(iw, SKEL_FIELD_W) * 0.4, SKEL_HEAD_BAR));
-    out.push(skelRect("sds-skel-control", ix, iy + SKEL_HEAD_BAR + SKEL_LABEL_GAP, iw, h));
+    // THE FIELD OF A FORM, AS THE LIBRARY'S FORM FIELD LAYS IT OUT: its title, with the mark of its help at the end of that line;
+    // its control, as wide as its place; and one line under the control, its error or else its description.
+    // An error is told by the failure colour, on the outline of the control and on its own line.
+    const top = iy + skelFieldHeadH(it) + SKEL_LABEL_GAP, below = skelFieldBelow(it);
+    if (it.label === undefined) out.push(bar(ix, iy, Math.min(iw, SKEL_FIELD_W) * 0.4, SKEL_HEAD_BAR));
+    else {
+      // The title of a field that is entered has the weight of content. The title of one that is read is heavier and
+      // lighter in tone than its value, so it reads as the heading of the value and does not compete with it; the mark
+      // of its help stands beside it, where the entered field's stands at the end of the line.
+      out.push(it.read
+        ? `  <text class="sds-note" x="${r2(ix)}" y="${Math.round(iy + 13)}" style="font-size:${SKEL_STEP_ITEM}px;font-weight:600">${esc(it.label)}</text>`
+        : `  <text class="sds-title" x="${r2(ix)}" y="${Math.round(iy + 13)}" style="font-size:${SKEL_STEP_ITEM}px;font-weight:400">${esc(it.label)}</text>`);
+      if (it.info) {
+        const cx = it.read ? ix + skelStepW(it.label, SKEL_STEP_ITEM) + SKEL_LABEL_GAP + 6 : ix + iw - 6;
+        out.push(`  <circle class="sds-skel-glyph" cx="${r2(cx)}" cy="${r2(iy + 9)}" r="6"/>`);
+        out.push(`  <text class="sds-note" x="${r2(cx)}" y="${r2(iy + 12.5)}" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>`);
+      }
+    }
+    if (it.read) {
+      // A FIELD THAT IS READ, AS THE LIBRARY'S DATA UNIT SHOWS IT: its value under its title, with no box around it.
+      const valueMid = iy + skelFieldHeadH(it) + SKEL_PACK_GAP + SKEL_READ_LINE / 2, text = it.text ?? "";
+      if (it.label === undefined) findings.push("a field that is read carries its title in `label`, and this one carries none");
+      if (it.control === "badge") {
+        const badge: SkeletonItem = { control: "badge", text };
+        skelDrawLeaf(badge, "control", ix, valueMid - SKEL_FACT_CTL / 2, skelFixedWidth(badge, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
+      } else out.push(`  <text class="sds-title" x="${r2(ix)}" y="${Math.round(valueMid + 4)}" style="font-size:${SKEL_STEP_PART}px;font-weight:400">${esc(text)}</text>`);
+      return;
+    }
+    const failed = it.error !== undefined;
+    out.push(failed ? skelRect("sds-skel-control", ix, top, iw, h).replace("/>", ` style="stroke:${SKEL_FAIL}"/>`) : skelRect("sds-skel-control", ix, top, iw, h));
+    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${Math.round(top + h / 2 + 4)}">${esc(it.text)}</text>`);
+    if (it.control === "select") out.push(...skelGlyph("select", ix + iw - SKEL_PAD - 4, top + h / 2, Math.round(h / 2)));
+    if (below !== undefined) out.push(`  <text class="sds-note" x="${r2(ix)}" y="${Math.round(top + h + SKEL_PACK_GAP + 13)}"${failed ? ` style="fill:${SKEL_FAIL}"` : ""}>${esc(below)}</text>`);
     return;
   }
   const heads = new Set(it.headings ?? []);
@@ -2334,7 +2384,7 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       out.push(skelRect("sds-skel-surface", x, bandTop, w, bandEnd - bandTop, 0));
     }
     // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline.
-    if (surface && dividers.has(rowIndex))
+    if ((surface || frame.look === "card") && dividers.has(rowIndex))
       out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w)}"/>`);
     if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
     // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the outline where it is the first row, or the line over its part.
