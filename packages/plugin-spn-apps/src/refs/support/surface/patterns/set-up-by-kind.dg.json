@@ -1,0 +1,537 @@
+{
+ "kind": "skeleton",
+ "title": "Set up by kind",
+ "caption": "Every kind is shown, connected or not, as a card, in the GRID layout of the data table. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, two on a tablet, and one on a phone, with the kinds in use first.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Providers",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Email",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "SendGrid",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "SMS",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Twilio",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "Storage",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "S3",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "WhatsApp",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "Push",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "Payments",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Providers",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Email",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "SendGrid",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "SMS",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Twilio",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Storage",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "S3",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "WhatsApp",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Push",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "Payments",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Providers",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Email",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "SendGrid",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "SMS",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Twilio",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "WhatsApp",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

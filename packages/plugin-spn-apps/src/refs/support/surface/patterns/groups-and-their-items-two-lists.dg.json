@@ -1,0 +1,297 @@
+{
+ "kind": "skeleton",
+ "title": "Groups and their items, a list and a list",
+ "caption": "The groups of the notification actions are a list, with a line between each two and a band behind the chosen one, and the actions of the chosen group are a list too. Each part is chosen by its own data: the groups are a few names, and an action is a name, a state and its channels, which a line of a list holds under its title. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Authentication"
+             },
+             "fill": true
+            }
+           ],
+           "chosen": true
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Organization"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Billing"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Security"
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Groups",
+         "width": "1/3",
+         "divided": true
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "note": "Actions of this group",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Authentication",
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Organization",
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Billing",
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Security",
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Groups",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "icon": "previous",
+        "text": "Groups"
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "3 channels"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "3 channels"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

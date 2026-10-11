@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "c816ab8f"
+      "seen": "7438b353"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
@@ -76,6 +76,9 @@ The design library holds one file for each layer of the design system that is dr
 - **Never type a color.** Every color on the page is a variable of Core, and a block already binds it.
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
 - **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
+- **Draw each part of a container with what the tree puts in it.** The header holds the title of the container at its start and its actions at its end. The footer holds what closes its work, such as the paging of a listing or the two actions of an entry. The action of one part of the content stands at the end of that part's title.
+- **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
+- **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a text takes the icon size of that text's size step and shares its centre line: an `XS` icon beside `XS` text.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
 

@@ -1,0 +1,365 @@
+{
+ "kind": "skeleton",
+ "title": "Groups and their items, a closed set",
+ "caption": "The groups are few and fixed, so all of it is one page with a container for each group. Under the name of an action stand its state, where it is not the normal one, and its channels. The end of a line holds its actions only. The actions of a group are the lines of a list, so a line stands between each two. On a phone the channels are one fact, a count.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "divided": true
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Member invited",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Ownership moved",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Off"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Organization",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "divided": true
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Member invited",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Ownership moved",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Off"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Organization",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Notifications",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "3 channels"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "3 channels"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "divided": true
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Member invited",
+              "meta": [
+               "3 channels"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Organization"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

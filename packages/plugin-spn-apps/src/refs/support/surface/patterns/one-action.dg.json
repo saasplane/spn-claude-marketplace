@@ -1,0 +1,256 @@
+{
+ "kind": "skeleton",
+ "title": "One action, read first",
+ "caption": "An action reads first. Any version can be opened to be read, and only the draft is edited.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Password reset",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "badge",
+        "text": "Published v3"
+       },
+       {
+        "control": "badge",
+        "text": "Draft v4"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Edit draft",
+        "main": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0,
+        "icon": "default"
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 4,
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Reset password",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "label": "Message"
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v4",
+              "meta": [
+               "Draft"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v3",
+              "meta": [
+               "Published",
+               "2 May"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v2",
+              "meta": [
+               "12 April"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Versions",
+         "width": "1/3",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Password reset",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "badge",
+        "text": "Published v3"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Edit draft",
+        "main": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 3,
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Message"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v4",
+              "meta": [
+               "Draft"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v3",
+              "meta": [
+               "Published",
+               "2 May"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v2",
+              "meta": [
+               "12 April"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Versions",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

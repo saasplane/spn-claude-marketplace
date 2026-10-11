@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "2c8a85bd"
+      "seen": "a623a591"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "c816ab8f"
+      "seen": "7438b353"
     }
   ]
 }
@@ -42,6 +42,30 @@ A container is an optional block. A page uses one when a part of it has a header
 | Footer | `DSContainer.Footer` | none or one | `flush`, and no other prop |
 
 The parts sit in one order: the header, then the content, then the footer. The header places its first block at the start and its last at the end. The footer starts its blocks at the start edge. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and nothing else.
+
+### What a page puts in each part
+
+What a page puts in each part follows one form. A person then finds the name and the actions of every framed part in the same place.
+
+| Part | What a page puts in it | Why |
+| --- | --- | --- |
+| Header | the title of the container at its start, one line under the title where the part needs one, and the actions of the container at its end. The header stands above the outline | a title above the outline reads as the name of the part, and the outline then holds only what that name is about |
+| Content | one part, or several parts each under its own title. The action of one part stands at the end of that part's title | a person sees which part an action changes, because the action stands on the title of that part and not in the header |
+| Footer | what closes the work of the container, such as the two actions that save an entry or leave it. It stands inside the outline, under a line | the actions that end the work are met last, after everything they act on |
+
+- **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block at the start and its last block at the end, so the title and the actions need no placing by the page.
+- **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
+- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The page patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
+
+Here is how the parts serve the pages most apps have.
+
+| A page | Header | Content | Footer |
+| --- | --- | --- | --- |
+| A listing | the page title, a line under it where one is needed, and actions at the end | a filter bar where the listing has one, and a data table in a `flush` part | the paging of the records |
+| A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
+| A dashboard | flat | raised, holding widgets that show numbers | none |
+
+**Not there yet.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSWDataTable` draws its paging in a footer of its own today, inside the content part. It has no setting that hands the paging to the container's footer. Until it has one, the footer of a listing stays empty and the paging stands at the foot of the table.
 
 ## The look — 🔮
 
@@ -91,6 +115,55 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 
 A block with `bordered` in a `flush` part keeps its border, because its own prop wins — the page then shows two lines, and the `UX` lens reports it as a finding. A popover draws its own surface; a block that opens a popover draws no surface of its own around it.
 
+## A container in use — 🔮
+
+The three parts below are a container in use. Each says how the same header, content and footer carry one of the page patterns of `standards-patterns.md`. None adds a prop or a part to the container.
+
+### An entry over the page
+
+An entry is a form a person fills in to add or change something. A small or a medium entry opens over the page it belongs to. The person then keeps their place and sees what the entry is about. How much there is to enter decides what it opens as.
+
+| The entry | At a desktop and a tablet | On a phone |
+| --- | --- | --- |
+| Small: up to about five fields in one group | a dialog over the page, `DSDialog` | a sheet from the bottom of the screen |
+| Medium: one column with a few groups, up to about a dozen fields | a sheet at the side, `DSSheet`, with the page still in view beside it | the full screen |
+| Large: sections, a part that repeats, or records of its own inside it | a page of its own, as a large form | a page of its own |
+
+- **A page MUST choose what an entry opens as by its size, from the table** (`RD.SUPPORT.SURFACE.075`). A large entry has more to hold than a dialog or a sheet has room for. The two numbers, about five and about a dozen, are proposed and not yet confirmed.
+- **A dialog on a phone MUST become a sheet from the bottom** (`RD.SUPPORT.SURFACE.076`). A phone has no room around a dialog. `DSDialog` already opens this way on a phone: it stands at the bottom of the screen and takes its full width. So a page writes nothing for it.
+- **A medium entry MUST take the full screen on a phone.** No part of the page would stay in view beside it.
+- **An entry MUST be one container, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
+- **That the actions stand in the footer is proposed, and not yet confirmed.** The reason is that the container already has a footer for the actions that end its work. A person then finds them in the same place in a dialog, in a sheet and on the full screen.
+
+**Not there yet.** `DSSheet` reads no device type today, and at the side it takes at most 95% of the width of the screen. So it does not take the full screen on a phone by itself.
+
+### A large form
+
+- **A large form MUST be a page of its own, and the page MUST be one container** (`RD.SUPPORT.SURFACE.078`). Its title stands in the header. Its sections are the parts of its content, one under another in one column, each under its own title. Its actions stand in its footer. That the page is one container is proposed, and not yet confirmed.
+- **A section of a large form MUST NOT be a container of its own.** The sections are parts of one form that is saved once. A frame around each section, with actions under each, would say that each is saved by itself.
+- **A list of the sections MUST NOT stand beside the form.** The app already has its navigation at the side, and a form of a few sections is read from top to bottom.
+- **Fields that are short and belong together MAY share a row at a desktop, and each MUST take a row of its own on a phone.** Each field keeps its title above its control, as the rules of content of `standards-core.md` state.
+
+### Groups and their items
+
+Some pages hold things in groups: the fields of each record type, or the actions of each group of notifications. Such a page has two parts, the groups and the items of the chosen group, and each part is a container.
+
+| Screen class | What the page shows |
+| --- | --- |
+| A desktop | both parts. The groups stand at the left and stay in view, and the items of the chosen group stand at the right |
+| A tablet and a phone | one part at a time. A person chooses a group, the items of that group are shown where the groups were, and a back action returns to the groups |
+
+- **Both parts MUST be in view at a desktop only** (`RD.SUPPORT.SURFACE.079`). There a person goes from one group to the next without losing the list.
+- **On a tablet and on a phone the items MUST take the place of the groups.** The two parts do not fit side by side there.
+- **The swap MUST change the address.** It happens in place, and the address still changes to name the chosen group. So the back of the browser does the same as the back action. A reload stays on the chosen group, and a link to one group opens that group on every screen.
+- **Each part MUST be shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`). The groups and the items seldom hold data of the same shape.
+- **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
+- **Many groups that a person searches MUST be a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, stated in `architecture-widgets.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
+
+Where the groups are few and fixed, the page needs no swap. Each group is a container of its own, one under another on one page, and nothing is hidden.
+
+**Not there yet.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has no way back today: it places its first block at the start and its last block at the end, and it has no place before the title. The web stack adds it by its own change.
+
 ## Boundary
 
 This ref states what frames a part of a page, what that frame looks like, and what a block does inside it. It stops at the edge of the part. It does not state what frames the whole page — that is `architecture-layouts.md`. It does not state where the app's choice for `raised`, `bordered`, `rounded` and `frames` comes from, or how `size` reaches a block — that is `architecture-app.md`.
@@ -104,6 +177,15 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.APPS.155` | the page decides what fills a part, with `flush`, and a block never changes by where it sits |
 | `RD.SUPPORT.APPS.148` | the card stays a separate block beside the container |
 | `RD.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |
+| `RD.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a container |
+| `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed |
+| `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
+| `RD.SUPPORT.SURFACE.077` | an entry is one container, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |
+| `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one container, with no container for each section. That the page is one container is proposed |
+| `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the swap changes the address |
+| `RD.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and never a row of tabs |
+| `RD.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for |
+| `RD.SUPPORT.SURFACE.069` | many groups a person searches are a data table in its `LIST` layout |
 
 ## Proof
 

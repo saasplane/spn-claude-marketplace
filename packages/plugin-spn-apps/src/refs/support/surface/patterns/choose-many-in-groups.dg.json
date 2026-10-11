@@ -1,0 +1,218 @@
+{
+ "kind": "skeleton",
+ "title": "Choose many, where the data has groups",
+ "caption": "The groups come from the data, so each is a container with its own title. The choices stand in columns: each column starts at the same place in every row and in every group, so a person reads down a column as well as along a row. A row with fewer choices leaves its last places empty. On a phone the choices stand one under another.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "What Enterprise is offered",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Members",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Roles",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Directory",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "App sites",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Custom domain",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Sign-in policy",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Data policy",
+             "fill": true
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Access"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Plans",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Invoices",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Usage",
+             "fill": true
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Billing"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Cancel"
+       },
+       {
+        "control": "button",
+        "text": "Save",
+        "main": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "What Enterprise is offered",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Members",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Roles",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Directory",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Access"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Plans",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Invoices",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Billing"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Cancel"
+       },
+       {
+        "control": "button",
+        "text": "Save",
+        "main": true
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

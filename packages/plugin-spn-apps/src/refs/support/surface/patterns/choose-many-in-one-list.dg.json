@@ -1,0 +1,204 @@
+{
+ "kind": "skeleton",
+ "title": "Choose many, where the data has no groups",
+ "caption": "A permission is a code and a name and nothing else, so no heading is made up: one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Permissions of the role",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            },
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config view",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Permissions of the role",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

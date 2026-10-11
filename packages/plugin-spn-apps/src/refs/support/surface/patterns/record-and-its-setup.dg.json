@@ -1,0 +1,1151 @@
+{
+ "kind": "skeleton",
+ "title": "A record and its setup",
+ "caption": "The record is the header: its picture, its name, and under the name its kind, its code and its owner. Each part of the setup is a container, with its title and its actions above its outline. At a desktop the large part is the main column and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Organization",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "item": {
+         "media": "default",
+         "title": "Acme Corp",
+         "meta": [
+          {
+           "control": "badge",
+           "text": "Enterprise"
+          },
+          "acme",
+          "Owner: Dana Lee"
+         ],
+         "end": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        },
+        "fill": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Account",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "label": "Platform",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": false
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app"
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "width": "1/3"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "note": "Owned by Dana Lee"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Transfer ownership"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Organization",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "item": {
+         "media": "default",
+         "title": "Acme Corp",
+         "meta": [
+          {
+           "control": "badge",
+           "text": "Enterprise"
+          },
+          "acme",
+          "Owner: Dana Lee"
+         ],
+         "end": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        },
+        "fill": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Account",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Platform",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": false
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in",
+         "note": "Registration and providers, for each app"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Organization",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "item": {
+         "media": "default",
+         "title": "Acme Corp",
+         "meta": [
+          {
+           "control": "badge",
+           "text": "Enterprise"
+          },
+          "acme"
+         ],
+         "end": [
+          {
+           "icon": "more"
+          }
+         ]
+        },
+        "fill": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Account",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "label": "Platform",
+              "rows": [],
+              "sections": [
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "control": "switch",
+                    "text": "Open registration",
+                    "on": false
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Google",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Facebook",
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "X",
+                    "on": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "Apple",
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": true,
+                    "text": "GitHub",
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "actions": [
+                 {
+                  "control": "button",
+                  "text": "Add"
+                 }
+                ],
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in",
+         "note": "Registration and providers"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,300 @@
+{
+ "kind": "skeleton",
+ "title": "An editor with its preview",
+ "caption": "At a desktop the editor and what it becomes stand side by side, each a container. On a tablet and a phone a person sees one of the two at a time. Bars stand for the running text of the message.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Password reset",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "badge",
+        "text": "Draft v4"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Discard"
+       },
+       {
+        "control": "button",
+        "text": "Publish",
+        "main": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0,
+        "icon": "default"
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Subject",
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "note": "Body"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 5,
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Message"
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 4,
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Reset password",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "label": "Preview"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Password reset",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "badge",
+        "text": "Draft v4"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Discard"
+       },
+       {
+        "control": "button",
+        "text": "Publish",
+        "main": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0,
+        "icon": "default"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "tabs",
+        "tabs": [
+         "Write",
+         "Preview"
+        ],
+        "chosen": 0
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Subject",
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "note": "Body"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 5,
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Message"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Password reset",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "badge",
+        "text": "Draft v4"
+       },
+       {
+        "spacer": true
+       },
+       {
+        "control": "button",
+        "text": "Publish",
+        "main": true
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Write",
+         "Preview"
+        ],
+        "chosen": 1
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 4,
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Reset password",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "label": "Preview"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

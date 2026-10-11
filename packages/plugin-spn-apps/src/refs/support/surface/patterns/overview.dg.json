@@ -1,0 +1,539 @@
+{
+ "kind": "skeleton",
+ "title": "An overview",
+ "caption": "How much there is, then what waits for the person beside the places they often go to. On a phone the same, one under another. Each number is a card of its own, and a line that waits ends with its action.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Home",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "label": "Users",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "180"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Roles",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "85"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Organizations",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,725"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Accounts",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,414"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "12 merchants wait for review",
+              "meta": [
+               "Since Monday"
+              ],
+              "end": [
+               {
+                "control": "button",
+                "text": "Review"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "3 notifications failed today",
+              "meta": [
+               "Email"
+              ],
+              "end": [
+               {
+                "control": "button",
+                "text": "Open"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "1 job run failed",
+              "meta": [
+               "Nightly export"
+              ],
+              "end": [
+               {
+                "control": "button",
+                "text": "Open"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Needs you",
+         "divided": true
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Users"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Merchants"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Schedules"
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Go to",
+         "width": "1/3",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Home",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "label": "Users",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "180"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Roles",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "85"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "label": "Organizations",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,725"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Accounts",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,414"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "12 merchants wait for review",
+              "meta": [
+               "Since Monday"
+              ],
+              "end": [
+               {
+                "control": "button",
+                "text": "Review"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "3 notifications failed today",
+              "meta": [
+               "Email"
+              ],
+              "end": [
+               {
+                "control": "button",
+                "text": "Open"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Needs you",
+         "divided": true
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Users"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Merchants"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Schedules"
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Go to",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Home",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "label": "Users",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "180"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Roles",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "85"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "label": "Organizations",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,725"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "card",
+         "label": "Accounts",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "1,414"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "12 merchants wait",
+              "meta": [
+               "Since Monday"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "3 notifications failed",
+              "meta": [
+               "Email"
+              ],
+              "end": [
+               {
+                "icon": "next"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Needs you",
+         "divided": true
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Users"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Merchants"
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "media": "default",
+              "title": "Schedules"
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Go to",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,415 @@
+{
+ "kind": "skeleton",
+ "title": "Inherit or override",
+ "caption": "The values a person reads stand in a grid, three across at a desktop and a tablet and one under another on a phone. A part says which it is on the line under its title: it follows the default, with one action to set its own, or it holds its own values, with a way back in its footer. Following the default is the normal state and shows no badge.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Policies",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Use default"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Policies",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Use default"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Policies",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Reset"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

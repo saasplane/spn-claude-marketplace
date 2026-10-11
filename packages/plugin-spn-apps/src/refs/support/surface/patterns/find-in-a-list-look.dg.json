@@ -1,0 +1,256 @@
+{
+ "kind": "skeleton",
+ "title": "A small record opens as a look",
+ "caption": "A record of a few facts and nothing else opens beside its list at a desktop, as a drawer, and as a screen of its own on a phone. Its name is the title, the action that closes it stands in its header, and its facts are readings, each a title with its value under it,, with no table.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Tags",
+         "actions": [
+          {
+           "control": "button",
+           "text": "New tag",
+           "main": true
+          }
+         ],
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Name",
+                "Record type",
+                ""
+               ],
+               "cells": [
+                [
+                 "Urgent",
+                 "Project",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "Blocked",
+                 "Project",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "VIP",
+                 "Customer",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "Overdue",
+                 "Invoice",
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Type",
+             "text": "Project"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Colour",
+             "text": "Red"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Made",
+             "text": "2 May"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "By",
+             "text": "Dana Lee"
+            }
+           ]
+          }
+         ],
+         "label": "Urgent",
+         "note": "Tag",
+         "actions": [
+          {
+           "icon": "close"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Edit"
+            }
+           ]
+          }
+         ],
+         "width": "1/3"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Tags",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "icon": "previous",
+        "text": "Tags"
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Type",
+             "text": "Project"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Colour",
+             "text": "Red"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Made",
+             "text": "2 May"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "By",
+             "text": "Dana Lee"
+            }
+           ]
+          }
+         ],
+         "label": "Urgent",
+         "note": "Tag",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

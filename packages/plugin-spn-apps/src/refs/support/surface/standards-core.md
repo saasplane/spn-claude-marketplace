@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "2a9385ae"
+      "seen": "0a52ce83"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "a8e19828"
+      "seen": "71e0b4be"
     }
   ]
 }
@@ -28,6 +28,7 @@ Read this before you design a page, before you review one, or before you add a s
 | Block | any unit a surface is built from: a layout, a container, a widget or a component |
 | Level | one step of the chain from the app to a component, with what that step owns |
 | Device type | the screen class and the orientation a page is drawn at |
+| Line of facts | the one line under a title that holds the short facts of a thing, such as its state, its kind and its code |
 
 ## The kinds of surface — ✅
 
@@ -57,6 +58,37 @@ app  →  page  →  layout  →  container  →  widget or component
 ## A page has one purpose — 🔮
 
 A page has one purpose: one main intent, and one main action. A page with two purposes is two pages. A review finds it with one question: what did the person come here to do? If the answer needs the word *and*, the page is doing two jobs, competing for the same space.
+
+## The rules of content — 🔮
+
+A page is made of small things that come back on every page: a label, a state, a count, a field, a line of a list. Each has one rule here. A person who has read one page can then read the next, because the same thing stands in the same place on both.
+
+None of these rules names a block, so each holds on every kind of surface. The blocks that carry them are named where they belong. The item line, the badge and the two blocks of a field are in `architecture-components.md`. The data table is in `architecture-widgets.md`. A form and its footer are in `architecture-containers.md`.
+
+The first five rules say what a page shows, and where.
+
+| The content | Its rule | A reviewer checks |
+| --- | --- | --- |
+| A label | A value **MUST** take a label only where a person cannot tell what the value is without one (`RD.SUPPORT.SURFACE.056`). A name, a picture, a state and an email need none. An address, an owner, a date and a limit each keep their label. This rule is proposed | cover the label and look at the value alone. If you can still tell what the value is, the label is a finding |
+| A frame | A part of a page **MUST** take a frame of its own only when it has a title of its own, and also an action of its own or data it loads by itself (`RD.SUPPORT.SURFACE.057`). The record a page is about is the header of the page, and it **MUST NOT** take a frame. This rule is proposed | for each framed part, find its title, and then its own action or its own loading. A frame with no title, or with neither of the other two, is a finding |
+| A state | A state **MUST** be shown as a badge on the line of facts under the title, before the other facts (`RD.SUPPORT.SURFACE.058`). It **MUST NOT** stand after the title, and it **MUST NOT** stand at the end of the line. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title or at the end of a line is a finding, and so is a badge for the normal state |
+| The end of a line | The end of a line **MUST** hold its actions, and nothing else (`RD.SUPPORT.SURFACE.059`) | read the end of each line. Anything there that a person cannot press is a finding |
+| A count | A page pattern **MUST NOT** depend on a count (`RD.SUPPORT.SURFACE.050`). A group **MUST** show how many items it has only where the server gives that number together with the groups | read the page as if no count had come. A part that is then empty or wrong is a finding |
+
+- **A badge that says what kind of thing a record is MUST follow the rule of a state.** It stands on the line of facts, as one of the facts, and never after the title.
+- **Why a label and a frame are held back.** A label that tells a person nothing new takes room from the value. A frame says that what is inside it stands apart, and a frame around every part says that of nothing.
+- **Why a state is not at the end.** A state is one of the facts of a thing, so it is read with them. At the end of a line it would look like something to press.
+
+The last four rules say how a field, a set of choices and a list are laid out.
+
+| The content | Its rule | A reviewer checks |
+| --- | --- | --- |
+| A field a person enters | Its title **MUST** stand above its control, and never beside it (`RD.SUPPORT.SURFACE.060`). One line under the control **MUST** hold its description, or its error where the value is refused | look for a title beside a control, and for an error shown anywhere but under the control it belongs to. Each is a finding |
+| A field a person reads | Its title **MUST** stand above its value, and never beside it (`RD.SUPPORT.SURFACE.061`). Readings **MUST** stand in a grid: several across at a desktop and a tablet, and one under another on a phone | look for a title beside a value. Then read the page at each screen class. One column of readings in a part that has room for several is a finding, and so are readings side by side on a phone |
+| The choices of one set | The choices **MUST** stand in columns: each choice starts at the same place in every row and in every group (`RD.SUPPORT.SURFACE.062`) | read down the start of the choices. A choice that starts where the one above it does not is a finding |
+| The lines of a list | A line **MUST** stand between each two lines of a list (`RD.SUPPORT.SURFACE.063`) | look between two lines of each list. Two lines with nothing between them are a finding |
+
+- **Why a title stands above.** A title above its control keeps the same place at every screen class. A title beside it needs a second arrangement on a phone. A field that is read then has the same shape as the field that is entered.
 
 ## What a surface adapts to — 🔮
 
@@ -96,6 +128,7 @@ A review asks the same questions of any page, each answered from one part of thi
 | The question | Answered from |
 | --- | --- |
 | Does the page have one purpose, and one main action? | this ref |
+| Does each label, state, count, field and line of a list follow its rule of content? | this ref |
 | Does each intent use its pattern, built from blocks of the design system? | `standards-interaction.md`, `standards-patterns.md` |
 | Does every block drawn from data show every task state? | `standards-interaction.md` |
 | Does every action answer the person: working, done or failed? | `standards-interaction.md` |
@@ -112,6 +145,20 @@ A device type is two closed sets, stated in full in the web's chapter (`docs/04-
 ## Boundary
 
 This ref states what a surface is built in, what one page is for, and what a page has to hold through, before any block is named. It stops where a block, a pattern or a name begins — those are `standards-interaction.md`, `standards-patterns.md`, `architecture-names.md` and the refs after it. Reach for `../apps/support.md` when the question is where a `ui/` folder sits or what a support package may share.
+
+## Binds
+
+| Rule | What it decides |
+| --- | --- |
+| `RD.SUPPORT.SURFACE.050` | no page pattern depends on a count |
+| `RD.SUPPORT.SURFACE.056` | when a value takes a label. The rule is proposed |
+| `RD.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
+| `RD.SUPPORT.SURFACE.058` | a state and a kind are badges on the line of facts, and the normal state shows none |
+| `RD.SUPPORT.SURFACE.059` | the end of a line holds its actions, and nothing else |
+| `RD.SUPPORT.SURFACE.060` | a field a person enters has its title above its control, with one line under it |
+| `RD.SUPPORT.SURFACE.061` | a field a person reads has its title above its value, and readings stand in a grid |
+| `RD.SUPPORT.SURFACE.062` | the choices of one set stand in columns |
+| `RD.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
 
 ## Proof
 

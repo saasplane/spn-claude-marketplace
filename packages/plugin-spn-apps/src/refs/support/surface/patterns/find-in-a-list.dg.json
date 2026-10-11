@@ -1,0 +1,430 @@
+{
+ "kind": "skeleton",
+ "title": "Find in a list",
+ "caption": "The page is one container. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records, which reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its picture, its name, and under the name its state and one more fact. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. On a tablet it holds fewer boxes. On a phone it is one button that says how many filters are on, with the action that clears them. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows fewer columns than a desktop.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Users",
+         "note": "Everyone in the organization",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Invite",
+           "main": true
+          }
+         ],
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "control": "select",
+               "text": "Role",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Name",
+                "Email",
+                "Role",
+                "State",
+                ""
+               ],
+               "cells": [
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Dana Lee"
+                 },
+                 "dana@acme.com",
+                 "Admin",
+                 "",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Omar Haddad"
+                 },
+                 "omar@acme.com",
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Invited"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Li Wei"
+                 },
+                 "li@acme.com",
+                 "Member",
+                 "",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Sara Novak"
+                 },
+                 "sara@acme.com",
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Suspended"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "note": "1 to 20 of 180"
+            },
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Users",
+         "note": "Everyone in the organization",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Invite",
+           "main": true
+          }
+         ],
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Name",
+                "Role",
+                "State",
+                ""
+               ],
+               "cells": [
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Dana Lee"
+                 },
+                 "Admin",
+                 "",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Omar Haddad"
+                 },
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Invited"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Li Wei"
+                 },
+                 "Member",
+                 "",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 {
+                  "icon": "person",
+                  "mark": true,
+                  "text": "Sara Novak"
+                 },
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Suspended"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Users",
+         "actions": [
+          {
+           "icon": "add"
+          }
+         ],
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "button",
+               "text": "Filters (2)",
+               "icon": "default"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "media": "person",
+                "title": "Dana Lee",
+                "meta": [
+                 "Admin"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "media": "person",
+                "title": "Omar Haddad",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Invited"
+                 },
+                 "Member"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "media": "person",
+                "title": "Li Wei",
+                "meta": [
+                 "Member"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

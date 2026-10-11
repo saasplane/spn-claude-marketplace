@@ -8,6 +8,18 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
       "seen": "d3d654ab"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
+      "seen": "9e5daefd"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
+      "seen": "89d80782"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
+      "seen": "7438b353"
     }
   ],
   "decisions": [
@@ -74,12 +86,39 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 **The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
 
+## A page is built from the tree of its page pattern
+
+The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md`, in this plugin, and each pattern's spec is in `refs/support/surface/patterns/`.
+
+- **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by layer. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
+- **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the containers, the widgets and the components the design system already has.
+- **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
+- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSWDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
+- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
+
+**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-widgets.md` and `architecture-containers.md` say plainly what each unit does not do today, under *Not there yet*. Today that is:
+
+| The unit | What it does not do yet |
+| --- | --- |
+| `DSWDataTable` | it reads no device type, so it does not change to its `LIST` layout on a phone by itself |
+| `DSWDataTable` | it has no cell that turns into a box with a save action, which Change in place, in a list needs |
+| `DSWDataTable` | it cannot hand its paging to the footer of the container, so the paging stands at the foot of the table |
+| `DSWFilterBar` | it draws its filter icon plain, and it keeps the same fields in view at a desktop and a tablet |
+| `DSSheet` | it reads no device type, so it does not take the full screen on a phone by itself |
+| `DSContainer.Header` | it has no way back before the title, which Groups and their items needs on a tablet and a phone |
+| a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
+
+- **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.
+- **Name each gap in the report**: the unit, what it does not do, and the line of the tree that waits for it. The gap is then proposed to the design system, where one change serves every page.
+- **Never write a second table, a second filter bar, a second sheet or a second header inside a module to close a gap.** A copy built inside a page gets none of the theme, the density, the accessibility or the translation the unit has. It also hides the gap from the stack that has to close it.
+- **Where the page cannot be built at all without the missing part, stop at that line and say so.** The page waits for the unit.
+
 ## 4. Close
 
 - **Run the conformance gates** — the `verify` skill code mode: codegen freshness, `spnutils apps validate`, build, lint, tests. This is what catches a file whose name no longer matches its contents. It also catches a barrel that was never regenerated, or a reach past another module's contract. A passing build reveals none of them.
 - **Run the tests** — the `run` skill tests mode. Typecheck the touched projects first: `npx nx run <project>:typecheck`, and `npx tsc --noEmit -p <project>/tsconfig.json` for a web app, whose `typecheck` target is disabled.
 - **Contract review gate** — if the contract surface changed, run the `review` skill contract mode before calling the work done. Code review (the `review` skill code mode) for everything else.
-- Report what changed per layer, what was regenerated, and test results. Never claim green without having run the commands.
+- Report what changed per layer, what was regenerated, and test results. For a page, name its page pattern and each gap of a unit the page met. Never claim green without having run the commands.
 
 ## Lenses
 

@@ -8,6 +8,10 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
       "seen": "020faf26"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
+      "seen": "9e5daefd"
     }
   ]
 }
@@ -86,6 +90,15 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
 3. **Web apps respond** on their configured dev ports, or through the local proxy's vhosts.
 4. **Login proof**, where the repo seeds credentials — authenticate a seeded principal through its own site host and assert the session comes back active.
 5. **Exercise the changed flow end to end** through the real entry. Tests passing is not the exit criterion; the change working in the running app is.
+6. **Read each changed page against its page pattern.** No check reads a page for its pattern, so this step is a reading, and you report it as one. The rules are in `refs/support/surface/standards-patterns.md`, in this plugin, and each pattern's spec is in `refs/support/surface/patterns/`.
+   - **Name the pattern the page should follow.** Take it from the tree the `design` skill wrote. Where the page has no tree, read its data and its person against the table of the page patterns, and name the one that fits. A page that fits none is a finding.
+   - **Open the spec of that pattern, and look at the page beside it at each screen class**: a desktop, a tablet and a phone. Look at the page through `spn-devex docs look <page>`, and never through a script inside a repository. The values in a spec are samples, so compare the arrangement and not the words.
+   - **Go down the pattern's tree by layer**: the containers, then the widgets, then the components. Each line of the tree is on the page, built with the unit the tree names. A part the page built for itself is a finding. So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
+   - **Check each rule of content with its reviewer's check** in `refs/support/surface/standards-core.md`: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
+   - **Type a search that matches a record on another page of the list.** A search that finds nothing ran in the page, and that is a finding (`RD.SUPPORT.SURFACE.070`).
+   - **A difference the refs list under *Not there yet* is a gap of the unit, and not a finding on the page.** `architecture-widgets.md` and `architecture-containers.md` list them. Report it as a gap, with the unit. A private copy that a page built to close such a gap is a finding.
+   - **Say where a finding rests on a proposed rule.** The refs mark each proposed rule.
+   - **Report the pattern by name, the screen classes you looked at, and each finding with its rule id.** Name each screen class you did not look at.
 
 Report per check: pass/fail with the observed evidence. Never report a check you did not run.
 

@@ -1,0 +1,472 @@
+{
+ "kind": "skeleton",
+ "title": "Groups and their items, many groups",
+ "caption": "Where the groups are many, the part at the left is a data table in its LIST layout: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Custom fields",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Record types",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Project",
+                "meta": [
+                 "Work"
+                ]
+               },
+               "fill": true
+              }
+             ],
+             "chosen": true
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Customer",
+                "meta": [
+                 "Sales"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Invoice",
+                "meta": [
+                 "Billing"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Contract",
+                "meta": [
+                 "Sales"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Shipment",
+                "meta": [
+                 "Logistics"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ],
+         "width": "1/2"
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              ""
+             ],
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "icon": "more"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Custom fields",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [],
+         "label": "Record types",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Project",
+                "meta": [
+                 "Work"
+                ],
+                "end": [
+                 {
+                  "icon": "next"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Customer",
+                "meta": [
+                 "Sales"
+                ],
+                "end": [
+                 {
+                  "icon": "next"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Invoice",
+                "meta": [
+                 "Billing"
+                ],
+                "end": [
+                 {
+                  "icon": "next"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Contract",
+                "meta": [
+                 "Sales"
+                ],
+                "end": [
+                 {
+                  "icon": "next"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Shipment",
+                "meta": [
+                 "Logistics"
+                ],
+                "end": [
+                 {
+                  "icon": "next"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "note": "1 to 20 of 64"
+            },
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Custom fields",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "icon": "previous",
+        "text": "Record types"
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Budget",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               "Number"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Due date",
+              "meta": [
+               "Date"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Stage",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               "Choice"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "actions": [
+          {
+           "icon": "add"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ],
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

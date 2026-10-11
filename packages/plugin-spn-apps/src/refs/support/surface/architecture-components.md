@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "5247fc05"
+      "seen": "6ae6dffc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "9c5a42e1"
+      "seen": "5cb907c5"
     }
   ]
 }
@@ -28,6 +28,10 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Host | the block that takes data and draws its item once for each entry |
 | Item | the unit a host draws once for each entry of its data |
 | Node | `DSDataMenuNodeType` — the kind of one entry a host that draws a tree takes: `ITEM` · `GROUP` · `SECTION` · `SEPARATOR` · `CUSTOM` |
+| Item line | `DSItem` — one thing shown as a line: a picture, a title, a description, a line of facts, and actions at its end |
+| Mark | a round picture or icon that stands for a thing or a person |
+
+An **item line** is not the Item of a host. A host may draw an item line for each entry, and an item line also stands alone, for one thing shown by itself.
 
 A **block** is any unit a surface is built from — a layout, a container, a widget or a component (`standards-core.md`). The component is the smallest of the four.
 
@@ -69,6 +73,69 @@ Some blocks are drawn from data: a select from its options, a menu from its node
 
 The reason is that a hover tells a person the row answers to them. A row that does nothing when it is pressed should not react, so a plain table stays still, and a table whose rows a person acts on turns `hoverable` on. `DSWDataTable` turns it on. `hoverable` is not a prop for the hover state: hover stays a shown state that the browser produces, and the prop states only whether this block answers to the pointer at all.
 
+## The item line, the badge and the mark — 🔮
+
+Three things show a record and its facts on most pages: a line for the record, a badge for a state, and a mark for a picture. Each has one form here. These are the blocks that carry the rules of content of `standards-core.md`.
+
+### The item line
+
+The item line, `DSItem`, shows one thing as a line.
+
+| Part of the item line | Holds | Its prop on `DSItem` |
+| --- | --- | --- |
+| A picture | a picture or an icon of the thing, at the start of the line | `media`, or `startIcon` for an icon alone |
+| A title | the name of the thing | `title` |
+| A description | one line about the thing, under its title | `description` |
+| A line of facts | the short facts of the thing, under its title, with a dot between each two. A badge stands among them, before the other facts | `description`. The block has no prop of its own for the facts |
+| Actions | the actions of the thing, at the end of the line | `actions` |
+
+- **A page MUST give the parts of an item line to these props, and the block places them in one order** (`RD.SUPPORT.SURFACE.064`). A person then reads every line of every list the same way.
+- **The line of facts MUST be written in the place the item line has under its title.** So `DSItem` takes no new part for it, and a badge needs no place of its own on the block.
+- **Nothing but the actions MAY stand at the end of an item line.** A state at the end would look like something to press.
+- **The header of a record and a line of a list MUST have the same shape: a picture, a title, a line under it, and actions.** A badge then stands in the same place on both. A person who has read a list can read the page of one record.
+
+### The badge
+
+The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Where it stands, and that the normal state shows none, are rules of content in `standards-core.md`. Two more rules keep a badge readable. Both are proposed, and not yet confirmed (`RD.SUPPORT.SURFACE.065`).
+
+- **A badge MUST always show its word.** It then reads without its colour and without its icon, also for a person who cannot tell the colours apart. `DSBadge` asks for its `label` on every use.
+- **The colour of a badge MUST say a state, and never a kind.** A person learns that a coloured badge asks to be looked at. A colour on every kind would spend that signal on things that need no attention.
+
+### A value of an enum
+
+- **A value of an enum MUST be shown by its name, and never by its code** (`RD.SUPPORT.SURFACE.066`). The name is the one a person reads. The code is written for the contract and not for a person.
+- **Its icon MUST be chosen in one order.** First the icon of the value, where its enum gives one to each value. Then the icon of the enum. Then the word alone. So a missing icon never stops a page. This order is proposed, and not yet confirmed.
+
+Where the value stands decides how it is shown.
+
+| The value is | Shown as |
+| --- | --- |
+| a state or a kind, beside other facts of the record | a badge |
+| the subject of the page, or of a part of it | a title |
+| the only thing in a field that has its label | plain text |
+| several values of one set | a row of small badges |
+| a choice that is being made | a control in a form |
+
+### The mark
+
+A mark is a picture or an icon that stands for a thing or a person: a person's picture, the brand of a provider, a channel.
+
+- **A mark MUST be round, and an icon inside an action MUST keep the square of the control it sits in** (`RD.SUPPORT.SURFACE.067`). The two shapes tell a person which picture names a thing and which one is a control, before they read a word.
+- **A filled mark is a thing that is set up, and an empty mark is a thing that is not set up yet.** So a row of marks shows where a setup stands with no count beside it.
+
+### The two blocks of a field
+
+A field has two blocks, one to enter a value and one to read it.
+
+| The field | Its block | What the block draws |
+| --- | --- | --- |
+| A field a person enters | `DSForm.Field` | its title above its control, and one line under the control that holds its description, or its error in place of the description. The room of that line is kept where a field has neither |
+| A field a person reads | `DSDataUnit` | its title above its value, with no box around the value. A value that is empty shows a dash |
+
+- **A form holds each field a person enters in `DSForm.Field`, and a page shows each field a person reads in `DSDataUnit`.** Both keep the title above, as the rules of content ask (`RD.SUPPORT.SURFACE.060`, `RD.SUPPORT.SURFACE.061`). So a record that is read and the form that changes it have the same shape.
+- **`DSDataFieldView` draws through `DSDataUnit`, and it needs the config of a data field.** So it fits a custom field, whose config the record already carries. A field with no such config is read through `DSDataUnit` itself.
+- **Neither block places its neighbours.** The grid that readings stand in is the page's to write, as `architecture-containers.md` says of every gap between two blocks.
+
 ## Composing, never restyling — 🔮
 
 A page composes these blocks, and never restyles a copy of one. A control that is missing is proposed to the design system, named and grouped here first. An overlay a block opens — a popover, a tooltip, a dropdown menu — is a private part of that block, shown by a switch such as `open`, and never a block a designer places on its own.
@@ -83,6 +150,10 @@ This ref states which components exist, in which group, and what every one must 
 | --- | --- |
 | `RD.SUPPORT.APPS.144` | a block drawn from data is declared as a host and an item, and one item serves every host that takes one data shape |
 | `RD.SUPPORT.APPS.164` | an overlay is drawn as its surface alone, over a backdrop, sized to the instance, and never placed as a block of its own |
+| `RD.SUPPORT.SURFACE.064` | the parts of the item line and their order, and the header of a record and a line of a list have one shape |
+| `RD.SUPPORT.SURFACE.065` | a badge always shows its word, and its colour says a state and never a kind. Both are proposed |
+| `RD.SUPPORT.SURFACE.066` | a value of an enum is shown by its name, and the order its icon is chosen in. The order is proposed |
+| `RD.SUPPORT.SURFACE.067` | a mark is round, and an icon inside an action keeps its square |
 
 ## Proof
 

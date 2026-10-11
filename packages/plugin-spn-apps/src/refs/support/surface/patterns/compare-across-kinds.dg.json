@@ -1,0 +1,272 @@
+{
+ "kind": "skeleton",
+ "title": "Compare across kinds",
+ "caption": "The page reads first, as a plain table: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. On a phone a person reads one kind at a time, as labelled values, with Edit in the footer. The kinds are a closed set, so tabs may be used.",
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "label": "Sign-in defaults",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "cells": [
+              [
+               "Password",
+               "Required",
+               "Required",
+               "Optional"
+              ],
+              [
+               "Two-step",
+               "Optional",
+               "Off",
+               "Required"
+              ],
+              [
+               "Social",
+               "On",
+               "On",
+               "Off"
+              ],
+              [
+               "Session",
+               "8 hours",
+               "30 days",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite only",
+               "Open",
+               "By review"
+              ],
+              [
+               "",
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "label": "Sign-in defaults",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "cells": [
+              [
+               "Password",
+               "Required",
+               "Required",
+               "Optional"
+              ],
+              [
+               "Two-step",
+               "Optional",
+               "Off",
+               "Required"
+              ],
+              [
+               "Social",
+               "On",
+               "On",
+               "Off"
+              ],
+              [
+               "Session",
+               "8 hours",
+               "30 days",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite only",
+               "Open",
+               "By review"
+              ],
+              [
+               "",
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "label": "Sign-in defaults",
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "control": "tabs",
+        "tabs": [
+         "Enterprise",
+         "Consumer",
+         "Merchant"
+        ],
+        "chosen": 0
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Edit"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}
