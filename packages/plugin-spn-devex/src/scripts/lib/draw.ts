@@ -109,7 +109,9 @@ export type SkeletonFrame = {
   /** With a `look` of `container`: what stands at the end of its header, the rows of its footer, and its content
    *  as several parts, each with a title of its own, its actions at the end of that title, and its rows. */
   actions?: SkeletonItem[]; footer?: SkeletonRow[];
-  sections?: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }[];
+  sections?: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean }[];
+  /** With a `look` of `container`: a line across the outline between each two of its rows, as a list has. A part takes it too. */
+  divided?: boolean;
   /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
   media?: string;
 };
@@ -1700,13 +1702,19 @@ const skelStepText = (words: string, step: number, x: number, y: number) =>
   `  <text class="sds-title" x="${r2(x)}" y="${Math.round(y)}" style="font-size:${step}px${step === SKEL_STEP_ITEM ? ";font-weight:500" : ""}">${esc(words)}</text>`;
 /** The facts on the line under an item's title: its description first, then each of `meta`. */
 const skelItemFacts = (it: SkeletonItem): (string | SkeletonItem)[] =>
-  [...(it.item?.description !== undefined ? [it.item.description] : []), ...(it.item?.meta ?? [])];
+  [...(it.item?.description !== undefined && !it.item?.meta?.length ? [it.item.description] : []), ...(it.item?.meta ?? [])];
+/** AN ITEM HAS UP TO THREE LEVELS: its title, a description that is plain words, and a line of facts. Each of the
+ *  last two is there only where the data has it. Where both are, the description stands on a line of its own. */
+const skelItemOwnDescription = (it: SkeletonItem): string | undefined => (it.item?.meta?.length ? it.item?.description : undefined);
+const skelItemDescriptionH = (it: SkeletonItem) => (skelItemOwnDescription(it) !== undefined ? SKEL_ITEM_LINE : 0);
 /** A dot stands between every two facts, a badge among them: a line may hold two badges, or a badge with an icon,
  *  and one mark between all of them reads the same wherever it falls. */
 const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 16;
 /** A word on the facts line is measured closer than a note elsewhere, so the dot stands midway between two facts. */
 const SKEL_W_FACT = 5.9;
-const skelFactW = (fact: string | SkeletonItem, h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_FACT) : skelFixedWidth(fact, h));
+/** A BADGE ON THE LINE OF FACTS IS AS TALL AS THE WORDS BESIDE IT, and not as tall as a badge that stands alone. */
+const SKEL_FACT_BADGE = 16, SKEL_FACT_CTL = SKEL_FACT_BADGE + 8;
+const skelFactW = (fact: string | SkeletonItem, _h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_FACT) : skelFixedWidth(fact, SKEL_FACT_CTL));
 function skelItemFactsW(it: SkeletonItem, h: number): number {
   const facts = skelItemFacts(it);
   return facts.reduce((t: number, fact, i) => t + skelFactW(fact, h)
@@ -1714,10 +1722,10 @@ function skelItemFactsW(it: SkeletonItem, h: number): number {
 }
 const skelItemHasBadge = (it: SkeletonItem) => skelItemFacts(it).some((fact) => typeof fact !== "string");
 const skelItemStep = (it: SkeletonItem) => (it.part ? SKEL_STEP_CONTAINER : SKEL_STEP_ITEM);
-const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(skelStepW(it.item?.title ?? "", skelItemStep(it)), skelItemFactsW(it, h));
+const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(skelStepW(it.item?.title ?? "", skelItemStep(it)), skelItemFactsW(it, h), Math.ceil((skelItemOwnDescription(it) ?? "").length * SKEL_W_NOTE));
 /** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
 const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length ? h
-  : skelItemHasBadge(it) ? SKEL_ITEM_LINE + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) + SKEL_LABEL_GAP : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP);
+  : skelItemDescriptionH(it) + (skelItemHasBadge(it) ? Math.max(h, SKEL_ITEM_LINE + SKEL_PACK_GAP + SKEL_FACT_BADGE + SKEL_LABEL_GAP) : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP));
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
  *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
 const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length ? skelItemH(it, h) - 4 : h);
@@ -1789,7 +1797,7 @@ function skelFrameHeight(frame: SkeletonFrame, inherited: number): number {
   return Math.max(skelHead(frame) + body + SKEL_PAD, (frame.height ?? 0) * ctl);
 }
 /** The rows a frame lays out: its own, and under them the footer's where it is a container drawn for a surface. */
-const skelSectionRows = (section: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }): SkeletonRow[] => [
+const skelSectionRows = (section: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean }): SkeletonRow[] => [
   // A PART OF THE CONTENT HAS ITS OWN TITLE, with the actions of that part at its end, so an action stands beside what it acts on.
   ...(section.label !== undefined || section.actions?.length
     ? [{ items: [...(section.label !== undefined ? [{ text: section.label, part: true }] : []), { spacer: true }, ...(section.actions ?? [])] }] : []),
@@ -1803,8 +1811,15 @@ function skelDividers(frame: SkeletonFrame): Set<number> {
   const at = new Set<number>();
   if (frame.look !== "container") return at;
   let index = 0;
-  (frame.sections ?? []).forEach((section, order) => { if (order > 0) at.add(index); index += skelSectionRows(section).length; });
+  // THE ROWS OF A PART THAT IS `divided` HAVE A LINE BETWEEN EACH TWO, as the lines of a list in a data table do.
+  (frame.sections ?? []).forEach((section, order) => {
+    if (order > 0) at.add(index);
+    const count = skelSectionRows(section).length, own = (section.rows ?? []).length;
+    if (section.divided) for (let r = count - own + 1; r < count; r++) at.add(index + r);
+    index += count;
+  });
   if ((frame.rows ?? []).length && index > 0) at.add(index);
+  if (frame.divided) for (let r = 1; r < (frame.rows ?? []).length; r++) at.add(index + r);
   index += (frame.rows ?? []).length;
   if (frame.footer?.length && index > 0) at.add(index);
   return at;
@@ -2004,7 +2019,9 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     const titleY = facts.length ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
     out.push(skelStepText(item.title ?? "", skelItemStep(it), wx, titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
-    const factsMid = skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) / 2 : titleY + SKEL_ITEM_LINE - 4;
+    const ownDescription = skelItemOwnDescription(it), below = skelItemDescriptionH(it);
+    if (ownDescription !== undefined) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(titleY + SKEL_ITEM_LINE)}">${esc(ownDescription)}</text>`);
+    const factsMid = below + (skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
     let fx = wx;
     facts.forEach((fact, i) => {
       if (i) {
@@ -2013,7 +2030,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       }
       if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
       else if (fact.control !== "badge") findings.push("a fact on the line under an item's title is a word or a badge");
-      else skelDrawLeaf(fact, "control", fx, factsMid - h / 2, skelFixedWidth(fact, h), h, h, h, findings, out);
+      else skelDrawLeaf(fact, "control", fx, factsMid - SKEL_FACT_CTL / 2, skelFixedWidth(fact, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
       fx += skelFactW(fact, h);
     });
     let ex = ix + iw - skelItemEndW(it, h);

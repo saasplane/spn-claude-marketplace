@@ -820,11 +820,11 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const facts = line({ media: "default", title: "SaaS Plane Platform", meta: [{ control: "badge", text: "Platform" }, "platform", "Owner: Dana Lee"] });
   one("an item with a line of facts draws without a finding", facts.findings, none);
   one("a dot stands between every two facts, a badge among them", texts(facts.svg, "sds-note").map((t) => t[2]).join("|"), "·|platform|·|Owner: Dana Lee");
-  one("the dot after a badge stands between the badge and the next fact", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 24), texts(facts.svg, "sds-note")],
+  one("the dot after a badge stands between the badge and the next fact", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 16), texts(facts.svg, "sds-note")],
     (g) => g[1][0][0] > g[0][0] + g[0][2] && g[1][0][0] < g[1][1][0]);
   const badges = line({ title: "x", meta: [{ control: "badge", text: "Platform", icon: "default" }, { control: "badge", text: "Pending", icon: "default" }] });
   one("two badges on one line have a dot between them", [badges.findings.length, texts(badges.svg, "sds-note").map((t) => t[2]).join("|")], (g) => g[0] === 0 && g[1] === "·");
-  one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 24), texts(facts.svg, "sds-note")[0], texts(facts.svg, "sds-title")[0]],
+  one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 16), texts(facts.svg, "sds-note")[0], texts(facts.svg, "sds-title")[0]],
     (g) => g[0][0] === g[2][0] && g[1][0] > g[0][0] + g[0][2] && g[1][1] > g[2][1]);
   one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "sds-box")[0][3] > rect(line({ title: "x", description: "y" }).svg, "sds-box")[0][3], true);
   one("a fact that is neither a word nor a badge is a finding", line({ title: "x", meta: [{ control: "button", text: "Go" }] }).findings, says("a word or a badge"));
@@ -874,6 +874,13 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const cardWithMark = card({ look: "card", label: "Email", media: "default", rows: [{ items: [{ note: "SendGrid" }] }] });
   one("a card with a mark draws it before its title, and the title starts after it", [cardWithMark.findings.length, (cardWithMark.svg.match(/<circle/g) ?? []).length, texts(cardWithMark.svg, "sds-title").find((t) => t[2] === "Email")[0], texts(card({ look: "card", label: "Email", rows: [{ items: [{ note: "SendGrid" }] }] }).svg, "sds-title").find((t) => t[2] === "Email")[0]],
     (g) => g[0] === 0 && g[1] === 1 && g[2] === g[3] + 30);
+  const itemOfThree = line({ media: "default", title: "SendGrid", description: "Sends the email of every app", meta: [{ control: "badge", text: "Connected" }, "Since 2 May"] });
+  const itemOfTwo = line({ media: "default", title: "SendGrid", meta: [{ control: "badge", text: "Connected" }, "Since 2 May"] });
+  one("an item with a description and facts stands itemOfThree lines: the description on its own line, the facts under it", [itemOfThree.findings.length, texts(itemOfThree.svg, "sds-note").map((t) => t[2]), rect(itemOfThree.svg, "sds-box")[0][3] - rect(itemOfTwo.svg, "sds-box")[0][3]],
+    (g) => g[0] === 0 && g[1][0] === "Sends the email of every app" && g[1].includes("Since 2 May") && g[2] === 18);
+  one("an item with a description and no facts keeps itemOfTwo lines", texts(line({ title: "x", description: "y" }).svg, "sds-note").map((t) => t[2]), (g) => g.length === 1 && g[0] === "y");
+  const listWithLines = card({ look: "container", label: "Users", divided: true, rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }, { items: [{ item: { title: "Li Wei" }, fill: true }] }, { items: [{ item: { title: "Omar" }, fill: true }] }] });
+  one("a divided container has a line between each itemOfTwo of its rows", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
   one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
   one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
