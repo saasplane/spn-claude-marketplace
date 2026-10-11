@@ -8,7 +8,8 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { BOOK_TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { exportTemplates } from "../../../../../src/scripts/commands/restates/files.ts";
+import { BOOK_PATTERNS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { exportTemplates, PATTERNS_SET } from "../../../../../src/scripts/commands/restates/files.ts";
 
 const BASE = mkdtempSync(join(tmpdir(), "t-restates-files-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -46,6 +47,30 @@ function exported(book, out, write) {
 }
 
 const BOOK = { "pages/report-template.html": "<h1>report</h1>\n", "agent/hook-template.ts": "export const hook = 1;\n" };
+
+console.log("=== restates files — the specs of the page patterns, a flat folder with a page of the book's own");
+{
+  // The book's folder holds two specs and a README it writes by hand; the copy takes the specs, and its README is the index.
+  made += 1;
+  const book = join(BASE, `book-${made}`), out = join(BASE, `plugin-${made}`, "patterns"), from = join(book, BOOK_PATTERNS);
+  mkdirSync(from, { recursive: true });
+  writeFileSync(join(from, "find-in-a-list.dg.json"), '{"kind":"skeleton"}\n', "utf8");
+  writeFileSync(join(from, "overview.dg.json"), '{"kind":"skeleton"}\n', "utf8");
+  writeFileSync(join(from, "README.md"), "# The specs, by the book's own hand\n", "utf8");
+  const lines = [];
+  const code = exportTemplates(book, out, true, (line) => lines.push(line), PATTERNS_SET);
+  ok("[MKT.SCRIPTS.176] the specs are copied, and the report counts specs", code === 0 && /^2 spec\(s\) exported/.test(lines.join("\n")), lines.join("\n"));
+  ok("[MKT.SCRIPTS.176] each spec is byte-identical in the copy", readFileSync(join(out, "overview.dg.json"), "utf8") === '{"kind":"skeleton"}\n');
+  const index = readFileSync(join(out, "README.md"), "utf8");
+  ok("[MKT.SCRIPTS.176] the copy's README is the index, with one stamp that names the folder, and not the book's own page",
+    index.includes(`"path": "spn-foundation/${BOOK_PATTERNS}"`) && index.includes("[`find-in-a-list.dg.json`](find-in-a-list.dg.json)") && !index.includes("by the book's own hand"));
+  ok("[MKT.SCRIPTS.176] the book keeps its own README, and gains an index of its specs", readFileSync(join(from, "README.md"), "utf8").startsWith("# The specs, by the book") && readFileSync(join(from, "index.md"), "utf8").includes("`overview.dg.json`"));
+  const again = [];
+  ok("[MKT.SCRIPTS.176] a second check finds every copy current", exportTemplates(book, out, false, (line) => again.push(line), PATTERNS_SET) === 0 && /every copy current/.test(again.join("\n")), again.join("\n"));
+  writeFileSync(join(from, "overview.dg.json"), '{"kind":"skeleton","title":"x"}\n', "utf8");
+  const behind = [];
+  ok("[MKT.SCRIPTS.176] known-bad: an edited spec is reported behind, and the check exits 1", exportTemplates(book, out, false, (line) => behind.push(line), PATTERNS_SET) === 1 && behind.join("\n").includes("overview.dg.json"), behind.join("\n"));
+}
 
 console.log("=== restates files — a copy the book no longer holds");
 {

@@ -277,6 +277,17 @@ export function bookTemplatesDir(foundation: string): string { return join(found
  */
 export const PLUGIN_TEMPLATES = ["refs", "devex", "workspace", DOCS, TEMPLATES].join("/");
 
+/**
+ * The specs of the surface's page patterns, relative to the foundation's root. Each is a skeleton spec an
+ * agent starts a page from, beside the chapter that states the patterns.
+ */
+export const BOOK_PATTERNS = [DOCS, SEAT.capabilities, "02-support", "03-surface", "03-standards-patterns", "01-common", "patterns"].join("/");
+/**
+ * The apps plugin's byte-identical copy of those specs, relative to that plugin's `src/`, beside the
+ * ref that restates the patterns chapter (`refs/support/surface/standards-patterns.md`).
+ */
+export const PLUGIN_PATTERNS = ["refs", "support", "surface", "patterns"].join("/");
+
 // ---------------------------------------------------------------------------- the workstreams
 
 /** The container every workstream sits in, under the workspace's `.spndevex/`. */

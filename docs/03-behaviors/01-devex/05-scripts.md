@@ -134,6 +134,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.172 | Partner / integrator | have the partner proof run a command the way a partner types it | `plugin partner check` runs `restates check` and `docs prose list` through the entry, by their words | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.174 | Backend developer | be refused an option a command does not take | Each command outside the `docs` group prints its usage line, names the option and exits 2, and never reads the option as a path | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.175 | Engineering leader | read what each plugin command cost, by its own words | The telemetry reader files a Bash line of a plugin command as group, subject and action, so `docs face check` is the action `check` of the subject `face` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.176 | Editor | have the apps plugin carry the specs of the surface's page patterns as the book holds them | `restates files write <book>` copies each spec of the book's `patterns` folder into the apps plugin, writes one stamp that names the folder, and leaves the book's own page about the folder in the book; `restates files check <book>` reports a spec that is behind | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
