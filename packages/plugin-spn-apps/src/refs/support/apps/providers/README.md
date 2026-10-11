@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/10-providers.md",
-      "seen": "92ba2683"
+      "seen": "fbae1e39"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/",
-      "seen": "539f648a"
+      "seen": "da6af1dd"
     }
   ]
 }
@@ -42,6 +42,8 @@
 **No stack invents, renames or re-scopes a kind, a symbol role, or any other closed value.** The closed vocabularies are the platform's, and a stack that extends one has forked the model while appearing to join it.
 
 **Every stack carries the seven rules of a call between services.** A server module has two faces, its contract and its implementation; the contract face loads without the implementation; a module offers a runtime manager and a remote manager from one base; a module's inner services are reachable in the same process only; each contract interface has its methods as data, produced and never written; one service calls another's contract through the API entry's remote route, with the caller's signed passport and the calling service's own credential; and only the identity module says whose token it is. Whether a stack publishes the contract face as a second door of one package or as a package of its own is that stack's choice.
+
+**A stack names the units of a web module in its own form.** In TypeScript every unit of a web module ends in the word for what it is, and only a plain component needs none (`RD.SUPPORT.APPS.202`). A module's route keys as one enum and its routes as one constant are proposed (`RD.SUPPORT.APPS.203`). [`ts/02-naming.md`](ts/02-naming.md) states both, and [`ts/08-web.md`](ts/08-web.md) names a route, an overlay with an address and the provider a partner mounts.
 
 **A stack declares which runtimes it realizes**, and answers *out of coverage* for a kind it does not have — rather than quietly skipping it. **No stack may answer *what kinds exist* differently from any other.**
 

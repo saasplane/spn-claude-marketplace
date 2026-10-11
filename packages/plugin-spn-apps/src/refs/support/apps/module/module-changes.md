@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md",
-      "seen": "c10b2110"
+      "seen": "289a4f8f"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
@@ -71,6 +71,8 @@ The hand-written contract states are the **only** hand-written artifact of the A
 ## Boundary rule
 
 **Pass cross-module calls through contracts, never internals.** This is what makes the monolith/microservice choice reversible: callers depend on the contract, not the deployment. A module is either mounted in a service or held remotely, where only its contract is present and the call crosses to the service that mounts it, by the API entry's remote route, by module, service, method and command. A service that holds a module remotely **MUST NOT** be able to name its inner services. A person's public token stops at the first service; from there the caller travels as the passport the identity module signed, with the calling service's own credential on every call. What a call may do is decided by the method's own check and nothing at the route.
+
+**On the web, reach a service through that service's client — MUST** (`RD.SUPPORT.APPS.201`). Each service has a client of its own, and the client holds the service's address. A second service means a second client. No page and no container is given an address to call. A web module exports its pages, its containers, its widgets, its hooks, and its routes as data, so that a partner can take a whole page, place a container, place a smaller piece, or build their own (`RD.SUPPORT.APPS.180`, `RD.SUPPORT.APPS.181`). The four ways as a set are proposed. `shape.md` in this plugin states them, with the provider a partner mounts to place a container.
 
 ## The review card
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md",
-      "seen": "c5ecdceb"
+      "seen": "34494c3b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md",
@@ -41,7 +41,7 @@ The Surface restatement, in the apps plugin, sits as `refs/support/surface/archi
 
 ## What it checks
 
-- **The `ui/` taxonomy holds**: components · hooks · pages · utils, with `ui/` always present as the web module's entry layer. A screen parses what a person does into a Command, invokes a contract service, renders the returned State.
+- **The `ui/` taxonomy holds**: components · hooks · pages · utils, with containers for the framed parts of a module's pages and widgets where it ships embeddable units, and `ui/` always present as the web module's entry layer. A screen parses what a person does into a Command, invokes a contract service, renders the returned State.
 - **The API client is the only client.** The surface consumes the API client — never a hand-written HTTP call. Regenerate it from the running service before consuming changed routes.
 - **The two contexts flow one way each**: the application supplies session, locale, and policy; the design system supplies theme, device, navigation, media, and density — nothing crosses the other way.
 - **The platform never formats; the surface renders.** Values and codes come from the server; dates, currency, and labels resolve through the design system's formatters and the translate seam — never improvised per screen.

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "14890d49"
+      "seen": "d9327276"
     }
   ]
 }
@@ -29,3 +29,45 @@
 **The dev server accepts the host the estate serves it on**, because the name a browser reaches it by comes from the estate's coordinates rather than from localhost.
 
 **A stylesheet's asset paths are relative to the stylesheet**, not to the page that loads it.
+
+**A web app has no asset origin to configure.** It serves its own files from its own hostname, and no asset-base key exists. A component writes a root-relative path, never an origin. The design system's `transformImageUrl` seam is where an app would write another origin for its images, if one were ever needed.
+
+## Routes, overlays and the session a container reads
+
+**Every name in this part is named and not built yet.** None is in a released package today, so read the installed package before you use one. The rules behind the names are in `../../shape.md` and `../../module/README.md` in this plugin.
+
+**A route as data** lives in `@saasplane/support-web-ts`, in `utils/route.ts`, with no router inside (`RD.SUPPORT.APPS.186`, `RD.SUPPORT.APPS.189`).
+
+| What | TypeScript | State |
+| --- | --- | --- |
+| A route | `ISPRoute`: `key` and `path`. A path names a value as `:name` and an optional one as `:name?` | decided |
+| What a route needs | `permissions?` and `enablements?` on `ISPRoute` (`RD.SUPPORT.APPS.187`) | proposed |
+| The routes by key | `prepareRouteMap(routes, paths?)`. `paths` replaces the path of a key, which is how an app moves a module's default path (`RD.SUPPORT.APPS.188`) | proposed |
+| The address of a route | `getRouteUrl(route, params?, query?)`. It fills each `:name` and adds the query | decided |
+| A missing value | `getRouteUrl` throws where a required value is missing | proposed |
+| At or under | `isRouteUrlUnder(url, currentUrl)`. It compares whole parts of the path, and leaves out the query and the part after `#` | decided |
+| The entry in view | `getRouteUrlInView(urls, currentUrl)` (`RD.SUPPORT.APPS.191`). That the longest address wins is proposed | decided |
+
+None of these imports a router or reads `window.location`. The app hands them the current address.
+
+**An overlay with an address** is in `@saasplane/support-web-ds-ts`.
+
+| What | TypeScript | State |
+| --- | --- | --- |
+| Shown through the overlay context | `DSOverlayContext.showComponent(component)`. It hands back the function that removes what it showed (`RD.SUPPORT.APPS.195`) | decided |
+| Shown while the address matches | `useDSOverlayRoute(match, renderer, onClose)`. It shows the overlay while `match` is not `null`, removes it when `match` turns to `null`, and calls `onClose` when the person closes it (`RD.SUPPORT.APPS.196`). The match comes from the app's own router | proposed |
+| The part after `#` | the app's own `navigate`: an address that begins with `#` goes to the router's reader of that part (`RD.SUPPORT.APPS.197`) | proposed |
+
+**An edit container's callback after a save** is the prop `onSaved?`. It is proposed (`RD.SUPPORT.APPS.184`).
+
+**The provider a partner mounts** is the platform's, in `@saasplane/support-web-ui-ts`, because it calls the platform's client (`RD.SUPPORT.APPS.199`, `RD.SUPPORT.APPS.200`).
+
+| What | TypeScript | State |
+| --- | --- | --- |
+| The one small provider | `SPPlatformProvider`. The developer uses the name and has not ruled on it | the provider is decided; the name and the package are proposed |
+| What a partner passes | `sessionType`, `appSite?` and `onSignInRequired?`. With no `appSite` the provider finds the site by the host | proposed |
+| The service's client | not a prop. The app calls `initClient(config)` once at its start | proposed |
+| Where it stands | outside `DSApp` | proposed |
+| What a container and the app read | `usePlatformSession()`: the signed-in person or `null`, `isAuthenticated` and `authLoading`, with the `permissions`, the `enablements` and `handleUnauthenticated` the app passes to the design system's app context | proposed |
+
+The names of a web module's own units are in `02-naming.md`, beside this file.

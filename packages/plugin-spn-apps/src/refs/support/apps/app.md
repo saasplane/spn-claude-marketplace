@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
-      "seen": "47f00159"
+      "seen": "b1656d9b"
     }
   ]
 }
@@ -279,7 +279,7 @@ A web application asks the same two questions a server does — how does it come
 
 **Presentation is a boot phase, and only here** — style layers resolve by load order, so a correct set loaded in the wrong sequence is wrong in a way no single layer's own test catches. There is no migration step, because a web application owns no schema. There is **no module registration** — a web surface's modules are composed by its router, so composition happens at navigation rather than at startup. And configuration is already resolved when it starts, arriving as build-time values rather than being read — which is why a web surface cannot be reconfigured without rebuilding it.
 
-**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and URL builders, the router mounts module screens lazily, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
+**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and their routes, the router mounts module screens lazily, each at the address its route gives, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
 
 **Teardown is best-effort and cannot be awaited.** The exit signal fires both when a surface is closed and when it is navigated away and cached, so nothing may block on the work it starts. **A web surface never boots into a privileged state** — everything it can do it could do from a reload, so the guard is the server refusing the call, never the boot order.
 

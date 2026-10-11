@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "7fdc830d"
+      "seen": "b7939ddb"
     }
   ]
 }
@@ -81,6 +81,25 @@
 | an entity or contract shape | PascalCase, no `I` | `User` |
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
+
+### Units of a web module
+
+**Every unit of a web module ends in the word for what it is, and only a plain component needs none — MUST** (`RD.SUPPORT.APPS.202`). A reader then knows what a unit is from its name, before opening its file.
+
+| Unit | Its name | Example |
+| --- | --- | --- |
+| a page | ends in `Page` | `RoleListPage` |
+| a container | ends in `Container` | `RoleListContainer` |
+| a widget | ends in `Widget` | `RoleMembersWidget` |
+| a dialog | ends in `Dialog` | `RoleInviteDialog` |
+| a form | ends in `Form` | `RoleForm` |
+| a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RolePicker` |
+| a hook | starts with `use` | `useRoleList` |
+| a plain component | no suffix and no prefix is needed | `RoleBadge` |
+
+**The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
+
+**A module's route keys are one enum, and its routes are one constant. Proposed** (`RD.SUPPORT.APPS.203`). The enum is `<MOD>RouteType`. Each key is in capitals and matches its value, and each value begins with the module's code: `IAMRouteType.ROLE_DETAIL = 'IAM_ROLE_DETAIL'`. The list is the constant `<MOD>_ROUTES`, typed `ISPRoute[]`. The developer has not seen this choice.
 
 ### Support classes and seams
 
@@ -235,6 +254,8 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 | Support provider | area + `Provider` + vendor | `IngressProviderNginx` |
 | Seam interface | `I` + area + `Provider` | `IIngressProvider` |
 | Props interface | `I` + component + `Props` | `IDSButtonProps` |
+| Web module unit | ends in what it is: `Page`, `Container`, `Widget`, `Dialog`, `Form`, or a pattern's word | `RoleListContainer` |
+| Web module plain component | no suffix needed | `RoleBadge` |
 | Contract entity | PascalCase, no `I` | `User` |
 | State levels | Meta inside Info inside the state, by `extends` | `IdentityMeta` |
 | Detail aggregate | `{Entity}Details`, composed | `RoleDetails` |

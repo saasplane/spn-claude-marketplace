@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "4aff4217"
+      "seen": "4ac2ec82"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "4aff4217"
+      "seen": "4ac2ec82"
     }
   ]
 }
@@ -110,7 +110,7 @@ packages/module-server-iam-ts/
 
 ### Interiors that differ
 
-- **A `MODULE_WEB` carries `entry/ui/{components, hooks, pages, utils}`**, plus `entry/ui/widgets/` where it ships embeddable units. `contract/` and `app/` are siblings only where the module owns client-side logic.
+- **A `MODULE_WEB` carries `entry/ui/{components, hooks, pages, utils}`**, plus `entry/ui/containers/` for the framed parts its pages are assembled from and `entry/ui/widgets/` where it ships embeddable units. `contract/` and `app/` are siblings only where the module owns client-side logic.
 - **A `SUPPORT_WEB` puts `ui/` at the source root**, because there the UI is the published surface rather than a module's adapter to it.
 - **A support package with no contract surface groups by feature folder** — `app/`, `http/`, `log/`, `utils/`. Those groups are the library's own to name.
 - **A `CLIENT_API` holds `src/generated/`, never hand-edited, plus a hand-maintained root barrel** over it.

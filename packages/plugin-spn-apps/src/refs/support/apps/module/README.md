@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "0bef20a1"
+      "seen": "2edda00f"
     }
   ]
 }
@@ -213,7 +213,28 @@ Contract names live at two altitudes. **Wire names are identical on every stack,
 
 A web module carries the same three layers, but expect most modules to never earn more than `entry/ui/` — the thin form, and the default. The generated API client is already the contract-derived client of the platform surface, so wrap it in a local service only when the module owns genuine client-side domain logic (offline operation, local persistence, a complex editor evaluating without a round trip). That is the full form, and it brings a local contract with it — states and service interfaces under the same seam discipline the server follows, but carrying **no permission codes**: authorization is decided on the server, so cite the server's permission code rather than declaring a second one.
 
-`entry/ui/` holds `pages` (routes and composition), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule).
+`entry/ui/` holds `pages` (routes and composition), `containers` (the framed parts a page is assembled from), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule). It holds `widgets` where the module ships embeddable units.
+
+### A page, its route and its address
+
+A page owns one screen and is the only thing a route lands on. It reads the address, places containers, and carries no business logic. Hold a page to these rules. A rule marked proposed is one the developer has not confirmed.
+
+- **Declare a route once, as data, in the module that owns its page — MUST** (`RD.SUPPORT.APPS.186`). A route is a key and a path. The key names the screen and carries the module's code. The app's router, a link and the app's menu all read that one declaration. A route holds no place in a menu, no older address and no router, so each app keeps its own router.
+- **A route also says which permissions and enablements it needs. Proposed** (`RD.SUPPORT.APPS.187`).
+- **A module ships a default path for each route, and an app may replace a path by its key. Proposed** (`RD.SUPPORT.APPS.188`).
+- **Build an address from a route and its values, by one function, and never write one as text — MUST** (`RD.SUPPORT.APPS.189`). That a missing value is an error, and never an address, is proposed.
+- **The menu is the app's own list, and an entry names a route by its key — MUST** (`RD.SUPPORT.APPS.190`). Its order, groups, labels and icons are the app's.
+- **The entry in view is the one whose address the current address is at or under — MUST** (`RD.SUPPORT.APPS.191`). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
+- **An address names the thing, and does not carry its place in the menu — MUST** (`RD.SUPPORT.APPS.192`). A menu can then be arranged again without breaking a link. No rule asks that an address begin with its module.
+- **An address that moves answers with a redirect — MUST** (`RD.SUPPORT.APPS.193`). The redirect is the app's own, in its router.
+- **On a page of groups and their items, the swap of the items for the groups changes the address — MUST** (`RD.SUPPORT.SURFACE.079`).
+- **An address has two parts — MUST** (`RD.SUPPORT.APPS.194`). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
+- **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RD.SUPPORT.APPS.197`).
+- **How a screen is shown is the choice of whoever builds the page, and nothing is configured for it — MUST** (`RD.SUPPORT.APPS.198`). A page places a container on itself, or in a dialog or a sheet.
+- **Show an overlay through the overlay context, and never place one in the page's own tree — MUST** (`RD.SUPPORT.APPS.195`). One host draws every overlay of the app.
+- **An overlay that has an address is shown while the address matches, and removed when it does not. Proposed** (`RD.SUPPORT.APPS.196`). Closing it moves to the address of the page beneath. The app's own router says whether the address matches. Not every overlay needs an address: a confirmation opens by the page's own state.
+
+What a page knows and what a container takes, the four ways a partner builds on the web, and the provider a partner mounts are in `../shape.md` in this plugin.
 
 ## What this does not cover
 

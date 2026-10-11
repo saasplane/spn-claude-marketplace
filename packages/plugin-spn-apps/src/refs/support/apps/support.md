@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/",
-      "seen": "ba0b3f44"
+      "seen": "95cacd42"
     }
   ]
 }
@@ -132,10 +132,30 @@ Apply this same taxonomy whether you are filing a support package's own tree or 
 | `hooks/` | reusable stateful logic and service invocation, named `use` + what it does | every unit that has any |
 | `utils/` | pure helper functions only | every unit that has any |
 | `widgets/` | embeddable composite units, self-contained enough to mount anywhere their props allow | units shipping embeddable composites |
-| `containers/` | blocks that frame a part of a page as a header, content and a footer | units that ship containers (the design system) |
+| `containers/` | blocks that frame a part of a page as a header, content and a footer | units that ship containers (the design system; a module, for each framed part of its pages) |
 | `layouts/` | blocks that frame a page, with its navigation and its main area | units that ship layouts (the design system) |
 
 A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the main area of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `refs/support/surface/architecture-containers.md` and `architecture-layouts.md` refs state the blocks themselves.
+
+### A page and its containers
+
+A partner must be able to take one part of a screen without taking the whole page. So the page holds everything about the address, and a container holds nothing about it.
+
+| | The page | A module's container |
+| --- | --- | --- |
+| Knows | the address: the values in its path, its query, and where to go next | nothing about the address |
+| Takes | no props | the data itself, or an id it loads by. Each container decides which |
+| Does | reads the address, chooses the layout, and places containers, widgets and components | shows one framed part of the screen, and saves changes where it edits |
+| Holds a path | never. Its address is its route's | never |
+| A partner | mounts it on an address | places it on a page of their own |
+
+- **Assemble a page from one or more containers — MUST** (`RD.SUPPORT.APPS.182`). A page may also place a widget or a component directly, as it does a breadcrumb.
+- **Give a container its data, or an id it loads by, as props, and never a path — MUST** (`RD.SUPPORT.APPS.183`). A link to a screen of its own module is built from that screen's route, by the route's key. A link to any other screen is a prop the page passes. A widget and a component take every link as a prop.
+- **An edit container takes an optional callback that runs after a save. Proposed** (`RD.SUPPORT.APPS.184`). With none, it goes where it goes today. The developer has not confirmed it.
+- **A SaaS Plane container takes data only — MUST** (`RD.SUPPORT.APPS.185`). It is handed no unit of a partner's: no component, no widget and no part to draw inside it. A partner who wants a different piece inside builds a container of their own, from the module's widgets and hooks.
+- **A container does not know how it is shown.** Its header, its content and its footer fit a page, a dialog and a sheet alike.
+
+A module's container is built on the design system's container, and adds the module's own data. The four ways a partner builds on the web, and the provider a partner mounts to place a container, are in `shape.md` in this plugin.
 
 Export through exactly one barrel at a package's root; never give a subfolder its own barrel index. If a util in one of these folders turns out domain-free and broadly useful, promote it to core utilities rather than copying it between units.
 
