@@ -98,7 +98,8 @@ export type SkeletonItem = {
 /** A row runs left to right. `label` names the place, in a column every row of the frame shares;
  *  `framed` puts the row's items inside one box, as an example sits in its frame. */
 /** `chosen`, in a container: this row is the chosen line of a list, and a band is drawn behind it. */
-export type SkeletonRow = { label?: string; framed?: boolean; chosen?: boolean; items: SkeletonItem[] };
+/** `marked`: the row has no border, and a dotted line is drawn around it to show how far it reaches. */
+export type SkeletonRow = { label?: string; framed?: boolean; chosen?: boolean; marked?: boolean; items: SkeletonItem[] };
 /** A frame is a box, with an optional title (`label`) and `note`, holding rows top to bottom. A
  *  frame nested in a row may carry `width` — a fraction of the row, or absent for what is left. Its `look` is
  *  `raised` (a surface), `bordered` (a solid line) or `flat` (neither), and `fill` takes the height left in its column.
@@ -121,6 +122,8 @@ export type SkeletonFrame = {
   sections?: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean }[];
   /** With a `look` of `container`: a line across the outline between each two of its rows, as a list has. A part takes it too. */
   divided?: boolean;
+  /** With a `look` of `container`: a dotted line around its header, which has no border, to show how far it reaches. */
+  marked?: boolean;
   /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
   media?: string;
 };
@@ -1628,6 +1631,8 @@ const SKEL_MIN_W = 200;
 const SKEL_LOOKS = ["raised", "bordered", "flat", "card", "container"];
 /** A container on a surface: the height of its header, which stands above its outline, and the room between the two. */
 const SKEL_CONTAINER_HEAD = 48;
+/** How far the dotted line of a part with no border stands above and below what it marks. */
+const SKEL_GUIDE_OUT = 6;
 /** A card's head: its title on one line, or its title with a note under it. */
 const SKEL_CARD_HEAD_ONE = 40, SKEL_CARD_HEAD_TWO = 58;
 /** A mark that tells a state, set up or not, is small: this much lower than a control. A mark that stands for a thing is as tall as one,
@@ -2311,6 +2316,10 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const surface = frame.look === "container" && !root;
   if (surface) {
     const headH = skelContainerHead(frame);
+    // A PART WITH NO BORDER OF ITS OWN MAY BE MARKED BY A DOTTED LINE, where a figure is about how far it reaches and
+    // what it lines up with. The header of a container has none: with `marked`, its dotted line is as wide as the
+    // outline under it. A figure that shows a page for its content leaves it off.
+    if (headH && frame.marked) out.push(skelRect("sds-skel-guide", x, y - SKEL_GUIDE_OUT, w, headH - SKEL_GUIDE_OUT + 2, 0));
     if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x, y + (frame.note ? 17 : 23)));
     if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x}" y="${y + 34}">${esc(frame.note)}</text>`);
     const actions = frame.actions ?? [];
@@ -2376,8 +2385,12 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const itemsX = x + SKEL_PAD + (labelCol ? labelCol + SKEL_GAP : 0);
   let rowY = y + skelHead(frame);
   const dividers = skelDividers(frame);
+  // A ROW WITH NO BORDER, such as the way back or the header of a record, takes the same dotted line with `marked`,
+  // as wide as the containers beside it, so their edges are seen to agree.
   rows.forEach((row, rowIndex) => {
     const rh = heights[rowIndex];
+    if (row.marked && !(row.items ?? []).some((it) => it.frame))
+      out.push(skelRect("sds-skel-guide", itemsX, rowY - SKEL_GUIDE_OUT, w - SKEL_PAD - (itemsX - x), rh + SKEL_GUIDE_OUT * 2, 0));
     // THE CHOSEN LINE OF A LIST IS A BAND across the outline, from the line above it to the line under it.
     if (surface && row.chosen) {
       const bandTop = rowIndex === 0 ? y + skelContainerHead(frame) : rowY - SKEL_GAP / 2;

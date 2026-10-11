@@ -673,6 +673,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const edited = draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Text", "German", ""], cells: [["Sign in", "Anmelden", ""], ["Sign out", { control: "field", text: "Abmelden", fill: true }, { icon: "checkbox" }]] }] }] } });
   one("a box in a cell that takes fill is as wide as its column, and the action of the row stands beside it", [edited.findings.length, rect(edited.svg, "sds-skel-control")],
     ([found, boxes]) => found === 0 && boxes.length === 2 && boxes[0][2] > 300 && boxes[1][0] - (boxes[0][0] + boxes[0][2]) <= 24);
+  // A part with no border may be marked by a dotted line, where a spec asks: the header of a container, and a row beside it.
+  const backPage = (marked) => draw({ kind: "skeleton", frame: { rows: [{ ...(marked ? { marked: true } : {}), items: [{ icon: "previous", text: "Schedules" }] },
+    { items: [{ frame: { look: "container", label: "New schedule", ...(marked ? { marked: true } : {}), rows: [{ items: [{ standin: "field", label: "Name", fill: true }] }] } }] }] } });
+  one("a marked header and a marked row each have a dotted line, as wide as the container's outline", [backPage(true).findings.length, rect(backPage(true).svg, "sds-skel-guide"), rect(backPage(true).svg, "sds-skel-control")],
+    ([found, guides, boxes]) => { const outline = boxes.reduce((widest, box) => (box[2] > widest[2] ? box : widest)); return found === 0 && guides.length === 2 && guides.every((g) => g[0] === outline[0] && g[2] === outline[2]); });
+  one("a page that asks for no mark has no dotted line", rect(backPage(false).svg, "sds-skel-guide").length, 0);
   const choices = (words) => ({ items: words.map((text) => (text ? { control: "checkbox", text, fill: true } : { spacer: true })) });
   one("the choices of a set stand in columns, and a shorter row keeps them", draw({ kind: "skeleton", frame: { rows: [choices(["Members", "Roles", "Directory"]), choices(["Custom domain", "Sign-in policy", ""])] } }).svg,
     (g) => { const x = rect(g, "sds-skel-control").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
