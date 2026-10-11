@@ -816,6 +816,15 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a media the set lacks is a finding that names the default", line({ media: "rocket", title: "x" }).findings, says("`default`"));
   one("a frame at the end of an item line is a finding", line({ title: "x", end: [{ frame: { rows: [] } }] }).findings, says("the end of an item line holds"));
 
+  // 15a · the line of facts under an item's title
+  const facts = line({ media: "default", title: "SaaS Plane Platform", meta: [{ control: "badge", text: "Platform" }, "platform", "Owner: Dana Lee"] });
+  one("an item with a line of facts draws without a finding", facts.findings, none);
+  one("a dot stands between two facts that are words, and none beside a badge", texts(facts.svg, "sds-note").map((t) => t[2]).join("|"), "platform|·|Owner: Dana Lee");
+  one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 24), texts(facts.svg, "sds-note")[0], texts(facts.svg, "sds-title")[0]],
+    (g) => g[0][0] === g[2][0] && g[1][0] > g[0][0] + g[0][2] && g[1][1] > g[2][1]);
+  one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "sds-box")[0][3] > rect(line({ title: "x", description: "y" }).svg, "sds-box")[0][3], true);
+  one("a fact that is neither a word nor a badge is a finding", line({ title: "x", meta: [{ control: "button", text: "Go" }] }).findings, says("a word or a badge"));
+
   // 15b · a card: a thin rounded outline, with a title of its own
   const card = (frame) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame }] }] } });
   const titled = card({ look: "card", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] });
@@ -837,6 +846,13 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("its footer begins under a line across the outline", boxed.svg, (g) => /<path class="sds-skel-control" d="M[\d.]+ [\d.]+ H[\d.]+"\/>/.test(g) && texts(g, "sds-code").some((t) => t[2] === "Follows the default"));
   one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
   one("a frame at the end of a container's header is a finding", card({ look: "container", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a container's header"));
+  const parted = card({ look: "container", label: "Web addresses", sections: [
+    { label: "Sites", actions: [{ control: "button", text: "Change" }], rows: [{ items: [{ text: "plat.spn.io" }] }] },
+    { label: "Email domains", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ note: "None yet" }] }] }] });
+  one("a container with two parts of content draws without a finding", parted.findings, none);
+  one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "sds-label").find((t) => t[2] === "Email domains"), rect(parted.svg, "sds-skel-control").filter((r) => r[3] === 32)],
+    (g) => g[1].length === 2 && Math.abs((g[1][1][1] + 16) - (g[0][1] - 4)) < 1 && g[1][1][0] + g[1][1][2] === outline(parted.svg)[0][0] + outline(parted.svg)[0][2] - 16);
+  one("a line divides the second part from the first, and none stands above the first", (parted.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 1);
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
 
   // 16 · one estimate of width, for every spec

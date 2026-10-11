@@ -75,8 +75,9 @@ export type SkeletonItem = {
   standin?: "rows" | "cards" | "field" | "list" | "table"; lines?: number; headings?: number[];
   columns?: string[]; cells?: (string | SkeletonItem)[][];
   /** A line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it;
-   *  and `end`, what stands at the end of the line. */
-  item?: { media?: string; title: string; description?: string; end?: SkeletonItem[] };
+   *  `meta`, several facts on the line under the title, each a word or a badge; and `end`, what stands at the end
+   *  of the line. */
+  item?: { media?: string; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[] };
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
@@ -98,8 +99,10 @@ export type SkeletonFrame = {
   label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat" | "card" | "container"; tag?: string; height?: number; fill?: boolean;
   frames?: string[]; raised?: boolean; bordered?: boolean; rounded?: boolean;
   size?: "XS" | "SM" | "MD" | "LG" | "XL";
-  /** With a `look` of `container`: what stands at the end of its header, and the rows of its footer. */
+  /** With a `look` of `container`: what stands at the end of its header, the rows of its footer, and its content
+   *  as several parts, each with a title of its own, its actions at the end of that title, and its rows. */
   actions?: SkeletonItem[]; footer?: SkeletonRow[];
+  sections?: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }[];
 };
 /** One screen at one screen class: a whole frame of its own, never derived from another view. A spec
  *  holds `views` in place of `frame`, and the views are drawn in one figure. */
@@ -1677,14 +1680,27 @@ const skelItemEndW = (it: SkeletonItem, h: number): number => {
   const end = it.item?.end ?? [];
   return end.reduce((t, e) => t + skelFixedWidth(e, h), 0) + SKEL_LABEL_GAP * Math.max(0, end.length - 1);
 };
-const skelItemWordsW = (it: SkeletonItem) =>
-  Math.max(Math.ceil((it.item?.title ?? "").length * SKEL_W_TITLE), Math.ceil((it.item?.description ?? "").length * SKEL_W_NOTE));
-const skelItemH = (it: SkeletonItem, h: number) => (it.item?.description !== undefined ? Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP) : h);
+/** The facts on the line under an item's title: its description first, then each of `meta`. */
+const skelItemFacts = (it: SkeletonItem): (string | SkeletonItem)[] =>
+  [...(it.item?.description !== undefined ? [it.item.description] : []), ...(it.item?.meta ?? [])];
+/** A dot stands between two facts that are both words; a badge is told apart by its own outline, and needs none. */
+const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 14;
+const skelFactW = (fact: string | SkeletonItem, h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_NOTE) : skelFixedWidth(fact, h));
+function skelItemFactsW(it: SkeletonItem, h: number): number {
+  const facts = skelItemFacts(it);
+  return facts.reduce((t: number, fact, i) => t + skelFactW(fact, h)
+    + (i ? (typeof fact === "string" && typeof facts[i - 1] === "string" ? SKEL_FACT_DOT_W : SKEL_LABEL_GAP) : 0), 0);
+}
+const skelItemHasBadge = (it: SkeletonItem) => skelItemFacts(it).some((fact) => typeof fact !== "string");
+const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(Math.ceil((it.item?.title ?? "").length * SKEL_W_TITLE), skelItemFactsW(it, h));
+/** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
+const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length ? h
+  : skelItemHasBadge(it) ? SKEL_ITEM_LINE + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) + SKEL_LABEL_GAP : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP);
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
  *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
-const skelItemMediaD = (it: SkeletonItem, h: number) => (it.item?.description !== undefined ? skelItemH(it, h) - 4 : h);
+const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length ? skelItemH(it, h) - 4 : h);
 const skelItemW = (it: SkeletonItem, h: number): number =>
-  (it.item?.media !== undefined ? skelItemMediaD(it, h) + SKEL_LABEL_GAP : 0) + skelItemWordsW(it) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+  (it.item?.media !== undefined ? skelItemMediaD(it, h) + SKEL_LABEL_GAP : 0) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
 
 /** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
 function skelFixedWidth(it: SkeletonItem, h: number): number {
@@ -1751,7 +1767,26 @@ function skelFrameHeight(frame: SkeletonFrame, inherited: number): number {
   return Math.max(skelHead(frame) + body + SKEL_PAD, (frame.height ?? 0) * ctl);
 }
 /** The rows a frame lays out: its own, and under them the footer's where it is a container drawn for a surface. */
-const skelRows = (frame: SkeletonFrame): SkeletonRow[] => [...(frame.rows ?? []), ...(frame.look === "container" ? frame.footer ?? [] : [])];
+const skelSectionRows = (section: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }): SkeletonRow[] => [
+  // A PART OF THE CONTENT HAS ITS OWN TITLE, with the actions of that part at its end, so an action stands beside what it acts on.
+  ...(section.label !== undefined || section.actions?.length
+    ? [{ items: [...(section.label !== undefined ? [{ text: section.label }] : []), { spacer: true }, ...(section.actions ?? [])] }] : []),
+  ...(section.rows ?? []),
+];
+const skelRows = (frame: SkeletonFrame): SkeletonRow[] =>
+  frame.look !== "container" ? frame.rows ?? []
+    : [...(frame.sections ?? []).flatMap(skelSectionRows), ...(frame.rows ?? []), ...(frame.footer ?? [])];
+/** The rows of a container that begin under a line: each part of its content after the first, and its footer. */
+function skelDividers(frame: SkeletonFrame): Set<number> {
+  const at = new Set<number>();
+  if (frame.look !== "container") return at;
+  let index = 0;
+  (frame.sections ?? []).forEach((section, order) => { if (order > 0) at.add(index); index += skelSectionRows(section).length; });
+  if ((frame.rows ?? []).length && index > 0) at.add(index);
+  index += (frame.rows ?? []).length;
+  if (frame.footer?.length && index > 0) at.add(index);
+  return at;
+}
 /** Whether a container drawn for a surface has a header: a title, or actions. */
 const skelContainerHead = (frame: SkeletonFrame): number => (frame.label || frame.actions?.length ? SKEL_CONTAINER_HEAD : 0);
 /** The parts of a container: the one frame each of its rows holds. */
@@ -1942,10 +1977,24 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       out.push(...skelIcon(item.media, ix + across / 2, mid, h, true, undefined, across));
       wx = ix + across + SKEL_LABEL_GAP;
     }
-    const two = item.description !== undefined;
-    // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is heavy, the description small and quiet.
-    out.push(`  <text class="sds-title" x="${r2(wx)}" y="${Math.round(two ? mid - 3 : mid + 4)}">${esc(item.title ?? "")}</text>`);
-    if (two) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(mid + SKEL_ITEM_LINE - 3)}">${esc(item.description!)}</text>`);
+    // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is heavy, the facts small and quiet.
+    const facts = skelItemFacts(it), top = mid - ih / 2;
+    const titleY = facts.length ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
+    out.push(`  <text class="sds-title" x="${r2(wx)}" y="${Math.round(titleY)}">${esc(item.title ?? "")}</text>`);
+    // THE FACTS STAND ON ONE LINE, a dot between two that are words, and room alone beside a badge.
+    const factsMid = skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) / 2 : titleY + SKEL_ITEM_LINE - 4;
+    let fx = wx;
+    facts.forEach((fact, i) => {
+      if (i) {
+        const dotted = typeof fact === "string" && typeof facts[i - 1] === "string";
+        if (dotted) out.push(`  <text class="sds-note" x="${r2(fx + 4)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+        fx += dotted ? SKEL_FACT_DOT_W : SKEL_LABEL_GAP;
+      }
+      if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
+      else if (fact.control !== "badge") findings.push("a fact on the line under an item's title is a word or a badge");
+      else skelDrawLeaf(fact, "control", fx, factsMid - h / 2, skelFixedWidth(fact, h), h, h, h, findings, out);
+      fx += skelFactW(fact, h);
+    });
     let ex = ix + iw - skelItemEndW(it, h);
     for (const part of item.end ?? []) {
       const partKind = skelKind(part), pw = skelFixedWidth(part, h);
@@ -2215,10 +2264,11 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
 
   const itemsX = x + SKEL_PAD + (labelCol ? labelCol + SKEL_GAP : 0);
   let rowY = y + skelHead(frame);
+  const dividers = skelDividers(frame);
   rows.forEach((row, rowIndex) => {
     const rh = heights[rowIndex];
-    // THE FOOTER OF A CONTAINER BEGINS UNDER A LINE across the outline.
-    if (surface && frame.footer?.length && rowIndex === (frame.rows ?? []).length)
+    // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline.
+    if (surface && dividers.has(rowIndex))
       out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w)}"/>`);
     if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
 
