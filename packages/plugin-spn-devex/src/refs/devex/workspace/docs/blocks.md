@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "104bf524"
+      "seen": "fe7b9fc2"
     }
   ]
 }
@@ -237,7 +237,7 @@ shares.
 
 | Field | Draws |
 | --- | --- |
-| `frame` | a region, such as a navigation beside a main area: `look` `raised` · `bordered` · `flat` · `card` · `container`, and a `container` also takes `actions`, what stands at the end of its header, `sections`, its content as several parts each with a `label`, `actions` and `rows`, and `footer`, the rows under its last line; `width` `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left with `fill`; regions in one row end on one line |
+| `frame` | a region, such as a navigation beside a main area: `look` `raised` · `bordered` · `flat` · `card` · `container`, and a `container` also takes `actions`, what stands at the end of its header, `sections`, its content as several parts each with a `label`, `actions` and `rows`, and `footer`, the rows under its last line, and a `card` takes `sections` as well; `width` `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left with `fill`; regions in one row end on one line |
 | `text` | a box as wide as its word, or the rest of the row with `fill` |
 | `note` | muted text, no box |
 | `slot` | one block whose text is its own name, with nothing drawn inside it |
@@ -268,7 +268,9 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
       { "items": [{ "frame": { "tag": "children", "fill": true, "rows": [] } }] }] } }] }] } }
 ```
 
-**A container on a surface is drawn with its header above it.** A page is made of containers, and a mock of a page shows each as a person sees it: the header stands above with nothing around it, the title and the line under it at the start and the actions at the end, and a thin rounded outline holds the content and, under a line, the footer. So a reader finds the parts of a page by the titles that stand between the outlines, and an outline never holds a title of its own. **The content of a container may be several parts, as `sections`.** Each part has its own title inside the outline, lighter than the container's, with the actions of that part at the end of its title, so an action stands beside what it acts on. A line divides each two parts. This is the form for a page. The form with named parts, a frame with `frames`, is for teaching the parts of the container itself.
+**A container on a surface is drawn with its header above it.** A page is made of containers, and a mock of a page shows each as a person sees it: the header stands above with nothing around it, the title and the line under it at the start and the actions at the end, and a thin rounded outline holds the content and, under a line, the footer. So a reader finds the parts of a page by the titles that stand between the outlines, and an outline never holds a title of its own. **The content of a container may be several parts, as `sections`.** Each part has its own title inside the outline, a step under the container's, with the actions of that part at the end of its title, so an action stands beside what it acts on. A line divides each two parts. This is the form for a page. The form with named parts, a frame with `frames`, is for teaching the parts of the container itself.
+
+**The titles of a surface stand in steps, as the type steps of the design system do.** A container's title is the largest, a card's is a step under it, and the title of a part of the content is a step under that; all three are heavy, since each names a part of the page. An item's title names one thing among the content, so it is smaller and of medium weight, and the line under it is smaller again and quiet. A reader so tells a title of a part from the name of a record at a glance, by size and by weight together. A card's content may be several parts as well, as `sections`, with no line between them.
 
 **A card is a smaller part inside a container's content, with a title of its own.** It is a thin outline with a rounded corner and nothing behind it, and its title is drawn in the heavy weight of a title, so a reader finds the parts of a page by their titles. A card needs no name on its boundary: its title says what it is. Use a card where a mock shows a page as a person sees it, and a named boundary where it teaches the names of a block's parts.
 
@@ -283,7 +285,7 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
       { "items": [{ "item": { "media": "person", "title": "Dana Lee", "description": "Owner", "end": [{ "icon": "more" }] }, "fill": true }] }] } }] }] } }
 ```
 
-**A table may carry sample values in place of bars, and a line may be drawn as an item.** Bars say that a part holds many of one thing, and nothing about what one of them is. Where a reader must see that, the skeleton shows a few rows of sample values. A table stand-in takes the words of its head row and a few rows of cells; a cell is a word, a badge, an icon or another control, and a column with an empty head holds the actions of a row and stands at the end. An item line is the library's item: its media at the start, its title with its description under it, and what stands at its end. The title is heavy, and the description is small and quiet. **The line under the title may hold several facts**, as `meta`: a word, a pair such as *Owner: Dana Lee*, or a badge. A dot stands between two facts that are words, and a badge needs none. A bar between facts is not used. A badge that says what kind of thing a record is stands on this line, and never after the title, because titles differ in length; a state that a person scans a list for stands at the end of the line. Bars stay for running text, and for a part whose data the page does not need to show.
+**A table may carry sample values in place of bars, and a line may be drawn as an item.** Bars say that a part holds many of one thing, and nothing about what one of them is. Where a reader must see that, the skeleton shows a few rows of sample values. A table stand-in takes the words of its head row and a few rows of cells; a cell is a word, a badge, an icon or another control, and a column with an empty head holds the actions of a row and stands at the end. An item line is the library's item: its media at the start, its title with its description under it, and what stands at its end. The title is of medium weight, and the description is small and quiet. **The line under the title may hold several facts**, as `meta`: a word, a pair such as *Owner: Dana Lee*, or a badge. A dot stands between every two facts, a badge among them, since a line may hold two badges or a badge that carries an icon. A bar between facts is not used. A badge that says what kind of thing a record is stands on this line, and never after the title, because titles differ in length; a state that a person scans a list for stands at the end of the line. Bars stay for running text, and for a part whose data the page does not need to show.
 
 ```dg
 { "kind": "skeleton",

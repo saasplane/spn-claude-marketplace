@@ -99,6 +99,9 @@ export type SkeletonFrame = {
   label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat" | "card" | "container"; tag?: string; height?: number; fill?: boolean;
   frames?: string[]; raised?: boolean; bordered?: boolean; rounded?: boolean;
   size?: "XS" | "SM" | "MD" | "LG" | "XL";
+  /** Set by the drawer and never written in a spec: this word is the title of a part of the content, or this
+   *  item is the header of the page. */
+  part?: boolean;
   /** With a `look` of `container`: what stands at the end of its header, the rows of its footer, and its content
    *  as several parts, each with a title of its own, its actions at the end of that title, and its rows. */
   actions?: SkeletonItem[]; footer?: SkeletonRow[];
@@ -162,7 +165,7 @@ function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
     { const [cx, cy, rx, ry] = m.slice(1).map(Number); see(cx - rx, cy - ry); see(cx + rx, cy + ry); }
   // Text is measured from the same character widths the figure check measures it by, and a baseline
   // sits below its own line, so the box runs upward from `y`.
-  for (const m of src.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="(-?[\d.]+)">([\s\S]*?)<\/text>/g)) {
+  for (const m of src.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="(-?[\d.]+)"(?: style="[^"]*")?>([\s\S]*?)<\/text>/g)) {
     const cls = m[1], x = Number(m[2]), y = Number(m[3]);
     const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "sds-title" ? W_TITLE : cls === "sds-label" ? W_LABEL : W_NOTE);
     see(x, y - 13); see(x + w, y + 3);
@@ -1680,19 +1683,31 @@ const skelItemEndW = (it: SkeletonItem, h: number): number => {
   const end = it.item?.end ?? [];
   return end.reduce((t, e) => t + skelFixedWidth(e, h), 0) + SKEL_LABEL_GAP * Math.max(0, end.length - 1);
 };
+/** THE TITLES OF A SURFACE STAND IN STEPS, as the design system's type steps do: a container's title is the largest,
+ *  a card's a step under it, and the title of a part of the content a step under that, all three heavy. An item's
+ *  title names one thing among the content, so it is smaller and of medium weight. A step is told by size and
+ *  weight together, and the size is written on the word, since the stylesheet has one size for a title. */
+const SKEL_STEP_CONTAINER = 17, SKEL_STEP_CARD = 15, SKEL_STEP_PART = 13, SKEL_STEP_ITEM = 12;
+const skelStepW = (words: string, step: number) => Math.ceil(words.length * SKEL_W_TITLE * step / SKEL_STEP_PART);
+const skelStepText = (words: string, step: number, x: number, y: number) =>
+  `  <text class="sds-title" x="${r2(x)}" y="${Math.round(y)}" style="font-size:${step}px${step === SKEL_STEP_ITEM ? ";font-weight:500" : ""}">${esc(words)}</text>`;
 /** The facts on the line under an item's title: its description first, then each of `meta`. */
 const skelItemFacts = (it: SkeletonItem): (string | SkeletonItem)[] =>
   [...(it.item?.description !== undefined ? [it.item.description] : []), ...(it.item?.meta ?? [])];
-/** A dot stands between two facts that are both words; a badge is told apart by its own outline, and needs none. */
-const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 14;
-const skelFactW = (fact: string | SkeletonItem, h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_NOTE) : skelFixedWidth(fact, h));
+/** A dot stands between every two facts, a badge among them: a line may hold two badges, or a badge with an icon,
+ *  and one mark between all of them reads the same wherever it falls. */
+const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 16;
+/** A word on the facts line is measured closer than a note elsewhere, so the dot stands midway between two facts. */
+const SKEL_W_FACT = 5.9;
+const skelFactW = (fact: string | SkeletonItem, h: number) => (typeof fact === "string" ? Math.ceil(fact.length * SKEL_W_FACT) : skelFixedWidth(fact, h));
 function skelItemFactsW(it: SkeletonItem, h: number): number {
   const facts = skelItemFacts(it);
   return facts.reduce((t: number, fact, i) => t + skelFactW(fact, h)
-    + (i ? (typeof fact === "string" && typeof facts[i - 1] === "string" ? SKEL_FACT_DOT_W : SKEL_LABEL_GAP) : 0), 0);
+    + (i ? SKEL_FACT_DOT_W : 0), 0);
 }
 const skelItemHasBadge = (it: SkeletonItem) => skelItemFacts(it).some((fact) => typeof fact !== "string");
-const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(Math.ceil((it.item?.title ?? "").length * SKEL_W_TITLE), skelItemFactsW(it, h));
+const skelItemStep = (it: SkeletonItem) => (it.part ? SKEL_STEP_CONTAINER : SKEL_STEP_ITEM);
+const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(skelStepW(it.item?.title ?? "", skelItemStep(it)), skelItemFactsW(it, h));
 /** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
 const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length ? h
   : skelItemHasBadge(it) ? SKEL_ITEM_LINE + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) + SKEL_LABEL_GAP : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP);
@@ -1705,7 +1720,7 @@ const skelItemW = (it: SkeletonItem, h: number): number =>
 /** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
 function skelFixedWidth(it: SkeletonItem, h: number): number {
   switch (skelKind(it)) {
-    case "plain": return skelWordW(it.text!);
+    case "plain": return it.part ? skelStepW(it.text!, SKEL_STEP_PART) : skelWordW(it.text!);
     case "note": return skelWordW(it.note!);
     case "place": return it.fill ? 0 : Math.max(it.text !== undefined ? skelTextW(it.text) : 0, skelTagW(it.tag!), SKEL_PAD * 2);
     case "slot": return it.fill ? 0 : Math.max(skelTagW(it.slot!), SKEL_PAD * 2);
@@ -1770,11 +1785,11 @@ function skelFrameHeight(frame: SkeletonFrame, inherited: number): number {
 const skelSectionRows = (section: { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[] }): SkeletonRow[] => [
   // A PART OF THE CONTENT HAS ITS OWN TITLE, with the actions of that part at its end, so an action stands beside what it acts on.
   ...(section.label !== undefined || section.actions?.length
-    ? [{ items: [...(section.label !== undefined ? [{ text: section.label }] : []), { spacer: true }, ...(section.actions ?? [])] }] : []),
+    ? [{ items: [...(section.label !== undefined ? [{ text: section.label, part: true }] : []), { spacer: true }, ...(section.actions ?? [])] }] : []),
   ...(section.rows ?? []),
 ];
 const skelRows = (frame: SkeletonFrame): SkeletonRow[] =>
-  frame.look !== "container" ? frame.rows ?? []
+  frame.look !== "container" && frame.look !== "card" ? frame.rows ?? []
     : [...(frame.sections ?? []).flatMap(skelSectionRows), ...(frame.rows ?? []), ...(frame.footer ?? [])];
 /** The rows of a container that begin under a line: each part of its content after the first, and its footer. */
 function skelDividers(frame: SkeletonFrame): Set<number> {
@@ -1845,7 +1860,7 @@ function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
 function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   const ctl = skelSizeH(frame, inherited);
   const labelCol = skelLabelCol(frame);
-  const head = Math.max(frame.label ? Math.ceil(frame.label.length * SKEL_W_TITLE) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
+  const head = Math.max(frame.label ? skelStepW(frame.label, frame.look === "container" ? SKEL_STEP_CONTAINER : frame.look === "card" ? SKEL_STEP_CARD : SKEL_STEP_PART) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
     frame.label && frame.note ? Math.ceil(frame.note.length * SKEL_W_NOTE) : 0);
   // A CONTAINER'S HEADER HOLDS ITS ACTIONS AT THE END, so its title and its actions must both fit across.
   const headActions = frame.look === "container" && frame.actions?.length
@@ -1953,7 +1968,7 @@ function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean
 function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, iw: number, ih: number, boxH: number, h: number, findings: string[], out: string[]): void {
   const mid = iy + ih / 2;
   const baseline = Math.round(mid + 4);
-  if (kind === "plain") { out.push(`  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
+  if (kind === "plain") { out.push(it.part ? skelStepText(it.text!, SKEL_STEP_PART, ix, baseline) : `  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
   if (kind === "note") { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
   if (kind === "slot") {
     out.push(...skelMarks(undefined, ix, iy, iw, ih));
@@ -1977,18 +1992,17 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       out.push(...skelIcon(item.media, ix + across / 2, mid, h, true, undefined, across));
       wx = ix + across + SKEL_LABEL_GAP;
     }
-    // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is heavy, the facts small and quiet.
+    // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is of medium weight, the facts small and quiet.
     const facts = skelItemFacts(it), top = mid - ih / 2;
     const titleY = facts.length ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
-    out.push(`  <text class="sds-title" x="${r2(wx)}" y="${Math.round(titleY)}">${esc(item.title ?? "")}</text>`);
-    // THE FACTS STAND ON ONE LINE, a dot between two that are words, and room alone beside a badge.
+    out.push(skelStepText(item.title ?? "", skelItemStep(it), wx, titleY));
+    // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
     const factsMid = skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + (h - SKEL_BADGE_DROP) / 2 : titleY + SKEL_ITEM_LINE - 4;
     let fx = wx;
     facts.forEach((fact, i) => {
       if (i) {
-        const dotted = typeof fact === "string" && typeof facts[i - 1] === "string";
-        if (dotted) out.push(`  <text class="sds-note" x="${r2(fx + 4)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
-        fx += dotted ? SKEL_FACT_DOT_W : SKEL_LABEL_GAP;
+        out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+        fx += SKEL_FACT_DOT_W;
       }
       if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
       else if (fact.control !== "badge") findings.push("a fact on the line under an item's title is a word or a badge");
@@ -2179,6 +2193,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const ctl = skelSizeH(frame, inherited);
   const isContainer = frame.frames !== undefined;
   const rows = skelRows(frame);
+  // AN ITEM THAT STANDS ON THE PAGE ITSELF IS THE PAGE'S HEADER: it names the record the page is about, so its
+  // title is as large and as heavy as a container's, and not the title of one thing among many.
+  if (root) for (const row of rows) for (const it of row.items ?? []) if (it.item) it.part = true;
   const parts = skelParts(frame);
   if (isContainer) skelContainerFindings(frame, parts, findings);
   else if (frame.raised !== undefined || frame.bordered !== undefined || frame.rounded !== undefined)
@@ -2204,7 +2221,7 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const surface = frame.look === "container" && !root;
   if (surface) {
     const headH = skelContainerHead(frame);
-    if (frame.label) out.push(`  <text class="sds-title" x="${x}" y="${y + (frame.note ? 16 : 22)}">${esc(frame.label)}</text>`);
+    if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x, y + (frame.note ? 16 : 22)));
     if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x}" y="${y + 33}">${esc(frame.note)}</text>`);
     const actions = frame.actions ?? [];
     let ax = x + w - (actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * Math.max(0, actions.length - 1));
@@ -2221,7 +2238,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   else if (!bare && !isContainer && !surface) out.push(...skelMarks(frame.look, x, y, w, h));
   const tagH = frame.tag ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   if (frame.tag) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.tag)}</text>`);
-  if (frame.label && !surface) out.push(`  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
+  if (frame.label && !surface) out.push(frame.look === "card" ? skelStepText(frame.label, SKEL_STEP_CARD, x + SKEL_PAD, y + tagH + 26)
+    : `  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
   if (frame.label && frame.note && !surface) out.push(`  <text class="sds-code" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
 
   // A PART THAT TAKES THE HEIGHT LEFT: where the frame stands taller than its rows need, the rows whose

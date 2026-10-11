@@ -784,7 +784,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
 
   // 14 · a table that takes sample cells
-  const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)">([^<]*)<`, "g"))].map((m) => [Number(m[1]), Number(m[2]), m[3]]);
+  const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)"(?: style="[^"]*")?>([^<]*)<`, "g"))].map((m) => [Number(m[1]), Number(m[2]), m[3]]);
   const table = (extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "State", ""],
     cells: [["Dana Lee", "dana@acme.com", "", { icon: "more" }], ["Omar Haddad", "omar@acme.com", { control: "badge", text: "Invited" }, { icon: "more" }]], ...extra }] }] } });
   one("a table with sample cells draws without a finding", table().findings, none);
@@ -819,7 +819,11 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 15a · the line of facts under an item's title
   const facts = line({ media: "default", title: "SaaS Plane Platform", meta: [{ control: "badge", text: "Platform" }, "platform", "Owner: Dana Lee"] });
   one("an item with a line of facts draws without a finding", facts.findings, none);
-  one("a dot stands between two facts that are words, and none beside a badge", texts(facts.svg, "sds-note").map((t) => t[2]).join("|"), "platform|·|Owner: Dana Lee");
+  one("a dot stands between every two facts, a badge among them", texts(facts.svg, "sds-note").map((t) => t[2]).join("|"), "·|platform|·|Owner: Dana Lee");
+  one("the dot after a badge stands between the badge and the next fact", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 24), texts(facts.svg, "sds-note")],
+    (g) => g[1][0][0] > g[0][0] + g[0][2] && g[1][0][0] < g[1][1][0]);
+  const badges = line({ title: "x", meta: [{ control: "badge", text: "Platform", icon: "default" }, { control: "badge", text: "Pending", icon: "default" }] });
+  one("two badges on one line have a dot between them", [badges.findings.length, texts(badges.svg, "sds-note").map((t) => t[2]).join("|")], (g) => g[0] === 0 && g[1] === "·");
   one("the facts stand on one line under the title, in the order given", [rect(facts.svg, "sds-skel-control").find((r) => r[3] === 24), texts(facts.svg, "sds-note")[0], texts(facts.svg, "sds-title")[0]],
     (g) => g[0][0] === g[2][0] && g[1][0] > g[0][0] + g[0][2] && g[1][1] > g[2][1]);
   one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "sds-box")[0][3] > rect(line({ title: "x", description: "y" }).svg, "sds-box")[0][3], true);
@@ -850,9 +854,21 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { label: "Sites", actions: [{ control: "button", text: "Change" }], rows: [{ items: [{ text: "plat.spn.io" }] }] },
     { label: "Email domains", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ note: "None yet" }] }] }] });
   one("a container with two parts of content draws without a finding", parted.findings, none);
-  one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "sds-label").find((t) => t[2] === "Email domains"), rect(parted.svg, "sds-skel-control").filter((r) => r[3] === 32)],
+  one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "sds-title").find((t) => t[2] === "Email domains"), rect(parted.svg, "sds-skel-control").filter((r) => r[3] === 32)],
     (g) => g[1].length === 2 && Math.abs((g[1][1][1] + 16) - (g[0][1] - 4)) < 1 && g[1][1][0] + g[1][1][2] === outline(parted.svg)[0][0] + outline(parted.svg)[0][2] - 16);
   one("a line divides the second part from the first, and none stands above the first", (parted.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 1);
+  // 15c · the titles of a surface stand in steps
+  const stepOf = (g, words) => (g.match(new RegExp(`style="([^"]*)">${words}<`)) ?? [])[1];
+  const stepped = card({ look: "container", label: "Sign-in", rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [
+    { label: "Directories", actions: [{ control: "button", text: "Add" }], rows: [{ items: [{ item: { title: "Acme Okta", meta: ["SAML"] }, fill: true }] }] }] } }] }] });
+  one("a card with a part of content draws without a finding", stepped.findings, none);
+  one("a container's title, a card's, a part's and an item's are four steps, largest first", ["Sign-in", "Account", "Directories", "Acme Okta"].map((w) => stepOf(stepped.svg, w)),
+    (g) => g.join("|") === "font-size:17px|font-size:15px|font-size:13px|font-size:12px;font-weight:500");
+  one("the title of a part is heavy and an item's title is of medium weight", [stepOf(stepped.svg, "Directories"), stepOf(stepped.svg, "Acme Okta")], (g) => !g[0].includes("font-weight") && g[1].includes("font-weight:500"));
+  const headed = draw({ kind: "skeleton", frame: { label: "Organization", rows: [{ items: [{ item: { media: "default", title: "SaaS Plane Platform", meta: ["platform"] }, fill: true }] }] } });
+  one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "font-size:17px");
+  one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
+  one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
 
   // 16 · one estimate of width, for every spec
