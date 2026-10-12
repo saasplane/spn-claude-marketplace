@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0f4f5292"
+      "seen": "08fae8da"
     }
   ]
 }
@@ -66,7 +66,7 @@ Here is how the parts serve the pages most apps have.
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
 | A dashboard | flat | raised, holding widgets that show numbers | none |
 
-**What the units do.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSWDataTable` hands its paging to a place the page gives it. The page puts an element in `DSContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no container, because a widget is a layer before the container. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
+**What the units do.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSDataTableWidget` hands its paging to a place the page gives it. The page puts an element in `DSContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no container, because a widget is a layer before the container. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -131,8 +131,8 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 | A block in a `flush` part | What it does |
 | --- | --- |
 | `DSTable` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | draws no border and no rounding of its own. Its own `bordered` still wins |
-| `DSAccordion` · `DSWDataTable` | keeps its own text off the edge of the frame |
-| `DSList` · `DSWDataTable` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
+| `DSAccordion` · `DSDataTableWidget` | keeps its own text off the edge of the frame |
+| `DSList` · `DSDataTableWidget` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
 | Any other block | nothing. It reaches the edge |
 | A block inside the one that reacted | nothing. The setting stops at the block that used it |
 | A block inside a card, or inside an overlay | nothing. A block that draws a frame of its own starts a new one |
@@ -186,7 +186,9 @@ Some pages hold things in groups: the fields of each record type, or the actions
 
 Where the groups are few and fixed, the page needs no swap. Each group is a container of its own, one under another on one page, and nothing is hidden.
 
-**What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has a small place for it before the title: a page gives the header a `backAnchor`, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. `DSWListDetail` is the widget that places the two parts: both at a desktop, and one at a time on a tablet and a phone. The page gives it the address of the groups once, as its `backAnchor`. While the items stand alone, the header of the container that holds them takes that address as its way back, and the page writes nothing more. `architecture-widgets.md` states the widget.
+**What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has a small place for it before the title: a page gives the header a `backAnchor`, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. While the items stand alone, that back action is the way back to the groups.
+
+**The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetailWidget`: both parts at a desktop, and one at a time on a tablet and a phone. `providers.md` names it.
 
 ## Boundary
 

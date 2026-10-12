@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "1e32626c"
+      "seen": "bc9d6197"
     }
   ]
 }
@@ -125,13 +125,13 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 - **Where the data and the person point to two patterns, say so and ask.** A list that grows, used by a person who comes once a year, is a different page from the same list used every day.
 - **A page that fits no pattern is named in the result, and it waits.** A new page pattern joins the patterns chapter of the book first.
 
-**Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSWDataTable`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
+**Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSDataTableWidget`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
 
 | What the contract says of the list | What one of them holds | Shown as |
 | --- | --- | --- |
-| the query takes a page, a text or a filter | several facts a person compares across rows | `DSWDataTable`, in its `TABLE` layout |
-| the same | a title and a line under it | `DSWDataTable`, in its `LIST` layout |
-| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSWDataTable`, in its `GRID` layout |
+| the query takes a page, a text or a filter | several facts a person compares across rows | `DSDataTableWidget`, in its `TABLE` layout |
+| the same | a title and a line under it | `DSDataTableWidget`, in its `LIST` layout |
+| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTableWidget`, in its `GRID` layout |
 | the whole set, a few and fixed | a name | a list, `DSList` |
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
 | the whole set, some | two to four facts a person compares | a plain table, `DSTable` |
@@ -145,8 +145,8 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 
 | At a desktop | At a tablet | On a phone |
 | --- | --- | --- |
-| `DSWDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
-| `DSWDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
+| `DSDataTableWidget`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
+| `DSDataTableWidget`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
 | two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; the address changes | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
@@ -206,7 +206,7 @@ The page pattern says where the parts of the page sit. A task pattern says how e
 | Intent | The person | Blocks that carry it | Task states |
 | --- | --- | --- | --- |
 | Move | goes to another place, and knows where they are | the layout · `DSNavigationMenu` · `DSTabs` · `DSBreadcrumb` · `DSLink` | working, then done or failed |
-| Find | searches, filters, sorts and pages through records | `DSWFilterBar` · `DSWDataTable` · `DSCommandPalette` · `DSPagination` | all six |
+| Find | searches, filters, sorts and pages through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` | all six |
 | Read | reads records as a table, a list or a grid, or one record in detail | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` | all six |
 | Enter | fills fields, sees the check on each one, and sends the form | `DSForm` and the entry fields | idle, working, then done or failed |
 | Choose | picks one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers | idle, then done. All six when the set is loaded |
@@ -240,9 +240,9 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **Write the `type` of an item line, and no type step or heading level for its title** (`RD.SUPPORT.SURFACE.094`). `CONTENT` is a line among others, and the default. `SECTION` is the title line of a part of a page. `HEADER` is the header of a page or of a record. The type decides the type step and the heading level of the title, and the size of the picture.
 - **Write `showArrow` on a line that leads somewhere, where the page wants the arrow.** It is a chevron after the actions, and it is off by default.
 - **In a list the row carries the link, the chosen fill and the reaction to the pointer, and the item line inside it carries none** (`RD.SUPPORT.SURFACE.097`). `DSItem` takes no `selected`: write `selected`, `anchor` and `showArrow` on the row, `DSList.Item`. An item line that stands alone, in a card or a header, carries its own `anchor` and `showArrow`. Write `hoverable` on a `DSList` whose rows a person acts on; it is off by default.
-- **A line of the `LIST` layout of `DSWDataTable` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
+- **A line of the `LIST` layout of `DSDataTableWidget` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
 - **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). `DSIconMark` draws an icon as a mark, with `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`. Choose rounded or square where the thing is better shown so, such as an app or a file. A mark is never pressed.
-- **Give `DSWDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSWFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
+- **Give `DSDataTableWidget` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSFilterBarWidget` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
 - **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
@@ -276,7 +276,7 @@ facts    one order holds a number, a customer, a state, a total and a date     t
          the set grows as people work                                         the contract
          the sales team comes many times a day, to find one order             asked
 pattern  Find in a list · spec: find-in-a-list.dg.json
-shows    the orders: DSWDataTable, layout TABLE; on a phone, layout LIST
+shows    the orders: DSDataTableWidget, layout TABLE; on a phone, layout LIST
 
 page  /orders · purpose: find an order · main action: New order · pattern: Find in a list
 └── DSLayout  RAIL
@@ -290,9 +290,9 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
             │   ├── DSText    typography=TITLE_LG "Orders"
             │   └── DSButton  variant=SOLID color=PRIMARY "New order"             Move · leads to /orders/new
             ├── DSContainer.Content
-            │   └── DSWFilterBar                                                  Find
+            │   └── DSFilterBarWidget                                                  Find
             └── DSContainer.Content  flush
-                └── DSWDataTable                                                  Find · Read
+                └── DSDataTableWidget                                                  Find · Read
 ```
 
 Under the tree, give one line for each task: what the person sees in each task state, and the way back from a failure. Then name what is missing.
@@ -300,7 +300,7 @@ Under the tree, give one line for each task: what the person sees in each task s
 For a flow, write the trees in the order a person meets the pages. Each Move names the page it leads to.
 
 ```text
-Find · Read   DSWDataTable   idle: the filters, with no search asked yet
+Find · Read   DSDataTableWidget   idle: the filters, with no search asked yet
                              working: the skeleton of the table
                              done: the orders, one row each
                              empty: nothing matches, and the filters stay shown
@@ -316,7 +316,9 @@ A tree is complete with no drawing. Draw it where the window holds the Figma con
 
 The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, name the developer's next step, and show the result. A child agent that sends `use_figma` cannot read the connector's own skill, so give it `skills/design/steps/connector-rules.md`. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
 
-**Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. A pattern is an arrangement of units, so the library draws none either: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
+**Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface has two core widgets, `DSDataTableWidget` and `DSFilterBarWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetailWidget`, so the library holds none for it (`RD.SUPPORT.SURFACE.099`).
+
+**The library draws nothing of a pattern** (`RD.SUPPORT.SURFACE.099`). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no page pattern, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 
 ## Close
 

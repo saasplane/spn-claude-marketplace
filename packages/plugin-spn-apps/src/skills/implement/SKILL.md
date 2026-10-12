@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "104a7522"
+      "seen": "0228413e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "6c2b5f02"
+      "seen": "7903df47"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0f4f5292"
+      "seen": "08fae8da"
     }
   ],
   "decisions": [
@@ -93,31 +93,31 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by layer. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
 - **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the containers, the widgets and the components the design system already has.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
-- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSWDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
+- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTableWidget`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
 - **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only, and after them the arrow of a line that leads somewhere. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 
 **A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-widgets.md` and `architecture-containers.md` state each one.
 
 | The pattern asks | What the page writes |
 | --- | --- |
-| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSWDataTable` reads no device type, and follows the layouts its page lists each time it draws |
+| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTableWidget` reads no device type, and follows the layouts its page lists each time it draws |
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
 | the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back on the title line | the page gives `DSContainer.Header` a `backAnchor`, or places the two parts with `DSWListDetail`, which gives it to the header |
+| a way back on the title line | the page gives `DSContainer.Header` a `backAnchor`. No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them and gives the header its `backAnchor` |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
 | the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
 | an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
 | a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
 | a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |
 | a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
-| fewer fields in the filter bar at a tablet | nothing. `DSWFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
+| fewer fields in the filter bar at a tablet | nothing. `DSFilterBarWidget` holds fewer by itself, and `moreLimitTablet` sets how many |
 
 **Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-widgets.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
 
 | The unit | What it does not do yet |
 | --- | --- |
-| `DSWDataTable` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
+| `DSDataTableWidget` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
 | a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
 
 - **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.

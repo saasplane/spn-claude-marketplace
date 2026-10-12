@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "835393b4"
+      "seen": "bcd0142d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "104a7522"
+      "seen": "0228413e"
     }
   ]
 }
@@ -38,7 +38,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 | Task intent | The pattern covers | Blocks that carry it |
 | --- | --- | --- |
 | Move | going to another place, and knowing where you are | the layout · `DSNavigationMenu` · `DSTabs` · `DSBreadcrumb` · `DSLink` |
-| Find | search, filter, sort, and paging through records | `DSWFilterBar` · `DSWDataTable` · `DSCommandPalette` · `DSPagination` |
+| Find | search, filter, sort, and paging through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` |
 | Read | records as a table, a list or a grid, one record in detail, and nothing to show | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` |
 | Enter | filling a field, the check on it, and sending a form | `DSForm` and the entry fields |
 | Choose | picking one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers |
@@ -131,13 +131,13 @@ Read the facts against the table of the page patterns, and name the one pattern 
 
 ### Step 2: what shows a part
 
-**The contract decides first.** Where the query takes a page, a text or a filter, the part is the data table, `DSWDataTable`. The server then holds more records than the page has loaded.
+**The contract decides first.** Where the query takes a page, a text or a filter, the part is the data table, `DSDataTableWidget`. The server then holds more records than the page has loaded.
 
 | What the contract says of the list | What one of them holds | Shown as |
 | --- | --- | --- |
-| the query takes a page, a text or a filter | several facts a person compares across rows | `DSWDataTable`, in its `TABLE` layout |
-| the same | a title and a line under it | `DSWDataTable`, in its `LIST` layout |
-| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSWDataTable`, in its `GRID` layout |
+| the query takes a page, a text or a filter | several facts a person compares across rows | `DSDataTableWidget`, in its `TABLE` layout |
+| the same | a title and a line under it | `DSDataTableWidget`, in its `LIST` layout |
+| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTableWidget`, in its `GRID` layout |
 | the whole set, a few and fixed | a name | a list, `DSList` |
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
 | the whole set, some | two to four facts a person compares | a plain table, `DSTable` |
@@ -152,8 +152,8 @@ The screen classes are `DESKTOP`, `TABLET` and `MOBILE` (`standards-core.md`). A
 
 | At a desktop | At a tablet | On a phone |
 | --- | --- | --- |
-| `DSWDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
-| `DSWDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
+| `DSDataTableWidget`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
+| `DSDataTableWidget`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
 | two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; the address changes | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
@@ -175,7 +175,7 @@ The two numbers of a small and a medium entry are proposed (`RD.SUPPORT.SURFACE.
 
 ### What holds for every row of a list
 
-- **A row ends with its actions** (`RD.SUPPORT.SURFACE.071`). `DSWDataTable` shows them as icons, or behind one action.
+- **A row ends with its actions** (`RD.SUPPORT.SURFACE.071`). `DSDataTableWidget` shows them as icons, or behind one action.
 - **One action stands on the row itself, and two or more go behind one action.** A row then keeps its width for its facts. This rule is proposed.
 - **A press on a row opens the record**, where the record has a page or a look. This rule is proposed.
 - **A state that is normal shows no badge** (`RD.SUPPORT.SURFACE.058`). A badge on every row says nothing, and the row that differs is then hard to find.
@@ -197,8 +197,8 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### Find in a list
 
 - **When.** The data grows as people work, and a person comes often, to find one record. A record that has things of its own opens as a page. A record of a few facts and nothing else opens as a look beside the list.
-- **Container.** One `DSContainer`. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSWDataTable` a place in the footer, and the table draws its paging there.
-- **Widget.** `DSWFilterBar` and `DSWDataTable`, in the layout that step 2 chose.
+- **Container.** One `DSContainer`. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSDataTableWidget` a place in the footer, and the table draws its paging there.
+- **Widget.** `DSFilterBarWidget` and `DSDataTableWidget`, in the layout that step 2 chose.
 - **Component.** `DSDrawer`, for the look of a small record beside its list.
 - **On a tablet and a phone.** A tablet keeps `TABLE` with fewer columns, and its filter bar holds fewer boxes. On a phone the data table is in its `LIST` layout, and the filter bar is one button that says how many filters are on. The look of a small record is a screen of its own on a phone.
 - **Specs.** `find-in-a-list.dg.json` · `find-in-a-list-look.dg.json`.
@@ -227,7 +227,7 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 
 - **When.** The data has fixed kinds, with one or a few of each. A person comes rarely, to connect or change one. The page shows every kind always, also a kind that has nothing yet. The kinds in use come first.
 - **Container.** One `DSContainer`, holding the kinds.
-- **Widget.** `DSWDataTable` in its `GRID` layout, where the kinds come from a query that takes a page, a text or a filter. It draws one card for each kind.
+- **Widget.** `DSDataTableWidget` in its `GRID` layout, where the kinds come from a query that takes a page, a text or a filter. It draws one card for each kind.
 - **Component.** `DSCard`, `DSItem` and `DSEmpty`. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider as an item. A kind with nothing yet says so and offers the action.
 - **On a tablet and a phone.** Three cards across at a desktop, two on a tablet, and one on a phone.
 - **Spec.** `set-up-by-kind.dg.json`.
@@ -308,10 +308,10 @@ Whether the set of groups is closed decides the arrangement, before any count do
 - **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs has the width of the page and no more.
 - **Both parts MUST be in view at a desktop only** (`RD.SUPPORT.SURFACE.079`). On a tablet and on a phone the items of the chosen group take the place of the groups, with a back action.
 - **The swap MUST change the address.** The back of the browser then does the same as the back action. A reload stays on the chosen group, and a link to one group opens it on every screen.
-- **Many groups a person searches MUST be the `LIST` layout of `DSWDataTable`, and never its `TABLE` layout** (`RD.SUPPORT.SURFACE.069`). The part is narrow, and a person picks one group by its name.
+- **Many groups a person searches MUST be the `LIST` layout of `DSDataTableWidget`, and never its `TABLE` layout** (`RD.SUPPORT.SURFACE.069`). The part is narrow, and a person picks one group by its name.
 - **Ask whether a group is a thing a person manages.** Where the product fixes the groups, a group is a heading. Where people make them, a group has its own actions.
 - **Container.** `DSContainer`: one for each group, or two side by side. Where two stand side by side, the chosen group is the title of the container at the right. The action that adds an item stands in that header.
-- **Widget.** `DSWDataTable` in its `LIST` layout, where the groups are many.
+- **Widget.** `DSDataTableWidget` in its `LIST` layout, where the groups are many.
 - **Component.** `DSList` holding `DSItem`, for the groups as lines, with a band behind the chosen one. `DSTable`, where the items are a table. `DSBadge` for a state that is not normal.
 - **Specs.** `groups-and-their-items.dg.json` for a closed set. `groups-and-their-items-two-lists.dg.json` for a list beside a list. `groups-and-their-items-open.dg.json` for a set that can be added to. `groups-and-their-items-many.dg.json` for many groups. `one-action.dg.json` for the page of one item.
 
@@ -351,14 +351,14 @@ Whether the set of groups is closed decides the arrangement, before any count do
 
 - **When.** The data is many small values of one kind, and a person changes one after another. The page is a data table whose rows are read. The action of a row turns its value from words into a box, and the action that saves it stands beside the box. The page holds no form, and nothing opens over it.
 - **Container.** One `DSContainer`: the filter bar and the rows in its content, and the paging in its footer.
-- **Widget.** `DSWDataTable` and `DSWFilterBar`.
+- **Widget.** `DSDataTableWidget` and `DSFilterBarWidget`.
 - **Component.** `DSInput`, the box in the one cell that is being changed, as wide as the cell.
 - **On a tablet and a phone.** On a phone the table is in its `LIST` layout. A row that is read is a line. The row that is being changed is its text with its box under it, and the same two actions beside the box.
 - **Spec.** `change-in-place.dg.json`.
 
 ## The listing pages — 🔮
 
-A listing page is a page whose whole content is the records of one kind. It follows Find in a list. `DSWDataTable` has three layouts, and a listing page is that one widget in one of the three. It keeps its search, its filters and its paging in each.
+A listing page is a page whose whole content is the records of one kind. It follows Find in a list. `DSDataTableWidget` has three layouts, and a listing page is that one widget in one of the three. It keeps its search, its filters and its paging in each.
 
 | One record holds | At a desktop | At a tablet | On a phone |
 | --- | --- | --- | --- |
@@ -380,7 +380,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 | a line of a list | an item line, `DSItem`, with a line between each two | `architecture-components.md` |
 | a field a person enters, and a field a person reads | `DSForm.Field`, and `DSDataUnit`, each with its title above | `architecture-components.md` |
 | a value from an enum | a badge beside other facts, a title where it is the subject of a part, and plain text where it stands alone in a labelled field. `a-value-from-an-enum.dg.json` draws each way | `architecture-components.md` |
-| a filter bar, a value changed in a list, and many groups a person searches | `DSWFilterBar` in its one form, and `DSWDataTable` | `architecture-widgets.md` |
+| a filter bar, a value changed in a list, and many groups a person searches | `DSFilterBarWidget` in its one form, and `DSDataTableWidget` | `architecture-widgets.md` |
 | a container, several parts of one content, and a large form | the title and the actions above the outline, and what closes the work in the footer | `architecture-containers.md` |
 
 ## What is not settled or checked yet

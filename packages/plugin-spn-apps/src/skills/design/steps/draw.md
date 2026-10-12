@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "94ec1375"
+      "seen": "ed0a4f86"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "74aa8ef8"
+      "seen": "c2f14479"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0f4f5292"
+      "seen": "08fae8da"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
@@ -30,7 +30,8 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
-- **The library holds the core units, which are the ones the book names, and no other unit** (`RD.SUPPORT.SURFACE.082`). It draws no component for a unit that a stack provides on its own, and none for a pattern. So a page pattern is drawn as its units, and never as one instance.
+- **The library holds the core units, which are the ones the book names, and no other unit** (`RD.SUPPORT.SURFACE.082`). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no page pattern, no skeleton and no sample page (`RD.SUPPORT.SURFACE.099`). So a page pattern is drawn as its units, and never as one instance.
+- **A widget is told by its name, which ends in `Widget`** (`RD.SUPPORT.SURFACE.098`). A container's name ends in `Container` and a layout's in `Layout`, a component takes no such word, and no block carries a letter for its layer before its name. The two core widgets are `DSDataTableWidget` and `DSFilterBarWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetailWidget` is the web stack's own unit and has no drawing.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
 ## Before you draw

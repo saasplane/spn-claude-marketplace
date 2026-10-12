@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "dbe910cd"
+      "seen": "97854208"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
-      "seen": "8ba72050"
+      "seen": "a223b411"
     }
   ]
 }
@@ -53,7 +53,7 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 | Overlays | `DSOverlayContext.showComponent` plus `useDSOverlayConfirm` — no screen mounts a dialog into the tree. `showComponent` hands back the function that removes what it showed, and `useDSOverlayRoute` shows an overlay while the match the app's router gives it holds a value |
 | Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSScopeContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes; `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |
 
-The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/boot/` (the system's own composition — `DSApp`, the contexts, the roots it mounts); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group); `ui/widgets/` (assembled surfaces mounted whole: the data table, the filter bar, and a list beside its detail); `ui/layouts/` (the app layout); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `ui/managers/` (cross-cutting runtime helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
+The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/boot/` (the system's own composition — `DSApp`, the contexts, the roots it mounts); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group); `ui/widgets/` (assembled surfaces mounted whole: the two core widgets, the data table and the filter bar, and `DSListDetailWidget`, this stack's own unit, which places a list beside the detail of its chosen row for a page of groups and their items); `ui/layouts/` (the app layout); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `ui/managers/` (cross-cutting runtime helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
 
 The tokens sit in tiers, and a component sees only the roles and the scale: Tier 0 the seed (one brand value); Tier 1 the ramps (generated from the seed; neutral and status ramps fixed); Tier 2 the roles (mode-adaptive surface / foreground / accent tokens) and the scale (fixed by the design system); Tier 3 components (`variant` × `color` → role classes). A component consumes role tokens, never ramps and never the seed — reaching past the role layer is what makes dark mode a second component tree instead of a mode flip. Light and dark are one re-pointing of the role layer, not a parallel stylesheet. A component reads the scale through the size maps, never a number of its own.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "7fd34d95"
+      "seen": "5b86e080"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
@@ -94,7 +94,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Data Entry - Fields | Control · Content: `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSTextarea` · `DSRadio` sizes, states, content, value each · `DSInputPhone` · `DSCheckbox` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` · `DSRadioGroup` sizes, states, content, value, data each · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, content, value, data each · `DSTagGroup` sizes, states. `DSLabel` Control · Inline · sizes, states |
 | Data Entry - Pickers | Control · Content: `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` sizes, states, content, value, data each · `DSDatePicker` · `DSTimePicker` · `DSDateTimePicker` sizes, states, content, value each · `DSDateRangePicker` sizes, states, content, value, data · `DSCalendar` states, value · `DSColorPicker` sizes, states, value. `DSCommand` Composite · Content · sizes, states, content, data. `DSCommandPalette` Overlay · Content · sizes, states, content, opener, data |
 | Data Entry - Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` sizes, states, content, value, data · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, content, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
-| Widgets | `DSWDataTable` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSWFilterBar` Composite · Full width · sizes, content, data; scenario page With overflow |
+| Widgets | `DSDataTableWidget` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBarWidget` Composite · Full width · sizes, content, data; scenario page With overflow |
 | Containers | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
 | Layouts | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav |
 

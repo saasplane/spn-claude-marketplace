@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "3332bf53"
+      "seen": "61dcb7a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "74aa8ef8"
+      "seen": "c2f14479"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/03-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
 
-Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system.
+Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the six layers and the word that says a block's layer, to the kinds of prop and the states a design and its code share.
 
 ## Terms
 
@@ -154,6 +154,33 @@ A layer uses only the layers named before it, so the direction between two block
 
 **App is the last layer, so no block of another layer uses the root block.** A block reads what the root block hands down from where it sits (`architecture-app.md`). Reading a setting that was handed down is not using the block that handed it. In a web package, each layer from components to layouts is one folder of the `ui` taxonomy, and the root block stands beside those folders.
 
+## A name says its layer — ✅
+
+A widget, a container and a layout carry their layer as the last word of the name. A component carries no such word.
+
+| Layer of the block | Its name ends in | Example |
+| --- | --- | --- |
+| Components | no word for the layer | `DSButton` · `DSTable` |
+| Widgets | `Widget` | `DSDataTableWidget` · `DSFilterBarWidget` |
+| Containers | `Container` | `DSContainer` |
+| Layouts | `Layout` | `DSLayout` |
+
+- **A widget's name MUST end in `Widget`, a container's in `Container` and a layout's in `Layout`** (`RD.SUPPORT.SURFACE.098`). A reader then tells the layer of a block from its name alone, in the book, in the design library and in every stack.
+- **A component MUST take no such word.** A component is the smallest block, and most blocks are components, so a name with no word for its layer is a component's.
+- **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
+- **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names of the two core widgets.
+- **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own widget for a list beside its detail is `DSListDetailWidget`.
+
+| Belongs to | What it is | Its name |
+| --- | --- | --- |
+| `DSDataTableWidget` | its settings | `IDSDataTableWidgetConfig` |
+| `DSDataTableWidget` | the vocabulary of its layouts | `DSDataTableWidgetConfigLayoutType` |
+| `DSDataTableWidget` | its private part for the empty state, in the design library | `.DSDataTableWidgetEmpty` |
+| `DSFilterBarWidget` | its item, one field | `DSFilterBarWidgetField`, with its shape `IDSFilterBarWidgetField` |
+| `DSFilterBarWidget` | the vocabulary of the kinds of field | `DSFilterBarWidgetFieldType` |
+
+`DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
+
 ## Marking each property — ✅
 
 Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has. Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size and the frame setting each have a hook of one value, which takes the block's own prop. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
@@ -164,7 +191,7 @@ A block drawn from data is a host and an item: one item serves every host that t
 
 ## Boundary
 
-This ref states which three props mean one thing everywhere, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
+This ref states which three props mean one thing everywhere, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, which word of a name says the layer, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
 
 ## Binds
 
@@ -172,6 +199,7 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | --- | --- |
 | `RD.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
+| `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |

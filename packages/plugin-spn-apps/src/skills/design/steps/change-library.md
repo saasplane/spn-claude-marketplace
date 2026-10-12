@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "94ec1375"
+      "seen": "ed0a4f86"
     }
   ]
 }
@@ -18,7 +18,8 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 
 - **The library draws the core units, which are the ones the book names** (`RD.SUPPORT.SURFACE.082`). A change of the surface is stated in the book first, drawn in the library second and built in a stack third, and that order binds a core unit and its props. Heading: "Changing the library".
 - **Never draw a unit that a stack provides on its own as a published component.** The book does not name it, so the library does not draw it, and the order does not bind it. Where an order asks for one, stop and report it. A stack's own unit that every stack should build joins the book first, and the library draws it then.
-- **Never put a page or a pattern into a library file.** A pattern is built from units, so it is composed on request from the published library, in a file that is not a library file. Heading: "Three kinds of work".
+- **Never put a page or a pattern into a library file** (`RD.SUPPORT.SURFACE.099`). The library draws the core units with their properties and their cases, the icons, and the places of the layout, and nothing else. It holds no task pattern, no page pattern, no skeleton and no sample page. A pattern is built from units, so it is composed on request from the published library, in a file that is not a library file. Heading: "Three kinds of work".
+- **Name a unit so that its name says its layer** (`RD.SUPPORT.SURFACE.098`). A widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`. A component takes no such word, and no block carries a letter for its layer before its name. A name that belongs to a unit keeps the unit's whole name first: `DSFilterBarWidgetField` is the item of `DSFilterBarWidget`, and `.DSDataTableWidgetEmpty` is a private part of `DSDataTableWidget`.
 - **A core unit that is put together from other blocks, or that opens something the device draws, is drawn as the table under "Drawing a block" says.** An item of `DSToolbar` is an instance of `DSButton` in a slot, and a tag of `DSTagGroup` is an instance of `DSBadge` with its close action, so neither has a variant for what it holds. `DSCalendar` is drawn once, as the grid that `DSDatePicker` opens. `DSColorPicker` is the swatch and the field, with a colour, with none, and with a typed text that is no code, and the picker of the device is not drawn. `DSColorView` is the swatch and the value, the swatch alone, and the empty case. `DSProgressCircle` is the ring at each size, filled to a value and turning. `DSIconMark` holds `shape`, `variant` and `size` as properties, and `color` as a mode. `DSConfirmPopover` is its surface alone, with the question and the two actions, and the control that opens it is not part of the drawing. `DSConfirmDialog` is its surface alone, over `DSBackdrop`.
 
 ## The walk, in order
