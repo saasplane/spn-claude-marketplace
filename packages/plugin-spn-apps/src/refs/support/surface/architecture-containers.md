@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "a623a591"
+      "seen": "7314b6e1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "ea814e26"
+      "seen": "0f4f5292"
     }
   ]
 }
@@ -41,7 +41,7 @@ A container is an optional block. A page uses one when a part of it has a header
 | Content | `DSContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
 | Footer | `DSContainer.Footer` | none or one | `flush`, and no other prop |
 
-The parts sit in one order: the header, then the content, then the footer. The header places its first block at the start and its last at the end. The footer starts its blocks at the start edge. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and nothing else.
+The parts sit in one order: the header, then the content, then the footer. The header places its first block at the start and its last at the end. The footer starts its blocks at the start edge. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and a fifth, `unframed`, that holds a part out of the frame.
 
 ### What a page puts in each part
 
@@ -55,6 +55,7 @@ What a page puts in each part follows one form. A person then finds the name and
 
 - **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block at the start and its last block at the end, so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
+- **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
 - **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The page patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
 Here is how the parts serve the pages most apps have.
@@ -75,6 +76,11 @@ Here is how the parts serve the pages most apps have.
 | `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
 | `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds. Blocks that need no line between them sit in one content part |
 | `rounded` | yes or no | whether the corners of the frame are rounded |
+| `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
+
+- **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first four is a choice that does not depend on the others. The theme holds the app's default for each, and a container may set its own.
+- **A part listed in `unframed` MUST take no frame, whatever `frames` and the theme give.** A page that sets `frames` takes the whole choice from the theme. A page that sets `unframed` takes one part out and leaves the rest to the theme. So a theme can still change the look of that container, and the named part stays flat in every theme.
+- **`unframed` is for a part that no theme should frame on this page.** One such part is a header that is the header of the page, which the rules of content keep out of a frame (`standards-core.md`). A page that wants a look sets `frames`, or leaves it to the theme. The book states `unframed` before the web builds it.
 
 A container also takes `size`, which sets the density of every block inside it (`architecture-app.md`).
 
@@ -90,6 +96,9 @@ A part insets its content, and the page decides what fills a part.
 
 Write `flush` on a part whose content reaches the edge of the frame, such as a table. Let `flush` describe the content, and never the look. A theme can change the frame from flat to bordered to raised, and no page changes.
 
+- **A part MUST NOT set the gap between its blocks.** The page writes that gap, from the scale.
+- **The foundation defines no block for a row or a grid. A stack MAY provide one** (`RD.SUPPORT.SURFACE.084`). Such a block is the stack's own unit, made to keep building simple, and its stack states it. A page on a stack that provides none writes the row or the grid itself. Either way the gap comes from the scale, and readings still stand as the rules of content ask.
+
 | Space | Owner |
 | --- | --- |
 | The frame | the container |
@@ -98,7 +107,22 @@ Write `flush` on a part whose content reaches the edge of the frame, such as a t
 | A block's border | the block |
 | The gap between two containers | the page |
 
-A container takes no background color, no padding value, no margin, no container inside it, and no prop named `variant`. It takes no child that is not one of its parts. The card, `DSCard`, stays a separate block beside it, taking `raised`, `bordered` and `rounded`.
+A container takes no background color, no padding value, no margin, no container inside it, and no prop named `variant`. It takes no child that is not one of its parts.
+
+### The card
+
+The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`, and the theme holds one default for both. A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
+
+| | A container | A card |
+| --- | --- | --- |
+| It frames | a part of a page, with the title and the actions of that part | one thing |
+| How many stand together | one for a part of the page | often many alike, side by side in a grid |
+| Its parts | named places that the look reaches. `frames` and the theme decide which parts the frame holds, and a part takes `flush` | all inside the one frame, in every theme. A part takes no prop |
+| Pressed as a whole | never | it may be, with `anchor` |
+| A block inside it | reacts to a `flush` part | looks as it does on a plain page, because a card starts a frame of its own |
+
+- **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it MUST still frame one thing** (`RD.SUPPORT.SURFACE.091`). The parts give the one thing a title, a body and what closes it, such as its action. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
+- **A card MAY sit inside the content of a container.** A dashboard MAY also use cards and no container at all.
 
 ## A frame is drawn once — 🔮
 
@@ -173,11 +197,15 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.147` | the parts of a container, the four props of its look, and what it refuses |
+| `RD.SUPPORT.SURFACE.092` | `unframed` names the parts that take no frame, whatever `frames` and the theme give |
 | `RD.SUPPORT.APPS.162` | inside a bordered frame, a line divides each two parts the frame holds |
 | `RD.SUPPORT.APPS.155` | the page decides what fills a part, with `flush`, and a block never changes by where it sits |
 | `RD.SUPPORT.APPS.148` | the card stays a separate block beside the container |
+| `RD.SUPPORT.SURFACE.084` | the foundation defines no block for a row or a grid, and a stack may provide one |
+| `RD.SUPPORT.SURFACE.091` | a card may hold a header, content and a footer as parts, and still frames one thing |
 | `RD.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |
 | `RD.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a container |
+| `RD.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order |
 | `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed |
 | `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
 | `RD.SUPPORT.SURFACE.077` | an entry is one container, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "3dcba637"
+      "seen": "835393b4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "59b48104"
+      "seen": "104a7522"
     }
   ]
 }
@@ -42,13 +42,23 @@ Read this to build a page from patterns a person already knows, or to review a p
 | Read | records as a table, a list or a grid, one record in detail, and nothing to show | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` |
 | Enter | filling a field, the check on it, and sending a form | `DSForm` and the entry fields |
 | Choose | picking one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers |
-| Act | one main action, an action on many records, and an action that destroys something | `DSButton` · `DSDropdownMenu` · `DSAlertDialog` |
+| Act | one main action, an action on many records, and an action that destroys something | `DSButton` · `DSDropdownMenu` · `DSConfirmPopover` · `DSConfirmDialog` |
 | Interrupt | a task that takes over the page for a moment | `DSDialog` · `DSDrawer` · `DSSheet` |
 | Disclose | showing more in place, without leaving | `DSAccordion` · `DSCollapsible` · `DSPopover` · `DSTooltip` · `DSHoverCard` |
 | Hear back | what the surface says while it works, when it is done, and when it fails | `DSSpinner` · `DSProgress` · `DSToast` · `DSAlert` |
 | Be refused | a block hidden or disabled because the person has no permission | `DSAuthz` and the gate props |
 
-A page usually serves several intents, and one is still the main one (`standards-core.md`'s one purpose). Each intent's section states its own six parts in full in the capability chapter; a few load-bearing details: an empty result is not a failed search — the two pictures stay apart. A field that is not accepted is a control state (error) on the field, where a send that does not work is a task state (failed) on the form. Every overlay that covers a page dims it with one scrim, so a dialog, an alert dialog, a drawer and a sheet all read the same way. An alert and a toast draw one picture; the toast is the alert that appears for a while and leaves. A refusal on the surface is presentation only — hiding or disabling protects nothing, and the refusal itself is the server's.
+A page usually serves several intents, and one is still the main one (`standards-core.md`'s one purpose). Each intent's section states its own six parts in full in the capability chapter; a few load-bearing details: an empty result is not a failed search — the two pictures stay apart. A field that is not accepted is a control state (error) on the field, where a send that does not work is a task state (failed) on the form. Every overlay that covers a page dims it with one scrim, so a dialog, a confirm dialog, a drawer and a sheet all read the same way: the page behind waits. **A sheet that is not modal covers no page, so it MUST draw no scrim** (`RD.SUPPORT.SURFACE.093`). It stands beside the page, and the page stays usable. It is no interruption, because the page does not wait. A page uses it where a person works in the sheet and in the page by turns, such as a panel of settings whose result shows on the page. A popover covers no page either, so `DSConfirmPopover` draws no scrim. An alert and a toast draw one picture; the toast is the alert that appears for a while and leaves. A refusal on the surface is presentation only — hiding or disabling protects nothing, and the refusal itself is the server's.
+
+An action that needs a confirmation first asks the person for it. A confirmation has two blocks, and what the act does decides which one a page uses.
+
+| The act | Its confirmation | Why |
+| --- | --- | --- |
+| A person can undo it, such as activate, deactivate or remove from a list | a popover, `DSConfirmPopover`, which opens from the control that was pressed | the page stays in view and the person keeps their place. A wrong answer costs little, because the act can be undone |
+| It cannot be undone, such as delete | a dialog, `DSConfirmDialog`, over the page | the dialog covers the page, so the person stops and reads the question before something is lost |
+
+- **A confirmation MUST be a popover for an act a person can undo, and a dialog for an act that cannot be undone.** A dialog for every small act teaches a person to confirm without reading. Then the dialog no longer stops them on the one act that matters.
+- **Both blocks stay open while the act runs.** A failure is then shown where the person confirmed, and the act is never sent twice.
 
 ## Adding an intent — 🔮
 
@@ -376,7 +386,6 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 ## What is not settled or checked yet
 
 - **No check reads a page for its pattern.** A review names the pattern and reads the page beside its spec.
-- **Where the actions of a footer stand is not settled.** The specs draw them at the end of a footer in An entry over the page, and at the start in An entry that is a page.
 - **A unit does not yet do everything a pattern asks of it.** No unit draws a strip of steps, and a value that is not text is not changed in a cell. `architecture-widgets.md` says plainly what a unit does not do, under *Not there yet*.
 
 ## Boundary
@@ -388,6 +397,7 @@ This ref states which pattern covers a given task, and what blocks carry it. It 
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.158` | every overlay that covers a page dims it with one scrim |
+| `RD.SUPPORT.SURFACE.093` | a sheet that is not modal stands beside the page and draws no scrim |
 | `RD.SUPPORT.APPS.159` | an alert and a toast draw one picture |
 | `RD.SUPPORT.SURFACE.046` | the two kinds of pattern, a task pattern and a page pattern |
 | `RD.SUPPORT.SURFACE.047` | how a thing is shown follows from the data and from the person who uses it |

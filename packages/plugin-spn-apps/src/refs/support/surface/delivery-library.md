@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "f2495643"
+      "seen": "fa7d55ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "3006ffac"
+      "seen": "94ec1375"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Delivery Library construct (`docs/02-constructs/02-support/03-surface/11-delivery-library.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/11-delivery-library/`). Delivery Library is the eleventh of thirteen Surface constructs, and the first of the Delivery group — where the library is drawn and what every stack shows as proof.
 
-Read this before you add a token or a block to the library, or before you ask whether a look may live only in one stack's code.
+Read this before you add a token or a block to the library, or before you ask whether a look may live only in one stack's code. The units the book names are the core units, and the library draws those. A stack may provide further units of its own, as `architecture-components.md` states. The book does not name them, so the library does not draw them, and the order of a change does not bind them.
 
 ## Terms
 
@@ -262,7 +262,7 @@ The folder is `~/.spnutils/surface/`. It holds what the tool takes in and what t
 
 ## Changing the library
 
-The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. The agent changes the library through the Figma connector and in no other way.
+The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. So the library never draws what the book does not name, and a stack never builds a core unit that the library does not draw. **This order binds the core units, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RD.SUPPORT.SURFACE.082`). The book does not name a stack's own unit, so the library does not draw it as a published component. A stack's own unit that every stack should build joins the book first, and the library draws it then. The agent changes the library through the Figma connector and in no other way.
 
 | Step | What happens |
 | --- | --- |
@@ -621,6 +621,20 @@ The rules under "Before a connector writes" and "How the connector's work is car
 - A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`. It is never a block a designer places on a page of its own.
 - A value that only changes which published block sits in a slot is no variant. The slot holds the block.
 
+Some core units are put together from other blocks, or open something the device draws. The rules above decide how each one is drawn.
+
+| Block | What the library draws |
+| --- | --- |
+| `DSToolbar` | the row, with its frame on and off. An item of it is an instance of `DSButton` in a slot, so the toolbar has no variant for what an item is |
+| `DSTagGroup` | the row of tags, each an instance of `DSBadge` with its close action |
+| `DSCalendar` | the month grid, once. It is the grid that `DSDatePicker` opens, so the two use one drawing |
+| `DSColorPicker` | the swatch and the field with the code beside it, with a colour, with none, and with a typed text that is no code. The picker that opens belongs to the device, so it is not drawn |
+| `DSColorView` | the swatch and the value, the swatch alone, and the empty case |
+| `DSProgressCircle` | the ring at each size, filled to a value and turning |
+| `DSIconMark` | `shape`, `variant` and `size` as properties, and `color` as a mode, as on every block |
+| `DSConfirmPopover` | its surface alone, with the question and the two actions, as a popover is drawn. The control that opens it is not part of the drawing |
+| `DSConfirmDialog` | its surface alone, over `DSBackdrop`, as every overlay is drawn |
+
 ## Boundary
 
 This ref states what the library draws, how its files are layered, and what stays in words because no person sees it. It does not state which blocks or tokens exist — that is `architecture-components.md` and `architecture-core.md`. It does not state how a stack builds what the library draws, or what proves it did — that is `providers.md` and `delivery-showcase.md`.
@@ -631,6 +645,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | --- | --- |
 | `RD.SUPPORT.APPS.141` | the design library draws the look of each named block, and behavior stays in words |
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
+| `RD.SUPPORT.SURFACE.082` | this order binds the core units, and not a unit that a stack provides on its own |
 | `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
 | `RD.SUPPORT.SURFACE.027` | the Figma connector is the one way the agent changes the library, and a developer publishes |
 | `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are saving a named version and publishing a file, the builder manages the library and a partner is given it published, and the agent says what it will change before a connector write |

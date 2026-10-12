@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "0a52ce83"
+      "seen": "b6f42ee7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "71e0b4be"
+      "seen": "4cd0ec8f"
     }
   ]
 }
@@ -72,7 +72,7 @@ The first five rules say what a page shows, and where.
 | A label | A value **MUST** take a label only where a person cannot tell what the value is without one (`RD.SUPPORT.SURFACE.056`). A name, a picture, a state and an email need none. An address, an owner, a date and a limit each keep their label. This rule is proposed | cover the label and look at the value alone. If you can still tell what the value is, the label is a finding |
 | A frame | A part of a page **MUST** take a frame of its own only when it has a title of its own, and also an action of its own or data it loads by itself (`RD.SUPPORT.SURFACE.057`). The record a page is about is the header of the page, and it **MUST NOT** take a frame. This rule is proposed | for each framed part, find its title, and then its own action or its own loading. A frame with no title, or with neither of the other two, is a finding |
 | A state | A state **MUST** be shown as a badge on the line of facts under the title, before the other facts (`RD.SUPPORT.SURFACE.058`). It **MUST NOT** stand after the title, and it **MUST NOT** stand at the end of the line. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title or at the end of a line is a finding, and so is a badge for the normal state |
-| The end of a line | The end of a line **MUST** hold its actions, and nothing else (`RD.SUPPORT.SURFACE.059`) | read the end of each line. Anything there that a person cannot press is a finding |
+| The end of a line | The end of a line **MUST** hold its actions, and nothing else (`RD.SUPPORT.SURFACE.059`). An arrow that says the whole line leads somewhere **MAY** stand after them (`RD.SUPPORT.SURFACE.087`) | read the end of each line. Anything there that a person cannot press is a finding, except the arrow of a line that is itself pressed |
 | A count | A page pattern **MUST NOT** depend on a count (`RD.SUPPORT.SURFACE.050`). A group **MUST** show how many items it has only where the server gives that number together with the groups | read the page as if no count had come. A part that is then empty or wrong is a finding |
 
 - **A badge that says what kind of thing a record is MUST follow the rule of a state.** It stands on the line of facts, as one of the facts, and never after the title.
@@ -84,7 +84,7 @@ The last four rules say how a field, a set of choices and a list are laid out.
 | The content | Its rule | A reviewer checks |
 | --- | --- | --- |
 | A field a person enters | Its title **MUST** stand above its control, and never beside it (`RD.SUPPORT.SURFACE.060`). One line under the control **MUST** hold its description, or its error where the value is refused | look for a title beside a control, and for an error shown anywhere but under the control it belongs to. Each is a finding |
-| A field a person reads | Its title **MUST** stand above its value, and never beside it (`RD.SUPPORT.SURFACE.061`). Readings **MUST** stand in a grid: several across at a desktop and a tablet, and one under another on a phone | look for a title beside a value. Then read the page at each screen class. One column of readings in a part that has room for several is a finding, and so are readings side by side on a phone |
+| A field a person reads | Its title **MUST** stand above its value, and never beside it (`RD.SUPPORT.SURFACE.061`). Readings **MUST** stand in a grid: several across at a desktop and a tablet, and one under another on a phone. A fact on a line of facts **MAY** carry its label before it (`RD.SUPPORT.SURFACE.096`), and that is the one exception | look for a title beside a value. Then read the page at each screen class. One column of readings in a part that has room for several is a finding, and so are readings side by side on a phone |
 | The choices of one set | The choices **MUST** stand in columns: each choice starts at the same place in every row and in every group (`RD.SUPPORT.SURFACE.062`) | read down the start of the choices. A choice that starts where the one above it does not is a finding |
 | The lines of a list | A line **MUST** stand between each two lines of a list (`RD.SUPPORT.SURFACE.063`) | look between two lines of each list. Two lines with nothing between them are a finding |
 
@@ -155,6 +155,7 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
 | `RD.SUPPORT.SURFACE.058` | a state and a kind are badges on the line of facts, and the normal state shows none |
 | `RD.SUPPORT.SURFACE.059` | the end of a line holds its actions, and nothing else |
+| `RD.SUPPORT.SURFACE.087` | the arrow of a line that leads somewhere may stand after its actions. It is a MAY |
 | `RD.SUPPORT.SURFACE.060` | a field a person enters has its title above its control, with one line under it |
 | `RD.SUPPORT.SURFACE.061` | a field a person reads has its title above its value, and readings stand in a grid |
 | `RD.SUPPORT.SURFACE.062` | the choices of one set stand in columns |

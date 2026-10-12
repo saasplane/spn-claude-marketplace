@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "858b564f"
+      "seen": "b1db72df"
     }
   ]
 }
@@ -51,14 +51,32 @@ Keep each of the three names for its one meaning, on every block — a block tak
 
 A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. `DSTable` takes `hoverable`, yes or no and no by default, for whether a body row takes the table's row-hover fill under the pointer; a selected row, and a row that holds an open menu, keep their fill whichever way it is set. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
+A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
+
+These yes-or-no props each belong to one block or two. Each is no when it is not set, unless its row says yes.
+
+| Block | Prop | Whether |
+| --- | --- | --- |
+| `DSList` · `DSItem` | `bleed` | a row keeps the padding of its size above and below, and takes the inset of its place at its two sides. It is for a list or an item that fills a part with no inset |
+| `DSList.Item` · `DSItem` | `showArrow` | a chevron is drawn at the end of the row, to say that the row leads somewhere |
+| A data cell of `DSTable` | `marked` | the cell stands out in its row, in the medium weight and the default text colour |
+| `DSCard` | `fullHeight` | the card fills the height of the place it stands in. Otherwise it is as tall as what it holds |
+| `DSCard` | `divided` | a line is drawn between each two parts of the card |
+| `DSSheet` | `modal` | the sheet takes the page over, with a scrim. Otherwise it stands beside the page, and the page stays usable. Yes by default |
+| `DSToolbar` | `bordered` | a frame is drawn around the row of controls. Yes by default |
+| `DSColorPicker` | `showValue` | the code of the colour is shown beside the swatch, in a field a person may type in. Yes by default |
+| `DSColorPicker` | `clearable` | an action that empties the picker is offered while it holds a colour. Yes by default |
+| `DSColorView` | `swatchOnly` | the swatch is drawn alone, with no value beside it |
+
 ## A prop that takes a vocabulary is stated with its values — ✅
 
-A design and its code agree on a prop only when they agree on what it takes. Without the values, a designer draws the clock of a time picker as a switch under a name of the designer's own, and the stack has to be corrected afterwards. Four rules keep the design library and every stack to the values.
+A design and its code agree on a prop only when they agree on what it takes. Without the values, a designer draws the clock of a time picker as a switch under a name of the designer's own, and the stack has to be corrected afterwards. Five rules keep the design library and every stack to the values.
 
 - **A prop whose values are a vocabulary is stated with its values.** A long code list may be stated by the vocabulary's name and the place its values are stated, as the icons are. The first table below holds the vocabularies of the design system, and the second holds the shared ones.
 - **The design library carries such a prop under the same name and the same values, and every stack takes it under the same name and the same values.** This is the rule that a name is the contract, applied to the values of a prop.
 - **A vocabulary is either the design system's own or a shared one of the platform.** The design system's own is `DS<Component><Word>Type`, and it drops the component where several blocks take it, as `DSOrientationType` does. A shared one is `SP…Type`. It is realized once, in the Support contract, so that a service and a surface use the same values, and a design system never defines a shared one again.
 - **A unit or a prop of the design library follows one order: the construct in the book, then the library in Figma as its visual proof, then each stack, then the showcase.** Each step follows the one before it. A component that belongs to one app does not follow this order.
+- **The order binds a core unit and its props, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RD.SUPPORT.SURFACE.082`). The foundation does not drive such a unit, as `architecture-components.md` states. The stack builds it and states it in its own docs, and the showcase shows it marked as the stack's own. A stack's own unit that is to join the core units takes the order from its first step.
 
 **The design system's own vocabularies.** A yes-or-no prop takes no vocabulary. The default is the value shown with "when unset".
 
@@ -70,15 +88,18 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
 | `DSLink` · `DSText` | `tone` | `DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
+| `DSIconMark` | `shape` (the outline of the background the icon stands on) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSIconMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` | `iconSize` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5` | `DSIconSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
 | `DSTabs` | `type` | `DEFAULT` · `LINE` · `BADGE` | `DSTabsType` |
+| `DSItem` | `type` (the place the item line stands in; it decides the type step and the heading level of the title, and the size of the picture) | `CONTENT` · `SECTION` · `HEADER`, `CONTENT` when unset | `DSItemType` |
+| `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
 | `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
 | `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
 | `DSButton` | `type` | `SUBMIT` · `BUTTON`, `BUTTON` when unset | `DSButtonType` |
-| `DSButtonGroup` · `DSTabs` · `DSSeparator` | `orientation` | `HORIZONTAL` · `VERTICAL`, `HORIZONTAL` when unset | `DSOrientationType` |
+| `DSButtonGroup` · `DSToolbar` · `DSTabs` · `DSSeparator` | `orientation` | `HORIZONTAL` · `VERTICAL`, `HORIZONTAL` when unset | `DSOrientationType` |
 | `DSButton` · `DSLink` · `DSMenubar` · `DSDropdownMenu` | `authzDenied` | `HIDE` · `DISABLE`, `HIDE` when unset | `DSAuthzDeniedType` |
 | `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorPlacement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
 | `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorExpandedIcon` · `indicatorCollapsedIcon` | an icon of the core's icons, `CHEVRON_UP` open and `CHEVRON_DOWN` closed when unset | `DSIconType` |
@@ -99,7 +120,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
-| `DSPopover` · `DSHoverCard` · `DSTooltip` · `DSDropdownMenu` | `placement` (`DSPopover` requires it; the others open at `BOTTOM`, `TOP` and `BOTTOM_LEFT` when unset, in that order) | `LEFT` · `RIGHT` · `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT` · `RIGHT_TOP` · `RIGHT_BOTTOM` · `LEFT_TOP` · `LEFT_BOTTOM` | `DSPlacementType` |
+| `DSPopover` · `DSHoverCard` · `DSTooltip` · `DSDropdownMenu` · `DSConfirmPopover` | `placement` (`DSPopover` requires it; the others open at `BOTTOM`, `TOP`, `BOTTOM_LEFT` and `BOTTOM_RIGHT` when unset, in that order) | `LEFT` · `RIGHT` · `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT` · `RIGHT_TOP` · `RIGHT_BOTTOM` · `LEFT_TOP` · `LEFT_BOTTOM` | `DSPlacementType` |
 | `DSContextMenu` | `placement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
@@ -156,6 +177,7 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | `RD.SUPPORT.SURFACE.041` | the design library carries such a prop, and every stack takes it, under the same name and the same values |
 | `RD.SUPPORT.SURFACE.042` | a vocabulary is the design system's own or a shared one of the platform, and a shared one is realized once in the Support contract |
 | `RD.SUPPORT.SURFACE.043` | a unit or a prop of the design library follows the order construct, Figma, stack, showcase |
+| `RD.SUPPORT.SURFACE.082` | that order binds the core units, and not a unit that a stack provides on its own |
 | `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |
 | `RD.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RD.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |

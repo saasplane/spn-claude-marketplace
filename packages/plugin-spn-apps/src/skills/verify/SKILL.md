@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "59b48104"
+      "seen": "104a7522"
     }
   ]
 }
@@ -95,6 +95,8 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
    - **Open the spec of that pattern, and look at the page beside it at each screen class**: a desktop, a tablet and a phone. Look at the page through `spn-devex docs look <page>`, and never through a script inside a repository. The values in a spec are samples, so compare the arrangement and not the words.
    - **Go down the pattern's tree by layer**: the containers, then the widgets, then the components. Each line of the tree is on the page, built with the unit the tree names. A part the page built for itself is a finding. So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
    - **Check each rule of content with its reviewer's check** in `refs/support/surface/standards-core.md`: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
+   - **Read each confirmation against what its act does.** An act a person can undo asks in a popover, `DSConfirmPopover`, and an act that cannot be undone asks in a dialog, `DSConfirmDialog`. A dialog for a small act that can be undone is a finding. Both stay open while the act runs, and a failure is shown where the person confirmed.
+   - **Look behind each overlay.** One that covers the page dims it with the one scrim. A sheet that is not modal stands beside the page and draws no scrim, and the page stays usable.
    - **Type a search that matches a record on another page of the list.** A search that finds nothing ran in the page, and that is a finding (`RD.SUPPORT.SURFACE.070`).
    - **A difference the refs list under *Not there yet* is a gap of the unit, and not a finding on the page.** `architecture-widgets.md` lists them. Report it as a gap, with the unit. A private copy that a page built to close such a gap is a finding.
    - **Say where a finding rests on a proposed rule.** The refs mark each proposed rule.

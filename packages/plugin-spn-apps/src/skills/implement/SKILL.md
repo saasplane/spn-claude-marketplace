@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "59b48104"
+      "seen": "104a7522"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "9bf5f6dc"
+      "seen": "74a865db"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "ea814e26"
+      "seen": "0f4f5292"
     }
   ],
   "decisions": [
@@ -94,7 +94,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the containers, the widgets and the components the design system already has.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSWDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
-- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
+- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only, and after them the arrow of a line that leads somewhere. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 
 **A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-widgets.md` and `architecture-containers.md` state each one.
 
@@ -104,6 +104,11 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
 | a way back on the title line | the page gives `DSContainer.Header` a `backAnchor`, or places the two parts with `DSWListDetail`, which gives it to the header |
+| a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
+| the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. The main action is a solid button and the action that leaves is an outline button |
+| an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
+| a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
+| a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |
 | a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
 | fewer fields in the filter bar at a tablet | nothing. `DSWFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
 

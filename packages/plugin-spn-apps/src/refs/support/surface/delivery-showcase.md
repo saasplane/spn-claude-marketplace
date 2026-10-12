@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "500a1a14"
+      "seen": "7fd34d95"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "9f1ba212"
+      "seen": "15ba48c3"
     }
   ]
 }
@@ -65,7 +65,13 @@ The groups stand in the order of their layers. Welcome stands before them and be
 | Layouts | Layouts |
 | App | App |
 
-Welcome, Core and App hold pages, and every other group holds units. Core holds Colour, Type, Scale, Icons, States, Primitives, Patterns and Inline alignment. App holds Theme and Contract. A group of units opens with its Overview, also when it has one unit, and no group nests inside another. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none. A showcase shows no unit that the constructs do not name.
+Welcome, Core and App hold pages, and every other group holds units. Core holds Colour, Type, Scale, Icons, States, Primitives, Patterns and Inline alignment. App holds Theme and Contract. A group of units opens with its Overview, also when it has one unit, and no group nests inside another. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
+
+The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
+
+- **A showcase MUST also show the units its stack provides on its own, and MUST mark each one as the stack's own** (`RD.SUPPORT.SURFACE.083`). A developer or a partner uses those units too, so the showcase is where they learn them. The mark tells a reader that the unit belongs to this stack and that another stack may not have it.
+- **A unit of the stack's own MUST declare that it is, and the showcase MUST show that on its card in the group's Overview and in the opening of its main page.** It stands in the group whose job it does, after the units the constructs name. It has no drawing in the library, so its Figma group holds a dash, as a missing value does. The table below does not list it, because the book does not name it.
+- **A unit that is shown with no such mark MUST be one the constructs name.** An unmarked unit that no construct lists is evidence of a second standard, not of this one.
 
 The Core pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, shows the same tokens with the same values, and has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
 
@@ -75,18 +81,18 @@ Each unit below is listed with its category, its showcase layout and what it has
 
 | Group | Its units |
 | --- | --- |
-| Component - Actions | `DSButton` Control · Inline · sizes, colours, variants, states, content, opener. `DSButtonGroup` Control · Content · sizes, content |
-| Component - Data Display | Display · Content: `DSAccordion` sizes, states, content · `DSAccordionGroup` sizes, content, data · `DSAddressView` sizes, states, content, data · `DSCard` sizes, content, opener · `DSCarousel` content · `DSCodeBlockView` sizes, content · `DSDataFieldView` sizes, states, content, data · `DSDataUnit` sizes, states, content · `DSItem` sizes, content, opener · `DSJSONView` data · `DSList` sizes, states, content, opener · `DSTable` sizes, content. Display · Inline: `DSAvatar` sizes, content · `DSAvatarGroup` sizes, content · `DSBadge` sizes, colours, variants, states, content, opener |
-| Component - Feedback | Display · Content: `DSAlert` sizes, colours, content · `DSProgress` sizes, colours, states, content · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours, content |
+| Component - Actions | `DSButton` Control · Inline · sizes, colours, variants, states, content, opener. Control · Content · sizes, content each: `DSButtonGroup` · `DSToolbar` |
+| Component - Data Display | Display · Content: `DSAccordion` sizes, states, content · `DSAccordionGroup` sizes, content, data · `DSAddressView` sizes, states, content, data · `DSCard` sizes, content, opener · `DSCarousel` content · `DSCodeBlockView` sizes, content · `DSDataFieldView` sizes, states, content, data · `DSDataUnit` sizes, states, content · `DSItem` sizes, content, opener · `DSJSONView` data · `DSList` sizes, states, content, opener · `DSTable` sizes, content. Display · Inline: `DSAvatar` sizes, content · `DSAvatarGroup` sizes, content · `DSBadge` sizes, colours, variants, states, content, opener · `DSColorView` states, content |
+| Component - Feedback | Display · Content: `DSAlert` sizes, colours, content · `DSProgress` sizes, colours, states, content · `DSProgressCircle` sizes, colours, states · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours, content |
 | Component - Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
-| Component - Media | `DSAspectRatio` Display · Content · content. Display · Inline: `DSIcon` sizes, colours, states, content · `DSImage` sizes, states, content |
+| Component - Media | `DSAspectRatio` Display · Content · content. Display · Inline: `DSIcon` sizes, colours, states, content · `DSIconMark` sizes, colours, variants, content · `DSImage` sizes, states, content |
 | Component - Navigation | Control · Content: `DSBreadcrumb` states, content, data · `DSMenubar` sizes, states, content, data · `DSNavigationMenu` sizes, states, content, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
-| Component - Overlays | Overlay · Content: `DSDialog` sizes, content · `DSAlertDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` content |
-| Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
+| Component - Overlays | Overlay · Content: `DSDialog` sizes, content · `DSConfirmDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` content |
+| Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSConfirmPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Component - Typography | `DSText` Display · Content · colours, content. `DSKbd` Display · Inline · sizes, content, data |
 | Component - Utility | Display · Content · a table of types: `DSFormatCurrency` content · `DSFormatDate` none · `DSFormatDateTime` content · `DSFormatNumber` none · `DSFormatTime` none. Utility · Content: `DSAuthz` content · `DSAnchorContainer` states, content, opener · `DSElementObserver` content · `DSPortal` none · `DSSticky` states, content |
-| Data Entry - Fields | Control · Content: `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSTextarea` · `DSRadio` sizes, states, content, value each · `DSInputPhone` · `DSCheckbox` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` · `DSRadioGroup` sizes, states, content, value, data each · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, content, value, data each. `DSLabel` Control · Inline · sizes, states |
-| Data Entry - Pickers | Control · Content: `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` sizes, states, content, value, data each · `DSDatePicker` · `DSTimePicker` · `DSDateTimePicker` sizes, states, content, value each · `DSDateRangePicker` sizes, states, content, value, data. `DSCommand` Composite · Content · sizes, states, content, data. `DSCommandPalette` Overlay · Content · sizes, states, content, opener, data |
+| Data Entry - Fields | Control · Content: `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSTextarea` · `DSRadio` sizes, states, content, value each · `DSInputPhone` · `DSCheckbox` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` · `DSRadioGroup` sizes, states, content, value, data each · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, content, value, data each · `DSTagGroup` sizes, states. `DSLabel` Control · Inline · sizes, states |
+| Data Entry - Pickers | Control · Content: `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` sizes, states, content, value, data each · `DSDatePicker` · `DSTimePicker` · `DSDateTimePicker` sizes, states, content, value each · `DSDateRangePicker` sizes, states, content, value, data · `DSCalendar` states, value · `DSColorPicker` sizes, states, value. `DSCommand` Composite · Content · sizes, states, content, data. `DSCommandPalette` Overlay · Content · sizes, states, content, opener, data |
 | Data Entry - Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` sizes, states, content, value, data · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, content, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
 | Widgets | `DSWDataTable` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSWFilterBar` Composite · Full width · sizes, content, data; scenario page With overflow |
 | Containers | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
@@ -328,11 +334,12 @@ The construct fixes the layers, the groups and their order; the pages of a unit;
 | Who | Outcome |
 | --- | --- |
 | Designer | finds every unit the constructs name, in the group that holds it, under its own name; opens its drawing from the Figma link in the opening of its main page |
+| Developer | tells a unit of the stack's own from a unit every stack builds, by the mark on the unit's card and in the opening of its main page |
 | Developer | reads how to use a unit: its examples with their usage code, its props, its Playground; sees each shared state and task state without writing code |
 | Partner | changes a theme choice on the page Theme and sees the page repaint |
 | Quality engineer | knows a behaviour (keys, focus, task states) is proven, not only shown — the component tier of tests proves it; the showcase only shows the look |
 
-The showcase never restyles a unit and never shows one the constructs do not name.
+The showcase never restyles a unit, and it marks a unit its stack provides on its own as the stack's own. A check compares the showcase's pages with the constructs' unit lists: a unit it cannot find in the showcase is a finding, and so is a unit it finds in the showcase and not in a construct, unless the unit is marked as the stack's own.
 
 ## Boundary
 

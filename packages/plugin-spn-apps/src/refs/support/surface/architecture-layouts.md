@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "52af90e7"
+      "seen": "349b9660"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "3f3eab29"
+      "seen": "0415bb2f"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/03-surface/09-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/09-architecture-layouts/`). Layouts is the ninth of thirteen Surface constructs.
 
-Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The layout types are `RAIL`, `DOCK` and `TOPNAV`, and every type places the same named places: the brand, the navigation, the account, the utility actions and the main area. A layout names no routing library.
+Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The layout types are `RAIL`, `DOCK` and `TOPNAV`, and every type places the same named places: the brand, the navigation, the account, the utility actions, the main area and an optional footer. A layout names no routing library.
 
 ## Terms
 
@@ -34,7 +34,9 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | `DOCK` | a navigation that stays open, beside one column of content |
 | `TOPNAV` | a bar across the top, with the content centered below it |
 
-Every layout type places the same named places. A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
+Every layout type places the same named places: the brand, the navigation, the account, the utility actions, the main area and the footer. **The footer is an optional place that closes the main area, and every layout type places it the same way.** Where the content is short, the footer stands at the bottom edge of the main area. Where the content is long, it stands after the content. An app that gives no footer has none. The layout places the footer and decides nothing about what it holds, as with the other named places.
+
+A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
 
 ## The main area — 🔮
 

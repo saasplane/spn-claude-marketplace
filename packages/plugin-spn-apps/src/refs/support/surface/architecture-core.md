@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "d271a03c"
+      "seen": "8785e856"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "cdcd69fa"
+      "seen": "d446f478"
     }
   ]
 }
@@ -44,7 +44,7 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body down to a muted or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body down to a muted or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
 ## The scale — ✅
 
@@ -52,7 +52,7 @@ The scale has five steps, `XS` to `XL`. Each step carries six measures: height, 
 
 ## The type steps and icons — ✅
 
-Text is drawn at one of three families of step, each at several sizes: heading (a page or section title), title (a component's own title or label), content (the body text a person reads). Each step also carries a weight (`REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`) and a tone (`DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE`). A block draws an icon from one closed set, `DSIconType`, never a file of its own choosing — the full list of names is declared member by member in the capability chapter.
+Text is drawn at one of three families of step, each at several sizes: heading (a page or section title), title (a component's own title or label), content (the body text a person reads). Each step also carries a weight (`REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`) and a tone (`DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE`). A block draws an icon from one closed set, `DSIconType`, of 56 names, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
 
 ## Boundary
 
