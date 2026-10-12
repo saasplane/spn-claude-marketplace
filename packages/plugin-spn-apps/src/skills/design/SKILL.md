@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "4b706b5f"
+      "seen": "1e32626c"
     }
   ]
 }
@@ -30,6 +30,8 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 **Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by layer of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-widgets.md` and `architecture-components.md` where the pattern names a data table, a filter bar, an item line, a badge or a field.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
+
+**The surface has two levels** (`RD.SUPPORT.SURFACE.081`). The book states the core: the core units, the rules, and for pages the patterns and their skeletons. A stack's design system builds all of it, and it may provide further units of its own that help build apps. So you read the pattern and its skeleton from the refs, and you pick the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
 
 Take the scope from the argument: one page, or a flow of pages. A flow is several pages, and each page gets a tree of its own.
 
@@ -63,7 +65,8 @@ A layout frames the page. It draws the navigation, and it hands the page a main 
 | `TOPNAV` | a bar across the top, with the content centered below it |
 
 - **The page chooses its layout, and the theme never does.** Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
-- **Fill the named places**: the brand, the navigation, the account, the utility actions and the main area. Every layout type places each of them.
+- **Fill the named places**: the brand, the navigation, the account, the utility actions, the main area and the footer. Every layout type places each of them.
+- **The footer is optional, and it closes the main area.** Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content. An app that gives no footer has none. The layout places it, and decides nothing about what it holds.
 - **Mark the place the person is in.** The navigation shows it with the selected state.
 - **Leave the navigation to the layout.** A page that draws its own navigation has taken the layout's job.
 
@@ -179,17 +182,21 @@ A container is optional. Use one where a part of the page has a header, content 
 | A dashboard | flat | raised, holding widgets that show numbers | none |
 
 - **Put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The action of one part of the content stands at the end of that part's title, and never in the header.
+- **The actions that close the work of an entry stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
 - **Frame a part only when it has a title of its own, and also an action of its own or data it loads by itself** (`RD.SUPPORT.SURFACE.057`, proposed). The record a page is about is the header of the page, and it takes no frame.
 - **An entry over the page is one container, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header, its fields are its content, and its actions stand in its footer.
 - **A large form is one container.** Its sections are the parts of its content, each under its own title. A section is never a container of its own, and no list of the sections stands beside the form (`RD.SUPPORT.SURFACE.078`).
 - **Groups and their items are two containers at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action, and the swap changes the address (`RD.SUPPORT.SURFACE.079`). A set of groups that can be added to is a list, and never a row of tabs (`RD.SUPPORT.SURFACE.080`).
-- **Give one container to each part that reads as one unit.** Parts that should sit apart are separate containers, or cards. A container frames a part of a page. A card, `DSCard`, frames one thing.
+- **Give one container to each part that reads as one unit.** Parts that should sit apart are separate containers, or cards. A container frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number.
+- **A card may hold `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it still frames one thing** (`RD.SUPPORT.SURFACE.091`). Its parts all sit inside its one frame, in every theme, and a part takes no prop. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
 - **Write the parts in one order**: `DSContainer.Header`, then `DSContainer.Content`, then `DSContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
 - **The page decides what fills a part.** Write `flush` on a part whose content reaches the edge of the frame, such as a table. A part without `flush` insets everything it holds.
 - **In a `flush` part, a block that draws a border of its own draws none.** Those blocks are a table, a list, a code block, an accordion and an empty state. Every other block reaches the edge.
 - **Never put a container inside a container.** A card, an accordion or a set of tabs goes inside the content.
-- **Leave the look to the theme.** The look is `frames`, `raised`, `bordered` and `rounded`. Set one on a container only where that container differs from the app.
+- **Leave the look to the theme.** The look is `frames`, `raised`, `bordered` and `rounded`, and one more prop, `unframed`, that holds a part out of the frame. Set one on a container only where that container differs from the app.
+- **Write `unframed` for a part that no theme should frame on this page** (`RD.SUPPORT.SURFACE.092`). It is a list: any of `HEADER`, `CONTENT`, `FOOTER`. A part listed there sits flat on the page, whatever `frames` and the theme give, and the rest of the look stays the theme's. One such part is a header that is the header of the page. The book states `unframed` before the web builds it, so say so where the tree writes it.
 - **Write no color, no padding and no margin on a container.** The gap between two blocks comes from the scale.
+- **The book defines no block for a row or a grid of blocks in a part** (`RD.SUPPORT.SURFACE.084`). The page writes it, with its gap from the scale, or uses a unit for it where its stack provides one.
 - **A page may use no container at all.** It may put a widget or a component straight into the main area, or fill the area with one block.
 
 ## 4. Choose the pattern for each task
@@ -203,7 +210,7 @@ The page pattern says where the parts of the page sit. A task pattern says how e
 | Read | reads records as a table, a list or a grid, or one record in detail | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` | all six |
 | Enter | fills fields, sees the check on each one, and sends the form | `DSForm` and the entry fields | idle, working, then done or failed |
 | Choose | picks one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers | idle, then done. All six when the set is loaded |
-| Act | runs one main action, an action on many records, or one that destroys something | `DSButton` · `DSDropdownMenu` · `DSAlertDialog` | working, then done or failed |
+| Act | runs one main action, an action on many records, or one that destroys something | `DSButton` · `DSDropdownMenu` · `DSConfirmPopover` · `DSConfirmDialog` | working, then done or failed |
 | Interrupt | meets a task that takes over the page for a moment | `DSDialog` · `DSDrawer` · `DSSheet` | those of the task inside it |
 | Disclose | sees more in place, without leaving | `DSAccordion` · `DSCollapsible` · `DSPopover` · `DSTooltip` · `DSHoverCard` | idle, then done. All six when it is loaded |
 | Hear back | learns that the surface works, is done, or failed | `DSSpinner` · `DSProgress` · `DSToast` · `DSAlert` | working, done and failed |
@@ -214,7 +221,9 @@ The six task states are idle, working, done, failed, empty and denied.
 - **One intent is the main one**, and it carries the main action of the page.
 - **Decide what the person sees in each task state**, for every task. A block drawn from data shows all six, each with a picture of its own. An action shows working, and then done or failed.
 - **Decide the way back from each failure.** A failed state says what went wrong. A failed send keeps what the person entered. An empty result keeps its filters shown.
-- **An action that destroys something asks first**, in `DSAlertDialog`.
+- **An action that needs a confirmation asks first**, and what the act does decides in which block. An act a person can undo, such as activate, deactivate or remove from a list, asks in a popover, `DSConfirmPopover`, which opens from the control that was pressed. An act that cannot be undone, such as delete, asks in a dialog, `DSConfirmDialog`, over the page. Never plan a dialog for a small act that can be undone. Both blocks stay open while the act runs, and show a failure where the person confirmed.
+- **An overlay's closing actions stand at the end of its footer, the cancel first and the main action last.** `DSDialog`, `DSDrawer` and `DSSheet` may hold the parts `Header`, `Content` and `Footer`, and only the content scrolls between the other two. `DSConfirmDialog` and `DSConfirmPopover` place their two actions the same way.
+- **Every overlay that covers a page dims it with one scrim.** A sheet that is not modal covers no page (`RD.SUPPORT.SURFACE.093`): the tree writes `modal=false` on `DSSheet`, the sheet stands beside the page and draws no scrim, and the page stays usable. Plan it where a person works in the sheet and in the page by turns. On a phone a sheet stays modal. A popover draws no scrim either.
 - **A toast and an alert take their icon from their hue, and the two draw one picture.** The toast is an alert that appears for a while and leaves, so no caller passes its icon.
 - **Put nothing a person needs behind hover alone.** `DSTooltip` and `DSHoverCard` hold an addition, and never the one way to a thing.
 - **Never invent a pattern for an intent the table holds.** A task that fits no intent is named in the result, and the page waits. A new intent joins the patterns chapter of the book first.
@@ -225,8 +234,14 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the tree by layer of the page pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
-- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a `DSBadge` on the line of facts under the title, before the other facts, and the normal state shows none. The end of a line holds its actions and nothing else. A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
+- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, and the normal state shows none. The end of a line holds its actions and nothing else, except that the arrow of a line that leads somewhere may stand after them (`RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
+- **Under the picture an item line holds its title, its description, then its line of facts.** The facts go to `facts`, and they stand under the description, so a line that has both shows both (`RD.SUPPORT.SURFACE.086`). Write each fact as data, in one of four forms: plain words; `TEXT`, with a `label` and icons where it needs them; `BADGE`, with a `color`; or `CUSTOM`, a block of the page's own (`RD.SUPPORT.SURFACE.096`). A fact whose value cannot be read alone, such as a count, a date or a person, carries its label before it, as *Members: 12*. A state is a `BADGE` fact.
+- **Write the `type` of an item line, and no type step or heading level for its title** (`RD.SUPPORT.SURFACE.094`). `CONTENT` is a line among others, and the default. `SECTION` is the title line of a part of a page. `HEADER` is the header of a page or of a record. The type decides the type step and the heading level of the title, and the size of the picture.
+- **Write `showArrow` on a line that leads somewhere, where the page wants the arrow.** It is a chevron after the actions, and it is off by default.
+- **In a list the row carries the link, the chosen fill and the reaction to the pointer, and the item line inside it carries none** (`RD.SUPPORT.SURFACE.097`). `DSItem` takes no `selected`: write `selected`, `anchor` and `showArrow` on the row, `DSList.Item`. An item line that stands alone, in a card or a header, carries its own `anchor` and `showArrow`. Write `hoverable` on a `DSList` whose rows a person acts on; it is off by default.
+- **A line of the `LIST` layout of `DSWDataTable` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
+- **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). `DSIconMark` draws an icon as a mark, with `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`. Choose rounded or square where the thing is better shown so, such as an app or a file. A mark is never pressed.
 - **Give `DSWDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSWFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
 - **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
@@ -236,7 +251,8 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **Write only props the book names.** Hover, focus and pressed are shown states. The platform produces them, and the tree never sets them.
 - **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown. One item serves every host that takes one data shape — the three menus take one shape and share `DSMenuNode`. A host whose data differs declares its own item.
 - **What a block does stays in words**: where an action leads, and which permission gates it. Write it beside the block.
-- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it. It is proposed to the design system.
+- **A unit the stack's design system provides on its own is written by the name its stack gives it.** The book does not name it, and its stack's docs state its props. Say in the result that it is the stack's own, because another stack may not have it and the library holds no drawing of it.
+- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it. It is proposed to the design system: one that every stack should build joins the core units, in the book first, and one that helps a single stack may be that stack's own unit.
 
 ## 6. State the page as a tree
 
@@ -251,7 +267,7 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | A block | its name in the book, then each prop as `name=VALUE` |
 | A part of a block | the name of the part: `DSContainer.Header`, or a named place of the layout. A part of a container carries `flush` after its name, where the page writes it |
 | Content | the text a person reads, in quotes |
-| A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look |
+| A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look. Where the stack provides a unit for it, the tree may name that unit |
 | A task | at the right of the block that carries it: the intent, and what the block does |
 
 ```text
@@ -299,6 +315,8 @@ Missing       nothing. The page reads the device and lists LIST on a phone, and 
 A tree is complete with no drawing. Draw it where the window holds the Figma connector and the developer asks for the drawing. Read `skills/design/steps/draw.md` then, and follow it. It draws the tree from the published libraries, by instances, with the look as theme modes. It then reads the page back by name. Where the window holds no connector, say so, and hand over the tree.
 
 The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, name the developer's next step, and show the result. A child agent that sends `use_figma` cannot read the connector's own skill, so give it `skills/design/steps/connector-rules.md`. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
+
+**Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. A pattern is an arrangement of units, so the library draws none either: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 
 ## Close
 

@@ -3,19 +3,19 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "3006ffac"
+      "seen": "94ec1375"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "858b564f"
+      "seen": "74aa8ef8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "ea814e26"
+      "seen": "0f4f5292"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "3f3eab29"
+      "seen": "0415bb2f"
     }
   ]
 }
@@ -30,6 +30,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
+- **The library holds the core units, which are the ones the book names, and no other unit** (`RD.SUPPORT.SURFACE.082`). It draws no component for a unit that a stack provides on its own, and none for a pattern. So a page pattern is drawn as its units, and never as one instance.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
 ## Before you draw
@@ -61,7 +62,8 @@ The design library holds one file for each layer of the design system that is dr
 | A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement or a format is never drawn under a name or a switch of the designer's own |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
-| A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
+| `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
+| A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it. The named places of a layout are the brand, the navigation, the account, the utility actions, the main area and the footer |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
 | Content | the text of the instance, typed as the tree gives it |
 | `row`, `column` or `grid` | a plain frame with auto layout. Its gap binds a variable of the scale |
@@ -77,14 +79,22 @@ The design library holds one file for each layer of the design system that is dr
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
 - **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
 - **Draw each part of a container with what the tree puts in it.** The header holds the title of the container at its start and its actions at its end. The footer holds what closes its work, such as the paging of a listing or the two actions of an entry. The action of one part of the content stands at the end of that part's title.
+- **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
+- **Draw a part named in `unframed` flat.** It takes no frame in any theme, so a change of the top frame's look leaves it as it is. One such part is a header that is the header of the page.
+- **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the main area. Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content.
+- **Draw the parts of a card inside its one frame.** `DSCard.Header`, `DSCard.Content` and `DSCard.Footer` take no prop, so no part of a card takes the frame setting. `divided` is the line between each two parts.
 - **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a text takes the icon size of that text's size step and shares its centre line: an `XS` icon beside `XS` text.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
+- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `type` is `CONTENT`, `SECTION` or `HEADER`, and it decides the size of the title and of the picture, so no text style is set by hand. `showArrow` is the chevron after the actions.
+- **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
 
 ## How a block is drawn
 
 - **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own, and the library draws no `extent` variant; the instance placed on the canvas decides it.
+- **The two confirmations are drawn as their surface alone.** `DSConfirmDialog` stands over `DSBackdrop`, as every overlay does. `DSConfirmPopover` is drawn with the question and its two actions, as a popover is drawn, with no backdrop, and the control that opens it is not part of the drawing. Both place the action that cancels first and the action that confirms last, at the end.
+- **A sheet that is not modal is drawn beside the page, with no `DSBackdrop`.** That is `modal` set to no on `DSSheet`.
 - **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
 - **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
 - **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason (the table "A property a named unit keeps crossed" in `refs/support/surface/delivery-library.md`).** Every other property of the web unit is a case on the unit's sheet, found by the section of the unit's page in the showcase that shows it (Cases, and a section of the unit's own); a hue is a mode on the instance; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
@@ -96,7 +106,8 @@ The libraries are drawn layer by layer, so a page can need a block that no file 
 | What is missing | What you do |
 | --- | --- |
 | A block the book names, which no library file has published | Draw the rest of the page. Hold its place with an empty plain frame named `missing <block>`, with no fill. Name the block and its line of the tree in the report |
-| A block the book does not name | Stop at that line of the tree. The control is proposed to the design system, and the page waits for it |
+| A unit that the stack provides on its own, which the book does not name | The library draws no component for it. Hold its place as for a block no file has published, and say in the report that the unit is the stack's own and has no drawing |
+| A block that neither the book nor the stack names | Stop at that line of the tree. The control is proposed to the design system, and the page waits for it |
 | A property or a value that the tree sets and the component lacks | Leave the property at its default. Name the difference in the report |
 
 **Nothing drawn by hand stands in for a block.** A stand-in reads back as a name the book does not hold, and a person takes it for the design. The report says that the page is drawn in part, and lists what it waits for. When the library publishes the block, an instance takes the place of the frame.

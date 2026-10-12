@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "b1db72df"
+      "seen": "74aa8ef8"
     }
   ]
 }
@@ -57,6 +57,7 @@ These yes-or-no props each belong to one block or two. Each is no when it is not
 
 | Block | Prop | Whether |
 | --- | --- | --- |
+| `DSList` | `hoverable` | a row takes the list's row-hover fill under the pointer, also where it is no link. A row that is chosen keeps its fill |
 | `DSList` · `DSItem` | `bleed` | a row keeps the padding of its size above and below, and takes the inset of its place at its two sides. It is for a list or an item that fills a part with no inset |
 | `DSList.Item` · `DSItem` | `showArrow` | a chevron is drawn at the end of the row, to say that the row leads somewhere |
 | A data cell of `DSTable` | `marked` | the cell stands out in its row, in the medium weight and the default text colour |

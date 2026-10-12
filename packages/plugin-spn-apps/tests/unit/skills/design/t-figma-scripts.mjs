@@ -408,6 +408,10 @@ async function guard(body) {
 // Every text below that holds a label's words is a real one of DS 2-Components, copied as it was read
 // (`notes/N020/inventory-ds-2-components-labels.md` and `inventory-ds-2-components.md`, 2026-10-07). A text the
 // case had to make up is named as made up.
+//
+// The library names its confirm dialog `DSAlertDialog`, and the book names it `DSConfirmDialog`. Arc 025 N006
+// renames the component in the library in its first drawing step. Until then `alertDialog` below is the real
+// label. No script matches a unit by this name, so the rename changes no script.
 
 console.log("\n=== the book's label form, read from real labels");
 const REAL = {

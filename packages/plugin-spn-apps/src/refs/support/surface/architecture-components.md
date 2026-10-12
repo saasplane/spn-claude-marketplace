@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "f7a54f1c"
+      "seen": "efd5352c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "36e25be9"
+      "seen": "36cd89d9"
     }
   ]
 }
@@ -90,6 +90,14 @@ Some blocks are drawn from data: a select from its options, a menu from its node
 
 The reason is that a hover tells a person the row answers to them. A row that does nothing when it is pressed should not react, so a plain table stays still, and a table whose rows a person acts on turns `hoverable` on. `DSWDataTable` turns it on. `hoverable` is not a prop for the hover state: hover stays a shown state that the browser produces, and the prop states only whether this block answers to the pointer at all.
 
+## What a list's rows carry — 🔮
+
+`DSList` **MUST** take `hoverable`, with the meaning it has on `DSTable` (`RD.SUPPORT.SURFACE.097`). It is a yes-or-no prop that is no by default. A list that is `hoverable` fills the row under the pointer, also where the row is no link. A row that is chosen keeps its fill.
+
+- **In a list the row MUST carry the link, the chosen fill and the reaction to the pointer, and an item line inside it MUST carry none of them.** The row is the whole width, with what stands at its start and at its end, so its fill covers all of it. An item line that stands alone, in a card or a header, carries its own link.
+- **`selected` is the row's, and `DSItem` takes none.** A thing is chosen within a set, and the set is the list. So the row of a list, `DSList.Item`, takes `anchor`, `selected` and `showArrow`.
+- **`anchor` and `showArrow` stand on both blocks**, because the link and the arrow that says it leads somewhere go together: on the row in a list, and on the item line where it stands alone.
+
 ## What single blocks answer — 🔮
 
 Each rule below is of one block or one prop. The props, their values and their defaults are in `architecture-names.md`.
@@ -123,7 +131,7 @@ Three things show a record and its facts on most pages: a line for the record, a
 
 ### The item line
 
-The item line, `DSItem`, shows one thing as a line. With `selected` it is the chosen one of its list, and a band stands behind it; a row of `DSList` takes `selected` the same way.
+The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a list the row is the chosen one, and the row carries the fill (`RD.SUPPORT.SURFACE.097`).
 
 | Part of the item line | Holds | Its prop on `DSItem` |
 | --- | --- | --- |
@@ -147,7 +155,7 @@ The item line, `DSItem`, shows one thing as a line. With `selected` it is the ch
 
 - **A fact MAY carry its label before it, where the value cannot be read alone.** A count, a date and a person are such values. A state, a kind and a code are read alone and take no label. This is the one place a title stands beside its value.
 - **A fact that is empty MUST be left out, with its dot.**
-- **Nothing but the actions MAY stand at the end of an item line, and the arrow of `showArrow` MAY stand after them** (`RD.SUPPORT.SURFACE.087`). A state at the end would look like something to press. The arrow is no state: it stands on a line that leads somewhere when it is pressed. It is off by default. A row of `DSList` takes `showArrow` the same way.
+- **Nothing but the actions MAY stand at the end of an item line, and the arrow of `showArrow` MAY stand after them** (`RD.SUPPORT.SURFACE.087`). A state at the end would look like something to press. The arrow is no state: it stands on a line that leads somewhere when it is pressed. It is off by default. A row of `DSList` takes `showArrow` the same way, and in a list the arrow is the row's.
 - **The header of a record and a line of a list MUST have the same shape: a picture, a title, a line under it, and actions.** A badge then stands in the same place on both. A person who has read a list can read the page of one record.
 
 One item line serves three places, and `type`, from `DSItemType`, says which one it stands in.
@@ -232,6 +240,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.090` | `DSColorView`, `DSIconMark` and `DSConfirmPopover` are core units |
 | `RD.SUPPORT.SURFACE.094` | the type of an item line decides the type step and the heading level of its title, and the size of its picture |
 | `RD.SUPPORT.SURFACE.096` | the four forms a fact of an item line is given in, and a fact may carry its label before it |
+| `RD.SUPPORT.SURFACE.097` | `DSList` takes `hoverable`, and `selected` is the row's and not the item line's |
 
 ## Proof
 

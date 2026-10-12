@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "c0749a0b"
+      "seen": "0e76e243"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "74a865db"
+      "seen": "6c2b5f02"
     }
   ]
 }
@@ -66,6 +66,8 @@ The records take one of three layouts, and the data decides which. The widget is
 - **A page MUST choose the layout from the data, by the table above** (`RD.SUPPORT.SURFACE.068`). It lists the layout in the widget's `layouts`, with the columns or the renderer of that layout.
 - **On a phone the records MUST be in the `LIST` layout.** A phone has no room for columns, or for cards side by side. At a tablet `TABLE` shows fewer columns, and `GRID` fewer cards across. That `LIST` stands on a phone, also in place of `GRID`, is proposed and not yet confirmed.
 - **Many groups that a person searches MUST be in the `LIST` layout, and never in `TABLE`** (`RD.SUPPORT.SURFACE.069`). A group is read by its name, as a line, and the groups stand in a narrow part of the page. A person picks one group and does not compare groups across columns.
+- **A line of the `LIST` layout MUST be an item line, `DSItem`** (`RD.SUPPORT.SURFACE.097`). The page gives the title, the description and the facts of a record, and every list of every data table then reads the same way. The widget's rows carry no padding of their own, so the item line's padding is the only one, and the widget lines the item up with the title of the container it stands in. A page that draws a block of its own in place of an item line brings that block's padding itself.
+- **When its records are shown as a list, `DSWDataTable` MUST turn `hoverable` on, as it does for a table.** The row under the pointer answers in both layouts. The row carries the reaction, and the item line inside it carries none.
 - **A line of the `LIST` layout MUST follow the rules of content of `standards-core.md`.** Its state is a badge on the line of facts, the normal state shows none, and a line stands between each two lines. The widget draws the line between each two lines itself. What a line holds is the page's renderer, so the badge and its place are the page's to write.
 
 **What the widget does.** The widget draws the layouts a page lists, and it reads no device type. The page chooses, and the widget follows what the page lists each time it draws: the layout a person chose while the page still lists it, and the first of the list otherwise. So the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone, and the widget shows the list at once when the screen becomes a phone. The widget does not change to `LIST` by itself. A page that lists `TABLE` alone shows a table on a phone.
@@ -148,6 +150,7 @@ This ref states what makes a block a widget, and what `DSWDataTable`, `DSWFilter
 | --- | --- |
 | `RD.SUPPORT.SURFACE.068` | the layout of the data table is chosen from the data, and it is `LIST` on a phone. That `LIST` also takes the place of `GRID` on a phone is proposed |
 | `RD.SUPPORT.SURFACE.069` | many groups a person searches are in the `LIST` layout, and never in `TABLE` |
+| `RD.SUPPORT.SURFACE.097` | a line of the `LIST` layout is an item line, and in a list the row carries the link, the chosen fill and the reaction to the pointer |
 | `RD.SUPPORT.SURFACE.070` | a search and a filter of the records are sent to the server |
 | `RD.SUPPORT.SURFACE.071` | the actions of a record stand at the end of its row, its line or its card. How many stand on the row, and what a press on a row does, are proposed |
 | `RD.SUPPORT.SURFACE.072` | a value changed in a table is changed in its cell, one row at a time |

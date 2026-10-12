@@ -137,7 +137,7 @@ if (neededNames.size > 0) {
   }
 }
 
-// What a component holds, in words: `INSTANCE DSAlertDialog`, `FRAME button row, TEXT caption`.
+// What a component holds, in words: `INSTANCE DSConfirmDialog`, `FRAME button row, TEXT caption`.
 const heldBy = (component) => ((component.children || []).length > 0 ? component.children.map((child) => `${child.type} ${child.name}`).join(", ") : "nothing");
 // A component is right when it holds exactly one instance of the base that carries every wanted mode and value.
 const instanceOfUnit = async (component) => {
