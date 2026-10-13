@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "b6f42ee7"
+      "seen": "1baa132a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "73ba0822"
+      "seen": "70c02fa5"
     }
   ]
 }
@@ -71,13 +71,14 @@ The first five rules say what a page shows, and where.
 | --- | --- | --- |
 | A label | A value **MUST** take a label only where a person cannot tell what the value is without one (`RD.SUPPORT.SURFACE.056`). A name, a picture, a state and an email need none. An address, an owner, a date and a limit each keep their label. This rule is proposed | cover the label and look at the value alone. If you can still tell what the value is, the label is a finding |
 | A frame | A part of a page **MUST** take a frame of its own only when it has a title of its own, and also an action of its own or data it loads by itself (`RD.SUPPORT.SURFACE.057`). The record a page is about is the header of the page, and it **MUST NOT** take a frame. This rule is proposed | for each framed part, find its title, and then its own action or its own loading. A frame with no title, or with neither of the other two, is a finding |
-| A state | A state **MUST** be shown as a badge on the line of facts under the title, before the other facts (`RD.SUPPORT.SURFACE.058`). It **MUST NOT** stand after the title, and it **MUST NOT** stand at the end of the line. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title or at the end of a line is a finding, and so is a badge for the normal state |
-| The end of a line | The end of a line **MUST** hold its actions, and nothing else (`RD.SUPPORT.SURFACE.059`). An arrow that says the whole line leads somewhere **MAY** stand after them (`RD.SUPPORT.SURFACE.087`) | read the end of each line. Anything there that a person cannot press is a finding, except the arrow of a line that is itself pressed |
+| A state | A state **MUST** be shown as a badge (`RD.SUPPORT.SURFACE.058`). It stands on the line of facts under the title, before the other facts, or at the end of the line, and the page chooses by the room the screen gives. It **MUST NOT** stand after the title. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title is a finding, and so is a badge for the normal state |
+| The end of a line | What stands at the end of a line is the page's own: its actions, a badge, or both (`RD.SUPPORT.SURFACE.059`). A line that leads to a page **MUST** show the arrow where its end holds no action. A line that has an action **MUST** give it at its end, and it shows no arrow (`RD.SUPPORT.SURFACE.087`). The arrow is off unless the page asks for it | read the end of each line. A line that leads to a page and shows neither an action nor the arrow is a finding, and so is an arrow on a line that leads nowhere |
 | A count | A page pattern **MUST NOT** depend on a count (`RD.SUPPORT.SURFACE.050`). A group **MUST** show how many items it has only where the server gives that number together with the groups | read the page as if no count had come. A part that is then empty or wrong is a finding |
 
 - **A badge that says what kind of thing a record is MUST follow the rule of a state.** It stands on the line of facts, as one of the facts, and never after the title.
 - **Why a label and a frame are held back.** A label that tells a person nothing new takes room from the value. A frame says that what is inside it stands apart, and a frame around every part says that of nothing.
-- **Why a state is not at the end.** A state is one of the facts of a thing, so it is read with them. At the end of a line it would look like something to press.
+- **Why a state stands where it does.** A state is one of the facts of a thing, so it is read with them, or at the end of the line where the line is short. A badge on every line would hide the few lines a person has to look at.
+- **Why the end of a line is kept so.** A person finds the actions of every line in the same place, and a line with no action still says that it leads somewhere.
 
 The last four rules say how a field, a set of choices and a list are laid out.
 
@@ -140,7 +141,7 @@ A question that cannot be answered from a part is a matter of taste, and it is n
 
 ## The web's own standards — 🔮
 
-A device type is two closed sets, stated in full in the web's chapter (`docs/04-capabilities/02-support/03-surface/01-standards-core/02-web/01-standards.md`): screen class (`MOBILE` · `TABLET` · `DESKTOP`) and orientation (`PORTRAIT` · `LANDSCAPE`). A page holds at each screen class and each orientation; a block decides its layout from the device type, read from the context it is drawn in, and never measures a width of its own. On the web, a pattern states the keys that carry it and what the pointer does, and whatever the pointer can do the keyboard must be able to do too. Hover is a shown state of the web alone, never a prop, and never the only way to reach something a person needs. A prop **MAY** state whether a block answers to the pointer at all, and **never** that a pointer is over it: `hoverable` on `DSTable` is such a prop, and the row's hover fill stays a shown state that the caller cannot claim.
+A device type is two closed sets, stated in full in the web's chapter (`docs/04-capabilities/02-support/03-surface/01-standards-core/02-web/01-standards.md`): screen class (`MOBILE` · `TABLET` · `DESKTOP`) and orientation (`PORTRAIT` · `LANDSCAPE`). A page holds at each screen class and each orientation; a block decides its layout from the device type, read from the context it is drawn in, and never measures a width of its own. There is one exception: a unit that can stand in a narrow place inside a wide window **MAY** arrange itself by the width of its place (`RD.SUPPORT.SURFACE.133`). The device type says how wide the window is, and it cannot say how wide a column of that window is. Such a unit reads the width of its own place, and never the width of the window. `DSPagination` and the footer of `DSDataTableWidget` are such units. On the web, a pattern states the keys that carry it and what the pointer does, and whatever the pointer can do the keyboard must be able to do too. Hover is a shown state of the web alone, never a prop, and never the only way to reach something a person needs. A prop **MAY** state whether a block answers to the pointer at all, and **never** that a pointer is over it: `hoverable` on `DSTable` is such a prop, and the row's hover fill stays a shown state that the caller cannot claim.
 
 ## Boundary
 
@@ -154,7 +155,8 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.056` | when a value takes a label. The rule is proposed |
 | `RD.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
 | `RD.SUPPORT.SURFACE.058` | a state and a kind are badges on the line of facts, and the normal state shows none |
-| `RD.SUPPORT.SURFACE.059` | the end of a line holds its actions, and nothing else |
+| `RD.SUPPORT.SURFACE.059` | what stands at the end of a line is the page's own, its actions, a badge or both, and when a line shows its arrow |
+| `RD.SUPPORT.SURFACE.133` | a unit in a narrow place of a wide window may arrange itself by the width of its place. It is a MAY |
 | `RD.SUPPORT.SURFACE.087` | the arrow of a line that leads somewhere may stand after its actions. It is a MAY |
 | `RD.SUPPORT.SURFACE.060` | a field a person enters has its title above its control, with one line under it |
 | `RD.SUPPORT.SURFACE.061` | a field a person reads has its title above its value, and readings stand in a grid |

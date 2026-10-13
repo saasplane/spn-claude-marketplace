@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "eed7c9a6"
+      "seen": "fbc89dc9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "3600d782"
+      "seen": "d83c3434"
     }
   ]
 }
@@ -88,7 +88,7 @@ Text is drawn in one of three families, and each family has its steps.
 - **A type step sets the size and the weight of a text, and nothing else** (`RD.SUPPORT.SURFACE.103`). Whether a text is a heading of the page is its element, which `DSText` takes through `element`. So a large number in a heading step is not announced as a section unless the page says so.
 - **The book states no line height for `HEADING_XXL` to `HEADING_XXL5` yet.** They take a tighter line than the smaller heading steps, and the stack sets it.
 
-The weights are `REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`. A text also carries a tone (`DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE`), for how strongly it stands out from its surface. A block draws an icon from one closed set, `DSIconType`, of 56 names, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
+The weights are `REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`. A text also carries a tone (`DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE`), for how strongly it stands out from its surface. A block draws an icon from one closed set, `DSIconType`, with one name for each icon, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
 
 ## Boundary
 

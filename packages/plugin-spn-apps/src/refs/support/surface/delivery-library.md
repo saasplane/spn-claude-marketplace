@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "c0134d01"
+      "seen": "a867d10c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "94086eb0"
+      "seen": "1cb7a965"
     }
   ]
 }
@@ -57,7 +57,7 @@ A file can use only what another file has published. SaaS Plane's own library is
 | DS 5-Layouts | Layouts |
 | DS 9-Lab | drafts, never published |
 
-Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
+Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Treatment` (the values of `variant`, `SOFT` · `SOLID` · `OUTLINE` · `GHOST` · `LINK`, for a unit that takes its look as a mode, with `SOFT` the default), `Mark-Shape` (the values of `shape` of a mark, `CIRCLE` · `ROUNDED` · `SQUARE`), `Scale` (it also holds the size of an icon and of a mark at each scale size), `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
 
 The organisation of a library file that the book states holds for any library, the builder's and a partner's own: a page for a group, a section for a unit with its header, set, Usage, Cases and Parts, the distances, the names of labels and cases, and the checks before a publish. Which files a library is divided into is the builder's for its design system and a partner's own for a library of its own. A partner's library uses the builder's published library and never edits it.
 
@@ -67,7 +67,7 @@ In the design library, `color` is a variable mode. `variant`, `size`, `scaleSize
 
 ## What stays in words
 
-The library holds the pictures, the properties and the variables. It draws every state and every tab of Cases that a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the five formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
+The library holds the pictures, the properties and the variables. It draws every state and every tab of Cases that a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
 
 ## A value held worked out
 
@@ -107,9 +107,13 @@ The view stays short by five rules. A `UNIT_ABSENT` line replaces every line und
 
 ## Reading the library
 
-The agent reads each library file through the Figma connector, with the scripts that its setup ships, and writes what it read as one inventory. The tool then takes the inventory in. Five library files are read, and Lab is never read, because it holds drafts.
+A library file has two readers. The tool, `spnutils`, reads the units of a library file from Figma and builds the file's inventory. The agent reads the variables and the styles through the Figma connector. Five library files are read, and Lab is never read, because it holds drafts.
 
-- **A reading MUST only read.** It creates, sets, moves and deletes nothing in the file. No access token and no REST call reads the library.
+**The tool does not hold its own reading yet.** Until it does, the agent reads each library file through the connector, with the scripts that its setup ships, and writes what it read as one inventory, and the tool takes the inventory in. The sections below state that reading.
+
+- **A reading MUST only read.** It creates, sets, moves and deletes nothing in the file.
+- **The tool MUST read a library file with a read-only token, and the token MUST NOT be printed, logged or kept in a file the tool writes.** The token is a Figma personal access token with no write scope. The developer keeps it in the seat file, under the key `SPN_DEVEX_AGENT_FIGMA_TOKEN`, and the tool alone reads it from the seat.
+- **The connector reads the variables and the styles, and it makes every write.** It reads the variables with their collections and values, and the text and effect styles with their sizes. Figma's answer for a unit gives the id of a bound variable and never its name. In a file that uses Core, that id carries the variable's key in Core, so Core's variables are read first, with each variable's key, and the tool finds each name there. No plugin of the team's own runs inside Figma.
 - **One inventory is read for each library file.** A unit in one library file is bound to a variable of another, so no file is read alone, and the five inventories are read by the same rules.
 - **The tool takes an inventory in, and the agent never writes in the tool's folder.** The agent prepares the inventory outside the tool's folder, and a command of the tool checks it and copies it into place, as "The folders of the tool" states.
 - **A reading shows the file as it is when it is read, whether or not its last change is published.** Another library file sees a change only after a person publishes it, and the inventory holds the time it was read.
@@ -606,6 +610,7 @@ A property that changes nothing a person can see in any state is drawn by no cas
 | DS 3-Widgets | `DSFilterBarWidgetField` | `kind` | each kind of field is a different control, and a person must see the field of every kind next to the others |
 | DS 3-Widgets | `DSFilterBarWidget` | `narrow` | a narrow bar folds its fields away and a wide bar shows them inline, so the two forms must be seen together |
 | DS 3-Widgets | `.DSDataTableWidgetEmpty` | `filtered` | a table empty because no record exists and a table empty because the filter left none say different things |
+| DS 2-Components | `DSCard.Header` · `DSCard.Content` · `DSCard.Footer` | `flush` | a part with its padding and a part without it are two forms of the part, and what it holds reaches the edge of the card only in one of them |
 | DS 4-Containers | `.DSContainerFrames` | `frames` | the parts a frame holds decide where its edges and fills fall, and every combination of parts is a form of the frame |
 | DS 4-Containers | `DSContainer.Header` | `flush` | a part with its inset and a part without it are two forms of the part |
 | DS 4-Containers | `DSContainer.Content` | `flush` | the same reason as for the header |
@@ -670,7 +675,8 @@ Some core units are put together from other blocks, or open something the device
 | `DSColorPicker` | the swatch and the field with the code beside it, with a colour, with none, and with a typed text that is no code. The picker that opens belongs to the device, so it is not drawn |
 | `DSColorView` | the swatch and the value, the swatch alone, and the empty case |
 | `DSProgressCircle` | the ring at each size, filled to a value and turning |
-| `DSIconMark` | `shape`, `variant`, `size` and `scaleSize` as properties, and `color` as a mode, as on every block |
+| `DSIconMark` | its sizes alone: `size` and `scaleSize` as properties. Its `shape` and its `variant` are modes, as its `color` is, so the set holds one version for each size and each scale size, and a designer sets the size, the icon, the shape, the look and the hue each by itself (`RD.SUPPORT.SURFACE.137`). The file is brought to this in a change of its own |
+| `DSAvatar` | `size`, `scaleSize` and `badge` as properties. At the sizes, `badge` holds its values, and the published versions stay. At the scale sizes the status mark is a switch: a dot and an icon are each shown by a yes-or-no property, and the size of the mark follows the avatar. The file is brought to this in a change of its own |
 | `DSConfirmPopover` | its surface alone, with the question and the two actions, as a popover is drawn. The control that opens it is not part of the drawing |
 | `DSConfirmDialog` | its surface alone, over `DSBackdrop`, as every overlay is drawn |
 
@@ -691,6 +697,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are saving a named version and publishing a file, the builder manages the library and a partner is given it published, and the agent says what it will change before a connector write |
 | `RD.SUPPORT.SURFACE.029` | the connector's work in a library file is carried out by an inventory read once, a script for each page, one picture for each set and a probe written once, and a person saves a named version before the connector's first change |
 | `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
+| `RD.SUPPORT.SURFACE.137` | the shape and the look of an icon mark are variable modes in the library, and its set holds its sizes alone |
 | `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
 | `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, usage, cases and parts in a fixed order and at fixed distances |
 | `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "74e81ea4"
+      "seen": "8025c446"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "c375261e"
+      "seen": "b4c45068"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -28,7 +28,7 @@ Read this before you mount a surface, write a theme, or ask what a block already
 
 | Term | What it means |
 | --- | --- |
-| Theme | `IDSTheme` — the closed list of six choices that gives an app its look |
+| Theme | `IDSTheme` — the closed list of choices that gives an app its look |
 
 ## The contexts and the seams — ✅
 
@@ -36,7 +36,7 @@ Exactly two contexts cross between an app and its design system, one direction e
 
 - **Service calls**: run every call of a screen through the service executor. It never throws: it resolves to what the call returns, or to nothing when the call fails. An unauthenticated failure goes to the app's policy alone. Before the app is mounted there is no policy, so that failure goes to the caller's own handler. Any other failure is shown once, by the screen's handler or by a toast. A failure that nothing takes is logged as an error, so none is silent.
 - **Theming**: derive the brand from a single seed. Treat light and dark as a mode flip on the role layer. A block with no `mode` follows the theme around it; a block whose `mode` names light or dark draws in that mode's own values wherever it stands, in both directions. Read the roles and the scale from a component, never a ramp step and never a raw value. Let the design-system root own theme state, with the setter reachable from any depth.
-- **Formatting**: ship one formatting capability per preference vocabulary. Never format by hand in a component or a module. Resolve an absent optional preference to the vocabulary's declared default, never to the device's locale.
+- **Formatting**: ship one formatting capability per preference vocabulary. Never format by hand in a component or a module. Resolve an absent optional preference to the vocabulary's declared default, never to the device's locale. The app always holds the time format, as it holds the date format and the number format (`RD.SUPPORT.SURFACE.123`). A block that shows or takes a time uses the format the page gives it, else the app's, and it holds no time format of its own. A console that states no preference of a person or of an organization gives the 12-hour form with AM or PM, `HH_MM_DAY_FORMAT`.
 - **Translation**: pass every user-facing string through the design system's translate capability, with a key, a source message and named variables. The application supplies the implementation.
 - **Navigation**: declare a `navigate` seam in the design system, and bind the application's router to it once. Never import a router, read a route or touch history from a design-system component.
 - **Media**: resolve variant, size and density into an address. Require a placeholder and an error image. Never assemble a URL by hand in a screen.
@@ -49,7 +49,7 @@ A conforming design system answers a fixed set of groups (`architecture-componen
 
 ## The theme — 🔮
 
-A theme is one declared object, `IDSTheme`, and it holds a closed list of six choices.
+A theme is one declared object, `IDSTheme`, and it holds a closed list of choices.
 
 | Choice | What it sets |
 | --- | --- |
@@ -58,7 +58,18 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of six ch
 | Default size | the size step a block takes when none is set on it |
 | Font family | the typeface of every text |
 | Corner radius | one base value. The radius of every size step is worked out from it |
-| Container look | the four props of the container, as the default for every container and every card |
+| Container look | `container`: the four props of the container, as the default for every container. A card follows it where the card look says nothing |
+| Card look | `card`: `raised`, `bordered` and `rounded`, as the default for the surface of every card |
+| Card widget look | `cardWidget`: what `DSCardWidget` adds to a card. `divided` is the lines between its head, its parts and its footer, `rowsDivided` the lines between the rows of its `ITEMS` and `LIST` parts, and `rowsHoverable` the hover of those rows |
+| Table look | `table`: `striped` and `hoverable`, as the default for every table |
+
+Each of the last three blocks is optional, and each of its values is yes or no.
+
+- **A table MUST take `striped` and `hoverable` from its own prop where the prop is given, else from the theme's `table`, else off** (`RD.SUPPORT.SURFACE.126`). A partner turns them on once for every table of an app, and one table that says no still wins.
+- **A card MUST take `raised`, `bordered` and `rounded` from its own prop where the prop is given, else from the theme's `card`** (`RD.SUPPORT.SURFACE.128`). Each of the props is decided by itself, so a `card` that sets `bordered` alone leaves the others as they were. Under a theme with no `card`, a card takes them from the theme's `container`, and where that says nothing it draws its own look: raised, bordered and with square corners. So a theme can say flat containers with bordered cards, and an app that has written no `card` sees no change.
+- **The card look holds the surface of a card and nothing else.** The line between the parts of a plain `DSCard`, `divided`, is a prop of the card that the page writes.
+- **`DSCardWidget` MUST take what it adds to a card from the theme's `cardWidget`, where its own prop says nothing.** Its `divided` is its own prop, else `divided` of `cardWidget`, else off. The rows of a part take `divided` from the prop of the part, else from `rowsDivided`, else on, and `hoverable` from the prop of the part, else from `rowsHoverable`, else off. The surface of the widget's card follows the card look.
+- **The theme holds no block for a list.** The `divided` and the `hoverable` of `DSList` are props that the page writes.
 
 A partner changes the look of an app through one theme, and in no other way (`RD.SUPPORT.APPS.150`). A partner writes one theme, and never a style for a block. The theme is held at the app's root, and changeable from any depth, so a component that learns the brand late (after sign-in, from an API response) retints the whole surface without reaching application-root state. The layout type is not a choice of the theme. Support ships a theme, and never a template.
 
@@ -105,6 +116,9 @@ This ref states what an app hands a surface, once, and in what order a block res
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.150` | a partner changes the look of an app through one theme, and the layout type is not a choice of it |
+| `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
+| `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
+| `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
 | `RD.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |
 
 ## Proof

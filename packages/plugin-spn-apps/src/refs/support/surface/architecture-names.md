@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "fe3a978b"
+      "seen": "a4274f20"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "dfedd1e6"
+      "seen": "dc0073d4"
     }
   ]
 }
@@ -69,7 +69,7 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 
 ### Names with a rule of their own
 
-A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no and no by default, for whether a body row takes the table's row-hover fill under the pointer; a selected row, and a row that holds an open menu, keep their fill whichever way it is set. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
+A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTableWidget`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`, else no. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
 A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
 
@@ -115,6 +115,8 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSIcon` · `DSIconMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
 | `DSItem` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the whole page, a part of the page, a titled group inside the content of a part, or a line among others. On the item line it decides, with the `size`, the type step and the element of the title and the scale size of the picture. On the tabs it decides the look) | `PAGE` · `SECTION` · `GROUP` · `CONTENT`, `CONTENT` when unset | `DSPageLevelType` |
+| `DSFormatDateTime` · `DSFormatDate` | `type` (the form the date is written in: the date as it is, or how long ago in words) | `DEFAULT` · `AGO`, `DEFAULT` when unset | `DSFormatDateType` |
+| `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `ICON_MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
 | `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
 | `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
 | `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
@@ -129,7 +131,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSInput` | `type` | `TEXT` · `NUMBER` · `PASSWORD` · `EMAIL` · `TEL` · `COLOR`, `TEXT` when unset | `DSInputType` |
 | `DSInput` | `mode` (the keyboard a touch device offers) | `NONE` · `TEXT` · `DECIMAL` · `NUMERIC` · `TEL` · `SEARCH` · `EMAIL` · `URL`, `TEXT` when unset | `DSInputModeType` |
 | `DSTimePicker` | `type` (the clock; required) | `TWENTY_FOUR_HOUR` · `TWELVE_HOUR` | `DSTimePickerType` |
-| `DSDateTimePicker` | `timeFormat` (the clock of the time part) | `TWENTY_FOUR_HOUR` · `TWELVE_HOUR`, `TWENTY_FOUR_HOUR` when unset | `DSTimePickerType` |
+| `DSDateTimePicker` | `timeFormat` (the clock of the time part) | `TWENTY_FOUR_HOUR` · `TWELVE_HOUR`, the clock of the app's time format when unset | `DSTimePickerType` |
 | `DSTimePicker` | `intervalMinutes` | `MIN_15` · `MIN_30` · `MIN_60`, `MIN_15` when unset | `DSTimePickerIntervalType` |
 | `DSDateTimePicker` | `minuteStep` (the values are numbers) | `15` · `30` · `60`, `15` when unset | `DSDateTimeMinuteStepType` |
 | `DSImagePicker` | `mode` (required) | `VIEW` · `EDIT` | `DSImagePickerModeType` |
@@ -158,7 +160,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSFormatCurrency` | `currencyCode` | `SPCurrencyCodeType` | `USD` · `EUR` · `GBP` · `INR` · `JPY` · `CAD` · `AUD` · `CHF` · `CNY` · `BRL` · `MXN` · `SEK` · `AED` · `SGD` |
 | `DSAddressForm` | `format` | `SPAddressFormatType` | `DEFAULT` · `US` · `IN` · `UK`, or a partial address configuration in their place |
 
-A format prop that is not set takes the person's preference from the app context. `DSFormatTime` falls back to `HH_MM` when the person has no time preference, and `DSAddressForm` derives its format from the selected country.
+A format prop that is not set takes the person's preference from the app context. A time takes the app's time format, which the app context always holds, and a block falls back to none of its own. `DSAddressForm` derives its format from the selected country.
 
 ## The six layers — ✅
 
@@ -182,14 +184,14 @@ A widget, a container and a layout carry their layer as the last word of the nam
 | Layer of the block | Its name ends in | Example |
 | --- | --- | --- |
 | Components | no word for the layer | `DSButton` · `DSTable` |
-| Widgets | `Widget` | `DSDataTableWidget` · `DSFilterBarWidget` |
+| Widgets | `Widget` | `DSDataTableWidget` · `DSFilterBarWidget` · `DSCardWidget` |
 | Containers | `Container` | `DSContainer` |
 | Layouts | `Layout` | `DSLayout` |
 
 - **A widget's name MUST end in `Widget`, a container's in `Container` and a layout's in `Layout`** (`RD.SUPPORT.SURFACE.098`). A reader then tells the layer of a block from its name alone, in the book, in the design library and in every stack.
 - **A component MUST take no such word.** A component is the smallest block, and most blocks are components, so a name with no word for its layer is a component's.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
-- **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names of the two core widgets.
+- **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core widgets.
 - **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own widget for a list beside its detail is `DSListDetailWidget`.
 
 | Belongs to | What it is | Its name |
@@ -199,6 +201,10 @@ A widget, a container and a layout carry their layer as the last word of the nam
 | `DSDataTableWidget` | its private part for the empty state, in the design library | `.DSDataTableWidgetEmpty` |
 | `DSFilterBarWidget` | its item, one field | `DSFilterBarWidgetField`, with its shape `IDSFilterBarWidgetField` |
 | `DSFilterBarWidget` | the vocabulary of the kinds of field | `DSFilterBarWidgetFieldType` |
+| `DSCardWidget` | its settings | `IDSCardWidgetProps` |
+| `DSCardWidget` | the vocabulary of the kinds of part | `DSCardWidgetPartType` |
+| `DSCardWidget` | the shape every part shares, and the shape of each kind of part | `IDSCardWidgetPartBase`, with `IDSCardWidgetPartItems`, `IDSCardWidgetPartList` and `IDSCardWidgetPartFree` |
+| `DSCardWidget` | an item of an `ITEMS` part, and a row of a `LIST` part | `IDSCardWidgetItem` and `IDSCardWidgetRow` |
 
 `DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
 
@@ -208,7 +214,7 @@ Mark each property of the design library as a declared prop, a shown state, or a
 
 ## Each shared state has one picture — ✅
 
-A block drawn from data is a host and an item: one item serves every host that takes one data shape, and a host whose data differs declares its own item (stated further in `architecture-components.md`). Each shared state has one picture, on every block and on every kind of surface, chosen on the first component that has it. Selected has one picture for each kind of entry: a row of a list or a menu draws a check at its end; an entry that is no row — a bar entry, the current page of a pager, a tab, a day of a calendar, an item of the layout's navigation — has no room for a check, and draws a fill of the primary role with its label in that role. A breadcrumb is the one trail that is not a bar of entries: its current page is the last crumb, and draws plain text in a stronger weight than the links before it, is not a link, and draws no fill. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible. No block takes the key and shows nothing. The picture shows when a person reaches the block with the keyboard, and not after a click with a pointer, and a picture that shows is whole: neither the box of the block nor a neighbour cuts it.
+A block drawn from data is a host and an item: one item serves every host that takes one data shape, and a host whose data differs declares its own item (stated further in `architecture-components.md`). Each shared state has one picture, on every block and on every kind of surface, chosen on the first component that has it. Selected has one picture for each kind of entry: the chosen option of a select or of a menu draws a check at its end; a chosen row of a list, the row with `selected`, draws a fill of the soft step of the primary role across the row, and no check; an entry that is no row — a bar entry, the current page of a pager, a tab, a day of a calendar, an item of the layout's navigation — has no room for a check, and draws a fill of the primary role with its label in that role. A breadcrumb is the one trail that is not a bar of entries: its current page is the last crumb, and draws plain text in a stronger weight than the links before it, is not a link, and draws no fill. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible. No block takes the key and shows nothing. The picture shows when a person reaches the block with the keyboard, and not after a click with a pointer, and a picture that shows is whole: neither the box of the block nor a neighbour cuts it.
 
 ## Boundary
 

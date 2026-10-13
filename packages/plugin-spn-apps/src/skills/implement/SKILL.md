@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "456d646d"
+      "seen": "bad848de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "c6e5babc"
+      "seen": "e395ff6a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "c2b43548"
+      "seen": "e87fd72e"
     }
   ],
   "decisions": [
@@ -96,7 +96,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTableWidget`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
-- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only, and after them the arrow of a line that leads somewhere. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
+- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 
 **A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-widgets.md` and `architecture-containers.md` state each one.
 
@@ -104,9 +104,15 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | --- | --- |
 | the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTableWidget` reads no device type, and follows the layouts its page lists each time it draws |
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
+| the picture and the end of an item line | the page gives the picture to `media` as data of one kind, `ICON`, `ICON_MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, with no size (`RD.SUPPORT.SURFACE.130`). It gives what stands at the end, the actions, a badge or both, to `endNode` (`RD.SUPPORT.SURFACE.131`). `DSItem` takes no `startIcon` and no `actions` |
+| the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the widget's config, usually read from the address. The widget holds no state for it (`RD.SUPPORT.SURFACE.125`) |
+| a card drawn from data | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`) |
+| a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
 | the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them |
+| a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
+| the head of a page that holds several containers | the head stands above the containers, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
+| tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
 | the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION` (`RD.SUPPORT.SURFACE.107`). A container that takes an item line as its header takes `pageLevel` and passes it on. The page writes no type step and no heading element |
 | the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
 | where a title starts | the page writes no prop and no padding. An item line at the level `PAGE`, `SECTION` or `GROUP` takes no padding at its two sides, and in a `flush` part it takes the inset of its place (`RD.SUPPORT.SURFACE.109`). `bleed` on a title changes nothing |

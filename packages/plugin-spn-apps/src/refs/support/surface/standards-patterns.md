@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "bcd0142d"
+      "seen": "189a6c48"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "456d646d"
+      "seen": "bad848de"
     }
   ]
 }
@@ -396,7 +396,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 | Part of a page | How every spec shows it | The rule is stated in |
 | --- | --- | --- |
 | the record a page is about | the header of the page: its picture, its name, and its facts on the line under the name. It has no frame | `standards-core.md` |
-| a state a person looks for | a badge on the line of facts, before the other facts. The normal state shows none | `standards-core.md` |
+| a state a person looks for | a badge on the line of facts, before the other facts, or at the end of the line. The normal state shows none. The end of a line holds its actions, a badge, or both | `standards-core.md` |
 | a line of a list | an item line, `DSItem`, with a line between each two | `architecture-components.md` |
 | a field a person enters, and a field a person reads | `DSForm.Field`, and `DSDataUnit`, each with its title above | `architecture-components.md` |
 | a value from an enum | a badge beside other facts, a title where it is the subject of a part, and plain text where it stands alone in a labelled field. `a-value-from-an-enum.dg.json` draws each way | `architecture-components.md` |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "cedef2e1"
+      "seen": "5c21dc62"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "c2b43548"
+      "seen": "e87fd72e"
     }
   ]
 }
@@ -58,6 +58,8 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
 - **A container that is the page MUST give its header the head of a page, and a container that is a part of a page the head of a part** (`RD.SUPPORT.SURFACE.107`). The title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION`, as `architecture-components.md` states the two. A container that takes an item line as its header takes `pageLevel` and passes it on to that item line. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
+- **A page that holds several containers MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one container puts its head in the header of that container. A page with several has no one container that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
+- **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
 - **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
 - **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The page patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
@@ -114,7 +116,7 @@ A container takes no background color, no padding value, no margin, no container
 
 ### The card
 
-The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`, and the theme holds one default for both. A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
+The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own, and a card follows the container look where the card look says nothing (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
 
 | | A container | A card |
 | --- | --- | --- |
@@ -141,6 +143,7 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 | `DSAccordion` · `DSDataTableWidget` | keeps its own text off the edge of the frame |
 | `DSList` · `DSDataTableWidget` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
 | `DSItem` at the level `PAGE`, `SECTION` or `GROUP` | it takes the inset of its place at its two sides, so the title starts where the rows under it start their text. In a part that is not `flush` it takes none |
+| `DSTabs` | the label of its first tab starts at the inset of its place, and its line still reaches the edge. Its panel takes that inset at its sides, and what the panel holds stands in a padded place |
 | Any other block | nothing. It reaches the edge |
 | A block inside the one that reacted | nothing. The setting stops at the block that used it |
 | A card or an overlay, and each block inside it | nothing. A block that draws a frame of its own starts a new one. A `flush` part of the card itself says so again to what that part holds |
@@ -187,6 +190,7 @@ Some pages hold things in groups: the fields of each record type, or the actions
 
 - **Both parts MUST be in view at a desktop only** (`RD.SUPPORT.SURFACE.079`). There a person goes from one group to the next without losing the list.
 - **On a tablet and on a phone the items MUST take the place of the groups.** The two parts do not fit side by side there.
+- **The part that holds the groups MAY be narrow, and a named choice MUST say so** (`RD.SUPPORT.SURFACE.119`). Where a group is read by its name alone, the items need most of the width. A unit that places the two parts keeps its usual width for the groups where the page chooses none, and it offers a narrower one by name. A page **MUST NOT** write a width of its own. The choice holds at a desktop, where both parts are in view.
 - **The swap MUST change the address.** It happens in place, and the address still changes to name the chosen group. So the back of the browser does the same as the back action. A reload stays on the chosen group, and a link to one group opens that group on every screen.
 - **Each part MUST be shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`). The groups and the items seldom hold data of the same shape.
 - **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
@@ -196,7 +200,7 @@ Where the groups are few and fixed, the page needs no swap. Each group is a cont
 
 **What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
 
-**The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetailWidget`: both parts at a desktop, and one at a time on a tablet and a phone. `providers.md` names it.
+**The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetailWidget`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
 
 ## Boundary
 
@@ -220,6 +224,8 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole |
 | `RD.SUPPORT.SURFACE.107` | a container that is the page gives its header the head of a page, and a container that is a part of a page the head of a part |
 | `RD.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
+| `RD.SUPPORT.SURFACE.120` | a page that holds several containers has its head above them, outside any frame, with its way back, and writes nothing by hand for it |
+| `RD.SUPPORT.SURFACE.119` | the part that holds the groups may be narrow, by a named choice and never by a width the page writes. It is a MAY |
 | `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed |
 | `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
 | `RD.SUPPORT.SURFACE.077` | an entry is one container, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |

@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "94086eb0"
+      "seen": "1cb7a965"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "dfedd1e6"
+      "seen": "dc0073d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "c2b43548"
+      "seen": "e87fd72e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
@@ -31,7 +31,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
 - **The library holds the core units, which are the ones the book names, and no other unit** (`RD.SUPPORT.SURFACE.082`). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no page pattern, no skeleton and no sample page (`RD.SUPPORT.SURFACE.099`). So a page pattern is drawn as its units, and never as one instance.
-- **A widget is told by its name, which ends in `Widget`** (`RD.SUPPORT.SURFACE.098`). A container's name ends in `Container` and a layout's in `Layout`, a component takes no such word, and no block carries a letter for its layer before its name. The two core widgets are `DSDataTableWidget` and `DSFilterBarWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetailWidget` is the web stack's own unit and has no drawing.
+- **A widget is told by its name, which ends in `Widget`** (`RD.SUPPORT.SURFACE.098`). A container's name ends in `Container` and a layout's in `Layout`, a component takes no such word, and no block carries a letter for its layer before its name. The core widgets are `DSDataTableWidget`, `DSFilterBarWidget` and `DSCardWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetailWidget` is the web stack's own unit and has no drawing.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
 ## Before you draw
@@ -88,8 +88,8 @@ The design library holds one file for each layer of the design system that is dr
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the icon mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
-- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `SECTION`, `GROUP` or `CONTENT`, and with the `size` it decides the type step of the title and the scale size of the picture, so no text style is set by hand. A row of tabs takes `pageLevel` too, and the level decides its look. The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. `showArrow` is the chevron after the actions.
-- **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
+- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `SECTION`, `GROUP` or `CONTENT`, and with the `size` it decides the type step of the title and the scale size of the picture, so no text style is set by hand. A row of tabs takes `pageLevel` too, and the level decides its look. The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. The picture is the kind the tree gives `media`, and what stands at the end of the line is what the tree gives `endNode`. `showArrow` is the chevron at the end of a line that leads to a page and has no action there.
+- **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. A chosen row of a list is a fill of the soft step of the primary role across the row, with no check. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
 
 ## How a block is drawn
 
