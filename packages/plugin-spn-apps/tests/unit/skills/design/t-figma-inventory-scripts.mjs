@@ -206,7 +206,7 @@ await guard(async () => {
 
 console.log("\n=== tokens.js — the variables and the styles");
 const mode = (modeId, name) => ({ modeId, name });
-const variableOf = (id, name, collection, resolvedType, valuesByMode) => ({ id, name, variableCollectionId: collection, resolvedType, valuesByMode });
+const variableOf = (id, name, collection, resolvedType, valuesByMode) => ({ id, key: `key-${id}`, name, variableCollectionId: collection, resolvedType, valuesByMode });
 const tokenParts = {
   collections: [
     { id: "C1", name: "Roles", modes: [mode("m1", "Light"), mode("m2", "Dark")], defaultModeId: "m1" },
@@ -231,6 +231,7 @@ await guard(async () => {
   same("a value is an alias kept as the name it points to, a colour as hex with alpha, or the number, string or boolean itself",
     answer.collections.flatMap((collection) => collection.variables.map((variable) => [variable.name, variable.type, variable.values])),
     [["surface", "COLOR", { Light: { alias: "color/neutral/0" }, Dark: "#0080ff80" }], ["color/neutral/0", "COLOR", { Light: "#ffffffff", Dark: "#ffffffff" }], ["icon-size/xs", "FLOAT", { Web: 12 }], ["label", "STRING", { Web: "Hello" }], ["flag", "BOOLEAN", { Web: true }]]);
+  same("a variable carries its own id and its key, right after its name", answer.collections.flatMap((collection) => collection.variables.map((variable) => [Object.keys(variable).slice(0, 3).join(), variable.id, variable.key])).slice(0, 2), [["name,id,key", "VariableID:1", "key-VariableID:1"], ["name,id,key", "VariableID:2", "key-VariableID:2"]]);
   same("a text style keeps its size and line height, an effect style its name", answer.styles, { text: [{ name: "heading/xl", fontSize: 40, lineHeight: { unit: "PERCENT", value: 120 } }], effect: [{ name: "shadow/md" }] });
 });
 await guard(async () => {
@@ -403,7 +404,7 @@ function fileFromRaw() {
   });
 }
 // The aliases of the stand-in point at `V:<name>`, and `getVariableByIdAsync` answers from the name in the id.
-const withoutPageIds = (inventory) => ({ ...inventory, file: { ...inventory.file, readAt: "-" }, pages: inventory.pages.map((page) => ({ ...page, id: "-" })) });
+const withoutPageIds = (inventory) => ({ ...inventory, collections: inventory.collections.map((collection) => ({ ...collection, variables: collection.variables.map(({ id, key, ...rest }) => rest) })), file: { ...inventory.file, readAt: "-" }, pages: inventory.pages.map((page) => ({ ...page, id: "-" })) });
 const keysOfUnits = (inventory) => inventory.pages.flatMap((page) => page.units.map((unit) => Object.keys(unit).join()));
 for (const depth of [2, 3]) {
   await guard(async () => {

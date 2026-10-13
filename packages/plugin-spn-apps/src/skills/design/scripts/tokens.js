@@ -1,5 +1,6 @@
 // The tokens of one library file, in the contract the tool takes in (`SPSurfaceInventory`): the variables
-// with their collection, modes, default mode and value for each mode, and the text and effect styles.
+// with their collection, modes, default mode, and for each variable its name, its own id, its key in the
+// library and its value for each mode, and the text and effect styles.
 //
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else. Never writes to the file, and it does not switch
@@ -76,7 +77,7 @@ for (let index = from; index < to; index += 1) {
     if (!collections.has(collection.id)) collections.set(collection.id, shell(collection));
     const values = {};
     for (const mode of collection.modes) values[mode.name] = await valueOf(variable.valuesByMode[mode.modeId]);
-    collections.get(collection.id).variables.push({ name: variable.name, type: variable.resolvedType, values });
+    collections.get(collection.id).variables.push({ name: variable.name, id: variable.id, key: variable.key, type: variable.resolvedType, values });
   } else if (item.kind === "text") {
     styles.text.push({ name: item.style.name, fontSize: item.style.fontSize, lineHeight: item.style.lineHeight });
   } else {
