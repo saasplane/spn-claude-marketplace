@@ -99,6 +99,9 @@ const PROPERTIES_A_UNIT_KEEPS_CROSSED = {
   "DSContainer.Header": ["flush"],
   "DSContainer.Content": ["flush"],
   "DSContainer.Footer": ["flush"],
+  "DSCard.Header": ["flush"],
+  "DSCard.Content": ["flush"],
+  "DSCard.Footer": ["flush"],
   DSLayoutNavNode: ["open", "inGroup", "inMenu"],
   DSLayout: ["open", "narrow", "flush", "side"],
 };
