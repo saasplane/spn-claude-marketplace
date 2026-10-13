@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "587be20f"
+      "seen": "02e405b9"
     }
   ],
   "decisions": [
@@ -150,7 +150,8 @@ snapshots and writes the gaps, with `rulesApplied` and `accepted`, and a view of
 leaves them out and counts them. `status` says what is on the machine and what is missing, and writes
 nothing. `library` and `accepted` check the file they take in and copy it into place, and refuse by name
 a file that fails the check, writing nothing. Four of the five operations read and write the machine's
-folder alone and need no stack. The tool never touches a repository or Figma. Every file is under
+folder alone and need no stack. The tool never touches a repository. In Figma it does one thing: it
+reads a library file with the developer's read-only token, and it changes nothing there. Every file is under
 `~/.spnutils/surface/`, in folders that say who writes there, and none enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
