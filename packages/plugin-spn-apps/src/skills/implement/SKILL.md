@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "0228413e"
+      "seen": "456d646d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "eb1f88f8"
+      "seen": "c2b43548"
     }
   ],
   "decisions": [
@@ -92,6 +92,8 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 
 - **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by layer. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
 - **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the containers, the widgets and the components the design system already has.
+- **Use one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never containers of their own. Two things that are read or saved apart are two containers. An editor with its preview is one container, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
+- **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTableWidget`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
 - **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts, and the normal state shows none. The end of a line holds its actions only, and after them the arrow of a line that leads somewhere. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
@@ -106,7 +108,8 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
 | a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them |
 | the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION` (`RD.SUPPORT.SURFACE.107`). A container that takes an item line as its header takes `pageLevel` and passes it on. The page writes no type step and no heading element |
-| the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture, and on a header that holds an item line with a padding of its own |
+| the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
+| where a title starts | the page writes no prop and no padding. An item line at the level `PAGE`, `SECTION` or `GROUP` takes no padding at its two sides, and in a `flush` part it takes the inset of its place (`RD.SUPPORT.SURFACE.109`). `bleed` on a title changes nothing |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
 | the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
 | an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |

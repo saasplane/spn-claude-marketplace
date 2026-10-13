@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "937d1e36"
+      "seen": "cedef2e1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "eb1f88f8"
+      "seen": "c2b43548"
     }
   ]
 }
@@ -55,6 +55,7 @@ What a page puts in each part follows one form. A person then finds the name and
 
 - **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block at the start and its last block at the end, so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
+- **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
 - **A container that is the page MUST give its header the head of a page, and a container that is a part of a page the head of a part** (`RD.SUPPORT.SURFACE.107`). The title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION`, as `architecture-components.md` states the two. A container that takes an item line as its header takes `pageLevel` and passes it on to that item line. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
@@ -121,24 +122,28 @@ The card, `DSCard`, stays a separate block beside the container, taking `raised`
 | How many stand together | one for a part of the page | often many alike, side by side in a grid |
 | Its parts | named places that the look reaches. `frames` and the theme decide which parts the frame holds, and a part takes `flush` | all inside the one frame, in every theme. A part pads itself, and a part takes `flush`, which drops that padding |
 | Pressed as a whole | never | it may be, with `anchor` |
-| A block inside it | reacts to a `flush` part | looks as it does on a plain page, because a card starts a frame of its own |
+| A block inside it | reacts to a `flush` part | reacts to a `flush` part of the card, in the same way. A `flush` part of a container around the card does not reach it, because a card starts a frame of its own |
+| Its size | sets the density of every block inside it | the same. A card hands its size to what it holds |
 
 - **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it MUST still frame one thing** (`RD.SUPPORT.SURFACE.091`). The parts give the one thing a title, a body and what closes it, such as its action. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
-- **A part of a card MUST pad itself, from the size of the card, and `flush` on a part MUST drop that padding.** A page then writes no padding of its own around what a card holds. A part whose content reaches the edge of the card, such as a list or a picture, takes `flush`. So does a header that holds an item line with a padding of its own. A part takes no other prop.
+- **A part of a card MUST pad itself, from the size of the card, and `flush` on a part MUST drop that padding.** A page then writes no padding of its own around what a card holds. A part whose content reaches the edge of the card, such as a list or a picture, takes `flush`. A part takes no other prop.
+- **A card MUST hand its size to what it holds, as a container does** (`RD.SUPPORT.SURFACE.114`). A block inside a card that reads the size of its place reads the size of the card. An item line with `bleed` and a title in a `flush` part are such blocks: each takes the inset of the card's size, so it starts where the card's own parts start their content. A card that states no size hands on the size it stands in.
+- **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a container does.** The header, the content and the footer of a card all do this.
 - **A card MAY sit inside the content of a container.** A dashboard MAY also use cards and no container at all.
 
 ## A frame is drawn once — 🔮
 
-A frame is drawn once on any part of a page. The page follows that rule, and no code enforces it. A block never changes because of where it sits — it reacts to one thing only: sitting in a `flush` part.
+A frame is drawn once on any part of a page. The page follows that rule, and no code enforces it. A block never changes because of where it sits — it reacts to one thing only: sitting in a `flush` part, of a container or of a card.
 
 | A block in a `flush` part | What it does |
 | --- | --- |
 | `DSTable` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | draws no border and no rounding of its own. Its own `bordered` still wins |
 | `DSAccordion` · `DSDataTableWidget` | keeps its own text off the edge of the frame |
 | `DSList` · `DSDataTableWidget` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
+| `DSItem` at the level `PAGE`, `SECTION` or `GROUP` | it takes the inset of its place at its two sides, so the title starts where the rows under it start their text. In a part that is not `flush` it takes none |
 | Any other block | nothing. It reaches the edge |
 | A block inside the one that reacted | nothing. The setting stops at the block that used it |
-| A block inside a card, or inside an overlay | nothing. A block that draws a frame of its own starts a new one |
+| A card or an overlay, and each block inside it | nothing. A block that draws a frame of its own starts a new one. A `flush` part of the card itself says so again to what that part holds |
 
 A block with `bordered` in a `flush` part keeps its border, because its own prop wins — the page then shows two lines, and the `UX` lens reports it as a finding. A popover draws its own surface; a block that opens a popover draws no surface of its own around it.
 
@@ -166,7 +171,7 @@ An entry is a form a person fills in to add or change something. A small or a me
 
 ### A large form
 
-- **A large form MUST be a page of its own, and the page MUST be one container** (`RD.SUPPORT.SURFACE.078`). Its title stands in the header. Its sections are the parts of its content, one under another in one column, each under its own title. Its actions stand in its footer. That the page is one container is proposed, and not yet confirmed.
+- **A large form MUST be a page of its own, and the page MUST be one container** (`RD.SUPPORT.SURFACE.078`). Its title stands in the header. Its sections are the parts of its content, one under another in one column, each under its own title. Its actions stand in its footer.
 - **A section of a large form MUST NOT be a container of its own.** The sections are parts of one form that is saved once. A frame around each section, with actions under each, would say that each is saved by itself.
 - **A list of the sections MUST NOT stand beside the form.** The app already has its navigation at the side, and a form of a few sections is read from top to bottom.
 - **Fields that are short and belong together MAY share a row at a desktop, and each MUST take a row of its own on a phone.** Each field keeps its title above its control, as the rules of content of `standards-core.md` state.
@@ -211,12 +216,14 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |
 | `RD.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a container |
 | `RD.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order |
+| `RD.SUPPORT.SURFACE.114` | a card hands its size to what it holds, as a container does |
+| `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole |
 | `RD.SUPPORT.SURFACE.107` | a container that is the page gives its header the head of a page, and a container that is a part of a page the head of a part |
 | `RD.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
 | `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed |
 | `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
 | `RD.SUPPORT.SURFACE.077` | an entry is one container, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |
-| `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one container, with no container for each section. That the page is one container is proposed |
+| `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one container, with no container for each section |
 | `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the swap changes the address |
 | `RD.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and never a row of tabs |
 | `RD.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for |

@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "ac1b1c41"
+      "seen": "68393479"
     }
   ]
 }
@@ -187,7 +187,9 @@ A container is optional. Use one where a part of the page has a header, content 
 - **An entry over the page is one container, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header, its fields are its content, and its actions stand in its footer.
 - **A large form is one container.** Its sections are the parts of its content, each under its own title. A section is never a container of its own, and no list of the sections stands beside the form (`RD.SUPPORT.SURFACE.078`).
 - **Groups and their items are two containers at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action, and the swap changes the address (`RD.SUPPORT.SURFACE.079`). A set of groups that can be added to is a list, and never a row of tabs (`RD.SUPPORT.SURFACE.080`).
-- **Give one container to each part that reads as one unit.** Parts that should sit apart are separate containers, or cards. A container frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number.
+- **Give one container to each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are the parts of its content, each under its own title, and never containers of their own. Two things that are read or saved apart are two containers, or cards. An editor with its preview and *Choose many* are each one container (`RD.SUPPORT.SURFACE.115`).
+- **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes it, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added.
+- **Write no prop and no padding to place a title** (`RD.SUPPORT.SURFACE.109`). An item line at the level `PAGE`, `SECTION` or `GROUP` starts where what stands under it starts, and in a `flush` part it takes the inset of its place. `bleed` on a title changes nothing. A card hands its size to what it holds, as a container does (`RD.SUPPORT.SURFACE.114`). A container frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number.
 - **A card may hold `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it still frames one thing** (`RD.SUPPORT.SURFACE.091`). Its parts all sit inside its one frame, in every theme. A part pads itself, and `flush` on a part drops that padding, for a part whose content reaches the edge of the card. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
 - **Write the parts in one order**: `DSContainer.Header`, then `DSContainer.Content`, then `DSContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
 - **The page decides what fills a part.** Write `flush` on a part whose content reaches the edge of the frame, such as a table. A part without `flush` insets everything it holds.

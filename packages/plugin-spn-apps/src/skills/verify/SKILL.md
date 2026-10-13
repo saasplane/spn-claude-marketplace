@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "0228413e"
+      "seen": "456d646d"
     }
   ]
 }
@@ -94,6 +94,8 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
    - **Name the pattern the page should follow.** Take it from the tree the `design` skill wrote. Where the page has no tree, read its data and its person against the table of the page patterns, and name the one that fits. A page that fits none is a finding.
    - **Open the spec of that pattern, and look at the page beside it at each screen class**: a desktop, a tablet and a phone. Look at the page through `spn-devex docs look <page>`, and never through a script inside a repository. The values in a spec are samples, so compare the arrangement and not the words.
    - **Go down the pattern's tree by layer**: the containers, then the widgets, then the components. Each line of the tree is on the page, built with the unit the tree names. A widget is told by its name, which ends in `Widget` (`RD.SUPPORT.SURFACE.098`). A part the page built for itself is a finding. A unit that the stack provides on its own is none: on the web, `DSListDetailWidget` places the two parts of a page of groups and their items, and no core unit does (`RD.SUPPORT.SURFACE.099`). So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
+   - **Count the containers against what is read or saved as a whole** (`RD.SUPPORT.SURFACE.116`). A page uses one container for each such thing, and its sections are content parts. A section framed as a container of its own is a finding, and so are two things saved apart in one container. An editor with its preview is one container, with each thing written beside its own result (`RD.SUPPORT.SURFACE.115`).
+   - **Read the page that changes a record beside the page that reads it.** The two hold the same parts in the same order (`RD.SUPPORT.SURFACE.117`): a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. A part that moves is a finding.
    - **Check each rule of content with its reviewer's check** in `refs/support/surface/standards-core.md`: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
    - **Read each confirmation against what its act does.** An act a person can undo asks in a popover, `DSConfirmPopover`, and an act that cannot be undone asks in a dialog, `DSConfirmDialog`. A dialog for a small act that can be undone is a finding. Both stay open while the act runs, and a failure is shown where the person confirmed.
    - **Look behind each overlay.** One that covers the page dims it with the one scrim. A sheet that is not modal stands beside the page and draws no scrim, and the page stays usable.

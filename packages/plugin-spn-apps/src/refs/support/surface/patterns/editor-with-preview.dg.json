@@ -1,45 +1,18 @@
 {
  "kind": "skeleton",
  "title": "An editor with its preview",
- "caption": "At a desktop the editor and what it becomes stand side by side, each a container. On a tablet and a phone a person sees one of the two at a time. Bars stand for the running text of the message.",
+ "caption": "The page is an entry that is a page, so it is one container, with its title in its header and its actions at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees one of the two at a time, and a second row of tabs moves between writing and the preview: the tablet view shows the writing, and the phone view the result. Bars stand for the running text of the message.",
  "views": [
   {
    "viewport": "DESKTOP",
    "frame": {
-    "label": "Password reset",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "control": "badge",
-        "text": "Draft v4"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Discard"
-       },
-       {
-        "control": "button",
-        "text": "Publish",
-        "main": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "control": "tabs",
-        "tabs": [
-         "Email",
-         "SMS",
-         "WhatsApp"
-        ],
-        "chosen": 0,
-        "icon": "default"
+        "icon": "previous",
+        "text": "Password reset"
        }
       ]
      },
@@ -48,68 +21,172 @@
        {
         "frame": {
          "look": "container",
-         "rows": [
+         "rows": [],
+         "label": "Edit draft",
+         "note": "Password reset, version 4",
+         "sections": [
           {
-           "items": [
+           "rows": [
             {
-             "standin": "field",
-             "fill": true,
-             "label": "Subject",
-             "text": "Reset your password"
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Email",
+                "SMS",
+                "WhatsApp"
+               ],
+               "chosen": 0,
+               "icon": "default"
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "Details",
+           "rows": [
             {
-             "note": "Body"
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Subject",
+               "text": "Reset your password"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Sender",
+               "text": "Acme Support",
+               "info": true
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "HTML body",
+           "rows": [
             {
-             "standin": "rows",
-             "lines": 5,
-             "fill": true
+             "items": [
+              {
+               "frame": {
+                "look": "bordered",
+                "tag": "editor",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 6,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ],
+                "width": "1/2"
+               }
+              },
+              {
+               "frame": {
+                "look": "flat",
+                "tag": "result",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "text": "Reset your password"
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 3,
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "control": "button",
+                    "text": "Reset password",
+                    "main": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Plain text body",
+           "rows": [
+            {
+             "items": [
+              {
+               "frame": {
+                "look": "bordered",
+                "tag": "editor",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 4,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ],
+                "width": "1/2"
+               }
+              },
+              {
+               "frame": {
+                "look": "flat",
+                "tag": "result",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 3,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
             }
            ]
           }
          ],
-         "label": "Message"
-        }
-       },
-       {
-        "frame": {
-         "look": "container",
-         "rows": [
-          {
-           "items": [
-            {
-             "text": "Reset your password"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "rows",
-             "lines": 4,
-             "fill": true
-            }
-           ]
-          },
+         "footer": [
           {
            "items": [
             {
              "control": "button",
-             "text": "Reset password",
+             "text": "Save",
              "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
             }
            ]
           }
-         ],
-         "label": "Preview"
+         ]
         }
        }
       ]
@@ -120,51 +197,13 @@
   {
    "viewport": "TABLET",
    "frame": {
-    "label": "Password reset",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "control": "badge",
-        "text": "Draft v4"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Discard"
-       },
-       {
-        "control": "button",
-        "text": "Publish",
-        "main": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "control": "tabs",
-        "tabs": [
-         "Email",
-         "SMS",
-         "WhatsApp"
-        ],
-        "chosen": 0,
-        "icon": "default"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "tabs",
-        "tabs": [
-         "Write",
-         "Preview"
-        ],
-        "chosen": 0
+        "icon": "previous",
+        "text": "Password reset"
        }
       ]
      },
@@ -173,35 +212,131 @@
        {
         "frame": {
          "look": "container",
-         "rows": [
+         "rows": [],
+         "label": "Edit draft",
+         "note": "Password reset, version 4",
+         "sections": [
           {
-           "items": [
+           "rows": [
             {
-             "standin": "field",
-             "fill": true,
-             "label": "Subject",
-             "text": "Reset your password"
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Email",
+                "SMS",
+                "WhatsApp"
+               ],
+               "chosen": 0,
+               "icon": "default"
+              },
+              {
+               "spacer": true
+              },
+              {
+               "control": "tabs",
+               "tabs": [
+                "Write",
+                "Preview"
+               ],
+               "chosen": 0
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "Details",
+           "rows": [
             {
-             "note": "Body"
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Subject",
+               "text": "Reset your password"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Sender",
+               "text": "Acme Support",
+               "info": true
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "HTML body",
+           "rows": [
             {
-             "standin": "rows",
-             "lines": 5,
-             "fill": true
+             "items": [
+              {
+               "frame": {
+                "look": "bordered",
+                "tag": "editor",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 6,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Plain text body",
+           "rows": [
+            {
+             "items": [
+              {
+               "frame": {
+                "look": "bordered",
+                "tag": "editor",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 4,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
             }
            ]
           }
          ],
-         "label": "Message"
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
         }
        }
       ]
@@ -212,47 +347,13 @@
   {
    "viewport": "MOBILE",
    "frame": {
-    "label": "Password reset",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "control": "badge",
-        "text": "Draft v4"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Publish",
-        "main": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "control": "tabs",
-        "tabs": [
-         "Email",
-         "SMS",
-         "WhatsApp"
-        ],
-        "chosen": 0
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "control": "tabs",
-        "tabs": [
-         "Write",
-         "Preview"
-        ],
-        "chosen": 1
+        "icon": "previous",
+        "text": "Password reset"
        }
       ]
      },
@@ -261,34 +362,151 @@
        {
         "frame": {
          "look": "container",
-         "rows": [
+         "rows": [],
+         "label": "Edit draft",
+         "note": "Password reset, version 4",
+         "sections": [
           {
-           "items": [
+           "rows": [
             {
-             "text": "Reset your password"
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Email",
+                "SMS",
+                "WhatsApp"
+               ],
+               "chosen": 0
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Write",
+                "Preview"
+               ],
+               "chosen": 1
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "Details",
+           "rows": [
             {
-             "standin": "rows",
-             "lines": 4,
-             "fill": true
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Subject",
+               "text": "Reset your password"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Sender",
+               "text": "Acme Support",
+               "info": true
+              }
+             ]
             }
            ]
           },
           {
-           "items": [
+           "label": "HTML body",
+           "rows": [
             {
-             "control": "button",
-             "text": "Reset password",
-             "main": true
+             "items": [
+              {
+               "frame": {
+                "look": "flat",
+                "tag": "result",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "text": "Reset your password"
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 3,
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "control": "button",
+                    "text": "Reset password",
+                    "main": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Plain text body",
+           "rows": [
+            {
+             "items": [
+              {
+               "frame": {
+                "look": "flat",
+                "tag": "result",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "standin": "rows",
+                    "lines": 3,
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
             }
            ]
           }
          ],
-         "label": "Preview"
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
         }
        }
       ]

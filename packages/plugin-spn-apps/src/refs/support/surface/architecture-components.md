@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "927714d6"
+      "seen": "d8419892"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "b68ddcea"
+      "seen": "691a0ec1"
     }
   ]
 }
@@ -109,8 +109,8 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSButton` | **A button that shows an icon and no label MUST show its label as a tooltip.** The words are those of its `ariaLabel`, shown when the pointer rests on the button and when the keyboard reaches it. A button with a visible label shows none, and a disabled button shows none. `tooltip` takes other words for it, or `false` for none |
 | `DSToolbar` | **A row of controls, and never a menu.** Its parts are `DSToolbar.Item`, `DSToolbar.Group` and `DSToolbar.Separator`. An item is drawn as a `DSButton` at the size of the toolbar. The arrow keys move between the items, so the whole toolbar is one stop for the Tab key. `bordered` draws the frame around the row, and a toolbar inside another surface turns it off |
 | `DSTable` | **A data cell MAY be `marked`.** A marked cell is the one that stands out in its row, such as the name of a record. Its text is drawn in the medium weight and the default text colour. No cell is marked by default |
-| `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. A header that holds an item line with a padding of its own takes `flush`, so that its title stands in line with the rows under it. `divided` draws a line between each two parts, from edge to edge. **A container or a card that holds parts, or more than one content part, MUST have a title:** an item line at the level `SECTION` in its header. A card that is one plain block of content needs none. `fullHeight` makes the card fill the height of its place, so the cards of one row of a grid end on one line. What then tells a card from a container is in `architecture-containers.md` |
-| `DSList` · `DSItem` | **`bleed` is for a list or an item that fills a part with no inset**, such as a `flush` part of a container. Each row keeps the padding of its size above and below, and takes the inset of its place at its two sides. So the text of a row lines up with a title in a part that insets, and the fill of a pressed or chosen row runs from edge to edge. On a list, `bleed` wins over `flush` |
+| `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. The title of a card is an item line in its header, and it starts where what the card holds starts. `divided` draws a line between each two parts, from edge to edge. **A container or a card that holds parts, or more than one content part, MUST have a title:** an item line at the level `SECTION` in its header. A card that is one plain block of content needs none. `fullHeight` makes the card fill the height of its place, so the cards of one row of a grid end on one line. What then tells a card from a container is in `architecture-containers.md` |
+| `DSList` · `DSItem` | **`bleed` is for a list or an item that fills a part with no inset**, such as a `flush` part of a container or of a card. On an item line it is for a line among others, the level `CONTENT`, and it changes nothing on an item line that is a title. Each row keeps the padding of its size above and below, and takes the inset of its place at its two sides. So the text of a row lines up with a title in a part that insets, and the fill of a pressed or chosen row runs from edge to edge. On a list, `bleed` wins over `flush` |
 | `DSColorView` | **Shows a stored colour that a person reads:** a small swatch, and the value beside it as text. With no colour it shows a dash, or the words of `emptyLabel`. `swatchOnly` draws the swatch alone. A colour that is part of a block's own look, such as a badge drawn in its colour, is not shown through this block |
 | `DSTagGroup` | **A set of tags a person removes from.** Each tag is drawn as a `DSBadge` with its close action, and the keyboard reaches each one. The page holds the set: it adds a tag elsewhere, and takes the tag out when the group reports that one was removed. A choice from a fixed set is `DSToggleGroupMulti`, and not this block |
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
@@ -196,7 +196,11 @@ Each cell below names the step of the title and the scale size of the picture, w
 - **The item line gives its picture the scale size.** A picture given through `media` or `startIcon`, with no scale size of its own, is drawn at the step of the table. At the level `PAGE`, an icon alone is the size of the heading or the next size up: 24px, 32px, 40px, 40px and 48px for the five sizes of the item.
 - **In the header of a page, an avatar or a mark MUST stand at the top of the text, its top where the heading's line starts.** An icon alone stands in the middle of the heading's first line, and so does the way back. On the title line of a part or of a group, the picture stands level with the middle of the text.
 - **`size` MUST still set the padding of the item line, and it is handed to what stands inside it.** So a head at a larger size has larger buttons beside it.
-- **An item line at the level `SECTION` or `PAGE` MUST take no padding at its two sides where the header it stands in has no frame** (`RD.SUPPORT.SURFACE.109`). The title of a page is then flush with what stands under it. Inside a frame the item line keeps its padding. An item line at the level `GROUP` pads as a line among others does.
+- **An item line that is a title MUST start where what stands under it starts** (`RD.SUPPORT.SURFACE.109`). A title is an item line at the level `PAGE`, `SECTION` or `GROUP`. It takes no padding of its own at its two sides. So the title of a group starts where the labels of the fields under it start, in a part that insets, in a card, in a dialog and in a sheet. The head of a page starts where the framed parts under it start. Above and below, a title keeps the padding of its size.
+- **In a `flush` part, a title MUST take the inset of its place at its two sides.** What stands under it there reaches the edge, and the rows start their text at that inset. The place is the container or the card the part belongs to, and its size sets the inset.
+- **A page MUST NOT write a prop or a padding to place a title.** The level says that the line is a title, and the part says whether it is `flush`. `bleed` on a title changes nothing.
+- **An item line at the level `CONTENT` pads as a row does.** It keeps the padding of its size on every side. With `bleed` it takes the inset of its place at its two sides, so its fill runs from edge to edge.
+- **An item line at the level `SECTION` MAY stand as the title of a dialog, a drawer or a sheet, in its header, and it MUST take no inset beside the inset of that header.** The title then starts where the fields under it start. `DSConfirmDialog` and `DSConfirmPopover` take a `title` and draw it themselves, so a page gives them the words and no item line.
 
 ### The badge
 
@@ -326,7 +330,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.104` | which icon, mark and avatar stand beside a title and beside a heading |
 | `RD.SUPPORT.SURFACE.105` | the initials of an avatar are a title step of about four tenths of the avatar |
 | `RD.SUPPORT.SURFACE.106` | a heading names the whole page, one to a page, and a title names a part or a line |
-| `RD.SUPPORT.SURFACE.109` | an item line that is a head takes no padding at its sides where the header it stands in has no frame |
+| `RD.SUPPORT.SURFACE.109` | an item line that is a title starts where what stands under it starts, and takes the inset of its place only in a `flush` part |
 | `RD.SUPPORT.SURFACE.110` | an action at the end of a row that is a link does not follow the link |
 | `RD.SUPPORT.SURFACE.111` | an item line draws its description whole, and the page decides what it says |
 | `RD.SUPPORT.SURFACE.112` | every level of a page has its title, and a title is larger than the titles of what stands under it |

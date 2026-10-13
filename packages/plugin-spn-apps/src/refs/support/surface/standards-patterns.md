@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "0228413e"
+      "seen": "456d646d"
     }
   ]
 }
@@ -245,8 +245,8 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 
 - **When.** The data is many things to tick, and a person ticks several. Where the data says which group each thing belongs to, the page has one part for each group. Where it does not, the things are one list with a search.
 - **A heading MUST NOT be made up for choices whose data names no group** (`RD.SUPPORT.SURFACE.055`). A made-up heading puts a choice where a person does not look for it.
-- **Layout.** The main area, or the content of the entry the choices stand in.
-- **Container.** One `DSContainer` for each group, or one for the whole list. Where the list is one, its actions stand in the footer.
+- **Layout.** The main area, or the content of the entry the choices stand in: one container, or the parts of the entry's content.
+- **Container.** One `DSContainer`: its title in its header, a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a container of its own.
 - **Widget.** None.
 - **Component.** `DSForm`, with `DSSwitch` or `DSCheckbox`, and `DSList`. The choices stand in columns.
 - **On a tablet and a phone.** On a phone the choices stand one under another.
@@ -255,11 +255,13 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### An editor with its preview
 
 - **When.** The data is content a person writes and what that content becomes. The person must see the result while writing.
-- **Layout.** A row of the page with the state and the actions, then the containers.
-- **Container.** Two `DSContainer`: the editor, and the preview.
+- **An editor with its preview MUST be one container, and each thing a person writes MUST stand beside its own result** (`RD.SUPPORT.SURFACE.115`). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
+- **Where the content has several forms, a row of tabs MUST choose the form.** The tabs stand at the top of the content, and every part under them belongs to the chosen form. Where the record is saved whole, one save holds every form.
+- **Layout.** The way back, then one container.
+- **Container.** One `DSContainer`: its title in its header; the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer.
 - **Widget.** None.
-- **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` and `DSTextarea` for the fields of the editor. The rendered result.
-- **On a tablet and a phone.** At a desktop the editor and its result stand side by side. On a tablet and a phone a person sees one of the two at a time. A second row of tabs moves between writing and the preview.
+- **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it. `DSSticky` for the footer that stays in view.
+- **On a tablet and a phone.** At a desktop the editor of each part and its result stand side by side. On a tablet and a phone a person sees one of the two at a time, the writing or the result. A second row of tabs moves between them, and the choice holds for every part of the content at once.
 - **Spec.** `editor-with-preview.dg.json`.
 
 ### An entry over the page
@@ -356,6 +358,24 @@ Whether the set of groups is closed decides the arrangement, before any count do
 - **On a tablet and a phone.** On a phone the table is in its `LIST` layout. A row that is read is a line. The row that is being changed is its text with its box under it, and the same two actions beside the box.
 - **Spec.** `change-in-place.dg.json`.
 
+## How many containers a page uses — 🔮
+
+A container frames one thing that a person reads as a whole or saves as a whole. That one fact decides how many containers a page has, in every pattern.
+
+- **A page MUST use one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that one thing are the parts of its content, each under its own title.
+- **A section of one thing MUST NOT be a container of its own.** A frame around a section says that the section is read or saved by itself.
+- **Two things that are read or saved apart MUST be two containers, each with its own title.** A person then sees where one thing ends and the next begins, and which actions belong to which.
+
+| The page | Its containers |
+| --- | --- |
+| an entry that is saved once | one container. Its sections are the parts of its content, and its actions stand in its footer |
+| the page of a record | the head of the record outside any frame, then one container for each thing that belongs to the record, such as its content and the list of its versions |
+| a listing | one container, with the filter bar and the records as the parts of its content |
+
+The reason is the theme. The parts of a container are the places the look of the app reaches. So a page that draws no frame, no line and no padding of its own takes the theme of a partner with no change.
+
+- **The page that reads a record and the page that changes it MUST hold the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes the record, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves. The rule holds for the container of the thing that is changed: the page that reads a record may hold more containers, such as the list of its versions.
+
 ## The listing pages — 🔮
 
 A listing page is a page whose whole content is the records of one kind. It follows Find in a list. `DSDataTableWidget` has three layouts, and a listing page is that one widget in one of the three. It keeps its search, its filters and its paging in each.
@@ -409,6 +429,9 @@ This ref states which pattern covers a given task, and what blocks carry it. It 
 | `RD.SUPPORT.SURFACE.053` | a spec in the plugin equals the spec of the same name in the book |
 | `RD.SUPPORT.SURFACE.054` | a listing page whose query takes a page, a text or a filter stays a data table |
 | `RD.SUPPORT.SURFACE.055` | no heading is made up for choices whose data names no group |
+| `RD.SUPPORT.SURFACE.115` | an editor with its preview is one container, and each thing a person writes stands beside its own result |
+| `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole, and a section of one thing is never a container of its own |
+| `RD.SUPPORT.SURFACE.117` | the page that reads a record and the page that changes it hold the same parts in the same order |
 
 ## Proof
 
