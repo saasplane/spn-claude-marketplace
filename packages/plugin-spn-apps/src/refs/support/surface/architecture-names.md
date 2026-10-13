@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "61dcb7a6"
+      "seen": "5524921b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "c2f14479"
+      "seen": "eaa4ab7a"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/03-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
 
-Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the six layers and the word that says a block's layer, to the kinds of prop and the states a design and its code share.
+Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the word that says a block's layer, to the kinds of prop and the states a design and its code share.
 
 ## Terms
 
@@ -49,7 +49,27 @@ One name is used in the book, in the design library and in every stack. The book
 
 Keep each of the three names for its one meaning, on every block — a block takes `variant` and `color` independently. A prop that means something else takes another name: a shape, a type step or a kind of alert is not a surface treatment. Name a prop and its vocabulary with one word: the vocabulary `DS<Component><Word>Type` is taken through the prop `<word>`. Take every value from the vocabulary of its prop, never a free string. The text props follow it: `underline` of `DSLink` and `DSText` takes `SOLID` · `DOTTED` · `DASHED`, and `format` of `DSText` takes `UPPERCASE` · `LOWERCASE` · `CAPITALIZE`. A drawer and a sheet take `extent` for their reach, and the design library draws no `extent` variant, because the extent of an overlay there is the size of the instance.
 
-A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. `DSTable` takes `hoverable`, yes or no and no by default, for whether a body row takes the table's row-hover fill under the pointer; a selected row, and a row that holds an open menu, keep their fill whichever way it is set. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
+### Size and scale size
+
+The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.100`). A person operates a control, so its height follows the density of the place it stands in. A picture is only shown, so a page chooses how large it is drawn.
+
+| What is compared | `size` | `scaleSize`, with the vocabulary `DSScaleSizeType` |
+| --- | --- | --- |
+| What it says | how dense a control is | how large a thing that is shown is drawn |
+| Its steps | `XS` to `XL` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` · `XXL3` · `XXL4` · `XXL5` |
+| Who takes it | a button, a field, an item, a table, a card, and every block that has padding | `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` |
+| Handed down | yes: a block with no `size` takes the size of the place it stands in | no: a block with no `scaleSize` takes the step that fits its `size` |
+| The text beside it | the content step of that size | the title step of the same name |
+
+- **Neither word is used for the other meaning, on any block.** No other prop and no other vocabulary says how large an icon, an icon mark, an avatar or a group of avatars is drawn.
+- **Each of these blocks holds its own pixels for a step.** An icon of `XXL3` is 40 px, and a mark or an avatar of `XXL3` is 64 px. So one value, given to all of them, draws things that fit together. `architecture-core.md` states the pixels of every step.
+- **A scale size is not handed down.** A block that is given no `scaleSize` takes the step of the same name as its `size`. `DSIconMark`, `DSAvatar` and `DSAvatarGroup` keep `size` for this, and with neither prop set each one takes the size of the place it stands in. `DSIcon` has no `size`, and its `scaleSize` is `MD` when unset.
+- **A `scaleSize` that is given decides how large the block is drawn, whatever its `size` is.** `size` stays the density step on the block.
+- **The values of `scaleSize` are read smallest to largest, `XXS` to `XXL5`, wherever they are listed.**
+
+### Names with a rule of their own
+
+A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no and no by default, for whether a body row takes the table's row-hover fill under the pointer; a selected row, and a row that holds an open menu, keep their fill whichever way it is set. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
 A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
 
@@ -84,7 +104,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | Block | Prop | Values | Vocabulary |
 | --- | --- | --- | --- |
 | `DSAlert` · `DSToast` | `color` | `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType`, limited to these four |
-| `DSText` | `typography` | `HEADING_XL` to `HEADING_XS` · `TITLE_XL` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
+| `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
 | `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
 | `DSLink` · `DSText` | `tone` | `DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
@@ -92,10 +112,9 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSIconMark` | `shape` (the outline of the background the icon stands on) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSIconMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
-| `DSIcon` | `iconSize` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5` | `DSIconSizeType` |
+| `DSIcon` · `DSIconMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
-| `DSTabs` | `type` | `DEFAULT` · `LINE` · `BADGE` | `DSTabsType` |
-| `DSItem` | `type` (the place the item line stands in; it decides the type step and the heading level of the title, and the size of the picture) | `CONTENT` · `SECTION` · `HEADER`, `CONTENT` when unset | `DSItemType` |
+| `DSItem` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the whole page, a part of the page, a titled group inside the content of a part, or a line among others. On the item line it decides, with the `size`, the type step and the element of the title and the scale size of the picture. On the tabs it decides the look) | `PAGE` · `SECTION` · `GROUP` · `CONTENT`, `CONTENT` when unset | `DSPageLevelType` |
 | `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
 | `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
 | `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
@@ -125,6 +144,8 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSContextMenu` | `placement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
+
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `SECTION`, `GROUP`, `CONTENT`. `DSItem` and `DSTabs` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -191,7 +212,7 @@ A block drawn from data is a host and an item: one item serves every host that t
 
 ## Boundary
 
-This ref states which three props mean one thing everywhere, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, which word of a name says the layer, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
+This ref states which three props mean one thing everywhere, which of the two sizes a block takes, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, which word of a name says the layer, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
 
 ## Binds
 
@@ -200,6 +221,8 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | `RD.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
+| `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the icon mark, the avatar and the avatar group take `scaleSize` |
+| `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType` |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |

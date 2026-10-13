@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "5b86e080"
+      "seen": "0e6d7eac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
@@ -208,6 +208,8 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 **The States section holds states only. A choice made with a prop is a tab of Cases.** A state is what a unit is in: default, disabled, working, error, empty, read only, open, checked, selected or no permission. Full width, a placement, an orientation, a type, a count, and an option that keeps a menu open are choices that a caller makes with a prop, so each is a tab of Cases.
 
 **A unit may add a section of its own after the sections its tags give.** A unit does so when it has a whole set of choices that none of the six sections names. Examples are the looks and the pinned parts of a table, the display of a code view, and the type of an address form. A section of its own is built as every other section is: a container with a title, one line, and one card of tabs. It stands after the sections that the tags give, which end with States, and before Props. A unit with several of them lists them in the order it wants them read.
+
+**A unit that takes `scaleSize` shows every scale size, `XXS` to `XXL5`, smallest to largest.** The scale sizes are a set of choices that none of the six sections names, so they stand in a section of the unit's own. The section Sizes keeps the density steps, `XS` to `XL`. The units are `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup`. The page Type of Core shows every type step, the larger steps of Title and of Heading among them. The page Scale of Core shows the scale sizes beside the size steps, and the page Icons shows every icon at each scale size.
 
 **A formatter shows its types as one table, in a section of its own named Formats.** The table has one row for each member of the unit's format type, with none left out. Its columns are *Type*, the member as a developer writes it, and *Sample value*, the unit itself drawn live with one fixed input that is the same in every row. The section's line states that input once. The table is the design system's own table in the section's container, and it draws no border and no heading of its own. A second choice that changes the output, such as a time zone, stays fixed and is stated in the section's line. A formatter whose type is two types, such as the date and the time of `DSFormatDateTime`, has the members of both in one table, and each row changes one of them. A case that shows what the table does not, such as the size of a value or a format that comes from the app, stays as a tab of Cases.
 

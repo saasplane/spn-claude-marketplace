@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "baacf961"
+      "seen": "6f4f22f0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "4a6983b6"
+      "seen": "0b4f499b"
     }
   ]
 }
@@ -29,6 +29,7 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Item | the unit a host draws once for each entry of its data |
 | Node | `DSDataMenuNodeType` — the kind of one entry a host that draws a tree takes: `ITEM` · `GROUP` · `SECTION` · `SEPARATOR` · `CUSTOM` |
 | Item line | `DSItem` — one thing shown as a line: a picture, a title, a description, a line of facts, and actions at its end |
+| Page level | `DSPageLevelType` — the level of a page a block stands at: `PAGE` · `SECTION` · `GROUP` · `CONTENT`. The item line and the tabs take it through `pageLevel` |
 | Mark | a picture or an icon that stands for a thing or a person. It is round unless a page chooses another shape |
 | Core unit | a block the book names, which every stack builds under that name. A stack may provide further units of its own |
 
@@ -97,6 +98,7 @@ The reason is that a hover tells a person the row answers to them. A row that do
 - **In a list the row MUST carry the link, the chosen fill and the reaction to the pointer, and an item line inside it MUST carry none of them.** The row is the whole width, with what stands at its start and at its end, so its fill covers all of it. An item line that stands alone, in a card or a header, carries its own link.
 - **`selected` is the row's, and `DSItem` takes none.** A thing is chosen within a set, and the set is the list. So the row of a list, `DSList.Item`, takes `anchor`, `selected` and `showArrow`.
 - **`anchor` and `showArrow` stand on both blocks**, because the link and the arrow that says it leads somewhere go together: on the row in a list, and on the item line where it stands alone.
+- **An action at the end of a row that is a link MUST NOT follow the link** (`RD.SUPPORT.SURFACE.110`). A press on the action does the action and nothing else, and a press anywhere else on the row follows the link. The row and the list hold this, so a page writes no guard for it.
 
 ## What single blocks answer — 🔮
 
@@ -107,14 +109,14 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSButton` | **A button that shows an icon and no label MUST show its label as a tooltip.** The words are those of its `ariaLabel`, shown when the pointer rests on the button and when the keyboard reaches it. A button with a visible label shows none, and a disabled button shows none. `tooltip` takes other words for it, or `false` for none |
 | `DSToolbar` | **A row of controls, and never a menu.** Its parts are `DSToolbar.Item`, `DSToolbar.Group` and `DSToolbar.Separator`. An item is drawn as a `DSButton` at the size of the toolbar. The arrow keys move between the items, so the whole toolbar is one stop for the Tab key. `bordered` draws the frame around the row, and a toolbar inside another surface turns it off |
 | `DSTable` | **A data cell MAY be `marked`.** A marked cell is the one that stands out in its row, such as the name of a record. Its text is drawn in the medium weight and the default text colour. No cell is marked by default |
-| `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part takes its padding from the size of the card, and takes no prop. `divided` draws a line between each two parts, from edge to edge. `fullHeight` makes the card fill the height of its place, so the cards of one row of a grid end on one line. What then tells a card from a container is in `architecture-containers.md` |
+| `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. A header that holds an item line with a padding of its own takes `flush`, so that its title stands in line with the rows under it. `divided` draws a line between each two parts, from edge to edge. **A container or a card that holds parts, or more than one content part, MUST have a title:** an item line at the level `SECTION` in its header. A card that is one plain block of content needs none. `fullHeight` makes the card fill the height of its place, so the cards of one row of a grid end on one line. What then tells a card from a container is in `architecture-containers.md` |
 | `DSList` · `DSItem` | **`bleed` is for a list or an item that fills a part with no inset**, such as a `flush` part of a container. Each row keeps the padding of its size above and below, and takes the inset of its place at its two sides. So the text of a row lines up with a title in a part that insets, and the fill of a pressed or chosen row runs from edge to edge. On a list, `bleed` wins over `flush` |
 | `DSColorView` | **Shows a stored colour that a person reads:** a small swatch, and the value beside it as text. With no colour it shows a dash, or the words of `emptyLabel`. `swatchOnly` draws the swatch alone. A colour that is part of a block's own look, such as a badge drawn in its colour, is not shown through this block |
 | `DSTagGroup` | **A set of tags a person removes from.** Each tag is drawn as a `DSBadge` with its close action, and the keyboard reaches each one. The page holds the set: it adds a tag elsewhere, and takes the tag out when the group reports that one was removed. A choice from a fixed set is `DSToggleGroupMulti`, and not this block |
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
 | `DSColorPicker` | **A swatch that opens the colour picker of the device, with the colour's code beside it.** `showValue` shows the code in a field, and a person may type the code there in place of picking. **It MUST write and show a hex code in capitals, such as `#1A365D`,** whether typed or picked. A code stored in small letters is shown in capitals and left as stored until a person changes the colour. **A typed colour MUST be a hex code of six digits with its `#`,** in either case, taken when the person presses Enter or leaves the field. A text that is no such code leaves the colour as it was, and the field shows its error state. **It MAY hold no colour:** the swatch then has a dashed edge and no fill, and `clearable` offers an action that empties it |
 | `DSProgressCircle` | **Progress as a ring.** The ring fills to `value` out of `max`, and `showValue` writes the value inside it. With `indeterminate` the ring turns and reads no value. It is a block of its own beside `DSProgress`: the bar and the ring share no picture |
-| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel |
+| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel. **The page level of the tabs MUST decide their look** (`RD.SUPPORT.SURFACE.113`): `DSTabs` takes `pageLevel`, with `CONTENT` when unset, and a page chooses no look for them. "The tabs by level" below states each look |
 
 ### The overlays, and the two confirmations
 
@@ -124,6 +126,17 @@ Each rule below is of one block or one prop. The props, their values and their d
 - **`DSConfirmPopover` asks a person to confirm an act they can undo, in a popover that opens from the control that was pressed.** It holds the question, an action that cancels and the action that confirms, named as on `DSConfirmDialog`. It draws on the surface of `DSPopover`, covers no page and draws no scrim. **It MUST stay open while the act runs, and MUST close when the act is done.** An act that fails keeps it open and shows the failure in it. The cancel action and the Escape key close it, and focus goes back to the control that opened it.
 
 `standards-patterns.md` states when a confirmation is the popover and when it is the dialog.
+
+### The tabs by level
+
+| `pageLevel` | The tabs are | Their look | At the size of the theme, `SM` |
+| --- | --- | --- | --- |
+| `PAGE` | the sub-pages of a page | the line: the open tab has a line under it in the primary colour, and no fill | a label of 16px in a row of 40px |
+| `SECTION` | the parts of a section | the line | a label of 14px in a row of 36px |
+| `GROUP` · `CONTENT` | two ways to show one thing | the filled row: the open tab is a raised pill on a filled bar | a label of 13px in a row of 32px |
+
+- **The `size` of the tabs picks the step, and the level says how far above it the tabs are drawn.** At `GROUP` and at `CONTENT` a tab is drawn at the step of its size. At `SECTION` it is drawn one step above, and at `PAGE` two steps above, and never above `XL`. A step gives the label its content step and the row the height of a control.
+- **Tabs that say no level draw the filled row.** The tabs of a part of a page say `SECTION`, and the tabs that lead to the sub-pages of a whole page say `PAGE`.
 
 ## The item line, the badge and the mark — 🔮
 
@@ -137,7 +150,7 @@ The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a
 | --- | --- | --- |
 | A picture | a picture or an icon of the thing, at the start of the line | `media`, or `startIcon` for an icon alone |
 | A title | the name of the thing | `title` |
-| A description | one line about the thing, under its title | `description` |
+| A description | a short summary of the thing, under its title, drawn whole | `description` |
 | A line of facts | the short facts of the thing, under its description, with a dot between each two. A badge stands among them, before the other facts | `facts` |
 | Actions | the actions of the thing, at the end of the line | `actions` |
 | An arrow | a chevron after the actions, on a line that leads somewhere | `showArrow` |
@@ -158,15 +171,32 @@ The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a
 - **Nothing but the actions MAY stand at the end of an item line, and the arrow of `showArrow` MAY stand after them** (`RD.SUPPORT.SURFACE.087`). A state at the end would look like something to press. The arrow is no state: it stands on a line that leads somewhere when it is pressed. It is off by default. A row of `DSList` takes `showArrow` the same way, and in a list the arrow is the row's.
 - **The header of a record and a line of a list MUST have the same shape: a picture, a title, a line under it, and actions.** A badge then stands in the same place on both. A person who has read a list can read the page of one record.
 
-One item line serves three places, and `type`, from `DSItemType`, says which one it stands in.
+- **An item line MUST draw its description whole, and the page decides what the description says** (`RD.SUPPORT.SURFACE.111`). The item line cuts no description and takes no prop for a number of lines. A page that wants the heads of a row of cards at one height gives each a description of one length.
 
-| `type` | The item line is | What the type decides |
-| --- | --- | --- |
-| `CONTENT` | a line among others, such as a line of a list. It is the default | the title is plain text at the size of the line |
-| `SECTION` | the title line of a part of a page, such as the header of a container | the title is a heading of a section, at a larger type step |
-| `HEADER` | the header of a page or of a record | the title is the heading of the page, at the largest type step of the three |
+One item line serves every level of a page, and `pageLevel`, from `DSPageLevelType`, says which one it stands at. The level picks the family of the title and how far above the item's `size` the title stands, and the `size` picks the step.
 
-- **The `type` of an item line MUST decide the type step of its title, its heading level and the size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the type and writes no type step and no heading level of its own.
+| `pageLevel` | The item line is | Its title | Its element | Its picture |
+| --- | --- | --- | --- | --- |
+| `PAGE` | the head of the whole page, such as the header of a record or of a listing that is the page | a heading, one step above the item's size | an `h1` | the scale size two steps above that heading's own step |
+| `SECTION` | the title line of a part of a page, such as the header of a container or of a card | a title, two steps above the item's size | an `h2` | the scale size of the same step as that title |
+| `GROUP` | the title line of a titled group inside the content of a part | a title, one step above the item's size | an `h3` | the scale size of the same step as that title |
+| `CONTENT` | a line among others, such as a line of a list. It is the default | a title, at the step of the item's size | no heading | the scale size of the same step as the title |
+
+Each cell below names the step of the title and the scale size of the picture, with the pixels of the text and of an avatar or a mark.
+
+| Size of the item | `CONTENT` | `GROUP` | `SECTION` | `PAGE` |
+| --- | --- | --- | --- | --- |
+| `XS` | `TITLE_XS`, 12px, with `XS`, 28px | `TITLE_SM`, 13px, with `SM`, 32px | `TITLE_MD`, 14px, with `MD`, 36px | `HEADING_SM`, 24px, with `LG`, 40px |
+| `SM` | `TITLE_SM`, 13px, with `SM`, 32px | `TITLE_MD`, 14px, with `MD`, 36px | `TITLE_LG`, 16px, with `LG`, 40px | `HEADING_MD`, 28px, with `XL`, 44px |
+| `MD` | `TITLE_MD`, 14px, with `MD`, 36px | `TITLE_LG`, 16px, with `LG`, 40px | `TITLE_XL`, 18px, with `XL`, 44px | `HEADING_LG`, 34px, with `XXL`, 48px |
+| `LG` | `TITLE_LG`, 16px, with `LG`, 40px | `TITLE_XL`, 18px, with `XL`, 44px | `TITLE_XXL`, 24px, with `XXL`, 48px | `HEADING_XL`, 40px, with `XXL2`, 56px |
+| `XL` | `TITLE_XL`, 18px, with `XL`, 44px | `TITLE_XXL`, 24px, with `XXL`, 48px | `TITLE_XXL2`, 32px, with `XXL2`, 56px | `HEADING_XXL`, 48px, with `XXL3`, 64px |
+
+- **The `pageLevel` and the `size` of an item line MUST together decide the type step of its title, its element and the scale size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the level and the size, and writes no type step, no heading element and no scale size of its own. A larger head needs no new level: the head of a profile page is the same item at `LG`.
+- **The item line gives its picture the scale size.** A picture given through `media` or `startIcon`, with no scale size of its own, is drawn at the step of the table. At the level `PAGE`, an icon alone is the size of the heading or the next size up: 24px, 32px, 40px, 40px and 48px for the five sizes of the item.
+- **In the header of a page, an avatar or a mark MUST stand at the top of the text, its top where the heading's line starts.** An icon alone stands in the middle of the heading's first line, and so does the way back. On the title line of a part or of a group, the picture stands level with the middle of the text.
+- **`size` MUST still set the padding of the item line, and it is handed to what stands inside it.** So a head at a larger size has larger buttons beside it.
+- **An item line at the level `SECTION` or `PAGE` MUST take no padding at its two sides where the header it stands in has no frame** (`RD.SUPPORT.SURFACE.109`). The title of a page is then flush with what stands under it. Inside a frame the item line keeps its padding. An item line at the level `GROUP` pads as a line among others does.
 
 ### The badge
 
@@ -198,7 +228,59 @@ A mark is a picture or an icon that stands for a thing or a person: a person's p
 - **An icon inside an action MUST keep the square of the control it sits in** (`RD.SUPPORT.SURFACE.067`). A mark is never pressed, so it draws no reaction to the pointer, whatever its shape.
 - **A filled mark is a thing that is set up, and an empty mark is a thing that is not set up yet.** So a row of marks shows where a setup stands with no count beside it.
 
-`DSIconMark` draws an icon as a mark, on a background of its own. `shape` takes `DSIconMarkShapeType`: `CIRCLE`, the default; `ROUNDED`, a square with the corner radius of its size step; `SQUARE`, a square with sharp corners. `size` is the size step: the background is as tall as a control of that step. `color` is the hue. `variant` is how the background is drawn: `SOFT`, a tinted fill and the default; `SOLID`, a strong fill; `OUTLINE`, a ring with no fill. A screen reader passes a mark by; a mark that stands alone takes a name through `ariaLabel`, and is then read as an image. A person's picture stays `DSAvatar`, which is round.
+`DSIconMark` draws an icon as a mark, on a background of its own. `shape` takes `DSIconMarkShapeType`: `CIRCLE`, the default; `ROUNDED`, a square with the corner radius of its size step; `SQUARE`, a square with sharp corners. `size` is the density step: a mark with no `scaleSize` takes the scale size of the same name, so its background is as tall as a control of that step. `scaleSize`, from `DSScaleSizeType`, says how large the mark is drawn, with a background of 24 to 96px, and the mark holds the icon of its own step. `color` is the hue. `variant` is how the background is drawn: `SOFT`, a tinted fill and the default; `SOLID`, a strong fill; `OUTLINE`, a ring with no fill. A screen reader passes a mark by; a mark that stands alone takes a name through `ariaLabel`, and is then read as an image. A person's picture stays `DSAvatar`, which is round.
+
+### The avatar
+
+`DSAvatar` shows the picture of a person or of a thing, and its initials where there is no picture. `DSAvatarGroup` shows several of them as one stack. Both take `scaleSize`, from 24 to 96px, and both keep `size`. With no `scaleSize`, an avatar takes the step of the same name as its `size`, and with neither it takes the size of the place it stands in. A group gives its scale size to each avatar it holds.
+
+- **The initials of an avatar MUST be a title step of about four tenths of the avatar** (`RD.SUPPORT.SURFACE.105`). From `XXL` up they are not the title of the avatar's own step name, because that title would fill the circle.
+
+| Scale size of the avatar | Its size | Its initials | What it is for |
+| --- | --- | --- | --- |
+| `XXS` | 24px | 10px | a person named inside a line of text or a dense table |
+| `XS` · `SM` · `MD` · `LG` · `XL` | 28 · 32 · 36 · 40 · 44px | 12 · 13 · 14 · 16 · 18px | a row, a list, the head of a section or of a page |
+| `XXL` | 48px | 18px | a card about one person |
+| `XXL2` | 56px | 24px | the head of a record with a line under its name |
+| `XXL3` | 64px | 24px | the head of a record with a line and facts |
+| `XXL4` | 80px | 32px | a profile page |
+| `XXL5` | 96px | 40px | an account's own page |
+
+### What stands beside what
+
+These rules are for a component a builder makes, where a text stands beside an icon, a mark or an avatar. Inside an item line the item decides, and a page chooses none of this there.
+
+- **Beside a title, an icon, a mark and an avatar MUST take the scale size of the title's own step name** (`RD.SUPPORT.SURFACE.104`). `TITLE_XXL3` stands beside `XXL3`: a 40px title, a 40px icon, and a 64px mark or avatar. An icon beside a title is never smaller than the title.
+- **Beside a heading, an icon MUST be the size of the heading or the next size up, up to 56px.** A heading has no scale size of its own name, so the pairing goes by size. Beside a heading larger than 56px, the icon stands in a mark.
+- **Beside a heading, an avatar or a mark MUST be two steps above the heading's own step, and never larger than `XXL5`.**
+
+| Heading | Its size | The icon beside it | The avatar or the mark beside it |
+| --- | --- | --- | --- |
+| `HEADING_XS` | 20px | `XL`, 20px | `MD`, 36px |
+| `HEADING_SM` | 24px | `XXL`, 24px | `LG`, 40px |
+| `HEADING_MD` | 28px | `XXL2`, 32px | `XL`, 44px |
+| `HEADING_LG` | 34px | `XXL3`, 40px | `XXL`, 48px |
+| `HEADING_XL` | 40px | `XXL3`, 40px | `XXL2`, 56px |
+| `HEADING_XXL` | 48px | `XXL4`, 48px | `XXL3`, 64px |
+| `HEADING_XXL2` | 56px | `XXL5`, 56px | `XXL4`, 80px |
+| `HEADING_XXL3` · `HEADING_XXL4` · `HEADING_XXL5` | 64 · 72 · 80px | the icon in a mark | `XXL5`, 96px |
+
+### Which to use where
+
+A title and a heading share sizes from 24 to 56px, so the size does not say which one a text is. What the text does on the page says it.
+
+| The text is | Use | How many on a page |
+| --- | --- | --- |
+| the name of the whole page: a record, a list, a page of cards | a heading, as an item line at the level `PAGE` | one |
+| the name of a part of a page: a container, a card | a title, as an item line at the level `SECTION`, at the size of its place | one for each part |
+| the name of a group inside the content of a part: a set of rows under one name | a title, as an item line at the level `GROUP`, at the size of its place | one for each group |
+| a line among others: a row of a list, a person in a cell | a title, as an item line at the level `CONTENT` | as many as there are lines |
+| a number, a price, the line of a hero | a heading step above `HEADING_XL`, in a component of the builder's own | one or two |
+
+- **A heading MUST name the whole page, and a page MUST have one heading that names it. A title MUST name a part of a page or a line among others** (`RD.SUPPORT.SURFACE.106`). A person then learns from the weight of a text whether it names the page or a part of it.
+- **A listing that is the page MUST give the header of its container the level `PAGE`.** A listing that is a part of a page says `SECTION`. So every page of an app opens with the same head, and only its body differs.
+- **Every level of a page MUST have its title, and a title MUST be larger than the titles of what stands under it** (`RD.SUPPORT.SURFACE.112`). At the size of the theme, `SM`, the page draws a heading of 28px, a part a title of 16px, a group a title of 14px and a row a title of 13px.
+- **A group inside the content of a part MUST draw its title as an item line at the level `GROUP`, at the size of its place.** The action of the group stands at the end of that item line. So a group needs no block and no prop of its own.
 
 ### The two blocks of a field
 
@@ -238,10 +320,18 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.088` | the dialog that asks a person to confirm an act is named `DSConfirmDialog` |
 | `RD.SUPPORT.SURFACE.089` | `DSToolbar`, `DSTagGroup`, `DSCalendar`, `DSColorPicker` and `DSProgressCircle` are core units |
 | `RD.SUPPORT.SURFACE.090` | `DSColorView`, `DSIconMark` and `DSConfirmPopover` are core units |
-| `RD.SUPPORT.SURFACE.094` | the type of an item line decides the type step and the heading level of its title, and the size of its picture |
+| `RD.SUPPORT.SURFACE.094` | the page level and the size of an item line together decide the type step and the element of its title, and the scale size of its picture |
 | `RD.SUPPORT.SURFACE.096` | the four forms a fact of an item line is given in, and a fact may carry its label before it |
 | `RD.SUPPORT.SURFACE.097` | `DSList` takes `hoverable`, and `selected` is the row's and not the item line's |
+| `RD.SUPPORT.SURFACE.104` | which icon, mark and avatar stand beside a title and beside a heading |
+| `RD.SUPPORT.SURFACE.105` | the initials of an avatar are a title step of about four tenths of the avatar |
+| `RD.SUPPORT.SURFACE.106` | a heading names the whole page, one to a page, and a title names a part or a line |
+| `RD.SUPPORT.SURFACE.109` | an item line that is a head takes no padding at its sides where the header it stands in has no frame |
+| `RD.SUPPORT.SURFACE.110` | an action at the end of a row that is a link does not follow the link |
+| `RD.SUPPORT.SURFACE.111` | an item line draws its description whole, and the page decides what it says |
+| `RD.SUPPORT.SURFACE.112` | every level of a page has its title, and a title is larger than the titles of what stands under it |
+| `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the level decides the look of the tabs |
 
 ## Proof
 
-No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The book states `facts` and `type` on `DSItem` before the web builds them, so a page checks what its stack's `DSItem` takes before it uses either.
+No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The book states `facts` and `pageLevel` on `DSItem` before the web builds them. It also states the larger sizes before the web builds them and before the library draws them: `scaleSize` on `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup`, the item line and the tabs drawn by their page level, and `flush` on the parts of a card. So a page checks what its stack's units take before it uses one of these.

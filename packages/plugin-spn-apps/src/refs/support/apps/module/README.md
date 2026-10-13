@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "2edda00f"
+      "seen": "cd44f9b3"
     }
   ]
 }
@@ -225,8 +225,13 @@ A page owns one screen and is the only thing a route lands on. It reads the addr
 - **Build an address from a route and its values, by one function, and never write one as text — MUST** (`RD.SUPPORT.APPS.189`). That a missing value is an error, and never an address, is proposed.
 - **The menu is the app's own list, and an entry names a route by its key — MUST** (`RD.SUPPORT.APPS.190`). Its order, groups, labels and icons are the app's.
 - **The entry in view is the one whose address the current address is at or under — MUST** (`RD.SUPPORT.APPS.191`). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
-- **An address names the thing, and does not carry its place in the menu — MUST** (`RD.SUPPORT.APPS.192`). A menu can then be arranged again without breaking a link. No rule asks that an address begin with its module.
-- **An address that moves answers with a redirect — MUST** (`RD.SUPPORT.APPS.193`). The redirect is the app's own, in its router.
+- **Declare one route name for a web module, beside its code — MUST** (`RD.SUPPORT.APPS.204`). The name is a plain word for the module's subject, in lower case, with a hyphen between words. Every address of the module begins with it. The name is fixed, and an app gives a module no other name.
+- **A route is one of two kinds, and the module declares which — MUST.** A page of work is one a person of the organization uses every day, and its address is `/<name>/<rest>`. A page of setup configures the module, and its address is `/settings/<name>/<rest>`. So a module named `identity` gives `/identity/orgs` and `/settings/identity/users`.
+- **A route gives its kind and the rest of its path, and never a whole address — MUST.** The function that builds an address puts the name in front, and the word `settings` in front of that for a page of setup. `settings` is a fixed word, and no module takes it as its name.
+- **A check compares every address of a module with the name the module declares — MUST.** An app that joins two modules with one name is refused when it starts.
+- **An app's own page, such as Home, takes a plain word of the app's own.** It may not use the name of a module it has mounted, or `settings` followed by such a name.
+- **The first word of an address is the module's, and an address does not carry its place in the menu — MUST** (`RD.SUPPORT.APPS.192`). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
+- **An address that changes answers with a redirect — MUST** (`RD.SUPPORT.APPS.193`). The redirect is the app's own, in the router of the app that had the address.
 - **On a page of groups and their items, the swap of the items for the groups changes the address — MUST** (`RD.SUPPORT.SURFACE.079`).
 - **An address has two parts — MUST** (`RD.SUPPORT.APPS.194`). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
 - **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RD.SUPPORT.APPS.197`).

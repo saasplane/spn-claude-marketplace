@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "ed0a4f86"
+      "seen": "94086eb0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "c2f14479"
+      "seen": "eaa4ab7a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "08fae8da"
+      "seen": "f3e287fd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
@@ -83,12 +83,12 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
 - **Draw a part named in `unframed` flat.** It takes no frame in any theme, so a change of the top frame's look leaves it as it is. One such part is a header that is the header of the page.
 - **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the main area. Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content.
-- **Draw the parts of a card inside its one frame.** `DSCard.Header`, `DSCard.Content` and `DSCard.Footer` take no prop, so no part of a card takes the frame setting. `divided` is the line between each two parts.
+- **Draw the parts of a card inside its one frame.** A part of a card pads itself, and `flush` on a part drops that padding. A block inside a card looks as it does on a plain page, because a card starts a frame of its own. `divided` is the line between each two parts.
 - **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
-- **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a text takes the icon size of that text's size step and shares its centre line: an `XS` icon beside `XS` text.
+- **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the icon mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
-- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `type` is `CONTENT`, `SECTION` or `HEADER`, and it decides the size of the title and of the picture, so no text style is set by hand. `showArrow` is the chevron after the actions.
+- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `SECTION`, `GROUP` or `CONTENT`, and with the `size` it decides the type step of the title and the scale size of the picture, so no text style is set by hand. A row of tabs takes `pageLevel` too, and the level decides its look. The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. `showArrow` is the chevron after the actions.
 - **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
 
 ## How a block is drawn
@@ -133,6 +133,6 @@ When the page is drawn, read it through the connector, and write what you read a
 | Containers inside a container | 0 |
 | Lines of the tree with no layer, and layers with no line | 0 |
 
-Do the comparison inside the call, and return the counts and the differences. The connector cuts a long result. Then give the developer the link of the top frame.
+Do the comparison inside the call, and return the counts and the differences. The connector refuses an answer over 20,480 bytes. Then give the developer the link of the top frame.
 
 **The connector cannot publish a library.** This step writes to no library file, so nothing here waits for a publish.

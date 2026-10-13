@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/01-shape.md",
-      "seen": "59b11fa0"
+      "seen": "bab15d8e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/",
@@ -194,8 +194,8 @@ Hold a web module to these rules when you write or review one. A rule marked pro
 | An address is built from a route and its values, by one function, and never written as text. That a missing value is an error is proposed | `RD.SUPPORT.APPS.189` | decided |
 | The menu is the app's own list, and an entry names a route by its key | `RD.SUPPORT.APPS.190` | decided |
 | The entry of the menu in view is the one whose address the current address is at or under. That the longest address wins among several is proposed | `RD.SUPPORT.APPS.191` | decided |
-| An address names the thing, and does not carry its place in the menu | `RD.SUPPORT.APPS.192` | decided |
-| An address that moves answers with a redirect, which is the app's own | `RD.SUPPORT.APPS.193` | decided |
+| The first word of an address is the module's, and an address does not carry its place in the menu | `RD.SUPPORT.APPS.192` | decided |
+| An address that changes answers with a redirect, which is the app's own | `RD.SUPPORT.APPS.193` | decided |
 | The path names the page, and the part after `#` names an overlay any page can have | `RD.SUPPORT.APPS.194` | decided |
 | An overlay is shown through the overlay context, and never placed in the page's own tree | `RD.SUPPORT.APPS.195` | decided |
 | An overlay that has an address is shown while the address matches, and removed when it does not | `RD.SUPPORT.APPS.196` | proposed |
@@ -204,6 +204,7 @@ Hold a web module to these rules when you write or review one. A rule marked pro
 | A partner places a SaaS Plane container by mounting one small provider beside the design system's context. It has no router, no layout and no sign-in screen | `RD.SUPPORT.APPS.199` | decided |
 | The provider finds the signed-in person itself, keeps the answer fresh, and tells its containers when nobody is signed in | `RD.SUPPORT.APPS.200` | decided |
 | A page, a container and a hook reach a service through that service's client. A second service means a second client | `RD.SUPPORT.APPS.201` | decided |
+| A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RD.SUPPORT.APPS.204` | decided |
 
 Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RD.SUPPORT.SURFACE.079`).
 
