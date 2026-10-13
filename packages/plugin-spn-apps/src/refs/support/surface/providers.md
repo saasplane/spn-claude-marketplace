@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "ce53ef29"
+      "seen": "4c9c53ae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
-      "seen": "8ad33531"
+      "seen": "55d2ee3c"
     }
   ]
 }
@@ -45,7 +45,7 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 
 | Book concept | TypeScript |
 | --- | --- |
-| App context | `IDSAppContextProps` — the `app` handle, `IDSAppContextInfo` (permissions, languages, `SPLanguageCodeType`, `SPCountryCodeType`, `SPCurrencyCodeType`, `SPDateFormatType`, `SPNumberFormatType`, optional `SPTimeFormatType`, timezone), `translate(key, defaultValue, vars)`, and `handleUnauthenticated` |
+| App context | `IDSAppContextProps` — the `app` handle, `IDSAppContextInfo` (permissions, languages, `SPLanguageCodeType`, `SPCountryCodeType`, `SPCurrencyCodeType`, `SPDateFormatType`, `SPNumberFormatType`, `SPTimeFormatType`, timezone, each one required), `translate(key, defaultValue, vars)`, and `handleUnauthenticated` |
 | Design-system context | `IDSContextProps` — `theme` + `setTheme`, `device`, `navigate`, `transformImageUrl`, `getImagePlaceholderUrl`, `getImageErrorUrl`. `DSApp` keeps `device` live: the app passes the first value, and the device then follows the window across a screen class and a turn |
 | Theme lifecycle | the app seeds `theme`; `DSApp` holds it; `setTheme` retints or flips mode from any depth |
 | Preferences and formatting | format components and helpers read the context's info, and never the browser locale. The app context holds the date format, the number format and the time format as required facts, and no unit falls back to a format of its own. `DSFormatDateTime` and `DSFormatDate` take `type`, a `DSFormatDateType`, and `AGO` writes how long ago in words |
