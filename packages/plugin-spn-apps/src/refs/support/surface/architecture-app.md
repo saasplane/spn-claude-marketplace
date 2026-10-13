@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "8025c446"
+      "seen": "a6d24bbd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "b4c45068"
+      "seen": "a661facd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -62,14 +62,32 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 | Card look | `card`: `raised`, `bordered` and `rounded`, as the default for the surface of every card |
 | Card widget look | `cardWidget`: what `DSCardWidget` adds to a card. `divided` is the lines between its head, its parts and its footer, `rowsDivided` the lines between the rows of its `ITEMS` and `LIST` parts, and `rowsHoverable` the hover of those rows |
 | Table look | `table`: `striped` and `hoverable`, as the default for every table |
+| Layout look | `layout`: how a layout is drawn, in two parts, `shell` and `content` |
 
-Each of the last three blocks is optional, and each of its values is yes or no.
+Each of the last four blocks is optional. In `card`, `cardWidget` and `table` each value is yes or no.
 
 - **A table MUST take `striped` and `hoverable` from its own prop where the prop is given, else from the theme's `table`, else off** (`RD.SUPPORT.SURFACE.126`). A partner turns them on once for every table of an app, and one table that says no still wins.
 - **A card MUST take `raised`, `bordered` and `rounded` from its own prop where the prop is given, else from the theme's `card`** (`RD.SUPPORT.SURFACE.128`). Each of the props is decided by itself, so a `card` that sets `bordered` alone leaves the others as they were. Under a theme with no `card`, a card takes them from the theme's `container`, and where that says nothing it draws its own look: raised, bordered and with square corners. So a theme can say flat containers with bordered cards, and an app that has written no `card` sees no change.
 - **The card look holds the surface of a card and nothing else.** The line between the parts of a plain `DSCard`, `divided`, is a prop of the card that the page writes.
 - **`DSCardWidget` MUST take what it adds to a card from the theme's `cardWidget`, where its own prop says nothing.** Its `divided` is its own prop, else `divided` of `cardWidget`, else off. The rows of a part take `divided` from the prop of the part, else from `rowsDivided`, else on, and `hoverable` from the prop of the part, else from `rowsHoverable`, else off. The surface of the widget's card follows the card look.
 - **The theme holds no block for a list.** The `divided` and the `hoverable` of `DSList` are props that the page writes.
+
+The layout look has two parts and no more. `architecture-layouts.md` states what the shell and the content are in each layout type, and how the entries of the navigation are drawn.
+
+| Part | Field | What it sets | Values |
+| --- | --- | --- | --- |
+| `shell` | `surface` | the fill of the shell. Its text, its fill under the pointer and its chosen entry follow from it | `DSThemeLayoutShellSurfaceType`: `BASE` · `SUNKEN` · `RAISED` · `PRIMARY` · `INVERSE` |
+| `shell` | `material` | whether the fill is solid, or frosted where content passes behind the shell | `DSThemeLayoutMaterialType`: `SOLID` · `TRANSLUCENT` |
+| `shell` | `entry` | how the entry of the open page is marked | `DSThemeLayoutEntryType`: `SOLID` · `SOFT` · `LINE` · `PLAIN` |
+| `shell` | `bordered` | the lines: at the edge of the shell, and around a panel of navigation that opens from it | yes or no |
+| `shell` | `raised` | the depth: a shadow under the shell, and under such a panel | yes or no |
+| `content` | `surface` | the fill that the containers and the cards of the page stand on | `DSThemeLayoutContentSurfaceType`: `BASE` · `SUNKEN` |
+| `content` | `inset` | the content as a rounded sheet set into the shell | yes or no |
+
+- **The theme MUST style the layout in two parts, the shell and the content, and it MUST hold no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A partner writes the look once, and the rail, the dock and the top bar each draw it.
+- **With no `layout`, and with a field left out, every layout MUST draw as it did before.** Where `content.surface` is left out, the fill of the page stays the sunken surface under a theme whose containers are raised, and the plain surface under any other.
+- **The layout look MUST take no colour, no opacity and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting: it follows the surface of the shell.
+- **The layout type, the widths of the layout and what a page shows in its main area are not part of the layout look.** A marketing page that needs bands, effects and backgrounds of its own writes its own layout.
 
 A partner changes the look of an app through one theme, and in no other way (`RD.SUPPORT.APPS.150`). A partner writes one theme, and never a style for a block. The theme is held at the app's root, and changeable from any depth, so a component that learns the brand late (after sign-in, from an API response) retints the whole surface without reaching application-root state. The layout type is not a choice of the theme. Support ships a theme, and never a template.
 
@@ -117,6 +135,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | --- | --- |
 | `RD.SUPPORT.APPS.150` | a partner changes the look of an app through one theme, and the layout type is not a choice of it |
 | `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
+| `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in two parts, the shell and the content |
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
 | `RD.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |

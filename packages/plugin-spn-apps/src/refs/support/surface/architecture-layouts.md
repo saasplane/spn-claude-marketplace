@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "349b9660"
+      "seen": "cdd898cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "0415bb2f"
+      "seen": "7a390842"
     }
   ]
 }
@@ -25,6 +25,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | --- | --- |
 | Layout | the block that frames a page: the navigation, and the main area it hands to the page |
 | Layout type | `DSLayoutType` — `RAIL` · `DOCK` · `TOPNAV` |
+| Shell | the part of a layout that holds the brand, the navigation and the account |
 
 ## The types — 🔮
 
@@ -40,9 +41,46 @@ A layout names no routing library — it moves between pages through the navigat
 
 ## The main area — 🔮
 
-- **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. No page and no story sets a fill of its own.
+- **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. Where the theme's layout look gives `content.surface`, that decides the fill of the main area. No page and no story sets a fill of its own.
 - **The layout gives the main area one inset, `layout/main-inset`, in every layout type.** A page whose content runs from edge to edge gives `flush` on the layout, the same word a part of a container takes. The page writes no inset of its own.
 - **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area. No layout holds one as a number.
+
+## The shell and the content — 🔮
+
+A layout has two parts for its look, whatever its type. The shell holds the brand, the navigation and the account. The content is the main area. The theme styles the two through its layout look, which `architecture-app.md` states field by field.
+
+| Layout type | Its shell | Its content |
+| --- | --- | --- |
+| `RAIL` | the side panel | the main area, with the thin bar over it that holds the collapse button and the utility actions |
+| `DOCK` | the top bar and the column of the navigation | the main area |
+| `TOPNAV` | the bar across the top | the main area |
+
+- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). With no layout look, and with a field left out, a layout draws as it did before.
+- **The thin bar over the content of `RAIL` MUST belong to the content.** It takes the surface of the content, and it stands inside the sheet where the content is inset.
+- **`content.inset` MUST draw the content as a sheet.** The sheet has the corner radius of the theme. It is set into the shell with a gutter, and the surface of the shell shows around it.
+- **A translucent shell MUST show only where content passes behind the shell:** a top bar that stays in view, a panel of navigation, and a shell drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, the shell draws solid.
+
+An entry of the navigation has three states, drawn from one set of colours in every layout type.
+
+| State of an entry | What it draws |
+| --- | --- |
+| At rest | the text of the shell that can be read on its surface |
+| Under the pointer | a quiet tint of the surface of the shell, and never the brand colour |
+| The entry of the open page | what `shell.entry` of the theme says |
+
+| `shell.entry` | The entry of the open page draws |
+| --- | --- |
+| `SOLID` | the brand fill. On a shell whose surface is `PRIMARY` it draws the reverse, so it does not vanish |
+| `SOFT` | a quiet tint, one step stronger than the tint under the pointer |
+| `LINE` | a line: under the entry in a top bar, and at the start edge of the entry in a rail or a dock |
+| `PLAIN` | stronger text alone |
+
+- **A nested entry of a rail MUST follow the same states, one step quieter.**
+- **Every pair of a shell surface and an entry MUST meet WCAG AA for text, in light and in dark.** A partner cannot choose a pair that hides the navigation.
+- **A panel of entries of the navigation MUST belong to the shell** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail are such panels. Each takes the surface and the material of the shell, a line where the shell is `bordered`, and a shadow where it is `raised`.
+- **A menu of actions MUST NOT take the look of the shell.** The menu of the account is such a menu, and it keeps the look every menu has.
+
+The web builds this part, and the design library has not drawn it yet.
 
 ## How the navigation behaves — 🔮
 
@@ -55,7 +93,7 @@ Each layout type draws its navigation the same way, whatever the type.
 
 ## Boundary
 
-This ref states what a layout owns, its three types, and how its navigation behaves. It stops at the edge of the main area. It does not state what a container is, or how a part of a page is framed inside the main area — that is `architecture-containers.md`. It does not state where the theme's choices come from, or how a setting reaches a block from above — that is `architecture-app.md`.
+This ref states what a layout owns, its three types, its shell and its content, and how its navigation behaves. It stops at the edge of the main area. It does not state what a container is, or how a part of a page is framed inside the main area — that is `architecture-containers.md`. It does not state where the theme's choices come from, or how a setting reaches a block from above — that is `architecture-app.md`.
 
 ## Binds
 
@@ -65,6 +103,8 @@ This ref states what a layout owns, its three types, and how its navigation beha
 | `RD.SUPPORT.APPS.160` | the page's fill is the theme's, and no page sets a fill behind itself |
 | `RD.SUPPORT.APPS.161` | the layout gives the main area one inset, in every layout type |
 | `RD.SUPPORT.APPS.163` | an item's actions are reachable without hover, in every layout type |
+| `RD.SUPPORT.SURFACE.139` | the theme styles a layout in two parts, the shell and the content, with no setting for one layout type |
+| `RD.SUPPORT.SURFACE.140` | a panel of entries of the navigation belongs to the shell, and a menu of actions does not |
 
 ## Proof
 

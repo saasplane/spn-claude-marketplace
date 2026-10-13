@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "2c759f5a"
+      "seen": "37bd4e0e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "36c696f8"
+      "seen": "7812719c"
     }
   ]
 }
@@ -281,7 +281,7 @@ An example sets no alignment and no width to place its unit. A unit that stands 
 
 ## Props and config objects — 🔮
 
-Props holds the props table: each prop with its type or its values, its default, and what it does. The link to the Playground follows from the section, so it stands in the section's footer, at the footer's start. On a narrow page each prop is a small block of its own.
+Props holds the props table, which gives each prop in four parts: its name, its type, its default and what it does (`RD.SUPPORT.SURFACE.138`). It says nothing about the control that a playground draws for the prop. The type is said truthfully, and it is never a sample and never left out. An enum that many units share is said by its name, such as `DSIconType`, and the name links to the page of Core that shows its values where there is one. An enum of the unit's own is said by its values, and so is the part of a shared enum that a unit takes. Every other type is said by its kind, such as a text, a number or a yes-or-no, or by the name of its shape. The default is the value that the playground of the unit gives the prop. The link to the Playground follows from the section, so it stands in the section's footer, at the footer's start. On a narrow page each prop is a small block of its own.
 
 A unit whose props take objects explains each object under its props table, in a part named *Config objects*. Each object has a part of its own: one sentence on what it is for and what takes it; a table of its fields with the name, the type, the default and what each does; and an example of the object as code. A field that is itself an object links to the part that explains that object. The main page explains each object in general, and a scenario page explains one config in particular.
 

@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "9abf1cc0"
+      "seen": "42b477dc"
     }
   ]
 }
@@ -64,6 +64,7 @@ A layout frames the page. It draws the navigation, and it hands the page a main 
 | `DOCK` | a navigation that stays open, beside one column of content |
 | `TOPNAV` | a bar across the top, with the content centered below it |
 
+- **The theme styles the layout in two parts, the shell and the content, and a page writes no look for either** (`RD.SUPPORT.SURFACE.139`). The shell holds the brand, the navigation and the account, and the content is the main area. `architecture-layouts.md` states both.
 - **The page chooses its layout, and the theme never does.** Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
 - **Fill the named places**: the brand, the navigation, the account, the utility actions, the main area and the footer. Every layout type places each of them.
 - **The footer is optional, and it closes the main area.** Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content. An app that gives no footer has none. The layout places it, and decides nothing about what it holds.
