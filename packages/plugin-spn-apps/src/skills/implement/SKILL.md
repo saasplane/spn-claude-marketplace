@@ -15,11 +15,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "7903df47"
+      "seen": "c6e5babc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "f3e287fd"
+      "seen": "eb1f88f8"
     }
   ],
   "decisions": [

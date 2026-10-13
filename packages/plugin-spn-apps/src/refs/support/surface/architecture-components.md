@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "6f4f22f0"
+      "seen": "927714d6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "0b4f499b"
+      "seen": "b68ddcea"
     }
   ]
 }
@@ -334,4 +334,4 @@ This ref states which components exist, in which group, and what every one must 
 
 ## Proof
 
-No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The book states `facts` and `pageLevel` on `DSItem` before the web builds them. It also states the larger sizes before the web builds them and before the library draws them: `scaleSize` on `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup`, the item line and the tabs drawn by their page level, and `flush` on the parts of a card. So a page checks what its stack's units take before it uses one of these.
+No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The web builds `facts` and `pageLevel` on `DSItem`. It also builds the larger sizes, in Support `5.13.0`: `scaleSize` on `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup`, the item line and the tabs drawn by their page level, and `flush` on the parts of a card. The design library has not drawn the larger sizes yet, and it is drawn after the stack. So a page on another stack checks what its stack's units take before it uses one of these.

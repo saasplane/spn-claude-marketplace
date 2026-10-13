@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "0e6d7eac"
+      "seen": "44fc0f2b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "15ba48c3"
+      "seen": "af7c77cb"
     }
   ]
 }
@@ -203,7 +203,7 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 | States | states | each state the unit is in, and nothing else: as the cells of one grid, with the name of each state at the top of its cell, when the showcase layout is Inline; otherwise one tab for each state, and a tab that holds several states shows them as the cells of one grid too. The grid is the rule of this section alone. A unit that is loading shows the state *Working* |
 | Props | always | the props table and the unit's config objects. Its footer holds the link to the Playground |
 
-**A choice that a unit has under another prop's name is a tab of Cases.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice declares content, which gets the section named Cases, and each value of the choice is one tab of the section Cases. The choice never gets a section of its own under the name of its prop, and never a page.
+**A choice that a unit has under another prop's name is a tab of Cases.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the page level of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice declares content, which gets the section named Cases, and each value of the choice is one tab of the section Cases. The choice never gets a section of its own under the name of its prop, and never a page.
 
 **The States section holds states only. A choice made with a prop is a tab of Cases.** A state is what a unit is in: default, disabled, working, error, empty, read only, open, checked, selected or no permission. Full width, a placement, an orientation, a type, a count, and an option that keeps a menu open are choices that a caller makes with a prop, so each is a tab of Cases.
 

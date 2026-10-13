@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "7903df47"
+      "seen": "c6e5babc"
     }
   ]
 }
@@ -53,7 +53,7 @@ Shows many records as one block: a bar (the bulk select and the bulk actions, pr
 - A read that fails **MUST** offer a retry.
 - A read refused because the person is no longer signed in belongs to the app, which sends the person to sign in. The table shows its refused state for a read the person may not make.
 - The two empty messages **MUST** differ.
-- An empty message given as plain text **MUST** be drawn as the standard empty state, `DSEmpty`, with the text as its title and a default icon: an inbox, `INBOX`, where there is no record at all, and a magnifier, `SEARCH`, where the filter found none. It shows no line under the title. A page that gives a block of its own as the message gets that block, drawn as it is, so a page that needs a description or an action writes its own `DSEmpty` there. The book states the default icon before the web builds it: the web draws one icon for both cases today.
+- An empty message given as plain text **MUST** be drawn as the standard empty state, `DSEmpty`, with the text as its title and a default icon: an inbox, `INBOX`, where there is no record at all, and a magnifier, `SEARCH`, where the filter found none. It shows no line under the title. A page that gives a block of its own as the message gets that block, drawn as it is, so a page that needs a description or an action writes its own `DSEmpty` there. The web builds the default icon of each case.
 - `DSDataTableWidget` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.
 - When its records are shown as a table, `DSDataTableWidget` **MUST** turn the table's `hoverable` prop on. A person acts on a record of this widget, so a row under the pointer says that it answers. A plain `DSTable` leaves it off, because a row that does nothing when it is pressed should not react.
 
