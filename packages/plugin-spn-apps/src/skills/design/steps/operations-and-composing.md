@@ -98,7 +98,7 @@ What the operations leave is a list, written for the page before composing start
 Closing a page is a fixed cost: `align.js` twice and the four scan parts, about 150 thousand characters sent whole, and a writer has room for about a dozen long calls. Composing costs by the line. The numbers are in "The measure and the pace" in `change-library.md`. So a page is shared:
 
 - **A composer** takes the units named for it, composes them, and does not close the page: no `align.js`, no scan. It places a new thing where the book puts it in its section, clear of its neighbours. It works unit by unit, smallest first, and writes its report after each unit. It stops at a clean point when its room runs short: no half-made version in a set, every version that stands whole and named. It says which units it did not reach.
-- **A closer** takes one page that is composed and does only the page's end: `align.js` in mode `plan`, repairs by the book where the plan names problems, `align.js` in mode `run` (on a large page `apply` and then `prove`, as "The page's end" says), then all four scan parts. It composes nothing.
+- **A closer** takes one page that is composed and does only the page's end: `align.js` in mode `plan`, repairs by the book where the plan names problems, `align.js` in mode `run` (on a large page `apply` and then `prove`, as "The page's end" says), then all four scan parts. It composes nothing. It runs when the page's drawing is done. Where the pages of a file only gain versions inside sets, one closer takes the file when all its drawing is done, and closes each changed page once, from what each writer's report says grew ("The measure and the pace" in `change-library.md`).
 
 ### How a unit is composed
 
