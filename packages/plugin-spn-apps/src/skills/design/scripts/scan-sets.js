@@ -78,7 +78,7 @@ const STATE_PROPERTIES = [
 // because of this list, so the gap is visible in every scan.
 const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
   "attached", "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
-  "percent", "placement", "shape", "sort", "type", "valueType",
+  "pageLevel", "percent", "placement", "scaleSize", "shape", "sort", "type", "valueType",
 ];
 // Properties that the book names for one unit, with a reason (the table "A property a named unit keeps crossed" in the delivery
 // library chapter). Unlike the list above, a pair here is admitted to the rule, for its own unit only: the same property on any
