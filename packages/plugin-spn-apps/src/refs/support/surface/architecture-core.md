@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "d6695aa8"
+      "seen": "e98aed97"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "192a5ef9"
+      "seen": "1f503d61"
     }
   ]
 }
@@ -45,17 +45,19 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is descriptions, facts and other secondary words. `fg-subtle` is for a hint that a person can miss, and for a mark between two texts such as a dot. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is descriptions, facts and other secondary words. `fg-subtle` is for a hint that a person can miss, and for a mark between two texts such as a dot. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block, and the quiet and subtle tints and the line of the lighter variants. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
 The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`).
 
 - **In dark, a surface MUST be a dark grey, and never black.** The page, a raised surface and a tinted fill each stand a step lighter than the one before: 19%, 23.5% and 27.5% lightness. So a person tells them apart by their fill.
 - **Surfaces MUST be told apart by their fill first, and by a line second.** The border in dark is a quiet, opaque grey, a little lighter than a tinted fill.
 - **The fill under the pointer MUST NOT be the grey of the border.** `surface-hover` is one step lighter than the border in light, and lighter than the border in dark. So a row under the pointer keeps its lines.
-- **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. The tinted fill of the default hue and an entry of the rail take it. `surface-inset` is that tinted fill of the default hue.
+- **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and an entry of the rail take it. `surface-inset` is the fill of `SUBTLE` in the default hue.
 - **A ghost or an outline control of the default hue MUST draw `surface-soft-hover` under the pointer** (`RD.SUPPORT.SURFACE.145`). That is one step stronger than the fill a row, a menu entry and a navigation entry draw under the pointer, so an action at the end of a row still shows the pointer on a filled row. A button, a badge, an icon mark and the arrow of an item line read this one step. The other hues keep their own step.
 - **Small text that a person reads MUST take the muted tone at least, and never the subtle tone.** The subtle tone does not reach 4.5 to 1 against a surface.
 - **A title that stands a step back MUST take the quiet tone, and its description MUST stay muted** (`RD.SUPPORT.SURFACE.143`). A description lighter than muted would fall under 4.5 to 1 on white, so the title moves up a step instead. `DSTextToneType` names it `QUIET`.
+- **The shades of the variants MUST be these** (`RD.SUPPORT.SURFACE.154`). In light `QUIET` is step 200, step 300 under the pointer, and `SUBTLE` and `SUBTLE_OUTLINE` step 100, step 200 under the pointer — not step 50, which stands too close to a white page. `SUBTLE` of the default hue is `surface-inset`, and `surface-soft-hover` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, neutral 300 for the default hue, a decoration not held to 3 to 1. In dark a tint is step 500 over the page at a share for each hue, its text step 200, and the line step 700, neutral 600 for the default hue. A tint inverts between modes.
+- **A chosen row of a list and the row in view of a table draw the subtle tint of primary, step 100 in light. A pressed toggle draws `QUIET` of its hue.**
 - **A known gap, open.** The muted tone falls under 4.5 to 1 on a tinted fill, on a row under the pointer and on a chosen row in light, down to 3.76 to 1. Nothing is changed for it yet.
 
 ## The scale — ✅
@@ -117,6 +119,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
 | `RD.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |
+| `RD.SUPPORT.SURFACE.154` | the shades of the variants by strength, in light and in dark |
 | `RD.SUPPORT.SURFACE.145` | a ghost or an outline control of the default hue draws the soft-hover fill under the pointer |
 | `RD.SUPPORT.APPS.152` | the spacing and size scale is a token group beside the roles, and a block reads a role token and the scale, never a ramp step or a number of its own |
 

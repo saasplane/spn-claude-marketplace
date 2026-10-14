@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "1cb7a965"
+      "seen": "bce75275"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "8741a8f6"
+      "seen": "accfaf64"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "7a390842"
+      "seen": "2768cf3c"
     }
   ]
 }
@@ -64,7 +64,7 @@ The design library holds one file for each layer of the design system that is dr
 | `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
-| A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it. The named places of a layout are the brand, the navigation, the account, the utility actions, the main area and the footer |
+| A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it. The places of a layout are `startNode`, the navigation, `endNode`, `actionsNode`, the main area and `footerNode`, and in a dock `headerNode` |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
 | Content | the text of the instance, typed as the tree gives it |
 | `row`, `column` or `grid` | a plain frame with auto layout. Its gap binds a variable of the scale |

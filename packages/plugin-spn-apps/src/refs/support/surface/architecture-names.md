@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "26eeef06"
+      "seen": "f8ae4264"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "8741a8f6"
+      "seen": "accfaf64"
     }
   ]
 }
@@ -39,13 +39,13 @@ One name is used in the book, in the design library and in every stack. The book
 
 | Name | Means | Values | Vocabulary |
 | --- | --- | --- | --- |
-| `variant` | the surface treatment | `SOLID` · `SOFT` · `OUTLINE` · `GHOST` · `LINK` | `DSVariantType` |
+| `variant` | the surface treatment, by its strength | `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK` | `DSVariantType` |
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
 
-**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. Neither rule holds for `variant` or `color`, because neither of those is a scale.
+**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the text tones are, and read from the strongest to the faintest** (`RD.SUPPORT.SURFACE.154`): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
 
-**`CUSTOM` is a value of `color` that means the caller owns the colour.** A block's inner text and icon take the colour around them, and a page passes a chosen colour as `customColor` on the blocks that take it. It is the one named way a page sets a colour outside the theme. `DSButton` and `DSSeparator` take no `customColor`.
+**`CUSTOM` is a value of `color` that means the caller owns the colour.** A block's inner text and icon take the colour around them, and a page passes a chosen colour as `customColor` on the blocks that take it. It is the one named way a page sets a colour outside the theme. `DSButton` and `DSSeparator` take no `customColor`. A colour the page chooses gives every variant: the design system works the fill, the text and the line of each out from the one colour, in light and in dark, and pulls the text until it reads at 4.5 to 1 on its fill.
 
 Keep each of the three names for its one meaning, on every block — a block takes `variant` and `color` independently. A prop that means something else takes another name: a shape, a type step or a kind of alert is not a surface treatment. Name a prop and its vocabulary with one word: the vocabulary `DS<Component><Word>Type` is taken through the prop `<word>`. Take every value from the vocabulary of its prop, never a free string. The text props follow it: `underline` of `DSLink` and `DSText` takes `SOLID` · `DOTTED` · `DASHED`, and `format` of `DSText` takes `UPPERCASE` · `LOWERCASE` · `CAPITALIZE`. A drawer and a sheet take `extent` for their reach, and the design library draws no `extent` variant, because the extent of an overlay there is the size of the instance.
 
@@ -111,6 +111,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
 | `DSIconMark` | `shape` (the outline of the background the icon stands on) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSIconMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
+| `DSNavBarSide` | `placement` (where the bar stands: at the edge of the screen, where it folds to icons, or inline in the page as a column) | `EDGE` · `INLINE`, `EDGE` when unset | `DSNavBarSidePlacementType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSIconMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
@@ -230,6 +231,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the icon mark, the avatar and the avatar group take `scaleSize` |
 | `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
+| `RD.SUPPORT.SURFACE.154` | the values of `variant` are named by their strength and read from the strongest to the faintest, and every variant of every hue, and of a colour the page chooses, keeps its text readable |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "a6d24bbd"
+      "seen": "3321d2dc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "a661facd"
+      "seen": "b723a7a3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -72,22 +72,25 @@ Each of the last four blocks is optional. In `card`, `cardWidget` and `table` ea
 - **`DSCardWidget` MUST take what it adds to a card from the theme's `cardWidget`, where its own prop says nothing.** Its `divided` is its own prop, else `divided` of `cardWidget`, else off. The rows of a part take `divided` from the prop of the part, else from `rowsDivided`, else on, and `hoverable` from the prop of the part, else from `rowsHoverable`, else off. The surface of the widget's card follows the card look.
 - **The theme holds no block for a list.** The `divided` and the `hoverable` of `DSList` are props that the page writes.
 
-The layout look has two parts and no more. `architecture-layouts.md` states what the shell and the content are in each layout type, and how the entries of the navigation are drawn.
+The layout look, `IDSThemeLayout`, has two parts and no more: `shell`, the look of a bar of the navigation (`IDSNavBarLook`), and `content` (`IDSContentLook`). `architecture-layouts.md` states what the shell and the content are in each layout type, and how the entries of the navigation are drawn.
 
-| Part | Field | What it sets | Values |
+| Field | What it sets | Values | Taken by |
 | --- | --- | --- | --- |
-| `shell` | `surface` | the fill of the shell. Its text, its fill under the pointer and its chosen entry follow from it | `DSThemeLayoutShellSurfaceType`: `BASE` · `SUNKEN` · `RAISED` · `PRIMARY` · `INVERSE` |
-| `shell` | `material` | whether the fill is solid, or frosted where content passes behind the shell | `DSThemeLayoutMaterialType`: `SOLID` · `TRANSLUCENT` |
-| `shell` | `entry` | how the entry of the open page is marked | `DSThemeLayoutEntryType`: `SOLID` · `SOFT` · `LINE` · `PLAIN` |
-| `shell` | `bordered` | the lines: at the edge of the shell, and around a panel of navigation that opens from it | yes or no |
-| `shell` | `raised` | the depth: a shadow under the shell, and under such a panel | yes or no |
-| `content` | `surface` | the fill that the containers and the cards of the page stand on | `DSThemeLayoutContentSurfaceType`: `BASE` · `SUNKEN` |
-| `content` | `inset` | the content as a rounded sheet set into the shell | yes or no |
+| `color` | the colour of the fill | `DSSurfaceColorType`: `BASE` (the surface of the page) · `DEFAULT` (the neutral hue) · `PRIMARY` (the brand hue) | the shell · the content |
+| `strength` | how strong the fill of a hue is. `BASE` takes none | `DSSurfaceStrengthType`: `SUBTLE` · `QUIET` · `SOLID` | the shell · the content |
+| `opacity` | whether the fill is opaque, or frosted where content passes behind it | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | the shell |
+| `bordered` | the lines: at the edge of the shell, and around a panel of navigation that opens from it | yes or no | the shell |
+| `raised` | the depth: a shadow under the shell, and under such a panel | yes or no | the shell |
+| `entry` | the kind of the entries of the navigation | `DSNavEntryType`: `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` | the shell |
+| `inset` | the content as a rounded sheet set into the shell | yes or no | the content |
 
-- **The theme MUST style the layout in two parts, the shell and the content, and it MUST hold no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A partner writes the look once, and the rail, the dock and the top bar each draw it.
-- **With no `layout`, and with a field left out, every layout MUST draw as it did before.** Where `content.surface` is left out, the fill of the page stays the sunken surface under a theme whose containers are raised, and the plain surface under any other.
-- **The layout look MUST take no colour, no opacity and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting: it follows the surface of the shell.
-- **The layout type, the widths of the layout and what a page shows in its main area are not part of the layout look.** A marketing page that needs bands, effects and backgrounds of its own writes its own layout.
+- **The theme MUST style the layout in two parts, the shell and the content, and it MUST hold no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A partner writes the look once, and the rail, the dock and the top bar each draw it. The shell of the theme and a bar of the navigation share one shape, `IDSNavBarLook`.
+- **A surface MUST take its look as a colour, a strength and an opacity, each from its own closed set.**
+- **In dark, a stronger shell MUST be darker than the page, and never lighter.**
+- **The content MUST take every colour and every strength**, so a marketing page can draw its bands. **Where the body text of the units would fall under 4.5 to 1 on the fill of the content — a `QUIET` or `SOLID` content — the content MUST give the units inside it the tokens of the opposite mode**, scoped to the content, as dark mode does for the page.
+- **With no `layout`, and with a field left out, every layout MUST draw as it did before.** Where the colour of the content is left out, the fill of the page stays the sunken surface under a theme whose containers are raised, and the plain surface under any other.
+- **The layout look MUST take no colour value, no opacity value and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting of its own: it follows from the kind of entry and the fill of the shell.
+- **The layout type and the widths of the layout are not part of the layout look.** A marketing page takes the layout type `CANVAS`, and draws its bands in the main area. The layouts alone read the layout look, and a layout's config can give one page a content look of its own.
 
 A partner changes the look of an app through one theme, and in no other way (`RD.SUPPORT.APPS.150`). A partner writes one theme, and never a style for a block. The theme is held at the app's root, and changeable from any depth, so a component that learns the brand late (after sign-in, from an API response) retints the whole surface without reaching application-root state. The layout type is not a choice of the theme. Support ships a theme, and never a template.
 
@@ -135,7 +138,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | --- | --- |
 | `RD.SUPPORT.APPS.150` | a partner changes the look of an app through one theme, and the layout type is not a choice of it |
 | `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
-| `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in two parts, the shell and the content |
+| `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in two parts, the shell and the content, and a surface takes a colour, a strength and an opacity |
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
 | `RD.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |

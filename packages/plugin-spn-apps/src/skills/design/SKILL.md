@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "edd8cce6"
+      "seen": "62b1db4f"
     }
   ]
 }
@@ -64,9 +64,9 @@ A layout frames the page. It draws the navigation, and it hands the page a main 
 | `DOCK` | a navigation that stays open, beside one column of content |
 | `TOPNAV` | a bar across the top, with the content centered below it |
 
-- **The theme styles the layout in two parts, the shell and the content, and a page writes no look for either** (`RD.SUPPORT.SURFACE.139`). The shell holds the brand, the navigation and the account, and the content is the main area. `architecture-layouts.md` states both.
+- **The theme styles the layout in two parts, the shell and the content, and a page writes no look for either** (`RD.SUPPORT.SURFACE.139`). The shell holds the bars of the navigation and the places they hold, and the content is the main area. The layouts alone read the theme. `architecture-layouts.md` states both.
 - **The page chooses its layout, and the theme never does.** Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
-- **Fill the named places**: the brand, the navigation, the account, the utility actions, the main area and the footer. Every layout type places each of them.
+- **Fill the places, named by where they stand** (`RD.SUPPORT.SURFACE.157`): `startNode`, the navigation, `endNode`, `actionsNode`, the main area and `footerNode`, and in a dock `headerNode`. Every layout type with a shell takes them in its config; `CANVAS` is the main area alone, with no gutter, for a marketing page, a sign-in or a page of an error.
 - **The footer is optional, and it closes the main area.** Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content. An app that gives no footer has none. The layout places it, and decides nothing about what it holds.
 - **Mark the place the person is in.** The navigation shows it with the selected state.
 - **Leave the navigation to the layout.** A page that draws its own navigation has taken the layout's job.
@@ -210,7 +210,7 @@ The page pattern says where the parts of the page sit. A task pattern says how e
 
 | Intent | The person | Blocks that carry it | Task states |
 | --- | --- | --- | --- |
-| Move | goes to another place, and knows where they are | the layout · `DSNavigationMenu` · `DSTabs` · `DSBreadcrumb` · `DSLink` | working, then done or failed |
+| Move | goes to another place, and knows where they are | the layout · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSTabs` · `DSBreadcrumb` · `DSLink` | working, then done or failed |
 | Find | searches, filters, sorts and pages through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` | all six |
 | Read | reads records as a table, a list or a grid, or one record in detail | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` | all six |
 | Enter | fills fields, sees the check on each one, and sends the form | `DSForm` and the entry fields | idle, working, then done or failed |
@@ -293,10 +293,10 @@ shows    the orders: DSDataTableWidget, layout TABLE; on a phone, layout LIST
 
 page  /orders · purpose: find an order · main action: New order · pattern: Find in a list
 └── DSLayout  RAIL
-    ├── brand             DSText "Acme"
-    ├── navigation        items: "Orders" selected · "Customers" · "Reports"      Move
-    ├── account           DSAvatar
-    ├── utility actions   DSButton variant=GHOST "Help"
+    ├── startNode         DSText "Acme"
+    ├── nav               items: "Orders" selected · "Customers" · "Reports"      Move
+    ├── endNode           DSAvatar
+    ├── actionsNode       DSButton variant=GHOST "Help"
     └── main area
         └── DSContainer
             ├── DSContainer.Header

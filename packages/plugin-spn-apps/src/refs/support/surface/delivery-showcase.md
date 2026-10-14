@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "e828a3a4"
+      "seen": "2e0dd267"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
@@ -86,7 +86,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Component - Feedback | Display · Content: `DSAlert` sizes, colours, content · `DSProgress` sizes, colours, states, content · `DSProgressCircle` sizes, colours, states · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours, content |
 | Component - Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
 | Component - Media | `DSAspectRatio` Display · Content · content. Display · Inline: `DSIcon` sizes, colours, states, content · `DSIconMark` sizes, colours, variants, content · `DSImage` sizes, states, content |
-| Component - Navigation | Control · Content: `DSBreadcrumb` states, content, data · `DSMenubar` sizes, states, content, data · `DSNavigationMenu` sizes, states, content, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
+| Component - Navigation | Control · Content: `DSBreadcrumb` states, content, data · `DSMenubar` sizes, states, content, data · `DSNavList` sizes, states, content, data · `DSNavMenu` sizes, states, content, data · `DSNavBarSide` sizes, states, content, data · `DSNavBarTop` sizes, states, content, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
 | Component - Overlays | Overlay · Content: `DSDialog` sizes, content · `DSConfirmDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` content |
 | Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSConfirmPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Component - Typography | `DSText` Display · Content · colours, content. `DSKbd` Display · Inline · sizes, content, data |
@@ -96,7 +96,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Data Entry - Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` sizes, states, content, value, data · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, content, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
 | Widgets | `DSDataTableWidget` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBarWidget` Composite · Full width · sizes, content, data; scenario page With overflow |
 | Containers | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
-| Layouts | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav |
+| Layouts | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav, Canvas |
 
 ## The pages of a unit — 🔮
 

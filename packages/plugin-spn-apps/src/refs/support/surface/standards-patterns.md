@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "189a6c48"
+      "seen": "b6ad9af9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "bad848de"
+      "seen": "a082187c"
     }
   ]
 }
@@ -37,7 +37,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 
 | Task intent | The pattern covers | Blocks that carry it |
 | --- | --- | --- |
-| Move | going to another place, and knowing where you are | the layout · `DSNavigationMenu` · `DSTabs` · `DSBreadcrumb` · `DSLink` |
+| Move | going to another place, and knowing where you are | the layout · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSTabs` · `DSBreadcrumb` · `DSLink` |
 | Find | search, filter, sort, and paging through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` |
 | Read | records as a table, a list or a grid, one record in detail, and nothing to show | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` |
 | Enter | filling a field, the check on it, and sending a form | `DSForm` and the entry fields |
