@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "2e0dd267"
+      "seen": "f7ce6203"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "e004a03d"
+      "seen": "76c33743"
     }
   ]
 }
@@ -296,7 +296,7 @@ Theme is a page of App, of its own kind. It has three parts, in this order.
 | Part of the page | What it holds |
 | --- | --- |
 | The theme explained | what a theme is: the closed list of its choices, who sets it, what a page may not set, and how it reaches every block through `DSApp`. Then the theme object, explained as a config object |
-| The theme's form | the form that sets the theme, on the page itself, with *Apply* and *Reset*. It is the same form the showcase's own bar offers. Applying it sets the theme of the page and of the sample app under it. The code of the theme object stands beside the form and follows the form's values |
+| The theme's form | the form that sets the theme, on the page itself, with *Apply* and *Reset to defaults*. A field with no choice shows the value applied, marked as the default. It is the same form the showcase's own bar offers. Applying it sets the theme of the page and of the sample app under it. The code of the theme object stands beside the form and follows the form's values |
 | One sample app | one app, embedded as an embedded screen is, in the layout type Rail, with a dashboard, a listing, an edit form and the view of one record. It takes the theme that the form applies |
 
 ## Built from the design system's own units — 🔮

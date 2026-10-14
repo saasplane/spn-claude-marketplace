@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "191e09a5"
+      "seen": "679b189f"
     }
   ]
 }
@@ -116,7 +116,7 @@ A container takes no background color, no padding value, no margin, no container
 
 ### The card
 
-The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own, and a card follows the container look where the card look says nothing (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
+The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own. Where the app chose no card value, the resolved theme takes the container's choice, else the default (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
 
 | | A container | A card |
 | --- | --- | --- |

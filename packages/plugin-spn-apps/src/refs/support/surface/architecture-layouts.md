@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "cd3bcd28"
+      "seen": "30fa665d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "80c7b357"
+      "seen": "ece98247"
     }
   ]
 }
@@ -72,7 +72,7 @@ A layout names no routing library — it moves between pages through the navigat
 
 ## The main area — 🔮
 
-- **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
+- **The page's fill is `page/fill`, and the colour of the resolved theme's content sets it** (`RD.SUPPORT.APPS.160`). Where the app chose no colour for the content, the resolved theme takes it from the containers: raised containers put the page on the light grey, `DEFAULT`, so a raised frame shows, and any other containers on the surface of the page, `BASE`. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
 - **The layout gives the main area its gutter, `layout/main-inset`, always in `RAIL`, `DOCK` and `TOPNAV`, and never in `CANVAS`** (`RD.SUPPORT.APPS.161`). No prop turns it off. A page whose bands run from edge to edge takes `CANVAS`. The page writes no inset of its own.
 - **A layout takes one setting for its width, `contentWidth`, of `FULL`, `WIDE` and `NARROW`** (`RD.SUPPORT.SURFACE.158`). `FULL` is the whole window, `WIDE` is at most `layout/shell` wide (1280 px) and centred, and `NARROW` is at most `layout/narrow` wide (768 px) and centred. Every type takes it in its config: `RAIL` is `FULL` by default, and `DOCK`, `TOPNAV` and `CANVAS` are `WIDE`. The contents of a top bar follow the body, and `NARROW` narrows only the page, in a dock the page beside the column, so the body and its bar stay at `WIDE`. `maxWidth` moves the width of `WIDE`. The config of every type is `IDSLayoutConfig`, with `mtype`, `contentWidth`, `maxWidth` and `content`, and `IDSLayoutConfigNav` adds the navigation and its places for `RAIL`, `DOCK` and `TOPNAV`.
 - **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the body at `WIDE`, the width of the page at `NARROW` and the gutter of the main area. No layout holds one as a number.
@@ -88,11 +88,11 @@ A layout has two parts for its look, whatever its type. The shell is the bars of
 | `TOPNAV` | the bar across the top | the main area |
 | `CANVAS` | none | the main area, with no gutter |
 
-- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). With no layout look, and with a field left out, a layout draws as it did before.
+- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw the default shell: the neutral hue at `SUBTLE`, with a line and a shadow, and the open entry `SUBTLE`.
 - **The thin bar over the content of `RAIL` MUST belong to the content.** It takes the fill of the content, and it stands inside the sheet where the content is inset.
 - **`inset` of the content MUST draw the content as a sheet.** The sheet has the corner radius of the theme. It is set into the shell with a gutter, and the fill of the shell shows around it.
 - **A translucent shell MUST show only where content passes behind the shell:** a top bar that stays in view, a panel of navigation, and a shell drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, the shell draws opaque.
-- **A panel of entries of the navigation MUST belong to the shell** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail are such panels. Each takes the fill and the opacity of the shell, a line where the shell is `bordered`, and a shadow where it is `raised`.
+- **A panel of entries of the navigation MUST belong to the shell** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail are such panels. Each takes the fill and the opacity of the shell, a line where the shell is `bordered`, and a shadow where it is `raised`. Inside the panel of a top bar stand rows as tight as a menu bar's, or the app's own drawing through the group's `renderPanel`, as `architecture-components.md` states.
 - **A menu of actions MUST NOT take the look of the shell.** The menu of the account is such a menu, and it keeps the look every menu has.
 
 ## The entry kinds — 🔮
@@ -109,6 +109,8 @@ An entry of the navigation is drawn by the kind its look names, `entry`. Each ki
 
 - **An open entry MUST never be mistaken for an entry under the pointer** (`RD.SUPPORT.SURFACE.155`). Under `SUBTLE`, `LINE` and `PLAIN` another entry draws no fill under the pointer, and only its text turns full.
 - **Under `LINE` and `PLAIN` an entry MUST keep no inset.** Its icon and its words start where the start of the bar starts.
+- **A list or a menu standing alone MUST pad its own fill as a bar does**, so an entry with no fill never stands on the edge of the fill.
+- **A group's child MUST line up with the group's words, under every entry kind**, in a list, a rail, a dock and a pop-up.
 - **A nested entry of a rail MUST follow the same kinds, one step quieter.**
 - **Every pair of a shell fill and an entry kind MUST keep the text of the open entry at 4.5 to 1, in light and in dark.** A partner cannot choose a pair that hides the navigation.
 
