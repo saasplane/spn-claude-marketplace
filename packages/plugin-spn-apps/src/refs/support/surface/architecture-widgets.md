@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "8825dfbd"
+      "seen": "59ca1c24"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "e395ff6a"
+      "seen": "56a73ea3"
     }
   ]
 }
@@ -37,7 +37,7 @@ A widget is built for one purpose. It is not a set of components a page composes
 
 ## DSDataTableWidget — 🔮
 
-Shows many records as one block: a bar (the bulk select and the bulk actions, present only when the table has bulk actions; then `headerNode`, a place that takes any node the page gives it, such as a search or a filter bar; then the sort; then the layout switch), its records (one shape for the whole widget: table, list or grid of cards), and a footer (the count of what is shown, and the pagination).
+Shows many records as one block: a bar (the control that ticks every record, with its menu of the bulk actions, present only when the table has bulk actions and shows records; then `headerNode`, a place that takes any node the page gives it, such as a search or a filter bar; then the sort, present only when records are shown; then the layout switch), its records (one shape for the whole widget: table, list or grid of cards), and a footer (the count of what is shown, and the pagination).
 
 | Task state | What it shows |
 | --- | --- |
@@ -87,6 +87,13 @@ A page may show one record of the table beside the table or under it, such as th
 - **The page MUST give the id, and the widget MUST hold no state for it.** The page usually reads the id from the address. A person who presses a row follows the link or the action of that row, and the page then gives the new id. A page with no record in view gives no id, and no row is marked.
 - **The record in view is not a record that a person ticked.** The bulk select of the bar ticks records to act on many of them, and it keeps its own look. A ticked record is checked, and the record in view is selected. A record may be both at once.
 
+### The bar above the records
+
+- **A control that acts on records MUST be drawn only where there are records to act on** (`RD.SUPPORT.SURFACE.147`). The control that ticks every record, with its menu, and the sort are not drawn while the first page is read, on a page that came back empty, first or after a filter, or where the read failed or was refused. They stay while a later page is read over records already shown. The layout's control and `headerNode` are drawn in every state, because they do not depend on records. A bar left with nothing to draw draws nothing and takes no height.
+- **The control that ticks every record MUST be a bare checkbox on the line of the rows' tick boxes** (`RD.SUPPORT.SURFACE.148`). It has no border and no fill around it. It is the checkbox a row draws, at the size of the rows, and its start edge and its centre are those of a row's tick box, in the `TABLE` and the `LIST` layout, on a plain page and in a `flush` part. In the `GRID` layout it stands at the start edge of the grid.
+- **The checkbox MUST say whether no record, every record or some records of the page are checked.** Some is the mixed state of a checkbox. A press checks every record of the page, also from the mixed state, and clears them where every record is checked.
+- **After the checkbox, an icon-only ghost button MUST open the menu of the actions on the checked records.** Its name is its tooltip. A table with no bulk action, or none the person may use, has no tick box on a row and no control in the bar.
+
 ### A search and a filter go to the server
 
 - **A search and a filter of the records MUST be sent to the server** (`RD.SUPPORT.SURFACE.070`). They **MUST NOT** be run in the page over the records already loaded. The widget holds one page of the records. A search over what is loaded would miss every record on another page, and a person would read *nothing matches* when something does.
@@ -105,6 +112,12 @@ The widget asks the page for each page of records through `getData`, with the pa
 - **The spare width MUST go to the data columns that state no width.** A data column that states a width keeps it.
 - **Where every data column states a width, each width MUST be a least width, and the columns share the spare width in proportion to it.** A table narrower than its columns scrolls sideways, and no column is narrower than the width it states.
 - **The cells at the two ends of the head MUST take the insets of the cells of the body under them.** So in every column what the head holds starts where what the rows hold starts.
+
+### The pinned columns
+
+- **Wherever the `TABLE` layout may scroll sideways, the widget MUST pin its tick column at the start edge and its actions column at the end edge** (`RD.SUPPORT.SURFACE.149`). A person who scrolls a wide table can then still tick a record and reach its actions. The page sets nothing for it, and no setting of the widget turns it on or off. Where the table may not scroll sideways, nothing is pinned.
+- **The columns a page pins MUST join the widget's own as one block on each side, with the widget's own column the outermost.** No cell scrolls beneath the actions column.
+- **The shadow at the edge of a pinned block MUST be drawn only while content is beneath that edge.** A table that fits its place, and a table scrolled to the end of that side, draw none. A pinned cell draws the fill of its row in every state, so a table that fits looks as a table with no pinned column looks. This holds for every `DSTable` with a pinned column.
 
 ### A value changed in a table is changed in its cell
 
@@ -154,13 +167,13 @@ The bar has one form, read from its start to its end. A person who has used one 
 
 | Part | The page gives | What the widget draws |
 | --- | --- | --- |
-| Its head | `header`, the props of `DSItem`, whole | an item line that stands flush in the header of the card, at the page level `SECTION` where the page gives none. A card with no `header` has no head |
+| Its head | `header`, the props of `DSItem`, whole | an item line that stands flush in the header of the card, at the page level `WIDGET` where the page gives none. A card with no `header` has no head |
 | Its parts | `parts`, a list in which each part is of one kind | each part in the order given |
 | Its footer | `footer`, any node | the node in the footer of the card. A card with no `footer` has no footer part |
 
 - **`DSCardWidget` MUST take each group of its settings as the props of the unit that draws it, whole** (`RD.SUPPORT.SURFACE.127`). Its head and the small head of a part are the props of `DSItem`. An item of a part is the props of `DSItem`, and a row of a part is the props of `DSList.Item`. A page that knows those units knows the widget. So the picture of a head or of an item is the `media` of `DSItem`, given as data of one kind.
 
-A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every part also takes `key`, and `header`, the props of `DSItem` for the small head of the part. That head is drawn at the page level `GROUP` where the page gives none.
+A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every part also takes `key`, and `header`, the props of `DSItem` for the small head of the part. That head is drawn at the page level `GROUP` where the page gives none, and a row of an `ITEMS` part at `CONTENT`.
 
 | Kind | The page gives | What the widget draws |
 | --- | --- | --- |
@@ -196,6 +209,9 @@ This ref states what makes a block a widget, and what `DSDataTableWidget`, `DSFi
 | `RD.SUPPORT.SURFACE.126` | the `striped` of the table layout follows the order of the table: the setting, else the theme, else off |
 | `RD.SUPPORT.SURFACE.134` | the tick column and the actions column are as wide as what they hold, and where the spare width of a table goes |
 | `RD.SUPPORT.SURFACE.133` | the footer of the data table arranges itself by the width of its own place |
+| `RD.SUPPORT.SURFACE.147` | the bar of a data table draws the control that ticks every record, and the sort, only where there are records |
+| `RD.SUPPORT.SURFACE.148` | the control that ticks every record is a bare checkbox on the line of the rows' tick boxes |
+| `RD.SUPPORT.SURFACE.149` | a data table pins its tick column and its actions column wherever it may scroll sideways, and a pinned edge shows its shadow only while content is beneath it |
 | `RD.SUPPORT.SURFACE.059` | what stands at the end of a row beside its actions is the page's own |
 | `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, with no letter for the layer before it |
 | `RD.SUPPORT.SURFACE.068` | the layout of the data table is chosen from the data, and it is `LIST` on a phone. That `LIST` also takes the place of `GRID` on a phone is proposed |
@@ -208,4 +224,4 @@ This ref states what makes a block a widget, and what `DSDataTableWidget`, `DSFi
 
 ## Proof
 
-No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The web builds the record in view, the widths of the columns, the footer that arranges itself by its place and `DSCardWidget`. The design library has drawn none of them yet.
+No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The web builds the record in view, the widths of the columns, the footer that arranges itself by its place, `DSCardWidget`, the bar that draws its controls only over records, the bare control that ticks every record and the pinned columns. The design library has drawn none of them yet.

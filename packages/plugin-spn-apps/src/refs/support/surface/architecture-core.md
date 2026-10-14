@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "fb0c784d"
+      "seen": "d6695aa8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "9240cfcc"
+      "seen": "192a5ef9"
     }
   ]
 }
@@ -45,7 +45,7 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body down to a muted or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg-subtle` is for a hint that a person can miss, and for a mark between two texts such as a dot. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is descriptions, facts and other secondary words. `fg-subtle` is for a hint that a person can miss, and for a mark between two texts such as a dot. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one scrim role, `scrim/overlay`, and `DSBackdrop` draws that scrim. Two more scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
 The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`).
 
@@ -53,7 +53,10 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`).
 - **Surfaces MUST be told apart by their fill first, and by a line second.** The border in dark is a quiet, opaque grey, a little lighter than a tinted fill.
 - **The fill under the pointer MUST NOT be the grey of the border.** `surface-hover` is one step lighter than the border in light, and lighter than the border in dark. So a row under the pointer keeps its lines.
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. The tinted fill of the default hue and an entry of the rail take it. `surface-inset` is that tinted fill of the default hue.
+- **A ghost or an outline control of the default hue MUST draw `surface-soft-hover` under the pointer** (`RD.SUPPORT.SURFACE.145`). That is one step stronger than the fill a row, a menu entry and a navigation entry draw under the pointer, so an action at the end of a row still shows the pointer on a filled row. A button, a badge, an icon mark and the arrow of an item line read this one step. The other hues keep their own step.
 - **Small text that a person reads MUST take the muted tone at least, and never the subtle tone.** The subtle tone does not reach 4.5 to 1 against a surface.
+- **A title that stands a step back MUST take the quiet tone, and its description MUST stay muted** (`RD.SUPPORT.SURFACE.143`). A description lighter than muted would fall under 4.5 to 1 on white, so the title moves up a step instead. `DSTextToneType` names it `QUIET`.
+- **A known gap, open.** The muted tone falls under 4.5 to 1 on a tinted fill, on a row under the pointer and on a chosen row in light, down to 3.76 to 1. Nothing is changed for it yet.
 
 ## The scale — ✅
 
@@ -87,16 +90,17 @@ Text is drawn in one of three families, and each family has its steps.
 
 | Family | What its text does | Its steps | Its weight |
 | --- | --- | --- | --- |
-| Heading | names the whole page, or is the one large line of an expressive page: a number, a price, the line of a hero | `HEADING_XS` to `HEADING_XXL5`, 20 to 80px | semibold up to `HEADING_MD`, bold from `HEADING_LG` |
-| Title | names a part of a page, or a line among others | `TITLE_XXS` to `TITLE_XXL5`, 10 to 56px | medium |
+| Heading | names the whole page, a container or a group, or is the one large line of an expressive page: a number, a price, the line of a hero | `HEADING_XXS` to `HEADING_XXL5`, 14 to 80px | semibold up to `HEADING_MD`, bold from `HEADING_LG` |
+| Title | names a widget, a row among others or a small row | `TITLE_XXS` to `TITLE_XXL5`, 10 to 56px | medium |
 | Content | is the running text a person reads | `CONTENT_XXS` to `CONTENT_XL`, 10 to 18px | regular |
 
-- **Title runs from `TITLE_XXS` to `TITLE_XXL5`, and Heading from `HEADING_XS` to `HEADING_XXL5`. Content ends at `CONTENT_XL`** (`RD.SUPPORT.SURFACE.102`). The steps from `XXL` to `XXL5` carry the names of the larger scale sizes, so a title, an icon, a mark and an avatar of one step name stand together.
-- **A title and a heading may have the same size, and they then differ by weight.** From 24 to 56px each family has a step.
-- **A type step sets the size and the weight of a text, and nothing else** (`RD.SUPPORT.SURFACE.103`). Whether a text is a heading of the page is its element, which `DSText` takes through `element`. So a large number in a heading step is not announced as a section unless the page says so.
-- **The book states no line height for `HEADING_XXL` to `HEADING_XXL5` yet.** They take a tighter line than the smaller heading steps, and the stack sets it.
+- **Title runs from `TITLE_XXS` to `TITLE_XXL5`, and Heading from `HEADING_XXS` to `HEADING_XXL5`. Content ends at `CONTENT_XL`** (`RD.SUPPORT.SURFACE.102`). The steps from `XXL` to `XXL5` carry the names of the larger scale sizes, so a title, an icon, a mark and an avatar of one step name stand together.
+- **The Heading scale MUST start at `HEADING_XXS`, 14px, with `HEADING_XS` at 18px and `HEADING_SM` at 22px** (`RD.SUPPORT.SURFACE.142`). Each is semibold. From `HEADING_MD` up the steps keep their sizes, so each level of a page has a step for its title.
+- **A title and a heading may have the same size, and they then differ by weight.** Both families have a step at 14px, at 18px and from 24 to 56px. Which family a title takes is the level of the page it names (`architecture-components.md`).
+- **A type step sets the size and the weight of a text, and nothing else** (`RD.SUPPORT.SURFACE.103`). Whether a text is a heading of the page is its element, which `DSText` takes through `element`. So a large number in a heading step is not announced as a section unless the page says so. The element of a title comes from the nesting of its boxes, never from its family (`RD.SUPPORT.SURFACE.106`).
+- **The steps `HEADING_XXS` to `HEADING_XL` MUST take a line of 1.2 times their size, and `HEADING_XXL` to `HEADING_XXL5` a tighter line of 1.1.** A Title step takes a line of 1.3, and a Content step a line of 1.5.
 
-The weights are `REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`. A text also carries a tone (`DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE`), for how strongly it stands out from its surface. A block draws an icon from one closed set, `DSIconType`, with one name for each icon, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
+The weights are `REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`. A text also carries a tone (`DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE`), for how strongly it stands out from its surface. A block draws an icon from one closed set, `DSIconType`, with one name for each icon, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
 
 ## Boundary
 
@@ -111,6 +115,9 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.101` | the pixels an icon, an icon mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content ends at `CONTENT_XL` |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
+| `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
+| `RD.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |
+| `RD.SUPPORT.SURFACE.145` | a ghost or an outline control of the default hue draws the soft-hover fill under the pointer |
 | `RD.SUPPORT.APPS.152` | the spacing and size scale is a token group beside the roles, and a block reads a role token and the scale, never a ramp step or a number of its own |
 
 ## Proof

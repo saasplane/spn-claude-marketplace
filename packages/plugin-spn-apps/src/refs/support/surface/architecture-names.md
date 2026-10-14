@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "a4274f20"
+      "seen": "26eeef06"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "dc0073d4"
+      "seen": "8741a8f6"
     }
   ]
 }
@@ -57,7 +57,7 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 | --- | --- | --- |
 | What it says | how dense a control is | how large a thing that is shown is drawn |
 | Its steps | `XS` to `XL` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` · `XXL3` · `XXL4` · `XXL5` |
-| Who takes it | a button, a field, an item, a table, a card, and every block that has padding | `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` |
+| Who takes it | a button, a field, a table, a card, and every block that has padding. The item line takes none, and its level gives its look | `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` |
 | Handed down | yes: a block with no `size` takes the size of the place it stands in | no: a block with no `scaleSize` takes the step that fits its `size` |
 | The text beside it | the content step of that size | the title step of the same name |
 
@@ -104,17 +104,18 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | Block | Prop | Values | Vocabulary |
 | --- | --- | --- | --- |
 | `DSAlert` · `DSToast` | `color` | `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType`, limited to these four |
-| `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
+| `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XXS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
 | `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
-| `DSLink` · `DSText` | `tone` | `DEFAULT` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
+| `DSLink` · `DSText` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
 | `DSIconMark` | `shape` (the outline of the background the icon stands on) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSIconMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSIconMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
-| `DSItem` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the whole page, a part of the page, a titled group inside the content of a part, or a line among others. On the item line it decides, with the `size`, the type step and the element of the title and the scale size of the picture. On the tabs it decides the look) | `PAGE` · `SECTION` · `GROUP` · `CONTENT`, `CONTENT` when unset | `DSPageLevelType` |
+| `DSItem` · `DSItemFacts` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSItemMediaAlignType` |
 | `DSFormatDateTime` · `DSFormatDate` | `type` (the form the date is written in: the date as it is, or how long ago in words) | `DEFAULT` · `AGO`, `DEFAULT` when unset | `DSFormatDateType` |
 | `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `ICON_MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
 | `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
@@ -147,7 +148,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `SECTION`, `GROUP`, `CONTENT`. `DSItem` and `DSTabs` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts` and `DSTabs` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -228,7 +229,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the icon mark, the avatar and the avatar group take `scaleSize` |
-| `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType` |
+| `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |

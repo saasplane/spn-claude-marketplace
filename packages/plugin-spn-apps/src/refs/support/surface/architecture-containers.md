@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "5c21dc62"
+      "seen": "40b3fbf1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "413b2a7e"
+      "seen": "191e09a5"
     }
   ]
 }
@@ -56,7 +56,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block at the start and its last block at the end, so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
-- **A container that is the page MUST give its header the head of a page, and a container that is a part of a page the head of a part** (`RD.SUPPORT.SURFACE.107`). The title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION`, as `architecture-components.md` states the two. A container that takes an item line as its header takes `pageLevel` and passes it on to that item line. So every page of an app opens with the same head, and only its body differs.
+- **A container MUST give the title in its header the level `CONTAINER`, and a listing that is the page MUST give it `PAGE`** (`RD.SUPPORT.SURFACE.107`). The title of a header is an item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. A container that takes an item line as its header takes `pageLevel` and passes it on to that item line. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several containers MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one container puts its head in the header of that container. A page with several has no one container that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
@@ -142,7 +142,7 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 | `DSTable` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | draws no border and no rounding of its own. Its own `bordered` still wins |
 | `DSAccordion` · `DSDataTableWidget` | keeps its own text off the edge of the frame |
 | `DSList` · `DSDataTableWidget` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
-| `DSItem` at the level `PAGE`, `SECTION` or `GROUP` | it takes the inset of its place at its two sides, so the title starts where the rows under it start their text. In a part that is not `flush` it takes none |
+| `DSItem` at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` | it takes the inset of its place at its two sides, so the title starts where the rows under it start their text. In a part that is not `flush` it takes none |
 | `DSTabs` | the label of its first tab starts at the inset of its place, and its line still reaches the edge. Its panel takes that inset at its sides, and what the panel holds stands in a padded place |
 | Any other block | nothing. It reaches the edge |
 | A block inside the one that reacted | nothing. The setting stops at the block that used it |
@@ -222,7 +222,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order |
 | `RD.SUPPORT.SURFACE.114` | a card hands its size to what it holds, as a container does |
 | `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole |
-| `RD.SUPPORT.SURFACE.107` | a container that is the page gives its header the head of a page, and a container that is a part of a page the head of a part |
+| `RD.SUPPORT.SURFACE.107` | the level a box gives the title in its header: `CONTAINER` for a container, `PAGE` for a listing that is the page, `WIDGET` for a card |
 | `RD.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
 | `RD.SUPPORT.SURFACE.120` | a page that holds several containers has its head above them, outside any frame, with its way back, and writes nothing by hand for it |
 | `RD.SUPPORT.SURFACE.119` | the part that holds the groups may be narrow, by a named choice and never by a width the page writes. It is a MAY |

@@ -15,11 +15,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "e395ff6a"
+      "seen": "56a73ea3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "413b2a7e"
+      "seen": "191e09a5"
     }
   ],
   "decisions": [
@@ -113,9 +113,9 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
 | the head of a page that holds several containers | the head stands above the containers, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
-| the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and a listing that is a part of a page gives it `SECTION` (`RD.SUPPORT.SURFACE.107`). A container that takes an item line as its header takes `pageLevel` and passes it on. The page writes no type step and no heading element |
+| the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and any other box gives the level of its kind: `CONTAINER` for a container or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element comes from the nesting of the boxes (`RD.SUPPORT.SURFACE.106`). The page writes no type step and no heading element |
 | the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
-| where a title starts | the page writes no prop and no padding. An item line at the level `PAGE`, `SECTION` or `GROUP` takes no padding at its two sides, and in a `flush` part it takes the inset of its place (`RD.SUPPORT.SURFACE.109`). `bleed` on a title changes nothing |
+| where a title starts | the page writes no prop and no padding. An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` takes no padding at its two sides, and in a `flush` part it takes the inset of its place (`RD.SUPPORT.SURFACE.109`). `bleed` on a title changes nothing |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
 | the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
 | an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
