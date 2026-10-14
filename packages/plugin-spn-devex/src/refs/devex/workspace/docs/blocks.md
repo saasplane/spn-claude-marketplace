@@ -259,12 +259,12 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
   "caption": "RAIL: each named place carries its prop's name; a place that takes any node is a slot; the navigation's entries are a list stand-in.",
   "frame": { "label": "DSLayout — RAIL", "rows": [{ "items": [
     { "frame": { "width": "1/4", "rows": [
-      { "items": [{ "slot": "brand", "fill": true }] },
+      { "items": [{ "slot": "startNode", "fill": true }] },
       { "items": [{ "frame": { "tag": "nav", "fill": true, "rows": [
         { "items": [{ "standin": "list", "lines": 5, "headings": [0], "fill": true }] }] } }] },
-      { "items": [{ "slot": "account", "fill": true }] }] } },
+      { "items": [{ "slot": "endNode", "fill": true }] }] } },
     { "frame": { "rows": [
-      { "items": [{ "icon": "menu" }, { "spacer": true }, { "slot": "utilityActions" }] },
+      { "items": [{ "icon": "menu" }, { "spacer": true }, { "slot": "actionsNode" }] },
       { "items": [{ "frame": { "tag": "children", "fill": true, "rows": [] } }] }] } }] }] } }
 ```
 

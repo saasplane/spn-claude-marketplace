@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "96fdf3e9"
+      "seen": "cd3bcd28"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "2768cf3c"
+      "seen": "80c7b357"
     }
   ]
 }
@@ -74,7 +74,8 @@ A layout names no routing library — it moves between pages through the navigat
 
 - **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
 - **The layout gives the main area its gutter, `layout/main-inset`, always in `RAIL`, `DOCK` and `TOPNAV`, and never in `CANVAS`** (`RD.SUPPORT.APPS.161`). No prop turns it off. A page whose bands run from edge to edge takes `CANVAS`. The page writes no inset of its own.
-- **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the gutter of the main area. No layout holds one as a number.
+- **A layout takes one setting for its width, `contentWidth`, of `FULL`, `WIDE` and `NARROW`** (`RD.SUPPORT.SURFACE.158`). `FULL` is the whole window, `WIDE` is at most `layout/shell` wide (1280 px) and centred, and `NARROW` is at most `layout/narrow` wide (768 px) and centred. Every type takes it in its config: `RAIL` is `FULL` by default, and `DOCK`, `TOPNAV` and `CANVAS` are `WIDE`. The contents of a top bar follow the body, and `NARROW` narrows only the page, in a dock the page beside the column, so the body and its bar stay at `WIDE`. `maxWidth` moves the width of `WIDE`. The config of every type is `IDSLayoutConfig`, with `mtype`, `contentWidth`, `maxWidth` and `content`, and `IDSLayoutConfigNav` adds the navigation and its places for `RAIL`, `DOCK` and `TOPNAV`.
+- **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the body at `WIDE`, the width of the page at `NARROW` and the gutter of the main area. No layout holds one as a number.
 
 ## The shell and the content — 🔮
 
@@ -137,6 +138,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.SURFACE.139` | the theme styles a layout in two parts, the shell and the content, with no setting for one layout type |
 | `RD.SUPPORT.SURFACE.140` | a panel of entries of the navigation belongs to the shell, and a menu of actions does not |
 | `RD.SUPPORT.SURFACE.155` | the entry kinds, each with its own hover, and that an open entry is never mistaken for one under the pointer |
+| `RD.SUPPORT.SURFACE.158` | a layout takes one setting for its width, `contentWidth`, of `FULL`, `WIDE` and `NARROW`, on the config of every type |
 | `RD.SUPPORT.SURFACE.157` | the layout types with `CANVAS`, the places named by where they stand and held in the config by `mtype`, the layouts built from the navigation units, and that the layouts alone read the theme |
 
 ## Proof
