@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "5cec8d18"
+      "seen": "aae865dd"
     }
   ]
 }
@@ -56,7 +56,7 @@ Shows many records as one block: a bar (the control that ticks every record, wit
 - An empty message given as plain text **MUST** be drawn as the standard empty state, `DSEmpty`, with the text as its title and a default icon: an inbox, `INBOX`, where there is no record at all, and a magnifier, `SEARCH`, where the filter found none. It shows no line under the title. A page that gives a block of its own as the message gets that block, drawn as it is, so a page that needs a description or an action writes its own `DSEmpty` there. The web builds the default icon of each case.
 - `DSDataTableWidget` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.
 - When its records are shown as a table, `DSDataTableWidget` **MUST** turn the table's `hoverable` prop on. A person acts on a record of this widget, so a row under the pointer says that it answers. A plain `DSTable` leaves it off unless the theme turns it on, because a row that does nothing when it is pressed should not react. The page sets nothing for it, and the theme does not turn it off, because the widget gives the table its `hoverable` and a prop that is given wins over the theme.
-- The `striped` of the table layout **MUST** follow the order of the table: the setting where the page gives it, else the value of the resolved theme, which stripes by default (`RD.SUPPORT.SURFACE.126`).
+- The `striped` of the table layout **MUST** follow the order of the table: the setting where the page gives it, else the value of the theme, which stripes by default (`RD.SUPPORT.SURFACE.126`).
 - The footer **MUST** arrange itself by the width of its own place, as its pager does (`RD.SUPPORT.SURFACE.133`). In a wide place the count stands at the start and the pager at the end of one line. In a narrow place the count stands on a line of its own above the pager, each in the middle.
 
 ### The three layouts
@@ -187,8 +187,8 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **A row of an `ITEMS` part MUST hold one link, and never a link inside a link.** What `endNode` holds stays outside the link, so a press on an action there does the action and does not follow the link.
 - **A row of an `ITEMS` part or of a `LIST` part MAY be `selected`.** The page says which row is chosen, and the widget draws it as a chosen row of a list, with the band and `aria-current="true"`. The widget holds no state for it.
 - **The widget MUST take `raised`, `bordered` and `rounded` for the surface of its card, and `fullHeight`, and MUST hand each to its `DSCard`.** One that the page does not give follows the card look of the theme (`architecture-app.md`).
-- **The widget MUST take `divided` from its own prop where the prop is given, else from the resolved theme's `cardWidget`** (`RD.SUPPORT.SURFACE.128`). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
-- **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the resolved theme's `cardWidget`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
+- **The widget MUST take `divided` from its own prop where the prop is given, else from the theme's `cardWidget`** (`RD.SUPPORT.SURFACE.128`). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
+- **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the theme's `cardWidget`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
 - **The widget MUST take one `size`, and MUST pass it to its head, its lists and its rows.**
 - **The widget MUST NOT fold rows away.** A row that a page wants hidden, or shown in another way, is the page's to place, usually in a `FREE` part or in the footer.
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTableWidget`.
@@ -206,7 +206,7 @@ This ref states what makes a block a widget, and what `DSDataTableWidget`, `DSFi
 | `RD.SUPPORT.SURFACE.127` | the card widget is a core widget, each group of its settings is the props of the unit that draws it, the kinds of its parts, and it folds no rows away |
 | `RD.SUPPORT.SURFACE.128` | the order the card widget takes its lines and the hover of its rows in: its own prop, else the theme's card widget look |
 | `RD.SUPPORT.SURFACE.125` | a data table takes the id of the record in view, and draws its row in the `LIST` and `TABLE` layouts |
-| `RD.SUPPORT.SURFACE.126` | the `striped` of the table layout follows the order of the table: the setting, else the resolved theme |
+| `RD.SUPPORT.SURFACE.126` | the `striped` of the table layout follows the order of the table: the setting, else the theme |
 | `RD.SUPPORT.SURFACE.134` | the tick column and the actions column are as wide as what they hold, and where the spare width of a table goes |
 | `RD.SUPPORT.SURFACE.133` | the footer of the data table arranges itself by the width of its own place |
 | `RD.SUPPORT.SURFACE.147` | the bar of a data table draws the control that ticks every record, and the sort, only where there are records |

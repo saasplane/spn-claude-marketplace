@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "3d0514c1"
+      "seen": "0a7dc4c9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "3fb269ca"
+      "seen": "f82fd9f0"
     }
   ]
 }
@@ -94,7 +94,7 @@ Some blocks are drawn from data: a select from its options, a menu from its node
 
 The reason is that a hover tells a person the row answers to them. A row that does nothing when it is pressed should not react, so a plain table stays still, and a table whose rows a person acts on turns `hoverable` on. A theme that turns it on does so for every table of the app. `DSDataTableWidget` turns it on. `hoverable` is not a prop for the hover state: hover stays a shown state that the browser produces, and the prop states only whether this block answers to the pointer at all.
 
-- **`DSTable` MUST decide `striped` and `hoverable` in one order: its own prop where the prop is given, else the value of the resolved theme** (`RD.SUPPORT.SURFACE.126`). A prop that says no is given, so a table that says no to `striped` draws no stripes under a theme that says yes. The default theme draws stripes and no hover, and the table keeps no value of its own for an unset theme. The theme holds the two values in its block `table` (`architecture-app.md`).
+- **`DSTable` MUST decide `striped` and `hoverable` in one order: its own prop where the prop is given, else the value of the theme** (`RD.SUPPORT.SURFACE.126`). A prop that says no is given, so a table that says no to `striped` draws no stripes under a theme that says yes. The default theme draws stripes and no hover, and the table keeps no value of its own for an unset theme. The theme holds the two values in its block `table` (`architecture-app.md`).
 - **A row of the body of `DSTable` MAY be marked as the row in view, with `selected`** (`RD.SUPPORT.SURFACE.125`). It is the row of the record that the page shows beside the table or under it, such as the order whose detail is open. `selected` is a yes-or-no prop of the row that is no by default. The row in view **MUST** draw the band that a chosen row of a list draws, and it **MUST** carry `aria-current="true"`. It takes no hover fill while it is in view.
 - **The row in view and a row that a person ticks MUST NOT share a name or a look.** A person ticks rows to act on many of them at once, and those are the checked records of a data table. One row is in view because its record is open, and it is the `selected` row. A row may be both, and then it shows both.
 - **A cell of the head of a table MAY state the width and the least width of its column.**
@@ -137,6 +137,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 - **`DSDialog`, `DSDrawer` and `DSSheet` MAY hold the parts `Header`, `Content` and `Footer`**, named `DSDialog.Header` and so on. The header stays at the top and the footer at the bottom, and only the content scrolls between them. The header places its first block at the start and its last block at the end, and leaves room for the close action. The footer places its actions at its end, the action that leaves the work first and the main action last (`architecture-containers.md`). `DSConfirmDialog` and `DSConfirmPopover` place their two actions the same way. An overlay that holds plain blocks and no parts scrolls them as one.
 - **A dialog, a drawer and a sheet MUST announce their title once** (`RD.SUPPORT.SURFACE.121`). Where an item line stands as the title in the header, that title and the name of the overlay are one heading to a screen reader. A page gives the title once, and it writes nothing more for the name.
+- **A dialog, a sheet and a drawer MUST be filled with the page's surface, `BASE`, and a popover, a menu and a tooltip with the raised surface, each fixed** (`RD.SUPPORT.SURFACE.163`). The theme chooses neither. A side panel inside a dialog, a sheet or a drawer takes a shell look, `DEFAULT` at `SUBTLE` unless the page says otherwise.
 - **`DSSheet` takes `modal`, which is yes by default.** A sheet that is not modal stands beside the page. It draws no scrim, and the page stays usable. A press on the page does not close the sheet; its close action and the Escape key do. **On a phone a sheet MUST stay modal, whatever `modal` says.**
 - **`DSConfirmDialog` asks a person to confirm an act that cannot be undone, and it stays open while the act runs** (`RD.SUPPORT.SURFACE.088` rules the name, and no older name is kept beside it). The confirm action shows working, neither action can be pressed, and the dialog cannot be left. An act that fails keeps the dialog open and shows the failure in it.
 - **`DSConfirmPopover` asks a person to confirm an act they can undo, in a popover that opens from the control that was pressed.** It holds the question, an action that cancels and the action that confirms, named as on `DSConfirmDialog`. It draws on the surface of `DSPopover`, covers no page and draws no scrim. **It MUST stay open while the act runs, and MUST close when the act is done.** An act that fails keeps it open and shows the failure in it. The cancel action and the Escape key close it, and focus goes back to the control that opened it.
@@ -243,7 +244,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 | `INLINE` | a value inside another unit, such as a row of a popover, of a menu or of a cell | `TITLE_XS`, 12px | `CONTENT_XS`, 12px | `CONTENT_XS`, 12px | `XS` |
 
 - **The `pageLevel` of an item line MUST alone decide the type of its title, its description and its facts, the size of a badge among its facts, and the size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the level, and writes no type step, no badge size and no scale size. `DSItem` takes no `size`. So the header of a record, the title of a container, of a widget and of a group, and a row keep one shape on every page. The titles run 22, 18, 16, 14, 13 and 12px from the page down to a small row.
-- **The title MUST take the body tone, and the title of a group the quiet tone. The description and the facts MUST take the muted tone** (`RD.SUPPORT.SURFACE.143`). So a group's bold 14px title stands a step back from the rows under it.
+- **The title MUST take the body tone, and the title of a group the quiet tone. The description MUST take the quiet tone at every level but `INLINE`, where it and the facts take the muted tone** (`RD.SUPPORT.SURFACE.143`, `166`). So a group's bold 14px title stands a step back from the rows under it. On a row under the pointer or a chosen row the muted words step to the quiet tone.
 - **A badge among the facts MUST take the size of its level, two levels to a size:** `MD` at `PAGE` and `CONTAINER`, `SM` at `WIDGET` and `GROUP`, and `XS` at `CONTENT` and `INLINE`. Its words are then 14, 13 and 12px. No badge is smaller than `XS`, the smallest of the standard sizes.
 - **The description MUST stand directly under the title, and the line of facts MUST stand 2px under whatever stands above it** (`RD.SUPPORT.SURFACE.135`). Each row of the text takes the line height of its own type step, 1.2 for a Heading, 1.3 for a Title and 1.5 for Content. A line of facts is as tall as its words, or as its badge where the badge is taller.
 - **An item line at `INLINE` with a title, a description and facts MUST draw two lines.** The first holds the title, a dot and the description, and the second holds the facts. Where the first line is full, the description wraps under the title within the text column. With a description alone or facts alone, and at every other level, the rows stand one under another.
@@ -282,10 +283,9 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 > [!NOTE]
 > **Still open, each with its lean.**
 > - **Whether the item line follows the density of its place.** Today a row pads by the size of its place and its look does not follow it. The lean is that it follows the place's density, with no prop on the item.
-> - **The looks on a phone.** The titles keep the sizes of the desktop there, 22, 18, 16, 14, 13 and 12px, and the lean is that a row a person presses is at least 44px tall.
+> - **The looks on a phone.** The titles keep the sizes of the desktop there, 22, 18, 16, 14, 13 and 12px, because an item draws no title above 22px. The display steps a page writes with `DSText` take smaller values on a phone (`architecture-core.md`). The lean is that a row a person presses is at least 44px tall.
 > - **`INLINE` against `DSActorView`.** `DSActorView` draws who did a thing and when, and it does not use the item line. One way is that a page writes an item line at `INLINE` in its place. The other is that `DSActorView` keeps its name and draws an item line at `INLINE` inside. Neither is leaned to yet.
 > - **The shade of the titles at `PAGE`, `CONTAINER` and `WIDGET`.** They take the body tone. Drawing them in the strongest text, with the descriptions muted, is open, and it is not leaned to yet.
-> - **Muted words on a row under the pointer.** The muted tone falls under 4.5 to 1 on a hovered, a tinted or a chosen row, as the roles (`architecture-core.md`) state. Nothing is changed for it yet.
 
 ### The badge
 
@@ -349,7 +349,7 @@ These rules are for a component a builder makes, where a text stands beside an i
 - **Beside a heading, an icon MUST be the size of the heading or the next size up, up to 56px.** A heading has no scale size of its own name, so the pairing goes by size. Beside a heading larger than 56px, the icon stands in a mark.
 - **Beside a heading, an avatar or a mark MUST be two steps above the heading's own step, and never larger than `XXL5`.**
 
-| Heading | Its size | The icon beside it | The avatar or the mark beside it |
+| Heading | Its size on a desktop | The icon beside it | The avatar or the mark beside it |
 | --- | --- | --- | --- |
 | `HEADING_XXS` | 14px | `SM`, 14px | `SM`, 32px |
 | `HEADING_XS` | 18px | `LG`, 18px | `MD`, 36px |
@@ -436,14 +436,16 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.123` | a block that shows or takes a time holds no time format of its own |
 | `RD.SUPPORT.SURFACE.124` | a mark takes `variant` with the shared vocabulary, `SUBTLE` when unset, and `GHOST` and `LINK` draw the icon with no fill |
 | `RD.SUPPORT.SURFACE.125` | a table marks the row in view, with the band and `aria-current` of a chosen row of a list, apart from the rows a person ticks. It is a MAY |
-| `RD.SUPPORT.SURFACE.126` | the order a table takes its stripes and its hover in: its own prop, else the resolved theme |
+| `RD.SUPPORT.SURFACE.126` | the order a table takes its stripes and its hover in: its own prop, else the theme |
 | `RD.SUPPORT.SURFACE.130` | the picture of an item line is data of one kind, the item owns its size, and the item line takes no `startIcon` |
 | `RD.SUPPORT.SURFACE.131` | the item line takes what stands at its end as `endNode`, a node outside the link of the line |
 | `RD.SUPPORT.SURFACE.132` | a row of a list holds plain words, a line of facts through `DSItemFacts`, or an item line, and takes no `facts` of its own |
 | `RD.SUPPORT.SURFACE.133` | the pager arranges itself by the width of its own place, and where its parts stand |
 | `RD.SUPPORT.SURFACE.135` | the description stands directly under the title, and the line of facts 2 pixels under whatever is above it |
 | `RD.SUPPORT.SURFACE.136` | the badge of an avatar is about a third of the avatar and its dot about a quarter, by scale size |
-| `RD.SUPPORT.SURFACE.143` | the title of a group takes the quiet tone, and descriptions and facts the muted tone |
+| `RD.SUPPORT.SURFACE.143` | the title of a group takes the quiet tone, and so does the description of an item but at `INLINE` |
+| `RD.SUPPORT.SURFACE.166` | the description of an item is quiet at every level but `INLINE`, and facts are muted |
+| `RD.SUPPORT.SURFACE.163` | a dialog, a sheet and a drawer are filled with the page's surface and a popover, a menu and a tooltip with the raised surface, each fixed |
 | `RD.SUPPORT.SURFACE.144` | an icon-only button that opens a menu keeps its tooltip |
 | `RD.SUPPORT.SURFACE.146` | a pressed toggle keeps its border, and a pressed toggle of the default hue takes a fill a person can see |
 | `RD.SUPPORT.SURFACE.153` | a badge with no `variant` draws `SUBTLE`, and a badge among the facts of an item line takes the given variant, else the one its level chooses |

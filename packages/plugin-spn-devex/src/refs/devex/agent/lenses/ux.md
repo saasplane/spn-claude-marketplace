@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "0377773f"
+      "seen": "d8a9906d"
     }
   ],
   "decisions": [
@@ -40,7 +40,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.158",
-      "seen": "9201c5b8"
+      "seen": "7473e9fe"
     },
     {
       "repo": "spn-foundation",
@@ -50,7 +50,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "651ed305"
+      "seen": "f5799342"
     },
     {
       "repo": "spn-foundation",
@@ -83,7 +83,7 @@ The question it holds: *can this person finish what they came to do, and do they
 
 - **The page has one purpose and one main action.** Ask what the person came here to do. An answer that needs *and* is two pages. Several actions of equal weight leave the person to work out what the page is for (standards § A page has one purpose).
 - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area. A page that draws its own navigation has taken the layout's job. A layout that arranges the page's blocks has taken the page's (standards § The levels · `RD.SUPPORT.APPS.146`).
-- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the colour of the resolved theme's content — where the app chose none it follows the containers, the light grey under raised containers — and no page or story sets a fill of its own. The layout gives the main area its gutter, `layout/main-inset`, always in `RAIL`, `DOCK` and `TOPNAV`, and never in `CANVAS`, with no switch; a page whose bands run edge to edge takes `CANVAS` (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`).
+- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the colour of the theme's content — where the app chose none it follows the containers, the light grey under raised containers — and no page or story sets a fill of its own. The layout gives the main area its gutter from the content look, `NONE`, `SM` or `MD`, and the gutter of `CANVAS` is `NONE`; a page whose bands run edge to edge takes `CANVAS`, or writes `width: FULL` and `gutter: NONE` (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`).
 - **The theme styles the layout in two parts, the shell and the content, in every layout type.** A look that a page or one layout type writes for the shell or the content is a finding. An entry of the navigation is drawn by the entry kind its look names, and an open entry that could be mistaken for one under the pointer is a finding. A navigation unit that reads the theme itself, or a layout that draws a navigation of its own, is a finding: the layouts alone read the theme and hand the look down (`RD.SUPPORT.SURFACE.155`, `RD.SUPPORT.SURFACE.156`). A panel of entries of the navigation takes the look of the shell, and a menu of actions, such as the menu of the account, does not (layout § The shell and the content · `RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.140`). A unit or a layout that keeps a fallback of its own for an unset theme value is a finding: the defaults live once, in the default theme (`RD.SUPPORT.SURFACE.161`).
 - **The navigation behaves the same in every layout type.** An item's actions are reachable without hover, wherever the item is drawn as a row. A closed group that holds the current page shows the selected mark. A shut group's flyout opens on a press, and hover shows only its name. The narrow dock keeps its back link (layout and container § How the navigation behaves · `RD.SUPPORT.APPS.163`).
 - **A framed part reads header, content, footer, in that order.** The title and the actions of a part then sit in the same place on every page. A container inside a container is a finding (layout and container § The container · `RD.SUPPORT.APPS.147`).
@@ -107,7 +107,7 @@ The question it holds: *can this person finish what they came to do, and do they
 - **A failure says what went wrong, and gives the way back.** A failed send keeps what the person entered. A failed action leaves every record as it was. An empty result keeps its filters shown (interaction § Feedback, recovery and interruption · patterns § Find, § Enter, § Act).
 - **A refusal leaves the person somewhere to go.** A refused block is hidden or disabled. A refused page says that the person has no permission. The navigation stays usable in both cases (patterns § Be refused).
 - **An interruption says why, answers, and returns the person.** An action that needs a confirmation asks first: in a popover, `DSConfirmPopover`, for an act a person can undo, and in a dialog, `DSConfirmDialog`, for an act that cannot be undone. A dialog for a small act that can be undone is a finding. Leaving an interruption returns the person and the focus to the place they left (interaction § Feedback, recovery and interruption · patterns § Interrupt, § Act).
-- **Every overlay that covers a page dims it with one scrim, `scrim/overlay`.** A dialog, a confirm dialog, a drawer and a sheet dim the page the same way, and `DSBackdrop` draws that scrim. A sheet that is not modal covers no page: it stands beside the page, draws no scrim and leaves the page usable. A popover draws no scrim either (patterns § Interrupt · `RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`).
+- **Every overlay that covers a page dims it with one scrim, `surface-overlay`.** A dialog, a confirm dialog, a drawer and a sheet dim the page the same way, and `DSBackdrop` draws that scrim. A dialog, a sheet and a drawer are filled with the page's surface, and a popover, a menu and a tooltip with the raised surface, each fixed (`RD.SUPPORT.SURFACE.163`). A sheet that is not modal covers no page: it stands beside the page, draws no scrim and leaves the page usable. A popover draws no scrim either (patterns § Interrupt · `RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`).
 - **The surface answers with the design system's own blocks.** A loading picture or a failure picture that the page drew itself is a finding. So is anything a person needs that only hover reaches (interaction § Feedback, recovery and interruption, § Input, by kind of surface).
 - **The look comes from the theme, and never from the page.** A color, a padding, a margin, a radius or a gap set by hand is the finding (layout and container § What a container refuses · `RD.SUPPORT.APPS.150`). In a design, it is a color that binds no variable, or a copy of a block that is no longer an instance (design system § The capability set).
 - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. `CUSTOM` is a value of `color` that means the caller owns the colour, and the one named way a page sets a colour outside the theme. A hue that means success on one page and decoration on the next is a finding (standards § What a surface is judged by · names § The three shared names).

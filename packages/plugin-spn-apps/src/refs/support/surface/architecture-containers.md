@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "40b3fbf1"
+      "seen": "9d43ebfd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "679b189f"
+      "seen": "df788688"
     }
   ]
 }
@@ -78,12 +78,14 @@ Here is how the parts serve the pages most apps have.
 | Prop | Values | What it decides |
 | --- | --- | --- |
 | `frames` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | which parts the frame holds. A part that is not listed sits flat on the page |
+| `color` | `BASE`, `DEFAULT` or `PRIMARY` | the colour of the fill of the frame, as the shell and the content take it. `BASE` is the default, and it leaves the fill to `raised` |
+| `strength` | `SUBTLE`, `QUIET` or `SOLID` | how strong the fill of a hue is. `BASE` takes none |
 | `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
 | `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds. Blocks that need no line between them sit in one content part |
 | `rounded` | yes or no | whether the corners of the frame are rounded |
 | `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
 
-- **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first four is a choice that does not depend on the others. The theme holds the app's default for each, and a container may set its own.
+- **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first six is a choice that does not depend on the others (`RD.SUPPORT.SURFACE.163`). The theme holds the app's default for each, and a container may set its own.
 - **A part listed in `unframed` MUST take no frame, whatever `frames` and the theme give.** A page that sets `frames` takes the whole choice from the theme. A page that sets `unframed` takes one part out and leaves the rest to the theme. So a theme can still change the look of that container, and the named part stays flat in every theme.
 - **`unframed` is for a part that no theme should frame on this page.** One such part is a header that is the header of the page, which the rules of content keep out of a frame (`standards-core.md`). A page that wants a look sets `frames`, or leaves it to the theme. The book states `unframed` before the web builds it.
 
@@ -116,7 +118,7 @@ A container takes no background color, no padding value, no margin, no container
 
 ### The card
 
-The card, `DSCard`, stays a separate block beside the container, taking `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own. Where the app chose no card value, the resolved theme takes the container's choice, else the default (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
+The card, `DSCard`, stays a separate block beside the container, taking `color`, `strength`, `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own. Where the app chose no card value, the theme takes the container's choice, else the default (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
 
 | | A container | A card |
 | --- | --- | --- |
@@ -210,7 +212,8 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 
 | Rule | What it decides |
 | --- | --- |
-| `RD.SUPPORT.APPS.147` | the parts of a container, the four props of its look, and what it refuses |
+| `RD.SUPPORT.APPS.147` | the parts of a container, the six props of its look, and what it refuses |
+| `RD.SUPPORT.SURFACE.163` | a container and a card take a `color` and a `strength`, `BASE` by default |
 | `RD.SUPPORT.SURFACE.092` | `unframed` names the parts that take no frame, whatever `frames` and the theme give |
 | `RD.SUPPORT.APPS.162` | inside a bordered frame, a line divides each two parts the frame holds |
 | `RD.SUPPORT.APPS.155` | the page decides what fills a part, with `flush`, and a block never changes by where it sits |

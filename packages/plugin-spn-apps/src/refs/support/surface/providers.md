@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "247d0354"
+      "seen": "699a49a8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
-      "seen": "6090c25d"
+      "seen": "545065fe"
     }
   ]
 }
@@ -41,15 +41,15 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 
 ## The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest
 
-`@saasplane/support-web-ds-ts` realizes the design system. `DSApp` mounts the roots and owns theme state, the choice and the resolved theme; components read the contexts through hooks and never through props.
+`@saasplane/support-web-ds-ts` realizes the design system. `DSApp` mounts the roots and owns theme state, the choice and the whole theme; components read the contexts through hooks and never through props.
 
 | Book concept | TypeScript |
 | --- | --- |
 | App context | `IDSAppContextProps` — the `app` handle, `IDSAppContextInfo` (permissions, languages, `SPLanguageCodeType`, `SPCountryCodeType`, `SPCurrencyCodeType`, `SPDateFormatType`, `SPNumberFormatType`, `SPTimeFormatType`, timezone, each one required), `translate(key, defaultValue, vars)`, and `handleUnauthenticated` |
-| Design-system context | `IDSContextProps` — `theme`, the resolved theme `IDSThemeResolved`, `themeChoice`, the `IDSTheme` the app chose, `setTheme`, `device`, `navigate`, `transformImageUrl`, `getImagePlaceholderUrl`, `getImageErrorUrl`. `DSApp` keeps `device` live: the app passes the first value, and the device then follows the window across a screen class and a turn |
-| Theme lifecycle | the app seeds the choice as `theme` in `IDSContextConfigProps`; `DSApp` holds it and lays it over `DS_THEME_DEFAULT` with `prepareThemeResolved`; `setTheme` takes a new choice from any depth |
+| Design-system context | `IDSContextProps` — `theme`, the whole theme `IDSTheme` with every value, `themeChoice`, the `DSDeepPartialType<IDSTheme>` the app chose, `setTheme`, `device`, `navigate`, `transformImageUrl`, `getImagePlaceholderUrl`, `getImageErrorUrl`. `DSApp` keeps `device` live: the app passes the first value, and the device then follows the window across a screen class and a turn |
+| Theme lifecycle | the app seeds the choice as `theme` in `IDSContextConfigProps`; `DSApp` holds it and lays it over `DS_THEME_DEFAULT`, field by field; `setTheme` takes a new choice from any depth |
 | Preferences and formatting | format components and helpers read the context's info, and never the browser locale. The app context holds the date format, the number format and the time format as required facts, and no unit falls back to a format of its own. `DSFormatDateTime` and `DSFormatDate` take `type`, a `DSFormatDateType`, and `AGO` writes how long ago in words |
-| Density | `size` is optional on the choice and held on the resolved theme, `SM` by default. `useDSScopeSize` resolves a component rendered without `size`: the nearest block above that sets one, then the resolved theme's `size` |
+| Density | `size` is optional on the choice and held on the theme, `SM` by default. `useDSScopeSize` resolves a component rendered without `size`: the nearest block above that sets one, then the theme's `size` |
 | The scope | `DSScope` sets the size or the frame setting for what it holds. A page writes `<DSScope size={…}>` around a region. A part of a container with `flush` wraps what it holds in `DSScope framed`; without `flush` it sets no frame setting. A card, and each overlay that holds blocks, wrap what they hold in `DSScope framed={false}`. An unset `framed` passes the setting on |
 | Overlays | `DSOverlayContext.showComponent` plus `useDSOverlayConfirm` — no screen mounts a dialog into the tree. `showComponent` hands back the function that removes what it showed, and `useDSOverlayRoute` shows an overlay while the match the app's router gives it holds a value |
 | Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSScopeContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes; `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |

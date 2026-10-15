@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "a082187c"
+      "seen": "af2315a7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "5cec8d18"
+      "seen": "aae865dd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "679b189f"
+      "seen": "df788688"
     }
   ],
   "decisions": [
