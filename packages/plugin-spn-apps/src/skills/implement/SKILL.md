@@ -15,11 +15,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "aae865dd"
+      "seen": "b3b3e08f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "df788688"
+      "seen": "9c49fd45"
     }
   ],
   "decisions": [
@@ -115,7 +115,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
 | the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and any other box gives the level of its kind: `CONTAINER` for a container or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element comes from the nesting of the boxes (`RD.SUPPORT.SURFACE.106`). The page writes no type step and no heading element |
 | the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
-| where a title starts | the page writes no prop and no padding. An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` takes no padding at its two sides, and in a `flush` part it takes the inset of its place (`RD.SUPPORT.SURFACE.109`). `bleed` on a title changes nothing |
+| where a title starts | the page writes no prop and no padding. The part that holds an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` gives it no padding at its two sides, and in a `flush` part the inset of its place (`RD.SUPPORT.SURFACE.109`). An item line draws no padding or highlight of its own, and a page writes no `bleed` (`RD.SUPPORT.SURFACE.175`) |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
 | the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
 | an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |

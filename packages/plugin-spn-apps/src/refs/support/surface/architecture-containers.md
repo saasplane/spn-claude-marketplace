@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "df788688"
+      "seen": "9c49fd45"
     }
   ]
 }
@@ -131,7 +131,7 @@ The card, `DSCard`, stays a separate block beside the container, taking `color`,
 
 - **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it MUST still frame one thing** (`RD.SUPPORT.SURFACE.091`). The parts give the one thing a title, a body and what closes it, such as its action. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
 - **A part of a card MUST pad itself, from the size of the card, and `flush` on a part MUST drop that padding.** A page then writes no padding of its own around what a card holds. A part whose content reaches the edge of the card, such as a list or a picture, takes `flush`. A part takes no other prop.
-- **A card MUST hand its size to what it holds, as a container does** (`RD.SUPPORT.SURFACE.114`). A block inside a card that reads the size of its place reads the size of the card. An item line with `bleed` and a title in a `flush` part are such blocks: each takes the inset of the card's size, so it starts where the card's own parts start their content. A card that states no size hands on the size it stands in.
+- **A card MUST hand its size to what it holds, as a container does** (`RD.SUPPORT.SURFACE.114`). A block inside a card that reads the size of its place reads the size of the card. A row of a list and a title in a `flush` part are such blocks: each takes the inset of the card's size, so it starts where the card's own parts start their content. A card that states no size hands on the size it stands in.
 - **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a container does.** The header, the content and the footer of a card all do this.
 - **A card MAY sit inside the content of a container.** A dashboard MAY also use cards and no container at all.
 

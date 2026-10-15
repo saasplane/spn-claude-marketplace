@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "0bcc12b2"
+      "seen": "7e7459c8"
     }
   ]
 }
@@ -190,7 +190,7 @@ A container is optional. Use one where a part of the page has a header, content 
 - **Groups and their items are two containers at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action, and the swap changes the address (`RD.SUPPORT.SURFACE.079`). A set of groups that can be added to is a list, and never a row of tabs (`RD.SUPPORT.SURFACE.080`).
 - **Give one container to each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are the parts of its content, each under its own title, and never containers of their own. Two things that are read or saved apart are two containers, or cards. An editor with its preview and *Choose many* are each one container (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes it, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added.
-- **Write no prop and no padding to place a title** (`RD.SUPPORT.SURFACE.109`). An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` starts where what stands under it starts, and in a `flush` part it takes the inset of its place. `bleed` on a title changes nothing. A card hands its size to what it holds, as a container does (`RD.SUPPORT.SURFACE.114`). A container frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number.
+- **Write no prop and no padding to place a title** (`RD.SUPPORT.SURFACE.109`). An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` starts where what stands under it starts, and in a `flush` part it takes the inset of its place. The part that holds a title gives it its room, and an item line draws no padding of its own (`RD.SUPPORT.SURFACE.175`). A card hands its size to what it holds, as a container does (`RD.SUPPORT.SURFACE.114`). A container frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number.
 - **A page that holds several containers has its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). It is an item line at the level `PAGE`. A page with one container puts its head in the header of that container. Write the title and the address to go back to, and no row, back button or padding for them.
 - **Write no padding for tabs in a `flush` part, or for their panel** (`RD.SUPPORT.SURFACE.118`). The first tab starts where the text under it starts, and the line of the tabs still reaches the edge.
 - **A card may hold `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it still frames one thing** (`RD.SUPPORT.SURFACE.091`). Its parts all sit inside its one frame, in every theme. A part pads itself, and `flush` on a part drops that padding, for a part whose content reaches the edge of the card. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.

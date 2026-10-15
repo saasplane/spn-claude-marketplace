@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "59ca1c24"
+      "seen": "7de35414"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "aae865dd"
+      "seen": "b3b3e08f"
     }
   ]
 }
@@ -72,7 +72,7 @@ The records take one of three layouts, and the data decides which. The widget is
 - **A page MUST choose the layout from the data, by the table above** (`RD.SUPPORT.SURFACE.068`). It lists the layout in the widget's `layouts`, with the columns or the renderer of that layout.
 - **On a phone the records MUST be in the `LIST` layout.** A phone has no room for columns, or for cards side by side. At a tablet `TABLE` shows fewer columns, and `GRID` fewer cards across. That `LIST` stands on a phone, also in place of `GRID`, is proposed and not yet confirmed.
 - **Many groups that a person searches MUST be in the `LIST` layout, and never in `TABLE`** (`RD.SUPPORT.SURFACE.069`). A group is read by its name, as a line, and the groups stand in a narrow part of the page. A person picks one group and does not compare groups across columns.
-- **A line of the `LIST` layout MUST be an item line, `DSItem`** (`RD.SUPPORT.SURFACE.097`). The page gives the title, the description and the facts of a record, and every list of every data table then reads the same way. The widget's rows carry no padding of their own, so the item line's padding is the only one, and the widget lines the item up with the title of the container it stands in. A page that draws a block of its own in place of an item line brings that block's padding itself.
+- **A line of the `LIST` layout MUST be an item line, `DSItem`** (`RD.SUPPORT.SURFACE.097`). The page gives the title, the description and the facts of a record, and every list of every data table then reads the same way. The widget's rows carry no padding of their own, and the widget gives each line its room: the padding of an item line above and below, and the inset of the table at its two sides, so the line lines up with the title of the container it stands in. The item line draws no padding of its own. A block of the page's own in place of an item line stands in the same room.
 - **When its records are shown as a list, `DSDataTableWidget` MUST turn `hoverable` on, as it does for a table.** The row under the pointer answers in both layouts. The row carries the reaction, and the item line inside it carries none.
 - **A line of the `LIST` layout MUST follow the rules of content of `standards-core.md`.** Its state is a badge on the line of facts, the normal state shows none, and a line stands between each two lines. The widget draws the line between each two lines itself. What a line holds is the page's renderer, so the badge and its place are the page's to write.
 
