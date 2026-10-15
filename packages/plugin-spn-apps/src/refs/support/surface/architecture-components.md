@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "8e86d693"
+      "seen": "3fb269ca"
     }
   ]
 }
@@ -251,7 +251,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 
   | `pageLevel` | The title alone | With a description | With facts | With a description and facts |
   | --- | --- | --- | --- | --- |
-  | `PAGE` | 36 | 48 | 48 | 80 |
+  | `PAGE` | 36 | 56 | 56 | 80 |
   | `CONTAINER` | 32 | 44 | 44 | 64 |
   | `WIDGET` | 28 | 40 | 40 | 56 |
   | `GROUP` | 24 | 36 | 36 | 48 |
