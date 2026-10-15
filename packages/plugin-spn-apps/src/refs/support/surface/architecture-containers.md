@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "9d43ebfd"
+      "seen": "e13fb162"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "9c49fd45"
+      "seen": "b252d75b"
     }
   ]
 }
@@ -26,7 +26,7 @@ Read this before you frame a part of a page, or before you draw or build the con
 | Container | `DSContainer` — an optional block that frames a part of a page as a header, content and a footer |
 | Part | `DSContainer.Header` · `DSContainer.Content` · `DSContainer.Footer` — a named place in a container. It holds anything, and takes only `flush` |
 | Frame | `frames` — the drawn edge and fill of a container. A frame is drawn once on any part of a page |
-| Container frame | `DSContainerFrameType` — the closed set that names which parts a frame holds |
+| Part of a box | `DSPageLevelPartType` — the closed set of the three parts of a box (`HEADER`, `CONTENT`, `FOOTER`): the parts a frame holds, the parts of a card, and the part a block stands in |
 | Inset | the space a part keeps between the frame and what it holds |
 | Flush | `flush` — the one word on a part that turns its inset off, because its content reaches the edge of the frame |
 | Card | `DSCard` — the block that frames one thing. It stays beside the container |
@@ -41,7 +41,7 @@ A container is an optional block. A page uses one when a part of it has a header
 | Content | `DSContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
 | Footer | `DSContainer.Footer` | none or one | `flush`, and no other prop |
 
-The parts sit in one order: the header, then the content, then the footer. The header places its first block at the start and its last at the end. The footer starts its blocks at the start edge. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and a fifth, `unframed`, that holds a part out of the frame.
+The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a container and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and a fifth, `unframed`, that holds a part out of the frame.
 
 ### What a page puts in each part
 
@@ -53,7 +53,7 @@ What a page puts in each part follows one form. A person then finds the name and
 | Content | one part, or several parts each under its own title. The action of one part stands at the end of that part's title | a person sees which part an action changes, because the action stands on the title of that part and not in the header |
 | Footer | what closes the work of the container, such as the two actions that save an entry or leave it. It stands inside the outline, under a line | the actions that end the work are met last, after everything they act on |
 
-- **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block at the start and its last block at the end, so the title and the actions need no placing by the page.
+- **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
 - **A container MUST give the title in its header the level `CONTAINER`, and a listing that is the page MUST give it `PAGE`** (`RD.SUPPORT.SURFACE.107`). The title of a header is an item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. A container that takes an item line as its header takes `pageLevel` and passes it on to that item line. So every page of an app opens with the same head, and only its body differs.

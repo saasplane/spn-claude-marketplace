@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "00a88f26"
+      "seen": "e4e50fc9"
     }
   ]
 }
@@ -211,7 +211,7 @@ A widget, a container and a layout carry their layer as the last word of the nam
 
 ## Marking each property — ✅
 
-Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has. Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size and the frame setting each have a hook of one value, which takes the block's own prop. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
+Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has. Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size context has a hook of one value, `useDSSize`, and the block's own `size` wins over it. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
 
 ## Each shared state has one picture — ✅
 

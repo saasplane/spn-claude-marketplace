@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "07f114b7"
+      "seen": "a4c5b708"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -111,7 +111,7 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   fontFamily: 'DSThemeSans',
   radius: DSThemeRadiusType.MEDIUM,
   container: {
-    frames: [DSContainerFrameType.CONTENT, DSContainerFrameType.FOOTER],
+    frames: [DSPageLevelPartType.CONTENT, DSPageLevelPartType.FOOTER],
     color: DSSurfaceColorType.BASE,
     strength: DSSurfaceStrengthType.SUBTLE,
     raised: true,
@@ -161,10 +161,10 @@ the app's own setting
 | Setting | Who sets it for the blocks inside | How far it travels |
 | --- | --- | --- |
 | Color | a block with a surface treatment | to its own text and icons |
-| Size | whoever composes a region: the app, a container, a card, a widget or a composite, or the page | all the way down, until a block that passes its size on sets another |
+| Size | whoever composes a region: a container, a card, an overlay, a widget or a composite, written from its `size`, or the page by writing `size` on the box that holds the region | all the way down, until a block that passes its size on sets another |
 | Frame | a part of a container or of a card that has `flush` | to the block that uses it. A card and an overlay stop the setting that comes from outside them |
 
-Only these blocks pass their size on: `DSApp` (from the theme) to every block of the app; `DSContainer` to every block inside it; `DSCard` to every block inside it, and a card that states no size hands on the size it stands in; a widget or a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls); `DSScope` with a `size`, written by the page, to everything in that region. No other block passes its size on — a dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a container or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
+Only these blocks pass their size on: `DSContainer` to every block inside it, and where none did the theme's size stands; `DSCard` to every block inside it, and a card that states no size hands on the size it stands in; a widget or a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls). No other block passes its size on — a dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a container or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
 
 ## What only a browser needs — ✅
 

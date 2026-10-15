@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "0919eca2"
+      "seen": "01ecd475"
     }
   ]
 }
@@ -22,7 +22,7 @@
 
 **A name is the book's, and TypeScript adds only its form.** The Surface construct states the name of a component, of a prop and of a closed value. This stack adds the form and nothing else: `DS` + PascalCase for a component, `I` + that name + `Props` for its props, a `Type` suffix for an enum, and `DS_` + UPPER_SNAKE for a constant map. A prop the book renames takes the book's name.
 
-**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSScopeSize` and `useDSOverlayConfirm`. [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md) states the rule. The two contexts realized — the app context, the design-system context, `DSScope`, the default size and the tokens a component may consume — are [`../../../surface/providers.md`](../../../surface/providers.md)'s, which this package's own interior realizes.
+**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSSize` and `useDSOverlayConfirm`. [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md) states the rule. The two contexts realized — the app context, the design-system context, the size context and the page-level context, the default size and the tokens a component may consume — are [`../../../surface/providers.md`](../../../surface/providers.md)'s, which this package's own interior realizes.
 
 **Every web app declares the same scripts, and a separate preview script is not among them** — it was the start script under another name and is retired. **The test bundle is a flavour of the build, never a second script.**
 

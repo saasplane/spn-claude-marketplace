@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "1baa132a"
+      "seen": "39a938a3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "70c02fa5"
+      "seen": "04627db3"
     }
   ]
 }
@@ -72,7 +72,7 @@ The first five rules say what a page shows, and where.
 | A label | A value **MUST** take a label only where a person cannot tell what the value is without one (`RD.SUPPORT.SURFACE.056`). A name, a picture, a state and an email need none. An address, an owner, a date and a limit each keep their label. This rule is proposed | cover the label and look at the value alone. If you can still tell what the value is, the label is a finding |
 | A frame | A part of a page **MUST** take a frame of its own only when it has a title of its own, and also an action of its own or data it loads by itself (`RD.SUPPORT.SURFACE.057`). The record a page is about is the header of the page, and it **MUST NOT** take a frame. This rule is proposed | for each framed part, find its title, and then its own action or its own loading. A frame with no title, or with neither of the other two, is a finding |
 | A state | A state **MUST** be shown as a badge (`RD.SUPPORT.SURFACE.058`). It stands on the line of facts under the title, before the other facts, or at the end of the line, and the page chooses by the room the screen gives. It **MUST NOT** stand after the title. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title is a finding, and so is a badge for the normal state |
-| The end of a line | What stands at the end of a line is the page's own: its actions, a badge, or both (`RD.SUPPORT.SURFACE.059`). A line that leads to a page **MUST** show the arrow where its end holds no action. A line that has an action **MUST** give it at its end, and it shows no arrow (`RD.SUPPORT.SURFACE.087`). The arrow is off unless the page asks for it | read the end of each line. A line that leads to a page and shows neither an action nor the arrow is a finding, and so is an arrow on a line that leads nowhere |
+| The end of a line | What stands at the end of a line is data: a badge, a count, a status, or the arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.178`). A line **MUST NOT** hold an action at its end: the actions of a line stand in the header, the row or the table that holds it. A line that leads to a page **MUST** show the arrow where its row holds no action. A row that has an action **MUST** give it at the end of the row, and it shows no arrow (`RD.SUPPORT.SURFACE.087`). The arrow is off unless the page asks for it | read the end of each line. A line that leads to a page and shows neither an action nor the arrow is a finding, and so is an arrow on a line that leads nowhere |
 | A count | A page pattern **MUST NOT** depend on a count (`RD.SUPPORT.SURFACE.050`). A group **MUST** show how many items it has only where the server gives that number together with the groups | read the page as if no count had come. A part that is then empty or wrong is a finding |
 
 - **A badge that says what kind of thing a record is MUST follow the rule of a state.** It stands on the line of facts, as one of the facts, and never after the title.
@@ -155,7 +155,7 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.056` | when a value takes a label. The rule is proposed |
 | `RD.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
 | `RD.SUPPORT.SURFACE.058` | a state and a kind are badges on the line of facts, and the normal state shows none |
-| `RD.SUPPORT.SURFACE.059` | what stands at the end of a line is the page's own, its actions, a badge or both, and when a line shows its arrow |
+| `RD.SUPPORT.SURFACE.059` | what stands at the end of a line is data, a badge, a count, a status or the arrow, never an action, and when a line shows its arrow |
 | `RD.SUPPORT.SURFACE.133` | a unit in a narrow place of a wide window may arrange itself by the width of its place. It is a MAY |
 | `RD.SUPPORT.SURFACE.087` | the arrow of a line that leads somewhere may stand after its actions. It is a MAY |
 | `RD.SUPPORT.SURFACE.060` | a field a person enters has its title above its control, with one line under it |

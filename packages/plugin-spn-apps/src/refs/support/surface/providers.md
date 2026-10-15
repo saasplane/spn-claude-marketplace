@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "699a49a8"
+      "seen": "e4824e5c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
-      "seen": "545065fe"
+      "seen": "ff74c8de"
     }
   ]
 }
@@ -49,16 +49,16 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 | Design-system context | `IDSContextProps` — `theme`, the whole theme `IDSTheme` with every value, `themeChoice`, the `DSDeepPartialType<IDSTheme>` the app chose, `setTheme`, `device`, `navigate`, `transformImageUrl`, `getImagePlaceholderUrl`, `getImageErrorUrl`. `DSApp` keeps `device` live: the app passes the first value, and the device then follows the window across a screen class and a turn |
 | Theme lifecycle | the app seeds the choice as `theme` in `IDSContextConfigProps`; `DSApp` holds it and lays it over `DS_THEME_DEFAULT`, field by field; `setTheme` takes a new choice from any depth |
 | Preferences and formatting | format components and helpers read the context's info, and never the browser locale. The app context holds the date format, the number format and the time format as required facts, and no unit falls back to a format of its own. `DSFormatDateTime` and `DSFormatDate` take `type`, a `DSFormatDateType`, and `AGO` writes how long ago in words |
-| Density | `size` is optional on the choice and held on the theme, `SM` by default. `useDSScopeSize` resolves a component rendered without `size`: the nearest block above that sets one, then the theme's `size` |
-| The scope | `DSScope` sets the size or the frame setting for what it holds. A page writes `<DSScope size={…}>` around a region. A part of a container with `flush` wraps what it holds in `DSScope framed`; without `flush` it sets no frame setting. A card, and each overlay that holds blocks, wrap what they hold in `DSScope framed={false}`. An unset `framed` passes the setting on |
+| Density | `size` is optional on the choice and held on the theme, `SM` by default. `useDSSize` resolves a component rendered without `size`: the nearest box or composite above that sets one, then the theme's `size` |
+| The size and the place | `DSSizeContext` holds only the size a box or a composite set below the root, and `useDSSize` returns it, else the theme's. `DSPageLevelContext` holds the level of the box, the part of it a block stands in and `flush`; every box writes it for each part through `DSPageLevel`, and as a header it lays out a title and its actions. A page writes `size` on the box that holds a region |
 | Overlays | `DSOverlayContext.showComponent` plus `useDSOverlayConfirm` — no screen mounts a dialog into the tree. `showComponent` hands back the function that removes what it showed, and `useDSOverlayRoute` shows an overlay while the match the app's router gives it holds a value |
-| Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSScopeContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes; `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |
+| Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSSize` · `useDSPageLevelContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |
 
 The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/boot/` (the system's own composition — `DSApp`, the contexts, the roots it mounts); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group); `ui/widgets/` (assembled surfaces mounted whole: the core widgets, which are the data table, the filter bar and the card widget, and `DSListDetailWidget`, this stack's own unit, which places a list beside the detail of its chosen row for a page of groups and their items. Its `listWidth` takes `DSListDetailWidgetListWidthType`: `WIDE`, the default and 320px, `NARROW`, 256px, and `COMPACT`, 224px. The unit has no stacked form: below a desktop it shows one of the two sides at a time); `ui/layouts/` (the app layout); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `ui/managers/` (cross-cutting runtime helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
 
 The tokens sit in tiers, and a component sees only the roles and the scale: Tier 0 the seed (one brand value); Tier 1 the ramps (generated from the seed; neutral and status ramps fixed); Tier 2 the roles (mode-adaptive surface / foreground / accent tokens) and the scale (fixed by the design system); Tier 3 components (`variant` × `color` → role classes). A component consumes role tokens, never ramps and never the seed — reaching past the role layer is what makes dark mode a second component tree instead of a mode flip. Light and dark are one re-pointing of the role layer, not a parallel stylesheet. A component reads the scale through the size maps, never a number of its own.
 
-`@saasplane/support-web-ds-ts` 2.1.0 builds the container, the context that carries a frame (`DSScope`), the theme's choices, the inset of the main area, the page's fill, the layout's own measures, and how the navigation behaves.
+`@saasplane/support-web-ds-ts` 2.1.0 builds the container, the contexts that carry the size and the level, the part and `flush` of a place, the theme's choices, the inset of the main area, the page's fill, the layout's own measures, and how the navigation behaves.
 
 `web-ds-showcase-ts` is the `ts` provider's showcase, built with Storybook. The outline in `delivery-showcase.md` leaves one measure to the stack, the width under which a page is narrow: in this showcase a page is narrow below 768 px.
 
