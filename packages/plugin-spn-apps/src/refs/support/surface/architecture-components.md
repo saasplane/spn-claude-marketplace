@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "e7907d1c"
+      "seen": "3d0514c1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "a1bd2834"
+      "seen": "8e86d693"
     }
   ]
 }
@@ -235,14 +235,14 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 
 | `pageLevel` | The item line is the title of | Its title | Its description | Its facts | A badge in its facts |
 | --- | --- | --- | --- | --- | --- |
-| `PAGE` | the whole page, such as the header of a record or of a listing that is the page | `HEADING_MD`, 28px | `CONTENT_XL`, 18px | `CONTENT_MD`, 14px | `MD` |
-| `CONTAINER` | a container, and a dialog, a sheet or a drawer | `HEADING_SM`, 22px | `CONTENT_LG`, 16px | `CONTENT_MD`, 14px | `MD` |
-| `WIDGET` | a widget or a card, and a confirmation | `TITLE_XL`, 18px | `CONTENT_MD`, 14px | `CONTENT_MD`, 14px | `SM` |
-| `GROUP` | an inner part of a widget, such as the head of a part of a card | `HEADING_XXS`, 14px, in the quiet tone | `CONTENT_MD`, 14px | `CONTENT_MD`, 14px | `SM` |
+| `PAGE` | the whole page, such as the header of a record or of a listing that is the page | `HEADING_SM`, 22px | `CONTENT_XL`, 18px | `CONTENT_MD`, 14px | `MD` |
+| `CONTAINER` | a container, and a dialog, a sheet or a drawer | `HEADING_XS`, 18px | `CONTENT_LG`, 16px | `CONTENT_MD`, 14px | `MD` |
+| `WIDGET` | a widget or a card, and a confirmation | `TITLE_LG`, 16px | `CONTENT_MD`, 14px | `CONTENT_MD`, 14px | `SM` |
+| `GROUP` | an inner part of a widget, such as the head of a part of a card | `HEADING_XXS`, 14px, in the quiet tone | `CONTENT_SM`, 13px | `CONTENT_MD`, 14px | `SM` |
 | `CONTENT` | a row among others, such as a row of a list or of a card. It is the default | `TITLE_SM`, 13px | `CONTENT_SM`, 13px | `CONTENT_SM`, 13px | `XS` |
 | `INLINE` | a value inside another unit, such as a row of a popover, of a menu or of a cell | `TITLE_XS`, 12px | `CONTENT_XS`, 12px | `CONTENT_XS`, 12px | `XS` |
 
-- **The `pageLevel` of an item line MUST alone decide the type of its title, its description and its facts, the size of a badge among its facts, and the size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the level, and writes no type step, no badge size and no scale size. `DSItem` takes no `size`. So the header of a record, the title of a container, of a widget and of a group, and a row keep one shape on every page. The titles run 28, 22, 18, 14, 13 and 12px from the page down to a small row.
+- **The `pageLevel` of an item line MUST alone decide the type of its title, its description and its facts, the size of a badge among its facts, and the size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the level, and writes no type step, no badge size and no scale size. `DSItem` takes no `size`. So the header of a record, the title of a container, of a widget and of a group, and a row keep one shape on every page. The titles run 22, 18, 16, 14, 13 and 12px from the page down to a small row.
 - **The title MUST take the body tone, and the title of a group the quiet tone. The description and the facts MUST take the muted tone** (`RD.SUPPORT.SURFACE.143`). So a group's bold 14px title stands a step back from the rows under it.
 - **A badge among the facts MUST take the size of its level, two levels to a size:** `MD` at `PAGE` and `CONTAINER`, `SM` at `WIDGET` and `GROUP`, and `XS` at `CONTENT` and `INLINE`. Its words are then 14, 13 and 12px. No badge is smaller than `XS`, the smallest of the standard sizes.
 - **The description MUST stand directly under the title, and the line of facts MUST stand 2px under whatever stands above it** (`RD.SUPPORT.SURFACE.135`). Each row of the text takes the line height of its own type step, 1.2 for a Heading, 1.3 for a Title and 1.5 for Content. A line of facts is as tall as its words, or as its badge where the badge is taller.
@@ -282,7 +282,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 > [!NOTE]
 > **Still open, each with its lean.**
 > - **Whether the item line follows the density of its place.** Today a row pads by the size of its place and its look does not follow it. The lean is that it follows the place's density, with no prop on the item.
-> - **The looks on a phone.** The lean is that the head of a page, a container and a widget each step down one size there, to `HEADING_SM`, `HEADING_XS` and `TITLE_LG`, so the titles run 22, 18, 16, 14, 13 and 12px, and that a row a person presses is at least 44px tall.
+> - **The looks on a phone.** The titles keep the sizes of the desktop there, 22, 18, 16, 14, 13 and 12px, and the lean is that a row a person presses is at least 44px tall.
 > - **`INLINE` against `DSActorView`.** `DSActorView` draws who did a thing and when, and it does not use the item line. One way is that a page writes an item line at `INLINE` in its place. The other is that `DSActorView` keeps its name and draws an item line at `INLINE` inside. Neither is leaned to yet.
 > - **The shade of the titles at `PAGE`, `CONTAINER` and `WIDGET`.** They take the body tone. Drawing them in the strongest text, with the descriptions muted, is open, and it is not leaned to yet.
 > - **Muted words on a row under the pointer.** The muted tone falls under 4.5 to 1 on a hovered, a tinted or a chosen row, as the roles (`architecture-core.md`) state. Nothing is changed for it yet.
@@ -376,7 +376,7 @@ A title and a heading share sizes, so the size does not say which family a text 
 | a number, a price, the line of a hero | a heading step above `HEADING_XL`, in a component of the builder's own | one or two |
 
 - **A listing that is the page MUST give the header of its container the level `PAGE`.** A listing that is a part of a page takes `CONTAINER`, the level its box gives. So every page of an app opens with the same head, and only its body differs.
-- **Every level of a page MUST have its title, and a title MUST be larger than the titles of what stands under it** (`RD.SUPPORT.SURFACE.112`). The titles run 28, 22, 18, 14, 13 and 12px from the page down to a value inside another unit. In a page with one container that holds a card, they are the `h1`, an `h2`, an `h3` and an `h4`, and a row is no heading.
+- **Every level of a page MUST have its title, and a title MUST be larger than the titles of what stands under it** (`RD.SUPPORT.SURFACE.112`). The titles run 22, 18, 16, 14, 13 and 12px from the page down to a value inside another unit. In a page with one container that holds a card, they are the `h1`, an `h2`, an `h3` and an `h4`, and a row is no heading.
 - **An inner part of a widget MUST draw its title as an item line at the level `GROUP`.** The action of the group stands at the end of that item line. So a group needs no block and no prop of its own.
 
 ### The two blocks of a field
