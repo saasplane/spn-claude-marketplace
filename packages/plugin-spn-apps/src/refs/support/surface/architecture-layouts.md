@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "b16ca0da"
+      "seen": "db8b66df"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "ed11d466"
+      "seen": "7b2199d5"
     }
   ]
 }
@@ -75,6 +75,7 @@ A layout names no routing library — it moves between pages through the navigat
 - **The page's fill is `page/fill`, and the colour of the theme's content sets it** (`RD.SUPPORT.APPS.160`). The default theme's content colour is `BASE`, so the page is white in light and 0.22 in dark under a shell of `DEFAULT` at `SUBTLE`, and a raised container stands out by its line and its shadow. Nothing works the colour out from the containers. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
 - **The layout gives the main area its gutter from the content look, `gutter`, of `NONE`, `SM` and `MD`, and the gutter of `CANVAS` is `NONE`** (`RD.SUPPORT.APPS.161`). `NONE` is 0, `SM` 16 and `MD` 24, which draws 16 on a phone, and `MD` is `layout/main-inset`. The theme gives every app `MD`. A page whose bands run from edge to edge takes `CANVAS`, or writes `gutter: NONE`. The page writes no padding of its own.
 - **The bar's items and the page's content stand in one box in every layout type** (`RD.SUPPORT.SURFACE.172`). The box is the content look's width, centred, with the gutter as its side padding, so the first item of the bar starts where the content starts and its last item ends where it ends, at every width. At `NONE` the bar's padding is 16 so its items never touch the window, and under `NARROW` the bar takes the `WIDE` box. With `inset` the sheet holds the same box, its side padding the gutter less the sheet's 8 px margin, so the edges still meet; a dock's sheet stands at the box's edge and keeps the whole gutter inside. The page writes no padding to line up with the bar.
+- **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RD.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. The app gives a `TOPNAV` only the entries that fit, grouping the rest, and an app with many sections takes `RAIL` or `DOCK`. Below `md` the list stays in the menu button.
 - **The size of the main area is the content look's `width` and `maxWidth`, of `FULL`, `WIDE` and `NARROW`** (`RD.SUPPORT.SURFACE.158`). `FULL` is the whole window, `WIDE` is at most `layout/shell` wide (1280 px) and centred, and `NARROW` is at most `layout/narrow` wide (768 px) and centred. The theme gives every type `FULL`. `maxWidth` moves the width of `WIDE`. `NARROW` narrows only the page, in a dock the page beside the column, so the body and its bar stay at `WIDE`. Size and padding stay apart, so edge to edge is `width: FULL` with `gutter: NONE`. The config of every type is `IDSLayoutConfig`, with `mtype` and a `content` look the page changes field by field, and `IDSLayoutConfigNav` adds the navigation and its places for `RAIL`, `DOCK` and `TOPNAV`. The config has no `contentWidth` and no `maxWidth` of its own.
 - **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the body at `WIDE`, the width of the page at `NARROW` and the gutter of the main area. No layout holds one as a number.
 
@@ -145,6 +146,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.SURFACE.158` | the main area is one look, the content's: its colour, strength and inset, its width and maximum width, and its gutter |
 | `RD.SUPPORT.SURFACE.165` | the edge line of a rail follows the shell's `bordered` |
 | `RD.SUPPORT.SURFACE.172` | the bar's items and the page's content stand in one box, the width centred with the gutter as its padding |
+| `RD.SUPPORT.SURFACE.173` | a top navigation holds the few entries that fit, on one line, and moves none of them |
 | `RD.SUPPORT.SURFACE.157` | the layout types with `CANVAS`, the places named by where they stand and held in the config by `mtype`, the layouts built from the navigation units, and that the layouts alone read the theme |
 
 ## Proof
