@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "873556aa"
+      "seen": "06ca76ef"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "7b1a7606"
+      "seen": "07f114b7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -92,7 +92,7 @@ The layout look, `IDSThemeLayout`, has two parts and no more: `shell`, the look 
 - **A surface MUST take its look as a colour, a strength and an opacity, each from its own closed set.**
 - **In dark, a stronger shell MUST be darker than the page, and never lighter.**
 - **The content MUST take every colour and every strength**, so a marketing page can draw its bands. **Where the body text of the units would fall under 4.5 to 1 on the fill of the content — a `QUIET` or `SOLID` content — the content MUST give the units inside it the tokens of the opposite mode**, scoped to the content, as dark mode does for the page.
-- **A field of the layout look that the app leaves out MUST take the value of the default theme.** Every layout reads the one theme, so no layout keeps a default of its own. Where the colour of the content is left out, it follows the containers: raised containers put the page on the light grey, `DEFAULT`, and any other containers on the surface of the page, `BASE`.
+- **A field of the layout look that the app leaves out MUST take the value of the default theme.** Every layout reads the one theme, so no layout keeps a default of its own. Where the colour of the content is left out, it is `BASE`, the surface of the page, under a shell of `DEFAULT` at `SUBTLE`: nothing works it out from the containers (`RD.SUPPORT.APPS.160`).
 - **The layout look MUST take no colour value, no opacity value and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting of its own: it follows from the kind of entry and the fill of the shell.
 - **Size and padding stay apart in the content look.** Edge to edge is `width: FULL` with `gutter: NONE`. The theme gives every app `FULL` and `MD`, and `CANVAS` takes `NONE`. The top bar keeps its own padding and lines up with the width, and with `inset` the gutter is inside the sheet.
 - **The layout type is not part of the layout look.** A marketing page takes the layout type `CANVAS`, and draws its bands in the main area. The layouts alone read the layout look, and a layout's config can give one page a content look of its own.
@@ -126,12 +126,12 @@ export const DS_THEME_DEFAULT: IDSTheme = {
       color: DSSurfaceColorType.DEFAULT,
       strength: DSSurfaceStrengthType.SUBTLE,
       opacity: DSSurfaceOpacityType.OPAQUE,
-      entry: DSNavEntryType.SUBTLE,
+      entry: DSNavEntryType.QUIET,
       bordered: true,
       raised: true,
     },
     content: {
-      color: DSSurfaceColorType.DEFAULT,
+      color: DSSurfaceColorType.BASE,
       strength: DSSurfaceStrengthType.SUBTLE,
       inset: false,
       width: DSLayoutWidthType.FULL,
@@ -143,8 +143,8 @@ export const DS_THEME_DEFAULT: IDSTheme = {
 
 - **The app and its context MUST hold the whole theme, `theme`, and the choice beside it, `themeChoice`** (`RD.SUPPORT.SURFACE.161`). So a form can mark a default and reset a choice. `DSApp`, `setTheme` and the form take the choice. A second, resolved type exists nowhere.
 - **The defaults MUST be written in one place, the default theme.** A unit and a layout read the theme, and keep no fallback of their own for a value of it. A unit's own prop, optional, still wins.
-- **Some values MUST be worked out from the choice, and not fixed.** The colour of the content follows the containers: raised containers put the page on the light grey, `DEFAULT`, and any other containers on `BASE`. A value of the card look follows the container's choice where the app chose one, else the default.
-- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, quiet, marked as the default; a value worked out says what it follows. Each field can clear its choice, and *Reset to defaults* clears every choice, so the page receives an empty choice.
+- **Some values MUST be worked out from the choice, and not fixed.** A value of the card look follows the container's choice where the app chose one, else the default.
+- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, quiet, marked as the default; a value worked out says what it follows. Each field can clear its choice, and *Reset to defaults* clears every choice, so the page receives an empty choice. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`): the mark or the link *Use the default* stands at the end of a field's label line, and a switch stands with its own label, its mark or link on the note line.
 
 ## Prop, nearest block, app — 🔮
 
@@ -194,6 +194,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
+| `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is drawn only when it holds something; the theme's form is built on it |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
 | `RD.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |
 

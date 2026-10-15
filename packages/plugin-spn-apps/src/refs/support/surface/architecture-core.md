@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "ba3a5a49"
+      "seen": "fdb47461"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "cff70931"
+      "seen": "7efc5a38"
     }
   ]
 }
@@ -52,7 +52,8 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163` and `166`).
 - **In dark, a surface MUST be a dark grey, and never black.** The sunken surface and the side bar stand a shade under the page, and the page, a raised surface and the fills under the pointer each stand a step lighter than the one before: 20%, 22%, 26.5% and 29% lightness, and 34% for the strong fill under the pointer. Light changes only by the two new roles. So a person tells them apart by their fill.
 - **Surfaces MUST be told apart by their fill first, and by a line second.** The border in dark is a quiet, opaque grey, a little lighter than a tinted fill.
 - **A line MUST be chosen by what it parts.** Between rows it is `surface-divider`, neutral 100 in light and 27% in dark. At an edge it is `surface-border`, and at a control `surface-border-strong`.
-- **The fill under the pointer MUST NOT be the grey of the edge in light.** `surface-hover` is one step lighter than the border there. In dark the two stand at 29%, and the divider under both at 27%.
+- **The fill under the pointer MUST NOT be the grey of the edge in light.** `surface-hover` is one step lighter than the border there. In dark the border stands at 32%, a clear step above the raised surface at 26.5%, the strong border at 40%, the fill under the pointer at 29% and the divider at 27%.
+- **A control's edge, and the off track of a switch, MUST step one small step from the strong border under the pointer** (`RD.SUPPORT.SURFACE.167`): neutral 300 to 400 in light, and 0.40 to 0.48 lightness in dark, drawn in full. The role is the edge under the pointer, `--surface-border-hover`.
 - **A card or a container takes `color` and `strength`, `BASE` by default. A dialog, a sheet and a drawer are `BASE`, and a popover, a menu and a tooltip are raised, each fixed.**
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. `surface-inset` is the fill of `SUBTLE` in the default hue.
 - **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and an icon mark read the strong step. The other hues keep their own step.

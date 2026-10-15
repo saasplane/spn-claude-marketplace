@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "b31c1cad"
+      "seen": "fbba9bba"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "814b72ad"
+      "seen": "e4d50059"
     }
   ]
 }
@@ -72,7 +72,7 @@ A layout names no routing library — it moves between pages through the navigat
 
 ## The main area — 🔮
 
-- **The page's fill is `page/fill`, and the colour of the theme's content sets it** (`RD.SUPPORT.APPS.160`). Where the app chose no colour for the content, the theme takes it from the containers: raised containers put the page on the light grey, `DEFAULT`, so a raised frame shows, and any other containers on the surface of the page, `BASE`. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
+- **The page's fill is `page/fill`, and the colour of the theme's content sets it** (`RD.SUPPORT.APPS.160`). The default theme's content colour is `BASE`, so the page is white in light and 0.22 in dark under a shell of `DEFAULT` at `SUBTLE`, and a raised container stands out by its line and its shadow. Nothing works the colour out from the containers. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
 - **The layout gives the main area its gutter from the content look, `gutter`, of `NONE`, `SM` and `MD`, and the gutter of `CANVAS` is `NONE`** (`RD.SUPPORT.APPS.161`). `NONE` is 0, `SM` 16 and `MD` 24, which draws 16 on a phone, and `MD` is `layout/main-inset`. The theme gives every app `MD`. A page whose bands run from edge to edge takes `CANVAS`, or writes `gutter: NONE`. The page writes no padding of its own.
 - **The size of the main area is the content look's `width` and `maxWidth`, of `FULL`, `WIDE` and `NARROW`** (`RD.SUPPORT.SURFACE.158`). `FULL` is the whole window, `WIDE` is at most `layout/shell` wide (1280 px) and centred, and `NARROW` is at most `layout/narrow` wide (768 px) and centred. The theme gives every type `FULL`. The contents of a top bar follow the width of the body and the bar keeps its own padding, and `NARROW` narrows only the page, in a dock the page beside the column, so the body and its bar stay at `WIDE`. `maxWidth` moves the width of `WIDE`, and with `inset` the gutter is inside the sheet. Size and padding stay apart, so edge to edge is `width: FULL` with `gutter: NONE`. The config of every type is `IDSLayoutConfig`, with `mtype` and a `content` look the page changes field by field, and `IDSLayoutConfigNav` adds the navigation and its places for `RAIL`, `DOCK` and `TOPNAV`. The config has no `contentWidth` and no `maxWidth` of its own.
 - **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the body at `WIDE`, the width of the page at `NARROW` and the gutter of the main area. No layout holds one as a number.
@@ -88,7 +88,7 @@ A layout has two parts for its look, whatever its type. The shell is the bars of
 | `TOPNAV` | the bar across the top | the main area |
 | `CANVAS` | none | the main area, with the gutter `NONE` |
 
-- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw the default shell: the neutral hue at `SUBTLE`, with a line and a shadow, and the open entry `SUBTLE`.
+- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw the default shell: the neutral hue at `SUBTLE`, with a line and a shadow, and the open entry `QUIET`.
 - **The shell holds no colour of its own: each part of its look points at a token** (`RD.SUPPORT.SURFACE.163`). **The edge line of a rail follows the `bordered` of the shell** (`RD.SUPPORT.SURFACE.165`), inset or not.
 - **The thin bar over the content of `RAIL` MUST belong to the content.** It takes the fill of the content, and it stands inside the sheet where the content is inset.
 - **`inset` of the content MUST draw the content as a sheet.** The sheet has the corner radius of the theme. It is set into the shell with a gutter, and the fill of the shell shows around it.

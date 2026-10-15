@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "d8a9906d"
+      "seen": "dc6767bf"
     }
   ],
   "decisions": [
@@ -45,7 +45,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.160",
-      "seen": "46b1e8cd"
+      "seen": "4d2e3144"
     },
     {
       "repo": "spn-foundation",
@@ -83,7 +83,7 @@ The question it holds: *can this person finish what they came to do, and do they
 
 - **The page has one purpose and one main action.** Ask what the person came here to do. An answer that needs *and* is two pages. Several actions of equal weight leave the person to work out what the page is for (standards § A page has one purpose).
 - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area. A page that draws its own navigation has taken the layout's job. A layout that arranges the page's blocks has taken the page's (standards § The levels · `RD.SUPPORT.APPS.146`).
-- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the colour of the theme's content — where the app chose none it follows the containers, the light grey under raised containers — and no page or story sets a fill of its own. The layout gives the main area its gutter from the content look, `NONE`, `SM` or `MD`, and the gutter of `CANVAS` is `NONE`; a page whose bands run edge to edge takes `CANVAS`, or writes `width: FULL` and `gutter: NONE` (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`).
+- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the colour of the theme's content — where the app chose none it is `BASE`, the surface of the page, whatever the containers are — and no page or story sets a fill of its own. The layout gives the main area its gutter from the content look, `NONE`, `SM` or `MD`, and the gutter of `CANVAS` is `NONE`; a page whose bands run edge to edge takes `CANVAS`, or writes `width: FULL` and `gutter: NONE` (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`).
 - **The theme styles the layout in two parts, the shell and the content, in every layout type.** A look that a page or one layout type writes for the shell or the content is a finding. An entry of the navigation is drawn by the entry kind its look names, and an open entry that could be mistaken for one under the pointer is a finding. A navigation unit that reads the theme itself, or a layout that draws a navigation of its own, is a finding: the layouts alone read the theme and hand the look down (`RD.SUPPORT.SURFACE.155`, `RD.SUPPORT.SURFACE.156`). A panel of entries of the navigation takes the look of the shell, and a menu of actions, such as the menu of the account, does not (layout § The shell and the content · `RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.140`). A unit or a layout that keeps a fallback of its own for an unset theme value is a finding: the defaults live once, in the default theme (`RD.SUPPORT.SURFACE.161`).
 - **The navigation behaves the same in every layout type.** An item's actions are reachable without hover, wherever the item is drawn as a row. A closed group that holds the current page shows the selected mark. A shut group's flyout opens on a press, and hover shows only its name. The narrow dock keeps its back link (layout and container § How the navigation behaves · `RD.SUPPORT.APPS.163`).
 - **A framed part reads header, content, footer, in that order.** The title and the actions of a part then sit in the same place on every page. A container inside a container is a finding (layout and container § The container · `RD.SUPPORT.APPS.147`).
