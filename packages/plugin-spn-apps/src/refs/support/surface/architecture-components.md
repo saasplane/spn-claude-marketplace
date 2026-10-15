@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "a1a7b2f5"
+      "seen": "583224ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "b97284f7"
+      "seen": "bf09f476"
     }
   ]
 }
@@ -385,10 +385,11 @@ A field has two blocks, one to enter a value and one to read it.
 
 | The field | Its block | What the block draws |
 | --- | --- | --- |
-| A field a person enters | `DSForm.Field` | its title above its control, and one line under the control that holds its description, or its error in place of the description. The line is drawn only when it holds something. Its label line reads the label, the `info` mark, and `labelEndNode` at the right end |
+| A field a person enters | `DSForm.Field` | its title above its control, and one line under the control that holds its description, or its error in place of the description. The line is kept where the field can fail or has a description, and drawn nowhere else. Its label line reads the label, the `info` mark, and `labelEndNode` at the right end |
 | A field a person reads | `DSDataUnit` | its title above its value, with no box around the value. A value that is empty shows a dash |
 
-- **`DSForm.Field` MUST take `labelEndNode` at the end of its label line, and draw its message line only when it holds something** (`RD.SUPPORT.SURFACE.169`). The label line reads the label, the `info` mark right after the label's text, then `labelEndNode` at the right end. Only the label shrinks when room runs out, cut with an ellipsis and its whole text shown on hover; the mark and the end node never shrink. A switch or a checkbox stands in a field with no `label` and `inline`, and the field's note lines up under the control's own label.
+- **`DSForm.Field` MUST take `labelEndNode` at the end of its label line** (`RD.SUPPORT.SURFACE.169`). The label line reads the label, the `info` mark right after the label's text, then `labelEndNode` at the right end. Only the label shrinks when room runs out, cut with an ellipsis and its whole text shown on hover; the mark and the end node never shrink. A switch or a checkbox stands in a field with no `label` and `inline`, and the field's note lines up under the control's own label.
+- **`DSForm.Field` MUST keep its message line where the field can fail or has a description, and draw none where it has neither** (`RD.SUPPORT.SURFACE.171`). A field with validators keeps the line while it is empty, so an error that comes never moves the fields below it; the space it holds is never announced. A field with no validators and no description, such as a switch in the theme form, draws no line.
 - **A switch MUST take its own `label`, drawn beside it as a checkbox draws its own, and no description; and a control with an edge MUST step that edge under the pointer** (`RD.SUPPORT.SURFACE.167`). Pressing the label flips the switch. One label names the setting, never a label for each state. Under the pointer the off track steps from the strong border one small step, and the on track takes the primary one step lighter. A field, a select, a picker, a radio, a checkbox and a toggle at rest take the same step on their edge; a disabled control, a focused control and a control in error keep their own.
 - **The drop area of an attachment MUST be neutral in every state, take a `title` and a `description`, and in `mini` be as wide as its content** (`RD.SUPPORT.SURFACE.168`). The edge is dashed, `--surface-border-strong`, on the `--surface-sunken` fill, with no brand colour; under the pointer the edge steps to `--surface-border-hover`, and while a file is dragged over it the fill takes `--surface-hover`. The full form is a centred column of an upload-cloud icon, the title, the description in the muted tone and an outline button one size step under the control's size. Left out, the title reads "Drag files here or click to browse", with no description. `mini` is one row, as wide as its content and left-aligned.
 - **A form holds each field a person enters in `DSForm.Field`, and a page shows each field a person reads in `DSDataUnit`.** Both keep the title above, as the rules of content ask (`RD.SUPPORT.SURFACE.060`, `RD.SUPPORT.SURFACE.061`). So a record that is read and the form that changes it have the same shape.
@@ -457,7 +458,8 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.160` | an entry of the navigation is one public unit, `DSNavEntry`, with nothing pressable inside it |
 | `RD.SUPPORT.SURFACE.167` | a switch takes its own `label` and no description, and a control with an edge steps the edge, and a switch its track, under the pointer |
 | `RD.SUPPORT.SURFACE.168` | the drop area of an attachment is neutral in every state, takes a `title` and a `description`, and in `mini` is as wide as its content |
-| `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is drawn only when it holds something |
+| `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, and only its label shrinks |
+| `RD.SUPPORT.SURFACE.171` | `DSForm.Field` keeps its message line where the field can fail or has a description, and draws none where it has neither |
 
 ## Proof
 
