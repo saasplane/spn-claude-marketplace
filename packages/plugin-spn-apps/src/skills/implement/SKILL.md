@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "b252d75b"
+      "seen": "f77c57a1"
     }
   ],
   "decisions": [
@@ -113,7 +113,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
 | the head of a page that holds several containers | the head stands above the containers, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
-| the head of a page, or of a part of a page | the title of a header is an item line. A listing that is the page gives it the level `PAGE`, and any other box gives the level of its kind: `CONTAINER` for a container or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element follows the level (`RD.SUPPORT.SURFACE.106`). A page that holds several containers writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RD.SUPPORT.SURFACE.178`). The page writes no type step and no heading element |
+| the head of a page, or of a part of a page | the title of a header is an item line. A container that is the whole page says `pageLevel` `PAGE` on the box, and its header is then the page head (`RD.SUPPORT.SURFACE.179`); any other box gives the level of its kind: `CONTAINER` for a container or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element follows the level (`RD.SUPPORT.SURFACE.106`). A page that holds several containers writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RD.SUPPORT.SURFACE.178`). The page writes no type step and no heading element |
 | the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
 | where a title starts | the page writes no prop and no padding. The part that holds an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` gives it no padding at its two sides, and in a `flush` part the inset of its place (`RD.SUPPORT.SURFACE.109`). An item line draws no padding or highlight of its own, and a page writes no `bleed` (`RD.SUPPORT.SURFACE.175`) |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |

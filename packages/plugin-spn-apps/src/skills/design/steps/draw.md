@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "b252d75b"
+      "seen": "f77c57a1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
