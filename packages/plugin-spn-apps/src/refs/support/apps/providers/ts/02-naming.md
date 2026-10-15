@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "b7939ddb"
+      "seen": "add3d540"
     }
   ]
 }
@@ -93,9 +93,11 @@
 | a widget | ends in `Widget` | `RoleMembersWidget` |
 | a dialog | ends in `Dialog` | `RoleInviteDialog` |
 | a form | ends in `Form` | `RoleForm` |
-| a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RolePicker` |
+| a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RoleAutocomplete` |
 | a hook | starts with `use` | `useRoleList` |
 | a plain component | no suffix and no prefix is needed | `RoleBadge` |
+
+**A unit that chooses records ends in `Autocomplete`.** `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card` or `Picker` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
 
 **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
 
@@ -148,7 +150,7 @@
 
 **Treat a trailing acronym as a word: `Id` and `Ids`, never `ID` or `IDs`.**
 
-**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception.
+**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception. **A state carries no module code in capitals** — `NtfTemplate`, `EntComment`, `Org`, `CaptchaConfig`; the module's own word in Pascal case (`Ntf`, `Ent`, `Doc`, `Job`) is part of a state's name where the module names its states so. A module code in capitals stands only on a constant (`IAMErrorCodeType`, `NTFEntityType`), a service (`INTFTemplateService`) and the module's internal classes (`IAMRoleController`) (`RD.SUPPORT.APPS.205`).
 
 **A server module's wiring names** carry its code and kind. At the package root: `interface.ts` holds `SPModule<CODE>` (extends `SPServiceAppRuntimeModule`) and `SPModule<CODE>Config` (extends `SPServiceAppRuntimeModuleConfig`); `<CODE>RuntimeModuleManager.ts` holds class `<CODE>RuntimeModuleManager` (extends `SPServiceAppRuntimeModuleManager`); `index.ts` is the main door and re-exports only. The `remote/` folder is the second door, written by hand: `remote/interface.ts` holds `SPModule<CODE>Remote` (extends `SPServiceAppRemoteModule`), one member under `services.contract` for each contract interface, importing nothing from the module's own `interface.ts`; `remote/<CODE>RemoteModuleManager.ts` holds class `<CODE>RemoteModuleManager` (extends `SPServiceAppRemoteModuleManager`); `remote/<code>Module.ts` holds `<code>Module`, typed `SPModule<CODE>Remote`; `remote/index.ts` exports `contract/` and those three files.
 
