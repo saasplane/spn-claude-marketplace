@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "3859760a"
+      "seen": "5a68dbdd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "43ee6438"
+      "seen": "9efefb9a"
     }
   ]
 }
@@ -50,7 +50,7 @@ Eleven groups, each answering one need of a surface. The list holds the core uni
 | Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSItem` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSTable` |
 | Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | choosing from a set, a date or a time | `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` · `DSCommand` · `DSCommandPalette` · `DSDatePicker` · `DSDateRangePicker` · `DSTimePicker` · `DSDateTimePicker` · `DSCalendar` · `DSColorPicker` |
-| Data entry · Composites | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSImagePicker` |
+| Data entry · Composites | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSThemeForm` · `DSImagePicker` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
 | Structure | the small blocks that divide, scroll or fold a part of a page | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSIconMark` · `DSImage` |
@@ -396,6 +396,9 @@ A field has two blocks, one to enter a value and one to read it.
 
 - **`DSForm.Field` MUST take `labelEndNode` at the end of its label line** (`RD.SUPPORT.SURFACE.169`). The label line reads the label, the `info` mark right after the label's text, then `labelEndNode` at the right end. Only the label shrinks when room runs out, cut with an ellipsis and its whole text shown on hover; the mark and the end node never shrink. A switch or a checkbox stands in a field with no `label` and `inline`, and the field's note lines up under the control's own label.
 - **`DSForm.Field` MUST keep its message line always, and that line is the space between two fields** (`RD.SUPPORT.SURFACE.189`, which replaces the condition of `RD.SUPPORT.SURFACE.171`). The line is kept while it is empty, with a space that is never announced, so a form has one rhythm and an error or a validator added later moves nothing. A field that stands in one row, a field of a filter bar or one edited inline in a table, is not drawn through `DSForm.Field` and keeps none.
+- **A field MUST carry no space around it, and whoever places the fields MUST space them** (`RD.SUPPORT.SURFACE.195`). `DSForm` and `DSForm.Field` add no gap: the field keeps only its message line. The code that places the fields, a composite of the design system or a page, sets the space between them, vertical or horizontal. The composites of the design system that stack their fields, `DSThemeForm`, `DSDataFieldBuilder` and `DSAddressForm`, stack them 8 px apart beyond the message line, a switch or a check that carries its own label included.
+- **`DSThemeForm` MUST arrange its settings in six parts that follow the theme's keys: Global, Layout, Container, Card, Card widget and Table** (`RD.SUPPORT.SURFACE.191`). They are the sections of one `DSAccordionGroup`, several open at once and Global first. The head of each is a `DSItem`: its name, what it holds, a fact counting the settings that differ from the default, and a *Reset* of that part beside it. Inside a part the fields stand two to a row and one to a row on a phone, a field that needs the width taking the whole row. A save that finds an error opens its part and moves the focus to the field. The form offers no font family (`RD.SUPPORT.SURFACE.196`).
+- **`DSAccordionGroup` MAY be controlled, through `expandedKeys`** (`RD.SUPPORT.SURFACE.191`). Given, the open sections are exactly these keys, the options' `expanded` seeds nothing, and a press is reported through `onChange` without opening anything by itself. Left out, the group keeps its own state. **An accordion MUST fit a settings form, every field already holding a value; a task form with fields to fill MUST use one scroll or steps.**
 - **A switch MUST take its own `label`, drawn beside it as a checkbox draws its own, and no description; and a control with an edge MUST step that edge under the pointer** (`RD.SUPPORT.SURFACE.167`). Pressing the label flips the switch. One label names the setting, never a label for each state. Under the pointer the off track steps from the strong border one small step, and the on track takes the primary one step lighter. A field, a select, a picker, a radio, a checkbox and a toggle at rest take the same step on their edge; a disabled control, a focused control and a control in error keep their own.
 - **The drop area of an attachment MUST be neutral in every state, take a `title` and a `description`, and in `mini` be as wide as its content** (`RD.SUPPORT.SURFACE.168`). The edge is dashed, `--surface-border-strong`, on the `--surface-sunken` fill, with no brand colour; under the pointer the edge steps to `--surface-border-hover`, and while a file is dragged over it the fill takes `--surface-hover`. The full form is a centred column of an upload-cloud icon, the title, the description in the muted tone and an outline button one size step under the control's size. Left out, the title reads "Drag files here or click to browse", with no description. `mini` is one row, as wide as its content and left-aligned.
 - **A form holds each field a person enters in `DSForm.Field`, and a page shows each field a person reads in `DSDataUnit`.** Both keep the title above, as the rules of content ask (`RD.SUPPORT.SURFACE.060`, `RD.SUPPORT.SURFACE.061`). So a record that is read and the form that changes it have the same shape.
@@ -471,6 +474,8 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, and only its label shrinks |
 | `RD.SUPPORT.SURFACE.171` | `DSForm.Field` keeps its message line while its field can fail, a condition `RD.SUPPORT.SURFACE.189` replaces |
 | `RD.SUPPORT.SURFACE.189` | `DSForm.Field` always keeps its message line, so the line is the space between fields, and a field standing in one row keeps none |
+| `RD.SUPPORT.SURFACE.195` | a field carries no space around it, whoever places the fields spaces them, and the composites of the design system stack theirs 8 px apart |
+| `RD.SUPPORT.SURFACE.191` | `DSThemeForm` arranges its settings in six parts, as the sections of one accordion a page may control with `expandedKeys`, and an accordion fits a settings form while a task form uses one scroll or steps |
 | `RD.SUPPORT.SURFACE.190` | every overlay takes its width from one scale, `extent`, `XS` 320 px to `XL` 720, and its padding from `size`; a sheet and a drawer default to `MD`, a dialog to `XL` |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 

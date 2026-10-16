@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "06ca76ef"
+      "seen": "3e6fbd28"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "a4c5b708"
+      "seen": "407f19b2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -57,7 +57,6 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 | Brand color | the seed the primary ramp is worked out from |
 | Light or dark | which ramp step each role token points at |
 | Default size | the size step a block takes when none is set on it |
-| Font family | the typeface of every text |
 | Corner radius | one base value. The radius of every size step is worked out from it |
 | Container look | `container`: `frames`, `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for every container. A card follows its choice where the card look says nothing |
 | Card look | `card`: `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the surface of every card |
@@ -108,7 +107,6 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   primary: DS_DEFAULT_PRIMARY,                  // '#1A365D'
   mode: DSThemeModeType.LIGHT,
   size: DSSizeType.SM,
-  fontFamily: 'DSThemeSans',
   radius: DSThemeRadiusType.MEDIUM,
   container: {
     frames: [DSPageLevelPartType.CONTENT, DSPageLevelPartType.FOOTER],
@@ -144,7 +142,8 @@ export const DS_THEME_DEFAULT: IDSTheme = {
 - **The app and its context MUST hold the whole theme, `theme`, and the choice beside it, `themeChoice`** (`RD.SUPPORT.SURFACE.161`). So a form can mark a default and reset a choice. `DSApp`, `setTheme` and the form take the choice. A second, resolved type exists nowhere.
 - **The defaults MUST be written in one place, the default theme.** A unit and a layout read the theme, and keep no fallback of their own for a value of it. A unit's own prop, optional, still wins.
 - **Some values MUST be worked out from the choice, and not fixed.** A value of the card look follows the container's choice where the app chose one, else the default.
-- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, quiet, marked as the default; a value worked out says what it follows. Each field can clear its choice, and *Reset to defaults* clears every choice, so the page receives an empty choice. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`): the mark or the link *Use the default* stands at the end of a field's label line, and a switch stands with its own label, its mark or link on the note line.
+- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, quiet, marked as the default; a value worked out says what it follows. Each field can clear its choice, and *Reset to defaults* clears every choice, so the page receives an empty choice. The form arranges its settings in six parts that follow the theme's keys, as the sections of an accordion (`RD.SUPPORT.SURFACE.191`), and offers no font family. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`): the mark or the link *Use the default* stands at the end of a field's label line, and a switch stands with its own label, its mark or link on the note line.
+- **The theme MUST hold no font family** (`RD.SUPPORT.SURFACE.196`). The typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans`. A family name without its file only falls back, so a brand font is a file and a licence an app decides once.
 
 ## Prop, nearest block, app — 🔮
 
@@ -194,6 +193,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
+| `RD.SUPPORT.SURFACE.196` | the theme holds no font family: the typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans` |
 | `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is kept where the field can fail or has a description (`RD.SUPPORT.SURFACE.171`); the theme's form is built on it |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
 | `RD.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |
