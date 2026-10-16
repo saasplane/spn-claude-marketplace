@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "773892ab"
+      "seen": "e14145b3"
     }
   ]
 }
@@ -876,7 +876,8 @@ number and the subject, so the file name repeats neither. A workstream that clos
 
 **The parts of the page that the arcs decide are produced, never typed — MUST.** They are the header's
 status, the Cycles table, and the heading of `Open`. The table has two columns: Arc, with the
-title, the line and a link pill for the arc's file and each preview and sample, and Status. Run
+title, the line and one line of Key: value facts (each preview and sample by kind, linked, with
+its state; the arc file last), and Status. Run
 `spn-devex docs cycles write <workstream folder>` after any change to an arc's status, its first
 line or its `## Previews` table. The header's status reads `PLANNING` while no arc is past `DECIDED`,
 `IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes. The heading of

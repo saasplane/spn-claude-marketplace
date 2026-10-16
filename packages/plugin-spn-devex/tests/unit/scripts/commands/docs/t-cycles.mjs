@@ -115,13 +115,13 @@ try {
       previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
         `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; decided<br>` +
         `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
-    const pill = (href, text) => `<a class="sds-badge sds-lens" href="${href}">${text}</a>`;
-    ok("the Arc cell is three levels: the title in bold, the line below it, then the file and each preview as link pills",
-      arcCell(held) === `<strong>N010 &mdash; the release</strong><br>` +
-        pill("arcs/N010-the-release.md", "arcs/N010-the-release.md") + " " +
-        pill("notes/N010/previews/layout-preview.html", "layout-preview.html &middot; preview &middot; proposed") + " " +
-        pill("notes/N010/samples/close_message.md", "close_message.md &middot; sample &middot; decided") + " " +
-        pill("notes/N010/previews/first-preview.html", "first-preview.html &middot; preview &middot; decided"), arcCell(held));
+    const link = (href, text) => `<a href="${href}">${text}</a>`;
+    ok("the Arc cell is three levels: the title in bold, the line below it, then Key: value facts, each preview and sample keyed by its kind and the arc file last",
+      arcCell(held) === `<p style="margin:0 0 .3rem"><strong>N010 &mdash; the release</strong></p>` +
+        ["Preview: " + link("notes/N010/previews/layout-preview.html", "layout-preview.html") + " (proposed)",
+          "Sample: " + link("notes/N010/samples/close_message.md", "close_message.md") + " (decided)",
+          "Preview: " + link("notes/N010/previews/first-preview.html", "first-preview.html") + " (decided)",
+          "Arc: " + link("arcs/N010-the-release.md", "N010-the-release.md")].join(" &middot; "), arcCell(held));
   }
 
   console.log("\n=== docs cycles — the table the approach template carries");
@@ -130,12 +130,12 @@ try {
     ok("the header is Arc · Status, two columns",
       table.includes("<thead><tr><th>Arc</th><th>Status</th></tr></thead>") && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
     ok("a row is two cells: the Arc cell, and the Status cell with a HELD arc's reason below its word",
-      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><span class="sds-small">The plugins ship once.</span><br>` +
-        `<a class="sds-badge sds-lens" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
+      table.includes(`<tr><td><p style="margin:0 0 .3rem"><strong>N10 &mdash; the release</strong></p><p style="margin:0 0 .3rem">The plugins ship once.</p>` +
+        `Arc: <a href="arcs/N10-the-release.md">N10-the-release.md</a></td>` +
         `<td>HELD<br><span class="sds-small">waits on Q7</span></td></tr>`), table);
     ok("a RUNNING arc's Status cell is its word alone", table.includes("<td>RUNNING</td></tr>"), table);
     ok("an arc with no number still links its file",
-      table.includes(`<strong>a legacy arc with no number</strong><br><span class="sds-small">Prepared: 2026-08-31</span><br><a class="sds-badge sds-lens" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
+      table.includes(`<p style="margin:0 0 .3rem"><strong>a legacy arc with no number</strong></p><p style="margin:0 0 .3rem">Prepared: 2026-08-31</p>Arc: <a href="arcs/arc-legacy.md">arc-legacy.md</a>`), table);
 
     // The older tables are still read by header name and compared: four columns on any page, three on a closed one.
     const { tableDifferences } = cyclesModule;
@@ -413,7 +413,7 @@ ${linesFor("1.0.0").script}
       !/status badge|Cycles table to write|wrote/.test(refused.err + refused.out), refused.err + refused.out);
     const printed = await capture(["docs", "cycles", "show", own]);
     ok("[MKT.SCRIPTS.108] with no option the table is still printed from the arcs, in the shared names",
-      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<a class="sds-badge sds-lens" href="arcs/N1-the-chapter.md">`), printed.out);
+      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`Arc: <a href="arcs/N1-the-chapter.md">N1-the-chapter.md</a>`), printed.out);
     // A page under `closed/` is never read, so it is neither refused nor written.
     const shut = place("closed", "058-own-copy-closed");
     const kept = await capture(["docs", "cycles", "write", shut]);

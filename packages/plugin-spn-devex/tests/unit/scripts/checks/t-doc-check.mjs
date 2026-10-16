@@ -116,7 +116,7 @@ ${STYLES.stylesheet}
 // The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
 // title, the line and the link pills, and the Status cell the word.
 const TWO_ROW = (id, name, file, line, status) =>
-  `<tr><td><strong>${id} &mdash; ${name}</strong><br><span class="sds-small">${line}</span><br><a class="sds-badge sds-lens" href="arcs/${file}">arcs/${file}</a></td><td>${status}</td></tr>`;
+  `<tr><td><p style="margin:0 0 .3rem"><strong>${id} &mdash; ${name}</strong></p><p style="margin:0 0 .3rem">${line}</p>Arc: <a href="arcs/${file}">${file}</a></td><td>${status}</td></tr>`;
 const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
   `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
   `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
@@ -462,7 +462,7 @@ try {
     "reports", "N2 reads RUNNING and the arc reads DECIDED");
 
   one("an arc with no row in Cycles",
-    write(page, CLEAN.replace(/\n  <tr><td><strong>N2[^\n]*/, "</tbody></table></div>")),
+    write(page, CLEAN.replace(/\n  <tr><td><p style="margin:0 0 .3rem"><strong>N2[^\n]*/, "</tbody></table></div>")),
     "reports", "has no row for N2");
 
   one("a Cycles row naming no arc",
@@ -478,7 +478,7 @@ try {
     "silent");
 
   one("a row whose Arc cell links no file",
-    write(page, CLEAN.replace(`<br><a class="sds-badge sds-lens" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
+    write(page, CLEAN.replace(`Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a>`, "")),
     "reports", "N2's links are not the arc file");
 
   one("a row whose Arc cell links another arc's file",
@@ -494,8 +494,8 @@ try {
     "reports", "N2's line is not the arc's own line");
 
   one("a preview pill the arc's Previews table does not list",
-    write(page, CLEAN.replace(`arcs/N2-the-check.md</a></td>`,
-      `arcs/N2-the-check.md</a> <a class="sds-badge sds-lens" href="notes/N2/previews/layout-preview.html">layout-preview.html &middot; preview &middot; proposed</a></td>`)),
+    write(page, CLEAN.replace(`Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></td>`,
+      `Preview: <a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></td>`)),
     "reports", "N2's links are not the arc file");
 
   one("four columns in an open workstream — told to run the command",
@@ -528,19 +528,19 @@ try {
     "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
     "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n\n## Steps"));
   writeFileSync(join(previewed, ARCS, "N002-the-check.md"), arcFile("N002", "the check", "DECIDED").replace("## Steps", "## Previews\n\nNone.\n\n## Steps"));
-  const PILLS = `<a class="sds-badge sds-lens" href="notes/N001/previews/layout-preview.html">layout-preview.html &middot; preview &middot; proposed</a> ` +
-    `<a class="sds-badge sds-lens" href="notes/N001/samples/close-message.md">close-message.md &middot; sample &middot; decided</a>`;
+  const PILLS = `Preview: <a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; ` +
+    `Sample: <a href="notes/N001/samples/close-message.md">close-message.md</a> (decided) &middot; `;
   const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
     .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
-    .replace("arcs/N001-the-chapter.md</a></td>", `arcs/N001-the-chapter.md</a> ${PILLS}</td>`);
+    .replace(`Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></td>`, `${PILLS}Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></td>`);
   const previewedPage = join(previewed, "approach.html");
   one("three-digit arcs, and link pills matching the arc's Previews table",
     write(previewedPage, PREVIEWED), "silent");
   one("link pills left out while the arc lists two files",
-    write(previewedPage, PREVIEWED.replace(` ${PILLS}`, "")),
+    write(previewedPage, PREVIEWED.replace(PILLS, "")),
     "reports", "N001's links are not the arc file");
   one("a pill whose state is not the arc's",
-    write(previewedPage, PREVIEWED.replace("preview &middot; proposed", "preview &middot; decided")),
+    write(previewedPage, PREVIEWED.replace("layout-preview.html</a> (proposed)", "layout-preview.html</a> (decided)")),
     "reports", "N001's links are not the arc file");
   one("a pill whose link is written from arcs/ rather than from the page",
     write(previewedPage, PREVIEWED.replace(`href="notes/N001/previews/`, `href="../notes/N001/previews/`)),

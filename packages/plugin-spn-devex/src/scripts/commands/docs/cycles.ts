@@ -3,7 +3,7 @@
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // A workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run, in two
-// columns. Arc holds the title, the description and the facts as link pills (the arc file, and the
+// columns. Arc holds the title, the description and the facts as links separated by middots (the arc file, and the
 // previews and samples the arc's own `## Previews` table carries); Status holds the word, and for
 // HELD, CARRIED and DROPPED the reason below it.
 //
@@ -237,26 +237,34 @@ export function arcHref(cycle: Cycle): string {
   return `${ARCS}/${basename(cycle.file)}`;
 }
 
-/** The facts of an arc, each a small link pill: its file, then each preview and sample with its state. */
+/**
+ * The facts of an arc, one line of `Key: value` facts separated by middots: each preview and sample,
+ * keyed by its kind, its name a link and its state in brackets; then the arc file last. A person reads
+ * the previews; the arc file is the agent's, and a preview links it again for whoever wants it.
+ */
 export function factsCell(cycle: Cycle): string {
-  const pill = (href: string, text: string) =>
-    `<a class="sds-badge sds-lens" href="${attribute(href)}">${escape(text)}</a>`;
-  const href = arcHref(cycle);
-  const facts = [pill(href, href)];
+  const link = (href: string, text: string) => `<a href="${attribute(href)}">${escape(text)}</a>`;
+  const keyOf = (kind: string) => (kind ? kind[0].toUpperCase() + kind.slice(1) : "File");
+  const facts: string[] = [];
   for (const preview of cycle.previews) {
-    const text = [preview.name, preview.kind, preview.state].filter(Boolean).join(" · ");
-    facts.push(preview.href ? pill(preview.href, text) : `<span class="sds-badge sds-lens">${escape(text)}</span>`);
+    const value = preview.href ? link(preview.href, preview.name) : escape(preview.name);
+    facts.push(`${keyOf(preview.kind)}: ${value}${preview.state ? ` (${escape(preview.state)})` : ""}`);
   }
-  return facts.join(" ");
+  facts.push(`Arc: ${link(arcHref(cycle), basename(cycle.file))}`);
+  return facts.join(" &middot; ");
 }
 
+// A level of an Arc cell: a paragraph with a third of a line under it. The shared stylesheet spaces a
+// paragraph by a whole line, too much inside a cell, and holds no rule for a cell's paragraphs yet.
+const CELL_LINE = '<p style="margin:0 0 .3rem">';
+
 /**
- * The Arc cell's HTML, in the three levels of a DSItem: the title in bold, the description below it
- * in muted small text, then a row of facts, each a link pill (the arc file, the previews, the samples).
+ * The Arc cell's HTML, in three levels: the title in bold, what the arc does below it in plain text,
+ * then its facts as one line of links.
  */
 export function arcCell(cycle: Cycle): string {
-  const description = cycle.does ? `<br><span class="sds-small">${escape(cycle.does)}</span>` : "";
-  return `<strong>${escape(arcLabel(cycle))}</strong>${description}<br>${factsCell(cycle)}`;
+  const description = cycle.does ? `${CELL_LINE}${escape(cycle.does)}</p>` : "";
+  return `${CELL_LINE}<strong>${escape(arcLabel(cycle))}</strong></p>${description}${factsCell(cycle)}`;
 }
 
 /** The Status cell's HTML: the word, then for HELD, CARRIED and DROPPED the reason below it in small text. */
@@ -324,13 +332,22 @@ export function tableColumns(table: string): string {
   return [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase()).join(" · ");
 }
 
-/** The title of an Arc cell: its bold text. The description and the link pills sit around it. */
+/** The title of an Arc cell: its bold text. The description and the links sit around it. */
 const titleOf = (cell: string): string => {
   const bold = /<strong\b[^>]*>([\s\S]*?)<\/strong>/i.exec(cell);
   return bold ? flat(bold[1]) : withoutAnchors(cell);
 };
 
-/** The description of an Arc cell: what is left of it with the title and the link pills taken out. */
+/** The facts of an Arc cell: what follows its last paragraph, the line of links. */
+const factsOf = (cell: string): string => cell.replace(/^[\s\S]*<\/p>/i, "");
+
+/** The description of an Arc cell: its second paragraph, or in an older cell what is left with the title and the links taken out. */
+const lineOf = (cell: string): string => {
+  const paragraphs = [...cell.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)];
+  return paragraphs.length > 0 ? (paragraphs[1] ? flat(paragraphs[1][1]) : "") : withoutTitle(cell);
+};
+
+/** The description of an Arc cell: what is left of it with the title and the links taken out. */
 const withoutTitle = (cell: string): string => withoutAnchors(cell.replace(/<strong\b[\s\S]*?<\/strong>/i, " "));
 
 /** The rows of a page's Cycles table, each under the key of the arc it names, in the page's order. */
@@ -375,10 +392,11 @@ export function tableDifferences(table: string, cycles: Cycle[], withPreviews = 
       const expected = arcCell(cycle);
       if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
         stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
-      if (withoutTitle(cells[0]) !== withoutTitle(expected))
+      if (lineOf(cells[0]) !== lineOf(expected))
         stale.push(`${key}'s line is not the arc's own line`);
-      const pills = (html: string) => anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n");
-      if (pills(cells[0]) !== pills(expected))
+      // The facts are compared whole, links and the kind and state written after each, as plain text.
+      const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
+      if (facts(cells[0]) !== facts(expected))
         stale.push(`${key}'s links are not the arc file and the previews and samples the arc's Previews table lists`);
       if (cycle.status && cycle.detail && status !== flat(statusCell(cycle)))
         stale.push(`${key}'s Status does not carry the arc's reason`);
