@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "b9d31e6c"
+      "seen": "d97cbc18"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "a6960525"
+      "seen": "24df2444"
     }
   ]
 }
@@ -337,6 +337,8 @@ A mark is a picture or an icon that stands for a thing or a person: a person's p
 - **The badge of an avatar MUST follow the scale size of the avatar** (`RD.SUPPORT.SURFACE.136`). A badge that holds an icon is about a third of the avatar, and never under 12px: 12, 12, 12, 14, 14, 16, 16, 20, 20, 24 and 32px from `XXS` to `XXL5`. A badge with no icon is a dot of about a quarter of the avatar, and never under 8px: 8, 8, 8, 10, 10, 12, 12, 14, 16, 20 and 24px. A page sets no size for either.
 - **The initials of an avatar MUST be a title step of about four tenths of the avatar** (`RD.SUPPORT.SURFACE.105`). From `XXL` up they are not the title of the avatar's own step name, because that title would fill the circle.
 
+- **A group of avatars MUST overlap its avatars as the design library draws it, and an overlapped avatar MUST centre its initials in what shows** (`RD.SUPPORT.SURFACE.197`). The overlap is 4, 6, 8, 10, 14, 20, 22, 26, 30, 36 and 44px from `XXS` to `XXL5`. The initials sit in the visible part, the circle less the overlap and the gap, and where they are still wider they are drawn one title step smaller, then one more, at most two. The last avatar and a photo are unchanged.
+
 | Scale size of the avatar | Its size | Its initials | What it is for |
 | --- | --- | --- | --- |
 | `XXS` | 24px | 10px | a person named inside a line of text or a dense table |
@@ -346,6 +348,10 @@ A mark is a picture or an icon that stands for a thing or a person: a person's p
 | `XXL3` | 64px | 24px | the head of a record with a line and facts |
 | `XXL4` | 80px | 32px | a profile page |
 | `XXL5` | 96px | 40px | an account's own page |
+
+### The slider
+
+- **A slider MUST show its value on its handle** (`RD.SUPPORT.SURFACE.198`). `DSSlider` and `DSSliderRange` draw each handle's value in a small label above it, formatted as the app formats numbers; on a range the two labels join into one when they would touch, and `aria-valuetext` carries the same text. The slider adds no prop, and takes the line of room the label needs above its track.
 
 ### What stands beside what
 
