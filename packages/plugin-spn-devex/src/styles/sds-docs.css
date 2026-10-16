@@ -552,11 +552,17 @@
   .border-cyan-soft {
     border-color: var(--sds-cyan-soft);
   }
+  .border-description {
+    border-color: var(--sds-text-description);
+  }
   .border-error {
     border-color: var(--sds-error);
   }
   .border-error-soft {
     border-color: var(--sds-error-soft);
+  }
+  .border-fact {
+    border-color: var(--sds-text-fact);
   }
   .border-fail {
     border-color: var(--sds-fail);
@@ -578,6 +584,9 @@
   }
   .border-grey-soft {
     border-color: var(--sds-grey-soft);
+  }
+  .border-heading {
+    border-color: var(--sds-text-heading);
   }
   .border-info {
     border-color: var(--sds-info);
@@ -627,6 +636,9 @@
   .border-success-soft {
     border-color: var(--sds-success-soft);
   }
+  .border-title {
+    border-color: var(--sds-text-title);
+  }
   .border-violet {
     border-color: var(--sds-violet);
   }
@@ -654,11 +666,17 @@
   .bg-cyan-soft {
     background-color: var(--sds-cyan-soft);
   }
+  .bg-description {
+    background-color: var(--sds-text-description);
+  }
   .bg-error {
     background-color: var(--sds-error);
   }
   .bg-error-soft {
     background-color: var(--sds-error-soft);
+  }
+  .bg-fact {
+    background-color: var(--sds-text-fact);
   }
   .bg-fail {
     background-color: var(--sds-fail);
@@ -680,6 +698,9 @@
   }
   .bg-grey-soft {
     background-color: var(--sds-grey-soft);
+  }
+  .bg-heading {
+    background-color: var(--sds-text-heading);
   }
   .bg-info {
     background-color: var(--sds-info);
@@ -728,6 +749,9 @@
   }
   .bg-success-soft {
     background-color: var(--sds-success-soft);
+  }
+  .bg-title {
+    background-color: var(--sds-text-title);
   }
   .bg-violet {
     background-color: var(--sds-violet);
@@ -1064,11 +1088,17 @@
   .text-cyan-soft {
     color: var(--sds-cyan-soft);
   }
+  .text-description {
+    color: var(--sds-text-description);
+  }
   .text-error {
     color: var(--sds-error);
   }
   .text-error-soft {
     color: var(--sds-error-soft);
+  }
+  .text-fact {
+    color: var(--sds-text-fact);
   }
   .text-fail {
     color: var(--sds-fail);
@@ -1090,6 +1120,9 @@
   }
   .text-grey-soft {
     color: var(--sds-grey-soft);
+  }
+  .text-heading {
+    color: var(--sds-text-heading);
   }
   .text-info {
     color: var(--sds-info);
@@ -1138,6 +1171,9 @@
   }
   .text-success-soft {
     color: var(--sds-success-soft);
+  }
+  .text-title {
+    color: var(--sds-text-title);
   }
   .text-violet {
     color: var(--sds-violet);
@@ -1203,6 +1239,14 @@
     --sds-ink: #141920;
     --sds-slate: #48525f;
     --sds-faint: #7c8794;
+    --sds-text-heading: #0a0e13;
+    --sds-text-title: #1f2731;
+    --sds-text-description: #475160;
+    --sds-text-fact: #5b6674;
+    --sds-text-heading-card: #080c10;
+    --sds-text-title-card: #1a222b;
+    --sds-text-description-card: #424c5a;
+    --sds-text-fact-card: #566170;
     --sds-rule: #d2d9e0;
     --sds-accent: #2f4e7a;
     --sds-accent-soft: #e0e8f4;
@@ -1259,6 +1303,14 @@
       --sds-ink: #e3e8ee;
       --sds-slate: #a3adb9;
       --sds-faint: #6f7986;
+      --sds-text-heading: #f5f8fb;
+      --sds-text-title: #dde3ea;
+      --sds-text-description: #b0bac6;
+      --sds-text-fact: #8f9aa8;
+      --sds-text-heading-card: #f7fafc;
+      --sds-text-title-card: #e6ecf2;
+      --sds-text-description-card: #b2bcc8;
+      --sds-text-fact-card: #96a1ae;
       --sds-rule: #242d37;
       --sds-accent: #86a9da;
       --sds-accent-soft: #18232f;
@@ -1303,6 +1355,14 @@
     --sds-ink: #e3e8ee;
     --sds-slate: #a3adb9;
     --sds-faint: #6f7986;
+    --sds-text-heading: #f5f8fb;
+    --sds-text-title: #dde3ea;
+    --sds-text-description: #b0bac6;
+    --sds-text-fact: #8f9aa8;
+    --sds-text-heading-card: #f7fafc;
+    --sds-text-title-card: #e6ecf2;
+    --sds-text-description-card: #b2bcc8;
+    --sds-text-fact-card: #96a1ae;
     --sds-rule: #242d37;
     --sds-accent: #86a9da;
     --sds-accent-soft: #18232f;
@@ -1345,11 +1405,18 @@
   * {
     box-sizing: border-box;
   }
+  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-tabs,.sds-index-side {
+    --sds-text-heading: var(--sds-text-heading-card);
+    --sds-text-title: var(--sds-text-title-card);
+    --sds-text-description: var(--sds-text-description-card);
+    --sds-text-fact: var(--sds-text-fact-card);
+    color: var(--sds-text-description);
+  }
   body {
     margin: 0px;
     background-color: var(--sds-paper);
     font-family: var(--sds-ui);
-    color: var(--sds-ink);
+    color: var(--sds-text-description);
     font-size: 1rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -1365,9 +1432,10 @@
   strong {
     --tw-font-weight: 600;
     font-weight: 600;
+    color: var(--sds-text-title);
   }
   em {
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     font-style: italic;
   }
   a {
@@ -1399,7 +1467,7 @@
   .sds-rail .sds-rail-title {
     --tw-font-weight: 700;
     font-weight: 700;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .15em;
     margin-bottom: .85rem;
@@ -1407,7 +1475,7 @@
   }
   .sds-rail a {
     display: flex;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     text-decoration-line: none;
     gap: .55rem;
     padding: .28rem 0 .28rem .6rem;
@@ -1418,12 +1486,12 @@
     display: none;
   }
   .sds-rail a.sds-sub {
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     padding-left: 1.6rem;
     font-size: .72rem;
   }
   .sds-rail a:hover {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-rail a.sds-is-current {
     border-left-color: var(--sds-accent);
@@ -1456,7 +1524,7 @@
     gap: calc(0.25rem * 2);
     font-family: var(--sds-ui);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
   }
   .sds-eyebrow .sds-line {
     display: flex;
@@ -1471,7 +1539,7 @@
     color: var(--sds-rule);
   }
   .sds-eyebrow .sds-line1 {
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .15em;
     font-weight: 650;
@@ -1479,7 +1547,7 @@
   }
   .sds-eyebrow .sds-label {
     font-family: var(--sds-mono);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     font-size: .68rem;
     letter-spacing: .08em;
@@ -1496,7 +1564,7 @@
     background-color: var(--sds-card);
     font-family: var(--sds-mono);
     white-space: nowrap;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     text-transform: uppercase;
     gap: .35rem;
     padding: .1rem .6rem;
@@ -1544,7 +1612,7 @@
     margin: 0 0 .35rem;
   }
   .sds-tile h4 a {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     text-decoration-line: none;
   }
   .sds-tile h4 a:hover {
@@ -1554,7 +1622,7 @@
     max-width: none;
     flex: 1;
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: 0 0 .6rem;
   }
   .sds-tile .sds-more {
@@ -1582,7 +1650,7 @@
   .sds-side .sds-label {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .08em;
   }
@@ -1590,7 +1658,7 @@
     font-family: var(--sds-ui);
     --tw-font-weight: 700;
     font-weight: 700;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-size: 1.8rem;
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
@@ -1598,11 +1666,11 @@
   .sds-side .sds-big .sds-total {
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-side .sds-of {
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-side .sds-side-numbers {
     display: flex;
@@ -1613,7 +1681,7 @@
   .sds-side .sds-percent {
     font-family: var(--sds-mono);
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     font-weight: 650;
     font-variant-numeric: tabular-nums;
   }
@@ -1646,6 +1714,7 @@
     --tw-font-weight: 700;
     font-weight: 700;
     text-wrap: balance;
+    color: var(--sds-text-heading);
     letter-spacing: -.02em;
     line-height: 1.15;
   }
@@ -1654,11 +1723,11 @@
     font-size: var(--sds-lg);
     --tw-leading: 1.5;
     line-height: 1.5;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     max-width: 46rem;
   }
   .sds-standfirst {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-size: 1rem;
     line-height: 1.6;
     max-width: var(--sds-measure);
@@ -1687,6 +1756,7 @@
     --tw-font-weight: 700;
     font-weight: 700;
     text-wrap: balance;
+    color: var(--sds-text-heading);
     letter-spacing: -.01em;
   }
   h3 {
@@ -1694,13 +1764,14 @@
     font-size: var(--sds-lg);
     --tw-font-weight: 600;
     font-weight: 600;
+    color: var(--sds-text-heading);
     letter-spacing: -.008em;
     margin: 2rem 0 .6rem;
   }
   h4 {
     font-family: var(--sds-ui);
     font-size: var(--sds-md);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     margin: 0 0 .5rem;
   }
   .sds-scroll {
@@ -1720,11 +1791,11 @@
   td .sds-sub {
     display: block;
     font-size: var(--sds-xs);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin-top: .4rem;
   }
   td .sds-sub b {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-weight: 650;
   }
   td .sds-sub-line {
@@ -1733,7 +1804,7 @@
     font-size: var(--sds-xs);
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     margin-top: .3rem;
   }
   table.sds-grid {
@@ -1757,7 +1828,7 @@
     text-align: left;
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .07em;
     font-weight: 650;
@@ -1766,12 +1837,12 @@
   }
   td {
     vertical-align: top;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     padding: .6rem .8rem;
     border-bottom: 1px solid var(--sds-rule);
   }
-  td strong {
-    color: var(--sds-ink);
+  td strong,td > p:first-child {
+    color: var(--sds-text-title);
   }
   tr:last-child td {
     border-bottom: none;
@@ -1793,7 +1864,7 @@
   .sds-small,.sds-code {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
   }
   pre {
     max-width: 100%;
@@ -1801,7 +1872,7 @@
     background-color: var(--sds-card);
     font-family: var(--sds-mono);
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     border: 1px solid var(--sds-rule);
     border-radius: 3px;
     padding: .9rem 1.1rem;
@@ -1858,7 +1929,7 @@
     max-width: none;
     font-family: var(--sds-ui);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
   }
   .sds-drawing .sds-box {
     fill: var(--sds-card);
@@ -1979,7 +2050,7 @@
     display: block;
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .08em;
     margin: .6rem 0 .2rem;
@@ -1987,13 +2058,13 @@
   .sds-open p {
     max-width: none;
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: 0 0 .4rem;
   }
   .sds-open .sds-recommended {
     margin-top: calc(0.25rem * 3);
     font-size: var(--sds-sm);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     padding-top: .65rem;
     border-top: 1px dashed var(--sds-rule);
   }
@@ -2018,7 +2089,7 @@
   footer {
     font-family: var(--sds-ui);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     border-top: 1px solid var(--sds-rule);
     padding-top: 1.3rem;
   }
@@ -2046,18 +2117,18 @@
   .sds-rail a:not(.sds-sub):not(.sds-home) {
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-size: .88rem;
     letter-spacing: -.005em;
   }
   .sds-rail a.sds-sub {
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     font-size: .78rem;
   }
   .sds-rail .sds-rail-title {
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-rail a:not(.sds-home), .sds-rail a.sds-sub {
     padding-left: .6rem;
@@ -2081,7 +2152,7 @@
     color: var(--sds-accent);
   }
   .sds-rail a.sds-sub:hover {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-rail a .sds-caret {
     margin-left: auto;
@@ -2089,7 +2160,7 @@
     flex: none;
     transform: none;
     place-items: center;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     width: 1.35rem;
     height: 1.35rem;
     border-radius: 3px;
@@ -2148,14 +2219,14 @@
     font-size: var(--sds-lg);
     --tw-font-weight: 500;
     font-weight: 500;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     line-height: 1.45;
     max-width: 52rem;
     margin: 0 0 1rem;
   }
   .sds-terms {
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-bar i.sds-success {
     background-color: var(--sds-ok);
@@ -2172,7 +2243,7 @@
   .sds-breakdown-title {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .08em;
     margin: 0 0 .45rem;
@@ -2195,7 +2266,7 @@
     flex-wrap: wrap;
     padding: 0px;
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     gap: .35rem 1.3rem;
     list-style: none;
     margin: .65rem 0 0;
@@ -2206,7 +2277,7 @@
     gap: .45rem;
   }
   .sds-breakdown-legend b {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-variant-numeric: tabular-nums;
   }
   .sds-breakdown-key {
@@ -2264,7 +2335,7 @@
     display: inline-block;
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     min-width: 8.5rem;
     letter-spacing: .08em;
@@ -2284,7 +2355,7 @@
     font-weight: 650;
   }
   tr.sds-total td {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     border-top: 2px solid var(--sds-ink);
     font-weight: 650;
   }
@@ -2293,7 +2364,7 @@
   }
   .sds-units {
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-record-group {
     background-color: var(--sds-card);
@@ -2307,7 +2378,7 @@
     flex-wrap: wrap;
     align-items: center;
     font-size: var(--sds-sm);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     list-style: none;
     gap: .35rem .7rem;
     padding: .7rem 1rem;
@@ -2354,13 +2425,13 @@
   .sds-record-worst {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     text-transform: uppercase;
     letter-spacing: .06em;
   }
   .sds-record-mix {
     font-size: var(--sds-xs);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-record-subs {
     border-top: 1px solid var(--sds-rule);
@@ -2411,7 +2482,7 @@
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
     overflow-wrap: anywhere;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     word-break: break-word;
   }
   .sds-record .sds-location code {
@@ -2421,7 +2492,7 @@
     grid-column: 2;
     font-size: var(--sds-sm);
     overflow-wrap: anywhere;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     margin: .2rem 0 0;
     max-width: var(--sds-measure);
   }
@@ -2429,7 +2500,7 @@
     grid-column: 2;
     font-size: var(--sds-xs);
     overflow-wrap: anywhere;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: .15rem 0 0;
   }
   .sds-record .sds-meta code {
@@ -2444,14 +2515,14 @@
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
     white-space: nowrap;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin-right: .55rem;
   }
   .sds-record .sds-by {
     grid-column: 2;
     font-size: var(--sds-xs);
     overflow-wrap: anywhere;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: .2rem 0 0;
   }
   .sds-decider {
@@ -2462,7 +2533,7 @@
     --tw-leading: 1.5;
     line-height: 1.5;
     white-space: nowrap;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     letter-spacing: .03em;
     border-radius: 2px;
     padding: 0 .4rem;
@@ -2480,11 +2551,11 @@
   }
   .sds-record-because {
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-open .sds-options {
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: .2rem 0 .4rem;
     padding-left: 1.2rem;
   }
@@ -2492,7 +2563,7 @@
     margin: 0 0 .2rem;
   }
   tr.sds-project td {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   tr.sds-project td:first-child {
     font-weight: 650;
@@ -2522,7 +2593,7 @@
   td.sds-state.sds-none {
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
   }
   td.sds-state .sds-small {
     display: block;
@@ -2571,6 +2642,14 @@
       --sds-ink: #141920;
       --sds-slate: #48525f;
       --sds-faint: #7c8794;
+      --sds-text-heading: #0a0e13;
+      --sds-text-title: #1f2731;
+      --sds-text-description: #475160;
+      --sds-text-fact: #5b6674;
+      --sds-text-heading-card: #080c10;
+      --sds-text-title-card: #1a222b;
+      --sds-text-description-card: #424c5a;
+      --sds-text-fact-card: #566170;
       --sds-rule: #d2d9e0;
       --sds-accent: #2f4e7a;
       --sds-accent-soft: #e0e8f4;
@@ -2660,7 +2739,7 @@
     outline: 2px solid var(--sds-accent);
   }
   blockquote {
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: 1.6rem 0;
     padding: .2rem 0 .2rem 1.1rem;
     border-left: 2px solid var(--sds-rule);
@@ -2674,7 +2753,7 @@
   }
   .sds-prose {
     background-color: var(--sds-card);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     border: 1px solid var(--sds-rule);
     border-radius: 3px;
     padding: 1.1rem 1.3rem;
@@ -2690,10 +2769,10 @@
     max-width: none;
   }
   .sds-prose strong,.sds-prose h4 {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-prose code {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-prose blockquote {
     border-left-color: var(--sds-accent);
@@ -2722,7 +2801,7 @@
   .sds-nextnav-card .sds-direction {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .06em;
   }
@@ -2730,7 +2809,7 @@
     font-size: var(--sds-sm);
     --tw-font-weight: 600;
     font-weight: 600;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-nextnav-card:hover .sds-title {
     color: var(--sds-accent);
@@ -2783,7 +2862,7 @@
     display: block;
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     letter-spacing: .08em;
     margin: .6rem 0 .2rem;
@@ -2791,13 +2870,13 @@
   .sds-card p {
     max-width: none;
     font-size: var(--sds-sm);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: 0 0 .4rem;
   }
   .sds-card .sds-recommended {
     margin-top: calc(0.25rem * 3);
     font-size: var(--sds-sm);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     padding-top: .65rem;
     border-top: 1px dashed var(--sds-rule);
   }
@@ -2834,7 +2913,7 @@
   .sds-frame .sds-caption {
     font-family: var(--sds-mono);
     font-size: var(--sds-xs);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     padding: .45rem .8rem;
     border-bottom: 1px solid var(--sds-rule);
   }
@@ -2926,7 +3005,7 @@
   }
   .sds-pull td {
     border-bottom-color: var(--sds-status);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     opacity: .9;
   }
   .sds-info {
@@ -3021,7 +3100,7 @@
     font-size: var(--sds-xs);
     --tw-tracking: 0.1em;
     letter-spacing: 0.1em;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     margin-bottom: .2rem;
   }
@@ -3051,7 +3130,7 @@
   }
   .sds-index-where {
     font-family: var(--sds-ui);
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     text-transform: uppercase;
     font-size: .7rem;
     font-weight: 650;
@@ -3061,7 +3140,7 @@
     margin: 0px;
     max-width: none;
     font-size: var(--sds-xs);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
   }
   .sds-index-toggle {
     display: flex;
@@ -3069,7 +3148,7 @@
     cursor: pointer;
     align-items: center;
     padding: 0px;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     justify-content: center;
     width: 1.7rem;
     height: 1.7rem;
@@ -3132,7 +3211,7 @@
     display: flex;
     cursor: pointer;
     align-items: center;
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     gap: .9rem;
     list-style: none;
     padding: .3rem .35rem;
@@ -3167,7 +3246,7 @@
     font-family: var(--sds-mono);
     --tw-font-weight: 400;
     font-weight: 400;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     font-size: .68rem;
   }
   .sds-tree-kids {
@@ -3178,7 +3257,7 @@
   .sds-tree-note {
     max-width: none;
     font-size: var(--sds-xs);
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     margin: .2rem 0 .3rem .35rem;
   }
   .sds-tree-row {
@@ -3190,7 +3269,7 @@
     display: block;
     min-width: 0px;
     flex: 1;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     text-decoration-line: none;
     padding: .26rem .4rem;
     border-radius: 3px;
@@ -3198,7 +3277,7 @@
   }
   .sds-tree-link:hover {
     background-color: var(--sds-paper);
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
   }
   .sds-tree-link.sds-is-current {
     background-color: var(--sds-accent-soft);
@@ -3211,7 +3290,7 @@
     cursor: pointer;
     align-items: center;
     padding: 0px;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     justify-content: center;
     width: 1.45rem;
     height: 1.45rem;
@@ -3293,14 +3372,14 @@
     font-family: var(--sds-ui);
     font-size: var(--sds-xs);
     white-space: nowrap;
-    color: var(--sds-slate);
+    color: var(--sds-text-description);
     text-overflow: ellipsis;
     border: 0;
     background: none;
     padding: .42rem .2rem .42rem .7rem;
   }
   .sds-tab.sds-is-current .sds-tab-title {
-    color: var(--sds-ink);
+    color: var(--sds-text-title);
     font-weight: 650;
   }
   .sds-tab-close {
@@ -3310,7 +3389,7 @@
     font-size: var(--sds-md);
     --tw-leading: 1;
     line-height: 1;
-    color: var(--sds-faint);
+    color: var(--sds-text-fact);
     width: 1.4rem;
     height: 1.4rem;
     border: 0;
