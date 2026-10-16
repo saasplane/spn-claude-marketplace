@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "f7ce6203"
+      "seen": "51e37d6e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "c424f3d2"
+      "seen": "e3035d40"
     }
   ]
 }
@@ -26,7 +26,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
 5. A section is one container. Its header holds the title, one line and the section's actions. Its content is one card that holds the tabs, the preview and the code as one object. Its footer holds the actions that follow from the section.
-6. The code of an example is the usage only, and it is shown whole.
+6. The code of an example is the usage and every name the usage uses, declared, and it is shown whole.
 7. A unit that writes a value shows the live value beside it in every example.
 8. A size is a tab of the page or the section that shows the unit, and never a page of its own.
 9. A showcase is built from the units of the design system it proves, and from nothing else.
@@ -243,9 +243,10 @@ The content of a section's container is one card. The card holds the tabs, the p
 | Tabs | a row at the card's top, from its start. The open tab has a line under it in the primary colour, and a rule runs across the card under the row | the same row. When the tabs do not fit, the row scrolls sideways inside the card and never wraps |
 | Preview | at the start of the card, on the card's own surface, with its unit placed by the unit's showcase layout | under the tabs, at the card's full width |
 | Code | beside the preview, on a dark surface that reaches the card's end and bottom edge, with no gap and no frame of its own; open at first | under one bar across the card, which holds *Show code* at its start and the copy control at its end; closed at first. When open, the same dark block, as wide as the card, closing the card's bottom edge |
-| Inside the code | each case begins with a comment line that names it, then the usage. An empty line separates two cases. A copy control stands at the top of the code, at its end | the same. A long line scrolls sideways inside the block, and the page never scrolls sideways |
+| Inside the code | what the cases declare once, then each case begins with a comment line that names it, then the usage. An empty line separates two cases. A copy control stands at the top of the code, at its end | the same. A long line scrolls sideways inside the block, and the page never scrolls sideways |
 
-- **The code is the usage only**: the lines a developer writes at the point of use. It holds no import, no wrapping function and no whole file.
+- **The code is the usage, with the declaration of every name it uses** (`RD.SUPPORT.SURFACE.185`): the lines a developer writes at the point of use, and over them the lines that give each name those lines use, with its real shape and type. Those are the data, the handlers, the services and the options. A state is declared with its hook, `const [plan, setPlan] = useState<string | null>(null);`, and the `valueLink` of a unit is declared from it, `const planLink = { value: plan, setValue: setPlan };`. A name that the design system, the contract, the support package, React or the browser gives is in scope. The code holds no wrapping function and no whole file, and an import only where a block shows a whole file.
+- **A case declares what it uses by itself, and the card writes it once.** The card of a tab writes each declared statement once, over the first element, so a case reads alone and a tab does not repeat itself.
 - **The code is shown whole, and is never cut.** The copy control copies all of it.
 - Where the showcase layout is Full width or Full screen, the code stands under the preview, inside the same card.
 - **Where the code of a tab is long, the code MUST stand under the preview for the whole tab** (`RD.SUPPORT.SURFACE.151`). The card then reads one way for every case of the tab, and a long sample does not squeeze the preview beside it. A case that needs the whole row does the same.
