@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "bfbac662"
+      "seen": "de9c78a4"
     }
   ]
 }
