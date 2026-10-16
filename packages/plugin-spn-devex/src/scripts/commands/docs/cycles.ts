@@ -254,9 +254,8 @@ export function factsCell(cycle: Cycle): string {
   return facts.join(" &middot; ");
 }
 
-// A level of an Arc cell: a paragraph with a third of a line under it. The shared stylesheet spaces a
-// paragraph by a whole line, too much inside a cell, and holds no rule for a cell's paragraphs yet.
-const CELL_LINE = '<p style="margin:0 0 .3rem">';
+// A level of an Arc cell: a plain paragraph. The shared stylesheet spaces a cell's title, line and facts.
+const CELL_LINE = "<p>";
 
 /**
  * The Arc cell's HTML, in three levels: the title in bold, what the arc does below it in plain text,

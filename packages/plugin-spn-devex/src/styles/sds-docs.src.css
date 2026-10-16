@@ -247,7 +247,10 @@
   table.sds-grid td{@apply wrap-anywhere}
   .sds-scroll table{@apply table-auto}
   th{@apply text-left font-mono text-xs uppercase text-fact; letter-spacing:.07em; font-weight:650; padding:.6rem .8rem; border-bottom:1px solid var(--sds-rule)}
-  td{@apply align-top text-description; padding:.6rem .8rem; border-bottom:1px solid var(--sds-rule)}
+  td{@apply align-top text-description; padding:.6rem .8rem; border-bottom:1px solid var(--sds-rule); line-height:1.55}
+  td > p{margin:0}
+  td > p + p{margin-top:.35rem}
+  td > .sds-small{display:block; margin-top:.5rem}
   td strong,td > p:first-child{@apply text-title}
   tr:last-child td{border-bottom:none}
   .sds-number-cell{@apply font-mono text-right whitespace-nowrap; font-variant-numeric:tabular-nums}

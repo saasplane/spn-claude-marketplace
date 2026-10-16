@@ -1840,6 +1840,17 @@
     color: var(--sds-text-description);
     padding: .6rem .8rem;
     border-bottom: 1px solid var(--sds-rule);
+    line-height: 1.55;
+  }
+  td > p {
+    margin: 0;
+  }
+  td > p + p {
+    margin-top: .35rem;
+  }
+  td > .sds-small {
+    display: block;
+    margin-top: .5rem;
   }
   td strong,td > p:first-child {
     color: var(--sds-text-title);

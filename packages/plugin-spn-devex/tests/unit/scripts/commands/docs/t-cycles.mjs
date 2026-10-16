@@ -117,7 +117,7 @@ try {
         `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
     const link = (href, text) => `<a href="${href}">${text}</a>`;
     ok("the Arc cell is three levels: the title in bold, the line below it, then Key: value facts, each preview and sample keyed by its kind and the arc file last",
-      arcCell(held) === `<p style="margin:0 0 .3rem"><strong>N010 &mdash; the release</strong></p><span class="sds-small">` +
+      arcCell(held) === `<p><strong>N010 &mdash; the release</strong></p><span class="sds-small">` +
         ["Preview: " + link("notes/N010/previews/layout-preview.html", "layout-preview.html") + " (proposed)",
           "Sample: " + link("notes/N010/samples/close_message.md", "close_message.md") + " (decided)",
           "Preview: " + link("notes/N010/previews/first-preview.html", "first-preview.html") + " (decided)",
@@ -130,12 +130,12 @@ try {
     ok("the header is Arc · Status, two columns",
       table.includes("<thead><tr><th>Arc</th><th>Status</th></tr></thead>") && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
     ok("a row is two cells: the Arc cell, and the Status cell with a HELD arc's reason below its word",
-      table.includes(`<tr><td><p style="margin:0 0 .3rem"><strong>N10 &mdash; the release</strong></p><p style="margin:0 0 .3rem">The plugins ship once.</p>` +
+      table.includes(`<tr><td><p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p>` +
         `<span class="sds-small">Arc: <a href="arcs/N10-the-release.md">N10-the-release.md</a></span></td>` +
         `<td>HELD<br><span class="sds-small">waits on Q7</span></td></tr>`), table);
     ok("a RUNNING arc's Status cell is its word alone", table.includes("<td>RUNNING</td></tr>"), table);
     ok("an arc with no number still links its file",
-      table.includes(`<p style="margin:0 0 .3rem"><strong>a legacy arc with no number</strong></p><p style="margin:0 0 .3rem">Prepared: 2026-08-31</p><span class="sds-small">Arc: <a href="arcs/arc-legacy.md">arc-legacy.md</a></span>`), table);
+      table.includes(`<p><strong>a legacy arc with no number</strong></p><p>Prepared: 2026-08-31</p><span class="sds-small">Arc: <a href="arcs/arc-legacy.md">arc-legacy.md</a></span>`), table);
 
     // The older tables are still read by header name and compared: four columns on any page, three on a closed one.
     const { tableDifferences } = cyclesModule;

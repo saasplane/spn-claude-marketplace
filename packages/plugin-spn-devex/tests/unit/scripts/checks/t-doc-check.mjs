@@ -116,7 +116,7 @@ ${STYLES.stylesheet}
 // The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
 // title, the line and the link pills, and the Status cell the word.
 const TWO_ROW = (id, name, file, line, status) =>
-  `<tr><td><p style="margin:0 0 .3rem"><strong>${id} &mdash; ${name}</strong></p><p style="margin:0 0 .3rem">${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${status}</td></tr>`;
+  `<tr><td><p><strong>${id} &mdash; ${name}</strong></p><p>${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${status}</td></tr>`;
 const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
   `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
   `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
@@ -462,7 +462,7 @@ try {
     "reports", "N2 reads RUNNING and the arc reads DECIDED");
 
   one("an arc with no row in Cycles",
-    write(page, CLEAN.replace(/\n  <tr><td><p style="margin:0 0 .3rem"><strong>N2[^\n]*/, "</tbody></table></div>")),
+    write(page, CLEAN.replace(/\n  <tr><td><p><strong>N2[^\n]*/, "</tbody></table></div>")),
     "reports", "has no row for N2");
 
   one("a Cycles row naming no arc",
