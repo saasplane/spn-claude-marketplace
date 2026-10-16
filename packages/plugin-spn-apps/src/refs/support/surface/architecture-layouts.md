@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "de9c78a4"
+      "seen": "2f0f6fc9"
     }
   ]
 }
@@ -65,7 +65,7 @@ A layout names no routing library — it moves between pages through the navigat
 | `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end |
 | `CANVAS` | nothing: the main area alone, with `footerNode` |
 
-- **The side column of `DOCK` MUST take the full height of the content beside it, and grow with the page, while its entries stay at the top.** The band of `headerNode` stands above both columns, and the footer of a dock spans both columns.
+- **The side column of `DOCK` MUST be a rounded panel beside the content, as tall as its entries and sticky at the top of the window, with its top edge on the same line as the page's first block, one vertical gutter under the band.** The band of `headerNode` stands above both columns, and the footer of a dock spans both columns.
 - **A layout MUST build its navigation from the navigation units** (`architecture-components.md`). On a narrow screen `DOCK` and `TOPNAV` open their navigation in a menu that holds a `DSNavList`.
 - **The layouts alone MUST read the theme, and each MUST hand the look down** (`RD.SUPPORT.SURFACE.156`). The shell of the theme goes to the bar as `look`, and the bar hands it to its list.
 - **A layout's config MAY give the content a look over the theme's**, field by field, so one page can draw its content on the brand colour while the app keeps its own.
