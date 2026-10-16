@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "Every moment gets a plain, warm line",
-      "seen": "b3ae09f3"
+      "seen": "644f26c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -302,6 +302,10 @@ things compared on the same points. *We* and *let's* are fine. This holds for ev
 each view's own lines inside one (`refs/devex/agent/lenses.md` § *A view is shown in its own voice*).
 A line such as *a check nobody runs is not a check* sounds finished and tells the developer nothing
 they can act on.
+
+The moment also chooses how a reply speaks: its register, its one icon and its shape. That rule is
+stated in `refs/devex/agent/agent.md` § *A reply speaks as a teammate: the moment chooses its register, its icon and its shape*,
+and **Needs you** and the close keep the form given here.
 
 **The diff is how the developer follows the work.** A line that says *row 3 landed* asks them to
 trust it. The few lines that changed, with a sentence on what they do, let them check it in the time

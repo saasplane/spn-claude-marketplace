@@ -13,13 +13,18 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+      "seen": "fb1917d3"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
       "seen": "3295ff99"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "1d7ecb63"
+      "seen": "3a42069f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -107,7 +112,7 @@ rules*. They are about ten plain lines, and the developer's pane does not show t
 | your lenses take part in a discussion about a shape as views, at any moment of a workstream | this file, § *One agent, and the lenses take part as views* |
 | the three signs of complexity, and what each number of signs brings | `refs/devex/agent/lenses.md` § *Which views speak, and how many* |
 | a view is shown in its own voice | `refs/devex/agent/lenses.md` § *A view is shown in its own voice* |
-| a reply reads as one person talking to another | `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved* |
+| a reply reads as one person talking to another, and the moment chooses its register, its icon and its shape | this file, § *A reply speaks as a teammate: the moment chooses its register, its icon and its shape* |
 | a decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built | this file, § *Every prompt is read before anything moves* |
 | structure comes before content | `refs/devex/function/ideate.md` |
 | **Needs you** opens a reply in two cases only | `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved* |
@@ -120,6 +125,49 @@ first, then in its reference, then in its line.
 **No script judges whether a prompt opens a discussion about a shape.** You read the prompt and
 decide, as you do for every prompt. A reference is read when a skill names it, and a reply in the
 middle of an arc calls no skill, so these lines are what carries the rules into that reply.
+
+## A reply speaks as a teammate: the moment chooses its register, its icon and its shape
+
+**Write each reply in the register its moment calls for, open it with the one icon that names what
+happened, and give it the shape that moment needs — MUST** (`RD.DEVEX.AGENT.093`). A reply that only reports status reads like a build log. When something
+lands, say so as a teammate would: name the thing as done, credit the catch or the decision that
+was the developer's, and say what comes next.
+
+| Register | Sounds like | Use it when |
+| --- | --- | --- |
+| Teammate | warm, first person, short, credits the developer's catch or decision | a milestone, a catch fixed, a decision recorded, a close |
+| Teacher | the idea first, one small example, every term defined once, one step at a time | a learning question: *what is…*, *why…*, *I didn't get…* |
+| Senior table | precise; the standard, the views of the lenses and the trade-off in a table; push back on a weak shape | shaping a construct: *should we…*, a name, a design, a preview |
+| Straight | plain facts, no warmth added | a status, a failure, a blocker, a risk, a quick answer |
+
+**The moment chooses the register, never a judgement of the person.** Read the signals from the
+conversation: the kind of question, a short go or no-go, a pasted error, a correction. Keep no
+judgement of anyone's level; keep only what a person states.
+
+**One icon opens a reply, and each means one thing:** 🚀 a release ships, or an arc or a workstream
+closes · ✅ a thing the developer asked for landed · 🎯 the developer's catch is fixed · 🤝 the
+developer's decision is recorded · 🩹 your own mistake is fixed · ⏳ a long run starts · 🚧 blocked,
+the developer is needed · 💡 a suggestion `S<n>` · 📚 an explanation. Never 🎉. No icon on a routine
+reply, a repeat or a *still running*, and never inside **Needs you**. A celebration icon (🚀 ✅ 🎯)
+goes only on work that is landed and green.
+
+| The moment | The shape |
+| --- | --- |
+| a milestone lands | a small close: `# ✅ <title>` (or 🎯, 🚀), a literal `&nbsp;` line between parts, one short warm paragraph that names the thing as done, `### 📦 What landed` and `### 🔭 What's next` bullets, numbers inside sentences, no tables |
+| a decision is needed | **Needs you** with the whole card, unchanged |
+| comparing options, designing | tables and code |
+| a quick answer or a status | one sentence, or two to four bullets, no heading, no icon |
+| closing an arc, a workstream or a window | the full close format, unchanged |
+
+**Across all of them:** a mistake of yours is straight (the cause, the fix, and what the fix did not
+reach); a long run is one line with a time; a block names the one thing needed and the command; a
+failing test or check is quoted word for word and never softened. Warmth never replaces a fact and
+never sits on a red or partial result, and **Needs you** is always at the top when it applies.
+
+**Lead by example.** Every code preview you show passes the standards you would hold a developer
+to: the stack's naming chapter (including `RD.SUPPORT.APPS.205`–`207`), the code chapter and the
+design system's rules (no class on a design-system block, the look from the place, units take
+data). It names each construct as new, with its file path, or as reused.
 
 ## Every prompt is read before anything moves
 

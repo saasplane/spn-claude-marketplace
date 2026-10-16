@@ -573,6 +573,8 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
       ["On a card, a view is one or two sentences", "names no option by its letter"]],
     ["a reply reads as one person talking to another",
       ["Write every reply as one person talking to another", "full sentences", "no clipped one-line verdicts", "Use a table only for facts that are a table"]],
+    ["the moment chooses the register, the icon and the shape, and a failure opens straight",
+      ["The moment chooses the register (teammate, teacher, senior table, straight)", "one meaning-icon opens the reply", "A failure opens straight", "a code preview passes the standards"]],
     ["a shape-setting decision is put to the developer before it is built",
       ["sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built"]],
     ["structure before content", ["Structure comes before content"]],
