@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "7908b2e8"
+      "seen": "bfbac662"
     }
   ]
 }
@@ -95,6 +95,7 @@ A layout has two parts for its look, whatever its type. The shell is the bars of
 - **The shell holds no colour of its own: each part of its look points at a token** (`RD.SUPPORT.SURFACE.163`). **The edge line of a rail follows the `bordered` of the shell** (`RD.SUPPORT.SURFACE.165`), inset or not.
 - **The thin bar over the content of `RAIL` MUST belong to the content.** It takes the fill of the content, and it stands inside the sheet where the content is inset.
 - **`inset` of the content MUST draw the content as a sheet.** The sheet has the corner radius of the theme. It is set into the shell with a margin, and the fill of the shell shows around it.
+- **A top navigation MUST take no `overlay` where the content is an inset sheet** (`RD.SUPPORT.SURFACE.199`). The bar stands on the shell, draws no fill, line or shadow of its own, takes the shell's colours, and the sheet starts below it.
 - **A translucent shell MUST show only where content passes behind the shell:** a top bar that stays in view, a panel of navigation, and a shell drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, the shell draws opaque.
 - **A panel of entries of the navigation MUST belong to the shell** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail are such panels. Each takes the fill and the opacity of the shell, a line where the shell is `bordered`, and a shadow where it is `raised`. Inside the panel of a top bar stand rows as tight as a menu bar's, or the app's own drawing through the group's `renderPanel`, as `architecture-components.md` states.
 - **A menu of actions MUST NOT take the look of the shell.** The menu of the account is such a menu, and it keeps the look every menu has.
