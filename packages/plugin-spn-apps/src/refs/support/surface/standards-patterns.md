@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "b6ad9af9"
+      "seen": "45dfd3f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
@@ -39,7 +39,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 | --- | --- | --- |
 | Move | going to another place, and knowing where you are | the layout · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSTabs` · `DSBreadcrumb` · `DSLink` |
 | Find | search, filter, sort, and paging through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` |
-| Read | records as a table, a list or a grid, one record in detail, and nothing to show | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` |
+| Read | records as a table, a list or a grid, one record in detail, subjects compared across the same settings, and nothing to show | `DSTable` · `DSList` · `DSDataFieldView` · `DSComparisonWidget` · `DSEmpty` · `DSSkeleton` |
 | Enter | filling a field, the check on it, and sending a form | `DSForm` and the entry fields |
 | Choose | picking one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers |
 | Act | one main action, an action on many records, and an action that destroys something | `DSButton` · `DSDropdownMenu` · `DSConfirmPopover` · `DSConfirmDialog` |
@@ -142,6 +142,7 @@ Read the facts against the table of the page patterns, and name the one pattern 
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
 | the whole set, some | two to four facts a person compares | a plain table, `DSTable` |
 | one record | several facts | readings, each a title with its value under it, `DSDataUnit` |
+| a few subjects, such as plans or roles | the same settings, a value for each subject | a comparison, `DSComparisonWidget`: the settings down the side, one column for each subject |
 
 - **A few is up to about 7, and some is up to about 30.** The numbers are there so that two people who read the same set reach the same block. Both numbers are proposed, and not yet confirmed (`RD.SUPPORT.SURFACE.052`).
 - **The search and the filters of a data table MUST be sent to the server** (`RD.SUPPORT.SURFACE.070`). The page holds one page of the records. A search in the page would search only that.

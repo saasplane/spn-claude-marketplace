@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "b3b3e08f"
+      "seen": "09b86169"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -106,7 +106,8 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
 | the picture and the end of an item line | the page gives the picture to `media` as data of one kind, `ICON`, `ICON_MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, with no size (`RD.SUPPORT.SURFACE.130`). It gives what stands at the end, which is data, a badge, a count or a status and never an action, to `endNode` (`RD.SUPPORT.SURFACE.131`, `RD.SUPPORT.SURFACE.178`). The actions of a head are the other blocks of its header, and they take their size and look from the place. `DSItem` takes no `startIcon` and no `actions` |
 | the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the widget's config, usually read from the address. The widget holds no state for it (`RD.SUPPORT.SURFACE.125`) |
-| a card drawn from data | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`) |
+| a card drawn from data | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
+| subjects compared across the same settings | the page gives `DSComparisonWidget` its `subjects`, its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The widget draws every value through `DSDataFieldView` and marks a value that differs from the first subject's (`RD.SUPPORT.SURFACE.181`) |
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
 | the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |

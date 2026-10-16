@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "7de35414"
+      "seen": "6c863528"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "b3b3e08f"
+      "seen": "09b86169"
     }
   ]
 }
@@ -31,7 +31,7 @@ A widget's task states are the task state of `standards-interaction.md`, and thi
 
 A widget is built for one purpose. It is not a set of components a page composes one at a time; it is one piece, and the widget itself places and wires the parts inside it. A widget takes one size, from its own prop or from the block above it, and **passes that size to every part inside it** — a page sets one size for the whole widget, and never dresses its parts separately.
 
-**Surface's core widgets are the data table `DSDataTableWidget`, the filter bar `DSFilterBarWidget` and the card widget `DSCardWidget`** (`RD.SUPPORT.SURFACE.099`, `RD.SUPPORT.SURFACE.127`). Every stack builds each of them, and the design library draws each of them. A stack may provide further widgets of its own, as `architecture-components.md` states under the core units and a stack's own. This ref does not name them, and the library does not draw them.
+**Surface's core widgets are the data table `DSDataTableWidget`, the filter bar `DSFilterBarWidget`, the card widget `DSCardWidget` and the comparison widget `DSComparisonWidget`** (`RD.SUPPORT.SURFACE.099`, `RD.SUPPORT.SURFACE.127`, `RD.SUPPORT.SURFACE.181`). Every stack builds each of them, and the design library draws each of them. A stack may provide further widgets of its own, as `architecture-components.md` states under the core units and a stack's own. This ref does not name them, and the library does not draw them.
 
 **Every widget, a core one or a stack's own, ends its name in `Widget`, with no letter for its layer before the name** (`RD.SUPPORT.SURFACE.098`). `architecture-names.md` states the rule for the three layers, and the names that belong to a widget.
 
@@ -173,7 +173,7 @@ The bar has one form, read from its start to its end. A person who has used one 
 
 - **`DSCardWidget` MUST take each group of its settings as the props of the unit that draws it, whole** (`RD.SUPPORT.SURFACE.127`). Its head and the small head of a part are the props of `DSItem`. An item of a part is the props of `DSItem`, and a row of a part is the props of `DSList.Item`. A page that knows those units knows the widget. So the picture of a head or of an item is the `media` of `DSItem`, given as data of one kind.
 
-A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every part also takes `key`, and `header`, the props of `DSItem` for the small head of the part. That head is drawn at the page level `GROUP` where the page gives none, and a row of an `ITEMS` part at `CONTENT`.
+A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every part also takes `key`, `header`, the props of `DSItem` for the small head of the part, and `headerActions`, the actions of that head. That head is drawn at the page level `GROUP` where the page gives none, and a row of an `ITEMS` part at `CONTENT`.
 
 | Kind | The page gives | What the widget draws |
 | --- | --- | --- |
@@ -183,6 +183,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 
 - **A page chooses the kind by what it holds.** A page that holds records as item lines gives `ITEMS`, and the widget builds the list. A page that needs a row of its own gives `LIST`. Anything else, such as a group of buttons, is `FREE`.
 - **The widget decides where things start, so a page does not.** An `ITEMS` part and a `LIST` part run from edge to edge of the card, and their rows pad to the inset of the card. The small head of a part, its rows and its empty words start on one line.
+- **The `headerActions` of a part MUST be drawn after the title of its head, as one group at the end, with the look of the head of a group** (`RD.SUPPORT.SURFACE.181`): the main action `SUBTLE`, every other action `OUTLINE`, an icon alone `GHOST`, one step below the size of the card. A size or a variant on a button wins. A part with no `header` draws no action.
 - **A part with no row MUST draw its `emptyText`, in the inset of the card and in the muted tone.** With no `emptyText` it draws its head alone.
 - **A row of an `ITEMS` part MUST hold one link, and never a link inside a link.** What `endNode` holds stays outside the link, so a press on an action there does the action and does not follow the link.
 - **A row of an `ITEMS` part or of a `LIST` part MAY be `selected`.** The page says which row is chosen, and the widget draws it as a chosen row of a list, with the band and `aria-current="true"`. The widget holds no state for it.
@@ -194,9 +195,27 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTableWidget`.
 - **The widget takes no `anchor` around the whole card, and no `className`, `style` or `minWidth`.** A card that is one link, or that needs a style of its own, is a `DSCard` that the page writes.
 
+## DSComparisonWidget — 🔮
+
+`DSComparisonWidget` sets subjects side by side across the same settings: plans against their limits, roles against their permissions. A page gives it data only (`RD.SUPPORT.SURFACE.181`), and the widget draws a table through `DSTable`, the head of each subject and each group through `DSItem`, and each value through `DSDataFieldView`.
+
+| Setting | The page gives | What the widget draws |
+| --- | --- | --- |
+| `subjects` | each a `key` and a `header`, the props of `DSItem` | one column for each subject, after the column of labels |
+| `groups` | each a `key`, a `header` where the page gives one, and `rows` | a head row at the level `GROUP`, then its rows |
+| `differencesOnly` | a yes-or-no, no by default | only the rows whose values are not all equal |
+
+A row states its kind in `mtype`, which takes `DSComparisonWidgetRowType`: `FIELD` gives `config`, an `SPDataFieldConfig`, and `values`, a value or null for each subject by its `key`; `CUSTOM` gives `label` and `renderer`, which draws the cell of one subject.
+
+- **The widget MUST draw every value of a `FIELD` row through `DSDataFieldView`.** A page gives the config and the stored values, never a node for a value a field can read. A value that is null, or missing, reads *not set* in the muted tone, translated.
+- **A value that differs from the first subject's MUST be marked as the cell that stands out in its row.** The first subject and a `CUSTOM` row are never marked.
+- **With `differencesOnly` the widget MUST keep only the `FIELD` rows whose values are not all equal, and every `CUSTOM` row.** A group with no row left is not drawn, and with no row at all the widget draws the empty state.
+- **The first column MUST hold the label of each row and stay pinned while the subjects scroll sideways.**
+- **The widget fills a `flush` content part of a container, as `DSDataTableWidget` does.** A set that needs paging, a search or a sort is a data table.
+
 ## Boundary
 
-This ref states what makes a block a widget, and what `DSDataTableWidget`, `DSFilterBarWidget` and `DSCardWidget` are built from. It stops at the edge of the widget. It does not state how a page shows a list beside the detail of its chosen row. That is a page pattern, groups and their items, and `architecture-containers.md` states what a person sees on such a page. No core widget is built for it: the web stack has a unit of its own, `DSListDetailWidget`, which `providers.md` names. It does not state what a component is — that is `architecture-components.md`. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`.
+This ref states what makes a block a widget, and what `DSDataTableWidget`, `DSFilterBarWidget`, `DSCardWidget` and `DSComparisonWidget` are built from. It stops at the edge of the widget. It does not state how a page shows a list beside the detail of its chosen row. That is a page pattern, groups and their items, and `architecture-containers.md` states what a person sees on such a page. No core widget is built for it: the web stack has a unit of its own, `DSListDetailWidget`, which `providers.md` names. It does not state what a component is — that is `architecture-components.md`. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`.
 
 ## Binds
 
