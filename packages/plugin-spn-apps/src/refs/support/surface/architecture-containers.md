@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "eb31911d"
+      "seen": "488c41c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "f77c57a1"
+      "seen": "ac07de80"
     }
   ]
 }
@@ -56,7 +56,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
-- **A container MUST give the title in its header the level of its box, `CONTAINER` unless the container is the whole page, and a container that is the whole page MUST say `PAGE` on the box** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A container takes `pageLevel`, the level of the box, `CONTAINER` where the page gives none, and gives it to its header, its content and its footer as their place. With `PAGE` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table container gives its box the `pageLevel` of its header. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
+- **A container MUST give the title in its header the level of its box, `CONTAINER` unless the container is the whole page, and a container that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A container takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this container is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the container gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table container takes `fullPage` too and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several containers MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one container puts its head in the header of that container. A page with several has no one container that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
@@ -226,7 +226,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.114` | a card hands its size to what it holds, as a container does |
 | `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole |
 | `RD.SUPPORT.SURFACE.107` | the level a box gives the title in its header: `CONTAINER` for a container, `PAGE` for a listing that is the page, `WIDGET` for a card |
-| `RD.SUPPORT.SURFACE.179` | a container that is the whole page takes the level `PAGE` on its box, and its header, content and footer take it as their place |
+| `RD.SUPPORT.SURFACE.179` | a container that is the whole page says so with the boolean `fullPage`, and its header, content and footer then take the level `PAGE` as their place |
 | `RD.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
 | `RD.SUPPORT.SURFACE.120` | a page that holds several containers has its head above them, outside any frame, with its way back, and writes nothing by hand for it |
 | `RD.SUPPORT.SURFACE.119` | the part that holds the groups may be narrow, by a named choice and never by a width the page writes. It is a MAY |

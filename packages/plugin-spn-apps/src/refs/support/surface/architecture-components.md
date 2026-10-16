@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "e00a7270"
+      "seen": "338284c0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "a03d1adb"
+      "seen": "97cdad26"
     }
   ]
 }
@@ -275,7 +275,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 
   | The box | The level of the title in its header |
   | --- | --- |
-  | a container and a data table container | the level of its box: `CONTAINER`, and `PAGE` where the container is the whole page, whose header is then the page head |
+  | a container and a data table container | the level of its box: `CONTAINER`, and `PAGE` where the container takes `fullPage` and is the whole page, whose header is then the page head |
   | a card, and the head of a card widget | `WIDGET` |
   | the head of a part of a card widget | `GROUP`, and its rows `CONTENT` |
   | a dialog, a sheet and a drawer | `CONTAINER` |
@@ -378,7 +378,7 @@ A title and a heading share sizes, so the size does not say which family a text 
 | a value inside another unit: a row of a popover, of a menu or of a cell | an item line at the level `INLINE`, a title | as many as there are rows |
 | a number, a price, the line of a hero | a heading step above `HEADING_XL`, in a component of the builder's own | one or two |
 
-- **A container that is the whole page MUST take the level `PAGE` on its box, and its header is then the page head** (`RD.SUPPORT.SURFACE.179`). A listing that is a part of a page takes `CONTAINER`, the level its box gives. So every page of an app opens with the same head, and only its body differs.
+- **A container that is the whole page MUST say so with `fullPage`, and its header is then the page head** (`RD.SUPPORT.SURFACE.179`). A listing that is a part of a page takes `CONTAINER`, the level its box gives. So every page of an app opens with the same head, and only its body differs.
 - **Every level of a page MUST have its title, and a title MUST be larger than the titles of what stands under it** (`RD.SUPPORT.SURFACE.112`). The titles run 22, 18, 16, 14, 13 and 12px from the page down to a value inside another unit. In a page with one container that holds a card, they are the `h1`, an `h2`, an `h3` and an `h4`, and a row is no heading.
 - **An inner part of a widget MUST draw its title as an item line at the level `GROUP`.** The action of the group stands at the end of that item line. So a group needs no block and no prop of its own.
 
