@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "407f19b2"
+      "seen": "b289ccf7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -142,7 +142,7 @@ export const DS_THEME_DEFAULT: IDSTheme = {
 - **The app and its context MUST hold the whole theme, `theme`, and the choice beside it, `themeChoice`** (`RD.SUPPORT.SURFACE.161`). So a form can mark a default and reset a choice. `DSApp`, `setTheme` and the form take the choice. A second, resolved type exists nowhere.
 - **The defaults MUST be written in one place, the default theme.** A unit and a layout read the theme, and keep no fallback of their own for a value of it. A unit's own prop, optional, still wins.
 - **Some values MUST be worked out from the choice, and not fixed.** A value of the card look follows the container's choice where the app chose one, else the default.
-- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, quiet, marked as the default; a value worked out says what it follows. Each field can clear its choice, and *Reset to defaults* clears every choice, so the page receives an empty choice. The form arranges its settings in six parts that follow the theme's keys, as the sections of an accordion (`RD.SUPPORT.SURFACE.191`), and offers no font family. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`): the mark or the link *Use the default* stands at the end of a field's label line, and a switch stands with its own label, its mark or link on the note line.
+- **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, filled in as a chosen value is, and carries no reset and no default note of its own; a choice equal to the default is left out of the theme. Resetting is the *Reset* of a part and *Reset to defaults*, which clears every choice, so the page receives an empty choice. The form arranges its settings in six parts that follow the theme's keys, as the sections of an accordion (`RD.SUPPORT.SURFACE.191`), and offers no font family. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`), and a switch stands with its own label.
 - **The theme MUST hold no font family** (`RD.SUPPORT.SURFACE.196`). The typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans`. A family name without its file only falls back, so a brand font is a file and a licence an app decides once.
 
 ## Prop, nearest block, app — 🔮

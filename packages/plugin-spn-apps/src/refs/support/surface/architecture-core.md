@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "56e979ac"
+      "seen": "0d9eaf37"
     }
   ]
 }
@@ -54,6 +54,7 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163` and `166`).
 - **A line MUST be chosen by what it parts.** Between rows it is `surface-divider`, neutral 100 in light and 27% in dark. At an edge it is `surface-border`, and at a control `surface-border-strong`.
 - **The fill under the pointer MUST NOT be the grey of the edge in light.** `surface-hover` is one step lighter than the border there. In dark the border stands at 32%, a clear step above the raised surface at 26.5%, the strong border at 40%, the fill under the pointer at 29% and the divider at 27%.
 - **A control's edge, and the off track of a switch, MUST step one small step from the strong border under the pointer** (`RD.SUPPORT.SURFACE.167`): neutral 300 to 400 in light, and 0.40 to 0.48 lightness in dark, drawn in full. The role is the edge under the pointer, `--surface-border-hover`.
+- **A block MUST read the paint tokens set on its own root and no others** (`RD.SUPPORT.SURFACE.192`). `--surface-fill` is unset by default, and where a class of the app sets it, to a colour or an image such as a gradient, a container's frames and a card's root draw it; where it is unset they draw the preset fill of their `color` and `strength`. `--surface-translucent-fill`, 82%, and `--surface-blur`, 12px, frost a TRANSLUCENT block, which stays solid where the browser cannot blur and where the person asks for reduced transparency; the shell's `--shell-translucent-fill` and `--shell-blur` are aliases of them.
 - **A card or a container takes `color` and `strength`, `BASE` by default. A dialog, a sheet and a drawer are `BASE`, and a popover, a menu and a tooltip are raised, each fixed.**
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. The fill of `SUBTLE` in the default hue is the text colour mixed into transparency.
 - **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and an icon mark read the strong step. The other hues keep their own step.

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "add3d540"
+      "seen": "a92f56a9"
     }
   ]
 }
@@ -143,6 +143,10 @@
 | `Internal` | suffix | a symbol beside its public sibling in the same file | the ungated twin of a public member |
 
 **The underscore is the mechanism, not a label** — the generated barrel skips every path holding one, at any depth. **The `Internal` suffix keeps a pair adjacent** wherever names are sorted, so you see both and pick deliberately.
+
+### CSS custom properties
+
+**An app or a module prefixes every CSS custom property it defines with its own code, and the design system's variables stay unprefixed** (`RD.SUPPORT.APPS.208`). The showcase's brand tokens are `--wds-surface` and `--wds-gradient-warm`; a partner's app names its own `--<app code>-…` and a module `--<module code>-…`, so nothing an app or a module defines meets a name of the design system, whose paint tokens `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` are unprefixed. An app names its own classes with its code too, such as `wds-card-promo`.
 
 ### Acronyms and codes
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "ac07de80"
+      "seen": "241b8118"
     }
   ]
 }
@@ -86,6 +86,7 @@ Here is how the parts serve the pages most apps have.
 | `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
 
 - **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first six is a choice that does not depend on the others (`RD.SUPPORT.SURFACE.163`). The theme holds the app's default for each, and a container may set its own.
+- **A partner MAY paint one container with a class of their own, through the paint tokens** (`RD.SUPPORT.SURFACE.192`). `DSContainer` takes `className`, which goes on its root, and `opacity`; the class sets `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` from the partner's own tokens, in light and in `[data-mode='dark']`, and each frame the container draws reads them. Anything else a class sets on the container is unsupported, and a card inside a painted container keeps its own fill. A card takes `className` and `opacity` the same way, and no `style`.
 - **A part listed in `unframed` MUST take no frame, whatever `frames` and the theme give.** A page that sets `frames` takes the whole choice from the theme. A page that sets `unframed` takes one part out and leaves the rest to the theme. So a theme can still change the look of that container, and the named part stays flat in every theme.
 - **`unframed` is for a part that no theme should frame on this page.** One such part is a header that is the header of the page, which the rules of content keep out of a frame (`standards-core.md`). A page that wants a look sets `frames`, or leaves it to the theme. The book states `unframed` before the web builds it.
 

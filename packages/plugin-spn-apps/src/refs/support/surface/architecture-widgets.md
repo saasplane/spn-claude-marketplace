@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "ebc71647"
+      "seen": "1a467a6b"
     }
   ]
 }
@@ -193,7 +193,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **The widget MUST take one `size`, and MUST pass it to its head, its lists and its rows.**
 - **The widget MUST NOT fold rows away.** A row that a page wants hidden, or shown in another way, is the page's to place, usually in a `FREE` part or in the footer.
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTableWidget`.
-- **The widget takes no `anchor` around the whole card, and no `className`, `style` or `minWidth`.** A card that is one link, or that needs a style of its own, is a `DSCard` that the page writes.
+- **The widget takes no `anchor` around the whole card, and no `style` or `minWidth`; its `className` and `opacity` paint the card and nothing else** (`RD.SUPPORT.SURFACE.192`). A class of the app on the widget sets the card's paint tokens and the widget hands it to the card it draws. A card that is one link, or that needs a style of its own, is a `DSCard` that the page writes.
 
 ## DSComparisonWidget — 🔮
 

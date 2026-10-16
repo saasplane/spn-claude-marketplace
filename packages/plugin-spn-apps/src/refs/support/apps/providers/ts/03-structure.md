@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "4ac2ec82"
+      "seen": "e55bab8e"
     }
   ]
 }
@@ -114,7 +114,7 @@ packages/module-server-iam-ts/
 - **A `SUPPORT_WEB` puts `ui/` at the source root**, because there the UI is the published surface rather than a module's adapter to it.
 - **A support package with no contract surface groups by feature folder** — `app/`, `http/`, `log/`, `utils/`. Those groups are the library's own to name.
 - **A `CLIENT_API` holds `src/generated/`, never hand-edited, plus a hand-maintained root barrel** over it.
-- **`src/assets/` sits beside `entry/`, never inside it.** Files reached by URL at runtime belong in the project's `public/`.
+- **`src/assets/` sits beside `entry/`, never inside it.** Files reached by URL at runtime belong in the project's `public/`. **A web app keeps every stylesheet in `src/assets/styles/`**: its entry `index.css` stands beside its partials, `index.tsx` imports `./assets/styles/index.css`, and the scaffold writes it there (`RD.SUPPORT.APPS.210`). **Tailwind's utilities are the toolkit's and are written `ds:` in every app**, each app importing Tailwind with `prefix(ds)`; an app names only its own classes and variables, with its own code (`RD.SUPPORT.APPS.209`).
 
 ### Inside an application
 
