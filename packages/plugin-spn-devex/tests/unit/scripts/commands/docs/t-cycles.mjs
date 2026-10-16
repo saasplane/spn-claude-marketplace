@@ -115,20 +115,46 @@ try {
       previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
         `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; decided<br>` +
         `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
-    ok("the Arc cell is the label in bold, then the arc's file as a link from the page",
-      arcCell(held) === `<strong>N010 &mdash; the release</strong><br><a class="sds-small" href="arcs/N010-the-release.md">arcs/N010-the-release.md</a>`, arcCell(held));
+    const pill = (href, text) => `<a class="sds-badge sds-lens" href="${href}">${text}</a>`;
+    ok("the Arc cell is three levels: the title in bold, the line below it, then the file and each preview as link pills",
+      arcCell(held) === `<strong>N010 &mdash; the release</strong><br>` +
+        pill("arcs/N010-the-release.md", "arcs/N010-the-release.md") + " " +
+        pill("notes/N010/previews/layout-preview.html", "layout-preview.html &middot; preview &middot; proposed") + " " +
+        pill("notes/N010/samples/close_message.md", "close_message.md &middot; sample &middot; decided") + " " +
+        pill("notes/N010/previews/first-preview.html", "first-preview.html &middot; preview &middot; decided"), arcCell(held));
   }
 
   console.log("\n=== docs cycles — the table the approach template carries");
   {
     const table = tableOf(cyclesOf(folder));
-    ok("the header is Arc · What it does · Status · Previews",
-      table.includes("<thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>"));
-    ok("a row is escaped HTML in the template's shape",
-      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><a class="sds-small" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
-        "<td>The plugins ship once.</td><td>HELD &middot; waits on Q7</td><td>&mdash;</td></tr>"), table);
+    ok("the header is Arc · Status, two columns",
+      table.includes("<thead><tr><th>Arc</th><th>Status</th></tr></thead>") && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
+    ok("a row is two cells: the Arc cell, and the Status cell with a HELD arc's reason below its word",
+      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><span class="sds-small">The plugins ship once.</span><br>` +
+        `<a class="sds-badge sds-lens" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
+        `<td>HELD<br><span class="sds-small">waits on Q7</span></td></tr>`), table);
+    ok("a RUNNING arc's Status cell is its word alone", table.includes("<td>RUNNING</td></tr>"), table);
     ok("an arc with no number still links its file",
-      table.includes(`<strong>a legacy arc with no number</strong><br><a class="sds-small" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
+      table.includes(`<strong>a legacy arc with no number</strong><br><span class="sds-small">Prepared: 2026-08-31</span><br><a class="sds-badge sds-lens" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
+
+    // The older tables are still read by header name and compared: four columns on any page, three on a closed one.
+    const { tableDifferences } = cyclesModule;
+    const cycles = cyclesOf(folder);
+    const four = `<table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead><tbody>` +
+      `<tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table>`;
+    const fourRead = tableDifferences(four, cycles);
+    ok("an old four-column table is read: its row is matched and its stale status is named",
+      fourRead.stale.length === 1 && /N1 reads PROPOSED and the arc reads RUNNING/.test(fourRead.stale[0]) && !fourRead.unknown.length, JSON.stringify(fourRead));
+    const three = `<table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead><tbody>` +
+      `<tr><td><strong>N1 &mdash; the chapter</strong></td><td>x</td><td>RUNNING</td></tr></tbody></table>`;
+    const threeRead = tableDifferences(three, cycles, false);
+    ok("a closed workstream's three-column table is read and compared by its Status header",
+      threeRead.stale.length === 0 && threeRead.missing.includes("N2") && !threeRead.unknown.length, JSON.stringify(threeRead));
+    const two = tableOf(cycles);
+    ok("a two-column table written from the arcs has no difference", JSON.stringify(tableDifferences(two, cycles)) === JSON.stringify({ missing: [], unknown: [], stale: [] }), JSON.stringify(tableDifferences(two, cycles)));
+    const reasonless = two.replace('<br><span class="sds-small">waits on Q7</span>', "");
+    ok("a HELD arc's reason missing from the Status cell is named",
+      tableDifferences(reasonless, cycles).stale.some((line) => /N10's Status does not carry the arc's reason/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));
   }
 
   console.log("\n=== docs cycles — naming the workstream");
@@ -293,7 +319,7 @@ ${linesFor("1.0.0").script}
       after.includes("<h2>Open &mdash; Q3</h2>") && openHeadingRule(page, after).length === 0);
     ok("[MKT.SCRIPTS.79] one table, one badge and one heading are replaced, each exactly once",
       count(after, "<table") === count(before, "<table") && count(after, "sds-badge sds-status") === 1 && count(after, "<h2") === count(before, "<h2") &&
-      count(after, "<th>Arc</th>") === 1 && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
+      count(after, "<th>Arc</th>") === 1 && !after.includes("<th>Previews</th>") && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
     ok("[MKT.SCRIPTS.79] it adds no generated marker to the page", !after.includes("spn:generated"));
     const writtenAt = stamp(page);
     const again = await capture(["docs", "cycles", "write", "050-write"], { SPN_WORKSPACE: TMP });
@@ -387,7 +413,7 @@ ${linesFor("1.0.0").script}
       !/status badge|Cycles table to write|wrote/.test(refused.err + refused.out), refused.err + refused.out);
     const printed = await capture(["docs", "cycles", "show", own]);
     ok("[MKT.SCRIPTS.108] with no option the table is still printed from the arcs, in the shared names",
-      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<a class="sds-small" href="arcs/N1-the-chapter.md">`), printed.out);
+      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<a class="sds-badge sds-lens" href="arcs/N1-the-chapter.md">`), printed.out);
     // A page under `closed/` is never read, so it is neither refused nor written.
     const shut = place("closed", "058-own-copy-closed");
     const kept = await capture(["docs", "cycles", "write", shut]);

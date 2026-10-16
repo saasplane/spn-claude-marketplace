@@ -52,7 +52,7 @@ import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUC
          artifactDocsPathOf, decisionsRegister, inArtifacts, isApproachPage, isArcFile, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { CYCLES_COLUMNS, cyclesOf, headerStatusRule, openHeadingFor, openHeadingOf, previewLinkForm, previewsOf, tableColumns,
+import { CYCLES_COLUMNS, FOUR_COLUMNS, THREE_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, previewLinkForm, previewsOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
@@ -292,10 +292,10 @@ const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).r
 
 const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
 
-// The header of the Cycles table, as a page writes it, and the same header with no Previews column,
-// which a closed workstream keeps.
+// The header of the Cycles table, as a page writes it, and the older headers (four columns, and three
+// with no Previews column) which a closed workstream keeps.
 const CYCLES_HEADER = CYCLES_COLUMNS.join(" · ");
-const CYCLES_HEADER_NO_PREVIEWS = CYCLES_COLUMNS.slice(0, 3).join(" · ");
+const CYCLES_HEADER_NO_PREVIEWS = THREE_COLUMNS.join(" · ");
 
 /** Whether a path sits in a closed workstream, whose page keeps the table it closed with. */
 function inClosedWorkstream(path: string): boolean {
@@ -305,12 +305,13 @@ function inClosedWorkstream(path: string): boolean {
 
 /**
  * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
- * `h3` named Cycles, whose table has Arc · What it does · Status · Previews. Inside a workstream the
+ * `h3` named Cycles, whose table has two columns, Arc · Status. Inside a workstream the
  * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
- * its name, the link to its file, its line, its status, and the previews and samples its `## Previews`
- * table lists. `spn-devex docs cycles show` prints the rows; this compares the page against the same
+ * its name, its line and the links to its file, its previews and its samples (all in the Arc cell),
+ * and its status with the reason a HELD, CARRIED or DROPPED arc carries.
+ * `spn-devex docs cycles show` prints the rows; this compares the page against the same
  * reading, which is `tableDifferences` in that command's file. A page in a closed workstream may
- * carry the table with no Previews column, and then only its rows and their statuses are compared.
+ * keep the older four columns, or three with no Previews, and a three-column table has only its rows and their statuses compared.
  */
 export function cyclesRule(path: string, text: string): Finding[] {
   const body = section(text, "How");
@@ -327,17 +328,18 @@ export function cyclesRule(path: string, text: string): Finding[] {
 
   const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
   const columns = table ? tableColumns(table) : "";
-  const withPreviews = columns === CYCLES_HEADER.toLowerCase();
-  if (!withPreviews && columns !== CYCLES_HEADER_NO_PREVIEWS.toLowerCase())
+  const current = columns === headerOf(CYCLES_COLUMNS);
+  const withPreviews = columns !== headerOf(THREE_COLUMNS);
+  if (!current && columns !== headerOf(THREE_COLUMNS) && columns !== headerOf(FOUR_COLUMNS))
     return [[CYCLES, `Cycles carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
       `the arcs' status lines and their Previews tables (05-artifacts.md § How ends in Cycles) · ${fix}`]];
 
   const home = workstreamOf(path);
   if (!home) return [];
-  if (!withPreviews && !inClosedWorkstream(path))
-    return [[CYCLES, `Cycles carries ${CYCLES_HEADER_NO_PREVIEWS} and no Previews column — each row links ` +
-      "its arc file and lists that arc's previews and samples (05-artifacts.md § How ends in Cycles) · " +
-      "run `spn-devex docs cycles show <workstream>` and replace the table with the one it prints"]];
+  if (!current && !inClosedWorkstream(path))
+    return [[CYCLES, `Cycles carries ${columns.split(" · ").map((name) => name.charAt(0).toUpperCase() + name.slice(1)).join(" · ")} where an open workstream carries ${CYCLES_HEADER} — each row holds the ` +
+      "arc's title, line and links, and its status (05-artifacts.md § How ends in Cycles) · " +
+      "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
   const { missing, unknown, stale } = tableDifferences(table!, cyclesOf(home.folder), withPreviews);

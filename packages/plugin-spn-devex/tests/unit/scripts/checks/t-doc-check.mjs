@@ -90,7 +90,7 @@ const STYLES = linesFor("1.0.0");
 
 // A page that passes everything, used as the base for each known-bad mutation. It is in the shared
 // form: it links one version of the shared stylesheet, and every class of it opens with `sds-`.
-const CLEAN = `<!doctype html>
+const CLEAN_FOUR = `<!doctype html>
 ${STYLES.stylesheet}
 <div class="sds-eyebrow">Who this is for &middot; the developer picking up this work</div>
 <h1>A subject</h1>
@@ -113,8 +113,16 @@ ${STYLES.stylesheet}
 </section>
 `;
 
+// The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
+// title, the line and the link pills, and the Status cell the word.
+const TWO_ROW = (id, name, file, line, status) =>
+  `<tr><td><strong>${id} &mdash; ${name}</strong><br><span class="sds-small">${line}</span><br><a class="sds-badge sds-lens" href="arcs/${file}">arcs/${file}</a></td><td>${status}</td></tr>`;
+const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
+  `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
+  `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
+
 // The same page with the Cycles table a closed workstream keeps: three columns, no file link.
-const NO_PREVIEWS = CLEAN
+const NO_PREVIEWS = CLEAN_FOUR
   .replace("<th>Previews</th>", "")
   .replace(/<br><a class="sds-small"[^>]*>[^<]*<\/a>/g, "")
   .replace(/<td>&mdash;<\/td><\/tr>/g, "</tr>");
@@ -419,8 +427,8 @@ one("a subsection after Cycles",
   "reports", "after Cycles");
 
 one("Cycles whose table has the wrong columns",
-  write(APPROACH, CLEAN.replace("<th>What it does</th>", "<th>Scope</th>")),
-  "reports", "Arc · What it does · Status");
+  write(APPROACH, CLEAN.replace("<th>Status</th>", "<th>Scope</th>")),
+  "reports", "Arc · Status");
 
 one("a Terms section — an approach page has none",
   write(APPROACH, CLEAN.replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
@@ -458,7 +466,7 @@ try {
     "reports", "has no row for N2");
 
   one("a Cycles row naming no arc",
-    write(page, CLEAN.replace("</tbody>", `<tr><td><strong>N3 &mdash; typed by hand</strong></td><td>x</td><td>DECIDED</td></tr></tbody>`)),
+    write(page, CLEAN.replace("</tbody>", `<tr><td><strong>N3 &mdash; typed by hand</strong></td><td>DECIDED</td></tr></tbody>`)),
     "reports", "lists N3");
 
   one("a status cell carrying its blocker still reads as its word",
@@ -470,33 +478,36 @@ try {
     "silent");
 
   one("a row whose Arc cell links no file",
-    write(page, CLEAN.replace(`<br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
-    "reports", "N2 does not link its arc file as arcs/N2-the-check.md");
+    write(page, CLEAN.replace(`<br><a class="sds-badge sds-lens" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
+    "reports", "N2's links are not the arc file");
 
   one("a row whose Arc cell links another arc's file",
     write(page, CLEAN.replace(`href="arcs/N2-the-check.md"`, `href="arcs/N1-the-chapter.md"`)),
-    "reports", "N2 does not link its arc file as arcs/N2-the-check.md");
+    "reports", "N2's links are not the arc file");
 
   one("a row named differently from its arc's heading",
     write(page, CLEAN.replace("N2 &mdash; the check</strong>", "N2 &mdash; the gate</strong>")),
     "reports", `N2 is named "N2 — the gate" and the arc is "N2 — the check"`);
 
-  one("a What it does cell typed by hand",
+  one("a line under the title typed by hand",
     write(page, CLEAN.replace("the check, in one sentence.", "a check reads the new shape")),
-    "reports", "N2's What it does is not the arc's own line");
+    "reports", "N2's line is not the arc's own line");
 
-  one("a Previews cell listing a file the arc does not",
-    write(page, CLEAN.replace("<td>DECIDED</td><td>&mdash;</td>",
-      `<td>DECIDED</td><td><a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed</td>`)),
-    "reports", "N2's Previews cell is not what the arc's Previews table lists");
+  one("a preview pill the arc's Previews table does not list",
+    write(page, CLEAN.replace(`arcs/N2-the-check.md</a></td>`,
+      `arcs/N2-the-check.md</a> <a class="sds-badge sds-lens" href="notes/N2/previews/layout-preview.html">layout-preview.html &middot; preview &middot; proposed</a></td>`)),
+    "reports", "N2's links are not the arc file");
+
+  one("four columns in an open workstream — told to run the command",
+    write(page, CLEAN_FOUR), "reports", "run `spn-devex docs cycles write <workstream>`");
 
   // THE TABLE WITH NO PREVIEWS COLUMN, in each of the three states. A workstream being worked or
   // parked is told to print the table again; a closed one stays as it was written.
   one("three columns in an open workstream — told to run the command",
-    write(page, NO_PREVIEWS), "reports", "run `spn-devex docs cycles show <workstream>`");
+    write(page, NO_PREVIEWS), "reports", "run `spn-devex docs cycles write <workstream>`");
   one("three columns in a backlog workstream — told to run the command",
     write(join(stream(TMP, "045-parked", "backlog"), "approach.html"), NO_PREVIEWS),
-    "reports", "no Previews column");
+    "reports", "where an open workstream carries Arc · Status");
   const closedPage = join(stream(TMP, "046-done", "closed"), "done-approach.html");
   one("three columns in a closed workstream — never judged for the column",
     write(closedPage, NO_PREVIEWS), "silent");
@@ -504,6 +515,8 @@ try {
     write(closedPage, NO_PREVIEWS.replace("<td>DECIDED</td>", "<td>RUNNING</td>")),
     "reports", "N2 reads RUNNING and the arc reads DECIDED");
   one("four columns in a closed workstream, matching its arcs",
+    write(closedPage, CLEAN_FOUR), "silent");
+  one("two columns in a closed workstream, matching its arcs",
     write(closedPage, CLEAN), "silent");
 
   // AN ARC NUMBERED IN THREE DIGITS, WITH A PREVIEWS TABLE: a preview, a sample with a dated state,
@@ -515,23 +528,23 @@ try {
     "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
     "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n\n## Steps"));
   writeFileSync(join(previewed, ARCS, "N002-the-check.md"), arcFile("N002", "the check", "DECIDED").replace("## Steps", "## Previews\n\nNone.\n\n## Steps"));
-  const PREVIEWS_CELL = `<a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
-    `<a href="notes/N001/samples/close-message.md">close-message.md</a> &middot; sample &middot; decided`;
+  const PILLS = `<a class="sds-badge sds-lens" href="notes/N001/previews/layout-preview.html">layout-preview.html &middot; preview &middot; proposed</a> ` +
+    `<a class="sds-badge sds-lens" href="notes/N001/samples/close-message.md">close-message.md &middot; sample &middot; decided</a>`;
   const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
     .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
-    .replace("<td>RUNNING</td><td>&mdash;</td>", `<td>RUNNING</td><td>${PREVIEWS_CELL}</td>`);
+    .replace("arcs/N001-the-chapter.md</a></td>", `arcs/N001-the-chapter.md</a> ${PILLS}</td>`);
   const previewedPage = join(previewed, "approach.html");
-  one("three-digit arcs, and a Previews cell matching the arc's Previews table",
+  one("three-digit arcs, and link pills matching the arc's Previews table",
     write(previewedPage, PREVIEWED), "silent");
-  one("a Previews cell left as a dash while the arc lists two files",
-    write(previewedPage, PREVIEWED.replace(PREVIEWS_CELL, "&mdash;")),
-    "reports", "N001's Previews cell is not what the arc's Previews table lists");
-  one("a Previews cell whose state is not the arc's",
+  one("link pills left out while the arc lists two files",
+    write(previewedPage, PREVIEWED.replace(` ${PILLS}`, "")),
+    "reports", "N001's links are not the arc file");
+  one("a pill whose state is not the arc's",
     write(previewedPage, PREVIEWED.replace("preview &middot; proposed", "preview &middot; decided")),
-    "reports", "N001's Previews cell is not what the arc's Previews table lists");
-  one("a Previews cell whose link is written from arcs/ rather than from the page",
+    "reports", "N001's links are not the arc file");
+  one("a pill whose link is written from arcs/ rather than from the page",
     write(previewedPage, PREVIEWED.replace(`href="notes/N001/previews/`, `href="../notes/N001/previews/`)),
-    "reports", "N001's Previews cell is not what the arc's Previews table lists");
+    "reports", "N001's links are not the arc file");
 
   // 008 is exempt by name: its page keeps the shape it was written in.
   const exempt = stream(TMP, "008-plain-probe");
@@ -677,7 +690,7 @@ try {
   mkdirSync(join(landing, ARCS), { recursive: true });
   writeFileSync(join(landing, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "LANDED"));
   writeFileSync(join(landing, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DROPPED"));
-  const LANDED_PAGE = CLEAN.replace("<td>RUNNING</td>", "<td>LANDED</td>").replace("<td>DECIDED</td>", "<td>DROPPED</td>");
+  const LANDED_PAGE = CLEAN.replace("<td>RUNNING</td>", "<td>LANDED</td>").replace("<td>DECIDED</td>", `<td>DROPPED<br><span class="sds-small">2026-09-29</span></td>`);
   one("[MKT.HOOKS.40] a page in open/ stamped DONE once every arc is terminal is left alone",
     write(join(landing, "approach.html"), withStatus(LANDED_PAGE, "DONE", "&#x2705;")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page in open/ stamped DONE while an arc still runs",
@@ -687,8 +700,7 @@ try {
   n += 1;
   const sweptHome = stream(TMP, "044-sweep");
   writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
-    `<tr><td><strong>N4 &mdash; late docs</strong><br><a class="sds-small" href="arcs/N4-late-docs.md">arcs/N4-late-docs.md</a></td>` +
-    `<td>late docs, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody>`));
+    TWO_ROW("N4", "late docs", "N4-late-docs.md", "late docs, in one sentence.", "DECIDED") + "</tbody>"));
   writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
     "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
   let out = "", code = 0;
@@ -711,7 +723,7 @@ try {
   // stylesheet. It links nothing, it carries a style block, and its classes have no prefix. Read by
   // the shared names it has no opening and no card in the open shape.
   const OWN = CLEAN.replace(`${STYLES.stylesheet}\n`, "<style>.eyebrow{font-size:.8rem} .standfirst{font-size:1.2rem} .open{border-left:2px solid orange}</style>\n")
-    .replace(/class="sds-section-head"/g, 'class="sec-head"').replace(/class="sds-small"/g, 'class="s"').replace(/class="sds-/g, 'class="')
+    .replace(/class="sds-section-head"/g, 'class="sec-head"').replace(/class="sds-small"/g, 'class="s"').replace(/sds-badge sds-lens/g, "badge lens").replace(/class="sds-/g, 'class="')
     + `<section id="s4"><div class="sec-head"><h2>Open &mdash; Q1</h2></div><div class="open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>\n`;
   const ownHome = stream(TMP, "060-own-copy");
   const ownPage = join(ownHome, "approach.html");

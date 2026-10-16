@@ -2,9 +2,10 @@
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status says which of eight states it is in
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// A workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run. A row
-// names the arc and links its file, says what the arc does and where it stands, and lists the
-// previews and samples the arc's own `## Previews` table carries.
+// A workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run, in two
+// columns. Arc holds the title, the description and the facts as link pills (the arc file, and the
+// previews and samples the arc's own `## Previews` table carries); Status holds the word, and for
+// HELD, CARRIED and DROPPED the reason below it.
 //
 //   spn-devex docs cycles show <workstream> [--json]   print the table, or the rows as data
 //   spn-devex docs cycles write <workstream>           write the parts of the page the arcs decide
@@ -50,8 +51,14 @@ export type Cycle = {
   previews: Preview[];     // the rows of the arc's `## Previews` table; empty where it reads `None.`
 };
 
-/** The columns of the Cycles table, in order. */
-export const CYCLES_COLUMNS = ["Arc", "What it does", "Status", "Previews"];
+/** The columns of the Cycles table, in order: the arc with its description and facts, then its status. */
+export const CYCLES_COLUMNS = ["Arc", "Status"];
+/** The four columns the table had before it went to two, which a closed workstream may keep. */
+export const FOUR_COLUMNS = ["Arc", "What it does", "Status", "Previews"];
+/** The three columns an older closed workstream keeps. */
+export const THREE_COLUMNS = FOUR_COLUMNS.slice(0, 3);
+/** A header as `tableColumns` reads it: lower case, joined by a middle dot. */
+export const headerOf = (columns: string[]): string => columns.join(" · ").toLowerCase();
 
 const MUST_CARRY = new Set(["HELD", "CARRIED", "DROPPED"]);
 // Longest word first, so `PART-LANDED` is never read as `LANDED`.
@@ -230,15 +237,37 @@ export function arcHref(cycle: Cycle): string {
   return `${ARCS}/${basename(cycle.file)}`;
 }
 
-/** The Arc cell's HTML: the label in bold, then the arc's file as a link from the page. */
-export function arcCell(cycle: Cycle): string {
+/** The facts of an arc, each a small link pill: its file, then each preview and sample with its state. */
+export function factsCell(cycle: Cycle): string {
+  const pill = (href: string, text: string) =>
+    `<a class="sds-badge sds-lens" href="${attribute(href)}">${escape(text)}</a>`;
   const href = arcHref(cycle);
-  return `<strong>${escape(arcLabel(cycle))}</strong><br><a class="sds-small" href="${attribute(href)}">${escape(href)}</a>`;
+  const facts = [pill(href, href)];
+  for (const preview of cycle.previews) {
+    const text = [preview.name, preview.kind, preview.state].filter(Boolean).join(" · ");
+    facts.push(preview.href ? pill(preview.href, text) : `<span class="sds-badge sds-lens">${escape(text)}</span>`);
+  }
+  return facts.join(" ");
 }
 
 /**
- * The Previews cell's HTML: one entry per row of the arc's Previews table, each the file as a link
- * from the page, its kind and its state. An arc with no rows reads as a dash.
+ * The Arc cell's HTML, in the three levels of a DSItem: the title in bold, the description below it
+ * in muted small text, then a row of facts, each a link pill (the arc file, the previews, the samples).
+ */
+export function arcCell(cycle: Cycle): string {
+  const description = cycle.does ? `<br><span class="sds-small">${escape(cycle.does)}</span>` : "";
+  return `<strong>${escape(arcLabel(cycle))}</strong>${description}<br>${factsCell(cycle)}`;
+}
+
+/** The Status cell's HTML: the word, then for HELD, CARRIED and DROPPED the reason below it in small text. */
+export function statusCell(cycle: Cycle): string {
+  if (!cycle.status) return escape(statusLabel(cycle));
+  return cycle.detail ? `${escape(cycle.status)}<br><span class="sds-small">${escape(cycle.detail)}</span>` : escape(cycle.status);
+}
+
+/**
+ * The Previews cell of the four-column table: one entry per row of the arc's Previews table, each the
+ * file as a link from the page, its kind and its state. An arc with no rows reads as a dash.
  */
 export function previewsCell(cycle: Cycle): string {
   if (!cycle.previews.length) return "&mdash;";
@@ -250,9 +279,9 @@ export function previewsCell(cycle: Cycle): string {
   }).join("<br>");
 }
 
-/** The four cells of one Cycles row, as HTML, in the order of `CYCLES_COLUMNS`. */
+/** The two cells of one Cycles row, as HTML, in the order of `CYCLES_COLUMNS`. */
 export function rowCells(cycle: Cycle): string[] {
-  return [arcCell(cycle), escape(cycle.does), escape(statusLabel(cycle)), previewsCell(cycle)];
+  return [arcCell(cycle), statusCell(cycle)];
 }
 
 /** The table the approach template's Cycles subsection carries, ready to replace it. */
@@ -295,12 +324,21 @@ export function tableColumns(table: string): string {
   return [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase()).join(" · ");
 }
 
+/** The title of an Arc cell: its bold text. The description and the link pills sit around it. */
+const titleOf = (cell: string): string => {
+  const bold = /<strong\b[^>]*>([\s\S]*?)<\/strong>/i.exec(cell);
+  return bold ? flat(bold[1]) : withoutAnchors(cell);
+};
+
+/** The description of an Arc cell: what is left of it with the title and the link pills taken out. */
+const withoutTitle = (cell: string): string => withoutAnchors(cell.replace(/<strong\b[\s\S]*?<\/strong>/i, " "));
+
 /** The rows of a page's Cycles table, each under the key of the arc it names, in the page's order. */
 function tableRows(table: string): Map<string, string[]> {
   const rows = [...(table.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
     .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((found) => found[1]))
-    .filter((cells) => cells.length >= 3);
-  return new Map(rows.map((cells) => [cycleKey(withoutAnchors(cells[0])), cells]));
+    .filter((cells) => cells.length >= 2);
+  return new Map(rows.map((cells) => [cycleKey(titleOf(cells[0])), cells]));
 }
 
 /** The arcs of a workstream, each under the key a Cycles row names it by. */
@@ -318,24 +356,47 @@ export function tableDifferences(table: string, cycles: Cycle[], withPreviews = 
   const onPage = tableRows(table);
   const inArcs = arcsByKey(cycles);
   const stale: string[] = [];
+  // Cells are read by the header's name, never by position: a table may hold two, three or four columns.
+  const headers = [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase());
+  const at = (name: string): number => headers.indexOf(name);
+  const statusAt = at("status") >= 0 ? at("status") : 2;
+  const doesAt = at("what it does");
+  const previewsAt = at("previews");
+  const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
   for (const [key, cells] of onPage) {
     const cycle = inArcs.get(key);
     if (!cycle) continue;
-    const status = flat(cells[2]);
+    const status = flat(cells[statusAt] ?? "");
     if (cycle.status && statusWord(status) !== cycle.status)
       stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${cycle.status}`);
     if (!withPreviews) continue;
+    if (doesAt < 0) {
+      // Two columns: the Arc cell holds the title, the description and the facts, and the Status cell its reason.
+      const expected = arcCell(cycle);
+      if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
+        stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
+      if (withoutTitle(cells[0]) !== withoutTitle(expected))
+        stale.push(`${key}'s line is not the arc's own line`);
+      const pills = (html: string) => anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n");
+      if (pills(cells[0]) !== pills(expected))
+        stale.push(`${key}'s links are not the arc file and the previews and samples the arc's Previews table lists`);
+      if (cycle.status && cycle.detail && status !== flat(statusCell(cycle)))
+        stale.push(`${key}'s Status does not carry the arc's reason`);
+      continue;
+    }
     if (withoutAnchors(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
       stale.push(`${key} is named "${withoutAnchors(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
     const href = arcHref(cycle);
     if (!anchorsOf(cells[0]).some((anchor) => anchor.href === href && anchor.text === href))
       stale.push(`${key} does not link its arc file as ${href}`);
-    if (flat(cells[1]) !== cycle.does.replace(/\s+/g, " ").trim())
+    if (flat(cells[doesAt]) !== cycle.does.replace(/\s+/g, " ").trim())
       stale.push(`${key}'s What it does is not the arc's own line`);
-    const previews = previewsCell(cycle);
-    const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
-    if (flat(cells[3] ?? "") !== flat(previews) || linked(cells[3] ?? "") !== linked(previews))
-      stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
+    if (previewsAt >= 0 || headers.length >= 4) {
+      const cell = cells[previewsAt >= 0 ? previewsAt : 3] ?? "";
+      const previews = previewsCell(cycle);
+      if (flat(cell) !== flat(previews) || linked(cell) !== linked(previews))
+        stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
+    }
   }
   return {
     missing: [...inArcs.keys()].filter((key) => !onPage.has(key)),
@@ -468,7 +529,7 @@ export function producedPage(folder: string, text: string, cycles: Cycle[] = cyc
   const table = cyclesTableAt(out)!;
   const current = out.slice(table.from, table.to);
   const differences = tableDifferences(current, cycles);
-  if (tableColumns(current) !== CYCLES_COLUMNS.join(" · ").toLowerCase()
+  if (tableColumns(current) !== headerOf(CYCLES_COLUMNS)
       || differences.missing.length || differences.unknown.length || differences.stale.length) {
     // The rows keep the order the page lists them in, which is the order a person chose. An arc the
     // page does not list yet is added after them, in the order of the arc numbers.
