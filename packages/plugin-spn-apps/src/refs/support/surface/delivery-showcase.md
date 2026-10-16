@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "51e37d6e"
+      "seen": "a484dea6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "e3035d40"
+      "seen": "09282607"
     }
   ]
 }
@@ -25,7 +25,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them.
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
-5. A section is one container. Its header holds the title, one line and the section's actions. Its content is one card that holds the tabs, the preview and the code as one object. Its footer holds the actions that follow from the section.
+5. A section is one container. Its header holds a `DSItem` with the title and one line, and the section's actions as plain siblings. Its content is one card that holds the tabs, the preview and the code as one object. Its footer holds the actions that follow from the section.
 6. The code of an example is the usage and every name the usage uses, declared, and it is shown whole.
 7. A unit that writes a value shows the live value beside it in every example.
 8. A size is a tab of the page or the section that shows the unit, and never a page of its own.
@@ -235,6 +235,7 @@ A section opens on the tab its unit names. Where the unit names none, Sizes open
 - The look of the frame comes from the theme, as an app's does. The showcase sets no frame part, no border, no fill and no corners of its own on a section, so a change of the container's look in the theme shows on every section. Its default theme names the content as the one framed part.
 - No container stands inside another container. The containers construct refuses a container inside a container, and a section is a container. So an example that is a container, or a whole page of an app, is shown as an embedded screen in the content of its section. The screen is a page of its own, loaded in the section's content, and the frame of the section is the one frame that the reader sees.
 - The opening of a page is the page's own header, and not the header of a container.
+- **The showcase builds its page head and its section heads from the blocks it shows** (`RD.SUPPORT.SURFACE.186`). The head of a page is a `DSPageLevel` head at `PAGE` that holds a `DSItem`, with its description and its way back. The header of a section's container holds a `DSItem` and the section's actions as plain siblings, and the tabs of a section take their level from the container. It draws no heading with `DSText`, sets no class on a block of the design system and forces no type size, and an example builds nothing by hand that a block does: a mark beside a title is a `DSItem` with the mark as its media.
 
 The content of a section's container is one card. The card holds the tabs, the preview and the code as one object. The container's frame is the card's border and its corners, so a section has one border and not two.
 
