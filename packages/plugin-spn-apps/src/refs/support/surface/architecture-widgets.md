@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "6c863528"
+      "seen": "e2fbd41e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "09b86169"
+      "seen": "9e3c1e2d"
     }
   ]
 }
@@ -208,7 +208,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 A row states its kind in `mtype`, which takes `DSComparisonWidgetRowType`: `FIELD` gives `config`, an `SPDataFieldConfig`, and `values`, a value or null for each subject by its `key`; `CUSTOM` gives `label` and `renderer`, which draws the cell of one subject.
 
 - **The widget MUST draw every value of a `FIELD` row through `DSDataFieldView`.** A page gives the config and the stored values, never a node for a value a field can read. A value that is null, or missing, reads *not set* in the muted tone, translated.
-- **A value that differs from the first subject's MUST be marked as the cell that stands out in its row.** The first subject and a `CUSTOM` row are never marked.
+- **A value that differs from the most common value of its row MUST be marked as the cell that stands out in its row, or, where the page gives `baselineKey`, one that differs from that subject's** (`RD.SUPPORT.SURFACE.184`). A row whose most common value is a tie marks none, an unknown key marks none, and a `CUSTOM` row is never marked.
 - **With `differencesOnly` the widget MUST keep only the `FIELD` rows whose values are not all equal, and every `CUSTOM` row.** A group with no row left is not drawn, and with no row at all the widget draws the empty state.
 - **The first column MUST hold the label of each row and stay pinned while the subjects scroll sideways.**
 - **The widget fills a `flush` content part of a container, as `DSDataTableWidget` does.** A set that needs paging, a search or a sort is a data table.

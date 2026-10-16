@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "7efc5a38"
+      "seen": "5cb13043"
     }
   ]
 }
@@ -55,12 +55,12 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163` and `166`).
 - **The fill under the pointer MUST NOT be the grey of the edge in light.** `surface-hover` is one step lighter than the border there. In dark the border stands at 32%, a clear step above the raised surface at 26.5%, the strong border at 40%, the fill under the pointer at 29% and the divider at 27%.
 - **A control's edge, and the off track of a switch, MUST step one small step from the strong border under the pointer** (`RD.SUPPORT.SURFACE.167`): neutral 300 to 400 in light, and 0.40 to 0.48 lightness in dark, drawn in full. The role is the edge under the pointer, `--surface-border-hover`.
 - **A card or a container takes `color` and `strength`, `BASE` by default. A dialog, a sheet and a drawer are `BASE`, and a popover, a menu and a tooltip are raised, each fixed.**
-- **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. `surface-inset` is the fill of `SUBTLE` in the default hue.
+- **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. The fill of `SUBTLE` in the default hue is the text colour mixed into transparency.
 - **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and an icon mark read the strong step. The other hues keep their own step.
 - **Small text that a person reads MUST take the muted tone at least, and the subtle tone is only for a placeholder or a disabled state** (`RD.SUPPORT.SURFACE.166`). The subtle tone does not reach 4.5 to 1 against a surface.
 - **A title that stands a step back MUST take the quiet tone, and the description of an item MUST take it at every level but `INLINE`; facts stay muted** (`RD.SUPPORT.SURFACE.143`, `166`). `DSTextToneType` names it `QUIET`.
-- **The shades of the variants MUST be these** (`RD.SUPPORT.SURFACE.154`). In light `QUIET` is step 200, step 300 under the pointer, and `SUBTLE` and `SUBTLE_OUTLINE` step 100, step 200 under the pointer — not step 50, which stands too close to a white page. `SUBTLE` of the default hue is `surface-inset`, and `surface-soft-hover` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, and `surface-border-strong` for the default hue. In dark a tint is step 500 over the page at a share for each hue, its text step 200, and the line step 700, and `surface-border-strong` for the default hue. A tint inverts between modes.
-- **A chosen row of a list and the row in view of a table draw the subtle tint of primary, step 100 in light. A pressed toggle draws `QUIET` of its hue.**
+- **The shades of the variants MUST be these** (`RD.SUPPORT.SURFACE.154`). In light `QUIET` is step 200, step 300 under the pointer, and `SUBTLE` and `SUBTLE_OUTLINE` a wash of the hue's step 500 into transparency, at a share for each hue and a larger one under the pointer, the least that stands `0.04` of lightness from the page, a card and a dialog (`RD.SUPPORT.SURFACE.183`). `SUBTLE` of the default hue is the text colour mixed into transparency, `6` percent and `11` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, and `surface-border-strong` for the default hue. In dark a tint is the same kind of wash, at its own share for each hue, its text step 200, and the line step 700, and `surface-border-strong` for the default hue. A tint inverts between modes.
+- **A chosen row of a list and the row in view of a table draw the subtle tint of primary. A pressed toggle draws `QUIET` of its hue.**
 - **Muted words on a hovered or a chosen row MUST step to the quiet tone** (`RD.SUPPORT.SURFACE.166`), because the muted tone falls to 3.76 to 1 there.
 
 ## The scale — ✅
