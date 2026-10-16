@@ -26,63 +26,58 @@
 </header>
 
 <section id="s1" data-block="reasons">
-  <div class="sds-section-head"><h2>Why &mdash; {{the problem in one line}}</h2></div>
-  <p>{{The problem, and the evidence for it.}}</p>
+  <div class="sds-section-head"><h2>Why</h2></div>
+  <p class="sds-standfirst">{{The problem in one line, and the evidence for it.}}</p>
   <h3 id="cat1">{{Category &mdash; one or two words, such as Cost}}</h3>
   <h4 id="w1">{{Finding}}</h4>
   <p>{{What is wrong, measured.}}</p>
-  <h3 id="cat2">{{Category &mdash; one or two words}}</h3>
   <h4 id="w2">{{Finding}}</h4>
+  <p>{{&hellip;}}</p>
+  <h3 id="cat2">{{Category &mdash; one or two words}}</h3>
+  <h4 id="w3">{{Finding}}</h4>
   <p>{{&hellip;}}</p>
 </section>
 
 <section id="s2" data-block="reasons">
-  <div class="sds-section-head"><h2>What &mdash; {{the decision in one line}}</h2></div>
-  <p>{{Nothing outside these domains changes.}}</p>
+  <div class="sds-section-head"><h2>What</h2></div>
+  <p class="sds-standfirst">{{The decision in one line. Nothing outside these domains changes.}}</p>
   <h3 id="d1">{{Domain &mdash; e.g. DevEx &middot; Workspace}}</h3>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Construct</th><th>What changes</th><th>New?</th><th>Status after</th></tr></thead>
-    <tbody>
-      <tr><td>{{construct id}}</td><td>{{what changes in its seat file}}</td><td>&mdash; or &#x1F52E; proposed here</td><td>{{&#x1F52E; &middot; &#x1F6A7; &middot; &#x2705;}}</td></tr>
-    </tbody>
-  </table></div>
-  <p>{{Read the preview &rarr;}} <a href="arcs/N001-{{subject}}.html#overview">{{preview name}}</a></p>
   <h4 id="c1">{{Construct &mdash; what changes in it}}</h4>
-  <p>{{The change, then why, with the block that shows it.}}</p>
-  <p><code>{{path of the file that changes}}</code></p>
-  <pre data-lang="diff">- what the file says today
-+ what it will say</pre>
+  <p>{{The change as description, bullets or a diagram, then why. A settled question is stated here as a result, with no Q number on view; its anchor, such as <code>id="q12"</code>, sits invisible on the statement.}}</p>
+  <p>Read the preview &rarr; <a href="notes/N001/previews/{{file}}">{{preview name}}</a></p>
   <h4 id="c2">{{Construct &mdash; what changes in it}}</h4>
   <p>{{&hellip;}}</p>
+  <p>Read the preview &rarr; <a href="notes/N001/previews/{{file}}">{{preview name}}</a></p>
   <h3 id="d2">{{Domain &mdash; proposed, if it does not exist yet}}</h3>
   <p>{{&hellip;}}</p>
 </section>
 
 <section id="s3" data-block="sequence">
-  <div class="sds-section-head"><h2>How &mdash; {{what changes in each repository, in one line}}</h2></div>
-  <p>{{Which repositories change, in the order the work runs.}}</p>
-  <h3 id="h1">{{repository}} &mdash; {{the kind of change}}</h3>
-  <p>{{What changes in this repository, then the block that shows it.}}</p>
-  <p><code>{{path of the file that changes}}</code></p>
-  <pre data-lang="diff">- what the file says today
-+ what it will say</pre>
-  <h3 id="h2">{{repository}} &mdash; {{the kind of change}}</h3>
-  <pre>{{folder/
-&#x251C;&#x2500;&#x2500; what is added      +
-&#x2514;&#x2500;&#x2500; what is removed    &minus;}}</pre>
-  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+  <div class="sds-section-head"><h2>How</h2></div>
+  <p class="sds-standfirst">{{The order the work runs in, in one line.}}</p>
+  <p id="h0">{{The places change in this order: &hellip;. What holds for every arc is on &hellip;.}}</p>
+  <h3 id="h1">{{repository, or a place that is no repository}} &mdash; {{the kind of change}}</h3>
+  <p>{{What changes here, in a line or two. Ships: what is released, or nothing. The paths and what each file says live in the preview.}}</p>
+  <p><span class="sds-small">Arcs: N001 &middot; N002</span></p>
+  <h3 id="h2">{{place}} &mdash; {{the kind of change}}</h3>
+  <p>{{&hellip; Ships: &hellip;}}</p>
+  <p><span class="sds-small">Arcs: N002</span></p>
+  <h3 id="h9">Cycles</h3>
+  <p>{{The order the arcs run in, in a sentence.}}</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Arc</th><th>Status</th></tr></thead>
+    <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/previews/{{file}}">{{file}}</a> ({{proposed &middot; decided}}) &middot; Arc: <a href="arcs/N001-{{subject}}.md">N001-{{subject}}.md</a></span></td><td>{{PROPOSED &middot; DECIDED &middot; RUNNING &middot; HELD &middot; PART-LANDED &middot; LANDED &middot; CARRIED &middot; DROPPED}}<br><span class="sds-small">{{for HELD, CARRIED and DROPPED, the reason}}</span></td></tr>
-      <tr><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Arc: <a href="arcs/N002-{{subject}}.md">N002-{{subject}}.md</a></span></td><td>{{&hellip;}}</td></tr>
+      <tr data-arc="arcs/N001-{{subject}}.md"><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/previews/{{file}}">{{file}}</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for HELD, CARRIED and DROPPED, the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
+      <tr data-arc="arcs/N002-{{subject}}.md"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/previews/{{file}}">{{file}}</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
     </tbody>
   </table></div>
+  <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped. -->
 </section>
 
 <section id="s4" data-block="reasons">
   <!-- With no card open, this heading reads: Open &mdash; no card is open -->
   <div class="sds-section-head"><h2>Open &mdash; Q{{n}} &middot; Q{{n}}</h2></div>
+  <!-- Numbering, for the agent: the next card takes the next number after the highest on this page or in its previews. Only open cards stand in this section. -->
   <div class="sds-open">
     <h4 id="q{{n}}">Q{{n}} &middot; {{The question, as a noun phrase naming the choice}}</h4>
     <span class="sds-key">Why it matters</span>
@@ -107,11 +102,13 @@
 </section>
 
 <section id="s5" data-block="comparison">
-  <div class="sds-section-head"><h2>Deferred &mdash; parked, each with the event that brings it back</h2></div>
+  <div class="sds-section-head"><h2>Deferred</h2></div>
+  <p class="sds-standfirst">Parked, each with the event that brings it back.</p>
+  <h3 id="s5-{{domain}}">{{Domain}}</h3>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Item</th><th>Why not now</th><th>What brings it back</th></tr></thead>
+    <thead><tr><th>Parked</th></tr></thead>
     <tbody>
-      <tr><td>{{item}}</td><td>{{&hellip;}}</td><td>{{the event}}</td></tr>
+      <tr><td><p><strong>{{item}}</strong></p><p>{{why not now, in a line}}</p><span class="sds-small">Needed for: {{the event that brings it back}}</span></td></tr>
     </tbody>
   </table></div>
 </section>

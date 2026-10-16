@@ -1234,6 +1234,8 @@
 }
 @layer theme {
   :root {
+    --sds-weight-heading: 700;
+    --sds-weight-title: 500;
     --sds-paper: #edf0f3;
     --sds-card: #f7f9fb;
     --sds-ink: #141920;
@@ -1430,9 +1432,8 @@
     font-size: 0.87em;
   }
   strong {
-    --tw-font-weight: 600;
-    font-weight: 600;
     color: var(--sds-text-title);
+    font-weight: var(--sds-weight-title);
   }
   em {
     color: var(--sds-text-description);
@@ -1711,10 +1712,9 @@
     margin: 0px;
     font-family: var(--sds-ui);
     font-size: var(--sds-xxl);
-    --tw-font-weight: 700;
-    font-weight: 700;
     text-wrap: balance;
     color: var(--sds-text-heading);
+    font-weight: var(--sds-weight-heading);
     letter-spacing: -.02em;
     line-height: 1.15;
   }
@@ -1753,18 +1753,16 @@
     margin: 0px;
     font-family: var(--sds-ui);
     font-size: var(--sds-xl);
-    --tw-font-weight: 700;
-    font-weight: 700;
     text-wrap: balance;
     color: var(--sds-text-heading);
+    font-weight: var(--sds-weight-heading);
     letter-spacing: -.01em;
   }
   h3 {
     font-family: var(--sds-ui);
     font-size: var(--sds-lg);
-    --tw-font-weight: 600;
-    font-weight: 600;
-    color: var(--sds-text-heading);
+    color: var(--sds-text-title);
+    font-weight: var(--sds-weight-title);
     letter-spacing: -.008em;
     margin: 2rem 0 .6rem;
   }
@@ -1772,6 +1770,7 @@
     font-family: var(--sds-ui);
     font-size: var(--sds-md);
     color: var(--sds-text-title);
+    font-weight: var(--sds-weight-title);
     margin: 0 0 .5rem;
   }
   .sds-scroll {
@@ -2901,6 +2900,50 @@
     border-color: var(--sds-gap);
     background-color: var(--sds-gap-soft);
     color: var(--sds-gap);
+  }
+  .sds-badge.sds-status.sds-decided {
+    border-color: var(--sds-info);
+    background-color: var(--sds-info-soft);
+    color: var(--sds-info);
+  }
+  .sds-badge.sds-status.sds-running {
+    border-color: var(--sds-orange);
+    background-color: var(--sds-orange-soft);
+    color: var(--sds-orange);
+  }
+  .sds-badge.sds-status.sds-held {
+    border-color: var(--sds-grey);
+    background-color: var(--sds-grey-soft);
+    color: var(--sds-grey);
+  }
+  .sds-badge.sds-status.sds-part-landed {
+    border-color: var(--sds-olive);
+    background-color: var(--sds-olive-soft);
+    color: var(--sds-olive);
+  }
+  .sds-badge.sds-status.sds-landed {
+    border-color: var(--sds-ok);
+    background-color: var(--sds-ok-soft);
+    color: var(--sds-ok);
+  }
+  .sds-badge.sds-status.sds-carried {
+    border-color: var(--sds-cyan);
+    background-color: var(--sds-cyan-soft);
+    color: var(--sds-cyan);
+  }
+  .sds-badge.sds-status.sds-dropped {
+    border-color: var(--sds-fail);
+    background-color: var(--sds-fail-soft);
+    color: var(--sds-fail);
+  }
+  th.sds-status-col {
+    width: 9.5rem;
+  }
+  th.sds-status-col,table:has(th.sds-status-col:last-child) td:last-child {
+    padding-left: 1.5rem;
+  }
+  .sds-section-head + .sds-standfirst {
+    margin-top: -.5rem;
   }
   .sds-badge.sds-status.sds-decided {
     border-color: var(--sds-ok);

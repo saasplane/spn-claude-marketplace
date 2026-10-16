@@ -6,6 +6,13 @@
 <!-- AN ORDER IS ONE DELEGATED EXECUTION: a child session in this workspace, or a window of its own in another
      repository. Every path is absolute, so either can resolve it. -->
 <!-- AN ORDER IS FOR WORK LONGER THAN ABOUT 15 MINUTES. The coordinator does shorter work itself. -->
+<!-- TWO FORMS. Pick one and delete the other's rows.
+     LIGHT FORM, for fixes (a one-line fix is made inline and has no order; several fixes in one area are one order): a targeted test
+     for each fix, the book updated once per round, no shots; the heavy checks run once, at the gate before a release.
+     FULL FORM, for a new prop, token, rule or construct: a fail-first test, the book row, the shots, and a section that names every
+     new construct before anything is added. -->
+<!-- POINT, DON'T COPY. The order names the section, the function or the lines to read, and never pastes them. A fact that
+     lives in the plan, the book or a preview is pointed to, so it cannot go stale in the order. -->
 # Order {{nn}} — {{what this agent does}}
 
 | | |
@@ -13,15 +20,20 @@
 | **Repo** | `{{repo}}` · **Depth:** {{child here · own window}} · **Run from:** `{{absolute path}}` |
 | **Workstream** | `{{NNN-subject}}` · **Arc:** `{{absolute path to arcs/N<nnn>-<subject>.md}}`, rows {{k}} |
 | **Pinned** | `{{repo}}` @ `{{sha}}` — stale if `git -C {{repo}} log {{sha}}..HEAD -- <path>` lists a file you touch |
-| **Model** | {{Opus 5 · Sonnet 5}} |
+| **Form** | {{light · full}} |
+| **Model** | {{the smallest model that can do it: mechanical work (moving text, restamping, running tiers, shots) on the smallest; specified code and docs on the middle one; shaping and design on the largest}} |
 | **Read first** | Only these parts: `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · `{{absolute path}}/orders/00-facts.md` § {{the checkout and the gates this order uses}} · `{{absolute path}}/plan.md` § Traps, § Commands, § Rows {{k}} · the arc's Log, {{the entries this order needs, by date}} |
 
-**Launch no agent.** **Read only:** the parts named in *Read first*, above, and the file you change. **Hand back** at most 15 lines; write the rest to `{{nn}}-{{subject}}-report.md` beside this order.
+**Launch no agent.** **Read only:** the parts named in *Read first*, above, and the file you change. **Hand back** at most {{10 for the light form · 15 for the full form}} lines; write the rest to `{{nn}}-{{subject}}-report.md` beside this order.
 
 ## What already exists
 
 {{The mechanism this order changes or sits beside, and its twin elsewhere. Name the part of each file to read: its
 section, its function or its lines. Name a whole file only where the whole is needed.}}
+
+## The constructs (full form only)
+
+{{What exists, what is reused, and every new name and path this order adds. Nothing unnamed here is added.}}
 
 ## The outcome
 
@@ -35,8 +47,9 @@ Every other file belongs to another agent. If you must touch one, stop and say s
 
 ## Loop
 
-Documents first, then source. Then run the cases of what you touched, under the working run name, until they pass. Then
-run every case the step touched once more under the fresh run name, and stamp the rows from that run. Run no whole
+Documents first, then source. Then run the cases of what you touched, under the working run name, until they pass. In the
+light form, a targeted test for each fix is the proof, the book is updated once for the round and no shot is taken. In the full
+form, run every case the step touched once more under the fresh run name, and stamp the rows from that run. Run no whole
 tier. A case written to fail first is one narrow run on the unchanged code. No source or test file changes while a
 test run for this repository is in flight.
 

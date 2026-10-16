@@ -10,7 +10,9 @@
      and a subject of two to four words. -->
 # N{{nnn}} — {{the cycle it pays, named: "R: the support release that carries X"}}
 
-Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>}} — {{date}}.** {{One sentence: what this arc changes, and why it is one arc.}}
+Status: **{{PROPOSED · DECIDED · RUNNING · HELD · PART-LANDED · LANDED · CARRIED · DROPPED}}** — {{a short reason, only for HELD (the card it waits on), CARRIED (to where) and DROPPED (why); otherwise none}}. {{One sentence: what this arc changes, and why it is one arc.}}
+
+<!-- The bold span is the status word and nothing else; the date of a change is a Log line. -->
 
 | Field | This arc |
 | --- | --- |
@@ -28,7 +30,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 
 ## Previews
 
-<!-- One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `proposed` or
+<!-- THE PREVIEWS TABLE IS REQUIRED FROM PROPOSED: an arc past PROPOSED with no preview fails `state check`. One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `proposed` or
      `decided <date>`. A preview that a later one replaces is removed, and the log says so. With none, the table is replaced by the one word `None.` -->
 
 | File | Kind | Shows | State |
@@ -41,7 +43,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 
 ## Steps
 
-<!-- A ROW IS ONE REPOSITORY AT ONE ALTITUDE. Repo is the repository, or `—` for the workstream itself; Altitude is
+<!-- A ROW CARRIES ITS KIND: fix (a small correction, recorded and batched with the others, or made inline), change (a new prop, token, rule or construct, with the full proof) or question (waits on a card). A ROW IS ONE REPOSITORY AT ONE ALTITUDE. Repo is the repository, or `—` for the workstream itself; Altitude is
      DOCS · CODE (with its tests) · GENERATED · RELEASE · PROOF; rows run in chain order by repository, then by
      altitude. What names the files, or "plan § k" — and every "plan § k" has that section. Mechanism is by hand ·
      script · command · agents (order <nn>). Acceptance cites a row of the plan's Commands table and its count:
@@ -52,12 +54,12 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
      started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ⏸ held on Q<n> (waits on that open card; not runnable until it is answered) · ✅ landed — `<commit>` — <the acceptance's result line> ·
      ↷ carried — to <where> · ⊘ deferred — <why>. Row 0 is a precondition of RUNNING; the last row is never deleted. -->
 
-| # | Repo | Altitude | What | Mechanism | Acceptance | State |
-| --- | --- | --- | --- | --- | --- | --- |
-| 0 | — | DOCS | write `notes/N{{nnn}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
-| 1 | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
-| 2 | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
-| {{n}} | — | PROOF | on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install | command | each Commands row → its after, and each named id → `SUCCESS` in that run's file | |
+| # | Kind | Repo | Altitude | What | Mechanism | Acceptance | State |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 | change | — | DOCS | write `notes/N{{nnn}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
+| 1 | change | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
+| 2 | {{fix · change}} | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
+| {{n}} | change | — | PROOF | on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install | command | each Commands row → its after, and each named id → `SUCCESS` in that run's file | |
 
 ## Before you write LANDED
 

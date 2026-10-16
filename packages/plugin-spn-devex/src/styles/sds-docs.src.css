@@ -124,6 +124,8 @@
    window. After a change of `--sds-page-max`, look at both. */
 @layer theme {
   :root{
+    --sds-weight-heading:700;
+    --sds-weight-title:500;
     --sds-paper:#edf0f3; --sds-card:#f7f9fb; --sds-ink:#141920; --sds-slate:#48525f; --sds-faint:#7c8794; --sds-text-heading:#0a0e13; --sds-text-title:#1f2731; --sds-text-description:#475160; --sds-text-fact:#5b6674;
     --sds-text-heading-card:#080c10; --sds-text-title-card:#1a222b; --sds-text-description-card:#424c5a; --sds-text-fact-card:#566170;
     --sds-rule:#d2d9e0; --sds-accent:#2f4e7a; --sds-accent-soft:#e0e8f4; --sds-gap:#8f5714; --sds-gap-soft:#f7ecda;
@@ -181,7 +183,7 @@
   body{@apply m-0 bg-paper text-description font-ui; font-size:1rem; line-height:1.6; -webkit-font-smoothing:antialiased}
   p{margin:0 0 1rem; max-width:var(--sds-measure)}
   code,.sds-mono{@apply font-mono; font-size:0.87em}
-  strong{@apply font-semibold text-title}
+  strong{@apply text-title; font-weight:var(--sds-weight-title)}
   em{@apply italic text-description}
   a{@apply text-accent}
   .sds-page{@apply grid gap-12; grid-template-columns:var(--sds-rail-width) minmax(0,1fr); max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:3rem 8px 6rem; align-items:start}
@@ -228,14 +230,14 @@
   .sds-bar{@apply h-2 bg-rule overflow-hidden; border-radius:999px}
   .sds-bar i{@apply block h-full bg-accent}
   p > .sds-more{@apply font-semibold no-underline}
-  h1{@apply font-ui text-xxl font-bold text-heading text-balance m-0; letter-spacing:-.02em; line-height:1.15}
+  h1{@apply font-ui text-xxl text-heading text-balance m-0; font-weight:var(--sds-weight-heading); letter-spacing:-.02em; line-height:1.15}
   .sds-subtitle{@apply text-lg leading-normal text-description m-0; max-width:46rem}
   .sds-standfirst{@apply text-title; font-size:1rem; line-height:1.6; max-width:var(--sds-measure)}
   .sds-section-head{@apply grid items-baseline gap-2; grid-template-columns:1fr; border-top:2px solid var(--sds-ink); padding-top:.7rem; margin-bottom:1.1rem}
   .sds-section-head .sds-number{@apply font-mono text-sm font-bold text-accent; font-variant-numeric:tabular-nums}
-  h2{@apply font-ui text-xl font-bold text-heading text-balance m-0; letter-spacing:-.01em}
-  h3{@apply font-ui text-lg font-semibold text-heading; letter-spacing:-.008em; margin:2rem 0 .6rem}
-  h4{@apply font-ui text-md text-title; margin:0 0 .5rem}
+  h2{@apply font-ui text-xl text-heading text-balance m-0; font-weight:var(--sds-weight-heading); letter-spacing:-.01em}
+  h3{@apply font-ui text-lg text-title; font-weight:var(--sds-weight-title); letter-spacing:-.008em; margin:2rem 0 .6rem}
+  h4{@apply font-ui text-md text-title; font-weight:var(--sds-weight-title); margin:0 0 .5rem}
   .sds-scroll{@apply overflow-x-auto bg-card; border:1px solid var(--sds-rule); border-radius:3px; margin:1.6rem 0}
   table{@apply border-collapse w-full font-ui text-sm; min-width:34rem}
   td .sds-sub{@apply block text-xs text-description; margin-top:.4rem}
@@ -531,6 +533,16 @@
   .sds-card .sds-recommended b{@apply text-ok}
   .sds-card .sds-scroll{margin:.4rem 0}
   .sds-badge.sds-status.sds-proposed{@apply border-gap text-gap bg-gap-soft}
+  .sds-badge.sds-status.sds-decided{@apply border-info text-info bg-info-soft}
+  .sds-badge.sds-status.sds-running{@apply border-orange text-orange bg-orange-soft}
+  .sds-badge.sds-status.sds-held{@apply border-grey text-grey bg-grey-soft}
+  .sds-badge.sds-status.sds-part-landed{@apply border-olive text-olive bg-olive-soft}
+  .sds-badge.sds-status.sds-landed{@apply border-ok text-ok bg-ok-soft}
+  .sds-badge.sds-status.sds-carried{@apply border-cyan text-cyan bg-cyan-soft}
+  .sds-badge.sds-status.sds-dropped{@apply border-fail text-fail bg-fail-soft}
+  th.sds-status-col{width:9.5rem}
+  th.sds-status-col,table:has(th.sds-status-col:last-child) td:last-child{padding-left:1.5rem}
+  .sds-section-head + .sds-standfirst{margin-top:-.5rem}
   .sds-badge.sds-status.sds-decided{@apply border-ok text-ok bg-ok-soft}
   .sds-frame{@apply bg-card overflow-hidden; border:1px solid var(--sds-rule); border-radius:3px; margin:1.6rem 0}
   .sds-frame iframe{@apply block w-full; height:46rem; border:0; background:#fff}

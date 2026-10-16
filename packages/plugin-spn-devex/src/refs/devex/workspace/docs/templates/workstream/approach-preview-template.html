@@ -25,7 +25,7 @@
 <div class="sds-wrap">
 
 <header class="sds-masthead">
-  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N{{nnn}}</span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">{{PROPOSED &middot; DECIDED}}</span></span></span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N{{nnn}}</span> <span class="sds-small"><a href="../../../arcs/N{{nnn}}-{{subject}}.md">N{{nnn}}-{{subject}}.md</a></span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">{{PROPOSED &middot; DECIDED}}</span></span></span></div>
   <h1>{{THE PREVIEW NAME}}</h1>
   <p class="sds-subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
   <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
@@ -36,15 +36,19 @@
   <p>{{What you are asked to decide, and which part of the approach page this preview serves.}}</p>
   <p>{{What to look at first.}}</p>
   <p>{{What in this preview is not final, and what will differ in the built thing.}}</p>
-  <!-- A preview holds what the developer judges: the proposal in its final form, the rules it rests on, the choices asked.
+  <!-- Every h2 is its word alone with a standfirst lead under it. A row that names a thing is an item: its title in bold, a line,
+       then one facts line of Key: value in .sds-small; long text is a list, not a cell. An answered question updates the section
+       it touches and leaves no Q number on view; the preview holds no Decisions log, and no history (nothing says "was", "moved
+       from" or "renamed"). The arc file is linked once, in the header facts, and nowhere else.
+       A preview holds what the developer judges: the proposal in its final form, the rules it rests on, the choices asked.
        Measurements, commit pins, the order of the work and the plan stay in the arc (RD.DEVEX.WORKSPACE.210).
        A fact has one home (RD.DEVEX.WORKSPACE.223): the Overview does not retell the workstream, a section states nothing
        the approach page or another preview already states, and a parked item is stated only in the page's Deferred. -->
 </section>
 
 <section id="s2" data-block="sequence">
-  <div class="sds-section-head"><h2>Today &mdash; {{the thing as it is, in one line}}</h2></div>
-  <p>{{The section&rsquo;s own overview, in one or two sentences. Then its subsections, each with the block that fits.}}</p>
+  <div class="sds-section-head"><h2>Today</h2></div>
+  <p class="sds-standfirst">{{The thing as it is, in one line. Then its subsections, each with the block that fits.}}</p>
 
   <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
   <p>{{What the diagram shows.}}</p>
@@ -72,8 +76,8 @@
 </section>
 
 <section id="s3" data-block="comparison">
-  <div class="sds-section-head"><h2>Proposed &mdash; {{the thing as it will be, in one line}}</h2></div>
-  <p>{{The section&rsquo;s own overview. Where a decision is still open, its options sit side by side.}}</p>
+  <div class="sds-section-head"><h2>Proposed</h2></div>
+  <p class="sds-standfirst">{{The thing as it will be, in one line. Where a decision is still open, its options sit side by side.}}</p>
 
   <h3 id="s3a">{{A subsection shown as a table}}</h3>
   <div class="sds-scroll"><table>
@@ -109,8 +113,8 @@
 </section>
 
 <section id="s4" data-block="sequence">
-  <div class="sds-section-head"><h2>Where it lands &mdash; {{what changes in each repository, in one line}}</h2></div>
-  <p>{{Which repositories change, in the order the work runs. The approach page&rsquo;s own How holds the full detail.}}</p>
+  <div class="sds-section-head"><h2>Where it lands</h2></div>
+  <p class="sds-standfirst">{{What changes in each repository, in one line, in the order the work runs.}}</p>
 
   <h3 id="s4a">{{Every change, by repository, in the order the work runs}}</h3>
   <p>{{Each repository is drawn as its own folder tree. The note on the right says whether the entry is new or changed, and what the change is. A folder with no note only holds the entries under it. Where the preview is still proposed, say here which folders and files are not known yet.}}</p>
