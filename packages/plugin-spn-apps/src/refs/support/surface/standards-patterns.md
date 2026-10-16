@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "45dfd3f3"
+      "seen": "af3f779b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
@@ -139,11 +139,13 @@ Read the facts against the table of the page patterns, and name the one pattern 
 | the same | a title and a line under it | `DSDataTableWidget`, in its `LIST` layout |
 | the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTableWidget`, in its `GRID` layout |
 | the whole set, a few and fixed | a name | a list, `DSList` |
+| the whole set, a few and fixed, and its order is the meaning | a name, or a few facts | a list, `DSList`, or a plain table, `DSTable`, with `reorder` |
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
 | the whole set, some | two to four facts a person compares | a plain table, `DSTable` |
 | one record | several facts | readings, each a title with its value under it, `DSDataUnit` |
 | a few subjects, such as plans or roles | the same settings, a value for each subject | a comparison, `DSComparisonWidget`: the settings down the side, one column for each subject |
 
+- **A fixed ordered set is a `DSTable` or a `DSList` with `reorder`; a listing of records is `DSDataTableWidget` and never reorders** (`RD.SUPPORT.SURFACE.182`). The order of a listing is its viewer's sort, and the order of a fixed set is its meaning, such as the tags of a record or the entries of a menu.
 - **A few is up to about 7, and some is up to about 30.** The numbers are there so that two people who read the same set reach the same block. Both numbers are proposed, and not yet confirmed (`RD.SUPPORT.SURFACE.052`).
 - **The search and the filters of a data table MUST be sent to the server** (`RD.SUPPORT.SURFACE.070`). The page holds one page of the records. A search in the page would search only that.
 

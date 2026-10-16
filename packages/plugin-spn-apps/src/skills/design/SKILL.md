@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "49f4320c"
+      "seen": "923033a5"
     }
   ]
 }
@@ -134,6 +134,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 | the same | a title and a line under it | `DSDataTableWidget`, in its `LIST` layout |
 | the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTableWidget`, in its `GRID` layout |
 | the whole set, a few and fixed | a name | a list, `DSList` |
+| the whole set, a few and fixed, and its order is the meaning | a name, or a few facts | a list, `DSList`, or a plain table, `DSTable`, with `reorder` |
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
 | the whole set, some | two to four facts a person compares | a plain table, `DSTable` |
 | one record | several facts | readings, each a title with its value under it, `DSDataUnit` |
