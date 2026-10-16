@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "5fe89cde"
+      "seen": "10329ae6"
     }
   ]
 }
@@ -253,7 +253,7 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **A line of the `LIST` layout of `DSDataTableWidget` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
 - **Where a page shows one record beside the data table or under it, give the table the id of that record** (`RD.SUPPORT.SURFACE.125`). It is `selectedRecordId` in the `data` of the widget's config. The `LIST` and `TABLE` layouts draw its row as a chosen row of a list. The record in view is selected, and the records a person ticks are checked.
 - **A card drawn from data is `DSCardWidget`** (`RD.SUPPORT.SURFACE.127`). Give it `header`, the props of `DSItem`, then `parts`, then `footer`, any node. A part is `ITEMS`, with item lines, `LIST`, with rows of a list, or `FREE`, with any node. The widget has no paging, no search and no working state: a set that needs them is a data table. The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`).
-- **Subjects compared across the same settings are `DSComparisonWidget`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects`, `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
+- **Subjects compared across the same settings are `DSComparisonWidget`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects` (each may carry its own `actions`, such as an Edit, which stand in its head and take their look from the place: `RD.SUPPORT.SURFACE.193`), `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
 - **A line that says roughly when a thing last changed may show how long ago it was** (`RD.SUPPORT.SURFACE.122`). Write `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`. A page that is a log of what happened shows the date and the time on each line.
 - **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). `DSIconMark` draws an icon as a mark, with `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`. Choose rounded or square where the thing is better shown so, such as an app or a file. Its `variant` takes the shared vocabulary, and `GHOST` and `LINK` draw the icon alone, with no fill (`RD.SUPPORT.SURFACE.124`). A mark is never pressed.
 - **`scaleSize` says how large a picture is drawn, and `size` stays the density step** (`RD.SUPPORT.SURFACE.100`). `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` take it, from `XXS` to `XXL5`. Inside an item line the item gives the picture its scale size, so write none there. In a component of your own, a picture beside a title takes the scale size of the title's own step name (`RD.SUPPORT.SURFACE.104`); `architecture-components.md` states what stands beside a heading.

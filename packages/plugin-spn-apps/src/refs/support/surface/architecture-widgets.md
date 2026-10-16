@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "e2fbd41e"
+      "seen": "3177a27b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "9e3c1e2d"
+      "seen": "ebc71647"
     }
   ]
 }
@@ -201,7 +201,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 
 | Setting | The page gives | What the widget draws |
 | --- | --- | --- |
-| `subjects` | each a `key` and a `header`, the props of `DSItem` | one column for each subject, after the column of labels |
+| `subjects` | each a `key`, a `header`, the props of `DSItem`, and `actions` where the subject has some of its own | one column for each subject, headed by its item and its actions, after the column of labels |
 | `groups` | each a `key`, a `header` where the page gives one, and `rows` | a head row at the level `GROUP`, then its rows |
 | `differencesOnly` | a yes-or-no, no by default | only the rows whose values are not all equal |
 
@@ -210,6 +210,7 @@ A row states its kind in `mtype`, which takes `DSComparisonWidgetRowType`: `FIEL
 - **The widget MUST draw every value of a `FIELD` row through `DSDataFieldView`.** A page gives the config and the stored values, never a node for a value a field can read. A value that is null, or missing, reads *not set* in the muted tone, translated.
 - **A value that differs from the most common value of its row MUST be marked as the cell that stands out in its row, or, where the page gives `baselineKey`, one that differs from that subject's** (`RD.SUPPORT.SURFACE.184`). A row whose most common value is a tie marks none, an unknown key marks none, and a `CUSTOM` row is never marked.
 - **With `differencesOnly` the widget MUST keep only the `FIELD` rows whose values are not all equal, and every `CUSTOM` row.** A group with no row left is not drawn, and with no row at all the widget draws the empty state.
+- **A subject's `actions` MUST stand in its own head cell, at the end beside its item, and take their size and look from the place as the actions in the head of a card do** (`RD.SUPPORT.SURFACE.193`). The head is a header of the level the widget stands at: the item at the start and the actions as one group at the end, below the item on a phone. A button writes no size, no variant and no class; a head with actions and a head without stand at one height; a `DSItem` holds no action, so the actions belong to the head that holds it.
 - **The first column MUST hold the label of each row and stay pinned while the subjects scroll sideways.**
 - **The widget fills a `flush` content part of a container, as `DSDataTableWidget` does.** A set that needs paging, a search or a sort is a data table.
 
