@@ -109,10 +109,10 @@
   <!-- Choose, for each construct, the form that shows it best: a plain description for an idea or a rule; a diagram for
        structure or flow (s3c); a skeleton for a screen or a layout (s3f); an inline sample that renders the thing itself
        for anything visual (s3g); the public shapes as code for a new or changed state, enum, contract, service
-       interface, component props, token or command option (s3e). Delete the forms a preview does not use. -->
+       interface, route, table and its migration, event or topic, component props, token or command option (s3e). Delete the forms a preview does not use. -->
 
   <h3 id="s3e">{{A subsection that shows the public shapes}}</h3>
-  <p>{{The declarations a developer builds against, in full: a contract state or enum, a service interface&rsquo;s methods, a component&rsquo;s props, a token, a command&rsquo;s options. Declarations only, never bodies; a <code>+</code>/<code>&minus;</code> diff where the shape exists today. An order points to this block and never copies it.}}</p>
+  <p>{{The declarations a developer builds against, in full: a contract state or enum, a service interface&rsquo;s methods, a route, a table and its migration, an event or a topic, a component&rsquo;s props, a token, a command&rsquo;s options. Declarations only, never bodies; a <code>+</code>/<code>&minus;</code> diff where the shape exists today. An order points to this block and never copies it.}}</p>
   <p><code>{{path of the file that declares it}}</code></p>
   <pre data-lang="diff">  export interface {{IShapeName}} {
     {{existingField}}: {{Type}};
