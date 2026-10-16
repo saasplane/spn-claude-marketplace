@@ -116,7 +116,7 @@ ${STYLES.stylesheet}
 // The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
 // title, the line and the link pills, and the Status cell the word.
 const TWO_ROW = (id, name, file, line, status) =>
-  `<tr><td><p style="margin:0 0 .3rem"><strong>${id} &mdash; ${name}</strong></p><p style="margin:0 0 .3rem">${line}</p>Arc: <a href="arcs/${file}">${file}</a></td><td>${status}</td></tr>`;
+  `<tr><td><p style="margin:0 0 .3rem"><strong>${id} &mdash; ${name}</strong></p><p style="margin:0 0 .3rem">${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${status}</td></tr>`;
 const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
   `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
   `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
@@ -478,7 +478,7 @@ try {
     "silent");
 
   one("a row whose Arc cell links no file",
-    write(page, CLEAN.replace(`Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a>`, "")),
+    write(page, CLEAN.replace(`<span class="sds-small">Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span>`, "")),
     "reports", "N2's links are not the arc file");
 
   one("a row whose Arc cell links another arc's file",
@@ -494,8 +494,8 @@ try {
     "reports", "N2's line is not the arc's own line");
 
   one("a preview pill the arc's Previews table does not list",
-    write(page, CLEAN.replace(`Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></td>`,
-      `Preview: <a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></td>`)),
+    write(page, CLEAN.replace(`<span class="sds-small">Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span></td>`,
+      `<span class="sds-small">Preview: <a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span></td>`)),
     "reports", "N2's links are not the arc file");
 
   one("four columns in an open workstream — told to run the command",
@@ -532,7 +532,7 @@ try {
     `Sample: <a href="notes/N001/samples/close-message.md">close-message.md</a> (decided) &middot; `;
   const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
     .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
-    .replace(`Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></td>`, `${PILLS}Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></td>`);
+    .replace(`<span class="sds-small">Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></span></td>`, `<span class="sds-small">${PILLS}Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></span></td>`);
   const previewedPage = join(previewed, "approach.html");
   one("three-digit arcs, and link pills matching the arc's Previews table",
     write(previewedPage, PREVIEWED), "silent");

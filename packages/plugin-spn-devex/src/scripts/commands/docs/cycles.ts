@@ -260,11 +260,11 @@ const CELL_LINE = '<p style="margin:0 0 .3rem">';
 
 /**
  * The Arc cell's HTML, in three levels: the title in bold, what the arc does below it in plain text,
- * then its facts as one line of links.
+ * then its facts as one line of links, in the page's small type.
  */
 export function arcCell(cycle: Cycle): string {
   const description = cycle.does ? `${CELL_LINE}${escape(cycle.does)}</p>` : "";
-  return `${CELL_LINE}<strong>${escape(arcLabel(cycle))}</strong></p>${description}${factsCell(cycle)}`;
+  return `${CELL_LINE}<strong>${escape(arcLabel(cycle))}</strong></p>${description}<span class="sds-small">${factsCell(cycle)}</span>`;
 }
 
 /** The Status cell's HTML: the word, then for HELD, CARRIED and DROPPED the reason below it in small text. */
