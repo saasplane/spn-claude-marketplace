@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "ecd6d365"
+      "seen": "f7b7dabf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "1b6673de"
+      "seen": "9991fa86"
     }
   ]
 }
@@ -69,7 +69,7 @@ declares *the* block of a section.
 | a record, a comparison, a glossary | a markdown table. A table already arrives as a bordered card, so it needs nothing added |
 | a literal — a contract, a manifest, a command, its output (`CODE`) | a fenced block **tagged with its language** |
 | a hierarchy easier read than drawn (`TREE`) | a fenced block, untagged |
-| today against after (`DIFF`) | a fenced block tagged `diff`. **An approach page only** |
+| today against after (`DIFF`) | a fenced block tagged `diff`. **An approach page or a preview only**, since a construct states current truth |
 | a shape (a figure) | a fenced block tagged `dg`, holding strict JSON |
 | a note to yourself, never rendered | `<!-- … -->`, on one line or many |
 
@@ -81,9 +81,21 @@ the shared script colours a tagged block when the page opens. The script knows s
 what you are looking at and a **caption after it** saying what to notice. A figure with neither is
 decoration.
 
+## A code block that is one file stands in a `FILE` frame
+
+**A code block that shows one file, or a part of one, is framed, with the file's path from its
+repository's root as the frame's title and its language as a small badge at the end.** You know which
+file you are reading before the first line, and a path in a line above a block is read as prose and
+skipped. A `DIFF` always shows one file, so it always stands in one. A block that is no one file — a
+command, a sample of output, a shape written out — stays a `CODE` block, with no frame.
+
+The frame is HTML, on a hand-written page (an approach page or a preview): a `figure.sds-file` holding
+a `figcaption` with its `.sds-file-path` and its `.sds-file-lang`, then the `pre`. The code stays plain
+in the file, and the shared script colours it. It is never a sample framed in the page.
+
 ## What has no markdown spelling yet
 
-`CATALOG` · `CARDS` · `NEXT` · the `PROSE` panel are named in the chapter and **the renderer produces
+`CATALOG` · `CARDS` · `NEXT` · `FILE` · the `PROSE` panel are named in the chapter and **the renderer produces
 none of them** — there is no markdown that asks for one, and `docs page write` adds no navigation. They
 exist today only as hand-written HTML in the templates. Until that changes, write a table for a
 `CATALOG` and ordinary paragraphs where you wanted a `PROSE` panel, and do not hand-write HTML to

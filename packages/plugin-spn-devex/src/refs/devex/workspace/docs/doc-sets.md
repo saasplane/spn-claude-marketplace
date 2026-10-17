@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "04685b17"
+      "seen": "e908d8d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "204e7d21"
+      "seen": "b0288194"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -512,25 +512,25 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **An instruction is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes a step row in the arc that owns it. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
 
-**A row's State cell says what it reached while the work runs**, so the developer can see what they asked for that has not happened yet:
+**A row's state says what it reached while the work runs**, so the developer can see what they asked for
+that has not happened yet. It is a field of the row in the arc's `state.json`, written only by the
+`spn-devex workstream` commands (`RD.DEVEX.WORKSPACE.249`):
 
-| State cell | Means |
+| `state` | Means |
 | --- | --- |
-| empty | the row is written down. Nothing has been built |
-| `in progress 2026-09-29 14:32 +05:30` | somebody started the row at that moment and is working on it now |
-| `◐ stopped` | somebody began the row and put it down, with what was done and what is unsafe to touch |
-| `⏸ held on Q<n>` | the row waits for the answer to card `Q<n>`, because that answer can change it |
-| `✅ landed` | the change is in the repository that owns it, with the commit beside the word |
-| `↷ carried` | the work moved to another workstream, which is named |
-| `⊘ deferred` | the work is parked on purpose, with the event that brings it back |
+| `waiting` | the row is written down, and what it waits on has not landed |
+| `ready` | nothing it waits on is left, and nobody has started it |
+| `running` | somebody is on it now; the arc's log says since when |
+| `stopped` | somebody began the row and put it down; the log says what was done and what is unsafe to touch |
+| `landed` | the change is in the repository that owns it, with its commits and its proof |
+| `carried` | the work moved to another workstream, which the row names |
+| `deferred` | the work is parked on purpose, with the event that brings it back |
 
-**A row that starts is marked `in progress` with the date, the time and its offset — MUST**, and landing replaces the mark with `✅ landed` and the commit.
+**A row with rows under it takes its state from them**, and never has one written. A row that waits on a
+card names it in `blockedBy` (`q<n>`), and it is not ready while that card is open.
 
-**A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the others fits: `in progress <time>` says somebody is on it now, and a bare cell says nobody has started it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
-
-**A row that only waits on a card's answer, with nothing half-done, is held rather than stopped.** It carries `⏸ held on Q<n>`, because nothing in it is unsafe to touch and the answer alone frees it (decision RD.DEVEX.WORKSPACE.188). A row that began and then met the question is stopped, and its `→` names the card. A held row is not runnable work while its card is open; when the card is answered, the answer is recorded, the mark goes, and the row runs again.
-
-The last three are what the close sweep asks of every row, and an empty row, a row in progress, a stopped row and a held row all refuse the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
+The last three are what the close sweep asks of every row, and a waiting, ready, running or stopped row
+refuses the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
@@ -612,7 +612,9 @@ a back link. In its back link and its previous and next doors, a markdown file o
 page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
 
 **A preview shows, and an approach page argues — MUST** (decision RD.DEVEX.WORKSPACE.233). A preview's
-sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* says what
+sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and an *Open* only for the questions it
+raises: the same cards as the approach page's, rendered from the same records by the `open` block
+(`RD.DEVEX.WORKSPACE.253`). An arc has one preview, `notes/N<nnn>/preview.html` (`RD.DEVEX.WORKSPACE.254`). *Overview* says what
 the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
 *Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
 lands* shows the files that change as one folder tree for each repository, with a link to the approach page's
@@ -629,8 +631,10 @@ on each line, never two columns of entries, and a note in one column on the righ
 drawn as folders on their own lines, so the note column stays near the names. A preview that is still proposed
 draws the folders and the files that are certain, and says which are not known yet. The tree is always drawn.
 The section is a mix of blocks whose first job is to show the changes. After a repository's tree come the
-blocks that show its changes, such as a diff of one file, code, JSON or a figure. You add one only where the
-note beside the entry is not enough to judge the change. A table never lists the changes.
+blocks that show its changes, such as a diff of one file, code, JSON or a figure. A code block that shows one
+file, or a part of one, stands in a `FILE` frame with the path from the repository's root as its title
+(`RD.DEVEX.WORKSPACE.256`). You add one only where the note beside the entry is not enough to judge the change.
+A table never lists the changes.
 
 **Code shown on a page follows its stack's own standards — MUST** (decision RD.DEVEX.WORKSPACE.235). A code
 block in a preview or on an approach page is read as code and copied as code, so it follows the naming and
@@ -742,7 +746,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 | `FLOWCHART` | a path one actor walks, with the shapes a flowchart has — a diamond is a choice |
 | `SEQUENCE` | a path several actors walk together, when *who said it* is the fact |
 | `ENTITIES` | data and how it relates |
-| `TREE` · `STATE` · `CODE` · `DIFF` | a hierarchy · a lifecycle · source · a change |
+| `TREE` · `STATE` · `CODE` · `FILE` · `DIFF` | a hierarchy · a lifecycle · source · source that is one file, framed with its path · a change, in a `FILE` frame |
 | `SYSTEM` | the architecture of something you build — a server module, a web module, an estate package |
 
 ### Drawing a `SYSTEM` figure for a module you are looking at

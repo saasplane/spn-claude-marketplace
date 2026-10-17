@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "0254f037"
+      "seen": "829020b6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -205,14 +205,21 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
       {NNN}-{subject}/                    prepared, blocked, or not picked up yet
     open/
       {NNN}-{subject}/                    being worked now
-        approach.html                     yours: the argument, iterated while you read it
-        arcs/                             the agent's: one file per arc, N<nnn>-<subject>.md, its rows and its state
-        notes/N<nnn>/                     one arc's work order
-          plan.md                         facts pinned to commits, anchors, commands, traps
-          previews/                       the pages that explain a change, proposed or decided
-          samples/                        real files of the kind the work produces, each in its own format
-          scripts/                        what a mechanical row runs
-          orders/                         one brief per delegated execution, and its report
+        approach.html                     yours: the argument, with the progress and Open blocks the commands write
+        suggestions.jsonl                 each suggestion, from raised to decided, parked or dropped
+        questions.jsonl                   each question card, open, answered or withdrawn
+        arcs/
+          N<nnn>/
+            state.json                    the arc's header and every row
+            log.jsonl                     one line per event
+            facts.jsonl                   each fact read, pinned to its commit
+        notes/
+          N<nnn>/                         one arc's work order
+            preview.html                  the arc's one preview
+            samples/                      real files of the kind the work produces, each in its own format
+            plan.md                       how the arc will be done: steps, commands, traps
+            orders/                       one brief per delegated execution, named by its row, and its report
+            scripts/                      what a mechanical row runs
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
     state.json                            `lastNumber`: the highest workstream number ever used
@@ -235,10 +242,18 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 | Inside a workstream | Written for | Lives | Ends as |
 | --- | --- | --- | --- |
 | the approach page | **you** — argued, corrected, re-read | while the subject is open | the argument, kept as a receipt once its arcs have moved the content into the documents that own it |
-| an arc | the agent — rows, each with its repository, its altitude, its check and its state | until its rows are accounted for | closed through the sweep |
+| an arc | the agent, through the `workstream` commands — rows, each with its repository, its altitude, its check, what it waits on, what it writes and its state | until its rows are accounted for | closed through the sweep |
 | an order | the agent — one delegated execution | until the child reports back | the report is appended, and it stays as the audit trail |
 
-**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and each arc file carries its own rows and status. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
+**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and each arc's data carries its own rows and status.
+
+**The workstream is kept as data, and every file has one owner** (`RD.DEVEX.WORKSPACE.249`). The `.jsonl`
+files and each arc's folder under `arcs/` are written only by the `spn-devex workstream` commands, and the
+PreToolUse hook refuses a direct edit to them. The approach page, the preview, the samples, the plan and the
+orders are yours to write by hand, and no command writes them. Two marked regions of the page are the
+exception, each with one owner: the progress block and the `Open` block, which the commands write. An arc is
+named by its number, `N<nnn>`, and its subject and title are fields of its data; one number names its two
+folders. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
 
 **A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
 
@@ -389,7 +404,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 | **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, one somebody started and put down, one held on an open card, or one still marked in progress |
 | **answered card** | you write while an approach page still asks a question its arc records as answered | a **warning** naming the card. Fold it into the section that now states it |
 
-**The arcs carry the rows, and the approach page does not.** The page argues the change, and its `How` ends in a *Cycles* table with one row per arc, written from each arc's status line. Where the page and an arc disagree, the arc is right.
+**The arcs carry the rows, and the approach page does not.** The page argues the change, and its `How` ends in a *Cycles* table with one row per arc, written from each arc's data, with the generated progress block under it. Each *Cycles* row carries a stamp of its arc's rows, so a check refuses a turn that leaves the page behind an arc proposed or widened. Where the page and an arc disagree, the arc is right.
 
 **The close gate reads every step row of every arc as one split plan**, so a documentation row is held exactly as a code row is. Park one in a note beside the page and no gate can see it.
 

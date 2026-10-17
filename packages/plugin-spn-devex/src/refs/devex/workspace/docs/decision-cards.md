@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "6af1c333"
+      "seen": "320a2ba0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "f3e03521"
+      "seen": "bed56138"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -72,8 +72,10 @@ or the direction of a dependency — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide i
 can name the rule that settles it. Otherwise put it to the developer before it is built, with what
 the views said, as a suggestion or as a card.
 
-**Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put a
-suggestion, `S<n>`: in chat only, numbered per window, never written to a file, and read by no hook. A
+**Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`, `RD.DEVEX.WORKSPACE.252`). While no arc row
+owns the subject, put a suggestion, `S<n>`, in chat, and record it the moment it is raised with
+`spn-devex workstream suggestion write <workstream> --title "…"`, which gives it its number in the
+workstream's `suggestions.jsonl`. It is never written on the approach page. A
 suggestion is a whole card, with the same parts as the card below and in the same order: why, what,
 the views that spoke, a lettered options table, and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
 sections, each with its own cards. Once the answer settles the shape, the arc row
@@ -97,7 +99,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **Views** | Short. One line says who spoke, why those views, and how each was made. Then each view has its name in bold and its reason in one or two plain sentences that a developer can follow without opening the code. A view says only what Why and What do not already say. It names no option by its letter, because the options come after it. A harder question may take a sentence or two more. Views with nothing to add are named together in one line. Two views that disagree still stand as two lines. Such as: **Views** — four fresh views: the architect, the server developer, the partner and product. **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used. **Product:** A person never sees the request key, so a version kept there tells them nothing. **Server developer and Partner:** No objection. You shorten a view's words for the card, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`, and do not link it from the card. The voice is unchanged: a colleague speaking, in short full sentences, never a slogan, and never a summary of what "the views" thought (`RD.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it. It may name the views it rests on, in a clause |
-| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked in the card on the approach page and never in the preview, which holds no card. A code fragment is written to its stack's own naming and code standards (decision RD.DEVEX.WORKSPACE.235) |
+| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked and answered in the card on the approach page; the preview may show the questions it raises in its own `Open`, which is the same card rendered from the same record (`question show`). A code fragment is written to its stack's own naming and code standards (decision RD.DEVEX.WORKSPACE.235) |
 
 **The parts come in that order — MUST** (`RD.DEVEX.WORKSPACE.242`): the number and summary, Why, What,
 Views, Options, the recommendation, and the preview. Every page already runs Why, What, How, so a card
@@ -111,6 +113,24 @@ reply that is not a card, a view may still say what it objects to at the length 
 field saying the card is open says nothing, and a field left empty is a blank somebody feels they
 should fill. An answered card leaves the page: its answer folds into the section that then states it.
 
+**A card is raised, never typed — MUST** (`RD.DEVEX.WORKSPACE.253`). Every question is one record in the
+workstream's `questions.jsonl`, and the `open` block of a page renders it, so the card is the same
+wherever it stands. The `workstream question` commands are the record's only writers:
+
+| Command | What it does |
+| --- | --- |
+| `question raise <arc> --file card.json` | takes the next number from the record, writes the record, and puts the card in the approach page's `Open`. `card.json` is the card with its title, and a card with a part missing is refused |
+| `question show <qN> --in notes/N<nnn>/preview.html` | shows the card in that preview's `Open`, with a line back to the approach page |
+| `question answer <qN> --key A --words "…"` | records the answer in the developer's words, and takes the card off every page |
+| `question withdraw <qN> --words "…"` | records the withdrawal, and takes the card off every page |
+
+**What an answer means stays yours to write.** After `question answer`, write the decision into the
+page's `What`, with the `q<n>` anchor on the statement and no Q number on view, and into the preview
+section it settles; then write the arc's log line through `workstream row write <arc> --note "…"`.
+`question answer` names both in its own line. The PreToolUse hook refuses a card written by hand and
+an edit inside an `open` block, and `workstream state check` fails an open record whose card is not on
+the approach page, or a preview's card that differs from its record.
+
 **On the page, a card is a `div.sds-open` wrapping an `h4` whose `id` is its number, and that is the
 one shape — MUST** (`RD.DEVEX.WORKSPACE.147`, `RD.DEVEX.WORKSPACE.216`). The markup is
 `<div class="sds-open"><h4 id="q<n>">`. The number is lower case in the `id`, and it is written
@@ -120,7 +140,8 @@ recommendation is a `div.sds-recommended`. The labels come in the order `Why it 
 `Views`, `Options`. The views block is the label, one paragraph on who spoke, why those and how each
 was made, and then one short paragraph for each view, opening with its name in `<strong>`:
 `<p><strong>Architect:</strong> …</p>`. Views with nothing to add share one paragraph:
-`<p><strong>Server developer and Partner:</strong> No objection.</p>`. A decided card is a `div.sds-card`. The checks
+`<p><strong>Server developer and Partner:</strong> No objection.</p>`. A decided card is a `div.sds-card`. The renderer
+writes this markup from the record, and the checks
 find an open card by this shape and by nothing else. So a card written in another shape makes a page
 look as if it has no questions.
 
