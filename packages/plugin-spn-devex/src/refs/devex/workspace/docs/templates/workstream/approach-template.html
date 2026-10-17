@@ -1,5 +1,5 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — the pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The outline is fixed for an argument and borrowed for an explanation · § Depth is decided by where else the detail lives · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, served in versions · § The page itself — its outline, its rail, its width and its furniture
-     and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An instruction is recorded before it is executed
+     and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § The workstream is kept as data, and every file has one owner · § An instruction is recorded before it is executed
      and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
      This file holds the structure of a workstream's approach page and states no rule: the sections
      in order with their ids, the card's markup, the slots an author fills, and the two lines that load the shared stylesheet and script. The sections
@@ -44,10 +44,10 @@
   <h3 id="d1">{{Domain &mdash; e.g. DevEx &middot; Workspace}}</h3>
   <h4 id="c1">{{Construct &mdash; what changes in it}}</h4>
   <p>{{The change as description, bullets or a diagram, then why. A settled question is stated here as a result, with no Q number on view; its anchor, such as <code>id="q12"</code>, sits invisible on the statement.}}</p>
-  <p>Read the preview &rarr; <a href="notes/N001/previews/{{file}}">{{preview name}}</a></p>
+  <p>Read the preview &rarr; <a href="notes/N001/preview.html">{{preview name}}</a></p>
   <h4 id="c2">{{Construct &mdash; what changes in it}}</h4>
   <p>{{&hellip;}}</p>
-  <p>Read the preview &rarr; <a href="notes/N001/previews/{{file}}">{{preview name}}</a></p>
+  <p>Read the preview &rarr; <a href="notes/N002/preview.html">{{preview name}}</a></p>
   <h3 id="d2">{{Domain &mdash; proposed, if it does not exist yet}}</h3>
   <p>{{&hellip;}}</p>
 </section>
@@ -67,17 +67,20 @@
   <div class="sds-scroll"><table>
     <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>
     <tbody>
-      <tr data-arc="arcs/N001-{{subject}}.md"><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/previews/{{file}}">{{file}}</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for HELD, CARRIED and DROPPED, the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
-      <tr data-arc="arcs/N002-{{subject}}.md"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/previews/{{file}}">{{file}}</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
+      <tr data-arc="arcs/N001/state.json" data-arc-stamp="{{the stamp `workstream arc stamp write` wrote}}"><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for HELD, CARRIED and DROPPED, the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
+      <tr data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
     </tbody>
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped. -->
+  <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
+  <p>{{Overall: rows done of all, arcs closed of all, and a thin bar}}</p>
+  <p>{{For each arc: its number, a small bar, and done/total, linking its arc's data}}</p>
+  <!-- /spn:generated -->
 </section>
 
 <section id="s4" data-block="reasons">
-  <!-- With no card open, this heading reads: Open &mdash; no card is open -->
+  <!-- spn:generated open — do not edit inside these markers; `workstream question` writes it from questions.jsonl -->
   <div class="sds-section-head"><h2>Open &mdash; Q{{n}} &middot; Q{{n}}</h2></div>
-  <!-- Numbering, for the agent: the next card takes the next number after the highest on this page or in its previews. Only open cards stand in this section. -->
   <div class="sds-open">
     <h4 id="q{{n}}">Q{{n}} &middot; {{The question, as a noun phrase naming the choice}}</h4>
     <span class="sds-key">Why it matters</span>
@@ -99,6 +102,7 @@
     </table></div>
     <div class="sds-recommended"><b>Recommended: {{A}}.</b> {{the reason it wins, which may name the views it rests on}}</div>
   </div>
+  <!-- /spn:generated -->
 </section>
 
 <section id="s5" data-block="comparison">

@@ -135,8 +135,21 @@ spnutils repo agent-sync</pre>
 │   └── {{file}}      changed  {{what the change is}}
 └── {{folder}}/       changed  {{what changes in the files under it}}</pre>
   <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
-  <pre data-lang="diff">- what the file says today
+  <p class="sds-small">a diff always shows one file, so it stands in a FILE frame</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{path of the file, from its repository&rsquo;s root}}</span><span class="sds-file-lang">diff</span></figcaption>
+    <pre data-lang="diff">- what the file says today
 + what it will say</pre>
+  </figure>
+  <h3 id="b-file">FILE &mdash; a code block that shows one file, framed with its path as the title</h3>
+  <p>{{Where a block of code is one file, or a part of one: a diff of a file, the declaration a file holds, a file&rsquo;s first lines. The path stands in the frame&rsquo;s title, from the repository&rsquo;s root; the language stands as a badge at its end; the code stays plain in the file and the shared script colours it. A block that is no one file (a command, a sample of output, a shape written out) stays a CODE block, with no frame.}}</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{packages/support-web-ds-ts/src/ui/core/theme.ts}}</span><span class="sds-file-lang">ts</span></figcaption>
+    <pre data-lang="ts">export interface IDSTheme {
+  {{field}}: {{Type}};
+}</pre>
+  </figure>
+  <p class="sds-small">the markup: a <code>figure.sds-file</code> holding a <code>figcaption</code> (its <code>.sds-file-path</code> and its <code>.sds-file-lang</code>) and the <code>pre</code></p>
 </section>
 
 <section id="figures" data-block="example">
