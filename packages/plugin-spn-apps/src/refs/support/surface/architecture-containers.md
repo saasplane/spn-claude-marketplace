@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "33eb478c"
+      "seen": "0bcf8593"
     }
   ]
 }
@@ -81,7 +81,8 @@ Here is how the parts serve the pages most apps have.
 | `color` | `BASE`, `DEFAULT` or `PRIMARY` | the colour of the fill of the frame, as the shell and the content take it. `BASE` is the default, and it leaves the fill to `raised` |
 | `strength` | `SUBTLE`, `QUIET` or `SOLID` | how strong the fill of a hue is. `BASE` takes none |
 | `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
-| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds. Blocks that need no line between them sit in one content part |
+| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds unless `divided` says otherwise. Blocks that need no line between them sit in one content part |
+| `divided` | yes or no, or a list: any of `CONTENT`, `FOOTER` | the lines inside a bordered frame. Yes, where left out, a line between every two parts; no, none, so the frame reads as one; a list, a line above each part named: `CONTENT` between two content parts (the header stays with the first), `FOOTER` above the footer. A frame with no border draws none |
 | `rounded` | yes or no | whether the corners of the frame are rounded |
 | `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
 
