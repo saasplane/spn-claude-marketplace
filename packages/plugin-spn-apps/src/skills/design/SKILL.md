@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "1cdb3069"
+      "seen": "e8430070"
     }
   ]
 }
@@ -64,7 +64,7 @@ A layout frames the page. It draws the navigation, and it hands the page a main 
 | `DOCK` | a bar across the top, and the entries in a column beside one page |
 | `TOPNAV` | a bar across the top, with the content below it |
 
-- **The theme styles the layout in three parts, the body, the navigation and the content, and a page writes no look for any of them** (`RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.200`). The body is the whole window, with the fill behind everything and the width of the box the others stand in; the navigation moves a person around the app; the content is the main area. Each of the navigation and the content is attached to the window's edge or floats, the layout's space in (`--layout-space`), and the top bar is sticky or not. The width is the body's: `FULL`, `XWIDE`, `WIDE`, `MEDIUM` or `NARROW`. A phone draws one drawer for all three layouts. The layouts alone read the theme. `architecture-layouts.md` states them.
+- **The theme styles the layout in three parts, the body, the navigation and the content, and a page writes no look for any of them** (`RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.200`). The body is the whole window, with the fill behind everything and the width of the box the others stand in; the navigation moves a person around the app; the content is the main area. The navigation is attached to the window's edge or floats, the layout's space in (`--layout-space`); the content is attached, a box at the body's width that meets the navigation with the body showing around it, or floats; and the top bar is sticky or not. The width is the body's: `FULL`, `XWIDE`, `WIDE`, `MEDIUM` or `NARROW`. A phone draws one drawer for all three layouts. The layouts alone read the theme. `architecture-layouts.md` states them.
 - **The page chooses its layout, and the theme never does.** Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
 - **Fill the places, named by where they stand** (`RD.SUPPORT.SURFACE.157`): `startNode`, the navigation, `endNode`, `actionsNode`, the main area and `footerNode`, and in a dock `headerNode`. Every layout type with a navigation takes them in its config, and `phone` says whether each node stands in the bar, the drawer or both on a phone; `CANVAS` is the body alone, with no navigation and no overlay, for a marketing page, a sign-in or a page of an error.
 - **The footer is optional, and it closes the main area.** Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content. An app that gives no footer has none. The layout places it, and decides nothing about what it holds.
