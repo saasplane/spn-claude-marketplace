@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "79906253"
+      "seen": "d9e80048"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
@@ -90,7 +90,7 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md`, in this plugin, and each pattern's spec is in `refs/support/surface/patterns/`.
 
-- **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by layer. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
+- **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
 - **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the containers, the widgets and the components the design system already has.
 - **Use one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never containers of their own. Two things that are read or saved apart are two containers. An editor with its preview is one container, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.

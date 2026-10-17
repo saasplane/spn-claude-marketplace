@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "af3f779b"
+      "seen": "fd7c3330"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "79906253"
+      "seen": "d9e80048"
     }
   ]
 }
@@ -193,14 +193,15 @@ The two numbers of a small and a medium entry are proposed (`RD.SUPPORT.SURFACE.
 - **A spec is strict JSON.** It holds no comment. Draw one with `spn-devex docs figure draw <spec>`.
 - **Never edit a file in that folder.** It is a copy of the book's folder. A spec in the plugin MUST equal the spec of the same name in the book (`RD.SUPPORT.SURFACE.053`).
 
-## Each page pattern, by layer — 🔮
+## Each page pattern, by level — 🔮
 
-Every page pattern fills the main area of the app's layout. It names no layout of its own. The units named below are the ones the pattern is drawn with. Which unit shows a part that holds many of one thing is still the choice of step 2.
+The levels are the layout, the page level, the containers, the widgets and cards, and the components (`RD.SUPPORT.SURFACE.202`). Every page pattern fills the content of the app's layout. It names no layout of its own: its spec draws it in the layout of its live page, as the sketch's setting. The page level is the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. A card stands at the level of a widget. The units named below are the ones the pattern is drawn with. Which unit shows a part that holds many of one thing is still the choice of step 2.
 
 ### Find in a list
 
 - **When.** The data grows as people work, and a person comes often, to find one record. A record that has things of its own opens as a page. A record of a few facts and nothing else opens as a look beside the list.
-- **Container.** One `DSContainer`. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSDataTableWidget` a place in the footer, and the table draws its paging there.
+- **Page level.** The header of the container, with `fullPage`: the title, a line under it and the main action.
+- **Container.** One `DSContainer`. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSDataTableWidget` a place in the footer, and the table draws its paging there.
 - **Widget.** `DSFilterBarWidget` and `DSDataTableWidget`, in the layout that step 2 chose.
 - **Component.** `DSDrawer`, for the look of a small record beside its list.
 - **On a tablet and a phone.** A tablet keeps `TABLE` with fewer columns, and its filter bar holds fewer boxes. On a phone the data table is in its `LIST` layout, and the filter bar is one button that says how many filters are on. The look of a small record is a screen of its own on a phone.
@@ -209,17 +210,20 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### A record and its setup
 
 - **When.** The data is one record and a few things set up for it. A person comes rarely, to see where things stand.
-- **Layout.** The header of the record, then its containers. An action that can do harm stands apart from the others, at the end.
+- **Layout.** The page level, then the containers. An action that can do harm stands apart from the others, at the end.
+- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the record, its picture, its name, and under the name its facts.
 - **Container.** One `DSContainer` for each thing set up, with its title and its actions above its outline.
 - **Widget.** None.
-- **Component.** `DSItem`, or `DSAvatar` with `DSText`, for the header of the record. `DSCard` for each smaller part. `DSSwitch` for a thing that is only on or off. `DSBadge` for a state that is not normal.
+- **Card.** `DSCard` for each smaller part.
+- **Component.** `DSSwitch` for a thing that is only on or off. `DSBadge` for a state that is not normal.
 - **On a tablet and a phone.** At a desktop the large part is the main column and the short part stands beside it. On a tablet and a phone all of it is one column: the header, the main column, then the column that stood beside it.
 - **Spec.** `record-and-its-setup.dg.json`.
 
 ### A record and what belongs to it
 
 - **When.** The data is one record with lists of other records attached. A person comes to attach or remove one, or to read what happened.
-- **Layout.** The header of the record, then the attached lists, side by side where the page is wide.
+- **Layout.** The page level, then the attached lists, side by side where the page is wide.
+- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the way back, the record's picture, its name, and under the name its state and one more fact.
 - **Container.** One `DSContainer` for each attached list. A list a person adds to has a box at its top that finds a record as they type, with Add beside it. A list that is only read has none.
 - **Widget.** None.
 - **Component.** `DSList` holding `DSItem`: each attached record is a line that ends with the action that removes it. `DSEmpty` for the empty state of a list. No list shows a count.
@@ -229,15 +233,18 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### Set up by kind
 
 - **When.** The data has fixed kinds, with one or a few of each. A person comes rarely, to connect or change one. The page shows every kind always, also a kind that has nothing yet. The kinds in use come first.
+- **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
 - **Container.** One `DSContainer`, holding the kinds.
 - **Widget.** `DSDataTableWidget` in its `GRID` layout, where the kinds come from a query that takes a page, a text or a filter. It draws one card for each kind.
-- **Component.** `DSCard`, `DSItem` and `DSEmpty`. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider as an item. A kind with nothing yet says so and offers the action.
+- **Card.** `DSCard`, one for each kind. Its title is the kind, with the icon of that kind before it.
+- **Component.** `DSItem` and `DSEmpty`. Under the title of a card stands the provider as an item. A kind with nothing yet says so and offers the action.
 - **On a tablet and a phone.** Three cards across at a desktop, two on a tablet, and one on a phone.
 - **Spec.** `set-up-by-kind.dg.json`.
 
 ### Compare across kinds
 
 - **When.** The data is one fixed set of settings for a fixed set of kinds. A person comes rarely, to check or change a default. The page has no search and no paging, because the settings are few and fixed.
+- **Page level.** The header of the container, with `fullPage`: the title of the page, and a line under it.
 - **Container.** One `DSContainer`, holding the table.
 - **Widget.** None.
 - **Component.** `DSTable`: a setting in each row and a kind in each column, with an Edit under each kind. `DSDialog` with `DSForm` for the change. On a phone, `DSTabs` and `DSDataUnit`.
@@ -248,8 +255,9 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 
 - **When.** The data is many things to tick, and a person ticks several. Where the data says which group each thing belongs to, the page has one part for each group. Where it does not, the things are one list with a search.
 - **A heading MUST NOT be made up for choices whose data names no group** (`RD.SUPPORT.SURFACE.055`). A made-up heading puts a choice where a person does not look for it.
-- **Layout.** The main area, or the content of the entry the choices stand in: one container, or the parts of the entry's content.
-- **Container.** One `DSContainer`: its title in its header, a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a container of its own.
+- **Layout.** The content, or the content of the entry the choices stand in: one container, or the parts of the entry's content.
+- **Page level.** The header of the container, with `fullPage`, where the choices are a page; the entry's own header where they stand in an entry.
+- **Container.** One `DSContainer`: a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a container of its own.
 - **Widget.** None.
 - **Component.** `DSForm`, with `DSSwitch` or `DSCheckbox`, and `DSList`. The choices stand in columns.
 - **On a tablet and a phone.** On a phone the choices stand one under another.
@@ -260,8 +268,9 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 - **When.** The data is content a person writes and what that content becomes. The person must see the result while writing.
 - **An editor with its preview MUST be one container, and each thing a person writes MUST stand beside its own result** (`RD.SUPPORT.SURFACE.115`). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
 - **Where the content has several forms, a row of tabs MUST choose the form.** The tabs stand at the top of the content, and every part under them belongs to the chosen form. Where the record is saved whole, one save holds every form.
-- **Layout.** The way back, then one container.
-- **Container.** One `DSContainer`: its title in its header; the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer.
+- **Layout.** One container.
+- **Page level.** The header of the container, with `fullPage`: the way back, before the title.
+- **Container.** One `DSContainer`: the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer.
 - **Widget.** None.
 - **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it. `DSSticky` for the footer that stays in view.
 - **On a tablet and a phone.** At a desktop the editor of each part and its result stand side by side. On a tablet and a phone a person sees one of the two at a time, the writing or the result. A second row of tabs moves between them, and the choice holds for every part of the content at once.
@@ -270,7 +279,8 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### An entry over the page
 
 - **When.** The data is a small or a medium form, and the page it belongs to stays beneath or beside it. Step 4 says which is small and which is medium.
-- **Layout.** The page the entry belongs to. It stays in view beneath a dialog, or beside a sheet.
+- **Layout.** The content of the page the entry belongs to. It stays in view beneath a dialog, or beside a sheet.
+- **Page level.** The page level of the page the entry belongs to. The entry takes none of its own: its title stands in the header of its container.
 - **Container.** One `DSContainer` inside the overlay. Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
 - **Widget.** None.
 - **Component.** `DSDialog` for a small form. `DSSheet` for a medium one. `DSDrawer` for a look at one record. `DSForm` for the fields.
@@ -280,6 +290,8 @@ Every page pattern fills the main area of the app's layout. It names no layout o
 ### Inherit or override
 
 - **When.** The data is a value that follows a default until someone sets their own. The person must see which of the two it is, and be able to go back.
+- **Layout.** The page level, then one container for each part.
+- **Page level.** `DSPageLevel` at `PAGE`: the title of what the values belong to, with the way back before it.
 - **Container.** One `DSContainer` for each part. The line under its title says whether the part follows the default or holds its own values. Its header or its footer holds the one action that changes that.
 - **Widget.** None.
 - **Component.** `DSDataUnit` for the values that are read. `DSButton` for the action to set its own, or to go back.
@@ -315,6 +327,7 @@ Whether the set of groups is closed decides the arrangement, before any count do
 - **The swap MUST change the address.** The back of the browser then does the same as the back action. A reload stays on the chosen group, and a link to one group opens it on every screen.
 - **Many groups a person searches MUST be the `LIST` layout of `DSDataTableWidget`, and never its `TABLE` layout** (`RD.SUPPORT.SURFACE.069`). The part is narrow, and a person picks one group by its name.
 - **Ask whether a group is a thing a person manages.** Where the product fixes the groups, a group is a heading. Where people make them, a group has its own actions.
+- **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
 - **Container.** `DSContainer`: one for each group, or two side by side. Where two stand side by side, the chosen group is the title of the container at the right. The action that adds an item stands in that header.
 - **Widget.** `DSDataTableWidget` in its `LIST` layout, where the groups are many.
 - **Component.** `DSList` holding `DSItem`, for the groups as lines, with a band behind the chosen one. `DSTable`, where the items are a table. `DSBadge` for a state that is not normal.
@@ -323,20 +336,23 @@ Whether the set of groups is closed decides the arrangement, before any count do
 ### An overview
 
 - **When.** The data is counts and what waits for a person, and the person has just arrived. The page shows how much there is, then what needs them, then the places they often go to.
-- **Layout.** A row of numbers, then the containers.
+- **Layout.** The page level, a row of numbers, then the containers.
+- **Page level.** `DSPageLevel` at `PAGE`: the title of the page.
 - **Container.** `DSContainer`: what waits for the person, and the places they often go to.
 - **Widget.** None.
-- **Component.** `DSDataUnit` for each number, drawn as a card of its own. `DSList` for each thing that waits, as a line that ends with its action.
+- **Card.** `DSCard` for each number, a card of its own.
+- **Component.** `DSDataUnit` for the number in its card. `DSList` for each thing that waits, as a line that ends with its action.
 - **On a tablet and a phone.** The numbers stand four across at a desktop, and two across on a tablet and a phone. The two containers stand side by side at a desktop, and one under another on a tablet and a phone.
 - **Spec.** `overview.dg.json`.
 
 ### A record and its steps
 
 - **When.** The data is one record that moves through known steps. A person with the right role moves it on. The page shows the step the record is at, and only the actions that are open at that step.
-- **Layout.** The header of the record, the steps, then the containers.
+- **Layout.** The page level, the steps, then the containers.
+- **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the way back, the record's picture, its name, and on the line under the name its state and its facts. Its end holds only the actions open at this step.
 - **Container.** `DSContainer`: the steps, and one container for each group of checks of the record.
 - **Widget.** None.
-- **Component.** `DSList` holding `DSItem` for the header of the record. `DSDataUnit` for each check. `DSBadge` only on the value that is not normal. `DSButton` for the actions open at this step.
+- **Component.** `DSDataUnit` for each check. `DSBadge` only on the value that is not normal. `DSButton` for the actions open at this step.
 - **The design system has no unit for a strip of steps today.** The spec draws the steps as four plain words, with the step the record is at as the heavy one.
 - **On a tablet and a phone.** The checks stand two across where two parts share the width at a desktop, three across on a tablet, and one under another on a phone. On a phone the steps stand one under another, and the actions of the step stand at the end of the page.
 - **Spec.** `record-and-its-steps.dg.json`.
@@ -344,8 +360,9 @@ Whether the set of groups is closed decides the arrangement, before any count do
 ### An entry that is a page
 
 - **When.** The data is a large form, with sections or a part that repeats. A person fills it in one sitting.
-- **Layout.** The way back, then one container.
-- **Container.** One `DSContainer`. Its title stands in its header. Its sections are the parts of its content, each with its own title. Its actions stand in its footer.
+- **Layout.** One container.
+- **Page level.** The header of the container, with `fullPage`: the way back, before the title.
+- **Container.** One `DSContainer`. Its sections are the parts of its content, each with its own title. Its actions stand in its footer.
 - **Widget.** None.
 - **Component.** `DSForm` for the fields, each with its title above its control. `DSSticky` for the footer that stays in view.
 - **The sections are parts of one form that is saved once.** So they are not containers of their own, and no list of the sections stands beside the form.
@@ -355,6 +372,7 @@ Whether the set of groups is closed decides the arrangement, before any count do
 ### Change in place, in a list
 
 - **When.** The data is many small values of one kind, and a person changes one after another. The page is a data table whose rows are read. The action of a row turns its value from words into a box, and the action that saves it stands beside the box. The page holds no form, and nothing opens over it.
+- **Page level.** The header of the container, with `fullPage`: the title, and a line under it.
 - **Container.** One `DSContainer`: the filter bar and the rows in its content, and the paging in its footer.
 - **Widget.** `DSDataTableWidget` and `DSFilterBarWidget`.
 - **Component.** `DSInput`, the box in the one cell that is being changed, as wide as the cell.
@@ -398,7 +416,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 
 | Part of a page | How every spec shows it | The rule is stated in |
 | --- | --- | --- |
-| the record a page is about | the header of the page: its picture, its name, and its facts on the line under the name. It has no frame | `standards-core.md` |
+| the record a page is about | the page level, the head of the page: its picture, its name, and its facts on the line under the name. It has no frame | `standards-core.md` |
 | a state a person looks for | a badge on the line of facts, before the other facts, or at the end of the line. The normal state shows none. The end of a line holds its actions, a badge, or both | `standards-core.md` |
 | a line of a list | an item line, `DSItem`, with a line between each two | `architecture-components.md` |
 | a field a person enters, and a field a person reads | `DSForm.Field`, and `DSDataUnit`, each with its title above | `architecture-components.md` |

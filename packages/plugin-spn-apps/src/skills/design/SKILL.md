@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "bdfdf362"
+      "seen": "1df03e1a"
     }
   ]
 }
@@ -27,7 +27,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Then read `refs/support/surface/standards-core.md`, `architecture-names.md`, `architecture-containers.md`, `architecture-layouts.md` and `architecture-app.md`, in this plugin.** They hold the levels of a page, the rules of content, the names, the container, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by layer of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-widgets.md` and `architecture-components.md` where the pattern names a data table, a filter bar, an item line, a badge or a field.
+**Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by level of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-widgets.md` and `architecture-components.md` where the pattern names a data table, a filter bar, an item line, a badge or a field.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -167,7 +167,8 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 ### Start from the spec of the pattern
 
 - **Open the spec of the pattern you named, in `refs/support/surface/patterns/`.** It is a skeleton with a view for each screen class. Draw it with `spn-devex docs figure draw <spec>` where you want to see it.
-- **Read the tree by layer of that pattern in `standards-patterns.md`.** It names the containers, the widgets and the components the pattern is drawn with, and what changes on a tablet and a phone.
+- **Read the tree by level of that pattern in `standards-patterns.md`.** It names the page level, the containers, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
+- **The spec names the layout and the page level a tree starts from** (`RD.DEVEX.WORKSPACE.260`). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
 - **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement.
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.
 
