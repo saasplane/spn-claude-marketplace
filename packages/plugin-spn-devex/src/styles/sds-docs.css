@@ -1793,6 +1793,9 @@
     font-size: var(--sds-sm);
     min-width: 34rem;
   }
+  table:has(> thead > tr > th:only-child) {
+    min-width: 0;
+  }
   td .sds-sub {
     display: block;
     font-size: var(--sds-xs);

@@ -242,6 +242,8 @@
   h4{@apply font-ui text-md text-title; font-weight:var(--sds-weight-title); margin:0 0 .5rem}
   .sds-scroll{@apply overflow-x-auto bg-card; border:1px solid var(--sds-rule); border-radius:3px; margin:1.6rem 0}
   table{@apply border-collapse w-full font-ui text-sm; min-width:34rem}
+  /* A table of one column is item cells, and item cells wrap: it takes the width it is given and never scrolls sideways */
+  table:has(> thead > tr > th:only-child){min-width:0}
   td .sds-sub{@apply block text-xs text-description; margin-top:.4rem}
   td .sds-sub b{@apply text-title; font-weight:650}
   td .sds-sub-line{@apply block font-mono text-xs font-normal text-fact; margin-top:.3rem}

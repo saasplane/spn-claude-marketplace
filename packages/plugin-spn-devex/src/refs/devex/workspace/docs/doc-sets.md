@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e908d8d3"
+      "seen": "0f59aeae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -581,9 +581,11 @@ unlearn.
    line that opens the construct page, named by the words the heading carries. The *Decide here*
    line is not a door.
 3. **The rules the path shares**, only where a rule is decided on one page and relied on by the
-   others: one sentence for the rule, then the check that enforces it.
-4. **Glossary** — generated on a domain overview. `docs face` writes it between its markers, three
-   columns grouped by construct in the domain's reading order, and nobody types a row inside them.
+   others: one item cell per rule — the rule in one sentence, why it holds, and where it is decided
+   and relied on as facts — then the check that enforces it.
+4. **Glossary** — generated on a domain overview. `docs face` writes it between its markers, one
+   column of item cells grouped by construct in the domain's reading order, and nobody types a row
+   inside them.
 5. **Where to go next.**
 
 An overview has no status and no cards.
@@ -599,9 +601,9 @@ section per area, then Glossary, then Where to go next.
   unlearn before choosing, then for each reading path what it covers, when you read it and what you
   can decide after it. A sub-area with one reading path ends in one door under its text; one with
   several ends in one tile per path.
-- **A hub's Glossary is written by hand, with two columns: *Term* and *What it means*.** The term
-  links to the page that defines it. There is no *Contract term* column; the generated three-column
-  glossary belongs to each domain (decision RD.DEVEX.WORKSPACE.150).
+- **A hub's Glossary is written by hand, one item cell per term: the term in bold, then what it
+  means.** The term links to the page that defines it. There is no *Contract term* fact; the generated
+  glossary, with its contract terms, belongs to each domain (decision RD.DEVEX.WORKSPACE.150).
 
 **Every page walks up one step, by the back link at the top of its rail — MUST** (decision RD.DEVEX.WORKSPACE.232).
 The top of a chain has none. A construct page goes back to its overview: where a domain has more than one
@@ -731,6 +733,8 @@ version of the stylesheet that has them.
 ## Blocks and figures — what a page is made of
 
 **A page is produced, never authored.** You write a **seat file in markdown** and `docs page write` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a code block tagged with that language, which the shared script colours when the page opens, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+
+**A table cell that holds an item reads in three levels on a hub, an overview, a construct and an approach page — MUST** (decision RD.DEVEX.WORKSPACE.259). The title is the cell's first paragraph, in bold where it is words; the line that says what it is or does is the paragraph under it; the facts are one line of `Key: value` pairs separated by middots, in `<span class="sds-small">`. A level with nothing to say is left out, and so is a fact whose value is a dash. **A table keeps a column only where a reader compares down it** — a status, a count, a version, a weight — and what nobody reads down becomes a level of the item's cell. A table of one column takes the width it is given and wraps at a phone's width, where a wider table scrolls inside its box. A construct's seat file keeps its markdown columns, and `docs page` writes the cells: `Terms` is one column with `Contract term:` as a fact, `Binds` is `Rule · Weight` with what the rule decides under it, a Model's `Piece · The question it answers · Its terms` is one column with `Terms:` as a fact, and a Boundary's `Owns · Refuses · Who owns that instead` keeps Owns beside Refuses with `Owned by:` as a fact. Any other seat table renders as written. On a hub or an overview, written by hand, you apply the same rule to every table. Every piece of text sits in the element whose tone it reads in — a name in an `h4`, a bold lead or a cell's first paragraph, running text in a paragraph, a fact in `sds-small` — and a page never sets a colour on text. A report's tables follow its own sections.
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 

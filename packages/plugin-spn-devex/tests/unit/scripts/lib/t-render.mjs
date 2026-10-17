@@ -52,5 +52,33 @@ ok("a fence with no language is written as `<pre>` with no tag", untagged.includ
   untagged.slice(untagged.indexOf("<pre"), untagged.indexOf("</pre>") + 6));
 ok("and it carries no colour span", !untagged.includes("sds-tk-"));
 
+console.log("=== the page renderer — a construct's fixed tables are written as item cells");
+const rowsOf = (html, head) => {
+  const at = html.indexOf(head);
+  return at < 0 ? "" : html.slice(at, html.indexOf("</table>", at));
+};
+const table = (head, ...rows) => `| ${head.join(" | ")} |\n| ${head.map(() => "---").join(" | ")} |\n${rows.map((row) => `| ${row.join(" | ")} |`).join("\n")}\n`;
+const terms = rowsOf(produced(table(["Term", "Contract term", "What it means"],
+  ["Estate", "`SPEstate`", "everything a product runs on"], ["Ring", "—", "a set of estates"], ["—", "`SPRingType`", "the ring's kind"])), "<thead>");
+ok("Terms is one column, headed Term", terms.startsWith("<thead><tr><th>Term</th></tr></thead>"), terms.slice(0, 80));
+ok("a term reads as its title in bold, what it means below it, and the contract's spelling as a fact",
+  terms.includes("<tr><td><p><strong>Estate</strong></p><p>everything a product runs on</p><span class=\"sds-small\">Contract term: <code>SPEstate</code></span></td></tr>"), terms);
+ok("a term the contract does not spell has no facts line", terms.includes("<tr><td><p><strong>Ring</strong></p><p>a set of estates</p></td></tr>"), terms);
+ok("a row with no consumer word is titled by the contract's spelling", terms.includes("<tr><td><p><code>SPRingType</code></p><p>the ring's kind</p></td></tr>"), terms);
+const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
+ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
+  binds.includes("<thead><tr><th>Rule</th><th>Weight</th></tr></thead>") && binds.includes("<tr><td><p><code>RD.X.1</code></p><p>what every provider delivers</p></td><td>MUST</td></tr>"), binds);
+const pieces = rowsOf(produced(table(["Piece", "The question it answers", "Its terms"], ["**A provider**", "What must it build?", "Provider"], ["**Figma**", "Why elsewhere?", "—"])), "<thead>");
+ok("a Model's pieces are one column: the piece, its question, and its terms as a fact",
+  pieces.includes("<tr><td><p><strong>A provider</strong></p><p>What must it build?</p><span class=\"sds-small\">Terms: Provider</span></td></tr>") &&
+  pieces.includes("<tr><td><p><strong>Figma</strong></p><p>Why elsewhere?</p></td></tr>"), pieces);
+const edges = rowsOf(produced(table(["Owns", "Refuses", "Who owns that instead"], ["the build", "what a kind is", "[Targets](targets.md)"])), "<thead>");
+ok("a Boundary keeps Owns beside Refuses, and who owns the refused part is a fact",
+  edges.includes("<thead><tr><th>Owns</th><th>Refuses</th></tr></thead>") &&
+  edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small\">Owned by: <a href=\"targets.md\">Targets</a></span></td></tr>"), edges);
+const other = rowsOf(produced(table(["Key", "Example", "Why"], ["`a`", "`b`", "c"])), "<thead>");
+ok("any other table is the author's, and is written as it stands",
+  other.includes("<thead><tr><th>Key</th><th>Example</th><th>Why</th></tr></thead>") && other.includes("<tr><td><code>a</code></td><td><code>b</code></td><td>c</td></tr>"), other);
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
 process.exit(failed ? 1 : 0);

@@ -1840,19 +1840,26 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
     return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
   });
   const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);
+  // ONE COLUMN OF ITEM CELLS (05-artifacts.md § The shape of a section, on every page kind): the term,
+  // linked to its construct's page, in bold; what it means below it; the contract's spelling as a fact.
+  // Nobody compares down a glossary, so no column of it stays. A term the contract does not spell has
+  // no facts line, and a row with no consumer word is titled by the contract's spelling. A construct's
+  // name heads its group as a header cell, so it reads as a label and never as one more item.
+  const blank = (x: string) => /^(?:—|–|-)?$/.test(x.trim());
   const out = [
     '  <div class="sds-scroll"><table class="sds-glossary">',
-    "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
+    "    <thead><tr><th>Term</th></tr></thead>",
     "    <tbody>",
   ];
   let group: string | null = null;
   for (const r of rows) {
-    if (r.group !== group) { out.push(`      <tr class="sds-group"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
+    if (r.group !== group) { out.push(`      <tr class="sds-group"><th scope="rowgroup">${esc(r.group)}</th></tr>`); group = r.group; }
     const href = relative(dirname(overviewFile), pageForSeat(r.file));
-    const term = r.term && r.term !== "—" ? `<a href="${href}">${esc(r.term)}</a>` : esc(r.term);
-    out.push(`      <tr><td>${term}</td><td>${cell(r.contract, r.file)}</td><td>${cell(r.means, r.file)}</td></tr>`);
+    const title = blank(r.term) ? cell(r.contract, r.file) : `<strong><a href="${href}">${esc(r.term)}</a></strong>`;
+    const facts = blank(r.term) || blank(r.contract) ? "" : `<span class="sds-small">Contract term: ${cell(r.contract, r.file)}</span>`;
+    out.push(`      <tr><td><p>${title}</p><p>${cell(r.means, r.file)}</p>${facts}</td></tr>`);
   }
-  if (!rows.length) out.push('      <tr><td>&mdash;</td><td>&mdash;</td><td>no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
+  if (!rows.length) out.push('      <tr><td><p>no construct in this domain carries a <code>Terms</code> table yet</p></td></tr>');
   out.push("    </tbody>", "  </table></div>");
   return { body: out.join("\n"), findings };
 }

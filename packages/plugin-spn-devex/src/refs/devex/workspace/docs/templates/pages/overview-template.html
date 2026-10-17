@@ -57,10 +57,12 @@
 
 <section id="s3" data-block="must">
   <div class="sds-section-head"><h2>{{The rules this path shares}}</h2></div>
-  <p>{{Only when a rule is decided on one page and relied on by the others. One sentence for the rule, then the check.}}</p>
+  <p>{{Only when a rule is decided on one page and relied on by the others. One item cell for each rule, then the check.}}</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>Decided on</th><th>Relied on by</th></tr></thead>
-    <tbody><tr><td><strong>{{The rule.}}</strong> {{why}}</td><td>{{Construct}}</td><td>{{Construct}} &middot; {{Construct}}</td></tr></tbody>
+    <thead><tr><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>{{The rule, in one sentence.}}</strong></p><p>{{why it holds, in a line}}</p><span class="sds-small">Decided on: <a href="#">{{Construct}}</a> &middot; Relied on by: <a href="#">{{Construct}}</a>, <a href="#">{{Construct}}</a></span></td></tr>
+    </tbody>
   </table></div>
   <p>Run <code>{{command}}</code> {{when}}.</p>
 </section>
@@ -69,8 +71,12 @@
   <div class="sds-section-head"><h2>Glossary</h2></div>
   <p>{{One authored line saying what the table is — on a domain overview, every term this domain declares and the construct each is declared in.}}</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
-    <tbody><tr><td>{{Estate}}</td><td><code>{{SPEstate}}</code></td><td>{{&hellip;}}</td></tr></tbody>
+    <thead><tr><th>Term</th></tr></thead>
+    <tbody>
+      <tr class="sds-group"><th scope="rowgroup">{{Construct}}</th></tr>
+      <tr><td><p><strong><a href="#">{{Estate}}</a></strong></p><p>{{what it means, on its own line}}</p><span class="sds-small">Contract term: <code>{{SPEstate}}</code></span></td></tr>
+      <tr><td><p><strong><a href="#">{{Ring}}</a></strong></p><p>{{&hellip; a term the contract does not spell has no facts line}}</p></td></tr>
+    </tbody>
   </table></div>
 </section>
 

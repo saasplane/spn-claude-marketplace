@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "f8e747d1"
+      "seen": "bc5335b1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e908d8d3"
+      "seen": "0f59aeae"
     }
   ]
 }
@@ -123,7 +123,9 @@ folded in: `proof`, `cost`, `commits`, `order`.
 
 **The `workstream` commands are the only writers of what a script owns — MUST.** Every `show` takes
 `--json`. Each write appends its event to the arc's log, refreshes the progress block, and prints any
-finding of `state check` for its workstream.
+finding of `state check` for its workstream. The grammar reads at most three words after the plugin's
+name, so `workstream arc stamp write` is the group `workstream`, the subject `arc` and the action
+`stamp`, and `write` is the first word that action takes.
 
 | Command | What it does, and what it answers |
 | --- | --- |
@@ -1011,7 +1013,7 @@ are the header's status and the Cycles table, which `spn-devex docs cycles write
 from the arcs' data; the progress block under the table, which `workstream progress write` writes
 and every other `workstream` write refreshes (`RD.DEVEX.WORKSPACE.250`); and `Open` with its heading,
 which the `workstream question` commands write from `questions.jsonl`. The table has two columns: Arc,
-with the title, the line and one line of Key: value facts (the preview first, then each sample, by
+an item cell with the title, the line and one line of Key: value facts (the preview first, then each sample, by
 kind, linked, with no state; a HELD, CARRIED or DROPPED reason as a fact), and Status, the word as its
 badge. Each row carries `data-arc="arcs/N<nnn>/state.json"` and the arc's stamp. The header's status
 reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has landed, and

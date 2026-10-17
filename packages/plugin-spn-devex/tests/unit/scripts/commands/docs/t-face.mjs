@@ -503,8 +503,15 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   one("the overview gains a generated region, the first in any HTML page",
     page, has("spn:generated glossary"));
-  one("and it carries the three columns the markdown face carries",
-    page, has("<th>Term</th><th>Contract term</th><th>What it means</th>"));
+  // THE PAGE READS IN ITEM CELLS (05-artifacts.md § The shape of a section, on every page kind): one
+  // column, the term in bold, what it means below it, and the contract's spelling as a fact. The
+  // markdown face keeps its three columns, because the glossary is generated from them.
+  one("and it carries the glossary as one column of item cells",
+    page, (g) => g.includes("<thead><tr><th>Term</th></tr></thead>") && !g.includes("<th>Contract term</th>"));
+  one("each row is the term in bold, what it means, and the contract's spelling as a fact",
+    page, (g) => /<tr><td><p><strong><a href="[^"]*session-construct\.html">sign-in<\/a><\/strong><\/p><p>one person's live access[^<]*<a [^>]*>the rule<\/a>[\s\S]*?<\/p><span class="sds-small">Contract term: <code>SPSession<\/code><\/span><\/td><\/tr>/.test(g));
+  one("a construct heads its group as a header cell, never as one more item",
+    page, (g) => /<tr class="sds-group"><th scope="rowgroup">[^<]+<\/th><\/tr>/.test(g));
   one("the term links to the construct PAGE, never the markdown seat (Q234)",
     page, has(`href="${CONSTRUCT_PAGES}/session-construct.html"`));
   // A term's meaning may hold a link, written for the seat file's folder. The overview sits in another

@@ -1,75 +1,89 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § An instruction is recorded before it is executed · § A prompt while an arc runs · § An arc's status says which of eight states it is in
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § An arc's status says which of eight states it is in · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
      and docs/04-capabilities/02-support/01-apps/06-tests/README.md § When a whole tier runs
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-<!-- AN ARC IS THE INDEX AND THE STATE; ITS PLAN IS THE WORK ORDER. What each row changes, exactly, lives in
-     `notes/N<nnn>/plan.md`, pinned to commits. An arc is a plan, never an argument: no card lives here. A question
-     is a card on the approach page's Open; HELD names that card; a scope change is logged as a dated line.
-     The heading names the arc for the cycle it pays. The file is named `N<nnn>-<subject>.md`: a three-digit number
-     and a subject of two to four words. -->
-# N{{nnn}} — {{the cycle it pays, named: "R: the support release that carries X"}}
+<!-- AN ARC IS KEPT AS DATA, IN TWO FOLDERS NAMED BY ONE NUMBER. `arcs/N<nnn>/` holds what the commands write:
+     `state.json`, `log.jsonl` and `facts.jsonl`. Nobody types in it, and the PreToolUse hook refuses an edit there.
+     `notes/N<nnn>/` holds what the agent writes: `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`.
+     This file is not copied into a workstream. It shows the commands that write the arc's data and what each field
+     holds, then the agent's own files, so an arc is opened and run the same way every time. No card lives in an arc:
+     a question is a record in `questions.jsonl`, raised with `workstream question raise`. -->
+# N{{nnn}} — the arc, as data and as the agent's files
 
-Status: **{{PROPOSED · DECIDED · RUNNING · HELD · PART-LANDED · LANDED · CARRIED · DROPPED}}** — {{a short reason, only for HELD (the card it waits on), CARRIED (to where) and DROPPED (why); otherwise none}}. {{One sentence: what this arc changes, and why it is one arc.}}
+## Open it — the commands write `arcs/N{{nnn}}/`
 
-<!-- The bold span is the status word and nothing else; the date of a change is a Log line. -->
+```sh
+# open the arc as PROPOSED: its title names the cycle it pays, its subject is two to four words
+spn-devex workstream row write N{{nnn}} --title "{{the cycle it pays, named: R: the support release that carries X}}" --subject {{two-to-four-words}}
 
-| Field | This arc |
-| --- | --- |
-| **Decides** | **{{what this arc decides, in one phrase}}.** {{What is true once it lands.}} |
-| **Highest document** | `{{repo}}` → `{{the document that must change first}}` |
-| **Lowest package** | `{{the deepest file or folder it touches}}` |
-| **Repos** | {{repo}} → {{repo}}: chain order, and why this order |
-| **Cycle it pays** | {{a book change · a support release · a plugin release and reinstall · a renumbering · a corpus pass · a symbols regeneration · a full verification}} (an arc with no cycle is a step on another arc) |
-| **What it must follow** | {{N<m> — why it must land first}}, or nothing |
-| **Design gate** | {{the cards that must be answered first: Q<n>}}, or passed |
-| **Green baseline** | {{the whole-repository gate}} at `{{sha}}`, {{date}}: {{its result line}} |
-| **Model** | Coordinator: {{Opus 5}}. Each order's model is in the plan's Orders table. |
-| **Page** | `approach.html`: this arc's Cycles row, and the cards it owns ({{Q<n>}}) |
-| **Work order** | `notes/N{{nnn}}/plan.md` (pinned facts, commands, rows, orders) · `previews/` (the pages that explain a change) · `samples/` (real files of the kind the work produces) · `scripts/` · `orders/` (one brief and its report per agent) |
+# its header: what it decides, the repositories in chain order, the cycle, what it follows, the coordinator's model
+spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{a book change · a support release · a plugin release and reinstall · a renumbering · a corpus pass · a symbols regeneration · a full verification}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
 
-## Previews
+# each fact read while ideating, the source's commit pinned
+spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fact "{{what the source says, in one line}}" --used-by {{q<n> or row}}
 
-<!-- THE PREVIEWS TABLE IS REQUIRED FROM PROPOSED: an arc past PROPOSED with no preview fails `state check`. One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `proposed` or
-     `decided <date>`. A preview that a later one replaces is removed, and the log says so. With none, the table is replaced by the one word `None.` -->
+# a row, once the plan is written: its kind, where, at what altitude, how, and its acceptance
+spn-devex workstream row write N{{nnn}} {{row}} --title "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
 
-| File | Kind | Shows | State |
-| --- | --- | --- | --- |
-| [`{{subject}}-preview.html`](../notes/N{{nnn}}/previews/{{subject}}-preview.html) | preview | {{what it shows, in one line}} | proposed |
+# the status, at your word: DECIDED, RUNNING, HELD, PART-LANDED, LANDED, CARRIED or DROPPED, with a reason for the last three and HELD
+spn-devex workstream row write N{{nnn}} --status {{STATUS}} --reason "{{the card it waits on · where it went · why}}"
 
-## What done means
+# a line on the log, which has no other writer: a decision, a correction, your words
+spn-devex workstream row write N{{nnn}} --note "{{what was decided or corrected, by whom, and why; the notes it changed}}"
 
-{{The state a person can observe once this lands, and the command from the plan's Commands table that shows it.}}
+# once the approach page's part for this arc is current with its rows
+spn-devex workstream arc stamp write N{{nnn}}
+```
 
-## Steps
+## What the commands keep — `arcs/N{{nnn}}/state.json`
 
-<!-- A ROW CARRIES ITS KIND: fix (a small correction, recorded and batched with the others, or made inline), change (a new prop, token, rule or construct, with the full proof) or question (waits on a card). A ROW IS ONE REPOSITORY AT ONE ALTITUDE. Repo is the repository, or `—` for the workstream itself; Altitude is
-     DOCS · CODE (with its tests) · GENERATED · RELEASE · PROOF; rows run in chain order by repository, then by
-     altitude. What names the files, or "plan § k" — and every "plan § k" has that section. Mechanism is by hand ·
-     script · command · agents (order <nn>). Acceptance cites a row of the plan's Commands table and its count:
-     `command` → before → after — never a sentence. A row proven by tests names behaviour ids, read as SUCCESS from a
-     named run's file: never an exit code, never a count of a whole tier. A GENERATED row's acceptance is "no diff on a second run".
-     A RELEASE row's acceptance names a consumer install (the published packages, no overrides), never only the
-     tool's version. A row inserted mid-run takes a letter suffix (4b). State follows the chapter: empty (not
-     started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ⏸ held on Q<n> (waits on that open card; not runnable until it is answered) · ✅ landed — `<commit>` — <the acceptance's result line> ·
-     ↷ carried — to <where> · ⊘ deferred — <why>. Row 0 is a precondition of RUNNING; the last row is never deleted. -->
+```json
+{ "schemaVersion": 1,
+  "arc": "N{{nnn}}", "subject": "{{two-to-four-words}}", "title": "{{the cycle it pays, named}}",
+  "status": "PROPOSED", "reason": null,
+  "decides": "{{what this arc decides}}", "repos": ["{{repo}}", "{{repo}}"],
+  "cycle": "{{the cycle it pays}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
+  "preview": "preview.html",
+  "rows": [
+    { "id": "0", "parent": "N{{nnn}}", "title": "write notes/N{{nnn}}/plan.md: pins, what exists today, commands with their before, rows, orders",
+      "kind": "change", "repo": "—", "altitude": "DOCS", "mechanism": "by hand",
+      "acceptance": "every plan row has Files, Fails before and Proof", "state": "waiting" },
+    { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{plan § 1}}",
+      "kind": "{{change}}", "repo": "{{repo}}", "altitude": "{{DOCS}}", "mechanism": "{{agents}}",
+      "acceptance": "{{`command` → before → after}}", "model": "{{sonnet}}",
+      "blockedBy": ["0"], "touches": ["{{repository:place}}"], "decisions": ["{{q<n>}}"], "facts": ["{{f<n>}}"],
+      "state": "waiting", "order": "orders/{{1}}.md" },
+    { "id": "{{n}}", "parent": "N{{nnn}}", "title": "on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install",
+      "kind": "change", "repo": "—", "altitude": "PROOF", "mechanism": "command",
+      "acceptance": "each Commands row → its after, and each named id → SUCCESS in that run's file", "state": "waiting" } ] }
+```
 
-| # | Kind | Repo | Altitude | What | Mechanism | Acceptance | State |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 | change | — | DOCS | write `notes/N{{nnn}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
-| 1 | change | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
-| 2 | {{fix · change}} | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
-| {{n}} | change | — | PROOF | on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install | command | each Commands row → its after, and each named id → `SUCCESS` in that run's file | |
+<!-- A row's state is waiting · ready · running · stopped · landed · carried · deferred, and `report write` folds a
+     child's hand-back into it: the outcome, the proof, the commits, the cost and the follow-ups. A row with rows under it
+     takes its state from them. Row 0 is a precondition of RUNNING, and the PROOF row is never deleted. -->
 
-## Before you write LANDED
+```text
+log.jsonl     {"at":"{{YYYY-MM-DDTHH:MM}}","kind":"{{what happened: opened · header · status · added · a row's new state · landed · stopped · needs-you · stamped · note}}","row":"{{row or null}}","note":"{{one line}}"}
+facts.jsonl   {"id":"f{{n}}","fact":"{{one line}}","source":"{{repo/path:line}}","commit":"{{sha}}","readAt":"{{YYYY-MM-DDTHH:MM}}","usedBy":["{{q<n> or row}}"]}
+```
 
-Every row is ✅ landed, ↷ carried or ⊘ deferred, and none is ◐ stopped or ⏸ held. The PROOF row's output is recorded, run with
-the cache off. Every card this arc answered has left the approach page's Open for the section that states it, and
-this arc's Cycles row reads LANDED. The landing is committed. The arcs are the state, and the page shows them.
+## What the agent writes — `notes/N{{nnn}}/`
 
-## Log
+```text
+notes/N{{nnn}}/
+  preview.html      the arc's one preview, from PROPOSED: each proposal a section, its status in the masthead
+  samples/          real files of the kind the work produces, each in its own format, as many as the work needs
+  plan.md           how the arc will be done, from DECIDED: pins, what exists today, the commands and their before, the traps
+  orders/
+    {{row}}.md          one brief per delegated row, named by the row, its front matter first (order-template.md)
+    {{row}}.report.md   the child's hand-back, its front matter first, which `report write` folds into the row
+  scripts/          what a script row runs
+```
 
-<!-- An answer or a review point lands in the same turn in the card, in this log and every row it changes, and in
-     notes/N<nnn>/ (the spec, the plan, and any preview or sample they name). Name the note files it changed. A decision the book,
-     the plugin references or the lenses settle is logged here with its reason, and never raised as a card. -->
-- **{{date}} — {{what was decided or corrected, by whom, and why; the notes it changed}}.**
+## Before the status reads LANDED
+
+Every row is landed, carried or deferred, and none is stopped or waits on a card. The PROOF row's output is in its
+`proof`, run with the cache off. Every card this arc answered has left `Open`, and the page's `What` states its
+result. The approach page's part for the arc is current, its stamp written, and its Cycles row reads LANDED. The
+landing is committed.

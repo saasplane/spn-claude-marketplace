@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks · § One stylesheet, served in versions
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks · § The shape of a section, on every page kind · § One stylesheet, served in versions
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
@@ -94,14 +94,67 @@ function inline(s: string): string {
   });
 }
 
+/** A cell that a dash or nothing fills says nothing, so no level of an item cell is made from it. */
+const isBlank = (cell: string): boolean => /^(?:—|–|-|&mdash;)?$/.test(cell.trim());
+
+/** A level's text in bold, unless its author already set it so. */
+const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) ? html : `<strong>${html}</strong>`;
+
+/**
+ * An item cell (05-artifacts.md § The shape of a section, on every page kind): the title in the first
+ * paragraph, the line under it, and the facts as `Key: value` pairs in the page's small type. A level
+ * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
+ */
+function itemCell(title: string, line: string, facts: [string, string][]): string {
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `${key}: ${inline(value)}`);
+  return [
+    isBlank(title) ? "" : `<p>${title}</p>`,
+    isBlank(line) ? "" : `<p>${inline(line)}</p>`,
+    said.length ? `<span class="sds-small">${said.join(" &middot; ")}</span>` : "",
+  ].join("");
+}
+
+/**
+ * The tables every construct carries, and the two shapes the corpus repeats, each written as item
+ * cells: a column a reader compares down stays a column, and the rest of what a row says about its
+ * item becomes a level of the item's cell. The seat file keeps its markdown columns, because the
+ * glossary is generated from them. Any other table is the author's, and is written as it stands.
+ */
+const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[] }[] = [
+  { // Terms: the term, what it means, and the term the contract spells.
+    head: [/^Term$/, /^Contract term$/, /^What it means/],
+    columns: ["Term"],
+    row: ([term, contract, means]) => isBlank(term)
+      ? [itemCell(inline(contract), means, [])]
+      : [itemCell(bold(inline(term)), means, [["Contract term", contract]])],
+  },
+  { // Binds: the rule and what it decides; the weight is read down the column.
+    head: [/^Rule$/, /^What it decides$/, /^Weight$/],
+    columns: ["Rule", "Weight"],
+    row: ([rule, decides, weight]) => [itemCell(inline(rule), decides, []), inline(weight)],
+  },
+  { // A Model's pieces: the piece, the question it answers, and its terms.
+    head: [/^Piece$/, /^The question it answers$/, /^Its terms$/],
+    columns: ["Piece"],
+    row: ([piece, question, terms]) => [itemCell(bold(inline(piece)), question, [["Terms", terms]])],
+  },
+  { // A Boundary's edges: what this construct owns beside what it refuses, and who owns that instead.
+    head: [/^Owns$/, /^Refuses$/, /^Who owns that instead$/],
+    columns: ["Owns", "Refuses"],
+    // Both sides are lines, read across the row, so neither takes the title's tone.
+    row: ([owns, refuses, instead]) => [inline(owns), inline(refuses) + itemCell("", "", [["Owned by", instead]])],
+  },
+];
+
 function table(lines: string[]): string {
   // A `\|` inside a cell is a pipe the author wants shown, not a column break — markdown's own rule,
   // and the one the first pattern table in the corpus needed (`{org}-{family}-public\|-private`).
   const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
-  const th = head.map((c) => `<th>${inline(c)}</th>`).join("");
-  const tb = rows.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("\n      ");
+  const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])));
+  const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
+  const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
   return `  <div class="sds-scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
