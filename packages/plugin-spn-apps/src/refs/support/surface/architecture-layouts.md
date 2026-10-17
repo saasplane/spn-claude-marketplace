@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "ed845bd7"
+      "seen": "ffb9175d"
     }
   ]
 }
@@ -134,7 +134,7 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 ## The phone and the tablet — 🔮
 
 - **On a phone everything attaches, and `--layout-space` is 16 px.** Each layout draws a bar: the menu at its start, the nodes the page places there, and the account's avatar at its end.
-- **One drawer serves all three layouts on a phone, and it replaces the pop-up menu of the top nav and of the dock** (`RD.SUPPORT.SURFACE.200`). It opens from the left, `layout/rail-narrow` wide, over a dimmed page. The dock's drawer starts with the way back, then the column's entries. The bar's start is the menu that opens the drawer, or the way back where the dock has `backTo`.
+- **One drawer serves all three layouts on a phone, and it replaces the pop-up menu of the top nav and of the dock** (`RD.SUPPORT.SURFACE.200`). It opens from the left, `layout/rail-narrow` wide, over a dimmed page. The dock's drawer starts with the way back, then the column's entries. It closes on a press of an entry that navigates, and a group that only opens stays open. Shut, the foot's actions stand in a column above the person, each with its tooltip, and past three the rest are behind a "⋯" menu. The bar's start is the menu that opens the drawer, or the way back where the dock has `backTo`.
 - **Each node takes a place on a phone, with a default, by `DSLayoutPhonePlaceType`:** `BAR`, `DRAWER` or `BOTH`. The config's `phone` places `startNode` (default `BOTH`), `actionsNode` (default `DRAWER`) and `endNode` (default `BAR`). A node in the bar draws its collapsed form when the page gives one.
 - **On a tablet floating applies.** The rail is shut to icons by default, and the top nav puts its entries in the drawer.
 - **The bar is at least `layout/bar` high, every tap target at least 44 px, and the bar and the drawer keep clear of the safe areas.** Tabs along the bottom of a phone are not a feature of the layout.

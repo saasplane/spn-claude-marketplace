@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "cc6f640c"
+      "seen": "94b9ed58"
     }
   ]
 }
@@ -186,7 +186,8 @@ The navigation is drawn by units of its own, and the layouts are built from them
 - **The menu MUST keep the bar, the entries, the opening, the keys, the closing and the panel's frame**, the frame being the shell's fill, line, corner and shadow. A list, a rail, a dock and the menu of a phone always draw the group's data, so every entry is reachable whatever a drawing leaves out.
 - **A drawing's closing animation MUST finish inside the panel's own closing transition**, and a panel on a strong fill gives what it holds the opposite mode's tokens, so an item, an icon and a text unit read on it.
 - **A drawing MUST place each entry as a `DSNavEntry`** (`RD.SUPPORT.SURFACE.160`), passing `close` as its `onSelect`. The entry keeps its link, hover, focus, open mark and actions wherever it stands. Its content may be a node or a function of `{ active, selected }`, so an icon can turn or be swapped while the entry is active. **Nothing pressable stands inside an entry**: a command goes in its actions or beside it. Its link carries `data-nav-entry`, for a page's own stylesheet.
-- **Still open, with each lean:** a count or a badge on an entry (none yet; add it when a page asks); the sizes of a top bar (`SM` and `MD`; keep that range).
+- **An entry MAY carry a `count`, and the number MUST be in its name.** Open, a quiet `DSBadge` at its end; shut, a dot on its icon; the name reads "Orders, 2"; `0` or none shows nothing. `DSButton` takes the same `count`: a quiet badge after its label, or a dot at the top end of an icon alone, named "Notifications, 3 unread" through `translate`.
+- **Still open, with each lean:** the sizes of a top bar (`SM` and `MD`; keep that range).
 
 The web builds the navigation units in a change not released yet, and the library is owed.
 
@@ -303,6 +304,7 @@ The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Wh
 - **A badge MUST always show its word.** It then reads without its colour and without its icon, also for a person who cannot tell the colours apart. `DSBadge` asks for its `label` on every use.
 - **The colour of a badge MUST say a state, and never a kind.** A person learns that a coloured badge asks to be looked at. A colour on every kind would spend that signal on things that need no attention.
 - **A badge with no `variant` MUST draw `SUBTLE`, the light tint** (`RD.SUPPORT.SURFACE.153`). A page asks for a stronger fill by writing `QUIET` or `SOLID`. So the badges of a table or a card stay quiet beside the words around them.
+- **A status badge MUST keep its own colour on a coloured surface.** Only a neutral and a primary badge take the surface's tint; success, warning, error and info stay their hue.
 - **A badge among the facts of an item line MUST take the `variant` the page gives, and else the one its level chooses:** `QUIET` at `PAGE` and `CONTAINER`, so it is seen beside a large title, and `SUBTLE_OUTLINE` at the others, whose line gives a small badge an edge down a list.
 
 ### A value of an enum
