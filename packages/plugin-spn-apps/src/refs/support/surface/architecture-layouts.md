@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "f8ec9fbd"
+      "seen": "c43e7bd2"
     }
   ]
 }
@@ -61,6 +61,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 - **The page's fill is `page/fill`, and the colour of the body sets it** (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. No page and no story sets a fill of its own.
 - **The content MUST fill from its own colour and strength**, `BASE` where the app left it out. Its `bordered` and `raised` are its own: they follow neither the navigation's nor each other's.
 - **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `QUIET`, and the content flat, at the whole width.
+- **The three parts take one surface scale**: a colour and a strength give the same fill on every part, so contrast between parts is a choice of values. The default sets the navigation (`DEFAULT` at `SUBTLE`) apart from a `BASE` body and content; a body one step stronger than the parts on it makes floating parts stand out; the same pair on two parts makes them one; all at `BASE` with floating on reads only through borders and shadows.
 - **A look comes from the theme, and a page's config changes it field by field** (`RD.SUPPORT.SURFACE.156`). The layouts alone read the theme and hand each look down: the navigation goes to its bar as `look`, and the bar hands it to its list. A config gives `body`, and for `RAIL`, `DOCK` and `TOPNAV` also `navigation` and `content`; `CANVAS` takes the body alone and refuses the others by its `mtype`. What an app chooses once sits in the theme, and what the code supplies sits in the config.
 - **The navigation holds no colour of its own: each part of its look points at a token** (`RD.SUPPORT.SURFACE.163`).
 
