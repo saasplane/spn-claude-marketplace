@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "5dd0d3e9"
+      "seen": "ccbb022e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "271d22ce"
+      "seen": "7c05f426"
     }
   ]
 }
@@ -107,14 +107,14 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | `actionsNode` | the actions of the frame: the foot of a rail above `endNode`, and before `endNode` in a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `endNode` | the end of the navigation: the foot of a rail, the end of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `headerNode` | a band directly under the bar, the window's width at every body width, for a hero, a slideshow, or the head of an account or a project; the content's box starts under it | `DOCK` · `TOPNAV` |
-| `footerNode` | the footer that closes the main area | every type |
+| `footerNode` | the footer that closes the page, a band at its end | every type |
 | the children | the main area | every type |
 
 A place has a short form for where its room is short: `startNodeCollapsed`, `actionsNodeCollapsed` and `endNodeCollapsed`.
 
 - **A place MUST be named by where it stands, and never by what it holds** (`RD.SUPPORT.SURFACE.157`). A brand, an account or a search is what a page puts in a place.
 - **The places of the navigation sit in the config of a layout type that has a navigation, and the `mtype` of the config decides them.** So `CANVAS` refuses a place of the navigation by its type. Every type with a navigation takes the same places, so a page moves between them with nothing in its main area changing.
-- **The footer is an optional place that closes the main area, and every layout type places it the same way.** Where the content is short, it stands at the bottom edge of the main area; where the content is long, after the content.
+- **The footer is an optional place that closes the page, and every layout type places it the same way: a band at the end of the page, as the top bar is at its start.** It runs the window's width, and beside a rail the width of the area beside it; what it holds stands in the body's box, on the same `--layout-box-inset` and layout space as the band and the bar, so it lines up with the bar's items and the page. It stands under the content's box, so its own fill or line runs the full width. Where the content is short it stands at the window's bottom, where long after the content. The layout draws no fill or line for it and pads it by the layout space above and below. At `FULL` the box is the window less the layout space; on a phone, the screen's width.
 
 ## Built from the navigation — 🔮
 
