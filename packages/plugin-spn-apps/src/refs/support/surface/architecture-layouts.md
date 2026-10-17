@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "02ecb16f"
+      "seen": "5dd0d3e9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "d36075e0"
+      "seen": "f8ec9fbd"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/03-surface/09-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/09-architecture-layouts/`). Layouts is the ninth of thirteen Surface constructs.
 
-Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The layout types are `RAIL`, `DOCK`, `TOPNAV` and `CANVAS`, the content alone. A layout builds its navigation from the navigation units, fills places named by where they stand, and alone reads the theme. A layout names no routing library.
+Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The layout types are `RAIL`, `DOCK`, `TOPNAV` and `CANVAS`, the body alone. A layout builds its navigation from the navigation units, fills places named by where they stand, and alone reads the theme. A layout names no routing library.
 
 ## Terms
 
@@ -25,7 +25,13 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | --- | --- |
 | Layout | the block that frames a page: the navigation, and the main area it hands to the page |
 | Layout type | `DSLayoutType` — `RAIL` · `DOCK` · `TOPNAV` · `CANVAS` |
-| Shell | the part of a layout that holds the bars of the navigation and the places they hold |
+| Body | the part of a layout that is the whole window: the fill behind everything, and the box every other part stands in, by its width |
+| Navigation | the part of a layout that moves a person around the app: the entries, `startNode`, `actionsNode` and `endNode`, with its own fill, line and shadow |
+| Content | the part of a layout that is the main area the page's children stand in, with its own fill, line and shadow |
+| Attached | `attached` — a part meets the window's edge; not attached, it floats, the layout's space in, as a rounded container |
+| Sticky | `sticky` — the top bar stays in the window while the page scrolls |
+| Bordered · Raised | `bordered` · `raised` — a part draws a line at its edges · a part draws a shadow |
+| Layout space | `--layout-space` — the one spacing of a layout, from the theme's size: the page's padding and every gap between its parts |
 | Place | where a layout puts what a page gives it, named by where it stands: `startNode`, `endNode`, `actionsNode`, `footerNode`, and in a dock `headerNode` |
 | Entry kind | `DSNavEntryType` — `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` |
 
@@ -33,73 +39,103 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 | Layout type | The navigation |
 | --- | --- |
-| `RAIL` | a sidebar of icons at the side, which a person opens and closes |
-| `DOCK` | a navigation that stays open, beside one column of content |
-| `TOPNAV` | a bar across the top, with the content centered below it |
-| `CANVAS` | none: the content alone, for a marketing page, a sign-in or a page of an error |
+| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons |
+| `DOCK` | a bar across the top, and the entries in a column beside one page |
+| `TOPNAV` | a bar across the top, with the content below it |
+| `CANVAS` | none: the body alone, for a marketing page, a sign-in or a page of an error |
 
 A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
+
+## The three parts — 🔮
+
+A layout has three parts for its look, whatever its type. Each part owns one thing, and the theme styles the three through its layout look, which `architecture-app.md` states field by field.
+
+| Part | What it owns | Taken by |
+| --- | --- | --- |
+| Body | the fill behind everything, and the box every other part stands in, by its width | every type, and `CANVAS` alone |
+| Navigation | its fill, its line, its shadow, whether it meets the window's edge, and whether the top bar stays while the page scrolls | `RAIL` · `DOCK` · `TOPNAV` |
+| Content | its fill, its line, its shadow, and whether it meets the window's edges | `RAIL` · `DOCK` · `TOPNAV` |
+
+- **A layout MUST have three parts, the body, the navigation and the content, and each MUST own only what the table gives it** (`RD.SUPPORT.SURFACE.200`). The width and the fill behind everything are the body's, and the content owns nothing inside its area (`RD.SUPPORT.APPS.146`).
+- **Each part that draws a fill MUST give its surface** (`RD.SUPPORT.SURFACE.199`): the body for what stands straight on it, the navigation for its entries, and the content for the page.
+- **The page's fill is `page/fill`, and the colour of the body sets it** (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. No page and no story sets a fill of its own.
+- **The content MUST fill from its own colour and strength**, `BASE` where the app left it out. Its `bordered` and `raised` are its own: they follow neither the navigation's nor each other's.
+- **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `QUIET`, and the content flat, at the whole width.
+- **A look comes from the theme, and a page's config changes it field by field** (`RD.SUPPORT.SURFACE.156`). The layouts alone read the theme and hand each look down: the navigation goes to its bar as `look`, and the bar hands it to its list. A config gives `body`, and for `RAIL`, `DOCK` and `TOPNAV` also `navigation` and `content`; `CANVAS` takes the body alone and refuses the others by its `mtype`. What an app chooses once sits in the theme, and what the code supplies sits in the config.
+- **The navigation holds no colour of its own: each part of its look points at a token** (`RD.SUPPORT.SURFACE.163`).
+
+## The width, on the body — 🔮
+
+- **The width is the body's, and the navigation and the content stand in its box** (`RD.SUPPORT.SURFACE.158`, `RD.SUPPORT.SURFACE.200`). The box is the width, centred. `width` takes five steps, and `maxWidth` stays for a page whose width no step names. The theme gives every app `FULL`. A width only bounds: on a screen narrower than its step, the box is the screen less the layout's space.
+
+| Width | At most | What it fits |
+| --- | --- | --- |
+| `NARROW` | 768 px | a page to read: an article, a sign-in, a single form |
+| `MEDIUM` | 1024 px | settings and profile pages, a form with a side column |
+| `WIDE` | 1280 px | the default page of an app |
+| `XWIDE` | 1536 px | dense dashboards and wide tables on a large monitor |
+| `FULL` | the screen | a canvas, a map, a board that uses every pixel |
+
+- **A page that wants a column narrower than the box sets that width on its own block.** What stands inside the content is the page's.
+- **The bar's items and the page's content stand in one box in every layout type, at every width** (`RD.SUPPORT.SURFACE.172`). The box is the body's, and the content keeps `--layout-space` as its padding, so the bar's first item starts where the content starts and its last item ends where it ends.
+
+## Attached and sticky — 🔮
+
+- **A part that is attached belongs to the window's edge.** Its fill runs to the edge it meets, and what it holds stands in the body's box. A part that is not attached floats, the layout's space in from the window and from the part beside it, rounded with the theme's radius, with its own fill, line and shadow. The navigation's default is attached, and the content's too.
+- **An attached content draws its border only on the sides that meet neither the window nor the navigation.** A floating content draws it all round. There is no `inset` and no alias for it.
+- **`sticky` governs the top bar alone, the bar of `TOPNAV` and of `DOCK`**, and the default is sticky. A rail always stays at the height of the window, and the column of a dock always stays beside the page; `sticky` governs neither. Sticky and attached stand apart, so each of their four combinations is drawn.
+- **A top navigation takes no `overlay`, and nothing stands over the content** (`RD.SUPPORT.SURFACE.200`). The content starts under the bar. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
+- **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RD.SUPPORT.SURFACE.170`). The edge line of a rail follows the `bordered` of the navigation (`RD.SUPPORT.SURFACE.165`).
+- **A translucent navigation shows only where content passes behind it:** a top bar that stays in view, a panel of navigation, and a navigation drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, it draws opaque.
+- **A panel of entries of the navigation belongs to the navigation** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail take the fill and the opacity of the navigation, a line where it is `bordered`, and a shadow where it is `raised`. A menu of actions, such as the menu of the account, does not take the look of the navigation.
+
+## The spacing — 🔮
+
+- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.200`). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
+- **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and between the dock's band and the row below it.
+- **Where two parts both float, the space between them is one `--layout-space`, never two.**
+- **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RD.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
+- **The layout's measures are named in the scale**: the rail open, shut and in the drawer, the height of a bar, the width of the dock's column, the widest body at `XWIDE`, `WIDE`, `MEDIUM` and `NARROW` (`layout/xwide`, `layout/shell`, `layout/medium`, `layout/narrow`), and `layout/space`. No layout holds one as a number (`RD.SUPPORT.APPS.152`).
 
 ## The places — 🔮
 
 | Place | Where it stands | Taken by |
 | --- | --- | --- |
 | `nav` | the navigation, given as data | `RAIL` · `DOCK` · `TOPNAV` |
-| `startNode` | the start of the shell: the top of a rail, the start of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
-| `endNode` | the end of the shell: the foot of a rail, the end of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
-| `actionsNode` | the actions of the frame: the end of the bar over the content of a rail, and before `endNode` in a top bar | `RAIL` · `DOCK` · `TOPNAV` |
+| `startNode` | the start of the navigation: the head of a rail, the start of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
+| `actionsNode` | the actions of the frame: the foot of a rail above `endNode`, and before `endNode` in a top bar | `RAIL` · `DOCK` · `TOPNAV` |
+| `endNode` | the end of the navigation: the foot of a rail, the end of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `headerNode` | a band across both columns of a dock, above them, for the head of an account or a project | `DOCK` |
 | `footerNode` | the footer that closes the main area | every type |
 | the children | the main area | every type |
 
+A place has a short form for where its room is short: `startNodeCollapsed`, `actionsNodeCollapsed` and `endNodeCollapsed`.
+
 - **A place MUST be named by where it stands, and never by what it holds** (`RD.SUPPORT.SURFACE.157`). A brand, an account or a search is what a page puts in a place.
-- **The places of the shell MUST sit in the config of a layout type that has a shell, and the `mtype` of the config MUST decide them.** So `CANVAS` refuses a place of the shell by its type. Every type with a shell takes the same places, so a page moves between them with nothing in its main area changing.
+- **The places of the navigation sit in the config of a layout type that has a navigation, and the `mtype` of the config decides them.** So `CANVAS` refuses a place of the navigation by its type. Every type with a navigation takes the same places, so a page moves between them with nothing in its main area changing.
 - **The footer is an optional place that closes the main area, and every layout type places it the same way.** Where the content is short, it stands at the bottom edge of the main area; where the content is long, after the content.
 
 ## Built from the navigation — 🔮
 
-| Layout type | Its shell is built from |
+| Layout type | Its navigation is built from |
 | --- | --- |
-| `RAIL` | `DSNavBarSide` at the edge, which folds to icons, with `startNode` and `endNode`. `actionsNode` stands at the end of the bar over the content |
-| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, `headerNode` as a band across both columns, then `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
+| `RAIL` | `DSNavBarSide` at the edge, which folds to icons, with `startNode` in its head, the entries scrolling, and `actionsNode` above `endNode` in its foot |
+| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, `headerNode` as a band, then `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
 | `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end |
-| `CANVAS` | nothing: the main area alone, with `footerNode` |
+| `CANVAS` | nothing: the body, with the page's children and `footerNode` |
 
-- **The side column of `DOCK` MUST be a rounded panel beside the content, as tall as its entries and sticky at the top of the window, with its top edge on the same line as the page's first block, one vertical gutter under the band.** The band of `headerNode` stands above both columns, and the footer of a dock spans both columns.
-- **A layout MUST build its navigation from the navigation units** (`architecture-components.md`). On a narrow screen `DOCK` and `TOPNAV` open their navigation in a menu that holds a `DSNavList`.
-- **The layouts alone MUST read the theme, and each MUST hand the look down** (`RD.SUPPORT.SURFACE.156`). The shell of the theme goes to the bar as `look`, and the bar hands it to its list.
-- **A layout's config MAY give the content a look over the theme's**, field by field, so one page can draw its content on the brand colour while the app keeps its own.
+- **A layout MUST build its navigation from the navigation units** (`architecture-components.md`, `RD.SUPPORT.SURFACE.157`).
+- **A rail has a fixed head, entries that scroll, and a fixed foot, and no strip over the content.** The page draws its own head, trail, title and actions in its first block.
+- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RD.SUPPORT.SURFACE.157`, `RD.SUPPORT.SURFACE.199`). With the content attached, the band spans the column and the page and the column stands inside the content, wearing the navigation's fill and line, never its shadow. With the content floating, the band stands on the body above both, and the column stands on the body wearing the navigation's whole look.
+- **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
 
-## The main area — 🔮
+## The phone and the tablet — 🔮
 
-- **The page's fill is `page/fill`, and the colour of the theme's content sets it** (`RD.SUPPORT.APPS.160`). The default theme's content colour is `BASE`, so the page is white in light and 0.22 in dark under a shell of `DEFAULT` at `SUBTLE`, and a raised container stands out by its line and its shadow. Nothing works the colour out from the containers. Where the layout look gives the content a colour, that decides the fill of the main area. No page and no story sets a fill of its own.
-- **The layout gives the main area its gutter from the content look, `gutter`, of `NONE`, `SM` and `MD`, and the gutter of `CANVAS` is `NONE`** (`RD.SUPPORT.APPS.161`). `NONE` is 0, `SM` 16 and `MD` 24, which draws 16 on a phone, and `MD` is `layout/main-inset`. The theme gives every app `MD`. A page whose bands run from edge to edge takes `CANVAS`, or writes `gutter: NONE`. The page writes no padding of its own.
-- **The bar's items and the page's content stand in one box in every layout type** (`RD.SUPPORT.SURFACE.172`). The box is the content look's width, centred, with the gutter as its side padding, so the first item of the bar starts where the content starts and its last item ends where it ends, at every width. At `NONE` the bar's padding is 16 so its items never touch the window, and under `NARROW` the bar takes the `WIDE` box. With `inset` the sheet holds the same box, its side padding the gutter less the sheet's 8 px margin, so the edges still meet; a dock's sheet stands at the box's edge and keeps the whole gutter inside. The page writes no padding to line up with the bar.
-- **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RD.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. The app gives a `TOPNAV` only the entries that fit, grouping the rest, and an app with many sections takes `RAIL` or `DOCK`. Below `md` the list stays in the menu button.
-- **The column of a dock takes no shadow and no line, bordered or not** (`RD.SUPPORT.SURFACE.174`, `RD.SUPPORT.SURFACE.176`). A dock is for an app whose navigation is short; its column stands in the page beside the content, under a bar that carries the shell's line and depth, and the gutter and its fill tell it apart.
-- **The size of the main area is the content look's `width` and `maxWidth`, of `FULL`, `WIDE` and `NARROW`** (`RD.SUPPORT.SURFACE.158`). `FULL` is the whole window, `WIDE` is at most `layout/shell` wide (1280 px) and centred, and `NARROW` is at most `layout/narrow` wide (768 px) and centred. The theme gives every type `FULL`. `maxWidth` moves the width of `WIDE`. `NARROW` narrows only the page, in a dock the page beside the column, so the body and its bar stay at `WIDE`. Size and padding stay apart, so edge to edge is `width: FULL` with `gutter: NONE`. The config of every type is `IDSLayoutConfig`, with `mtype` and a `content` look the page changes field by field, and `IDSLayoutConfigNav` adds the navigation and its places for `RAIL`, `DOCK` and `TOPNAV`. The config has no `contentWidth` and no `maxWidth` of its own.
-- **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the body at `WIDE`, the width of the page at `NARROW` and the gutter of the main area. No layout holds one as a number.
-
-## The shell and the content — 🔮
-
-A layout has two parts for its look, whatever its type. The shell is the bars of the navigation and the places they hold. The content is the main area. The theme styles the two through its layout look, which `architecture-app.md` states field by field.
-
-| Layout type | Its shell | Its content |
-| --- | --- | --- |
-| `RAIL` | the side panel | the main area, with the thin bar over it that holds the collapse button and `actionsNode` |
-| `DOCK` | the top bar and the column of the navigation | the main area |
-| `TOPNAV` | the bar across the top | the main area |
-| `CANVAS` | none | the main area, with the gutter `NONE` |
-
-- **A layout MUST draw its shell and its content by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw the default shell: the neutral hue at `SUBTLE`, with a line and a shadow, and the open entry `QUIET`.
-- **The shell holds no colour of its own: each part of its look points at a token** (`RD.SUPPORT.SURFACE.163`). **The edge line of a rail follows the `bordered` of the shell** (`RD.SUPPORT.SURFACE.165`), inset or not.
-- **The thin bar over the content of `RAIL` MUST belong to the content.** It takes the fill of the content, and it stands inside the sheet where the content is inset.
-- **`inset` of the content MUST draw the content as a sheet.** The sheet has the corner radius of the theme. It is set into the shell with a margin, and the fill of the shell shows around it.
-- **An inset sheet MUST keep an 8px margin on all four sides** (`RD.SUPPORT.SURFACE.199`). Beside the rail and beside the column of a dock too, with the gutter of the content inside the sheet.
-- **A top navigation MUST take no `overlay` where the content is an inset sheet** (`RD.SUPPORT.SURFACE.199`). The bar stands on the shell, draws no fill, line or shadow of its own, takes the shell's colours, and the sheet starts below it.
-- **A translucent shell MUST show only where content passes behind the shell:** a top bar that stays in view, a panel of navigation, and a shell drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, the shell draws opaque.
-- **A panel of entries of the navigation MUST belong to the shell** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail are such panels. Each takes the fill and the opacity of the shell, a line where the shell is `bordered`, and a shadow where it is `raised`. Inside the panel of a top bar stand rows as tight as a menu bar's, or the app's own drawing through the group's `renderPanel`, as `architecture-components.md` states.
-- **A menu of actions MUST NOT take the look of the shell.** The menu of the account is such a menu, and it keeps the look every menu has.
+- **On a phone everything attaches, and `--layout-space` is 16 px.** Each layout draws a bar: the menu at its start, the nodes the page places there, and the account's avatar at its end.
+- **One drawer serves all three layouts on a phone, and it replaces the pop-up menu of the top nav and of the dock** (`RD.SUPPORT.SURFACE.200`). It opens from the left, `layout/rail-narrow` wide, over a dimmed page. The dock's drawer starts with the way back, then the column's entries. The bar's start is the menu that opens the drawer, or the way back where the dock has `backTo`.
+- **Each node takes a place on a phone, with a default, by `DSLayoutPhonePlaceType`:** `BAR`, `DRAWER` or `BOTH`. The config's `phone` places `startNode` (default `BOTH`), `actionsNode` (default `DRAWER`) and `endNode` (default `BAR`). A node in the bar draws its collapsed form when the page gives one.
+- **On a tablet floating applies.** The rail is shut to icons by default, and the top nav puts its entries in the drawer.
+- **The bar is at least `layout/bar` high, every tap target at least 44 px, and the bar and the drawer keep clear of the safe areas.** Tabs along the bottom of a phone are not a feature of the layout.
 
 ## The entry kinds — 🔮
 
@@ -118,7 +154,7 @@ An entry of the navigation is drawn by the kind its look names, `entry`. Each ki
 - **A list or a menu standing alone MUST pad its own fill as a bar does**, so an entry with no fill never stands on the edge of the fill.
 - **A group's child MUST line up with the group's words, under every entry kind**, in a list, a rail, a dock and a pop-up.
 - **A nested entry of a rail MUST follow the same kinds, one step quieter.**
-- **Every pair of a shell fill and an entry kind MUST keep the text of the open entry at 4.5 to 1, in light and in dark.** A partner cannot choose a pair that hides the navigation.
+- **Every pair of a navigation fill and an entry kind MUST keep the text of the open entry at 4.5 to 1, in light and in dark.** A partner cannot choose a pair that hides the navigation.
 
 The web builds these parts in a change not released yet, and the design library has not drawn them.
 
@@ -133,26 +169,26 @@ Each layout type draws its navigation the same way, whatever the type.
 
 ## Boundary
 
-This ref states what a layout owns, its types and its places, the units it is built from, its shell and its content, the entry kinds, and how its navigation behaves. It stops at the edge of the main area. It does not state what a container is, or how a part of a page is framed inside the main area — that is `architecture-containers.md`. It does not state where the theme's choices come from, or how a setting reaches a block from above — that is `architecture-app.md`. The navigation units themselves are `architecture-components.md`.
+This ref states what a layout owns, its types and its places, the units it is built from, its three parts, the entry kinds, and how its navigation behaves. It stops at the edge of the main area. It does not state what a container is, or how a part of a page is framed inside the main area — that is `architecture-containers.md`. It does not state where the theme's choices come from, or how a setting reaches a block from above — that is `architecture-app.md`. The navigation units themselves are `architecture-components.md`.
 
 ## Binds
 
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.146` | a layout owns the navigation and the main area, and nothing inside that area |
-| `RD.SUPPORT.APPS.160` | the page's fill is the theme's, and no page sets a fill behind itself |
-| `RD.SUPPORT.APPS.161` | the layout gives the main area its gutter from the content look, and the gutter of `CANVAS` is `NONE` |
+| `RD.SUPPORT.APPS.160` | the page's fill is the body's colour, and no page sets a fill behind itself |
+| `RD.SUPPORT.APPS.161` | the layout keeps one spacing, `--layout-space`, from the theme's size, with no gutter |
 | `RD.SUPPORT.APPS.163` | an item's actions are reachable without hover, in every layout type |
-| `RD.SUPPORT.SURFACE.139` | the theme styles a layout in two parts, the shell and the content, with no setting for one layout type |
-| `RD.SUPPORT.SURFACE.140` | a panel of entries of the navigation belongs to the shell, and a menu of actions does not |
+| `RD.SUPPORT.SURFACE.139` | the theme styles a layout by its layout look, with no setting for one layout type |
+| `RD.SUPPORT.SURFACE.140` | a panel of entries of the navigation belongs to the navigation, and a menu of actions does not |
 | `RD.SUPPORT.SURFACE.155` | the entry kinds, each with its own hover, and that an open entry is never mistaken for one under the pointer |
-| `RD.SUPPORT.SURFACE.158` | the main area is one look, the content's: its colour, strength and inset, its width and maximum width, and its gutter |
-| `RD.SUPPORT.SURFACE.165` | the edge line of a rail follows the shell's `bordered` |
-| `RD.SUPPORT.SURFACE.172` | the bar's items and the page's content stand in one box, the width centred with the gutter as its padding |
-| `RD.SUPPORT.SURFACE.173` | a top navigation holds the few entries that fit, on one line, and moves none of them |
-| `RD.SUPPORT.SURFACE.174` | the column of a dock takes no shadow, and where the shell is bordered one line, on the side that meets the content |
-| `RD.SUPPORT.SURFACE.176` | the column of a dock takes no line either, bordered or not |
 | `RD.SUPPORT.SURFACE.157` | the layout types with `CANVAS`, the places named by where they stand and held in the config by `mtype`, the layouts built from the navigation units, and that the layouts alone read the theme |
+| `RD.SUPPORT.SURFACE.158` | the width and `maxWidth` are the body's, on five steps |
+| `RD.SUPPORT.SURFACE.165` | the edge line of a rail follows the navigation's `bordered` |
+| `RD.SUPPORT.SURFACE.172` | the bar's items and the page's content stand in one box, the body's, with `--layout-space` as its padding |
+| `RD.SUPPORT.SURFACE.173` | a top navigation holds the few entries that fit, on one line, and moves none of them |
+| `RD.SUPPORT.SURFACE.199` | each part that draws a fill gives its surface, and the dock's column and band stand by the content |
+| `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |
 
 ## Proof
 

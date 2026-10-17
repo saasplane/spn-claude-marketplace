@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "3e6fbd28"
+      "seen": "f1c476f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "b289ccf7"
+      "seen": "f03491ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -62,7 +62,7 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 | Card look | `card`: `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the surface of every card |
 | Card widget look | `cardWidget`: what `DSCardWidget` adds to a card. `divided` is the lines between its head, its parts and its footer, `rowsDivided` the lines between the rows of its `ITEMS` and `LIST` parts, and `rowsHoverable` the hover of those rows |
 | Table look | `table`: `striped` and `hoverable`, as the default for every table |
-| Layout look | `layout`: how a layout is drawn, in two parts, `shell` and `content` |
+| Layout look | `layout`: how a layout is drawn, in three parts, `body`, `navigation` and `content` |
 
 In `card`, `cardWidget` and `table` each value is yes or no.
 
@@ -72,29 +72,30 @@ In `card`, `cardWidget` and `table` each value is yes or no.
 - **`DSCardWidget` MUST take what it adds to a card from the theme's `cardWidget`, where its own prop says nothing.** Its `divided` is its own prop, else `divided` of `cardWidget`, no by default. The rows of a part take `divided` from the prop of the part, else from `rowsDivided`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default. The surface of the widget's card follows the card look.
 - **The theme holds no block for a list.** The `divided` and the `hoverable` of `DSList` are props that the page writes.
 
-The layout look, `IDSThemeLayout`, has two parts and no more: `shell`, the look of a bar of the navigation (`IDSNavBarLook`), and `content` (`IDSContentLook`), everything about the main area (`RD.SUPPORT.SURFACE.158`). `architecture-layouts.md` states what the shell and the content are in each layout type, and how the entries of the navigation are drawn.
+The layout look, `IDSThemeLayout`, has three parts and no more: `body`, `navigation` and `content` (`RD.SUPPORT.SURFACE.200`). The body is the whole window, with the fill behind everything and the width of the box the other two stand in. The navigation is the look of the rail, the top bar, and the bar and column of a dock, and the content is the look of the main area. `architecture-layouts.md` states what each part is in each layout type, and how the entries of the navigation are drawn.
 
 | Field | What it sets | Values | Taken by |
 | --- | --- | --- | --- |
-| `color` | the colour of the fill | `DSSurfaceColorType`: `BASE` (the surface of the page) · `DEFAULT` (the neutral hue) · `PRIMARY` (the brand hue) | the shell · the content |
-| `strength` | how strong the fill of a hue is. `BASE` takes none | `DSSurfaceStrengthType`: `SUBTLE` · `QUIET` · `SOLID` | the shell · the content |
-| `opacity` | whether the fill is opaque, or frosted where content passes behind it | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | the shell |
-| `bordered` | the lines: at the edge of the shell, and around a panel of navigation that opens from it | yes or no | the shell |
-| `raised` | the depth: a shadow under the shell, and under such a panel | yes or no | the shell |
-| `entry` | the kind of the entries of the navigation | `DSNavEntryType`: `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` | the shell |
-| `inset` | the content as a rounded sheet set into the shell | yes or no | the content |
-| `width` | how wide the main area grows | `DSLayoutWidthType`: `FULL` · `WIDE` (at most `layout/shell`, centred) · `NARROW` (at most `layout/narrow`, centred) | the content |
-| `maxWidth` | the widest `WIDE` grows, in pixels. Left out, `WIDE` is `layout/shell` | a number | the content |
-| `gutter` | the space between the edge of the main area and what it holds | `DSLayoutGutterType`: `NONE` 0 · `SM` 16 · `MD` 24, which draws 16 on a phone | the content |
+| `color` | the colour of the fill | `DSSurfaceColorType`: `BASE` (the surface of the page) · `DEFAULT` (the neutral hue) · `PRIMARY` (the brand hue) | the body · the navigation · the content |
+| `strength` | how strong the fill of a hue is. `BASE` takes none | `DSSurfaceStrengthType`: `SUBTLE` · `QUIET` · `SOLID` | the body · the navigation · the content |
+| `width` | how wide the body's box grows | `DSLayoutWidthType`: `FULL` (the whole window) · `XWIDE` (at most 1536 px) · `WIDE` (1280) · `MEDIUM` (1024) · `NARROW` (768), each centred | the body |
+| `maxWidth` | the widest the box grows, in pixels, over the width's own step | a number | the body |
+| `opacity` | whether the fill is opaque, or frosted where content passes behind it | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | the navigation |
+| `entry` | the kind of the entries of the navigation | `DSNavEntryType`: `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` | the navigation |
+| `bordered` | the lines: at the edge of the part, and around a panel of navigation that opens from it | yes or no | the navigation · the content |
+| `raised` | the depth: a shadow under the part, and under such a panel | yes or no | the navigation · the content |
+| `attached` | the part meets the window's edge. No, it floats as a rounded container, the layout's space in | yes or no | the navigation · the content |
+| `sticky` | the top bar stays in the window while the page scrolls. A rail always stays | yes or no | the navigation |
 
-- **The theme MUST style the layout in two parts, the shell and the content, and it MUST hold no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A partner writes the look once, and the rail, the dock and the top bar each draw it. The shell of the theme and a bar of the navigation share one shape, `IDSNavBarLook`.
-- **A surface MUST take its look as a colour, a strength and an opacity, each from its own closed set.**
-- **In dark, a stronger shell MUST be darker than the page, and never lighter.**
+- **The theme MUST style the layout in three parts, the body, the navigation and the content, and it MUST hold no setting for one layout type** (`RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.200`). A partner writes the look once, and the rail, the dock and the top bar each draw it. The navigation look of the theme extends the look a bar takes, `IDSNavBarLook`, so the theme and a bar share one shape.
+- **A surface MUST take its look as a colour and a strength, and the navigation also an opacity, each from its own closed set.**
+- **In dark, a stronger navigation MUST be darker than the page, and never lighter.**
 - **The content MUST take every colour and every strength**, so a marketing page can draw its bands. **Where the body text of the units would fall under 4.5 to 1 on the fill of the content — a `QUIET` or `SOLID` content — the content MUST give the units inside it the tokens of the opposite mode**, scoped to the content, as dark mode does for the page.
-- **A field of the layout look that the app leaves out MUST take the value of the default theme.** Every layout reads the one theme, so no layout keeps a default of its own. Where the colour of the content is left out, it is `BASE`, the surface of the page, under a shell of `DEFAULT` at `SUBTLE`: nothing works it out from the containers (`RD.SUPPORT.APPS.160`).
-- **The layout look MUST take no colour value, no opacity value and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting of its own: it follows from the kind of entry and the fill of the shell.
-- **Size and padding stay apart in the content look.** Edge to edge is `width: FULL` with `gutter: NONE`. The theme gives every app `FULL` and `MD`, and `CANVAS` takes `NONE`. The top bar keeps its own padding and lines up with the width, and with `inset` the gutter is inside the sheet.
-- **The layout type is not part of the layout look.** A marketing page takes the layout type `CANVAS`, and draws its bands in the main area. The layouts alone read the layout look, and a layout's config can give one page a content look of its own.
+- **A field of the layout look that the app leaves out MUST take the value of the default theme.** Every layout reads the one theme, so no layout keeps a default of its own. Where the colour of the body is left out, it is `BASE`, the surface of the page, under a navigation of `DEFAULT` at `SUBTLE`: nothing works it out from the containers (`RD.SUPPORT.APPS.160`).
+- **The layout look MUST take no colour value, no opacity value and no blur as a value.** Each field names one of a closed set, and the design system holds the values. The fill under the pointer of an entry is not a setting of its own: it follows from the kind of entry and the fill of the navigation.
+- **The width MUST be the body's, and the spacing MUST follow the theme's `size`** (`RD.SUPPORT.SURFACE.158`, `RD.SUPPORT.SURFACE.200`). The layout keeps one spacing, `--layout-space`: 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone. It is not a field of the layout look, and there is no gutter. The theme gives every app `FULL`.
+- **`sticky` MUST sit in the layout look, so an app sets it once.** It governs the top bar of a top nav and of a dock. The config of a top nav has no `sticky` and no `overlay` of its own.
+- **The layout type is not part of the layout look.** A marketing page takes the layout type `CANVAS`, and draws its bands in the body's box. The layouts alone read the layout look, and a layout's config can give one page a look of its own for each part, field by field.
 
 A partner changes the look of an app through one theme, and in no other way (`RD.SUPPORT.APPS.150`). A partner writes one theme, and never a style for a block. The theme is held at the app's root, and changeable from any depth, so a component that learns the brand late (after sign-in, from an API response) retints the whole surface without reaching application-root state. The layout type is not a choice of the theme. Support ships a theme, and never a template.
 
@@ -120,20 +121,27 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   cardWidget: { divided: false, rowsDivided: true, rowsHoverable: true },
   table: { striped: true, hoverable: false },
   layout: {
-    shell: {
+    body: {
+      color: DSSurfaceColorType.BASE,
+      strength: DSSurfaceStrengthType.SUBTLE,
+      width: DSLayoutWidthType.FULL,
+    },
+    navigation: {
       color: DSSurfaceColorType.DEFAULT,
       strength: DSSurfaceStrengthType.SUBTLE,
       opacity: DSSurfaceOpacityType.OPAQUE,
       entry: DSNavEntryType.QUIET,
       bordered: true,
       raised: true,
+      attached: true,
+      sticky: true,
     },
     content: {
       color: DSSurfaceColorType.BASE,
       strength: DSSurfaceStrengthType.SUBTLE,
-      inset: false,
-      width: DSLayoutWidthType.FULL,
-      gutter: DSLayoutGutterType.MD,
+      bordered: false,
+      raised: false,
+      attached: true,
     },
   },
 };
@@ -189,7 +197,8 @@ This ref states what an app hands a surface, once, and in what order a block res
 | --- | --- |
 | `RD.SUPPORT.APPS.150` | a partner changes the look of an app through one theme, and the layout type is not a choice of it |
 | `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
-| `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in two parts, the shell and the content, and a surface takes a colour, a strength and an opacity |
+| `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in three parts, the body, the navigation and the content, and a surface takes a colour and a strength |
+| `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; the width is the body's, attached and sticky are the navigation's and the content's, and the spacing follows the theme's size |
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
