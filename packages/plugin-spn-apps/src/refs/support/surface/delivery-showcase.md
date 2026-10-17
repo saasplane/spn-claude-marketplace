@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "a484dea6"
+      "seen": "b72941bf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "09282607"
+      "seen": "04e2f1b5"
     }
   ]
 }
@@ -65,7 +65,7 @@ The groups stand in the order of their layers. Welcome stands before them and be
 | Layouts | Layouts |
 | App | App |
 
-Welcome, Core and App hold pages, and every other group holds units. Core holds Colour, Type, Scale, Icons, States, Primitives, Patterns and Inline alignment. App holds Theme and Contract. A group of units opens with its Overview, also when it has one unit, and no group nests inside another. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
+Welcome and Core hold pages, and every other group holds units. Core holds Colour, Type, Scale, Icons, States, Primitives, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and no group nests inside another. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
 
 The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
 
@@ -289,17 +289,11 @@ Props holds the props table, which gives each prop in four parts: its name, its 
 
 A unit whose props take objects explains each object under its props table, in a part named *Config objects*. Each object has a part of its own: one sentence on what it is for and what takes it; a table of its fields with the name, the type, the default and what each does; and an example of the object as code. A field that is itself an object links to the part that explains that object. The main page explains each object in general, and a scenario page explains one config in particular.
 
-## The container's pages, and the page Theme — 🔮
+## The container's pages, and the units of App — 🔮
 
 The pages of `DSContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
-Theme is a page of App, of its own kind. It has three parts, in this order.
-
-| Part of the page | What it holds |
-| --- | --- |
-| The theme explained | what a theme is: the closed list of its choices, who sets it, what a page may not set, and how it reaches every block through `DSApp`. Then the theme object, explained as a config object |
-| The theme's form | the form that sets the theme, on the page itself, with *Apply* and *Reset to defaults*. A field with no choice shows the value applied, marked as the default. It is the same form the showcase's own bar offers. Applying it sets the theme of the page and of the sample app under it. The code of the theme object stands beside the form and follows the form's values |
-| One sample app | one app, embedded as an embedded screen is, in the layout type Rail, with a dashboard, a listing, an edit form and the view of one record. It takes the theme that the form applies |
+App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app under its Usage, in the layout types Rail, Dock and Top nav and floating, with the theme's form in a sheet, and the sample app takes the theme the form applies. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
 
 ## Built from the design system's own units — 🔮
 
@@ -346,7 +340,7 @@ The construct fixes the layers, the groups and their order; the pages of a unit;
 | Designer | finds every unit the constructs name, in the group that holds it, under its own name; opens its drawing from the Figma link in the opening of its main page |
 | Developer | tells a unit of the stack's own from a unit every stack builds, by the mark on the unit's card and in the opening of its main page |
 | Developer | reads how to use a unit: its examples with their usage code, its props, its Playground; sees each shared state and task state without writing code |
-| Partner | changes a theme choice on the page Theme and sees the page repaint |
+| Partner | changes a theme choice in the Playground of `DSContext` and sees the page repaint |
 | Quality engineer | knows a behaviour (keys, focus, task states) is proven, not only shown — the component tier of tests proves it; the showcase only shows the look |
 
 The showcase never restyles a unit, and it marks a unit its stack provides on its own as the stack's own. A check compares the showcase's pages with the constructs' unit lists: a unit it cannot find in the showcase is a finding, and so is a unit it finds in the showcase and not in a construct, unless the unit is marked as the stack's own.
