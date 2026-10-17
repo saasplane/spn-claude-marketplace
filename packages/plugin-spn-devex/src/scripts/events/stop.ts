@@ -18,6 +18,7 @@
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the step rows stand, and names each open card in one line
 //   page-stale an arc this window wrote left its workstream's page behind the arcs
+//   state      `workstream state check` fails for a workstream of this window kept as data
 //   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
@@ -50,6 +51,8 @@ import { readFileSync, readdirSync, rmSync, statSync, mkdirSync, writeFileSync }
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
+import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
+import { arcIdsOf, readArc, workstreamsOf } from "../lib/workstream.ts";
 import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, holdsOwnCopy, isInProgress, markedAgo,
          miscountLines, openWorkstreams, ownCopyLines, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
@@ -329,9 +332,15 @@ export function inProgressSteps(arc: string, now = Date.now(), out: Set<string> 
  * @param mine  the workstreams this window works on; a row in any other is another window's work
  */
 export function workRuns(root: string, mine: Set<string>): boolean {
-  return openArcs(root, mine)
+  const marked = openArcs(root, mine)
     .filter((arc) => !TERMINAL.has(statusOf(arc)))
     .some((arc) => (stepsOf(read(arc)) ?? []).some((step) => step.state !== null && isInProgress(step.state)));
+  // AN ARC KEPT AS DATA says a row runs with its `state`, `running`, in `arcs/N<nnn>/state.json`.
+  return marked || workstreamsOf(root, ["open"]).filter((ws) => mine.has(basename(ws))).some((ws) =>
+    arcIdsOf(ws).some((arc) => {
+      const data = readArc(ws, arc);
+      return !!data && !TERMINAL.has(data.status) && data.rows.some((row) => row.state === "running");
+    }));
 }
 
 const REPORT_SUFFIX = "-report.md";
@@ -1366,6 +1375,25 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
 }
 
+// ---------------------------------------------------------------------------- the workstream kept as data
+
+/**
+ * `workstream state check` over this window's workstreams kept as data (01-workstream.md § The commands).
+ * The turn does not end while it fails, so a page behind its arcs, a missing preview or a card that
+ * differs from its record is mended in the same turn, in any window. A workstream that still keeps
+ * its arcs as Markdown waits for the one-time move, and is not read here.
+ */
+export function checkWorkstreamState(root: string, mine: Set<string>): Warning[] {
+  const folders = workstreamsOf(root).filter((ws) => mine.has(basename(ws)) && heldByStop(ws));
+  const findings = folders.flatMap(checkWorkstream);
+  if (!findings.length) return [];
+  const shown = findings.slice(0, 8).map((one) => `${one.workstream}${one.arc ? ` ${one.arc}` : ""}: ${one.message}`);
+  return [{ check: "state", message:
+    `\`spn-devex workstream state check\` fails — ${shown.join(" · ")}${findings.length > shown.length ? ` · and ${findings.length - shown.length} more` : ""}. ` +
+    `Mend each before the turn ends: the page's parts by hand, then \`workstream arc stamp write <arc>\`; the data through ` +
+    `the \`workstream\` commands, which are its only writers.` }];
+}
+
 // ---------------------------------------------------------------------------- a page with its own copy of the styles
 
 /**
@@ -1564,6 +1592,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
+    ...span({ group: "stop", action: "state" }, () => checkWorkstreamState(root, mine)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),

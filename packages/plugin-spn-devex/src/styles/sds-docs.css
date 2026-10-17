@@ -1927,6 +1927,46 @@
     font-weight: 600;
     color: var(--sds-tk-t);
   }
+  .sds-file {
+    max-width: 100%;
+    overflow: hidden;
+    background-color: var(--sds-card);
+    border: 1px solid var(--sds-rule);
+    border-radius: 3px;
+    margin: 1.6rem 0;
+  }
+  .sds-file>figcaption {
+    display: flex;
+    align-items: center;
+    font-family: var(--sds-mono);
+    font-size: var(--sds-xs);
+    color: var(--sds-text-description);
+    gap: .75rem;
+    margin: 0;
+    padding: .4rem 1.1rem;
+    border-bottom: 1px solid var(--sds-rule);
+  }
+  .sds-file .sds-file-path {
+    min-width: 0px;
+    overflow-wrap: anywhere;
+    flex: 1;
+  }
+  .sds-file .sds-file-lang {
+    font-family: var(--sds-mono);
+    color: var(--sds-text-fact);
+    text-transform: uppercase;
+    flex: none;
+    padding: 0 .5rem;
+    border: 1px solid var(--sds-rule);
+    border-radius: 999px;
+    font-size: .65rem;
+    letter-spacing: .06em;
+  }
+  .sds-file>pre {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
   figure {
     padding: 0px;
     margin: 2.4rem 0;

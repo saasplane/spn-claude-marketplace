@@ -40,7 +40,7 @@
 // their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
 import { readdirSync, statSync } from "node:fs";
-import { TERMINAL, statusIn } from "./arc-status.ts";
+import { TERMINAL, statusIn, statusOfData } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -278,14 +278,48 @@ export function arcRowsOf(text: string, arc: string): Row[] {
   return rowsOf(section, true, "repo").map((row) => ({ ...row, label: `${arc} ${row.label}` }));
 }
 
+// A data row's state as a step cell writes it, so `stateOf` reads both kinds of arc one way.
+const DATA_STATE: Record<string, string> = {
+  landed: "landed", carried: "carried", deferred: "deferred", stopped: "◐ stopped", running: "in progress", waiting: "pending", ready: "pending",
+};
+
+/** The arcs a workstream keeps as data: each `arcs/N<nnn>/` folder, by its id. */
+export function dataArcsOf(folder: string): string[] {
+  const dir = join(folder, "arcs");
+  return listdir(dir).filter((name) => /^N\d+[a-z]?$/.test(name) && isDir(join(dir, name)));
+}
+
 /**
- * A workstream's whole split plan: the step rows of every arc in its folders, and the scope tables of
- * any page written in the older shape. Each folder is read once, however many ways it was found.
+ * The split-plan rows of the arcs a workstream keeps as data (01-workstream.md § The formats): each
+ * row with no row under it, by its repository and its state. A carried row's proof says where it went.
+ */
+export function dataRowsOf(folder: string): Row[] {
+  const out: Row[] = [];
+  for (const arc of dataArcsOf(folder)) {
+    let data: { rows?: Array<{ id: string; parent?: string; repo?: string | null; state?: string | null; proof?: string | null }> } | null = null;
+    try { data = JSON.parse(read(join(folder, "arcs", arc, "state.json"))); } catch { continue; }
+    if (!data || !Array.isArray(data.rows)) continue;
+    const parents = new Set(data.rows.map((row) => row.parent));
+    for (const row of data.rows) {
+      if (parents.has(row.id)) continue;
+      const word = DATA_STATE[row.state ?? ""] ?? "";
+      out.push({ label: `${arc} ${row.id}`, scope: row.repo ?? "—", state: row.state === "carried" && row.proof ? `${word} — ${row.proof}` : word });
+    }
+  }
+  return out;
+}
+
+/**
+ * A workstream's whole split plan: the step rows of every arc in its folders, whether the arc is a
+ * Markdown file or kept as data, and the scope tables of any page written in the older shape. Each
+ * folder is read once, however many ways it was found.
  */
 export function workstreamPlan(folders: string[], pages: string[]): Row[] {
   const rows = pages.flatMap(planOf);
-  for (const folder of [...new Set(folders.map((f) => resolve(f)))])
+  for (const folder of [...new Set(folders.map((f) => resolve(f)))]) {
     for (const file of arcFiles(folder)) rows.push(...arcRowsOf(read(file), arcName(file)));
+    rows.push(...dataRowsOf(folder));
+  }
   return rows;
 }
 
@@ -454,6 +488,9 @@ export function arcStatus(root: string, subject: string, arc: string): string | 
         if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
         const arcs = join(dir, entry, "arcs");
         if (!isDir(arcs)) continue;
+        // AN ARC KEPT AS DATA holds its status in its own `state.json`, which the schema keeps in the set.
+        const kept = statusOfData(arcs, arc.toUpperCase());
+        if (kept) return kept;
         // `N8` LIVES IN `N7-N8-flip-and-close.md`. An arc is not always the first name in its file,
         // so a prefix match alone finds nothing and reads as *no such arc*.
         const file = listdir(arcs).find((f) =>
@@ -1232,6 +1269,10 @@ export function gateClose(payload: Payload): Verdict {
         const st = statusIn(read(join(dir, f)));
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${f.replace(/\.md$/, "")} — ${st}`);
       }
+      for (const arc of listdir(dir).filter((x) => /^N\d+[a-z]?$/.test(x))) {
+        const st = statusOfData(dir, arc);
+        if (st && !TERMINAL.has(st)) unfinished.push(`  - ${arc} — ${st}`);
+      }
     }
     if (unfinished.length) {
       const listed = unfinished.slice(0, 10).join("\n");
@@ -1243,7 +1284,8 @@ export function gateClose(payload: Payload): Verdict {
           `terminal. The three that are: \`LANDED\` (nothing is owed), \`CARRIED\` (the work left, ` +
           `and the status names where) and \`DROPPED\` (abandoned on purpose, with the reason).\n\n` +
           `${listed}${more}\n\n` +
-          `For each one, decide which of the three it is and say so in its \`Status:\` line. An arc ` +
+          `For each one, decide which of the three it is and say so in its \`Status:\` line, or for an arc kept as ` +
+          `data with \`spn-devex workstream row write <arc> --status …\`. An arc ` +
           `left at \`PART-LANDED\` inside a closed workstream is a receipt that disagrees with ` +
           `itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
       };

@@ -70,6 +70,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],
     workspace: ["tokens"],
+    workstream: ["arc", "fact", "progress", "question", "report", "row", "rows", "state", "suggestion"],
   },
   "spn-apps": { library: ["catalogue"] },
   "spn-infra": {},

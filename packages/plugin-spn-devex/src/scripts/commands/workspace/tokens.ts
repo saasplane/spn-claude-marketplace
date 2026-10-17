@@ -38,10 +38,11 @@
 // does. An agent's transcript runs while its window waits on the tool that launched it, so an agent's
 // time is also inside its window's tool time, and the three do not add up across transcripts.
 
-import { closeSync, existsSync, openSync, readSync, readdirSync, statSync } from "node:fs";
+import { closeSync, existsSync, openSync, readFileSync, readSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { type Action, FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { ARCS, WORKSTREAM_STATES, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 type Tag = { workstream: string | null; arc: string | null; order: string | null };
 type TelemetryLine = Tag & { session: string; agent: string | null; at: number };
@@ -51,7 +52,7 @@ type Time = { modelMs: number; toolMs: number; waitingMs: number };
 type Reply = Usage & { session: string; agent: string | null; at: number };
 /** The time before one transcript line, which ends at `at` and is of the kind the line makes it. */
 type Stretch = { session: string; agent: string | null; at: number; kind: keyof Time; ms: number };
-export type Row = Tag & Usage & Time & { replies: number };
+export type Row = Tag & Usage & Time & { replies: number; arcTitle?: string | null; rowTitle?: string | null };
 export type Report = {
   root: string; projects: string; filter: string | null;
   sessions: number; noTranscript: number; transcripts: number; replies: number; repeatedLines: number;
@@ -291,6 +292,37 @@ export function report(root: string, projects: string, filter: string | null): R
            repeatedLines, outsideWindow, rows: sorted, untagged, total };
 }
 
+/**
+ * The titles an arc kept as data gives its rows (01-workstream.md § The formats): the arc's own, and
+ * each row's by its id, which is the order's name. A workstream with no `arcs/N<nnn>/state.json` has none.
+ */
+export function titlesOf(root: string, workstream: string): Map<string, { title: string; rows: Map<string, string> }> {
+  const out = new Map<string, { title: string; rows: Map<string, string> }>();
+  for (const state of WORKSTREAM_STATES) {
+    const arcs = join(workstreamsDir(root, state), workstream, ARCS);
+    let entries: string[] = [];
+    try { entries = readdirSync(arcs); } catch { continue; }
+    for (const arc of entries.filter((entry) => /^N\d+[a-z]?$/.test(entry))) {
+      try {
+        const data = JSON.parse(readFileSync(join(arcs, arc, "state.json"), "utf8")) as { title?: string; rows?: Array<{ id: string; title: string }> };
+        out.set(arc, { title: data.title ?? "", rows: new Map((data.rows ?? []).map((row) => [String(row.id), row.title])) });
+      } catch { /* an arc kept as Markdown has no data */ }
+    }
+  }
+  return out;
+}
+
+/** Each row labelled with the titles its arc's data gives it. */
+export function withTitles(root: string, rows: Row[]): Row[] {
+  const cache = new Map<string, ReturnType<typeof titlesOf>>();
+  return rows.map((row) => {
+    if (!row.workstream || !row.arc) return row;
+    if (!cache.has(row.workstream)) cache.set(row.workstream, titlesOf(root, row.workstream));
+    const arc = cache.get(row.workstream)!.get(row.arc);
+    return arc ? { ...row, arcTitle: arc.title || null, rowTitle: row.order ? arc.rows.get(row.order) ?? null : null } : row;
+  });
+}
+
 const n = (value: number) => value.toLocaleString("en-US");
 const minutes = (ms: number) => `${(ms / 60000).toFixed(1)} min`;
 const cells = (usage: Usage & Time & { replies: number }) =>
@@ -319,10 +351,11 @@ function print(result: Report): void {
     const arcs = [...new Set(mine.map((row) => row.arc))];
     for (const arc of arcs) {
       const ofArc = mine.filter((row) => row.arc === arc);
-      console.log(label(arc ?? "(no arc)", 2) + cells(sum(ofArc)));
+      const arcTitle = ofArc.find((one) => one.arcTitle)?.arcTitle;
+      console.log(label(arc ? `${arc}${arcTitle ? ` — ${arcTitle}` : ""}` : "(no arc)", 2) + cells(sum(ofArc)));
       if (arc === null) continue;
       for (const row of ofArc.filter((one) => one.order !== null))
-        console.log(label(String(row.order), 4) + cells(row));
+        console.log(label(`${row.order}${row.rowTitle ? ` — ${row.rowTitle}` : ""}`, 4) + cells(row));
       const loose = ofArc.filter((one) => one.order === null);
       if (loose.length && loose.length !== ofArc.length) console.log(label("(no order)", 4) + cells(sum(loose)));
     }
@@ -346,7 +379,8 @@ function show(args: string[]): number {
   if (!existsSync(join(root, ".spndevex")))
     throw new UsageFault(`needs a workspace, and ${root} is none. Run it inside one, or pass \`--root <workspace>\`.`);
   const projects = resolve(words.value("projects") ?? projectFolder(root));
-  const result = report(root, projects, filter);
+  const measured = report(root, projects, filter);
+  const result = { ...measured, rows: withTitles(root, measured.rows) };
   if (words.given("json")) console.log(JSON.stringify(result, null, 2));
   else print(result);
   return 0;

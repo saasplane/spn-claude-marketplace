@@ -41,6 +41,8 @@ import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
 import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
 import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
+import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
+import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 
@@ -63,6 +65,12 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
   { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
+  // ONE OWNER PER FILE, BY FORCE: a file the `workstream` commands own, a generated block, an arc's
+  // stamp. Its fast path is one pattern over the path or the command.
+  { name: { group: "workstream-owner", action: "workstream-owner" }, run: checkOwner, needs: ["command", "file_path"],
+    applies: (path, command) => ownerApplies(path, command) },
+  // A card is its record rendered: a page in a workstream kept as data is read only where it is HTML.
+  { name: { group: "questions", action: "hand-made" }, run: checkQuestions, needs: ["file_path"], applies: (path) => questionsApply(path) },
   // A refusal, so it runs before the checks that only advise. Its fast path is one pattern over the
   // path or the command, so a call that names no `src` and no `tests` pays that and stops. A call
   // that names one lists the start files, a folder that is absent or empty unless a timed command runs.

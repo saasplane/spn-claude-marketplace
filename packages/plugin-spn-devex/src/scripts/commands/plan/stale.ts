@@ -8,6 +8,9 @@
 // `git status --short` over the same paths for what the working tree holds uncommitted. One line per
 // repository: `nothing moved`, or the files that did.
 //
+// AN ARC KEPT AS DATA PINS ITS FACTS IN `arcs/N<nnn>/facts.jsonl` (01-workstream.md § Ideation is kept as it
+// happens). A plan at `notes/N<nnn>/plan.md` is read with them: each fact's source, from its commit.
+//
 // AN ACTION OF NO SUBJECT, AND IT NEVER REFUSES. A plan going stale is something to read and act on,
 // not something this can judge, so the exit code is 0 whether anything moved or not. It never runs
 // `spnutils`, because a plugin script never does.
@@ -67,6 +70,23 @@ export function movedFiles(repo: string, commit: string, paths: string[]): strin
   return [...moved].sort();
 }
 
+/** The facts an arc kept as data pinned, for a plan at `notes/N<nnn>/plan.md`, as pins of one path each. */
+export function factPinsOf(plan: string): Array<Pin & { id: string }> {
+  const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/plan\.md$/.exec(plan.split("\\").join("/"));
+  if (!placed) return [];
+  const file = join(placed[1], "arcs", placed[2], "facts.jsonl");
+  if (!existsSync(file)) return [];
+  const out: Array<Pin & { id: string }> = [];
+  for (const line of readFileSync(file, "utf8").split("\n").filter((one) => one.trim())) {
+    let fact: { id?: unknown; source?: unknown; commit?: unknown } = {};
+    try { fact = JSON.parse(line); } catch { continue; }
+    if (typeof fact.source !== "string" || typeof fact.commit !== "string") continue;
+    const [repo, ...rest] = fact.source.replace(/:\d+(?:-\d+)?$/, "").split("/");
+    if (repo && rest.length && !rest.includes("…")) out.push({ id: String(fact.id ?? "?"), repo, commit: fact.commit, paths: [rest.join("/")] });
+  }
+  return out;
+}
+
 export const describe = "whether a plan's pinned facts have moved since the commit it read them at";
 
 export const usage = "<plan.md>";
@@ -74,8 +94,15 @@ export const usage = "<plan.md>";
 export function run(args: string[]): number {
   const plan = onePath(scopeOf(readWords(args).paths, REQUIRED));
   const pins = pinsOf(readFileSync(plan, "utf8"));
-  if (!pins.length) { console.log("no `## Pins` table in this plan — nothing to check"); return 0; }
+  const facts = factPinsOf(plan);
   const workspace = workspaceRoot(dirname(plan)) ?? workspaceRoot(process.cwd());
+  for (const fact of facts) {
+    const repo = workspace ? join(workspace, fact.repo) : fact.repo;
+    if (!existsSync(join(repo, ".git"))) { console.log(`${fact.id} ${fact.repo}: no checkout at ${repo} — skipped`); continue; }
+    const moved = movedFiles(repo, fact.commit, fact.paths);
+    console.log(moved.length ? `${fact.id} ${fact.repo}/${fact.paths[0]}: moved since ${fact.commit}` : `${fact.id} ${fact.repo}/${fact.paths[0]}: nothing moved`);
+  }
+  if (!pins.length) { if (!facts.length) console.log("no `## Pins` table in this plan, and no facts pinned for its arc — nothing to check"); return 0; }
   for (const pin of pins) {
     const repo = workspace ? join(workspace, pin.repo) : pin.repo;
     if (!pin.paths.length) { console.log(`${pin.repo}: no paths pinned — nothing to check`); continue; }

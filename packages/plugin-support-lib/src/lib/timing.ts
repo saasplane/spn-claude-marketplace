@@ -142,11 +142,12 @@ export type WorkTags = { workstream: string | null; arc: string | null; order: s
 
 // `.spndevex/workstreams/<state>/<NNN-subject>/` and whatever follows it inside that folder.
 const IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-]+)((?:\\/[^\\s'"\`)\\]|;&<>]*)?)`, "g");
-// Inside one: `arcs/N<n>…` names the arc, `notes/N<n>/…` names it too (and so does a notes folder
-// named past its arc, `notes/N<n>-<subject>/`), `notes/N<n>…/orders/<order>…` names the order as well.
-const ARC_FILE = /^\/arcs\/(N\d+[a-z]?)(?:[-.]|$)/i;
+// Inside one: `arcs/N<n>…` names the arc, and so does an arc kept as data, `arcs/N<n>/state.json`;
+// `notes/N<n>/…` names it too (and so does a notes folder named past its arc, `notes/N<n>-<subject>/`),
+// and `notes/N<n>…/orders/<order>…` names the order as well, its report and its ledger with it.
+const ARC_FILE = /^\/arcs\/(N\d+[a-z]?)(?:[-./]|$)/i;
 const ARC_NOTES = /^\/notes\/(N\d+[a-z]?)(?:-[^/]*)?(?:\/|$)/i;
-const ORDER_FILE = /^\/notes\/N\d+[a-z]?(?:-[^/]*)?\/orders\/([^/]+?)(?:\.md)?(?:\/|$)/i;
+const ORDER_FILE = /^\/notes\/N\d+[a-z]?(?:-[^/]*)?\/orders\/([^/]+?)(?:\.(?:report|ledger))?(?:\.md)?(?:\/|$)/i;
 // A relative path from inside a workstream folder, as a command run there spells it.
 const RELATIVE = /(?:^|[\s'"`=(])((?:arcs\/N\d+[a-z]?[^\s'"`)\]|;&<>]*)|(?:notes\/N\d+[a-z]?[^\s'"`)\]|;&<>]*))/gi;
 
