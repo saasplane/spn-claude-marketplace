@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "ffb9175d"
+      "seen": "271d22ce"
     }
   ]
 }
@@ -83,7 +83,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 ## Attached and sticky — 🔮
 
 - **An attached navigation belongs to the window's edge.** Its fill runs to the edge it meets, and what it holds stands in the body's box. An attached content is the body's box itself: it meets the navigation and runs to the window's bottom, at the body's width and centred (beside a rail, centred in the area beside it), the body showing around it; its fill, line, shadow and `className` fall on that box, and at `FULL` and on a phone the box is the window. A part that is not attached floats, the layout's space in from the window and from the part beside it, rounded with the theme's radius, with its own fill, line and shadow. The navigation's default is attached, and the content's too.
-- **A part's `bordered` and `raised` are its look wherever it stands, attached or floating; no switch is ever ignored.** A floating content draws its line and shadow all round its sheet. An attached content runs from the navigation to the page's end, so bordered it draws its line down its two sides and none across its top or bottom, and raised it casts its shadow from its two sides only; a side that meets a bordered, attached navigation shows the navigation's one line. There is no `inset` and no alias for it.
+- **A part's `bordered` and `raised` are its look wherever it stands, attached or floating; no switch is ever ignored.** A floating content draws its line and shadow all round its sheet. An attached content runs from the navigation to the page's end, so bordered it draws its line down its two sides and none across its top or bottom, and raised it casts its shadow from its two sides only; a side that meets a bordered, attached navigation shows the navigation's one line. A raised content beside a navigation that is not raised stands above it, so its shadow falls on the navigation; where both are raised, the navigation stands above. There is no `inset` and no alias for it.
 - **`sticky` governs the top bar alone, the bar of `TOPNAV` and of `DOCK`**, and the default is sticky. A rail always stays at the height of the window, and the column of a dock always stays beside the page; `sticky` governs neither. Sticky and attached stand apart, so each of their four combinations is drawn.
 - **A top navigation takes no `overlay`, and nothing stands over the content** (`RD.SUPPORT.SURFACE.200`). The content starts under the bar, or under the band. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
 - **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RD.SUPPORT.SURFACE.170`). The edge line of a rail follows the `bordered` of the navigation (`RD.SUPPORT.SURFACE.165`).
