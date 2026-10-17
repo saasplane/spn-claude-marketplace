@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "c43e7bd2"
+      "seen": "273ea477"
     }
   ]
 }
@@ -83,7 +83,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 ## Attached and sticky — 🔮
 
 - **A part that is attached belongs to the window's edge.** Its fill runs to the edge it meets, and what it holds stands in the body's box. A part that is not attached floats, the layout's space in from the window and from the part beside it, rounded with the theme's radius, with its own fill, line and shadow. The navigation's default is attached, and the content's too.
-- **An attached content draws its border only on the sides that meet neither the window nor the navigation.** A floating content draws it all round. There is no `inset` and no alias for it.
+- **A part's `bordered` and `raised` are its look wherever it stands, attached or floating; no switch is ever ignored.** An attached content draws its line on each side that meets the navigation or the body and none at the window's edge, and where the navigation is bordered too the shared edge shows one line. A floating content draws it all round. Raised, a content casts its shadow from its own box in all three layouts. There is no `inset` and no alias for it.
 - **`sticky` governs the top bar alone, the bar of `TOPNAV` and of `DOCK`**, and the default is sticky. A rail always stays at the height of the window, and the column of a dock always stays beside the page; `sticky` governs neither. Sticky and attached stand apart, so each of their four combinations is drawn.
 - **A top navigation takes no `overlay`, and nothing stands over the content** (`RD.SUPPORT.SURFACE.200`). The content starts under the bar. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
 - **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RD.SUPPORT.SURFACE.170`). The edge line of a rail follows the `bordered` of the navigation (`RD.SUPPORT.SURFACE.165`).
@@ -127,7 +127,7 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 
 - **A layout MUST build its navigation from the navigation units** (`architecture-components.md`, `RD.SUPPORT.SURFACE.157`).
 - **A rail has a fixed head, entries that scroll, and a fixed foot, and no strip over the content.** The page draws its own head, trail, title and actions in its first block.
-- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RD.SUPPORT.SURFACE.157`, `RD.SUPPORT.SURFACE.199`). With the content attached, the band spans the column and the page and the column stands inside the content, wearing the navigation's fill and line, never its shadow. With the content floating, the band stands on the body above both, and the column stands on the body wearing the navigation's whole look.
+- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RD.SUPPORT.SURFACE.157`, `RD.SUPPORT.SURFACE.199`). With the content attached, the band spans the column and the page and the column stands inside the content, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the band stands on the body above both, and the column stands on the body wearing the navigation's whole look.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
 
 ## The phone and the tablet — 🔮
