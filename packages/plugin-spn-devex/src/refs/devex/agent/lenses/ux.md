@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "51cc4647"
+      "seen": "590fcdd0"
     }
   ],
   "decisions": [
@@ -115,7 +115,7 @@ The question it holds: *can this person finish what they came to do, and do they
 - **A name says its layer.** A widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`. A component takes no such word. A block that carries a letter for its layer before its name is a finding, and so is a name that belongs to a block and does not keep the block's whole name first (names § A name says its layer · `RD.SUPPORT.SURFACE.098`).
 - **The library draws nothing of a pattern.** It holds the core units with their properties and their cases, the icons, and the places of the layout. A task pattern, a page pattern, a skeleton or a sample page drawn in a library file is a finding (design library § Overview · `RD.SUPPORT.SURFACE.099`).
 - **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block of the page. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible — no block takes the key and shows nothing (design library § Each shared state has one picture · `RD.SUPPORT.APPS.142`).
-- **An icon beside a title or beside running text takes the scale size of that text's own step name, and the two sit on one centre line.** An `XS` text takes the `XS` icon; an icon one step off, or sitting above or below the line of its text, is a finding. `size` says how dense a control is, and `scaleSize` says how large an icon, an icon mark, an avatar or a group of avatars is drawn; one word used for the other meaning is a finding (names and core § The scale, § Size and scale size · `RD.SUPPORT.SURFACE.008`, `RD.SUPPORT.SURFACE.100`).
+- **An icon beside a title or beside running text takes the scale size of that text's own step name, and the two sit on one centre line.** An `XS` text takes the `XS` icon; an icon one step off, or sitting above or below the line of its text, is a finding. `size` says how dense a control is, and `scaleSize` says how large an icon, a mark, an avatar or a group of avatars is drawn; one word used for the other meaning is a finding (names and core § The scale, § Size and scale size · `RD.SUPPORT.SURFACE.008`, `RD.SUPPORT.SURFACE.100`).
 - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark. A page built from the design system's blocks inherits all of it. A control the page built owes all of it on its own (accessibility § The baseline).
 - **One page holds at each density, theme, device type, language and direction.** A second version of the page for any of them is a finding. So is a block restyled for dark (standards § What a surface adapts to).
 

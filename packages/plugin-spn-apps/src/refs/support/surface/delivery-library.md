@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "c7e8a95f"
+      "seen": "4c13632f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "bce75275"
+      "seen": "136514a2"
     }
   ]
 }
@@ -63,7 +63,7 @@ The organisation of a library file that the book states holds for any library, t
 
 ## Color is a mode, and the rest are properties
 
-In the design library, `color` is a variable mode. `variant`, `size`, `scaleSize` and the state are properties. The scale sizes are variables of the library's core, and the icon mark, the avatar and the avatar group carry `scaleSize` with every step from `XXS` to `XXL5`. Which other properties of a unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
+In the design library, `color` is a variable mode. `variant`, `size`, `scaleSize` and the state are properties. The scale sizes are variables of the library's core, and the mark, the avatar and the avatar group carry `scaleSize` with every step from `XXS` to `XXL5`. Which other properties of a unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
 
 ## What stays in words
 
@@ -675,7 +675,7 @@ Some core units are put together from other blocks, or open something the device
 | `DSColorPicker` | the swatch and the field with the code beside it, with a colour, with none, and with a typed text that is no code. The picker that opens belongs to the device, so it is not drawn |
 | `DSColorView` | the swatch and the value, the swatch alone, and the empty case |
 | `DSProgressCircle` | the ring at each size, filled to a value and turning |
-| `DSIconMark` | its sizes alone: `size` and `scaleSize` as properties. Its `shape` and its `variant` are modes, as its `color` is, so the set holds one version for each size and each scale size, and a designer sets the size, the icon, the shape, the look and the hue each by itself (`RD.SUPPORT.SURFACE.137`). The file is brought to this in a change of its own |
+| `DSMark` | its sizes alone: `size` and `scaleSize` as properties. Its `shape` and its `variant` are modes, as its `color` is, so the set holds one version for each size and each scale size, and a designer sets the size, the icon, the shape, the look and the hue each by itself (`RD.SUPPORT.SURFACE.137`). The file is brought to this in a change of its own |
 | `DSAvatar` | `size`, `scaleSize` and `badge` as properties. At the sizes, `badge` holds its values, and the published versions stay. At the scale sizes the status mark is a switch: a dot and an icon are each shown by a yes-or-no property, and the size of the mark follows the avatar. The file is brought to this in a change of its own |
 | `DSConfirmPopover` | its surface alone, with the question and the two actions, as a popover is drawn. The control that opens it is not part of the drawing |
 | `DSConfirmDialog` | its surface alone, over `DSBackdrop`, as every overlay is drawn |
@@ -697,7 +697,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are saving a named version and publishing a file, the builder manages the library and a partner is given it published, and the agent says what it will change before a connector write |
 | `RD.SUPPORT.SURFACE.029` | the connector's work in a library file is carried out by an inventory read once, a script for each page, one picture for each set and a probe written once, and a person saves a named version before the connector's first change |
 | `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
-| `RD.SUPPORT.SURFACE.137` | the shape and the look of an icon mark are variable modes in the library, and its set holds its sizes alone |
+| `RD.SUPPORT.SURFACE.137` | the shape and the look of a mark are variable modes in the library, and its set holds its sizes alone |
 | `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
 | `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, usage, cases and parts in a fixed order and at fixed distances |
 | `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |

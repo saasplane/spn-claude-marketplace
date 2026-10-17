@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "bce75275"
+      "seen": "136514a2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "3fb00909"
+      "seen": "6d197120"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -86,7 +86,7 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw the parts of a card inside its one frame.** A part of a card pads itself, and `flush` on a part drops that padding. A card hands its size to what it holds, and a `flush` part of a card says so to the blocks in it. A `flush` part of a container around a card does not reach into it. An item line draws no padding or highlight of its own: the part that holds a title gives it no padding at its two sides, and in a `flush` part the inset of its place, and a row of a list gives the line it holds its room and its highlight. The book states these before the library draws them. `divided` is the line between each two parts.
 - **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
-- **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the icon mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
+- **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
 - **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts. A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` or `INLINE`, and it alone decides the type of the text, the size of a badge among the facts and the box of the picture, so no text style is set by hand. The item line has no size. A row of tabs takes `pageLevel` too, and the level decides its look. The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. The picture is the kind the tree gives `media`, and what stands at the end of the line is what the tree gives `endNode`. `showArrow` is the chevron at the end of a line that leads to a page and has no action there.
 - **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. A chosen row of a list is a fill of the soft step of the primary role across the row, with no check. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "f8ae4264"
+      "seen": "7ee77eb6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "3fb00909"
+      "seen": "6d197120"
     }
   ]
 }
@@ -57,13 +57,13 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 | --- | --- | --- |
 | What it says | how dense a control is | how large a thing that is shown is drawn |
 | Its steps | `XS` to `XL` | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` · `XXL3` · `XXL4` · `XXL5` |
-| Who takes it | a button, a field, a table, a card, and every block that has padding. The item line takes none, and its level gives its look | `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` |
+| Who takes it | a button, a field, a table, a card, and every block that has padding. The item line takes none, and its level gives its look | `DSIcon`, `DSMark`, `DSAvatar` and `DSAvatarGroup` |
 | Handed down | yes: a block with no `size` takes the size of the place it stands in | no: a block with no `scaleSize` takes the step that fits its `size` |
 | The text beside it | the content step of that size | the title step of the same name |
 
-- **Neither word is used for the other meaning, on any block.** No other prop and no other vocabulary says how large an icon, an icon mark, an avatar or a group of avatars is drawn.
+- **Neither word is used for the other meaning, on any block.** No other prop and no other vocabulary says how large an icon, a mark, an avatar or a group of avatars is drawn.
 - **Each of these blocks holds its own pixels for a step.** An icon of `XXL3` is 40 px, and a mark or an avatar of `XXL3` is 64 px. So one value, given to all of them, draws things that fit together. `architecture-core.md` states the pixels of every step.
-- **A scale size is not handed down.** A block that is given no `scaleSize` takes the step of the same name as its `size`. `DSIconMark`, `DSAvatar` and `DSAvatarGroup` keep `size` for this, and with neither prop set each one takes the size of the place it stands in. `DSIcon` has no `size`, and its `scaleSize` is `MD` when unset.
+- **A scale size is not handed down.** A block that is given no `scaleSize` takes the step of the same name as its `size`. `DSMark`, `DSAvatar` and `DSAvatarGroup` keep `size` for this, and with neither prop set each one takes the size of the place it stands in. `DSIcon` has no `size`, and its `scaleSize` is `MD` when unset.
 - **A `scaleSize` that is given decides how large the block is drawn, whatever its `size` is.** `size` stays the density step on the block.
 - **The values of `scaleSize` are read smallest to largest, `XXS` to `XXL5`, wherever they are listed.**
 
@@ -108,16 +108,16 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
 | `DSLink` · `DSText` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
-| `DSIconMark` | `shape` (the outline of the background the icon stands on) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSIconMarkShapeType` |
+| `DSMark` · `DSAvatar` | `shape` (the outline of the background the icon, the symbol or the picture stands on; one type for both units) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
 | `DSNavBarSide` | `placement` (where the bar stands: at the edge of the screen, where it folds to icons, or inline in the page as a column) | `EDGE` · `INLINE`, `EDGE` when unset | `DSNavBarSidePlacementType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
-| `DSIcon` · `DSIconMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
+| `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
 | `DSItem` · `DSItemFacts` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
 | `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSItemMediaAlignType` |
 | `DSFormatDateTime` · `DSFormatDate` | `type` (the form the date is written in: the date as it is, or how long ago in words) | `DEFAULT` · `AGO`, `DEFAULT` when unset | `DSFormatDateType` |
-| `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `ICON_MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
+| `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
 | `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
 | `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
 | `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
@@ -228,7 +228,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
-| `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the icon mark, the avatar and the avatar group take `scaleSize` |
+| `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the mark, the avatar and the avatar group take `scaleSize` |
 | `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
 | `RD.SUPPORT.SURFACE.154` | the values of `variant` are named by their strength and read from the strongest to the faintest, and every variant of every hue, and of a colour the page chooses, keeps its text readable |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "60c5a31f"
+      "seen": "0a8dc01b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "a4fcbb61"
+      "seen": "4db8c086"
     }
   ]
 }
@@ -60,7 +60,7 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163` and `166`).
 - **Where a surface has a colour other than `BASE`, a hue tint is a share of the surface's own text colour** (`RD.SUPPORT.SURFACE.199`). An avatar's fallback, the chip of an avatar group and a `SUBTLE` or a `QUIET` badge take `--surface-tint-subtle` and `--surface-tint-quiet` and the surface's text, so a tint stands 1.5 to 1 off the fill; on `BASE` the tints stay the page's.
 - **A card or a container takes `color` and `strength`, `BASE` by default. A dialog, a sheet and a drawer are `BASE`, and a popover, a menu and a tooltip are raised, each fixed.**
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. The fill of `SUBTLE` in the default hue is the text colour mixed into transparency.
-- **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and an icon mark read the strong step. The other hues keep their own step.
+- **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and a mark read the strong step. The other hues keep their own step.
 - **Small text that a person reads MUST take the muted tone at least, and the subtle tone is only for a placeholder or a disabled state** (`RD.SUPPORT.SURFACE.166`). The subtle tone does not reach 4.5 to 1 against a surface.
 - **A title that stands a step back MUST take the quiet tone, and the description of an item MUST take it at every level but `INLINE`; facts stay muted** (`RD.SUPPORT.SURFACE.143`, `166`). `DSTextToneType` names it `QUIET`.
 - **The shades of the variants MUST be these** (`RD.SUPPORT.SURFACE.154`). Every tint is a wash of the hue's step 500 into transparency, at a share for each hue and a larger one under the pointer (`RD.SUPPORT.SURFACE.183`): `SUBTLE` and `SUBTLE_OUTLINE` at the least share that stands `0.04` of lightness from the page, a card and a dialog, and `QUIET` at the share that keeps its designed step from the page. `SUBTLE` of the default hue is the text colour mixed into transparency, `6` percent and `11` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, and `surface-border-strong` for the default hue. In dark the light tint of every hue is its step 500 at 18 percent, 24 under the pointer, with the hue's step 400 for the text on it, step 300 for primary (`RD.SUPPORT.SURFACE.188`), the quiet tint keeps its own share and its text step 200, and the line is step 700, and `surface-border-strong` for the default hue. A tint inverts between modes.
@@ -73,9 +73,9 @@ The scale has five steps, `XS` to `XL`. Each step carries six measures: height, 
 
 ## The scale sizes — ✅
 
-A scale size says how large a thing that is shown is drawn. It runs from `XXS` to `XXL5`, through `scaleSize` and the vocabulary `DSScaleSizeType`, and `DSIcon`, `DSIconMark`, `DSAvatar` and `DSAvatarGroup` take it. It stands beside the scale and is not a step of it: the scale says how dense a control is, and a scale size says how large a picture is. Each unit holds its own pixels for a step, so one value, given to an icon, a mark and an avatar, draws things that fit together (`RD.SUPPORT.SURFACE.101`).
+A scale size says how large a thing that is shown is drawn. It runs from `XXS` to `XXL5`, through `scaleSize` and the vocabulary `DSScaleSizeType`, and `DSIcon`, `DSMark`, `DSAvatar` and `DSAvatarGroup` take it. It stands beside the scale and is not a step of it: the scale says how dense a control is, and a scale size says how large a picture is. Each unit holds its own pixels for a step, so one value, given to an icon, a mark and an avatar, draws things that fit together (`RD.SUPPORT.SURFACE.101`).
 
-| Step | Icon | Icon mark and avatar |
+| Step | Icon | Mark and avatar |
 | --- | --- | --- |
 | `XXS` | 10px | 24px |
 | `XS` | 12px | 28px |
@@ -89,7 +89,7 @@ A scale size says how large a thing that is shown is drawn. It runs from `XXS` t
 | `XXL4` | 48px | 80px |
 | `XXL5` | 56px | 96px |
 
-- **An icon mark holds the icon of its own step.** The icon is about half the mark from `XXL` up: a 24px icon in a 48px mark, and a 56px icon in a 96px mark. An avatar of a group takes the pixels of an avatar.
+- **A mark holds the icon of its own step.** The icon is about half the mark from `XXL` up: a 24px icon in a 48px mark, and a 56px icon in a 96px mark. An avatar of a group takes the pixels of an avatar.
 - **From `XS` to `XL` a mark and an avatar are as tall as a control of the size step of the same name.** So a picture with no scale size of its own lines up with the controls beside it. A unit that is given no scale size takes the step that fits its `size`.
 - **From `XXL` to `XXL5` an icon is the size of the title of its own step name.** Below `XXL` an icon is equal to its title or a little larger.
 
@@ -123,7 +123,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | --- | --- |
 | `RD.SUPPORT.SURFACE.008` | an icon placed beside a title or beside running text takes the scale size of that text's own step name, and the two sit on one centre line |
 | `RD.SUPPORT.SURFACE.141` | the neutral shades of the surfaces and the text in light and in dark, and small text a person reads is never subtle |
-| `RD.SUPPORT.SURFACE.101` | the pixels an icon, an icon mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
+| `RD.SUPPORT.SURFACE.101` | the pixels an icon, a mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content ends at `CONTENT_XL` |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
