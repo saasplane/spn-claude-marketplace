@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "e00166a4"
+      "seen": "f8857d11"
     }
   ]
 }
@@ -419,6 +419,25 @@ A field has two blocks, one to enter a value and one to read it.
 - **`DSDataFieldView` draws through `DSDataUnit`, and it needs the config of a data field.** So it fits a custom field, whose config the record already carries. A field with no such config is read through `DSDataUnit` itself.
 - **Neither block places its neighbours.** The foundation defines no block for the grid that readings stand in. The page writes that grid, or uses a unit for it where its stack provides one, as `architecture-containers.md` says of every gap between two blocks.
 
+## The motion of an icon — 🔮
+
+An icon moves only because what holds it is hovered, pressed or open; it never moves on its own and never loops. `DSIcon` takes `motion` (`DSIconMotionType`) and `hoverNode`, and no block takes a speed prop.
+
+| Motion | What it does |
+| --- | --- |
+| `NUDGE_UP`, `NUDGE_DOWN`, `NUDGE_START`, `NUDGE_END` | 2 px that way; `START` and `END` flip in a right-to-left language |
+| `NUDGE_UP_END`, `NUDGE_UP_START`, `NUDGE_DOWN_START`, `NUDGE_DOWN_END` | the diagonals; `NUDGE_UP_END` is a link that leaves the app |
+| `LIFT` | a 2 px rise |
+| `ZOOM_IN`, `ZOOM_OUT` | x 1.12, x 0.88 |
+| `FADE_IN`, `FADE_OUT` | opacity 0.4 at rest and full while held, or the reverse; never 0 |
+| `SPIN_ONCE`, `WIGGLE` | one turn, one short shake |
+| `TURN_90`, `TURN_180` | a quarter or half turn while open |
+
+- The nudges, zooms, turns, lift and fades take the hover duration; `SPIN_ONCE` and `WIGGLE` take the icon's emphasis duration.
+- `hoverNode` shows another icon while the holder is hovered or pressed; the two cross-fade. `DSButton`'s icons, `DSIconMark` and `DSItem`'s media pass both through.
+- Under reduced motion an icon swaps but does not move; fades and `hoverNode` stay.
+- The theme's speed is `motionSpeed`: `DEFAULT`, `FAST` or `SLOW`. The loader (`DSSpinner`) is not motion and owns its turning.
+
 ## Composing, never restyling — 🔮
 
 A page composes these blocks, and never restyles a copy of one. A control that is missing is proposed to the design system. One that every stack should build is named and grouped here first. One that helps a single stack may be that stack's own unit. **A block takes data and props, and a class on one is a missing prop or a place's room** (`RD.SUPPORT.SURFACE.177`). Where a block has a prop for what a class would say, such as the tone and the weight of a text, the colour of a card, or where a table cell holds its content, the page gives the prop. Where the class is the room the block stands in, the parent gives it: a row, a grid or a part, or a plain element with the width around the block. Where no prop exists and three or more calls need it, the block gains the prop. A list or an item is never given a `flex` and a gap to lay a row of things: a plain row holds blocks, and an item holds its content in its own slots. A class stays on a block only on a page that shows how a primitive is styled, and in the showcase's own chrome.
@@ -493,6 +512,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.192` | a partner paints one container, card or card widget with a class of their own, and the class sets the block's paint tokens `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` and nothing else |
 | `RD.SUPPORT.SURFACE.199` | the surface a block stands on is one value, a colour and a strength, carried by context and read by tokens; `DSSurface` puts a block on a fill, `painted` stands it on a picture, and a popup sets the page's surface again |
 | `RD.SUPPORT.SURFACE.190` | every overlay takes its width from one scale, `extent`, `XS` 320 px to `XL` 720, and its padding from `size`; a sheet and a drawer default to `MD`, a dialog to `XL` |
+| `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens, a role for each kind of unit, icon motions moved only by their holder, and one reduced-motion rule |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "39a938a3"
+      "seen": "7a55e6dd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "04627db3"
+      "seen": "5fdeecbf"
     }
   ]
 }
@@ -107,7 +107,26 @@ Never write a second version of a page for a density, a theme, a device type or 
 
 ## An application and a site — 🔮
 
-An application and a site are built from the same blocks, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. It needs four additions the standard names and states no rule for yet: larger type steps, a full-width section, motion tokens, and site widgets (such as the opening block and a footer in columns). They add to the design system and read the same tokens, so one theme tints a partner's site and their app together.
+An application and a site are built from the same blocks, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. It needs three additions the standard names and states no rule for yet: larger type steps, a full-width section, and site widgets (such as the opening block and a footer in columns). They add to the design system and read the same tokens, so one theme tints a partner's site and their app together.
+
+## Motion — ✅
+
+One set of tokens moves every surface. A place has its own clamped duration (`clamp(min, base x --motion-speed, max)`) for the hover, the icon's emphasis, the tooltip, the menu, the collapse, the toast, the dialog, the sheet and the rail. Three eases are shared: `enter` (ease-out) for what arrives, `exit` (ease-in) for what leaves, `move` (ease-in-out) for what changes size or place. `--motion-speed` is the multiplier a theme sets as `motionSpeed` (`DEFAULT` x 1, `FAST` x 0.75, `SLOW` x 1.25), and `--motion-amount` is how far things move.
+
+| Kind | Enters | Leaves |
+| --- | --- | --- |
+| Dialog | fades, grows from 96 % | the same, reversed, in two thirds of the time |
+| Sheet and phone drawer | slides its whole width from its edge | slides back, in two thirds of the time |
+| Menu, popover, select, hover card, context menu | fades, moves 4 px out from its trigger | the same, reversed, in two thirds of the time |
+| Tooltip | fades in after a short wait | fades, in the time it entered |
+| Toast | slides in from its corner | fades where it stands, in the time it entered |
+| Accordion, collapsible | grows to its content's height | shrinks, in the time it entered |
+| Rail | grows to its open width, labels fade in after | labels fade, then it shrinks, in the time it entered |
+
+- Every unit that moves MUST take its duration and ease from the tokens, and each kind MUST enter and leave by its role.
+- An icon MUST move only because what holds it is hovered, pressed or open (`architecture-components.md` states the motions).
+- Under `prefers-reduced-motion` nothing MUST move and every fade MUST take the hover duration, set in one place. A size change in place keeps its place's min duration with no overshoot.
+- The loader is not motion; it owns its turning.
 
 ## What every surface owes a person — ✅
 
