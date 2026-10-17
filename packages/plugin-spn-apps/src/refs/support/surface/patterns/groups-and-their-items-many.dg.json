@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, many groups",
- "caption": "Where the groups are many, the part at the left is a data table in its LIST layout: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. Where the groups are many, the part at the left is a data table widget in its LIST layout, under its filter bar: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second. On a phone the page level is the chosen group, with the way back to the groups.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 4
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    }
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
@@ -14,10 +41,12 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Record types",
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -47,6 +76,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "divided": true,
            "rows": [
             {
@@ -136,6 +166,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -200,8 +231,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    }
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
@@ -209,10 +244,12 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Record types",
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -242,6 +279,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "divided": true,
            "rows": [
             {
@@ -361,23 +399,26 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Project"
+    },
+    "actions": [
+     {
+      "icon": "add"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Record types"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -440,12 +481,6 @@
              "fill": true
             }
            ]
-          }
-         ],
-         "label": "Project",
-         "actions": [
-          {
-           "icon": "add"
           }
          ],
          "footer": [

@@ -1,10 +1,45 @@
 {
  "kind": "skeleton",
  "title": "A small record opens as a look",
- "caption": "A record of a few facts and nothing else opens beside its list at a desktop, as a drawer, and as a screen of its own on a phone. Its name is the title, the action that closes it stands in its header, and its facts are readings, each a title with its value under it,, with no table.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. A record of a few facts and nothing else opens beside its list at a desktop, as a drawer, and as a screen of its own on a tablet and a phone, with the way back before its name. In the drawer its name is the title and the action that closes it stands in its header. Its facts are readings, each a title with its value under it, with no table: two across on a tablet.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 1
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Tags"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New tag",
+      "main": true
+     }
+    ]
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -13,17 +48,11 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Tags",
-         "actions": [
-          {
-           "control": "button",
-           "text": "New tag",
-           "main": true
-          }
-         ],
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -53,6 +82,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "rows": [
             {
              "items": [
@@ -106,6 +136,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSDrawer",
          "rows": [
           {
            "items": [
@@ -181,24 +212,29 @@
    }
   },
   {
-   "viewport": "MOBILE",
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Urgent",
+     "description": "Tag"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Tags",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Tags"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -236,13 +272,74 @@
             }
            ]
           }
-         ],
-         "label": "Urgent",
-         "note": "Tag",
-         "actions": [
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Urgent",
+     "description": "Tag"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
           {
-           "control": "button",
-           "text": "Edit"
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Type",
+             "text": "Project"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Colour",
+             "text": "Red"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Made",
+             "text": "2 May"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "By",
+             "text": "Dana Lee"
+            }
+           ]
           }
          ]
         }

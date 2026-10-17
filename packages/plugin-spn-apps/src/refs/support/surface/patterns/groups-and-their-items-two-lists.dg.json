@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, a list and a list",
- "caption": "The groups of the notification actions are a list, with a line between each two and a band behind the chosen one, and the actions of the chosen group are a list too. Each part is chosen by its own data: the groups are a few names, and an action is a name, a state and its channels, which a line of a list holds under its title. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The groups of the notification actions are a list, with a line between each two and a band behind the chosen one, and the actions of the chosen group are a list too. Each part is chosen by its own data: the groups are a few names, and an action is a name, a state and its channels, which a line of a list holds under its title. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second. On a phone the page level is the chosen group, with the way back to the groups.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 4
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Notifications"
+    }
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +41,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -65,6 +93,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -143,8 +172,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Notifications"
+    }
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
@@ -152,6 +185,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -225,23 +259,21 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Authentication"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Groups"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -284,7 +316,6 @@
            ]
           }
          ],
-         "label": "Authentication",
          "divided": true
         }
        }

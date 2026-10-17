@@ -1,49 +1,68 @@
 {
  "kind": "skeleton",
  "title": "A record and its steps",
- "caption": "The header is the record: its picture, its name, and on the line under the name its state, its kind and its code. The end of the header holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across where two parts share the width at a desktop, three across on a tablet, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. On a phone the steps stand one under another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. On a phone the steps stand one under another.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 1
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant",
+      "blue-bakery"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Reject"
+     },
+     {
+      "control": "button",
+      "text": "Approve",
+      "main": true
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Merchant",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Blue Bakery",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "In review"
-          },
-          "Merchant",
-          "blue-bakery"
-         ],
-         "end": [
-          {
-           "control": "button",
-           "text": "Reject"
-          },
-          {
-           "control": "button",
-           "text": "Approve",
-           "main": true
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -71,6 +90,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -112,6 +132,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -156,44 +177,40 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant",
+      "blue-bakery"
+     ]
+    },
+    "actions": [
+     {
+      "icon": "more"
+     },
+     {
+      "control": "button",
+      "text": "Approve",
+      "main": true
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Merchant",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Blue Bakery",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "In review"
-          },
-          "Merchant",
-          "blue-bakery"
-         ],
-         "end": [
-          {
-           "icon": "more"
-          },
-          {
-           "control": "button",
-           "text": "Approve",
-           "main": true
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -221,6 +238,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -238,13 +256,20 @@
              "label": "Bank",
              "text": "Waiting",
              "control": "badge"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "standin": "field",
              "fill": true,
              "read": true,
              "label": "Tax number",
              "text": "Verified"
+            },
+            {
+             "spacer": true
             }
            ]
           }
@@ -259,6 +284,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -275,13 +301,20 @@
              "read": true,
              "label": "Catalogue",
              "text": "Done"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "standin": "field",
              "fill": true,
              "read": true,
              "label": "Payouts",
              "text": "Not started"
+            },
+            {
+             "spacer": true
             }
            ]
           }
@@ -296,38 +329,34 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant"
+     ]
+    },
+    "actions": [
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Merchant",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Blue Bakery",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "In review"
-          },
-          "Merchant"
-         ],
-         "end": [
-          {
-           "icon": "more"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -367,6 +396,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, a closed set",
- "caption": "The groups are few and fixed, so all of it is one page with a container for each group. Under the name of an action stand its state, where it is not the normal one, and its channels. The end of a line holds its actions only. The actions of a group are the lines of a list, so a line stands between each two. On a phone the channels are one fact, a count.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The groups are few and fixed, so all of it is one page with a container for each group. Under the name of an action stand its state, where it is not the normal one, and its channels. The end of a line holds its actions only. The actions of a group are the lines of a list, so a line stands between each two. On a phone the channels are one fact, a count.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 4
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Notifications"
+    }
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +41,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -91,6 +119,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -148,8 +177,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Notifications"
+    }
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
@@ -157,6 +190,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -214,6 +248,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -271,8 +306,12 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Notifications"
+    }
+   },
    "frame": {
-    "label": "Notifications",
     "size": "XS",
     "rows": [
      {
@@ -280,6 +319,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -333,6 +373,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

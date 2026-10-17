@@ -1,34 +1,58 @@
 {
  "kind": "skeleton",
  "title": "One action, read first",
- "caption": "An action reads first. Any version can be opened to be read, and only the draft is edited.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. An action reads first: the page level holds the title, the states of the versions on the line under it, and the action at its end. Any version can be opened to be read, and only the draft is edited. On a tablet and a phone the versions stand under the message.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 4
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Password reset",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Published v3"
+      },
+      {
+       "control": "badge",
+       "text": "Draft v4"
+      }
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit draft",
+      "main": true
+     }
+    ]
+   },
    "frame": {
-    "label": "Password reset",
     "size": "XS",
     "rows": [
-     {
-      "items": [
-       {
-        "control": "badge",
-        "text": "Published v3"
-       },
-       {
-        "control": "badge",
-        "text": "Draft v4"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Edit draft",
-        "main": true
-       }
-      ]
-     },
      {
       "items": [
        {
@@ -48,6 +72,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -81,6 +106,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -134,27 +160,164 @@
    }
   },
   {
-   "viewport": "MOBILE",
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Password reset",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Published v3"
+      },
+      {
+       "control": "badge",
+       "text": "Draft v4"
+      }
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit draft",
+      "main": true
+     }
+    ]
+   },
    "frame": {
-    "label": "Password reset",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "control": "badge",
-        "text": "Published v3"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Edit draft",
-        "main": true
+        "control": "tabs",
+        "tabs": [
+         "Email",
+         "SMS",
+         "WhatsApp"
+        ],
+        "chosen": 0,
+        "icon": "default"
        }
       ]
      },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "text": "Reset your password"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "rows",
+             "lines": 4,
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Reset password",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "label": "Message"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v4",
+              "meta": [
+               "Draft"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v3",
+              "meta": [
+               "Published",
+               "2 May"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "v2",
+              "meta": [
+               "12 April"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Versions",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Password reset",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Published v3"
+      }
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit draft",
+      "main": true
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
      {
       "items": [
        {
@@ -173,6 +336,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -201,6 +365,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

@@ -1,10 +1,46 @@
 {
  "kind": "skeleton",
  "title": "Find in a list",
- "caption": "The page is one container. Its header holds the title, a line under it and the main action. Its content is two parts: the filter bar, and the records, which reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its picture, its name, and under the name its state and one more fact. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. On a tablet it holds fewer boxes. On a phone it is one button that says how many filters are on, with the action that clears them. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows fewer columns than a desktop.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title, a line under it and the main action: it is the header of the one container, which is the page. The container's content is two parts: the filter bar widget, and the data table widget, whose records reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its name, and under the name its state and one more fact. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. On a tablet it holds fewer boxes. On a phone it is one button that says how many filters are on, with the action that clears them, and the main action is an icon. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows fewer columns than a desktop.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 1
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Orders",
+     "description": "Every order placed in Lumen Labs"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New order",
+      "main": true
+     }
+    ]
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -13,18 +49,11 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Users",
-         "note": "Everyone in the organization",
-         "actions": [
-          {
-           "control": "button",
-           "text": "Invite",
-           "main": true
-          }
-         ],
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -39,7 +68,7 @@
               },
               {
                "control": "select",
-               "text": "Role",
+               "text": "Status",
                "fill": true
               },
               {
@@ -59,6 +88,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "rows": [
             {
              "items": [
@@ -67,67 +97,51 @@
                "fill": true,
                "flush": true,
                "columns": [
-                "Name",
-                "Email",
-                "Role",
-                "State",
+                "Order",
+                "Customer",
+                "Status",
+                "Total",
                 ""
                ],
                "cells": [
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Dana Lee"
-                 },
-                 "dana@acme.com",
-                 "Admin",
+                 "#1042",
+                 "Acme Corp",
                  "",
+                 "$1,240.00",
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Omar Haddad"
-                 },
-                 "omar@acme.com",
-                 "Member",
+                 "#1041",
+                 "Blue Bakery",
                  {
                   "control": "badge",
-                  "text": "Invited"
+                  "text": "Pending"
                  },
+                 "$86.50",
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Li Wei"
-                 },
-                 "li@acme.com",
-                 "Member",
+                 "#1040",
+                 "Dana Lee",
                  "",
+                 "$412.00",
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Sara Novak"
-                 },
-                 "sara@acme.com",
-                 "Viewer",
+                 "#1039",
+                 "Omar Haddad",
                  {
                   "control": "badge",
-                  "text": "Suspended"
+                  "text": "Refunded"
                  },
+                 "$59.90",
                  {
                   "icon": "more"
                  }
@@ -143,7 +157,7 @@
           {
            "items": [
             {
-             "note": "1 to 20 of 180"
+             "note": "1 to 20 of 312"
             },
             {
              "spacer": true
@@ -163,6 +177,19 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Orders",
+     "description": "Every order placed in Lumen Labs"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New order",
+      "main": true
+     }
+    ]
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -171,18 +198,11 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Users",
-         "note": "Everyone in the organization",
-         "actions": [
-          {
-           "control": "button",
-           "text": "Invite",
-           "main": true
-          }
-         ],
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -212,6 +232,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "rows": [
             {
              "items": [
@@ -220,61 +241,45 @@
                "fill": true,
                "flush": true,
                "columns": [
-                "Name",
-                "Role",
-                "State",
+                "Order",
+                "Customer",
+                "Status",
                 ""
                ],
                "cells": [
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Dana Lee"
-                 },
-                 "Admin",
+                 "#1042",
+                 "Acme Corp",
                  "",
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Omar Haddad"
-                 },
-                 "Member",
+                 "#1041",
+                 "Blue Bakery",
                  {
                   "control": "badge",
-                  "text": "Invited"
+                  "text": "Pending"
                  },
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Li Wei"
-                 },
-                 "Member",
+                 "#1040",
+                 "Dana Lee",
                  "",
                  {
                   "icon": "more"
                  }
                 ],
                 [
-                 {
-                  "icon": "person",
-                  "mark": true,
-                  "text": "Sara Novak"
-                 },
-                 "Viewer",
+                 "#1039",
+                 "Omar Haddad",
                  {
                   "control": "badge",
-                  "text": "Suspended"
+                  "text": "Refunded"
                  },
                  {
                   "icon": "more"
@@ -308,6 +313,16 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Orders"
+    },
+    "actions": [
+     {
+      "icon": "add"
+     }
+    ]
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -316,21 +331,17 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Users",
-         "actions": [
-          {
-           "icon": "add"
-          }
-         ],
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
               {
                "control": "button",
-               "text": "Filters (2)",
+               "text": "Filters (1)",
                "icon": "default"
               },
               {
@@ -341,16 +352,16 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "divided": true,
            "rows": [
             {
              "items": [
               {
                "item": {
-                "media": "person",
-                "title": "Dana Lee",
+                "title": "#1042 · Acme Corp",
                 "meta": [
-                 "Admin"
+                 "$1,240.00"
                 ],
                 "end": [
                  {
@@ -366,14 +377,13 @@
              "items": [
               {
                "item": {
-                "media": "person",
-                "title": "Omar Haddad",
+                "title": "#1041 · Blue Bakery",
                 "meta": [
                  {
                   "control": "badge",
-                  "text": "Invited"
+                  "text": "Pending"
                  },
-                 "Member"
+                 "$86.50"
                 ],
                 "end": [
                  {
@@ -389,10 +399,9 @@
              "items": [
               {
                "item": {
-                "media": "person",
-                "title": "Li Wei",
+                "title": "#1040 · Dana Lee",
                 "meta": [
-                 "Member"
+                 "$412.00"
                 ],
                 "end": [
                  {

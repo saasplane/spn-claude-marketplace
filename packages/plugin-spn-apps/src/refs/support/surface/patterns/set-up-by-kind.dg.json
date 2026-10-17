@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Set up by kind",
- "caption": "Every kind is shown, connected or not, as a card, in the GRID layout of the data table. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, two on a tablet, and one on a phone, with the kinds in use first.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title of the page. Every kind is shown, connected or not, as a card, in the GRID layout of the data table, in one container. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact, its state alone on a tablet. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, two on a tablet, and one on a phone, with the kinds in use first.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 5
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Providers"
+    }
+   },
    "frame": {
-    "label": "Providers",
     "size": "XS",
     "rows": [
      {
@@ -14,12 +41,14 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Email",
               "rows": [
                {
@@ -52,6 +81,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "SMS",
               "rows": [
                {
@@ -84,6 +114,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Storage",
               "rows": [
                {
@@ -120,6 +151,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "WhatsApp",
               "rows": [
                {
@@ -146,6 +178,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Push",
               "rows": [
                {
@@ -172,6 +205,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Payments",
               "rows": [
                {
@@ -207,8 +241,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Providers"
+    }
+   },
    "frame": {
-    "label": "Providers",
     "size": "XS",
     "rows": [
      {
@@ -216,12 +254,14 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Email",
               "rows": [
                {
@@ -234,8 +274,7 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    },
-                    "Since 2 May"
+                    }
                    ],
                    "end": [
                     {
@@ -254,6 +293,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "SMS",
               "rows": [
                {
@@ -266,8 +306,7 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    },
-                    "Since 2 May"
+                    }
                    ],
                    "end": [
                     {
@@ -290,6 +329,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Storage",
               "rows": [
                {
@@ -302,8 +342,7 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    },
-                    "Since 2 May"
+                    }
                    ],
                    "end": [
                     {
@@ -322,6 +361,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "WhatsApp",
               "rows": [
                {
@@ -335,7 +375,8 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ]
+                   ],
+                   "meta": null
                   },
                   "fill": true
                  }
@@ -352,6 +393,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Push",
               "rows": [
                {
@@ -365,7 +407,8 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ]
+                   ],
+                   "meta": null
                   },
                   "fill": true
                  }
@@ -378,6 +421,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Payments",
               "rows": [
                {
@@ -391,7 +435,8 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ]
+                   ],
+                   "meta": null
                   },
                   "fill": true
                  }
@@ -413,8 +458,12 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Providers"
+    }
+   },
    "frame": {
-    "label": "Providers",
     "size": "XS",
     "rows": [
      {
@@ -422,12 +471,14 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Email",
               "rows": [
                {
@@ -464,6 +515,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "SMS",
               "rows": [
                {
@@ -500,6 +552,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "WhatsApp",
               "rows": [
                {

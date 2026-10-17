@@ -1,46 +1,65 @@
 {
  "kind": "skeleton",
  "title": "A record and what belongs to it",
- "caption": "The header carries the picture of the person, the name, and the email on the line under it, with the state before it on that line: the end of a header holds actions only. Then the lists attached to the record, each a container. A list a person adds to has a box at its top that finds a record as they type, with Add beside it, so one is attached without leaving the page; a list that is only read has none: side by side at a desktop, two and one on a tablet, and one column on a phone. Each line ends with the action that removes it. No list shows a count.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, the picture of the person, the name, and the email on the line under it, with the state before it on that line: the end of the page level holds actions only. Then the lists attached to the record, each a container. A list a person adds to has a box at its top that finds a record as they type, with Add beside it, an icon on a tablet, so one is attached without leaving the page; a list that is only read has none: side by side at a desktop, two and one on a tablet, and one column on a phone. Each line ends with the action that removes it. No list shows a count.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 2
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@acme.com"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "User",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "person",
-         "title": "Dana Lee",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Invited"
-          },
-          "dana@acme.com"
-         ],
-         "end": [
-          {
-           "control": "button",
-           "text": "Edit"
-          },
-          {
-           "icon": "more"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -126,6 +145,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -189,6 +209,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -238,42 +259,38 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@acme.com"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "User",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "person",
-         "title": "Dana Lee",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Invited"
-          },
-          "dana@acme.com"
-         ],
-         "end": [
-          {
-           "control": "button",
-           "text": "Edit"
-          },
-          {
-           "icon": "more"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -287,8 +304,7 @@
                "fill": true
               },
               {
-               "control": "button",
-               "text": "Add"
+               "icon": "add"
               }
              ]
             }
@@ -359,6 +375,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -372,8 +389,7 @@
                "fill": true
               },
               {
-               "control": "button",
-               "text": "Add"
+               "icon": "add"
               }
              ]
             }
@@ -426,6 +442,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -475,38 +492,34 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@acme.com"
+     ]
+    },
+    "actions": [
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "User",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "person",
-         "title": "Dana Lee",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Invited"
-          },
-          "dana@acme.com"
-         ],
-         "end": [
-          {
-           "icon": "more"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -578,6 +591,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -645,6 +659,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

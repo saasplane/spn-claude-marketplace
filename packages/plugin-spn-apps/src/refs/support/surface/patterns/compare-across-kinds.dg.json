@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Compare across kinds",
- "caption": "The page reads first, as a plain table: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. On a phone a person reads one kind at a time, as labelled values, with Edit in the footer. The kinds are a closed set, so tabs may be used.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The page reads first, as a plain table in one container: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. On a phone a person reads one kind at a time, as labelled values, with Edit in the footer. The kinds are a closed set, so tabs may be used.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 7
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
    "frame": {
-    "label": "Sign-in defaults",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +41,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -87,8 +115,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
    "frame": {
-    "label": "Sign-in defaults",
     "size": "XS",
     "rows": [
      {
@@ -96,6 +128,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -169,8 +202,12 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
    "frame": {
-    "label": "Sign-in defaults",
     "size": "XS",
     "rows": [
      {
@@ -191,6 +228,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

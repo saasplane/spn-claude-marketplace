@@ -1,29 +1,50 @@
 {
  "kind": "skeleton",
  "title": "An entry that is a page",
- "caption": "A large form is a page of its own, and the page is one container: its title in its header, its sections as the parts of its content, each with its own title and a line above it, and its actions in its footer. The sections are parts of one form that is saved once, so they are not containers of their own, and no list of the sections stands beside it. Each field is drawn as the form field of the design system lays it out: its title; the mark of its help at the end of the title's line, where the field has one; its control, as wide as its place; and one line under the control, which is its description, or its error where the value is refused; the room of that line is kept where a field has neither, so a form does not change its height when an error shows. A title never stands beside its control. Fields that are short and belong together share a row at a desktop, and on a phone each takes a row. The actions stand at the start of the footer.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. A large form is a page of its own, and the page is one container: its header is the page level, the way back and the title with a line under it; its sections are the parts of its content, each with its own title and a line above it, and its actions stand in its footer. The sections are parts of one form that is saved once, so they are not containers of their own, and no list of the sections stands beside it. Each field is drawn as the form field of the design system lays it out: its title; the mark of its help at the end of the title's line, where the field has one; its control, as wide as its place; and one line under the control, which is its description, or its error where the value is refused; the room of that line is kept where a field has neither, so a form does not change its height when an error shows. A title never stands beside its control. Fields that are short and belong together share a row at a desktop, fewer share one on a tablet, and on a phone each takes a row. The actions stand at the start of the footer.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 1
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "New schedule",
+     "description": "Runs a job at a set time"
+    },
+    "back": true
+   },
    "frame": {
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Schedules"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "New schedule",
-         "note": "Runs a job at a set time",
          "sections": [
           {
            "label": "Details",
@@ -145,25 +166,166 @@
    }
   },
   {
-   "viewport": "MOBILE",
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "New schedule",
+     "description": "Runs a job at a set time"
+    },
+    "back": true
+   },
    "frame": {
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Schedules"
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Details",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Name",
+               "text": "Nightly export",
+               "info": true
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Owner",
+               "text": "Dana Lee",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "About",
+               "text": "",
+               "description": "Shown in the list of schedules"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Trigger",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Repeats",
+               "text": "Daily",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Starts on",
+               "text": "2 May",
+               "description": "In the time zone of the organization"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Time",
+               "text": "25:00",
+               "error": "Enter a time from 00:00 to 23:59"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Destinations",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add another"
+            }
+           ],
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Kind",
+               "text": "Webhook",
+               "control": "select"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Address",
+               "text": "https://acme.com/hook",
+               "info": true
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Create",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
        }
       ]
-     },
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "New schedule"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
      {
       "items": [
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "New schedule",
          "sections": [
           {
            "label": "Details",

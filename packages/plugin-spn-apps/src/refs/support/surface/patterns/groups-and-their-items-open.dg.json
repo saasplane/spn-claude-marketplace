@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, an open set",
- "caption": "A module may add a record type, so the groups are a list and never a row of tabs. The groups are the lines of a list, with a line between each two, and the chosen one has a band behind it. At a desktop the list stays in view beside the items of the chosen group, which are a plain table here: a few fields, each with two facts. The chosen group is the title of the container at the right, and the action that adds an item stands in its header. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. A module may add a record type, so the groups are a list and never a row of tabs. The groups are the lines of a list, with a line between each two, and the chosen one has a band behind it. At a desktop the list stays in view beside the items of the chosen group, which are a plain table here: a few fields, each with two facts. The chosen group is the title of the container at the right, and the action that adds an item stands in its header. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second. On a phone the page level is the chosen group, with the way back to the groups.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 4
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    }
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +41,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -77,6 +105,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -155,8 +184,12 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    }
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
@@ -164,6 +197,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -249,23 +283,26 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Project"
+    },
+    "actions": [
+     {
+      "icon": "add"
+     }
+    ],
+    "back": true
+   },
    "frame": {
-    "label": "Custom fields",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Record types"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -328,12 +365,6 @@
              "fill": true
             }
            ]
-          }
-         ],
-         "label": "Project",
-         "actions": [
-          {
-           "icon": "add"
           }
          ],
          "divided": true

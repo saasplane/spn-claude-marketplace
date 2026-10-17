@@ -1,12 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Compare across kinds, editing one kind",
- "caption": "Edit opens the values of one kind over the page, as a dialog: the kind is its title, the action that closes it stands in its header, and its actions stand in its footer. On a phone the entry takes the full screen. The dialog is drawn beside the page, because a skeleton lays no frame over another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. Edit opens the values of one kind over the page, as a dialog: the kind is its title, the action that closes it stands in its header, and its actions stand in its footer. On a tablet the table keeps the kind being changed, and on a phone the entry takes the full screen. The dialog is drawn beside the page, because a skeleton lays no frame over another.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 7
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
    "frame": {
-    "label": "Sign-in defaults",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +41,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -68,6 +96,158 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Password",
+             "text": "Required",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Two-step",
+             "text": "Optional",
+             "control": "select",
+             "info": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Social",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Session",
+             "text": "8 hours",
+             "control": "select",
+             "description": "How long a person stays signed in"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Sign-up",
+             "text": "Invite only",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Enterprise",
+         "note": "Sign-in defaults",
+         "actions": [
+          {
+           "icon": "close"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "width": "1/2"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise"
+             ],
+             "cells": [
+              [
+               "Password",
+               "Required"
+              ],
+              [
+               "Two-step",
+               "Optional"
+              ],
+              [
+               "Social",
+               "On"
+              ],
+              [
+               "Session",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite only"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -162,8 +342,12 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
    "frame": {
-    "label": "Sign-in defaults",
     "size": "XS",
     "rows": [
      {
@@ -171,6 +355,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

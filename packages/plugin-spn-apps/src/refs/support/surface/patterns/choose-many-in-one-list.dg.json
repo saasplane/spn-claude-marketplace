@@ -1,12 +1,40 @@
 {
  "kind": "skeleton",
  "title": "Choose many, where the data has no groups",
- "caption": "A permission is a code and a name and nothing else, so no heading is made up: one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. A permission is a code and a name and nothing else, so no heading is made up: the page level holds the way back and the title, then one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row: three at a desktop, two on a tablet, one on a phone.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 6
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Permissions of the role",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +42,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -111,9 +140,14 @@
    }
   },
   {
-   "viewport": "MOBILE",
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Permissions of the role",
     "size": "XS",
     "rows": [
      {
@@ -121,6 +155,105 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            },
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit view",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [

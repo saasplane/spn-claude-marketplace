@@ -1,10 +1,39 @@
 {
  "kind": "skeleton",
  "title": "Change in place, in a list",
- "caption": "This is a data table whose one cell is changed where it stands: the texts of the app are its rows, found with its filter bar and paged in its footer. A row is read until a person chooses to change it: it shows its translation as words, and its action at the end opens it. The row that is being changed shows a box in that cell, as wide as the cell, with the action that saves it beside the box and the action that leaves it unchanged after that. Only one row is changed at a time, nothing opens over the page, and the page holds no form. A text with no translation yet carries a badge, since that is the state that is not normal. On a phone the table is in its LIST layout: a row that is read is a line, the text with its translation under it, and the row that is being changed is the text with its box under it and the same two actions beside the box. The action that opens a row is drawn as the default icon.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title and a line under it: it is the header of the one container, which is the page. This is a data table whose one cell is changed where it stands: the texts of the app are its rows, found with its filter bar and paged in its footer. A row is read until a person chooses to change it: it shows its translation as words, and its action at the end opens it. The row that is being changed shows a box in that cell, as wide as the cell, with the action that saves it beside the box and the action that leaves it unchanged after that. Only one row is changed at a time, nothing opens over the page, and the page holds no form. A text with no translation yet carries a badge, since that is the state that is not normal. On a tablet the filter bar holds fewer boxes. On a phone the table is in its LIST layout: a row that is read is a line, the text with its translation under it, and the row that is being changed is the text with its box under it and the same two actions beside the box. The action that opens a row is drawn as the default icon.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 3
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Labels",
+     "description": "The texts of the app, in each language"
+    }
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -13,11 +42,11 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Labels",
-         "note": "The texts of the app, in each language",
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -52,6 +81,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "rows": [
             {
              "items": [
@@ -137,7 +167,13 @@
    }
   },
   {
-   "viewport": "MOBILE",
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Labels",
+     "description": "The texts of the app, in each language"
+    }
+   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -146,10 +182,142 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Labels",
          "sections": [
           {
+           "unit": "DSFilterBarWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTableWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Text",
+                "German",
+                "",
+                ""
+               ],
+               "cells": [
+                [
+                 "Sign in",
+                 "Anmelden",
+                 "",
+                 {
+                  "icon": "default"
+                 }
+                ],
+                [
+                 "Sign out",
+                 {
+                  "control": "field",
+                  "text": "Abmelden",
+                  "fill": true
+                 },
+                 {
+                  "icon": "checkbox"
+                 },
+                 {
+                  "icon": "close"
+                 }
+                ],
+                [
+                 "Forgot password",
+                 "Passwort vergessen",
+                 "",
+                 {
+                  "icon": "default"
+                 }
+                ],
+                [
+                 "Invite a member",
+                 {
+                  "control": "badge",
+                  "text": "Missing"
+                 },
+                 "",
+                 {
+                  "icon": "default"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Labels"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBarWidget",
            "rows": [
             {
              "items": [
@@ -166,6 +334,7 @@
            ]
           },
           {
+           "unit": "DSDataTableWidget",
            "divided": true,
            "rows": [
             {

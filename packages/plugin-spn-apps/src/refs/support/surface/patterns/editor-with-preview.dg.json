@@ -1,29 +1,50 @@
 {
  "kind": "skeleton",
  "title": "An editor with its preview",
- "caption": "The page is an entry that is a page, so it is one container, with its title in its header and its actions at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees one of the two at a time, and a second row of tabs moves between writing and the preview: the tablet view shows the writing, and the phone view the result. Bars stand for the running text of the message.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page is an entry that is a page, so it is one container, and its header is the page level: the way back, then the title. Its actions stand at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees one of the two at a time, and a second row of tabs moves between writing and the preview: the tablet view shows the writing, and the phone view the result. Bars stand for the running text of the message.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 7
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Edit draft",
+     "description": "Password reset, version 4"
+    },
+    "back": true
+   },
    "frame": {
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Password reset"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Edit draft",
-         "note": "Password reset, version 4",
          "sections": [
           {
            "rows": [
@@ -196,25 +217,23 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Edit draft",
+     "description": "Password reset, version 4"
+    },
+    "back": true
+   },
    "frame": {
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Password reset"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Edit draft",
-         "note": "Password reset, version 4",
          "sections": [
           {
            "rows": [
@@ -346,25 +365,23 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Edit draft",
+     "description": "Password reset, version 4"
+    },
+    "back": true
+   },
    "frame": {
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "icon": "previous",
-        "text": "Password reset"
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
-         "label": "Edit draft",
-         "note": "Password reset, version 4",
          "sections": [
           {
            "rows": [

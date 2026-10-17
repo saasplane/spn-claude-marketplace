@@ -1,50 +1,69 @@
 {
  "kind": "skeleton",
  "title": "A record and its setup",
- "caption": "The record is the header: its picture, its name, and under the name its kind, its code and its owner. Each part of the setup is a container, with its title and its actions above its outline. At a desktop the large part is the main column and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, with its title and its actions above its outline, and each smaller part of a thing set up is a card. At a desktop the large part is the main column, its cards one under another, and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 5
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme",
+      "Owner: Dana Lee"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ]
+   },
    "frame": {
-    "label": "Organization",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Acme Corp",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Enterprise"
-          },
-          "acme",
-          "Owner: Dana Lee"
-         ],
-         "end": [
-          {
-           "control": "button",
-           "text": "Edit"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Account",
               "rows": [],
               "sections": [
@@ -154,10 +173,15 @@
                }
               ]
              }
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Platform",
               "rows": [],
               "sections": [
@@ -248,6 +272,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",
@@ -353,6 +378,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -404,46 +430,42 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme",
+      "Owner: Dana Lee"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ]
+   },
    "frame": {
-    "label": "Organization",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Acme Corp",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Enterprise"
-          },
-          "acme",
-          "Owner: Dana Lee"
-         ],
-         "end": [
-          {
-           "control": "button",
-           "text": "Edit"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Account",
               "rows": [],
               "sections": [
@@ -561,6 +583,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Platform",
               "rows": [],
               "sections": [
@@ -655,6 +678,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",
@@ -759,6 +783,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -796,44 +821,40 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme"
+     ]
+    },
+    "actions": [
+     {
+      "icon": "more"
+     }
+    ]
+   },
    "frame": {
-    "label": "Organization",
     "size": "XS",
     "rows": [
      {
       "items": [
        {
-        "item": {
-         "media": "default",
-         "title": "Acme Corp",
-         "meta": [
-          {
-           "control": "badge",
-           "text": "Enterprise"
-          },
-          "acme"
-         ],
-         "end": [
-          {
-           "icon": "more"
-          }
-         ]
-        },
-        "fill": true
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Account",
               "rows": [],
               "sections": [
@@ -951,6 +972,7 @@
             {
              "frame": {
               "look": "card",
+              "unit": "DSCard",
               "label": "Platform",
               "rows": [],
               "sections": [
@@ -1045,6 +1067,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",

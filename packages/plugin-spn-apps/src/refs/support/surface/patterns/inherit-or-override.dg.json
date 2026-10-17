@@ -1,12 +1,40 @@
 {
  "kind": "skeleton",
  "title": "Inherit or override",
- "caption": "The values a person reads stand in a grid, three across at a desktop and a tablet and one under another on a phone. A part says which it is on the line under its title: it follows the default, with one action to set its own, or it holds its own values, with a way back in its footer. Following the default is the normal state and shows no badge.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the way back and the title of what the values belong to, then one container for each part. The values a person reads stand in a grid, three across at a desktop, two on a tablet, and one under another on a phone. A part says which it is on the line under its title: it follows the default, with one action to set its own, or it holds its own values, with a way back in its footer. Following the default is the normal state and shows no badge.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": 6
+  },
+  "content": {
+   "attached": true
+  }
+ },
  "views": [
   {
    "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Policies",
     "size": "XS",
     "rows": [
      {
@@ -14,6 +42,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -79,6 +108,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -133,8 +163,13 @@
   },
   {
    "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Policies",
     "size": "XS",
     "rows": [
      {
@@ -142,6 +177,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -158,13 +194,6 @@
              "read": true,
              "label": "Two-step",
              "text": "Optional"
-            },
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Session",
-             "text": "8 hours"
             }
            ]
           },
@@ -174,9 +203,20 @@
              "standin": "field",
              "fill": true,
              "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
              "label": "Social sign-in",
              "text": "On"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "standin": "field",
              "fill": true,
@@ -211,6 +251,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -265,8 +306,13 @@
   },
   {
    "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
    "frame": {
-    "label": "Policies",
     "size": "XS",
     "rows": [
      {
@@ -274,6 +320,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
@@ -359,6 +406,7 @@
        {
         "frame": {
          "look": "container",
+         "unit": "DSContainer",
          "rows": [
           {
            "items": [
