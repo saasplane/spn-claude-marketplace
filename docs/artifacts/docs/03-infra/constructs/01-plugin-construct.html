@@ -4,7 +4,7 @@
 {"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,14 +33,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>the manifest</td><td><code>plugin.json</code></td><td><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</td></tr>
-      <tr><td>the name</td><td><code>spn-infra</code></td><td>what the marketplace entry and every install refer to this folder by</td></tr>
-      <tr><td>the description</td><td><code>description</code></td><td>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</td></tr>
-      <tr><td>the version</td><td><code>version</code></td><td>which published bytes a session is reading, shared with the other two plugins</td></tr>
-      <tr><td>an INFRA repository</td><td><code>sprepo.json</code></td><td>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</td></tr>
-      <tr><td>the plugin root</td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed copy a session reads, and the base every wired command is written against</td></tr>
+      <tr><td><p><strong>the manifest</strong></p><p><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
+      <tr><td><p><strong>the name</strong></p><p>what the marketplace entry and every install refer to this folder by</p><span class="sds-small">Contract term: <code>spn-infra</code></span></td></tr>
+      <tr><td><p><strong>the description</strong></p><p>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
+      <tr><td><p><strong>the version</strong></p><p>which published bytes a session is reading, shared with the other two plugins</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
+      <tr><td><p><strong>an INFRA repository</strong></p><p>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</p><span class="sds-small">Contract term: <code>sprepo.json</code></span></td></tr>
+      <tr><td><p><strong>the plugin root</strong></p><p>the installed copy a session reads, and the base every wired command is written against</p><span class="sds-small">Contract term: <code>CLAUDE_PLUGIN_ROOT</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -113,11 +113,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what carries the estate standard into a session and which bytes a session reads. It does not answer what a plugin is in general — the manifest shape, the marketplace file and the installed copy are <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a>. It does not answer what any construct inside this folder holds.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>this plugin's identity, its description, and that it loads where a repository declares <code>INFRA</code></td><td>the shape of a manifest, a marketplace entry, and what an installed copy is</td><td><a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></td></tr>
-      <tr><td>that the version is the set's and moves after a release</td><td>which moments this plugin wires, and what the wiring declares</td><td><a href="./02-hooks-construct.html">Hooks</a></td></tr>
-      <tr><td>that no <code>agents/</code> folder is shipped</td><td>what the folders it does ship hold</td><td><a href="./03-skills-construct.html">Skills</a> · <a href="./04-scripts-construct.html">Scripts</a> · <a href="./05-refs-construct.html">Refs</a> · <a href="./06-providers-construct.html">Providers</a> · <a href="./07-tests-construct.html">Tests</a></td></tr>
+      <tr><td>this plugin's identity, its description, and that it loads where a repository declares <code>INFRA</code></td><td>the shape of a manifest, a marketplace entry, and what an installed copy is<span class="sds-small">Owned by: <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></span></td></tr>
+      <tr><td>that the version is the set's and moves after a release</td><td>which moments this plugin wires, and what the wiring declares<span class="sds-small">Owned by: <a href="./02-hooks-construct.html">Hooks</a></span></td></tr>
+      <tr><td>that no <code>agents/</code> folder is shipped</td><td>what the folders it does ship hold<span class="sds-small">Owned by: <a href="./03-skills-construct.html">Skills</a> · <a href="./04-scripts-construct.html">Scripts</a> · <a href="./05-refs-construct.html">Refs</a> · <a href="./06-providers-construct.html">Providers</a> · <a href="./07-tests-construct.html">Tests</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -126,12 +126,12 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></td><td>the manifest is the current description, and a marketplace entry disagreeing with it is the stale side</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what decides this plugin is loaded at all</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>source beside a committed build, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></p><p>the manifest is the current description, and a marketplace entry disagreeing with it is the stale side</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what decides this plugin is loaded at all</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</p><p>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>source beside a committed build, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex plugin partner check</code></p>
@@ -142,4 +142,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

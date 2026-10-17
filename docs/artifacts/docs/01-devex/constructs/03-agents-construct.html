@@ -4,7 +4,7 @@
 {"id":"agent-set","variant":"construct","title":"Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed","subtitle":"A second reader, convened for just one turn, who holds only what its own file grants it.","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -34,18 +34,18 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a brief</td><td><code>agents/</code></td><td>a markdown file naming a persona a session can convene by name</td></tr>
-      <tr><td>the bound model</td><td><code>model</code></td><td>an optional field choosing which model runs the persona</td></tr>
-      <tr><td>the bound tools</td><td><code>tools</code></td><td>an optional field narrowing what the persona may call; leaving it out grants everything the session has</td></tr>
-      <tr><td>a parameterized brief</td><td>—</td><td>a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened</td></tr>
-      <tr><td>a lens</td><td><code>lenses/</code></td><td>one file naming what a single engineering function checks when it reads work</td></tr>
-      <tr><td>worn</td><td>—</td><td>the agent loading a lens for itself while it writes, so the work is right the first time</td></tr>
-      <tr><td>convened</td><td>—</td><td>a context that did not write the work reading it through one lens and reporting what it found</td></tr>
-      <tr><td>the block condition</td><td>—</td><td>the one thing a lens may refuse on; everything the file finds below that is advice and says so</td></tr>
-      <tr><td>the lens register</td><td><code>LENS_LABEL</code></td><td>the closed set of viewpoint values, and the reader label each one renders as on a document's own header</td></tr>
-      <tr><td>the audience</td><td><code>lenses</code></td><td>the field in a document's metadata block, drawn from that same closed set</td></tr>
+      <tr><td><p><strong>a brief</strong></p><p>a markdown file naming a persona a session can convene by name</p><span class="sds-small">Contract term: <code>agents/</code></span></td></tr>
+      <tr><td><p><strong>the bound model</strong></p><p>an optional field choosing which model runs the persona</p><span class="sds-small">Contract term: <code>model</code></span></td></tr>
+      <tr><td><p><strong>the bound tools</strong></p><p>an optional field narrowing what the persona may call; leaving it out grants everything the session has</p><span class="sds-small">Contract term: <code>tools</code></span></td></tr>
+      <tr><td><p><strong>a parameterized brief</strong></p><p>a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened</p></td></tr>
+      <tr><td><p><strong>a lens</strong></p><p>one file naming what a single engineering function checks when it reads work</p><span class="sds-small">Contract term: <code>lenses/</code></span></td></tr>
+      <tr><td><p><strong>worn</strong></p><p>the agent loading a lens for itself while it writes, so the work is right the first time</p></td></tr>
+      <tr><td><p><strong>convened</strong></p><p>a context that did not write the work reading it through one lens and reporting what it found</p></td></tr>
+      <tr><td><p><strong>the block condition</strong></p><p>the one thing a lens may refuse on; everything the file finds below that is advice and says so</p></td></tr>
+      <tr><td><p><strong>the lens register</strong></p><p>the closed set of viewpoint values, and the reader label each one renders as on a document's own header</p><span class="sds-small">Contract term: <code>LENS_LABEL</code></span></td></tr>
+      <tr><td><p><strong>the audience</strong></p><p>the field in a document's metadata block, drawn from that same closed set</p><span class="sds-small">Contract term: <code>lenses</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -130,11 +130,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what a brief is, how a persona is convened, what a viewpoint file holds, and how far the authority of either reaches. It does not answer how a restatement is stamped or compared — a lens is a ref, and <a href="./06-refs-construct.html">Refs</a> answers that. It does not answer what a skill is either, although a brief and a skill are selected by the same kind of sentence.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the frontmatter a brief declares, and the difference between an authority bound by a field and one stated in prose</td><td>the block, the stamp and the drift comparison every lens file carries</td><td><a href="./06-refs-construct.html">Refs</a></td></tr>
-      <tr><td>what a viewpoint file states, and the line between blocking and advising</td><td>whether the rule being restated is correct</td><td>the foundation chapter the stamp names</td></tr>
-      <tr><td>that a reviewing persona reports and one rewriting persona writes</td><td>the matching rule the description is read by, and which gate in a walk convenes which viewpoint</td><td><a href="./04-skills-construct.html">Skills</a></td></tr>
+      <tr><td>the frontmatter a brief declares, and the difference between an authority bound by a field and one stated in prose</td><td>the block, the stamp and the drift comparison every lens file carries<span class="sds-small">Owned by: <a href="./06-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>what a viewpoint file states, and the line between blocking and advising</td><td>whether the rule being restated is correct<span class="sds-small">Owned by: the foundation chapter the stamp names</span></td></tr>
+      <tr><td>that a reviewing persona reports and one rewriting persona writes</td><td>the matching rule the description is read by, and which gate in a walk convenes which viewpoint<span class="sds-small">Owned by: <a href="./04-skills-construct.html">Skills</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -143,13 +143,13 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Agent construct</td><td>one agent, equipped by the book, and a reviewer that reads what it did not write</td><td>MUST</td></tr>
-      <tr><td>the foundation's Actors, Lenses and Panels construct</td><td>the viewpoint set is closed by a rule, and a reviewer blocks only where its own file says it may</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a brief edit needs an install and a fresh window before a convening can read it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a lens is a restatement, and the book wins wherever the two disagree</td><td>MUST</td></tr>
-      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.004</a></td><td>a read-only promise is bound only where the brief declares <code>tools</code>; elsewhere it is prose</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's DevEx Agent construct</p><p>one agent, equipped by the book, and a reviewer that reads what it did not write</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's Actors, Lenses and Panels construct</p><p>the viewpoint set is closed by a rule, and a reviewer blocks only where its own file says it may</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a brief edit needs an install and a fresh window before a convening can read it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a lens is a restatement, and the book wins wherever the two disagree</p></td><td>MUST</td></tr>
+      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.004</a></p><p>a read-only promise is bound only where the brief declares <code>tools</code>; elsewhere it is prose</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -160,4 +160,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

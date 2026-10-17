@@ -4,7 +4,7 @@
 {"id":"provider-set","variant":"construct","title":"Providers — How a Plugin Is Extended Per Instance","subtitle":"Everything that changes with a stack or a cloud lives in one folder, and nowhere else.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,13 +32,13 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>an instance</td><td><code>providers/&lt;instance&gt;/</code></td><td>one realization a plugin serves — a stack (<code>ts</code>), or a cloud (<code>aws</code>, <code>gcp</code>, <code>local</code>)</td></tr>
-      <tr><td>a gate</td><td><code>skills/&lt;verb&gt;/SKILL.md</code> · <code>scripts/checks/&lt;subject&gt;.ts</code></td><td>the instance-free half: it resolves the instance and dispatches, and states no rule about any one of them</td></tr>
-      <tr><td>the skills half</td><td><code>providers/&lt;instance&gt;/skills/&lt;skill&gt;/</code></td><td>what a skill loads when it is working in this instance — a procedure</td></tr>
-      <tr><td>the scripts half</td><td><code>providers/&lt;instance&gt;/scripts/checks/</code></td><td>what a gate runs for this instance — the parse and the rules it carries</td></tr>
-      <tr><td>the contract</td><td><code>refs/&lt;domain&gt;/…/providers/&lt;instance&gt;/</code></td><td>what is <strong>true</strong> of this instance, restating a construct for a reader</td></tr>
+      <tr><td><p><strong>an instance</strong></p><p>one realization a plugin serves — a stack (<code>ts</code>), or a cloud (<code>aws</code>, <code>gcp</code>, <code>local</code>)</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/</code></span></td></tr>
+      <tr><td><p><strong>a gate</strong></p><p>the instance-free half: it resolves the instance and dispatches, and states no rule about any one of them</p><span class="sds-small">Contract term: <code>skills/&lt;verb&gt;/SKILL.md</code> · <code>scripts/checks/&lt;subject&gt;.ts</code></span></td></tr>
+      <tr><td><p><strong>the skills half</strong></p><p>what a skill loads when it is working in this instance — a procedure</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/skills/&lt;skill&gt;/</code></span></td></tr>
+      <tr><td><p><strong>the scripts half</strong></p><p>what a gate runs for this instance — the parse and the rules it carries</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/scripts/checks/</code></span></td></tr>
+      <tr><td><p><strong>the contract</strong></p><p>what is <strong>true</strong> of this instance, restating a construct for a reader</p><span class="sds-small">Contract term: <code>refs/&lt;domain&gt;/…/providers/&lt;instance&gt;/</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -117,12 +117,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p><strong>A provider never states a rule the domain owns.</strong> What is true of every realization belongs to the gate's own domain documents; a provider says only how that truth looks here. <strong>A provider folder carries no <code>SKILL.md</code></strong>, because skill discovery keys on that filename and a provider holds the material a skill loads rather than a skill of its own. <strong>A provider is not a release unit</strong>: it ships inside its plugin, at the plugin's version.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the folder a realization contributes, the two halves, and the rule that decides whether a skills half exists</td><td>what a skill is, how it is matched, and what its frontmatter declares</td><td><a href="./04-skills-construct.html">Skills</a></td></tr>
-      <tr><td>that a gate resolves the instance and states no rule about any one of them</td><td>how a check is composed into a moment, and the verdict it returns</td><td><a href="./02-hooks-construct.html">Hooks</a> · <a href="./05-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that what is <strong>true</strong> of an instance is restated in <code>refs/</code> rather than executed</td><td>the block a restatement carries, and the drift run that re-reads it</td><td><a href="./06-refs-construct.html">Refs</a></td></tr>
-      <tr><td>that a provider ships inside its plugin at the plugin's version</td><td>the manifest, the marketplace entry and the installed copy</td><td><a href="./01-plugin-construct.html">The Plugin</a></td></tr>
+      <tr><td>the folder a realization contributes, the two halves, and the rule that decides whether a skills half exists</td><td>what a skill is, how it is matched, and what its frontmatter declares<span class="sds-small">Owned by: <a href="./04-skills-construct.html">Skills</a></span></td></tr>
+      <tr><td>that a gate resolves the instance and states no rule about any one of them</td><td>how a check is composed into a moment, and the verdict it returns<span class="sds-small">Owned by: <a href="./02-hooks-construct.html">Hooks</a> · <a href="./05-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that what is <strong>true</strong> of an instance is restated in <code>refs/</code> rather than executed</td><td>the block a restatement carries, and the drift run that re-reads it<span class="sds-small">Owned by: <a href="./06-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>that a provider ships inside its plugin at the plugin's version</td><td>the manifest, the marketplace entry and the installed copy<span class="sds-small">Owned by: <a href="./01-plugin-construct.html">The Plugin</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -131,11 +131,11 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.AGENT.025</code></td><td>a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</td><td>MUST</td></tr>
-      <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.AGENT.025</code></p><p>a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</p></td><td>MUST</td></tr>
+      <tr><td><p>the apps plugin's subject registry</p><p><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex docs coherence check</code></p>
@@ -146,4 +146,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

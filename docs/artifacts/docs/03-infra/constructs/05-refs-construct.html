@@ -4,7 +4,7 @@
 {"id":"estate-refs","variant":"construct","title":"Refs — This Domain's Vocabulary, Restated as Cards","subtitle":"This domain's own words, explained for a reader who has never opened the book.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book.","keywords":["card","manifest","layer","naming","laws","grammar"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,15 +33,15 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a card</td><td><code>refs/support/infra/</code></td><td>one markdown file restating one subject of the estate model, in full, under a stamp</td></tr>
-      <tr><td>the manifests</td><td><code>spestate.json</code> · <code>spinfrapkg.json</code></td><td>the files that mark an estate node and name what kind it is</td></tr>
-      <tr><td>the path locator</td><td>—</td><td>how a node is resolved from wherever you are standing, rather than guessed from a folder name</td></tr>
-      <tr><td>a layer</td><td>—</td><td>one band of the estate, with the same commands as every other and a fixed place in the order</td></tr>
-      <tr><td>a coordinate</td><td>—</td><td>one part a resource name is composed from, drawn from a closed vocabulary</td></tr>
-      <tr><td>a law</td><td>—</td><td>one thing a declaration must never do, written with the checkable defect it names</td></tr>
-      <tr><td>a cloud's vocabulary</td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what that cloud calls the things the model names, restated subject by subject</td></tr>
+      <tr><td><p><strong>a card</strong></p><p>one markdown file restating one subject of the estate model, in full, under a stamp</p><span class="sds-small">Contract term: <code>refs/support/infra/</code></span></td></tr>
+      <tr><td><p><strong>the manifests</strong></p><p>the files that mark an estate node and name what kind it is</p><span class="sds-small">Contract term: <code>spestate.json</code> · <code>spinfrapkg.json</code></span></td></tr>
+      <tr><td><p><strong>the path locator</strong></p><p>how a node is resolved from wherever you are standing, rather than guessed from a folder name</p></td></tr>
+      <tr><td><p><strong>a layer</strong></p><p>one band of the estate, with the same commands as every other and a fixed place in the order</p></td></tr>
+      <tr><td><p><strong>a coordinate</strong></p><p>one part a resource name is composed from, drawn from a closed vocabulary</p></td></tr>
+      <tr><td><p><strong>a law</strong></p><p>one thing a declaration must never do, written with the checkable defect it names</p></td></tr>
+      <tr><td><p><strong>a cloud's vocabulary</strong></p><p>what that cloud calls the things the model names, restated subject by subject</p><span class="sds-small">Contract term: <code>refs/support/infra/providers/&lt;cloud&gt;/</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -118,12 +118,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers which subjects the estate's cards cover and what a card may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../../01-devex/constructs/06-refs-construct.html">Refs</a>, and these files carry the same block. It does not answer what the estate model itself is: the book states it, and a card is the copy.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the subjects restated here, and that every value in them is grammar rather than a real one</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../../01-devex/constructs/06-refs-construct.html">Refs</a></td></tr>
-      <tr><td>that a cloud's vocabulary is restated as a fact</td><td>the code that parses one cloud's text at write time</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
-      <tr><td>that a refusal's reasoning is one hop from the refusal</td><td>what is refused at the moment an estate file is written</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that a card holds the words a skill uses</td><td>the skills themselves, and the walk each one sequences</td><td><a href="./03-skills-construct.html">Skills</a></td></tr>
+      <tr><td>the subjects restated here, and that every value in them is grammar rather than a real one</td><td>the block, the stamp, the hash and the drift comparison<span class="sds-small">Owned by: <a href="../../01-devex/constructs/06-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>that a cloud's vocabulary is restated as a fact</td><td>the code that parses one cloud's text at write time<span class="sds-small">Owned by: <a href="./06-providers-construct.html">Providers</a></span></td></tr>
+      <tr><td>that a refusal's reasoning is one hop from the refusal</td><td>what is refused at the moment an estate file is written<span class="sds-small">Owned by: <a href="./04-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that a card holds the words a skill uses</td><td>the skills themselves, and the walk each one sequences<span class="sds-small">Owned by: <a href="./03-skills-construct.html">Skills</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -132,11 +132,11 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a card is a restatement, carrying its sources and adding no rule</td><td>MUST</td></tr>
-      <tr><td><code>RD.SUPPORT.INFRA.026</code></td><td>which manifest declares which kind of estate node, which the manifest card restates</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a card carries rules it does not own and adds none</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a card is a restatement, carrying its sources and adding no rule</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.SUPPORT.INFRA.026</code></p><p>which manifest declares which kind of estate node, which the manifest card restates</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a card carries rules it does not own and adds none</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -147,4 +147,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

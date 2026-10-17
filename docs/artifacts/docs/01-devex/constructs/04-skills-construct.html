@@ -4,7 +4,7 @@
 {"id":"skill-set","variant":"construct","title":"Skills — A Stage's Steps, Loaded on Match","subtitle":"A skill only loads when the work in front of you actually matches it.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches.","keywords":["skill","SKILL.md","description","match","steps","stage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,14 +33,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a skill</td><td><code>SKILL.md</code></td><td>one folder under a plugin's <code>skills/</code>, named for its stage, holding the file a session loads</td></tr>
-      <tr><td>the name</td><td><code>name</code></td><td>the value a person types to ask for the skill directly, and the folder's own bare name</td></tr>
-      <tr><td>the trigger</td><td><code>description</code></td><td>the sentence matched against the work at hand, which decides whether the file is loaded at all</td></tr>
-      <tr><td>the listing</td><td>—</td><td>every installed skill's name and description, one line each; this is what a session holds in full</td></tr>
-      <tr><td>a step</td><td><code>steps/</code></td><td>one file a skill's own instructions sequence, read only when they name it</td></tr>
-      <tr><td>a mode</td><td>—</td><td>an argument a skill's description names, so one folder answers several close asks rather than two folders competing</td></tr>
+      <tr><td><p><strong>a skill</strong></p><p>one folder under a plugin's <code>skills/</code>, named for its stage, holding the file a session loads</p><span class="sds-small">Contract term: <code>SKILL.md</code></span></td></tr>
+      <tr><td><p><strong>the name</strong></p><p>the value a person types to ask for the skill directly, and the folder's own bare name</p><span class="sds-small">Contract term: <code>name</code></span></td></tr>
+      <tr><td><p><strong>the trigger</strong></p><p>the sentence matched against the work at hand, which decides whether the file is loaded at all</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
+      <tr><td><p><strong>the listing</strong></p><p>every installed skill's name and description, one line each; this is what a session holds in full</p></td></tr>
+      <tr><td><p><strong>a step</strong></p><p>one file a skill's own instructions sequence, read only when they name it</p><span class="sds-small">Contract term: <code>steps/</code></span></td></tr>
+      <tr><td><p><strong>a mode</strong></p><p>an argument a skill's description names, so one folder answers several close asks rather than two folders competing</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -119,12 +119,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what a skill is, how it is selected, and what it may contain. It does not answer which skills exist for a given world — the stack-agnostic set is realized by the core plugin, and each domain's own set by that domain's plugin. It does not answer what a persona or a reviewing viewpoint is either, although both are selected the same way.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the frontmatter a skill declares, the matching, the step folder, and the mode argument</td><td>the list of skills a given world offers, and what each one does</td><td>the skills chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></td></tr>
-      <tr><td>that a skill carries steps and never a rule of its own</td><td>where the rule a skill carries actually lives</td><td><a href="./06-refs-construct.html">Refs</a></td></tr>
-      <tr><td>that a skill is loaded and followed rather than executed</td><td>a persona convened by name, which is selected the same way and is a different thing</td><td><a href="./03-agents-construct.html">Agents</a></td></tr>
-      <tr><td>that a concrete step belongs to the realization that changes it</td><td>the folder shape a realization contributes, and how a gate resolves into it</td><td><a href="./07-providers-construct.html">Providers</a></td></tr>
+      <tr><td>the frontmatter a skill declares, the matching, the step folder, and the mode argument</td><td>the list of skills a given world offers, and what each one does<span class="sds-small">Owned by: the skills chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></span></td></tr>
+      <tr><td>that a skill carries steps and never a rule of its own</td><td>where the rule a skill carries actually lives<span class="sds-small">Owned by: <a href="./06-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>that a skill is loaded and followed rather than executed</td><td>a persona convened by name, which is selected the same way and is a different thing<span class="sds-small">Owned by: <a href="./03-agents-construct.html">Agents</a></span></td></tr>
+      <tr><td>that a concrete step belongs to the realization that changes it</td><td>the folder shape a realization contributes, and how a gate resolves into it<span class="sds-small">Owned by: <a href="./07-providers-construct.html">Providers</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -133,12 +133,12 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Skills construct</td><td>a skill is a named unit of work, and its value spells the domain of the plugin that ships it</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a skill edit is loadable only after an install and a fresh window</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a skill restates a chapter's steps and adds no rule of its own</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.AGENT.025</code></td><td>a folder per skill value and a value per folder, so the set a gate dispatches over is closed</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's DevEx Skills construct</p><p>a skill is a named unit of work, and its value spells the domain of the plugin that ships it</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a skill edit is loadable only after an install and a fresh window</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a skill restates a chapter's steps and adds no rule of its own</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.AGENT.025</code></p><p>a folder per skill value and a value per folder, so the set a gate dispatches over is closed</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -149,4 +149,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

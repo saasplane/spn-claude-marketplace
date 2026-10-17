@@ -4,7 +4,7 @@
 {"id":"apps-plugin","variant":"construct","title":"The Plugin — What spn-apps Is, and When a Session Loads It","subtitle":"The one folder that makes spn-apps its own plugin, separate from every other.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","lockstep"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,13 +32,13 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>the manifest</td><td><code>plugin.json</code></td><td>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</td></tr>
-      <tr><td>the name</td><td><code>name</code></td><td>what an install, a marketplace entry and a session all address this folder by</td></tr>
-      <tr><td>the description</td><td><code>description</code></td><td>the sentences matched against the work at hand, which is how this plugin's material is reached at all</td></tr>
-      <tr><td>the world</td><td><code>sprepo.json</code></td><td>what a repository declares about itself, from which its plugin set is derived</td></tr>
-      <tr><td>the version</td><td><code>version</code></td><td>the number saying which bytes are published, shared with the other plugins and moved after a release</td></tr>
+      <tr><td><p><strong>the manifest</strong></p><p>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
+      <tr><td><p><strong>the name</strong></p><p>what an install, a marketplace entry and a session all address this folder by</p><span class="sds-small">Contract term: <code>name</code></span></td></tr>
+      <tr><td><p><strong>the description</strong></p><p>the sentences matched against the work at hand, which is how this plugin's material is reached at all</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
+      <tr><td><p><strong>the world</strong></p><p>what a repository declares about itself, from which its plugin set is derived</p><span class="sds-small">Contract term: <code>sprepo.json</code></span></td></tr>
+      <tr><td><p><strong>the version</strong></p><p>the number saying which bytes are published, shared with the other plugins and moved after a release</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -112,11 +112,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what this plugin claims about itself and what its version means. It does not answer what a plugin is in general — the manifest's shape, the marketplace entry, the installed copy and the plugin root are <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a>. It does not answer what sits inside any of the folders it ships.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>this plugin's name, its description, and which world earns it</td><td>the shape of a manifest, the marketplace list, and what an installed copy is</td><td><a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></td></tr>
-      <tr><td>that the version is shared across the marketplace and moves after a release</td><td>how a release is cut, and what is granted rather than published</td><td>the foundation's Agent Plugins construct</td></tr>
-      <tr><td>that this plugin ships no agents</td><td>what an agent brief is, and which plugin ships one</td><td><a href="../../01-devex/constructs/03-agents-construct.html">Agents</a></td></tr>
+      <tr><td>this plugin's name, its description, and which world earns it</td><td>the shape of a manifest, the marketplace list, and what an installed copy is<span class="sds-small">Owned by: <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></span></td></tr>
+      <tr><td>that the version is shared across the marketplace and moves after a release</td><td>how a release is cut, and what is granted rather than published<span class="sds-small">Owned by: the foundation's Agent Plugins construct</span></td></tr>
+      <tr><td>that this plugin ships no agents</td><td>what an agent brief is, and which plugin ships one<span class="sds-small">Owned by: <a href="../../01-devex/constructs/03-agents-construct.html">Agents</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -125,13 +125,13 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the plugins are authored and delivered in one public repository, and publishing is pushing it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what the plugin set is derived from</td><td>MUST</td></tr>
-      <tr><td>the marketplace's <code>CLAUDE.md</code> § Versioning</td><td>the plugins move together, at one number, stamped in each manifest because that is what a marketplace reads</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>source beside a committed build, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>the plugins are authored and delivered in one public repository, and publishing is pushing it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what the plugin set is derived from</p></td><td>MUST</td></tr>
+      <tr><td><p>the marketplace's <code>CLAUDE.md</code> § Versioning</p><p>the plugins move together, at one number, stamped in each manifest because that is what a marketplace reads</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</p><p>a workspace never types a plugin name</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>source beside a committed build, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex plugin partner check</code></p>
@@ -142,4 +142,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

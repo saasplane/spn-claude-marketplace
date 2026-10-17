@@ -4,7 +4,7 @@
 {"id":"hook-set","variant":"construct","title":"Hooks — Code the Runtime Calls on Your Behalf","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -34,20 +34,20 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a hook</td><td><code>hooks.json</code></td><td>a script a plugin wires to a named moment, declared with a matcher, a command and a timeout</td></tr>
-      <tr><td>a moment</td><td><code>hooks</code></td><td>a named point in a session the harness stops at and runs whatever a plugin wired there</td></tr>
-      <tr><td>the window opening</td><td><code>SessionStart</code></td><td>the moment a session begins, resumes or is cleared; its output is the first screen a developer sees</td></tr>
-      <tr><td>a prompt being sent</td><td><code>UserPromptSubmit</code></td><td>the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call</td></tr>
-      <tr><td>a call about to run</td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
-      <tr><td>a command that finished</td><td><code>PostToolUse</code></td><td>the moment after a shell command has run, when its own text and its result can both be read</td></tr>
-      <tr><td>a turn about to end</td><td><code>Stop</code></td><td>the moment before a reply is handed back, when a warning is still useful and a refusal is not</td></tr>
-      <tr><td>a matcher</td><td><code>matcher</code></td><td>the names a moment is narrowed to, so a script runs only for the calls it could have an opinion about</td></tr>
-      <tr><td>the payload</td><td><code>Payload</code></td><td>what the harness hands a hook on standard input: the tool's name, the call's own fields, the working folder, the session</td></tr>
-      <tr><td>the call</td><td><code>ToolInput</code></td><td>the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries</td></tr>
-      <tr><td>a verdict</td><td><code>Verdict</code></td><td>what a hook decided: <code>deny</code> refuses the call, <code>note</code> is advice the turn reads, and nothing at all is silence</td></tr>
-      <tr><td>the dispatcher</td><td><code>dispatch</code></td><td>one process that asks every check applying to a call, keeps the first refusal, and joins the advice</td></tr>
+      <tr><td><p><strong>a hook</strong></p><p>a script a plugin wires to a named moment, declared with a matcher, a command and a timeout</p><span class="sds-small">Contract term: <code>hooks.json</code></span></td></tr>
+      <tr><td><p><strong>a moment</strong></p><p>a named point in a session the harness stops at and runs whatever a plugin wired there</p><span class="sds-small">Contract term: <code>hooks</code></span></td></tr>
+      <tr><td><p><strong>the window opening</strong></p><p>the moment a session begins, resumes or is cleared; its output is the first screen a developer sees</p><span class="sds-small">Contract term: <code>SessionStart</code></span></td></tr>
+      <tr><td><p><strong>a prompt being sent</strong></p><p>the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call</p><span class="sds-small">Contract term: <code>UserPromptSubmit</code></span></td></tr>
+      <tr><td><p><strong>a call about to run</strong></p><p>the moment before a tool call is performed, and the only moment that may refuse one</p><span class="sds-small">Contract term: <code>PreToolUse</code></span></td></tr>
+      <tr><td><p><strong>a command that finished</strong></p><p>the moment after a shell command has run, when its own text and its result can both be read</p><span class="sds-small">Contract term: <code>PostToolUse</code></span></td></tr>
+      <tr><td><p><strong>a turn about to end</strong></p><p>the moment before a reply is handed back, when a warning is still useful and a refusal is not</p><span class="sds-small">Contract term: <code>Stop</code></span></td></tr>
+      <tr><td><p><strong>a matcher</strong></p><p>the names a moment is narrowed to, so a script runs only for the calls it could have an opinion about</p><span class="sds-small">Contract term: <code>matcher</code></span></td></tr>
+      <tr><td><p><strong>the payload</strong></p><p>what the harness hands a hook on standard input: the tool's name, the call's own fields, the working folder, the session</p><span class="sds-small">Contract term: <code>Payload</code></span></td></tr>
+      <tr><td><p><strong>the call</strong></p><p>the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries</p><span class="sds-small">Contract term: <code>ToolInput</code></span></td></tr>
+      <tr><td><p><strong>a verdict</strong></p><p>what a hook decided: <code>deny</code> refuses the call, <code>note</code> is advice the turn reads, and nothing at all is silence</p><span class="sds-small">Contract term: <code>Verdict</code></span></td></tr>
+      <tr><td><p><strong>the dispatcher</strong></p><p>one process that asks every check applying to a call, keeps the first refusal, and joins the advice</p><span class="sds-small">Contract term: <code>dispatch</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -193,11 +193,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers which moments exist, how a script claims one, what it is handed, and what it may say back. It does not answer which rule any one check enforces: a rule belongs to a chapter of the foundation book, and the check's own header names that chapter rather than restating it.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the moments this marketplace wires, the authority each one carries, and the wiring that claims one</td><td>what any individual check looks for, and what it says when it finds it</td><td><a href="./05-scripts-construct.html">Scripts</a>, and the scripts chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></td></tr>
-      <tr><td>the payload, the verdict, the composition of many checks into one answer, and the always-zero exit</td><td>a file run by its own path rather than by a moment</td><td><a href="./05-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that a guard the dispatcher runs before the list is still the dispatcher's own refusal</td><td>what a split plan is, and which rows a close gate counts</td><td>the foundation's workspace construct</td></tr>
+      <tr><td>the moments this marketplace wires, the authority each one carries, and the wiring that claims one</td><td>what any individual check looks for, and what it says when it finds it<span class="sds-small">Owned by: <a href="./05-scripts-construct.html">Scripts</a>, and the scripts chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></span></td></tr>
+      <tr><td>the payload, the verdict, the composition of many checks into one answer, and the always-zero exit</td><td>a file run by its own path rather than by a moment<span class="sds-small">Owned by: <a href="./05-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that a guard the dispatcher runs before the list is still the dispatcher's own refusal</td><td>what a split plan is, and which rows a close gate counts<span class="sds-small">Owned by: the foundation's workspace construct</span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -206,17 +206,17 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a hook script is the one construct read from disk on its next run, with no fresh window owed</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a hook carries a rule it does not own, and names the chapter that owns it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.020</code></td><td>the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.AGENT.089</code></td><td>the rules a reply must follow reach the agent once, at session start, as short lines that each point at the reference holding the rule</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.AGENT.092</code></td><td>a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.189</code></td><td>a reply opens with <em>Needs you</em> when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.244</code></td><td>while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held</td><td>MUST</td></tr>
-      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.002</a></td><td>the dispatcher does refuse on its own account, through the generated-file guard it runs before the list</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a hook script is the one construct read from disk on its next run, with no fresh window owed</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a hook carries a rule it does not own, and names the chapter that owns it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.020</code></p><p>the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.AGENT.089</code></p><p>the rules a reply must follow reach the agent once, at session start, as short lines that each point at the reference holding the rule</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.AGENT.092</code></p><p>a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.189</code></p><p>a reply opens with <em>Needs you</em> when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.244</code></p><p>while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held</p></td><td>MUST</td></tr>
+      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.002</a></p><p>the dispatcher does refuse on its own account, through the generated-file guard it runs before the list</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex plugin partner check</code></p>
@@ -227,4 +227,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

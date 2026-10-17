@@ -4,7 +4,7 @@
 {"id":"ref-set","variant":"construct","title":"Refs — A Chapter, Restated and Stamped","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,14 +33,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a ref</td><td>—</td><td>a markdown file under a plugin's <code>refs/</code>, restating part of the foundation book for a reader who cannot open it</td></tr>
-      <tr><td>the block</td><td><code>spn:restates</code></td><td>a comment at the top of that file, holding strict JSON, naming what the file restates</td></tr>
-      <tr><td>a stamp</td><td><code>Citation</code></td><td>one entry of the block — a chapter's path, an optional section, and the hash last read there</td></tr>
-      <tr><td>the hash</td><td><code>seen</code></td><td>eight characters over the cited text, with trailing spaces and surrounding blank lines removed</td></tr>
-      <tr><td>drift</td><td>—</td><td>a stamp whose hash no longer matches the chapter's text today</td></tr>
-      <tr><td>a source line</td><td>—</td><td>a file's own prose naming what it restates; it is read beside the block, and an omission from the block is a finding</td></tr>
+      <tr><td><p><strong>a ref</strong></p><p>a markdown file under a plugin's <code>refs/</code>, restating part of the foundation book for a reader who cannot open it</p></td></tr>
+      <tr><td><p><strong>the block</strong></p><p>a comment at the top of that file, holding strict JSON, naming what the file restates</p><span class="sds-small">Contract term: <code>spn:restates</code></span></td></tr>
+      <tr><td><p><strong>a stamp</strong></p><p>one entry of the block — a chapter's path, an optional section, and the hash last read there</p><span class="sds-small">Contract term: <code>Citation</code></span></td></tr>
+      <tr><td><p><strong>the hash</strong></p><p>eight characters over the cited text, with trailing spaces and surrounding blank lines removed</p><span class="sds-small">Contract term: <code>seen</code></span></td></tr>
+      <tr><td><p><strong>drift</strong></p><p>a stamp whose hash no longer matches the chapter's text today</p></td></tr>
+      <tr><td><p><strong>a source line</strong></p><p>a file's own prose naming what it restates; it is read beside the block, and an omission from the block is a finding</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -121,12 +121,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what a restatement is, where one belongs in the folder, and how it stays honest. It does not answer what any chapter says — the chapter answers that, and a ref only ever repeats it under a stamp. It does not answer how a ref is delivered either, or when a reader loads one: a ref is loaded because something names it, and the thing naming it is a skill, a brief or a check.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the block, the stamp, what the hash covers, and the three ways a restatement stops being comparable</td><td>whether the rule being restated is correct</td><td>the foundation chapter the stamp names</td></tr>
-      <tr><td>that a bare source comment in code names a chapter and is not a stamp</td><td>when a session reads a ref, and what names it</td><td><a href="./04-skills-construct.html">Skills</a> · <a href="./03-agents-construct.html">Agents</a></td></tr>
-      <tr><td>that a ref adds no rule of its own</td><td>a restatement whose subject is one reviewing viewpoint, and the brief handed it</td><td><a href="./03-agents-construct.html">Agents</a></td></tr>
-      <tr><td>that <code>refs/</code> mirrors the book and holds nothing else</td><td>where material a skill loads for one realization lives instead</td><td><a href="./07-providers-construct.html">Providers</a></td></tr>
+      <tr><td>the block, the stamp, what the hash covers, and the three ways a restatement stops being comparable</td><td>whether the rule being restated is correct<span class="sds-small">Owned by: the foundation chapter the stamp names</span></td></tr>
+      <tr><td>that a bare source comment in code names a chapter and is not a stamp</td><td>when a session reads a ref, and what names it<span class="sds-small">Owned by: <a href="./04-skills-construct.html">Skills</a> · <a href="./03-agents-construct.html">Agents</a></span></td></tr>
+      <tr><td>that a ref adds no rule of its own</td><td>a restatement whose subject is one reviewing viewpoint, and the brief handed it<span class="sds-small">Owned by: <a href="./03-agents-construct.html">Agents</a></span></td></tr>
+      <tr><td>that <code>refs/</code> mirrors the book and holds nothing else</td><td>where material a skill loads for one realization lives instead<span class="sds-small">Owned by: <a href="./07-providers-construct.html">Providers</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -135,11 +135,11 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a file carrying a rule it does not own is a restatement, and the verb is <code>restates</code></td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>04-discipline.md</code> § Restatement discipline</td><td>repetition is allowed only as a declared restatement, carrying its source and never a new rule</td><td>MUST</td></tr>
-      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.003</a></td><td>a ref that carries no block is unstamped, and a marker no tool reads is not a declaration</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a file carrying a rule it does not own is a restatement, and the verb is <code>restates</code></p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>04-discipline.md</code> § Restatement discipline</p><p>repetition is allowed only as a declared restatement, carrying its source and never a new rule</p></td><td>MUST</td></tr>
+      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.003</a></p><p>a ref that carries no block is unstamped, and a marker no tool reads is not a declaration</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -150,4 +150,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

@@ -23,7 +23,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
@@ -99,63 +99,63 @@
   <p>Every term this domain declares, grouped by the construct that declares it.</p>
   <!-- spn:generated glossary-html — do not edit inside these markers; `docs.ts face` writes it -->
   <div class="sds-scroll"><table class="sds-glossary">
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr class="sds-group"><td colspan="3">The Plugin</td></tr>
-      <tr><td><a href="constructs/01-plugin-construct.html">the description</a></td><td><code>description</code></td><td>the sentences matched against the work at hand, which is how this plugin's material is reached at all</td></tr>
-      <tr><td><a href="constructs/01-plugin-construct.html">the manifest</a></td><td><code>plugin.json</code></td><td>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</td></tr>
-      <tr><td><a href="constructs/01-plugin-construct.html">the name</a></td><td><code>name</code></td><td>what an install, a marketplace entry and a session all address this folder by</td></tr>
-      <tr><td><a href="constructs/01-plugin-construct.html">the version</a></td><td><code>version</code></td><td>the number saying which bytes are published, shared with the other plugins and moved after a release</td></tr>
-      <tr><td><a href="constructs/01-plugin-construct.html">the world</a></td><td><code>sprepo.json</code></td><td>what a repository declares about itself, from which its plugin set is derived</td></tr>
-      <tr class="sds-group"><td colspan="3">Hooks</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">a call about to run</a></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">a subject</a></td><td><code>SUBJECT_NAMES</code></td><td>one grouping of rules the dispatcher asks about a write, resolved per call rather than listed</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">the dispatcher</a></td><td><code>pretooluse.ts</code></td><td>the single process the entry names, which resolves what to run and joins the answers</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">the entry</a></td><td>—</td><td>one declaration behind which every rule runs, rather than one declaration per rule</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">the matcher</a></td><td><code>Write|Edit</code></td><td>the tool names this entry narrows to, so nothing else in a session reaches the chain at all</td></tr>
-      <tr><td><a href="constructs/02-hooks-construct.html">the wiring</a></td><td><code>hooks.json</code></td><td>the single file declaring what this plugin claims, at which moment, with which command and which timeout</td></tr>
-      <tr class="sds-group"><td colspan="3">Skills</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">a mode</a></td><td>—</td><td>an argument a skill's own description names, so one folder answers several close asks</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">a skill</a></td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>, named for a command of the group this domain answers to</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">a step</a></td><td><code>steps/</code></td><td>one file of a longer walk, read only when the skill's own router names it</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">the classification</a></td><td>—</td><td>the first thing the router does: deciding which layers an ask actually touches</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">the closing gate</a></td><td>—</td><td>the review a skill hands its own work to, named in its description so the hand-off happens without being asked for</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">the stage</a></td><td><code>RD.DEVEX.AGENT.017</code></td><td>the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked</td></tr>
-      <tr><td><a href="constructs/03-skills-construct.html">the value</a></td><td><code>APPS_{SKILL}</code></td><td>the name the enum carries for that folder, its domain prefix derived from the plugin's own claim</td></tr>
-      <tr class="sds-group"><td colspan="3">Scripts</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">a hand-checked row</a></td><td><code>MANUAL</code></td><td>a row a person proves, which no run ever writes over</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">a register</a></td><td><code>HEADINGS</code></td><td>any table carrying the behaviour headings in order, wherever in a repository it sits</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">a row</a></td><td><code>cellsOf</code></td><td>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">a subject</a></td><td><code>SUBJECT_NAMES</code></td><td>one grouping of rules a write is asked about, cheapest first</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">an action</a></td><td><code>@SPAPIRouteCommand</code></td><td>one published thing a caller can perform, found by its declaration rather than by a folder shape</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">masking</a></td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">the dispatcher</a></td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">the gate</a></td><td><code>subjectsFor</code></td><td>the stack-free half: it reads the node's declaration and hands the write to the provider for it</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">the resulting text</a></td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">the results file</a></td><td>—</td><td>what a test runner wrote about one run, read by behaviour id and by tier</td></tr>
-      <tr><td><a href="constructs/04-scripts-construct.html">the tier</a></td><td><code>tier</code></td><td>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</td></tr>
-      <tr class="sds-group"><td colspan="3">Refs</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">a domain folder</a></td><td>—</td><td>one folder per book domain, and the only kind of folder this tree holds at its top</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">a group</a></td><td>—</td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">a ref</a></td><td><code>refs/</code></td><td>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">a stack entry</a></td><td><code>providers/&lt;stack&gt;/</code></td><td>what is **true** of one stack — its kinds, naming, generation, tests and conformance</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">drift</a></td><td>—</td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">the face</a></td><td><code>README.md</code></td><td>a folder's own subject, which is what makes a folder a subject rather than a bucket</td></tr>
-      <tr><td><a href="constructs/05-refs-construct.html">the stamp</a></td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
-      <tr class="sds-group"><td colspan="3">Providers</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">a door</a></td><td><code>src.ts</code> · <code>tests.ts</code></td><td>the file a gate imports for one subject: it parses once, orders the verdicts, and isolates a rule that throws</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">a private rule</a></td><td><code>_&lt;subject&gt;/</code></td><td>one rule, behind an underscore folder, private to the door standing beside it</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">an instance</a></td><td><code>providers/&lt;instance&gt;/</code></td><td>one realization this plugin serves, which in this domain is a stack</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">the claim</a></td><td><code>config.stack</code></td><td>what a repository declares about its own stack, and the only place a gate reads one from</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">the scripts half</a></td><td><code>providers/&lt;stack&gt;/scripts/checks/</code></td><td>the parse a gate resolves into, and the rules that read what the parse produced</td></tr>
-      <tr><td><a href="constructs/06-providers-construct.html">the skills half</a></td><td><code>providers/&lt;stack&gt;/skills/&lt;skill&gt;/</code></td><td>the procedure a skill loads once it has resolved which stack it is standing in</td></tr>
-      <tr class="sds-group"><td colspan="3">Tests</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">a suite</a></td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one thing, named for what it proves rather than for where it sits</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">discovery</a></td><td><code>checkPath</code></td><td>finding the file a case names by searching the provider folders, rather than typing its path</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">the harness</a></td><td><code>harness.mjs</code></td><td>what a suite is written against: a throwaway tree, one case, and the plugin root found once</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">the mirror</a></td><td>—</td><td>the path under a tier, which is the source file's own path inside the plugin</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">the runner</a></td><td><code>run.mjs</code></td><td>the one command that finds every suite and reports the verdict of each</td></tr>
-      <tr><td><a href="constructs/07-tests-construct.html">the tier</a></td><td><code>unit/</code></td><td>what kind of proof this is, which is the first thing a folder name answers</td></tr>
+      <tr class="sds-group"><th scope="rowgroup">The Plugin</th></tr>
+      <tr><td><p><strong><a href="constructs/01-plugin-construct.html">the description</a></strong></p><p>the sentences matched against the work at hand, which is how this plugin's material is reached at all</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/01-plugin-construct.html">the manifest</a></strong></p><p>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/01-plugin-construct.html">the name</a></strong></p><p>what an install, a marketplace entry and a session all address this folder by</p><span class="sds-small">Contract term: <code>name</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/01-plugin-construct.html">the version</a></strong></p><p>the number saying which bytes are published, shared with the other plugins and moved after a release</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/01-plugin-construct.html">the world</a></strong></p><p>what a repository declares about itself, from which its plugin set is derived</p><span class="sds-small">Contract term: <code>sprepo.json</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Hooks</th></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">a call about to run</a></strong></p><p>the moment before a tool call is performed, and the only moment that may refuse one</p><span class="sds-small">Contract term: <code>PreToolUse</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">a subject</a></strong></p><p>one grouping of rules the dispatcher asks about a write, resolved per call rather than listed</p><span class="sds-small">Contract term: <code>SUBJECT_NAMES</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">the dispatcher</a></strong></p><p>the single process the entry names, which resolves what to run and joins the answers</p><span class="sds-small">Contract term: <code>pretooluse.ts</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">the entry</a></strong></p><p>one declaration behind which every rule runs, rather than one declaration per rule</p></td></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">the matcher</a></strong></p><p>the tool names this entry narrows to, so nothing else in a session reaches the chain at all</p><span class="sds-small">Contract term: <code>Write|Edit</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/02-hooks-construct.html">the wiring</a></strong></p><p>the single file declaring what this plugin claims, at which moment, with which command and which timeout</p><span class="sds-small">Contract term: <code>hooks.json</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Skills</th></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">a mode</a></strong></p><p>an argument a skill's own description names, so one folder answers several close asks</p></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">a skill</a></strong></p><p>one folder under this plugin's <code>skills/</code>, named for a command of the group this domain answers to</p><span class="sds-small">Contract term: <code>SKILL.md</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">a step</a></strong></p><p>one file of a longer walk, read only when the skill's own router names it</p><span class="sds-small">Contract term: <code>steps/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">the classification</a></strong></p><p>the first thing the router does: deciding which layers an ask actually touches</p></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">the closing gate</a></strong></p><p>the review a skill hands its own work to, named in its description so the hand-off happens without being asked for</p></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">the stage</a></strong></p><p>the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked</p><span class="sds-small">Contract term: <code>RD.DEVEX.AGENT.017</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/03-skills-construct.html">the value</a></strong></p><p>the name the enum carries for that folder, its domain prefix derived from the plugin's own claim</p><span class="sds-small">Contract term: <code>APPS_{SKILL}</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Scripts</th></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">a hand-checked row</a></strong></p><p>a row a person proves, which no run ever writes over</p><span class="sds-small">Contract term: <code>MANUAL</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">a register</a></strong></p><p>any table carrying the behaviour headings in order, wherever in a repository it sits</p><span class="sds-small">Contract term: <code>HEADINGS</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">a row</a></strong></p><p>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</p><span class="sds-small">Contract term: <code>cellsOf</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">a subject</a></strong></p><p>one grouping of rules a write is asked about, cheapest first</p><span class="sds-small">Contract term: <code>SUBJECT_NAMES</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">an action</a></strong></p><p>one published thing a caller can perform, found by its declaration rather than by a folder shape</p><span class="sds-small">Contract term: <code>@SPAPIRouteCommand</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">masking</a></strong></p><p>blanking comments and string bodies before searching, so a word inside a quote is never read as code</p><span class="sds-small">Contract term: <code>mask</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">the dispatcher</a></strong></p><p>the single process behind the wired entry, which keeps the first refusal and joins the advice</p><span class="sds-small">Contract term: <code>pretooluse.ts</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">the gate</a></strong></p><p>the stack-free half: it reads the node's declaration and hands the write to the provider for it</p><span class="sds-small">Contract term: <code>subjectsFor</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">the resulting text</a></strong></p><p>the source as the pending write would leave it, which is what a rule actually reads</p><span class="sds-small">Contract term: <code>resultingText</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">the results file</a></strong></p><p>what a test runner wrote about one run, read by behaviour id and by tier</p></td></tr>
+      <tr><td><p><strong><a href="constructs/04-scripts-construct.html">the tier</a></strong></p><p>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</p><span class="sds-small">Contract term: <code>tier</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Refs</th></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">a domain folder</a></strong></p><p>one folder per book domain, and the only kind of folder this tree holds at its top</p></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">a group</a></strong></p><p>a folder under a domain; a file under it is named for a construct the book states</p></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">a ref</a></strong></p><p>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</p><span class="sds-small">Contract term: <code>refs/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">a stack entry</a></strong></p><p>what is **true** of one stack — its kinds, naming, generation, tests and conformance</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">drift</a></strong></p><p>the state where a stamped hash no longer matches the chapter, which is what a run reports</p></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">the face</a></strong></p><p>a folder's own subject, which is what makes a folder a subject rather than a bucket</p><span class="sds-small">Contract term: <code>README.md</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/05-refs-construct.html">the stamp</a></strong></p><p>the block at the top naming each chapter this file restates and the hash last read from it</p><span class="sds-small">Contract term: <code>spn:restates</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Providers</th></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">a door</a></strong></p><p>the file a gate imports for one subject: it parses once, orders the verdicts, and isolates a rule that throws</p><span class="sds-small">Contract term: <code>src.ts</code> · <code>tests.ts</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">a private rule</a></strong></p><p>one rule, behind an underscore folder, private to the door standing beside it</p><span class="sds-small">Contract term: <code>_&lt;subject&gt;/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">an instance</a></strong></p><p>one realization this plugin serves, which in this domain is a stack</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">the claim</a></strong></p><p>what a repository declares about its own stack, and the only place a gate reads one from</p><span class="sds-small">Contract term: <code>config.stack</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">the scripts half</a></strong></p><p>the parse a gate resolves into, and the rules that read what the parse produced</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/scripts/checks/</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/06-providers-construct.html">the skills half</a></strong></p><p>the procedure a skill loads once it has resolved which stack it is standing in</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/skills/&lt;skill&gt;/</code></span></td></tr>
+      <tr class="sds-group"><th scope="rowgroup">Tests</th></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">a suite</a></strong></p><p>one file proving one thing, named for what it proves rather than for where it sits</p><span class="sds-small">Contract term: <code>t-&lt;name&gt;.mjs</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">discovery</a></strong></p><p>finding the file a case names by searching the provider folders, rather than typing its path</p><span class="sds-small">Contract term: <code>checkPath</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">the harness</a></strong></p><p>what a suite is written against: a throwaway tree, one case, and the plugin root found once</p><span class="sds-small">Contract term: <code>harness.mjs</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">the mirror</a></strong></p><p>the path under a tier, which is the source file's own path inside the plugin</p></td></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">the runner</a></strong></p><p>the one command that finds every suite and reports the verdict of each</p><span class="sds-small">Contract term: <code>run.mjs</code></span></td></tr>
+      <tr><td><p><strong><a href="constructs/07-tests-construct.html">the tier</a></strong></p><p>what kind of proof this is, which is the first thing a folder name answers</p><span class="sds-small">Contract term: <code>unit/</code></span></td></tr>
     </tbody>
   </table></div>
   <!-- /spn:generated -->
@@ -180,4 +180,4 @@
   Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; apps; the constructs it links.
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

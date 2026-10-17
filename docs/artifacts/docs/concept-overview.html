@@ -12,7 +12,7 @@
 }
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -68,24 +68,13 @@
 
   <div class="sds-scroll">
     <table>
-      <thead><tr><th>The line</th><th>Which side this repository is on</th></tr></thead>
+      <thead><tr><th>The line</th></tr></thead>
       <tbody>
-        <tr><td><strong>What it owns</strong></td>
-            <td>how an instrument is shaped, what it may refuse, what it may never do, and how
-            the set reaches a workspace — the hooks, the tools, the skills, the refs and the
-            agent briefs, as files</td></tr>
-        <tr><td><strong>What it refuses</strong></td>
-            <td>authoring a rule. A rule true of every repository belongs in the foundation
-            book, and a copy here is a second source that will drift</td></tr>
-        <tr><td><strong>How the refusal is kept</strong></td>
-            <td>every file carrying a rule declares the chapter it restates, and a drift
-            checker compares this tree against the book's</td></tr>
-        <tr><td><strong>Why it is public</strong></td>
-            <td>an instrument is loaded by a runtime on your own machine, so you have to be
-            able to reach it without a grant</td></tr>
-        <tr><td><strong>Why that forces restatement</strong></td>
-            <td>you cannot reach the book the same way. That, and only that, is why a ref
-            restates a chapter instead of linking to one</td></tr>
+        <tr><td><p><strong>What it owns</strong></p><p>how an instrument is shaped, what it may refuse, what it may never do, and how the set reaches a workspace — the hooks, the tools, the skills, the refs and the agent briefs, as files</p></td></tr>
+        <tr><td><p><strong>What it refuses</strong></p><p>authoring a rule. A rule true of every repository belongs in the foundation book, and a copy here is a second source that will drift</p></td></tr>
+        <tr><td><p><strong>How the refusal is kept</strong></p><p>every file carrying a rule declares the chapter it restates, and a drift checker compares this tree against the book's</p></td></tr>
+        <tr><td><p><strong>Why it is public</strong></p><p>an instrument is loaded by a runtime on your own machine, so you have to be able to reach it without a grant</p></td></tr>
+        <tr><td><p><strong>Why that forces restatement</strong></p><p>you cannot reach the book the same way. That, and only that, is why a ref restates a chapter instead of linking to one</p></td></tr>
       </tbody>
     </table>
   </div>
@@ -118,19 +107,10 @@
 
   <div class="sds-scroll">
     <table>
-      <thead><tr><th>Reader</th><th>What they hold</th><th>What follows for them</th></tr></thead>
+      <thead><tr><th>Reader</th></tr></thead>
       <tbody>
-        <tr><td><strong>The partner</strong></td>
-            <td>this repository, and not the foundation book</td>
-            <td>every citation they meet here <em>names</em> a chapter rather than linking to
-            one, and a ref carries enough of that chapter to be read in full without the
-            book</td></tr>
-        <tr><td><strong>The builder</strong></td>
-            <td>both trees, side by side in one workspace</td>
-            <td>the drift checker is theirs. It is the only thing in the workspace that reads
-            across the two trees, and it is run here, before anything is published:
-            <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or
-            <code>spn-devex restates check</code>, once installed)</td></tr>
+        <tr><td><p><strong>The partner</strong></p><p>every citation they meet here <em>names</em> a chapter rather than linking to one, and a ref carries enough of that chapter to be read in full without the book</p><span class="sds-small">Holds: this repository, and not the foundation book</span></td></tr>
+        <tr><td><p><strong>The builder</strong></p><p>the drift checker is theirs. It is the only thing in the workspace that reads across the two trees, and it is run here, before anything is published: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed)</p><span class="sds-small">Holds: both trees, side by side in one workspace</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -166,18 +146,11 @@
 
   <div class="sds-scroll">
     <table>
-      <thead><tr><th>Domain</th><th>Ships</th><th>Instruments it carries</th></tr></thead>
+      <thead><tr><th>Domain</th></tr></thead>
       <tbody>
-        <tr><td><strong><code>spn-devex</code></strong></td>
-            <td>the stack-agnostic plugin, loaded by every repository whatever world it
-            declares</td>
-            <td>all five kinds — plugins, hooks, skills, refs and agents</td></tr>
-        <tr><td><strong><code>spn-apps</code></strong></td>
-            <td>the TypeScript stack plugin</td>
-            <td>checks, tools, skills and refs, each true of that stack and nowhere else</td></tr>
-        <tr><td><strong><code>spn-infra</code></strong></td>
-            <td>the estate plugin</td>
-            <td>one guard, plus the skills and refs that change an estate</td></tr>
+        <tr><td><p><strong><code>spn-devex</code></strong></p><p>the stack-agnostic plugin, loaded by every repository whatever world it declares</p><span class="sds-small">Instruments: all five kinds — plugins, hooks, skills, refs and agents</span></td></tr>
+        <tr><td><p><strong><code>spn-apps</code></strong></p><p>the TypeScript stack plugin</p><span class="sds-small">Instruments: checks, tools, skills and refs, each true of that stack and nowhere else</span></td></tr>
+        <tr><td><p><strong><code>spn-infra</code></strong></p><p>the estate plugin</p><span class="sds-small">Instruments: one guard, plus the skills and refs that change an estate</span></td></tr>
       </tbody>
     </table>
   </div>
@@ -252,33 +225,19 @@
   repository gives it, and where the foundation book defines one, the book wins.</p>
 
   <div class="sds-scroll"><table>
-    <tr><th>Word</th><th>What it means here</th></tr>
-    <tr><td><strong>the marketplace</strong></td><td>this repository, and the public listing at
-      its root that tells a runtime which plugins exist and where each one sits</td></tr>
-    <tr><td><strong>a plugin</strong></td><td>one delivery unit — a manifest and a folder tree —
-      holding any of the five instrument kinds. Three are shipped:
-      <code>spn-devex</code>, <code>spn-apps</code>, <code>spn-infra</code></td></tr>
-    <tr><td><strong>an instrument</strong></td><td>the house word for anything this repository
-      delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</td></tr>
-    <tr><td><strong>a hook</strong></td><td>code the runtime calls for you at a named moment of
-      the loop. It returns a verdict rather than printing one, and only one of the four moments
-      is allowed to refuse anything</td></tr>
-    <tr><td><strong>a skill</strong></td><td>a stage's steps, in a folder with a description
-      written to be <em>matched</em> against the work at hand rather than browsed by a
-      person</td></tr>
-    <tr><td><strong>a ref</strong></td><td>a restatement of one or more chapters of the
-      foundation book, carried here in full so a reader with no book checkout can still read
-      it</td></tr>
-    <tr><td><strong>the stamp</strong></td><td>the hash of the chapter a ref last saw. It is
-      what turns a moved chapter into something reported rather than discovered later</td></tr>
-    <tr><td><strong>a lens</strong></td><td>one reviewing viewpoint, naming the single thing it
-      may block and everything it can only advise. A panel is convened by naming one</td></tr>
-    <tr><td><strong>an agent brief</strong></td><td>a persona a session can convene, and the
-      bound authority it carries once it runs — which for most of them excludes
-      writing</td></tr>
-    <tr><td><strong>the book</strong></td><td>the foundation repository, which states the rules
-      this one delivers. It is private; this one is not, and that asymmetry is the reason
-      restatement exists</td></tr>
+    <thead><tr><th>Word</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>the marketplace</strong></p><p>this repository, and the public listing at its root that tells a runtime which plugins exist and where each one sits</p></td></tr>
+      <tr><td><p><strong>a plugin</strong></p><p>one delivery unit — a manifest and a folder tree — holding any of the five instrument kinds. Three are shipped: <code>spn-devex</code>, <code>spn-apps</code>, <code>spn-infra</code></p></td></tr>
+      <tr><td><p><strong>an instrument</strong></p><p>the house word for anything this repository delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</p></td></tr>
+      <tr><td><p><strong>a hook</strong></p><p>code the runtime calls for you at a named moment of the loop. It returns a verdict rather than printing one, and only one of the four moments is allowed to refuse anything</p></td></tr>
+      <tr><td><p><strong>a skill</strong></p><p>a stage's steps, in a folder with a description written to be <em>matched</em> against the work at hand rather than browsed by a person</p></td></tr>
+      <tr><td><p><strong>a ref</strong></p><p>a restatement of one or more chapters of the foundation book, carried here in full so a reader with no book checkout can still read it</p></td></tr>
+      <tr><td><p><strong>the stamp</strong></p><p>the hash of the chapter a ref last saw. It is what turns a moved chapter into something reported rather than discovered later</p></td></tr>
+      <tr><td><p><strong>a lens</strong></p><p>one reviewing viewpoint, naming the single thing it may block and everything it can only advise. A panel is convened by naming one</p></td></tr>
+      <tr><td><p><strong>an agent brief</strong></p><p>a persona a session can convene, and the bound authority it carries once it runs — which for most of them excludes writing</p></td></tr>
+      <tr><td><p><strong>the book</strong></p><p>the foundation repository, which states the rules this one delivers. It is private; this one is not, and that asymmetry is the reason restatement exists</p></td></tr>
+    </tbody>
   </table></div>
 </section>
 
@@ -289,30 +248,17 @@
   this page to the thing that states the answer in full.</p>
 
   <div class="sds-scroll"><table>
-    <tr><th>If you want</th><th>Open</th></tr>
-    <tr><td>the model, stated once and in full</td>
-      <td><a href="../../../CONCEPT.md"><code>CONCEPT.md</code></a> at the repository root</td></tr>
-    <tr><td>this repository's own doc set</td>
-      <td><a href="../../README.md"><code>docs/</code></a> — the five seats and the two
-      pockets</td></tr>
-    <tr><td>why the marketplace exists at all</td>
-      <td><a href="../../01-purpose/README.md">01-purpose</a> — why, what, and who</td></tr>
-    <tr><td>what a hook, skill, ref or agent <em>is</em></td>
-      <td><a href="../../02-constructs/README.md">02-constructs</a>, one seat file per
-      construct</td></tr>
-    <tr><td>what exists under <code>plugins/</code> today</td>
-      <td><a href="../../04-capabilities/README.md">04-capabilities</a> — a mirror per source
-      folder that earns one</td></tr>
-    <tr><td>to install the plugins into a workspace</td>
-      <td><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names
-      the commands in order</td></tr>
-    <tr><td>to prove the hooks still work</td>
-      <td><code>node packages/plugin-spn-devex/tests/run.mjs</code>, the suite runner this
-      repository carries (or <code>pnpm run test</code>, every plugin's suite in one command)</td></tr>
-    <tr><td>the rules themselves, rather than the code that runs them</td>
-      <td>the foundation book. If you hold only this tree, the
-      <a href="01-devex/constructs/06-refs-construct.html">refs</a> are the copy you can
-      read</td></tr>
+    <thead><tr><th>If you want</th></tr></thead>
+    <tbody>
+      <tr><td><p>the model, stated once and in full</p><p><a href="../../../CONCEPT.md"><code>CONCEPT.md</code></a> at the repository root</p></td></tr>
+      <tr><td><p>this repository's own doc set</p><p><a href="../../README.md"><code>docs/</code></a> — the five seats and the two pockets</p></td></tr>
+      <tr><td><p>why the marketplace exists at all</p><p><a href="../../01-purpose/README.md">01-purpose</a> — why, what, and who</p></td></tr>
+      <tr><td><p>what a hook, skill, ref or agent <em>is</em></p><p><a href="../../02-constructs/README.md">02-constructs</a>, one seat file per construct</p></td></tr>
+      <tr><td><p>what exists under <code>plugins/</code> today</p><p><a href="../../04-capabilities/README.md">04-capabilities</a> — a mirror per source folder that earns one</p></td></tr>
+      <tr><td><p>to install the plugins into a workspace</p><p><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names the commands in order</p></td></tr>
+      <tr><td><p>to prove the hooks still work</p><p><code>node packages/plugin-spn-devex/tests/run.mjs</code>, the suite runner this repository carries (or <code>pnpm run test</code>, every plugin's suite in one command)</p></td></tr>
+      <tr><td><p>the rules themselves, rather than the code that runs them</p><p>the foundation book. If you hold only this tree, the <a href="01-devex/constructs/06-refs-construct.html">refs</a> are the copy you can read</p></td></tr>
+    </tbody>
   </table></div>
 </section>
 
@@ -328,4 +274,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

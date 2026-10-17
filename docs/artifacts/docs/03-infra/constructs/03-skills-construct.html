@@ -4,7 +4,7 @@
 {"id":"estate-skills","variant":"construct","title":"Skills — The Doors Infrastructure Is Changed Through","subtitle":"The commands that change what a piece of infrastructure declares itself to be.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.","keywords":["skill","declare","plan","module","release","door"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,14 +32,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>an estate skill</td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>. <strong>The words are the ones the apps domain reads</strong> — <code>new</code> · <code>implement</code> · <code>review</code> · <code>run</code> · <code>verify</code> · <code>release</code> — so a partner working in both domains learns one set of names</td></tr>
-      <tr><td>declaring</td><td>—</td><td>changing what the estate says it is, as an edit to a manifest rather than to a rendering</td></tr>
-      <tr><td>a rendering</td><td>—</td><td>what a declaration would produce if applied, read while changing it is still cheap</td></tr>
-      <tr><td>an approval</td><td>—</td><td>the moment after which the estate has changed and the question becomes a repair</td></tr>
-      <tr><td>a module</td><td><code>spinfrapkg.json</code></td><td>a piece the platform actually runs, attached at a step of the estate's own lifecycle</td></tr>
-      <tr><td>a pin flip</td><td>—</td><td>pointing a consumer at a published version, which is the last act of authoring a module</td></tr>
+      <tr><td><p><strong>an estate skill</strong></p><p>one folder under this plugin's <code>skills/</code>. <strong>The words are the ones the apps domain reads</strong> — <code>new</code> · <code>implement</code> · <code>review</code> · <code>run</code> · <code>verify</code> · <code>release</code> — so a partner working in both domains learns one set of names</p><span class="sds-small">Contract term: <code>SKILL.md</code></span></td></tr>
+      <tr><td><p><strong>declaring</strong></p><p>changing what the estate says it is, as an edit to a manifest rather than to a rendering</p></td></tr>
+      <tr><td><p><strong>a rendering</strong></p><p>what a declaration would produce if applied, read while changing it is still cheap</p></td></tr>
+      <tr><td><p><strong>an approval</strong></p><p>the moment after which the estate has changed and the question becomes a repair</p></td></tr>
+      <tr><td><p><strong>a module</strong></p><p>a piece the platform actually runs, attached at a step of the estate's own lifecycle</p><span class="sds-small">Contract term: <code>spinfrapkg.json</code></span></td></tr>
+      <tr><td><p><strong>a pin flip</strong></p><p>pointing a consumer at a published version, which is the last act of authoring a module</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -116,11 +116,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers which skills an estate repository answers to and what each one does. It does not answer what a skill is — the frontmatter, the matching and the rule that a skill carries steps and never a rule are <a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a>. It does not answer the vocabulary these skills use either, and it does not answer what happens at write time when an edit would break a law.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the skills an estate answers to, and that none of them changes a cloud itself</td><td>the frontmatter, the listing and the matching every skill shares</td><td><a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a></td></tr>
-      <tr><td>that a declaration change is read as one line per choice, before any approval</td><td>the manifest, layer, naming and law vocabulary each skill uses</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
-      <tr><td>that publishing is a reviewed version edit followed by the release command</td><td>what is refused at the moment an estate file is written</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
+      <tr><td>the skills an estate answers to, and that none of them changes a cloud itself</td><td>the frontmatter, the listing and the matching every skill shares<span class="sds-small">Owned by: <a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a></span></td></tr>
+      <tr><td>that a declaration change is read as one line per choice, before any approval</td><td>the manifest, layer, naming and law vocabulary each skill uses<span class="sds-small">Owned by: <a href="./05-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>that publishing is a reviewed version edit followed by the release command</td><td>what is refused at the moment an estate file is written<span class="sds-small">Owned by: <a href="./04-scripts-construct.html">Scripts</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -129,11 +129,11 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Skills construct</td><td>the skill set is closed, and a skill's value spells the domain of the plugin that ships it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.020</code></td><td>a cloud is changed only through the tool's own doors, and never by hand</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>every skill here restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's DevEx Skills construct</p><p>the skill set is closed, and a skill's value spells the domain of the plugin that ships it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.020</code></p><p>a cloud is changed only through the tool's own doors, and never by hand</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>every skill here restates a chapter and adds no rule of its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -144,4 +144,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

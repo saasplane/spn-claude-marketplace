@@ -4,7 +4,7 @@
 {"id":"checks","variant":"construct","title":"Scripts — The Code a Plugin Ships, Wired or Reached by Name","subtitle":"Every file a plugin can run lives in one folder, sorted by what calls it.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["hook-set"],"summary":"Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.","keywords":["script","check","tool","applies","finding","grade"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,20 +33,20 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a script</td><td><code>scripts/</code></td><td>one file a plugin ships under <code>checks/</code>, <code>events/</code>, <code>tools/</code> or <code>lib/</code>, named for what it decides or measures</td></tr>
-      <tr><td>a check</td><td><code>Check</code></td><td>a file a moment's dispatcher composes: it reads one call and returns a verdict</td></tr>
-      <tr><td>the fast path</td><td><code>applies</code></td><td>a test on the path or the shell command alone, deciding whether this check could have an opinion at all</td></tr>
-      <tr><td>what it reads</td><td><code>needs</code></td><td>which fields of a call a check requires; a call carrying none of them never reaches it</td></tr>
-      <tr><td>a refusal</td><td><code>deny</code></td><td>the call is stopped, with the reason a reader is given</td></tr>
-      <tr><td>advice</td><td><code>note</code></td><td>the call goes through and the turn is told something; advice from several checks is joined</td></tr>
-      <tr><td>a tool</td><td>—</td><td>a file under <code>tools/</code> that nothing wires, reached by naming its own path</td></tr>
-      <tr><td>a finding</td><td><code>Finding</code></td><td>one thing a run found: which question raised it, its grade, the file, and what a reader should do</td></tr>
-      <tr><td>the grade</td><td><code>Grade</code></td><td>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</td></tr>
-      <tr><td>the exit code</td><td>—</td><td>the count of refusals; a report alone leaves a run green</td></tr>
-      <tr><td>a job</td><td>—</td><td>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>parity</code></td></tr>
-      <tr><td>silence</td><td>—</td><td>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</td></tr>
+      <tr><td><p><strong>a script</strong></p><p>one file a plugin ships under <code>checks/</code>, <code>events/</code>, <code>tools/</code> or <code>lib/</code>, named for what it decides or measures</p><span class="sds-small">Contract term: <code>scripts/</code></span></td></tr>
+      <tr><td><p><strong>a check</strong></p><p>a file a moment's dispatcher composes: it reads one call and returns a verdict</p><span class="sds-small">Contract term: <code>Check</code></span></td></tr>
+      <tr><td><p><strong>the fast path</strong></p><p>a test on the path or the shell command alone, deciding whether this check could have an opinion at all</p><span class="sds-small">Contract term: <code>applies</code></span></td></tr>
+      <tr><td><p><strong>what it reads</strong></p><p>which fields of a call a check requires; a call carrying none of them never reaches it</p><span class="sds-small">Contract term: <code>needs</code></span></td></tr>
+      <tr><td><p><strong>a refusal</strong></p><p>the call is stopped, with the reason a reader is given</p><span class="sds-small">Contract term: <code>deny</code></span></td></tr>
+      <tr><td><p><strong>advice</strong></p><p>the call goes through and the turn is told something; advice from several checks is joined</p><span class="sds-small">Contract term: <code>note</code></span></td></tr>
+      <tr><td><p><strong>a tool</strong></p><p>a file under <code>tools/</code> that nothing wires, reached by naming its own path</p></td></tr>
+      <tr><td><p><strong>a finding</strong></p><p>one thing a run found: which question raised it, its grade, the file, and what a reader should do</p><span class="sds-small">Contract term: <code>Finding</code></span></td></tr>
+      <tr><td><p><strong>the grade</strong></p><p>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</p><span class="sds-small">Contract term: <code>Grade</code></span></td></tr>
+      <tr><td><p><strong>the exit code</strong></p><p>the count of refusals; a report alone leaves a run green</p></td></tr>
+      <tr><td><p><strong>a job</strong></p><p>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>parity</code></p></td></tr>
+      <tr><td><p><strong>silence</strong></p><p>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -143,12 +143,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what a script is, how each kind is reached, and what it answers with. It does not answer how checks are composed, what the payload is, or why the exit code is always zero — that is <a href="./02-hooks-construct.html">Hooks</a>. It does not answer what the rules themselves say either: each file's header names the chapter that states its rule, and that chapter is where a change is made.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the four folders, the shape of one check, the shape of one tool, and the grade a finding carries</td><td>the composition, the payload, the dispatcher's own guard, and the exit code a moment's script ends on</td><td><a href="./02-hooks-construct.html">Hooks</a></td></tr>
-      <tr><td>the line between refusing a call and only speaking about it</td><td>which rule a given script enforces, and what that rule says</td><td>the foundation chapter each header names</td></tr>
-      <tr><td>that a page is produced from its seat file and compared against it</td><td>what a page is made of — the blocks, the figure grammar and the furniture</td><td>the foundation's <code>05-artifacts.md</code></td></tr>
-      <tr><td>that a stack-agnostic question belongs here</td><td>a question true only of one stack, or only of an estate</td><td>the scripts chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></td></tr>
+      <tr><td>the four folders, the shape of one check, the shape of one tool, and the grade a finding carries</td><td>the composition, the payload, the dispatcher's own guard, and the exit code a moment's script ends on<span class="sds-small">Owned by: <a href="./02-hooks-construct.html">Hooks</a></span></td></tr>
+      <tr><td>the line between refusing a call and only speaking about it</td><td>which rule a given script enforces, and what that rule says<span class="sds-small">Owned by: the foundation chapter each header names</span></td></tr>
+      <tr><td>that a page is produced from its seat file and compared against it</td><td>what a page is made of — the blocks, the figure grammar and the furniture<span class="sds-small">Owned by: the foundation's <code>05-artifacts.md</code></span></td></tr>
+      <tr><td>that a stack-agnostic question belongs here</td><td>a question true only of one stack, or only of an estate<span class="sds-small">Owned by: the scripts chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -157,14 +157,14 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a script restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a file carrying a rule it does not own is a restatement, and it names its source</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § What it makes checkable</td><td>which standards are expected to be answered by a script rather than by a reader</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>05-artifacts.md</code> § The blocks · § The figures</td><td>what a produced page is made of, which this folder renders and never decides</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the four kinds of script, the <code>&lt;group&gt; [&lt;subject&gt;] &lt;action&gt;</code> shape <code>commands/</code> dispatches by, one command entry</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a script restates a chapter and adds no rule of its own</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a file carrying a rule it does not own is a restatement, and it names its source</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § What it makes checkable</p><p>which standards are expected to be answered by a script rather than by a reader</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>05-artifacts.md</code> § The blocks · § The figures</p><p>what a produced page is made of, which this folder renders and never decides</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the four kinds of script, the <code>&lt;group&gt; [&lt;subject&gt;] &lt;action&gt;</code> shape <code>commands/</code> dispatches by, one command entry</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex plugin partner check</code></p>
@@ -175,4 +175,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

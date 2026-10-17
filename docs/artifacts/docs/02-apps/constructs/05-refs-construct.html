@@ -4,7 +4,7 @@
 {"id":"stack-refs","variant":"construct","title":"Refs — The Book, Restated Inside the Plugin","subtitle":"The foundation book's rules, carried inside this plugin for a reader with no other copy.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read.","keywords":["ref","restatement","domain","stamp","leaf","generated"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a ref</td><td><code>refs/</code></td><td>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</td></tr>
-      <tr><td>a domain folder</td><td>—</td><td>one folder per book domain, and the only kind of folder this tree holds at its top</td></tr>
-      <tr><td>a group</td><td>—</td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
-      <tr><td>the face</td><td><code>README.md</code></td><td>a folder's own subject, which is what makes a folder a subject rather than a bucket</td></tr>
-      <tr><td>the stamp</td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
-      <tr><td>drift</td><td>—</td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
-      <tr><td>a stack entry</td><td><code>providers/&lt;stack&gt;/</code></td><td>what is <strong>true</strong> of one stack — its kinds, naming, generation, tests and conformance</td></tr>
+      <tr><td><p><strong>a ref</strong></p><p>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</p><span class="sds-small">Contract term: <code>refs/</code></span></td></tr>
+      <tr><td><p><strong>a domain folder</strong></p><p>one folder per book domain, and the only kind of folder this tree holds at its top</p></td></tr>
+      <tr><td><p><strong>a group</strong></p><p>a folder under a domain; a file under it is named for a construct the book states</p></td></tr>
+      <tr><td><p><strong>the face</strong></p><p>a folder's own subject, which is what makes a folder a subject rather than a bucket</p><span class="sds-small">Contract term: <code>README.md</code></span></td></tr>
+      <tr><td><p><strong>the stamp</strong></p><p>the block at the top naming each chapter this file restates and the hash last read from it</p><span class="sds-small">Contract term: <code>spn:restates</code></span></td></tr>
+      <tr><td><p><strong>drift</strong></p><p>the state where a stamped hash no longer matches the chapter, which is what a run reports</p></td></tr>
+      <tr><td><p><strong>a stack entry</strong></p><p>what is <strong>true</strong> of one stack — its kinds, naming, generation, tests and conformance</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -120,12 +120,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what this plugin restates and how the folder is arranged. It does not answer how a restatement is stamped, parsed or compared — the block, the hash and the drift comparison are <a href="../../01-devex/constructs/06-refs-construct.html">The Ref</a>. It does not answer what any chapter of the book says, because the book says it.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>which domains this plugin carries, and that the top of the tree holds domain folders alone</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../../01-devex/constructs/06-refs-construct.html">The Ref</a></td></tr>
-      <tr><td>that a stack entry states what is true of a stack</td><td>the procedure a skill walks in that stack, and the rules a gate runs against it</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
-      <tr><td>that one file here is written by a command and carries the citation saying so</td><td>what that command reads, and what it leaves out</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that a ref carries the book rather than citing it</td><td>what the book says</td><td>the foundation's own chapters</td></tr>
+      <tr><td>which domains this plugin carries, and that the top of the tree holds domain folders alone</td><td>the block, the stamp, the hash and the drift comparison<span class="sds-small">Owned by: <a href="../../01-devex/constructs/06-refs-construct.html">The Ref</a></span></td></tr>
+      <tr><td>that a stack entry states what is true of a stack</td><td>the procedure a skill walks in that stack, and the rules a gate runs against it<span class="sds-small">Owned by: <a href="./06-providers-construct.html">Providers</a></span></td></tr>
+      <tr><td>that one file here is written by a command and carries the citation saying so</td><td>what that command reads, and what it leaves out<span class="sds-small">Owned by: <a href="./04-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that a ref carries the book rather than citing it</td><td>what the book says<span class="sds-small">Owned by: the foundation's own chapters</span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -134,12 +134,12 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a file carrying a rule it does not own is a restatement, and says so under the restates command</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes a stack a claim rather than something detected</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a ref is readable only after an install, so an edit here is not live in the open session</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a file carrying a rule it does not own is a restatement, and says so under the restates command</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what makes a stack a claim rather than something detected</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a ref is readable only after an install, so an edit here is not live in the open session</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>
@@ -150,4 +150,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

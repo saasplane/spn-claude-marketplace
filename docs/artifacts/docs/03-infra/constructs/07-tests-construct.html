@@ -4,7 +4,7 @@
 {"id":"estate-tests","variant":"construct","title":"Tests — How This Plugin Proves Its Own Gate","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,15 +33,15 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>the tree</td><td><code>tests/</code></td><td>this plugin's proofs, at the plugin root and never beside the source they prove</td></tr>
-      <tr><td>a tier</td><td><code>unit/</code></td><td>what kind of proof a suite is, which is the first thing the path says</td></tr>
-      <tr><td>the mirror</td><td><code>unit/&lt;source path&gt;</code></td><td>the rest of the path, repeating the path of the file being proven</td></tr>
-      <tr><td>a suite</td><td><code>t-&lt;subject&gt;.mjs</code></td><td>one file of cases, named for what it proves rather than for where it sits</td></tr>
-      <tr><td>the runner</td><td><code>tests/run.mjs</code></td><td>one command for every suite; it walks the tree rather than reading a list</td></tr>
-      <tr><td>the harness</td><td><code>tests/helpers/harness.mjs</code></td><td>what drives a real process per case and reads the verdict back</td></tr>
-      <tr><td>the plugin root</td><td><code>PLUGIN</code></td><td>found once by the harness, so no suite counts folders to reach the code</td></tr>
+      <tr><td><p><strong>the tree</strong></p><p>this plugin's proofs, at the plugin root and never beside the source they prove</p><span class="sds-small">Contract term: <code>tests/</code></span></td></tr>
+      <tr><td><p><strong>a tier</strong></p><p>what kind of proof a suite is, which is the first thing the path says</p><span class="sds-small">Contract term: <code>unit/</code></span></td></tr>
+      <tr><td><p><strong>the mirror</strong></p><p>the rest of the path, repeating the path of the file being proven</p><span class="sds-small">Contract term: <code>unit/&lt;source path&gt;</code></span></td></tr>
+      <tr><td><p><strong>a suite</strong></p><p>one file of cases, named for what it proves rather than for where it sits</p><span class="sds-small">Contract term: <code>t-&lt;subject&gt;.mjs</code></span></td></tr>
+      <tr><td><p><strong>the runner</strong></p><p>one command for every suite; it walks the tree rather than reading a list</p><span class="sds-small">Contract term: <code>tests/run.mjs</code></span></td></tr>
+      <tr><td><p><strong>the harness</strong></p><p>what drives a real process per case and reads the verdict back</p><span class="sds-small">Contract term: <code>tests/helpers/harness.mjs</code></span></td></tr>
+      <tr><td><p><strong>the plugin root</strong></p><p>found once by the harness, so no suite counts folders to reach the code</p><span class="sds-small">Contract term: <code>PLUGIN</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -122,11 +122,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers where a proof of this plugin lives, what the path means, and what the runner and the harness each do. It does not answer what a tier is or what a passing suite does and does not mean — that is the foundation's test standard, restated for the agent's loop by <a href="../../01-devex/constructs/08-tests-construct.html">Tests</a>. It does not answer what any rule refuses.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the tier-then-mirror path, the walking runner, and the absences</td><td>what a tier means and what a passing suite proves</td><td><a href="../../01-devex/constructs/08-tests-construct.html">Tests</a></td></tr>
-      <tr><td>that a case drives a real process and reads a real verdict</td><td>the rules a case asserts about, and the direction they fail in</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that moving a cloud folder is how the discovery is proven load-bearing</td><td>what a cloud folder holds, and what a missing one states</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>the tier-then-mirror path, the walking runner, and the absences</td><td>what a tier means and what a passing suite proves<span class="sds-small">Owned by: <a href="../../01-devex/constructs/08-tests-construct.html">Tests</a></span></td></tr>
+      <tr><td>that a case drives a real process and reads a real verdict</td><td>the rules a case asserts about, and the direction they fail in<span class="sds-small">Owned by: <a href="./04-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that moving a cloud folder is how the discovery is proven load-bearing</td><td>what a cloud folder holds, and what a missing one states<span class="sds-small">Owned by: <a href="./06-providers-construct.html">Providers</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -135,12 +135,12 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Test construct § The test tree</td><td>which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a suite proves a rule stated elsewhere and states none of its own</td><td>MUST</td></tr>
-      <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — which is why no tier stands empty here</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>04-plugins/02-shape.md</code></td><td>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's DevEx Test construct § The test tree</p><p>which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a suite proves a rule stated elsewhere and states none of its own</p></td><td>MUST</td></tr>
+      <tr><td><p>the apps plugin's subject registry</p><p><em>until a parser exists there is no folder for it</em> — which is why no tier stands empty here</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>04-plugins/02-shape.md</code></p><p>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
@@ -151,4 +151,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

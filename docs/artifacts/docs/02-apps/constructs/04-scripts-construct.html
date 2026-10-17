@@ -4,7 +4,7 @@
 {"id":"stack-checks","variant":"construct","title":"Scripts — The Code This Plugin Runs","subtitle":"Every file this plugin runs, sorted by what calls it and what stack it serves.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,19 +32,19 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>the gate</td><td><code>subjectsFor</code></td><td>the stack-free half: it reads the node's declaration and hands the write to the provider for it</td></tr>
-      <tr><td>a subject</td><td><code>SUBJECT_NAMES</code></td><td>one grouping of rules a write is asked about, cheapest first</td></tr>
-      <tr><td>the dispatcher</td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
-      <tr><td>the resulting text</td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
-      <tr><td>masking</td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
-      <tr><td>a register</td><td><code>HEADINGS</code></td><td>any table carrying the behaviour headings in order, wherever in a repository it sits</td></tr>
-      <tr><td>a row</td><td><code>cellsOf</code></td><td>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</td></tr>
-      <tr><td>the tier</td><td><code>tier</code></td><td>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</td></tr>
-      <tr><td>the results file</td><td>—</td><td>what a test runner wrote about one run, read by behaviour id and by tier</td></tr>
-      <tr><td>an action</td><td><code>@SPAPIRouteCommand</code></td><td>one published thing a caller can perform, found by its declaration rather than by a folder shape</td></tr>
-      <tr><td>a hand-checked row</td><td><code>MANUAL</code></td><td>a row a person proves, which no run ever writes over</td></tr>
+      <tr><td><p><strong>the gate</strong></p><p>the stack-free half: it reads the node's declaration and hands the write to the provider for it</p><span class="sds-small">Contract term: <code>subjectsFor</code></span></td></tr>
+      <tr><td><p><strong>a subject</strong></p><p>one grouping of rules a write is asked about, cheapest first</p><span class="sds-small">Contract term: <code>SUBJECT_NAMES</code></span></td></tr>
+      <tr><td><p><strong>the dispatcher</strong></p><p>the single process behind the wired entry, which keeps the first refusal and joins the advice</p><span class="sds-small">Contract term: <code>pretooluse.ts</code></span></td></tr>
+      <tr><td><p><strong>the resulting text</strong></p><p>the source as the pending write would leave it, which is what a rule actually reads</p><span class="sds-small">Contract term: <code>resultingText</code></span></td></tr>
+      <tr><td><p><strong>masking</strong></p><p>blanking comments and string bodies before searching, so a word inside a quote is never read as code</p><span class="sds-small">Contract term: <code>mask</code></span></td></tr>
+      <tr><td><p><strong>a register</strong></p><p>any table carrying the behaviour headings in order, wherever in a repository it sits</p><span class="sds-small">Contract term: <code>HEADINGS</code></span></td></tr>
+      <tr><td><p><strong>a row</strong></p><p>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</p><span class="sds-small">Contract term: <code>cellsOf</code></span></td></tr>
+      <tr><td><p><strong>the tier</strong></p><p>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</p><span class="sds-small">Contract term: <code>tier</code></span></td></tr>
+      <tr><td><p><strong>the results file</strong></p><p>what a test runner wrote about one run, read by behaviour id and by tier</p></td></tr>
+      <tr><td><p><strong>an action</strong></p><p>one published thing a caller can perform, found by its declaration rather than by a folder shape</p><span class="sds-small">Contract term: <code>@SPAPIRouteCommand</code></span></td></tr>
+      <tr><td><p><strong>a hand-checked row</strong></p><p>a row a person proves, which no run ever writes over</p><span class="sds-small">Contract term: <code>MANUAL</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -134,12 +134,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what sits in this plugin's scripts folder and what each part may decide. It does not answer the frame a check runs in — the payload, the verdict, the composition and the always-zero exit are <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a> and <a href="../../01-devex/constructs/05-scripts-construct.html">The Check</a>, and this plugin follows that shape rather than inventing one. It does not answer any rule about a language, because no such rule lives here.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>resolving a write to the declared stack, the subject order, and the single process behind the entry</td><td>the payload, the verdict, the dispatcher's shape, and the exit code</td><td><a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a></td></tr>
-      <tr><td>finding a register by its header, the cells a run owns, and checking the rows against the cases and the runs</td><td>that a tool is invoked by its own path and grades what it finds</td><td><a href="../../01-devex/constructs/05-scripts-construct.html">The Check</a></td></tr>
-      <tr><td>that nothing here names a stack</td><td>every rule that reads a language's own syntax, and the parse that feeds it</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
-      <tr><td>that a run speaks only for the tiers it covered</td><td>what a behaviour row must contain, and the grammar of its id</td><td>the foundation's document chapter</td></tr>
+      <tr><td>resolving a write to the declared stack, the subject order, and the single process behind the entry</td><td>the payload, the verdict, the dispatcher's shape, and the exit code<span class="sds-small">Owned by: <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a></span></td></tr>
+      <tr><td>finding a register by its header, the cells a run owns, and checking the rows against the cases and the runs</td><td>that a tool is invoked by its own path and grades what it finds<span class="sds-small">Owned by: <a href="../../01-devex/constructs/05-scripts-construct.html">The Check</a></span></td></tr>
+      <tr><td>that nothing here names a stack</td><td>every rule that reads a language's own syntax, and the parse that feeds it<span class="sds-small">Owned by: <a href="./06-providers-construct.html">Providers</a></span></td></tr>
+      <tr><td>that a run speaks only for the tiers it covered</td><td>what a behaviour row must contain, and the grammar of its id<span class="sds-small">Owned by: the foundation's document chapter</span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -148,14 +148,14 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.FUNCTION.008</code></td><td>a behaviour row's shape, its id grammar, and that a test title carries the id</td><td>MUST</td></tr>
-      <tr><td><code>RD.SUPPORT.APPS.035</code></td><td>which rung proves which behaviour, and that status is synced from a run rather than typed</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.FUNCTION.035</code></td><td>a rule reaches a write-time hook only where review would be too late</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what the gate reads the stack from</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a script here is live on its next run, so an edit lands without an install</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the four kinds of script, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.FUNCTION.008</code></p><p>a behaviour row's shape, its id grammar, and that a test title carries the id</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.SUPPORT.APPS.035</code></p><p>which rung proves which behaviour, and that status is synced from a run rather than typed</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.FUNCTION.035</code></p><p>a rule reaches a write-time hook only where review would be too late</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what the gate reads the stack from</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a script here is live on its next run, so an edit lands without an install</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the four kinds of script, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
@@ -166,4 +166,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

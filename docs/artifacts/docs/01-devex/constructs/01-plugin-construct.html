@@ -4,7 +4,7 @@
 {"id":"plugin-set","variant":"construct","title":"The Plugin — Delivery Unit of the Marketplace","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,13 +33,13 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a plugin</td><td><code>plugin.json</code></td><td>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
-      <tr><td>the marketplace</td><td><code>marketplace.json</code></td><td>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</td></tr>
-      <tr><td>the version</td><td><code>version</code></td><td>the field in a manifest saying which bytes are published; the count moves after a release, never before</td></tr>
-      <tr><td>the plugin root</td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, and the base every wired command path is written against</td></tr>
-      <tr><td>a construct</td><td>—</td><td>one folder a plugin may ship: <code>hooks/</code>, <code>agents/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> or <code>tests/</code>. A plugin holds any mix and owes none</td></tr>
+      <tr><td><p><strong>a plugin</strong></p><p>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
+      <tr><td><p><strong>the marketplace</strong></p><p>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</p><span class="sds-small">Contract term: <code>marketplace.json</code></span></td></tr>
+      <tr><td><p><strong>the version</strong></p><p>the field in a manifest saying which bytes are published; the count moves after a release, never before</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
+      <tr><td><p><strong>the plugin root</strong></p><p>the installed folder a session reads, and the base every wired command path is written against</p><span class="sds-small">Contract term: <code>CLAUDE_PLUGIN_ROOT</code></span></td></tr>
+      <tr><td><p><strong>a construct</strong></p><p>one folder a plugin may ship: <code>hooks/</code>, <code>agents/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> or <code>tests/</code>. A plugin holds any mix and owes none</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -114,10 +114,10 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what a plugin is made of, how it is listed, and what an installed copy is. It does not answer which plugins a given repository is entitled to load — that is derived from the repository's own manifest, and the foundation's delivery chapter rules it. It also does not answer what any one construct is: each has its own page, and you read the one you need next.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the shape of <code>plugin.json</code>, the shape of one <code>marketplace.json</code> entry, and what a version field means</td><td>which plugin set a repository loads, and what is granted rather than published</td><td>the foundation's Agent Plugins construct</td></tr>
-      <tr><td>that an edit is live only after an install, and that a wired path is written against the plugin root</td><td>when a particular construct becomes readable after that install</td><td><a href="./02-hooks-construct.html">Hooks</a> · <a href="./04-skills-construct.html">Skills</a> · <a href="./06-refs-construct.html">Refs</a> · <a href="./03-agents-construct.html">Agents</a></td></tr>
+      <tr><td>the shape of <code>plugin.json</code>, the shape of one <code>marketplace.json</code> entry, and what a version field means</td><td>which plugin set a repository loads, and what is granted rather than published<span class="sds-small">Owned by: the foundation's Agent Plugins construct</span></td></tr>
+      <tr><td>that an edit is live only after an install, and that a wired path is written against the plugin root</td><td>when a particular construct becomes readable after that install<span class="sds-small">Owned by: <a href="./02-hooks-construct.html">Hooks</a> · <a href="./04-skills-construct.html">Skills</a> · <a href="./06-refs-construct.html">Refs</a> · <a href="./03-agents-construct.html">Agents</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -126,13 +126,13 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the plugins are authored and delivered in one public repository, and publishing is pushing it</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
-      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></td><td>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</td><td>MUST</td></tr>
-      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>the plugins are authored and delivered in one public repository, and publishing is pushing it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</p><p>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</p></td><td>MUST</td></tr>
+      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></p><p>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex plugin partner check</code></p>
@@ -143,4 +143,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

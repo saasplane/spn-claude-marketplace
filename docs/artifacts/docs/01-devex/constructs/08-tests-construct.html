@@ -4,7 +4,7 @@
 {"id":"tests","variant":"construct","title":"Tests — How This Plugin Proves Itself","subtitle":"A suite sits at the same path as the file it proves, so nothing has to be searched for.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set","checks"],"summary":"Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path.","keywords":["test","suite","tier","mirror","runner","harness"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,14 +33,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a suite</td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one source file, named for what it proves</td></tr>
-      <tr><td>the tier</td><td><code>unit/</code> · <code>integration/</code></td><td>the first folder under <code>tests/</code>, saying what kind of proof the suites below it are</td></tr>
-      <tr><td>the mirror</td><td>—</td><td>the path under a tier that repeats the source file's own path inside the plugin</td></tr>
-      <tr><td>the runner</td><td><code>run.mjs</code></td><td>the file that finds every suite by walking the tree, runs each, and reports</td></tr>
-      <tr><td>the harness</td><td><code>helpers/harness.mjs</code></td><td>what every suite imports instead of computing: the plugin root, a temporary tree, one case, a script's path</td></tr>
-      <tr><td>a case</td><td>—</td><td>one named assertion inside a suite; a title carrying a behaviour row's id becomes that row's result</td></tr>
+      <tr><td><p><strong>a suite</strong></p><p>one file proving one source file, named for what it proves</p><span class="sds-small">Contract term: <code>t-&lt;name&gt;.mjs</code></span></td></tr>
+      <tr><td><p><strong>the tier</strong></p><p>the first folder under <code>tests/</code>, saying what kind of proof the suites below it are</p><span class="sds-small">Contract term: <code>unit/</code> · <code>integration/</code></span></td></tr>
+      <tr><td><p><strong>the mirror</strong></p><p>the path under a tier that repeats the source file's own path inside the plugin</p></td></tr>
+      <tr><td><p><strong>the runner</strong></p><p>the file that finds every suite by walking the tree, runs each, and reports</p><span class="sds-small">Contract term: <code>run.mjs</code></span></td></tr>
+      <tr><td><p><strong>the harness</strong></p><p>what every suite imports instead of computing: the plugin root, a temporary tree, one case, a script's path</p><span class="sds-small">Contract term: <code>helpers/harness.mjs</code></span></td></tr>
+      <tr><td><p><strong>a case</strong></p><p>one named assertion inside a suite; a title carrying a behaviour row's id becomes that row's result</p></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -123,12 +123,12 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers where a suite sits, how it is found, and what it may not compute for itself. It does not answer which tier a given behaviour belongs to, or what a passing suite does and does not mean — the foundation's own test chapter rules that, and it is the source of the tier names used here. It does not answer what the scripts under proof do either.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>the folder shape, the tier-then-mirror order, the walk, and the rule that no suite computes a depth</td><td>which tier a behaviour belongs to, and what a green suite does and does not prove</td><td>the foundation's test construct</td></tr>
-      <tr><td>that a suite drives the script as a process rather than importing it</td><td>what any one script decides, and the rule it restates</td><td><a href="./05-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that an absent tier states an absence rather than hiding a gap</td><td>the same rule applied to a realization's own folders</td><td><a href="./07-providers-construct.html">Providers</a></td></tr>
-      <tr><td>that a case's title can carry a behaviour row's id</td><td>where that row lives, and who writes its status</td><td>the behaviours register beside each construct</td></tr>
+      <tr><td>the folder shape, the tier-then-mirror order, the walk, and the rule that no suite computes a depth</td><td>which tier a behaviour belongs to, and what a green suite does and does not prove<span class="sds-small">Owned by: the foundation's test construct</span></td></tr>
+      <tr><td>that a suite drives the script as a process rather than importing it</td><td>what any one script decides, and the rule it restates<span class="sds-small">Owned by: <a href="./05-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that an absent tier states an absence rather than hiding a gap</td><td>the same rule applied to a realization's own folders<span class="sds-small">Owned by: <a href="./07-providers-construct.html">Providers</a></span></td></tr>
+      <tr><td>that a case's title can carry a behaviour row's id</td><td>where that row lives, and who writes its status<span class="sds-small">Owned by: the behaviours register beside each construct</span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -137,13 +137,13 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's test construct § The test tree</td><td>the tier names, and what a passing suite may be read as saying</td><td>MUST</td></tr>
-      <tr><td>the apps provider's <code>test</code> step</td><td><code>tests/</code> sits at a project's root and never beside the source it proves</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>this repository is served with docs commands alone, which is why the plugins' own suites are its runner</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a suite proves a restatement fires; it states no rule of its own</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>04-plugins/02-shape.md</code></td><td>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</td><td>MUST</td></tr>
+      <tr><td><p>the foundation's test construct § The test tree</p><p>the tier names, and what a passing suite may be read as saying</p></td><td>MUST</td></tr>
+      <tr><td><p>the apps provider's <code>test</code> step</p><p><code>tests/</code> sits at a project's root and never beside the source it proves</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>this repository is served with docs commands alone, which is why the plugins' own suites are its runner</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a suite proves a restatement fires; it states no rule of its own</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>04-plugins/02-shape.md</code></p><p>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node packages/plugin-spn-devex/tests/run.mjs</code></p>
@@ -154,4 +154,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>

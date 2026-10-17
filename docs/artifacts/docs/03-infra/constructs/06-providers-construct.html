@@ -4,7 +4,7 @@
 {"id":"estate-providers","variant":"construct","title":"Providers — One Folder per Cloud, Scripts Half Only","subtitle":"One folder per cloud, holding only what changes between them.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,14 +32,14 @@
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Term</th></tr></thead>
     <tbody>
-      <tr><td>a cloud</td><td><code>providers/&lt;cloud&gt;/</code></td><td>one realization this plugin serves — the folder is the whole registration</td></tr>
-      <tr><td>the scripts half</td><td><code>providers/&lt;cloud&gt;/scripts/checks/</code></td><td>what the gate runs for this cloud: one validator per subject</td></tr>
-      <tr><td>a subject</td><td><code>manifest</code> · <code>rendering</code></td><td>one kind of file with one parse, named the same way in every cloud's folder</td></tr>
-      <tr><td>a skills half</td><td><code>providers/&lt;instance&gt;/skills/</code></td><td>what a skill loads when working in this instance — a procedure, which no cloud here has</td></tr>
-      <tr><td>the vocabulary</td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what this cloud calls things, restated as a fact rather than run as code</td></tr>
-      <tr><td>discovery</td><td><code>instances()</code></td><td>the gate reading which folders exist, rather than a list of clouds written anywhere</td></tr>
+      <tr><td><p><strong>a cloud</strong></p><p>one realization this plugin serves — the folder is the whole registration</p><span class="sds-small">Contract term: <code>providers/&lt;cloud&gt;/</code></span></td></tr>
+      <tr><td><p><strong>the scripts half</strong></p><p>what the gate runs for this cloud: one validator per subject</p><span class="sds-small">Contract term: <code>providers/&lt;cloud&gt;/scripts/checks/</code></span></td></tr>
+      <tr><td><p><strong>a subject</strong></p><p>one kind of file with one parse, named the same way in every cloud's folder</p><span class="sds-small">Contract term: <code>manifest</code> · <code>rendering</code></span></td></tr>
+      <tr><td><p><strong>a skills half</strong></p><p>what a skill loads when working in this instance — a procedure, which no cloud here has</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/skills/</code></span></td></tr>
+      <tr><td><p><strong>the vocabulary</strong></p><p>what this cloud calls things, restated as a fact rather than run as code</p><span class="sds-small">Contract term: <code>refs/support/infra/providers/&lt;cloud&gt;/</code></span></td></tr>
+      <tr><td><p><strong>discovery</strong></p><p>the gate reading which folders exist, rather than a list of clouds written anywhere</p><span class="sds-small">Contract term: <code>instances()</code></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -116,11 +116,11 @@
   <div class="sds-section-head"><h2>Boundary</h2></div>
   <p>This page answers what this plugin puts in a provider folder and why the halves are what they are. It does not answer what a provider is — the two halves, the rule that a gate never names an instance, and the test a skills half has to pass are <a href="../../01-devex/constructs/07-providers-construct.html">Providers</a>. It does not answer what the shared rule bodies say, and it does not answer what each cloud's words mean.</p>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
     <tbody>
-      <tr><td>that a cloud carries a scripts half alone, and why the authoring stack decides it</td><td>the two halves, the dispatch rule, and what a provider may never hold</td><td><a href="../../01-devex/constructs/07-providers-construct.html">Providers</a></td></tr>
-      <tr><td>that a cloud's parse and its own spellings sit in its own folder</td><td>the gate that discovers the folders, and the shared rule bodies it runs</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
-      <tr><td>that a cloud with no validator says so by having no folder</td><td>that cloud's vocabulary, which is restated whether or not code reads it</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+      <tr><td>that a cloud carries a scripts half alone, and why the authoring stack decides it</td><td>the two halves, the dispatch rule, and what a provider may never hold<span class="sds-small">Owned by: <a href="../../01-devex/constructs/07-providers-construct.html">Providers</a></span></td></tr>
+      <tr><td>that a cloud's parse and its own spellings sit in its own folder</td><td>the gate that discovers the folders, and the shared rule bodies it runs<span class="sds-small">Owned by: <a href="./04-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>that a cloud with no validator says so by having no folder</td><td>that cloud's vocabulary, which is restated whether or not code reads it<span class="sds-small">Owned by: <a href="./05-refs-construct.html">Refs</a></span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -129,11 +129,11 @@
 <section id="s5">
   <div class="sds-section-head"><h2>Binds</h2></div>
   <div class="sds-scroll"><table>
-    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</td><td>MUST</td></tr>
-      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a provider folder restates nothing and states no rule the domain owns</td><td>MUST</td></tr>
-      <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>a provider folder restates nothing and states no rule the domain owns</p></td><td>MUST</td></tr>
+      <tr><td><p>the apps plugin's subject registry</p><p><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
@@ -144,4 +144,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
