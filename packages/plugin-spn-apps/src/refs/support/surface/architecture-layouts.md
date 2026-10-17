@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "306f1a58"
+      "seen": "ed845bd7"
     }
   ]
 }
@@ -32,7 +32,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 | Sticky | `sticky` — the top bar stays in the window while the page scrolls |
 | Bordered · Raised | `bordered` · `raised` — a part draws a line at its edges · a part draws a shadow |
 | Layout space | `--layout-space` — the one spacing of a layout, from the theme's size: the page's padding and every gap between its parts |
-| Place | where a layout puts what a page gives it, named by where it stands: `startNode`, `endNode`, `actionsNode`, `footerNode`, and in a dock `headerNode` |
+| Place | where a layout puts what a page gives it, named by where it stands: `startNode`, `endNode`, `actionsNode`, `footerNode`, and in a dock or a top nav `headerNode` |
 | Entry kind | `DSNavEntryType` — `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` |
 
 ## The types — 🔮
@@ -83,9 +83,9 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 ## Attached and sticky — 🔮
 
 - **An attached navigation belongs to the window's edge.** Its fill runs to the edge it meets, and what it holds stands in the body's box. An attached content is the body's box itself: it meets the navigation and runs to the window's bottom, at the body's width and centred (beside a rail, centred in the area beside it), the body showing around it; its fill, line, shadow and `className` fall on that box, and at `FULL` and on a phone the box is the window. A part that is not attached floats, the layout's space in from the window and from the part beside it, rounded with the theme's radius, with its own fill, line and shadow. The navigation's default is attached, and the content's too.
-- **A part's `bordered` and `raised` are its look wherever it stands, attached or floating; no switch is ever ignored.** A bordered content draws its line all round its box, attached or floating; the one exception is an edge it shares with a bordered, attached navigation, where the navigation's line shows once and the content skips that side. Raised, a content casts its shadow from its own box in all three layouts. There is no `inset` and no alias for it.
+- **A part's `bordered` and `raised` are its look wherever it stands, attached or floating; no switch is ever ignored.** A floating content draws its line and shadow all round its sheet. An attached content runs from the navigation to the page's end, so bordered it draws its line down its two sides and none across its top or bottom, and raised it casts its shadow from its two sides only; a side that meets a bordered, attached navigation shows the navigation's one line. There is no `inset` and no alias for it.
 - **`sticky` governs the top bar alone, the bar of `TOPNAV` and of `DOCK`**, and the default is sticky. A rail always stays at the height of the window, and the column of a dock always stays beside the page; `sticky` governs neither. Sticky and attached stand apart, so each of their four combinations is drawn.
-- **A top navigation takes no `overlay`, and nothing stands over the content** (`RD.SUPPORT.SURFACE.200`). The content starts under the bar. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
+- **A top navigation takes no `overlay`, and nothing stands over the content** (`RD.SUPPORT.SURFACE.200`). The content starts under the bar, or under the band. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
 - **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RD.SUPPORT.SURFACE.170`). The edge line of a rail follows the `bordered` of the navigation (`RD.SUPPORT.SURFACE.165`).
 - **A translucent navigation shows only where content passes behind it:** a top bar that stays in view, a panel of navigation, and a navigation drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, it draws opaque.
 - **A panel of entries of the navigation belongs to the navigation** (`RD.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail take the fill and the opacity of the navigation, a line where it is `bordered`, and a shadow where it is `raised`. A menu of actions, such as the menu of the account, does not take the look of the navigation.
@@ -93,7 +93,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 ## The spacing — 🔮
 
 - **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.200`). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
-- **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and between the dock's band and the row below it.
+- **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and the gap above the band under a floating bar.
 - **Where two parts both float, the space between them is one `--layout-space`, never two.**
 - **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RD.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
 - **The layout's measures are named in the scale**: the rail open, shut and in the drawer, the height of a bar, the width of the dock's column, the widest body at `XWIDE`, `WIDE`, `MEDIUM` and `NARROW` (`layout/xwide`, `layout/shell`, `layout/medium`, `layout/narrow`), and `layout/space`. No layout holds one as a number (`RD.SUPPORT.APPS.152`).
@@ -106,7 +106,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | `startNode` | the start of the navigation: the head of a rail, the start of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `actionsNode` | the actions of the frame: the foot of a rail above `endNode`, and before `endNode` in a top bar | `RAIL` · `DOCK` · `TOPNAV` |
 | `endNode` | the end of the navigation: the foot of a rail, the end of a top bar | `RAIL` · `DOCK` · `TOPNAV` |
-| `headerNode` | a band across both columns of a dock, above them, for the head of an account or a project | `DOCK` |
+| `headerNode` | a band directly under the bar, the window's width at every body width, for a hero, a slideshow, or the head of an account or a project; the content's box starts under it | `DOCK` · `TOPNAV` |
 | `footerNode` | the footer that closes the main area | every type |
 | the children | the main area | every type |
 
@@ -121,13 +121,14 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 | Layout type | Its navigation is built from |
 | --- | --- |
 | `RAIL` | `DSNavBarSide` at the edge, which folds to icons, with `startNode` in its head, the entries scrolling, and `actionsNode` above `endNode` in its foot |
-| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, `headerNode` as a band, then `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
-| `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end |
+| `DOCK` | a top bar with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, `headerNode` as a band, then the content's box, which holds `DSNavBarSide` inline in the page, with the way back as its start, beside the content |
+| `TOPNAV` | `DSNavBarTop`, with `startNode` at its start, and `actionsNode` then `endNode` at its end. Under it, `headerNode` as a band, then the content's box |
 | `CANVAS` | nothing: the body, with the page's children and `footerNode` |
 
 - **A layout MUST build its navigation from the navigation units** (`architecture-components.md`, `RD.SUPPORT.SURFACE.157`).
 - **A rail has a fixed head, entries that scroll, and a fixed foot, and no strip over the content.** The page draws its own head, trail, title and actions in its first block.
-- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RD.SUPPORT.SURFACE.157`, `RD.SUPPORT.SURFACE.199`). With the content attached, the band spans the top of the content's box and the column stands inside the box at its left, on the content's fill, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the band stands on the body above both, and the column stands on the body wearing the navigation's whole look.
+- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RD.SUPPORT.SURFACE.157`, `RD.SUPPORT.SURFACE.199`). With the content attached, the column stands inside the box at its left, on the content's fill, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the column stands on the body beside the sheet wearing the navigation's whole look. The band is above both.
+- **The band, `headerNode`, is the window's width at every body width, directly under the bar, and scrolls with the page.** It belongs to `TOPNAV` and `DOCK`, a rail and a canvas take none, and under a floating bar it starts one `--layout-space` below it. The layout draws no fill, line or padding for it, and writes `--layout-box-inset` on its outer box, the space from the window's edge to the box's edge (0 at `FULL`), so words inside the band can line up with the box.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
 
 ## The phone and the tablet — 🔮
