@@ -3102,6 +3102,170 @@
       grid-template-columns: repeat(2,minmax(0,1fr));
     }
   }
+  .sds-footbar {
+    position: fixed;
+    inset-inline: 0px;
+    bottom: 0px;
+    z-index: 40;
+    display: grid;
+    background-color: var(--sds-card);
+    grid-template-rows: 4px auto minmax(0,1fr);
+    height: 72px;
+    border-top: 1px solid var(--sds-rule);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / .08);
+  }
+  body:has(.sds-footbar) {
+    padding-bottom: 72px;
+  }
+  .sds-footbar-line {
+    background-color: var(--sds-rule);
+    height: 4px;
+  }
+  .sds-footbar-line i {
+    display: block;
+    height: 100%;
+    background-color: var(--sds-accent);
+  }
+  .sds-footbar-text {
+    overflow: hidden;
+    font-family: var(--sds-mono);
+    font-size: var(--sds-xs);
+    white-space: nowrap;
+    color: var(--sds-text-fact);
+    max-width: none;
+    margin: 0;
+    padding: .15rem 12px 0;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+  }
+  .sds-footbar-chips {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: .5rem;
+    padding: 1px 12px 5px;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 12px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%);
+    mask-image: linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%);
+  }
+  .sds-footbar-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .sds-chip {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--sds-card);
+    color: var(--sds-text-title);
+    text-decoration-line: none;
+    --sds-arc: var(--sds-accent);
+    flex: 0 0 auto;
+    width: 11.5rem;
+    min-width: 0;
+    scroll-snap-align: start;
+    gap: 1px;
+    justify-content: center;
+    border: 1px solid var(--sds-rule);
+    border-radius: 3px;
+    padding: 1px .5rem 2px;
+  }
+  .sds-chip:hover {
+    border-color: var(--sds-accent);
+  }
+  .sds-chip.sds-here {
+    border-color: var(--sds-accent);
+    box-shadow: 0 0 0 1px var(--sds-accent);
+  }
+  .sds-chip-name {
+    overflow: hidden;
+    font-size: var(--sds-xs);
+    white-space: nowrap;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+  }
+  .sds-chip-name .sds-mono {
+    --tw-font-weight: 700;
+    font-weight: 700;
+  }
+  .sds-chip-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .4rem;
+  }
+  .sds-chip-line .sds-badge {
+    padding: 0 .4rem;
+    font-size: .58rem;
+    letter-spacing: .04em;
+    line-height: 1.3;
+  }
+  .sds-chip-bar {
+    display: block;
+    overflow: hidden;
+    background-color: var(--sds-rule);
+    height: 3px;
+    border-radius: 999px;
+  }
+  .sds-chip-bar i {
+    display: block;
+    height: 100%;
+    background: var(--sds-arc);
+  }
+  .sds-chip.sds-proposed {
+    --sds-arc: var(--sds-arc-proposed);
+  }
+  .sds-chip.sds-decided {
+    --sds-arc: var(--sds-arc-decided);
+  }
+  .sds-chip.sds-running {
+    --sds-arc: var(--sds-arc-running);
+  }
+  .sds-chip.sds-held {
+    --sds-arc: var(--sds-arc-held);
+  }
+  .sds-chip.sds-part-landed {
+    --sds-arc: var(--sds-arc-part-landed);
+  }
+  .sds-chip.sds-landed {
+    --sds-arc: var(--sds-arc-landed);
+  }
+  .sds-chip.sds-carried {
+    --sds-arc: var(--sds-arc-carried);
+  }
+  .sds-chip.sds-dropped {
+    --sds-arc: var(--sds-arc-dropped);
+  }
+  .sds-chip.sds-landed,.sds-chip.sds-carried,.sds-chip.sds-dropped {
+    background-color: transparent;
+    color: var(--sds-text-fact);
+  }
+  .sds-chip.sds-landed .sds-chip-bar i,.sds-chip.sds-carried .sds-chip-bar i,.sds-chip.sds-dropped .sds-chip-bar i {
+    opacity: .5;
+  }
+  @media (max-width:40rem) {
+    .sds-chip {
+      width: auto;
+      min-width: 5.2rem;
+    }
+    .sds-chip-subject {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    .sds-footbar-chips {
+      scroll-behavior: auto;
+    }
+  }
+  @media print {
+    .sds-footbar {
+      display: none;
+    }
+    body:has(.sds-footbar) {
+      padding-bottom: 0;
+    }
+  }
   .sds-frame {
     overflow: hidden;
     background-color: var(--sds-card);

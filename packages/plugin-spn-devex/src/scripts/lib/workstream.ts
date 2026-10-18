@@ -550,17 +550,45 @@ function arcTile(data: ArcData, done: number, total: number): string[] {
   ];
 }
 
-/** The inside of the progress block: an overall line and bar, then a grid of one tile per arc, each linking its Cycles row. */
+/**
+ * One arc's chip in the sticky status bar: its number and short name, its status badge, done/total, and a thin
+ * bar. The status word is the chip's second class, and the stylesheet colours the bar from it. It links the
+ * arc's Cycles row.
+ */
+function arcChip(data: ArcData, done: number, total: number): string {
+  const word = data.status.toLowerCase();
+  return `      <a class="sds-chip sds-${word}" href="#${data.arc}"><span class="sds-chip-name"><span class="sds-mono">${data.arc}</span><span class="sds-chip-subject"> ${escapeHtml(data.subject.replace(/-/g, " "))}</span></span>`
+    + `<span class="sds-chip-line"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><span class="sds-arc-count">${done}/${total}</span></span>`
+    + `<span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span></a>`;
+}
+
+/**
+ * The sticky status bar, fixed to the bottom of the window: the overall progress as a thick line along its top
+ * edge with the overall text at its left, and under it one row of arc chips that scrolls sideways inside itself.
+ */
+function statusBar(counts: readonly { data: ArcData; done: number; total: number }[], overall: string, overallShare: number): string[] {
+  return [
+    `  <nav class="sds-footbar" aria-label="Workstream status">`,
+    `    <div class="sds-footbar-line"><i style="width:${overallShare}%"></i></div>`,
+    `    <p class="sds-footbar-text">${overall}</p>`,
+    ...(counts.length ? [`    <div class="sds-footbar-chips">`, ...counts.map((one) => arcChip(one.data, one.done, one.total)), `    </div>`] : []),
+    `  </nav>`,
+  ];
+}
+
+/** The inside of the progress block: an overall line and bar, a grid of one tile per arc, each linking its Cycles row, and the sticky status bar. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
   const counts = arcs.map((data) => ({ data, ...doneOf(data) }));
   const done = counts.reduce((sum, one) => sum + one.done, 0);
   const total = counts.reduce((sum, one) => sum + one.total, 0);
   const closed = arcs.filter((data) => TERMINAL.has(data.status)).length;
+  const overall = `Overall: ${done} of ${total} rows done &middot; ${closed} of ${arcs.length} arcs closed`;
   const lines = [
-    `  <p>Overall: ${done} of ${total} rows done &middot; ${closed} of ${arcs.length} arcs closed</p>`,
+    `  <p>${overall}</p>`,
     `  ${bar(done, total)}`,
   ];
   if (counts.length) lines.push(`  <div class="sds-arcs">`, ...counts.flatMap((one) => arcTile(one.data, one.done, one.total)), `  </div>`);
+  lines.push(...statusBar(counts, overall, share(done, total)));
   return `${lines.join("\n")}\n`;
 }
 

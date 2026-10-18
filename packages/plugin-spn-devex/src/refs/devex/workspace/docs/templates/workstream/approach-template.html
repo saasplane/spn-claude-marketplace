@@ -84,6 +84,13 @@
       <div class="sds-bar"><i style="width:{{share}}%"></i></div>
     </div>
   </div>
+  <nav class="sds-footbar" aria-label="Workstream status">
+    <div class="sds-footbar-line"><i style="width:{{share}}%"></i></div>
+    <p class="sds-footbar-text">{{Overall: rows done of all &middot; arcs closed of all}}</p>
+    <div class="sds-footbar-chips">
+      <a class="sds-chip sds-running" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001</span><span class="sds-chip-subject"> {{subject as words}}</span></span><span class="sds-chip-line"><span class="sds-badge sds-status sds-running">RUNNING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span></a>
+    </div>
+  </nav>
   <!-- /spn:generated -->
 </section>
 

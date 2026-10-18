@@ -190,3 +190,37 @@
     pre.innerHTML=colour(pre.textContent,lang);
   });
 })();
+
+/* The sticky status bar: mark the chip whose arc is on screen, and keep it in view inside the bar's own row.
+   The page never scrolls sideways: only the row's scrollLeft moves. */
+(function(){
+  var bar=document.querySelectorAll('.sds-footbar-chips')[0];
+  if(!bar)return;
+  var chips=Array.prototype.slice.call(bar.querySelectorAll('a.sds-chip'));
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pending=false,current=null;
+  function mark(){
+    pending=false;
+    var floor=window.innerHeight-bar.parentNode.offsetHeight,centre=floor/2,best=null,bestDistance=Infinity;
+    chips.forEach(function(chip){
+      var target=document.getElementById(chip.getAttribute('href').slice(1));
+      if(!target)return;
+      var box=target.getBoundingClientRect();
+      if(box.bottom<=0||box.top>=floor)return;
+      var distance=Math.abs((box.top+box.bottom)/2-centre);
+      if(distance<bestDistance){best=chip;bestDistance=distance;}
+    });
+    if(best===current)return;
+    if(current)current.classList.remove('sds-here');
+    current=best;
+    if(!best)return;
+    best.classList.add('sds-here');
+    var left=best.offsetLeft-bar.offsetLeft,right=left+best.offsetWidth;
+    if(left<bar.scrollLeft||right>bar.scrollLeft+bar.clientWidth)
+      bar.scrollTo({left:Math.max(0,left-12),behavior:reduce?'auto':'smooth'});
+  }
+  function ask(){if(!pending){pending=true;window.requestAnimationFrame(mark);}}
+  window.addEventListener('scroll',ask,{passive:true});
+  window.addEventListener('resize',ask);
+  mark();
+})();
