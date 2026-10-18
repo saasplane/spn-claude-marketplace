@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The formats · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The formats · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The one schema for every file a script owns in a workstream. `workstream state check` runs it, and
@@ -28,6 +28,23 @@ export const OUTCOMES = ["landed", "stopped", "needs-you"] as const;
 
 /** An arc's id, `N007`, with an optional letter. */
 export const ARC_ID = /^N\d+[a-z]?$/;
+/** The longest an arc's subject may be (RD.DEVEX.WORKSPACE.265). */
+export const SUBJECT_MAX = 24;
+/** An arc's subject: one to three words in kebab-case, lower case letters and digits. */
+const SUBJECT_FORM = /^[a-z0-9]+(?:-[a-z0-9]+){0,2}$/;
+
+/**
+ * What is wrong with an arc's subject, as the words a refusal or a finding ends with, or null where it
+ * is short: one to three words of at most 24 characters, in kebab-case (RD.DEVEX.WORKSPACE.265).
+ */
+export function subjectFault(subject: string): string | null {
+  if (!SUBJECT_FORM.test(subject)) {
+    const words = subject.split(/[-\s]+/).filter(Boolean).length;
+    return words > 3 ? `is ${words} words, and a subject is one to three` : "is not one to three words in kebab-case, such as `layout-model`";
+  }
+  if (subject.length > SUBJECT_MAX) return `is ${subject.length} characters, and a subject is at most ${SUBJECT_MAX}`;
+  return null;
+}
 /** A row's id: a number, an optional letter, and optional dotted parts — `57`, `57b`, `3e.1`. */
 export const ROW_ID = /^\d+[a-z]?(?:\.\d+[a-z]?)*$/i;
 export const FACT_ID = /^f\d+$/;
@@ -45,7 +62,7 @@ export type ArcRow = {
   [field: string]: unknown;
 };
 export type ArcData = {
-  schemaVersion: number; arc: string; subject: string; title: string; status: string; reason: string | null;
+  schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
   decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null;
   preview: string; rows: ArcRow[];
   [field: string]: unknown;
@@ -107,6 +124,7 @@ const ARC_FIELDS: Record<string, Rule> = {
   arc: { kind: "string", required: true, pattern: ARC_ID },
   subject: { kind: "string", required: true },
   title: { kind: "string", required: true },
+  goal: { kind: "text", required: false },
   status: { kind: "enum", required: true, values: STATUSES },
   reason: { kind: "text", required: true },
   decides: { kind: "text", required: false },

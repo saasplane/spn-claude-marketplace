@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "32b59b0d"
+      "seen": "3c52e03b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -228,6 +228,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             state.json                    the arc's header and every row
             log.jsonl                     one line per event
             facts.jsonl                   each fact read, pinned to its commit
+            <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
           N<nnn>/                         one arc's work order: these five entries, and nothing else
             preview.html                  the arc's one preview
@@ -268,8 +269,9 @@ files and each arc's folder under `arcs/` are written only by the `spn-devex wor
 PreToolUse hook refuses a direct edit to them. The approach page, the preview, the samples, the plan and the
 orders are yours to write by hand, and no command writes them. Two marked regions of the page are the
 exception, each with one owner: the progress block and the `Open` block, which the commands write. An arc is
-named by its number, `N<nnn>`, and its subject and title are fields of its data; one number names its two
-folders. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
+named by its number, `N<nnn>`, and its short subject, its title and its goal are fields of its data; one
+number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
+on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
 
 **A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
 

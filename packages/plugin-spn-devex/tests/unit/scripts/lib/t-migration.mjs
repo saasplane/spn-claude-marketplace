@@ -4,6 +4,7 @@
 import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
+import { arcData, cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
 const lib = await import("../../../../src/scripts/lib/migration.ts");
 const { MIGRATIONS } = await import("../../../../src/scripts/lib/migrations/index.ts");
@@ -110,6 +111,33 @@ console.log("\n=== 002 — an arc's notes folder holds the five, and nothing els
   rmSync(join(root, OLD, "notes/N001/parked-cards.md"));
   const done = applyMigrations(root, MIGRATIONS, ["002"], true);
   ok("green: once folded, write 002 --steps-done records it as the agent's work", done.code === 0 && done.out.join() === "002 · recorded · by the agent's steps", done.out.join(" | "));
+}
+
+console.log("\n=== 002 — each arc's address, goal and name file, and the levels above the arc folders");
+{
+  const { root, ws } = await dataWorkspace("address-002");
+  const page = join(ws, "approach.html");
+  writeFileSync(page, readFileSync(page, "utf8").replace('<tr id="N001" ', "<tr ")
+    .replace('<a href="notes/N001/preview.html">the probe</a>', '<a href="notes/N001/preview.html">the probe</a> &middot; <a href="arcs/N001/state.json">the arc</a>'));
+  writeFileSync(join(ws, "notes", "N001", "preview.html"), '<p><a href="../../arcs/N001/state.json">arcs/N001/state.json</a></p>\n');
+  writeFileSync(join(ws, "arcs", "N001", "state.json"), JSON.stringify({ ...arcData(), goal: null, subject: "the-probe-of-everything" }, null, 2));
+  writeFileSync(join(ws, "notes", "ideation.md"), "# how it arrived\n");
+  const found = m002.check(root);
+  const says = (pattern) => found.some((place) => pattern.test(place));
+  ok("red: 002 names the arc with no goal, from its plan's What done means", says(/^open\/031-probe\/arcs\/N001: no goal → `row write N001 --goal/), found.join(" | "));
+  ok("red: a long subject is a finding for the workstream's own window, never renamed", says(/subject `the-probe-of-everything` is 4 words.* own window, never shortened by guessing/), found.join(" | "));
+  ok("red: the name file not the commands'", says(/arcs\/N001\/the-probe-of-everything\.md: not as the commands write it/), found.join(" | "));
+  ok("red: the Cycles row with no id", says(/N001's Cycles row carries no `id="N001"`/), found.join(" | "));
+  ok("red: each page linking an arc's state.json, by its count", says(/^open\/031-probe\/approach\.html: 1 link\(s\)/) && says(/^open\/031-probe\/notes\/N001\/preview\.html: 1 link\(s\)/), found.join(" | "));
+  ok("red: a note loose at notes/ goes to the first open arc's plan", says(/^open\/031-probe\/notes\/ideation\.md → a section of `notes\/N001\/plan\.md`/), found.join(" | "));
+  ok("its steps rewrite the links to the address, fill the goal and run cycles write",
+    m002.steps.some((step) => /approach\.html#N<nnn>/.test(step) && /state\.json/.test(step)) && m002.steps.some((step) => /--goal/.test(step)) && m002.steps.some((step) => /docs cycles write/.test(step)));
+  writeFileSync(page, readFileSync(page, "utf8").replace(' &middot; <a href="arcs/N001/state.json">the arc</a>', ""));
+  writeFileSync(join(ws, "notes", "N001", "preview.html"), '<p><a href="../../approach.html#N001">approach.html#N001</a></p>\n');
+  rmSync(join(ws, "notes", "ideation.md"));
+  cli(root, ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered", "--subject", "probe"]);
+  cli(root, ["docs", "cycles", "write", "031"]);
+  ok("green: links rewritten, goal and short subject written, cycles write run — 002 finds nothing", m002.check(root).length === 0, m002.check(root).join(" | "));
 }
 
 console.log("\n=== a broken ledger → reported, never written over");

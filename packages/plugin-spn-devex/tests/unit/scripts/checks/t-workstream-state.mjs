@@ -42,12 +42,75 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row");
   ok("green: a row's state moving leaves the stamp current", !has(checkWorkstream(ws), "stamp", /behind/));
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
-  writeFileSync(page, text.replace(/<tr data-arc="arcs\/N001\/state.json"[^>]*>/, "<tr>"));
+  writeFileSync(page, text.replace(/<tr id="N001" data-arc="arcs\/N001\/state.json"[^>]*>/, "<tr>"));
   ok("red: an arc with no row in Cycles fails", has(checkWorkstream(ws), "stamp", /has no row in Cycles/), said(checkWorkstream(ws)));
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc whose preview What does not link fails", has(checkWorkstream(ws), "stamp", /not linked from the page's What/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
   ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.263 — every arc has an address, its Cycles row's id");
+{
+  const { root, ws } = await dataWorkspace("state-address");
+  const page = join(ws, "approach.html");
+  const text = readFileSync(page, "utf8");
+  writeFileSync(page, text.replace('<tr id="N001" ', "<tr "));
+  const red = checkWorkstream(ws);
+  ok("red: a Cycles row with no id fails, naming the address it leaves empty", has(red, "stamp", /carries no `id="N001"`, so `approach.html#N001` opens nothing/), said(red));
+  const wrote = cli(root, ["docs", "cycles", "write", "031"]);
+  ok("`docs cycles write` gives the row its id", wrote.code === 0 && readFileSync(page, "utf8").includes('<tr id="N001" data-arc="arcs/N001/state.json"'), wrote.out);
+  ok("green: the row under its address passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, a short subject");
+{
+  const { root, ws } = await dataWorkspace("state-name");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const name = join(ws, "arcs", "N001", "probe.md");
+  const data = arcData();
+  writeFileSync(file, JSON.stringify({ ...data, goal: null }, null, 2));
+  const noGoal = checkWorkstream(ws);
+  ok("red: an arc with no goal is named, with the command that sets it", has(noGoal, "name", /N001 has no goal — `spn-devex workstream row write N001 --goal/), said(noGoal));
+  const set = cli(root, ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered"]);
+  ok("green: `row write --goal` sets it and writes the name file with it", set.code === 0 && checkWorkstream(ws).length === 0 &&
+    readFileSync(name, "utf8").includes("**Goal.** the probe is answered"), set.out + said(checkWorkstream(ws)));
+  const good = readFileSync(name, "utf8");
+  writeFileSync(name, good.replace("**Status.** DECIDED", "**Status.** LANDED"));
+  ok("red: a hand edit of the name file is named", has(checkWorkstream(ws), "name", /`arcs\/N001\/probe.md` is not what the commands write/), said(checkWorkstream(ws)));
+  writeFileSync(name, good);
+  writeFileSync(join(ws, "arcs", "N001", "notes.md"), "# mine\n");
+  ok("red: a second Markdown file in the data folder is named", has(checkWorkstream(ws), "name", /`arcs\/N001\/notes.md` is a second Markdown file/), said(checkWorkstream(ws)));
+  rmSync(join(ws, "arcs", "N001", "notes.md"));
+  rmSync(name);
+  ok("red: a missing name file is named", has(checkWorkstream(ws), "name", /has no name file `arcs\/N001\/probe.md`/), said(checkWorkstream(ws)));
+  cli(root, ["docs", "cycles", "write", "031"]);
+  ok("green: `docs cycles write` writes it back", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  const long = cli(root, ["workstream", "row", "write", "031/N001", "--subject", "web-stack-and-partner-choices"]);
+  ok("red: `row write --subject` refuses a subject of more than three words", long.code !== 0 && /is 5 words, and a subject is one to three/.test(long.out), long.out);
+  writeFileSync(file, JSON.stringify({ ...data, subject: "the-probe-of-everything" }, null, 2));
+  ok("red: the check names a long subject already in the data", has(checkWorkstream(ws), "name", /subject `the-probe-of-everything` is 4 words/), said(checkWorkstream(ws)));
+  const short = cli(root, ["workstream", "row", "write", "031/N001", "--subject", "probe"]);
+  ok("green: a short subject written, the file renamed with it", short.code === 0 && checkWorkstream(ws).length === 0, short.out + said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.262 — notes/ and arcs/ hold only arc folders");
+{
+  const { ws } = await dataWorkspace("state-levels");
+  writeFileSync(join(ws, "notes", "ideation.md"), "# how the idea arrived\n");
+  writeFileSync(join(ws, "notes", "N001-inventory.md"), "# what exists\n");
+  mkdirSync(join(ws, "notes", "shots"), { recursive: true });
+  const red = checkWorkstream(ws);
+  ok("red: a note loose at notes/ goes to the first open arc's plan, since it names none",
+    has(red, "notes", /`notes\/ideation.md` is not an arc's folder .* `notes\/N001\/plan.md`, the workstream's first open arc/), said(red));
+  ok("red: a note naming its arc goes to that arc's plan", has(red, "notes", /`notes\/N001-inventory.md` .* `notes\/N001\/plan.md`, the arc it names/), said(red));
+  ok("red: a folder loose at notes/ is named", has(red, "notes", /`notes\/shots\/` is not an arc's folder/), said(red));
+  writeFileSync(join(ws, "arcs", "index.txt"), "x");
+  ok("red: a file loose at arcs/ is named", has(checkWorkstream(ws), "notes", /`arcs\/index.txt` is not an arc's folder/), said(checkWorkstream(ws)));
+  for (const one of ["notes/ideation.md", "notes/N001-inventory.md", "arcs/index.txt"]) rmSync(join(ws, one));
+  rmSync(join(ws, "notes", "shots"), { recursive: true });
+  writeFileSync(join(ws, "notes", ".DS_Store"), "");
+  ok("green: folded away, and a dot-file is no one's", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
 console.log("\n=== Q99 — one preview per arc, by its fixed name");

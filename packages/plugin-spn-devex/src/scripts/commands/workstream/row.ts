@@ -1,33 +1,34 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The formats · § The life of an arc, and every file it touches
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The commands · § The formats · § The life of an arc, and every file it touches
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream row write <arc> [<row>] [--field value …] [--note "…"]
 //
 // Given the arc alone, it opens the arc as PROPOSED (`--title` and `--subject` needed), or changes its
-// header and its status. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
+// header and its status; `--goal` sets the outcome the arc's name file leads with, and `--subject` takes
+// one to three words of at most 24 characters. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
 // `--note` alone writes a line on the arc's log, which has no other writer.
 
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
-import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
+import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, listOf, typed } from "./_shared.ts";
 
 export const describe = "open an arc or change its header, or add a row or change its fields and its state";
 
-const HEADER_TEXT = ["title", "subject", "reason", "decides", "cycle", "follows", "model"] as const;
+const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "follows", "model"] as const;
 const ROW_TEXT = ["parent", "title", "repo", "mechanism", "acceptance", "model", "proof", "order"] as const;
 const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", touches: "touches", decisions: "decisions", facts: "facts" };
 
 const OPTIONS = {
-  title: VALUE, subject: VALUE, status: STATUSES, reason: VALUE, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
+  title: VALUE, subject: VALUE, goal: VALUE, status: STATUSES, reason: VALUE, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
   model: VALUE, parent: VALUE, kind: ROW_KINDS, repo: VALUE, altitude: ALTITUDES, mechanism: VALUE, acceptance: VALUE,
   "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE,
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-const HEADER_ONLY = ["subject", "status", "reason", "decides", "repos", "cycle", "follows"];
+const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows"];
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -71,6 +72,9 @@ function write(args: string[]): number {
   if (more.length) throw new UsageFault("takes an arc and at most one row.");
   const { ws, arc } = arcNamed(ref, true);
   const note = words.value("note");
+  const subject = words.value("subject");
+  const short = subject === null ? null : subjectFault(subject);
+  if (short) throw new UsageFault(`takes a short subject: \`${subject}\` ${short}, such as \`layout-model\` (RD.DEVEX.WORKSPACE.265).`);
   let data = readArc(ws, arc);
   const said: string[] = [];
 
@@ -79,7 +83,6 @@ function write(args: string[]): number {
     if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")} — name the row after the arc.`);
     if (!data) {
       const title = words.value("title");
-      const subject = words.value("subject");
       if (!title || !subject) throw new UsageFault(`opens ${arc} with \`--title\` and \`--subject\`.`);
       data = newArc(arc, subject, title);
       header(data, words);
@@ -133,7 +136,7 @@ function write(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--note …] …",
+    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--note …] …",
     run: write,
   },
 };

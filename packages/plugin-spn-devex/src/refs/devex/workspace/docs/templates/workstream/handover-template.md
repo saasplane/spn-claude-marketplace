@@ -13,7 +13,7 @@ continue:     workstream `{{NNN-subject}}`, arc `N{{nnn}}`, row {{k}}, in a `{{r
               — or, after a plugin reload — open workstream `{{next NNN-subject}}`;
               `{{NNN-subject}}` N{{nnn}} waits on it
 model:        {{an exact model, such as Opus 5.5}}, effort {{low · medium · high · xhigh · max}}
-read first:   `{{absolute path}}/arcs/N{{nnn}}-<subject>.md` (fields, and row {{k}}),
+read first:   `{{absolute path}}/approach.html#N{{nnn}}` (the arc), `spn-devex workstream rows show {{NNN}}` (row {{k}}),
               `{{absolute path}}/notes/N{{nnn}}/plan.md` (§ Traps, § Commands, row {{k}}), then
               `{{the order or seat file being changed}}`
 pins:         {{repo}} {{short sha}} · {{repo}} {{short sha}} · {{package}} {{version}} released;

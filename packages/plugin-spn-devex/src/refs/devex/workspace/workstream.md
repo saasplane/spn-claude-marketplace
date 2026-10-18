@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "32b59b0d"
+      "seen": "3c52e03b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "154805ce"
+      "seen": "6a8da653"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "10dd58cd"
+      "seen": "4c0d04a9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3cf9e1eb"
+      "seen": "55f695fa"
     }
   ]
 }
@@ -103,7 +103,7 @@ conflicts are declared once.
 | Owner | Files |
 | --- | --- |
 | **you, by hand** | `approach.html`; each arc's `notes/N<nnn>/preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/` |
-| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl` and `facts.jsonl`; the `progress` and `open` blocks inside the pages |
+| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl`, `facts.jsonl` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
 
 **A file a command owns is never edited by hand**: the PreToolUse hook refuses a direct write to it, an
 edit that touches a `progress` or `open` block, and a hand edit of an arc's `data-arc-stamp`. A page you
@@ -113,7 +113,7 @@ is added only with the developer's approval, and these two have it. The folder i
 
 **An arc's `state.json` holds its header and every row, and a field is added and never repurposed.**
 It carries `schemaVersion`; one schema in the plugin validates it, and every write runs it first. The
-header is `arc`, `subject`, `title`, `status` and its `reason` (for `HELD`, `CARRIED` and `DROPPED`),
+header is `arc`, `subject`, `title`, `goal`, `status` and its `reason` (for `HELD`, `CARRIED` and `DROPPED`),
 `decides`, `repos`, `cycle`, `follows`, `model` and `preview`. A row is `id`, `parent`, `title` (the
 step's *What*), `kind` (`fix` · `change` · `question`), `repo`, `altitude`, `mechanism`, `acceptance`,
 `model`, `blockedBy`, `touches` (`repository:place`), `decisions`, `facts`, `state`, and what its report
@@ -132,7 +132,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state show [<workstream>]` | where everything stands, in a line: `025 · N007 18/19 · 57b running · N010 proposed · 0 open cards · 1 suggestion shaped` |
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
-| `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`), or changes its header and status; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer |
+| `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), or changes its header and status, writing the arc's name file with its data; a `--subject` over three words or 24 characters is refused; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer |
 | `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
 | `report write <workstream> <notes/N<nnn>/orders/<row>.report.md>` | folds a child's hand-back in from its front matter: state, proof, cost, commits, follow-ups. `ok · N007 18/19 · 57b added · 58 ready` |
 | `fact write <arc> --source <repository>/<path>[:<line>] --fact "…"` | one fact, its source's current commit pinned: `f12 · pinned 8b99ae92` |
@@ -158,7 +158,7 @@ files it writes, and a file a command owns is written only by that command.
 | Step | Files it writes |
 | --- | --- |
 | shape | `suggestions.jsonl`, by command; nothing else moves |
-| open the arc, at the developer's word | `state.json` and `log.jsonl`, by command (`row write <arc> --title … --subject …`); the preview's first draft; the page's `Why`, `What` and `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
+| open the arc, at the developer's word | `state.json`, `log.jsonl` and `<subject>.md`, by command (`row write <arc> --title … --subject … --goal …`); the preview's first draft; the page's `Why`, `What` and `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
 | preview and cards | the preview; the cards in `Open`, by `question raise`; each fact read, by `fact write` |
 | decide | the status, by `row write --status DECIDED`; the answers folded into `What` and the preview; the register rows owed |
 | plan | the rows, by `row write`, each with its kind, model, `blockedBy` and `touches`; `plan.md`; the page's `How`, then `arc stamp write` |
@@ -591,7 +591,7 @@ its own number and its own tie to a window, so you never create one alone.
 
 **Where the set is too large for the step, it goes to a section of that arc's `plan.md`, and the step names it by path and heading**, such as `notes/N007/plan.md#the-move-table`. A set a script reads sits beside the script, in `scripts/`. `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
 
-**An arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`, and nothing else — MUST** (`RD.DEVEX.WORKSPACE.262`). Never create a sixth entry there; each kind of thing you keep already has its place.
+**An arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`, and nothing else — MUST** (`RD.DEVEX.WORKSPACE.262`). Never create a sixth entry there; each kind of thing you keep already has its place. One level up the same holds: `notes/` and `arcs/` hold only `N<nnn>/` folders, and a note loose at `notes/` is a section of the plan of the arc it belongs to, or of the workstream's first open arc where it names none. The hook refuses a write that would make one, and `state check` names one already there.
 
 | What you have in hand | Where it goes |
 | --- | --- |
@@ -1037,7 +1037,16 @@ and every other `workstream` write refreshes (`RD.DEVEX.WORKSPACE.250`); and `Op
 which the `workstream question` commands write from `questions.jsonl`. The table has two columns: Arc,
 an item cell with the title, the line and one line of Key: value facts (the preview first, then each sample, by
 kind, linked, with no state; a HELD, CARRIED or DROPPED reason as a fact), and Status, the word as its
-badge. Each row carries `data-arc="arcs/N<nnn>/state.json"` and the arc's stamp. The header's status
+badge. Each row carries the arc's number as its id, `id="N<nnn>"`, then `data-arc="arcs/N<nnn>/state.json"`
+and the arc's stamp.
+
+**Every arc has an address on the approach page, `approach.html#N<nnn>`, and every link to an arc points
+there — MUST** (`RD.DEVEX.WORKSPACE.263`). The developer: *"no, this is approach.html, let's keep it like
+that, such that changing the arc number in the browser quickly opens"*. A preview's masthead links
+`../../approach.html#N013`; a plan links the same; an order `../../../approach.html#N013`; a report, a
+handover and a command's output name the address. Never link `arcs/N<nnn>/state.json`: it is data for the
+commands. Where `What` gives one arc a part of its own, that part's heading carries `id="N<nnn>-what"`.
+`docs cycles write` writes the ids, and `state check` names a row without one. The header's status
 reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has landed, and
 `DONE` when the workstream closes. The heading of `Open` reads `Open — Q<n> · Q<n>`, each open card by
 its number. With no card open it reads `Open — no card is open`. The PreToolUse hook refuses an edit
@@ -1089,8 +1098,21 @@ has written. A page that is not in git exists in one place, and a script that em
 copy. This is the coordinator's commit: an agent carrying out an order still commits nothing.
 
 **An arc is named by its number, `N<nnn>`** (`RD.DEVEX.WORKSPACE.203`): three digits, as a workstream's
-number has. Its subject, two to four words, and its title, the full phrase that names the cycle, are
-fields of its data. One number names its two folders, `arcs/N<nnn>/` and `notes/N<nnn>/`.
+number has. Its subject, its title (the full phrase that names the cycle) and its goal are fields of its
+data. One number names its two folders, `arcs/N<nnn>/` and `notes/N<nnn>/`.
+
+**An arc's subject is one to three words, at most 24 characters, in kebab-case — MUST**
+(`RD.DEVEX.WORKSPACE.265`). A noun phrase a reader recognises, such as `layout-model` or `web-stack`,
+never a sentence. `row write --subject` refuses a longer one and `state check` names one. A long subject
+in another workspace is a finding for that workstream's own window, never renamed by guessing.
+
+**Each arc's data folder holds one name file, `arcs/N<nnn>/<subject>.md`, leading with the arc's goal —
+MUST** (`RD.DEVEX.WORKSPACE.264`). `goal` is one or two sentences of the outcome once the arc is done, in a
+reader's words; set it with `row write <arc> --goal "…"`, and `state check` names an arc without one. The
+file holds, in order, the title, the goal, the status with its reason, what the arc decides, its repos, and
+links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no rows, no log. `row write`,
+`report write` and `docs cycles write` write it, and rename it with the subject. Never write it by hand:
+the hook refuses it, and `state check` names a hand edit and a second `.md` in the folder.
 
 **A close is a milestone, and you say so before you ask — MUST** (`RD.DEVEX.WORKSPACE.206`). Open with
 a titled line that names the workstream as shipped, led by a rocket or a plane rather than a party

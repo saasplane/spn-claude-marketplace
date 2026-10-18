@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -7,7 +7,7 @@
 // checks and the hooks read through it, so a path or a format is spelled once.
 
 import { createHash } from "node:crypto";
-import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { withOffset } from "./clock.ts";
@@ -95,6 +95,39 @@ export function strayNotes(notesDir: string, skipPreviews = false): Array<[strin
   return out;
 }
 
+/**
+ * Each entry directly under a workstream's `notes/` or `arcs/` that is not an arc's folder, with where
+ * it belongs, as `[entry, home]` (RD.DEVEX.WORKSPACE.262). A note loose at `notes/` is a section of the
+ * plan of the arc it names, or of `firstOpen`, the workstream's first open arc, where it names none.
+ * A workstream that still keeps its arcs as Markdown under `arcs/` is migration 001's, so `arcs/` is
+ * read only where `markdownArcs` is false. A dot-name is no one's entry and is passed.
+ */
+export function strayLevels(ws: string, firstOpen: string | null, markdownArcs = false): Array<[string, string]> {
+  const out: Array<[string, string]> = [];
+  const plan = (name: string): string => {
+    const named = /\bN\d{3}[a-z]?\b/.exec(name)?.[0];
+    const arc = named ?? firstOpen;
+    return arc
+      ? `a section of \`${NOTES}/${arc}/plan.md\`${named ? ", the arc it names" : ", the workstream's first open arc, since it names none"}`
+      : "a section of the first arc's `plan.md`, once the workstream opens one";
+  };
+  for (const entry of listdir(join(ws, NOTES))) {
+    if (entry.startsWith(".")) continue;
+    const folder = isDir(join(ws, NOTES, entry));
+    if (folder && ARC_ID.test(entry)) continue;
+    const home = folder ? `the arc folder it belongs to, each note in it ${plan(entry)}`
+      : SAMPLE_KINDS.test(entry) || entry.endsWith(".html") ? "the `samples/` of the arc it belongs to" : plan(entry);
+    out.push([`${NOTES}/${entry}${folder ? "/" : ""}`, home]);
+  }
+  if (!markdownArcs) for (const entry of listdir(join(ws, ARCS))) {
+    if (entry.startsWith(".")) continue;
+    const folder = isDir(join(ws, ARCS, entry));
+    if (folder && ARC_ID.test(entry)) continue;
+    out.push([`${ARCS}/${entry}${folder ? "/" : ""}`, "nowhere by hand: `arcs/` holds only `N<nnn>/` folders, which the `workstream` commands write"]);
+  }
+  return out;
+}
+
 export const arcDataDir = (ws: string, arc: string): string => join(ws, ARCS, arc);
 export const stateFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), STATE_FILE);
 export const logFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), LOG_FILE);
@@ -102,6 +135,16 @@ export const factsFileOf = (ws: string, arc: string): string => join(arcDataDir(
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
 export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
+/** The arc's name file beside its data, named for its subject (RD.DEVEX.WORKSPACE.264). */
+export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
+/** The data files of an arc's folder; with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE];
+
+/**
+ * The arc's address on the approach page: its Cycles row, by its number (RD.DEVEX.WORKSPACE.263).
+ * `from` is the path from the folder the link is written in back to the workstream's folder.
+ */
+export const arcAddress = (arc: string, from = ""): string => `${from}${APPROACH_PAGE}#${arc}`;
 export const suggestionsFileOf = (ws: string): string => join(ws, SUGGESTIONS_FILE);
 
 /** The workstream's approach page: `approach.html`, or the one page named as a closed workstream keeps it. */
@@ -113,13 +156,14 @@ export function approachOf(ws: string): string | null {
 }
 
 /**
- * The file a script owns, as its place in a workstream, or null where the path is none. The
- * workspace's own `workstreams/state.json` is `spnutils`'s and is not one of these.
+ * The file a script owns, as its place in a workstream, or null where the path is none: every file in
+ * an arc's data folder, its three data files and its name file alike, and the workstream's two records.
+ * The workspace's own `workstreams/state.json` is `spnutils`'s and is not one of these.
  */
 export function scriptOwned(path: string): { workstream: string; file: string } | null {
   const slashed = resolve(path).split(sep).join("/");
   const found = new RegExp(`^(.*\\/${workstreamPrefixSource()}[^/]+)/` +
-    `(${ARCS}/N\\d+[a-z]?/(?:${STATE_FILE}|${LOG_FILE}|${FACTS_FILE})|${QUESTIONS_FILE}|${SUGGESTIONS_FILE})$`).exec(slashed);
+    `(${ARCS}/N\\d+[a-z]?/[^/]+|${QUESTIONS_FILE}|${SUGGESTIONS_FILE})$`).exec(slashed);
   return found ? { workstream: found[1], file: found[2] } : null;
 }
 
@@ -128,6 +172,26 @@ export function arcIdsOf(ws: string): string[] {
   return listdir(join(ws, ARCS))
     .filter((entry) => ARC_ID.test(entry) && isFile(stateFileOf(ws, entry)))
     .sort(arcOrder);
+}
+
+/**
+ * The workstream's first arc that is not landed, carried or dropped, by number, or null: read from its
+ * data, or from the status line of an arc still kept as Markdown, which migration 001 brings over.
+ */
+export function firstOpenArc(ws: string): string | null {
+  const open: string[] = [];
+  for (const arc of arcIdsOf(ws)) {
+    const status = (readJson(stateFileOf(ws, arc)) as { status?: unknown } | null)?.status;
+    if (typeof status === "string" && !TERMINAL.has(status)) open.push(arc);
+  }
+  for (const file of markdownArcsOf(ws)) {
+    const arc = /^(N\d+[a-z]?)(?=-|\.md$)/.exec(file)?.[1];
+    let text = "";
+    try { text = readFileSync(join(ws, ARCS, file), "utf8"); } catch { continue; }
+    const word = /^\s*\*{0,2}Status:?\*{0,2}\s*\*{0,2}([A-Z][A-Z-]*)/m.exec(text)?.[1] ?? "";
+    if (arc && !TERMINAL.has(word)) open.push(arc);
+  }
+  return open.sort(arcOrder)[0] ?? null;
 }
 
 /** Arcs by number, then by the letter after it. */
@@ -248,11 +312,70 @@ export function readArc(ws: string, arc: string): ArcData | null {
   return data && typeof data === "object" ? data as ArcData : null;
 }
 
-/** Writes an arc's data after the schema passes it. Throws with every fault where it does not. */
+/** Writes an arc's data after the schema passes it, and its name file with it. Throws with every fault where it does not. */
 export function writeArc(ws: string, data: ArcData): void {
   const faults = arcFaults(data, `${data.arc}'s state.json`);
   if (faults.length) throw new Error(faults.join("; "));
   writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeNameFile(ws, data);
+}
+
+/** The Markdown files in an arc's data folder: its name file, and any other, which the check names. */
+export const markdownIn = (ws: string, arc: string): string[] =>
+  listdir(arcDataDir(ws, arc)).filter((entry) => entry.endsWith(".md") && isFile(join(arcDataDir(ws, arc), entry)));
+
+/**
+ * The arc's name file as the commands write it (RD.DEVEX.WORKSPACE.264): the title, the goal, the
+ * status with its reason, what it decides, its repositories, then links to its row on the approach
+ * page, its preview, its plan and its samples, each linked only where it is on disk. No rows, no log.
+ */
+export function nameFileText(ws: string, data: ArcData): string {
+  const goal = typeof data.goal === "string" && data.goal.trim() ? data.goal.trim()
+    : `(none yet: \`spn-devex workstream row write ${data.arc} --goal "…"\`)`;
+  const lines = [
+    `<!-- ${data.arc}'s name. \`spn-devex workstream row write\` and \`docs cycles write\` write it from state.json; never by hand. -->`,
+    `# ${data.arc} — ${data.title}`,
+    "",
+    `**Goal.** ${goal}`,
+    "",
+    `**Status.** ${data.status}${data.reason ? ` — ${data.reason}` : ""}`,
+  ];
+  if (typeof data.decides === "string" && data.decides.trim()) lines.push("", `**Decides.** ${data.decides.trim()}`);
+  if (Array.isArray(data.repos) && data.repos.length) lines.push("", `**Repos.** ${data.repos.join(" · ")}`);
+  const notes = `../../${NOTES}/${data.arc}`;
+  const links = [`[the arc on the approach page](${arcAddress(data.arc, "../../")})`];
+  if (isFile(previewOf(ws, data.arc))) links.push(`[preview](${notes}/${PREVIEW_FILE})`);
+  if (isFile(join(notesDirOf(ws, data.arc), "plan.md"))) links.push(`[plan](${notes}/plan.md)`);
+  if (isDir(join(notesDirOf(ws, data.arc), "samples"))) links.push(`[samples](${notes}/samples/)`);
+  lines.push("", `**Links.** ${links.join(" · ")}`, "");
+  return lines.join("\n");
+}
+
+/**
+ * Whether a name file on disk is the commands' own for the data. Its links follow what is on disk in
+ * the arc's notes, so a sample added since does not make it a hand edit: the links line is compared
+ * by its being there, and the next write of the arc brings it current.
+ */
+export function nameFileHolds(ws: string, data: ArcData, text: string): boolean {
+  const LINKS = /^\*\*Links\.\*\* .*$/m;
+  const wanted = nameFileText(ws, data);
+  return LINKS.test(text) && text.replace(LINKS, "") === wanted.replace(LINKS, "");
+}
+
+/**
+ * Writes the arc's name file where it differs, and removes any other Markdown file in its data folder,
+ * so a subject changed renames it. Says whether it wrote.
+ */
+export function writeNameFile(ws: string, data: ArcData): boolean {
+  const file = nameFileOf(ws, data.arc, data.subject);
+  const text = nameFileText(ws, data);
+  let wrote = false;
+  for (const other of markdownIn(ws, data.arc))
+    if (other !== `${data.subject}.md`) { rmSync(join(arcDataDir(ws, data.arc), other)); wrote = true; }
+  let current: string | null = null;
+  try { current = readFileSync(file, "utf8"); } catch { /* absent */ }
+  if (current !== text) { writeWhole(file, text); wrote = true; }
+  return wrote;
 }
 
 /** The instant a record carries: the local date and time with its offset. */
@@ -265,7 +388,7 @@ export function logEvent(ws: string, arc: string, kind: string, row: string | nu
 
 /** A new arc's data, `PROPOSED`, with no row. */
 export function newArc(arc: string, subject: string, title: string): ArcData {
-  return { schemaVersion: SCHEMA_VERSION, arc, subject, title, status: "PROPOSED", reason: null,
+  return { schemaVersion: SCHEMA_VERSION, arc, subject, title, goal: null, status: "PROPOSED", reason: null,
            decides: null, repos: [], cycle: null, follows: null, model: null, preview: PREVIEW_FILE, rows: [] };
 }
 
@@ -411,7 +534,7 @@ export function inline(text: string): string {
 const bar = (done: number, total: number): string =>
   `<div class="sds-bar"><i style="width:${total ? Math.round((done / total) * 100) : 0}%"></i></div>`;
 
-/** The inside of the progress block: an overall line and bar, then a line and a small bar per arc. */
+/** The inside of the progress block: an overall line and bar, then a line and a small bar per arc, linking its Cycles row. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
   const counts = arcs.map((data) => ({ data, ...doneOf(data) }));
   const done = counts.reduce((sum, one) => sum + one.done, 0);
@@ -422,7 +545,7 @@ export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(w
     `  ${bar(done, total)}`,
   ];
   for (const one of counts)
-    lines.push(`  <p><a href="${ARCS}/${one.data.arc}/${STATE_FILE}">${one.data.arc}</a> <span class="sds-small">${one.done}/${one.total}</span></p>`,
+    lines.push(`  <p><a href="#${one.data.arc}">${one.data.arc}</a> <span class="sds-small">${one.done}/${one.total}</span></p>`,
       `  ${bar(one.done, one.total)}`);
   return `${lines.join("\n")}\n`;
 }

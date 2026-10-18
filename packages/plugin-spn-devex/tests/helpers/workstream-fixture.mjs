@@ -1,6 +1,7 @@
 // A workstream kept as data, on disk in a throwaway workspace: an approach page in the template's
 // shape (What linking the preview, Cycles with the arc's row and the progress block, Open as the open
-// block), one arc's `state.json`, its preview and its plan. Each case starts whole and breaks one thing.
+// block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
+// and breaks one thing.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -27,7 +28,7 @@ export function approachPage(stamp = "") {
     `  <div class="sds-scroll"><table>`,
     `    <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>`,
     `    <tbody>`,
-    `      <tr data-arc="arcs/N001/state.json"${stamp ? ` data-arc-stamp="${stamp}"` : ""}><td><p><strong>N001 &mdash; the probe arc</strong></p><p>what it decides</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>`,
+    `      <tr id="N001" data-arc="arcs/N001/state.json"${stamp ? ` data-arc-stamp="${stamp}"` : ""}><td><p><strong>N001 &mdash; the probe arc</strong></p><p>what it decides</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>`,
     `    </tbody>`,
     `  </table></div>`,
     `  <!-- spn:generated progress — do not edit inside these markers; \`workstream progress write\` writes it from the arcs -->`,
@@ -49,7 +50,7 @@ export const PREVIEW = `<meta charset="utf-8">\n<div class="sds-wrap">\n<section
 /** The arc's data: decided, two rows, the second waiting on the first. */
 export function arcData(rows) {
   return {
-    schemaVersion: 1, arc: "N001", subject: "probe", title: "the probe arc", status: "DECIDED", reason: null,
+    schemaVersion: 1, arc: "N001", subject: "probe", title: "the probe arc", goal: "the probe is answered", status: "DECIDED", reason: null,
     decides: "what it decides", repos: ["spn-x"], cycle: "a plugin release", follows: null, model: "Opus 5.5", preview: "preview.html",
     rows: rows ?? [
       { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["foundation:a"], state: "waiting" },
@@ -71,7 +72,7 @@ export const CARD = {
  * `spn-x` beside it. The stamp on the page is the arc's own unless `stamp` says otherwise.
  */
 export async function dataWorkspace(name, { stamp = null, rows = undefined } = {}) {
-  const { rowStamp } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
+  const { rowStamp, writeNameFile } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
   const data = arcData(rows);
   const ws = `.spndevex/workstreams/open/031-probe`;
   const root = workspace(name, {
@@ -81,6 +82,7 @@ export async function dataWorkspace(name, { stamp = null, rows = undefined } = {
     [`${ws}/notes/N001/plan.md`]: "# N001 plan\n",
     "spn-x/a.ts": "export const a = 1;\n",
   });
+  writeNameFile(join(root, ws), data);
   const repo = join(root, "spn-x");
   const git = (args) => execFileSync("git", args, { cwd: repo, stdio: ["ignore", "pipe", "ignore"], encoding: "utf8" }).trim();
   git(["init", "-q"]);

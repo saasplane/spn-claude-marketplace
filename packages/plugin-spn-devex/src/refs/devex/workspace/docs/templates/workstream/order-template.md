@@ -28,7 +28,7 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | | |
 | --- | --- |
 | **Repo** | `{{repo}}` · **Depth:** {{child here · own window}} · **Run from:** `{{absolute path}}` |
-| **Workstream** | `{{NNN-subject}}` · **Arc:** `N{{nnn}}`, row {{row}} — `spn-devex workstream rows show {{NNN}}` reads it |
+| **Workstream** | `{{NNN-subject}}` · **Arc:** [`N{{nnn}}`](../../../approach.html#N{{nnn}}), row {{row}} — `spn-devex workstream rows show {{NNN}}` reads it |
 | **Pinned** | the facts named above, each pinned to its commit; `spn-devex workstream state check` lists any source that moved since |
 | **Form** | {{light · full}} |
 | **Read first** | Only these parts: `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · the preview's section `{{absolute path}}/notes/N{{nnn}}/preview.html#{{part}}` · `{{absolute path}}/notes/N{{nnn}}/plan.md` § Traps, § Commands · the facts and cards named in the front matter |

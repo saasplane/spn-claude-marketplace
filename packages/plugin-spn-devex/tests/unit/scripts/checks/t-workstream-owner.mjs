@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { CARD, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 
-const { notesTreeRefusal, ownedRefusal, pageRefusal } = await import("../../../../src/scripts/checks/workstream-owner.ts");
+const { levelRefusal, notesTreeRefusal, ownedRefusal, pageRefusal } = await import("../../../../src/scripts/checks/workstream-owner.ts");
 const HOOK = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
 
 let total = 0, failed = 0;
@@ -124,6 +124,22 @@ console.log("\n=== RD.DEVEX.WORKSPACE.262 — a write that would make a sixth en
   ok("green: a stray already on disk can still be edited, so its links are rewritten before it is folded", existing !== "deny");
   const closed = join(root, ".spndevex", "workstreams", "closed", "020-done", "notes", "N001", "shots", "a.png");
   ok("green: a closed workstream is never judged", ownedRefusal(closed) === null && notesTreeRefusal(closed) === null);
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.262 and .264 — notes/ and arcs/ hold arc folders, and the name file is the commands'");
+{
+  const [loose, looseWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "notes", "ideation.md"), content: "# x\n" } }, root);
+  ok("red: a note loose at notes/ is refused, and sent to an arc's plan", loose === "deny" && looseWhy.includes("`notes/ideation.md`") && looseWhy.includes("`plan.md`"), `${loose}: ${looseWhy.slice(0, 300)}`);
+  const [folder] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(ws, "notes", "shots")}` } }, root);
+  ok("red: a mkdir of a folder at notes/ that is no arc's is refused", folder === "deny");
+  const [arcsFile, arcsWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "arcs", "N009-new.md"), content: "# N009\n" } }, root);
+  ok("red: a file written at arcs/ is refused", arcsFile === "deny" && arcsWhy.includes("`arcs/N009-new.md`"), `${arcsFile}: ${arcsWhy.slice(0, 300)}`);
+  const [name, nameWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "arcs", "N001", "probe.md"), content: "# mine\n" } }, root);
+  ok("red: a hand write of the arc's name file is refused, and names its commands", name === "deny" && nameWhy.includes("`docs cycles write`"), `${name}: ${nameWhy.slice(0, 300)}`);
+  const [arcDir] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(ws, "notes", "N007", "samples")}` } }, root);
+  ok("green: a new arc's notes folder is made", arcDir !== "deny");
+  const closed = join(root, ".spndevex", "workstreams", "closed", "020-done", "notes", "ideation.md");
+  ok("green: a closed workstream is never judged", levelRefusal(closed) === null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream owner` : `\n  all ${total} passed — workstream owner`);

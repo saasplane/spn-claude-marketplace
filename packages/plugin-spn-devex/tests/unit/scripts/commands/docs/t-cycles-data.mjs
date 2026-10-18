@@ -1,7 +1,8 @@
 // `commands/docs/cycles.ts` over arcs kept as data: each row read from `arcs/N<nnn>/state.json`, the
-// preview by its fixed name and the samples beside it, the badge, `data-arc` on the row, and the stamp
-// a rewrite of the table keeps, since only `workstream arc stamp write` writes it.
-import { readFileSync, writeFileSync } from "node:fs";
+// preview by its fixed name and the samples beside it, the badge, the arc's number as the row's id with
+// `data-arc` beside it, the stamp a rewrite of the table keeps, since only `workstream arc stamp write`
+// writes it, and the arc's name file, which `write` writes too.
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 
@@ -32,7 +33,8 @@ console.log("=== an arc kept as data, read into its row");
   const held = { ...cycle, status: "HELD", detail: "waits on q3" };
   ok("a HELD reason is a fact on the arc's line", cycles.factsCell(held).endsWith("&middot; waits on q3"));
   const row = cycles.tableOf([cycle], new Map([["N001", { stamp: "abc123abc123" }]]));
-  ok("the row carries its data's path and the stamp it was given", row.includes('<tr data-arc="arcs/N001/state.json" data-arc-stamp="abc123abc123">'), row);
+  ok("the row carries the arc's number as its id, its data's path and the stamp it was given",
+    row.includes('<tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="abc123abc123">'), row);
   ok("the Status column is the template's", row.includes('<th class="sds-status-col">Status</th>'));
 }
 
@@ -51,10 +53,19 @@ console.log("\n=== docs cycles write keeps the stamp, and the page is then curre
   const table = after.slice(cycles.cyclesTableAt(after).from, cycles.cyclesTableAt(after).to);
   const green = cycles.tableDifferences(table, cycles.cyclesOf(ws));
   ok("green: the table now matches the arcs", !green.missing.length && !green.unknown.length && !green.stale.length, JSON.stringify(green));
-  writeFileSync(page, after.replace('<tr data-arc="arcs/N001/state.json"', "<tr"));
+  writeFileSync(page, after.replace(' data-arc="arcs/N001/state.json"', ""));
   const lost = readFileSync(page, "utf8");
   const noData = cycles.tableDifferences(lost.slice(cycles.cyclesTableAt(lost).from, cycles.cyclesTableAt(lost).to), cycles.cyclesOf(ws));
   ok("red: a row that lost its data-arc is stale", noData.stale.some((line) => /does not carry `data-arc="arcs\/N001\/state.json"`/.test(line)), JSON.stringify(noData));
+  writeFileSync(page, after.replace('<tr id="N001" ', "<tr "));
+  const unaddressed = readFileSync(page, "utf8");
+  const noId = cycles.tableDifferences(unaddressed.slice(cycles.cyclesTableAt(unaddressed).from, cycles.cyclesTableAt(unaddressed).to), cycles.cyclesOf(ws));
+  ok("red: a row with no id is stale, its address empty", noId.stale.some((line) => /carries no `id="N001"`/.test(line)), JSON.stringify(noId));
+  rmSync(join(ws, "arcs", "N001", "probe.md"));
+  const again = cli(root, ["docs", "cycles", "write", "031"]);
+  ok("green: write gives the row its id back and writes the arc's name file",
+    again.code === 0 && readFileSync(page, "utf8").includes('<tr id="N001" data-arc=') && /wrote the name file of N001\/probe.md/.test(again.out)
+      && existsSync(join(ws, "arcs", "N001", "probe.md")), again.out);
   const json = JSON.parse(cli(root, ["docs", "cycles", "show", "031", "--json"]).out);
   ok("show --json names the arc's data file", json[0].file === "state.json" && json[0].status === "DECIDED", JSON.stringify(json));
 }

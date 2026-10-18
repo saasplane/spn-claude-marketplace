@@ -5,7 +5,9 @@
 // The refusal that makes one owner per file hold by force: a direct write to a file the `workstream`
 // commands own, an edit that touches a `progress` or `open` block, a hand edit of an arc's stamp, and
 // a write to the workspace's migrations ledger, which `plugin migration write` alone appends to, and
-// a write that would create a sixth entry in an arc's notes folder of an open or backlog workstream.
+// a write that would create a sixth entry in an arc's notes folder of an open or backlog workstream, or
+// anything but an arc's folder directly under its `notes/` or `arcs/`. Every file in an arc's data
+// folder, its name file `<subject>.md` too, is the commands' (RD.DEVEX.WORKSPACE.264).
 // A command writes these through the library, never through a tool call, so nothing here refuses it.
 
 import { existsSync, readFileSync } from "node:fs";
@@ -13,6 +15,7 @@ import { basename, resolve, sep } from "node:path";
 import { bashWrites } from "./doc-check.ts";
 import { type Payload, type Verdict } from "../lib/payload.ts";
 import { NOTES, NOTES_ENTRIES, blocksIn, scriptOwned, stampsOn, strayHome, workstreamAround, wrongKind } from "../lib/workstream.ts";
+import { ARC_ID } from "../lib/workstream-schema.ts";
 import { DEVEX, DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { LEDGER } from "../lib/migration.ts";
 
@@ -33,7 +36,10 @@ export function ownedRefusal(path: string): string | null {
   const owned = scriptOwned(path);
   if (!owned) return null;
   const name = owned.file.split("/").pop()!;
-  return `Denied: \`${owned.file}\` is written only by ${WRITERS[name] ?? "the `workstream` commands"}, and never by hand ` +
+  const writer = WRITERS[name] ?? (name.endsWith(".md")
+    ? "`workstream row write` and `docs cycles write`, from the arc's `state.json` — it is the arc's name file"
+    : "the `workstream` commands");
+  return `Denied: \`${owned.file}\` is written only by ${writer}, and never by hand ` +
     `(01-workstream.md § A script or an agent writes each file, never both). Run \`spn-devex workstream\` for the change, ` +
     `or \`spn-devex workstream state show\` to read it.`;
 }
@@ -58,6 +64,28 @@ export function notesTreeRefusal(path: string, makesFolder = false): string | nu
   return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`preview.html\`, ` +
     `\`samples/\`, \`plan.md\`, \`orders/\` and \`scripts/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
     `or names the note that holds it; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
+}
+
+const LEVEL_ENTRY = new RegExp(`^(.*/${DEVEX_WORKSTREAMS.replace(/\./g, "\\.")}/(?:open|backlog)/[^/]+)/(${NOTES}|arcs)/([^/]+)(/.*)?$`);
+
+/**
+ * Why a write may not make this path, or null: one that would create anything but an arc's folder,
+ * `N<nnn>/`, directly under a workstream's `notes/` or `arcs/` (RD.DEVEX.WORKSPACE.262). An entry
+ * already on disk is not refused, so a loose note can still be folded into a plan. A closed workstream
+ * is never read.
+ */
+export function levelRefusal(path: string, makesFolder = false): string | null {
+  const found = LEVEL_ENTRY.exec(resolve(path).split(sep).join("/"));
+  if (!found) return null;
+  const [, ws, level, entry, below] = found;
+  if (entry.startsWith(".") || existsSync(`${ws}/${level}/${entry}`)) return null;
+  const folder = below !== undefined || makesFolder;
+  if (folder && ARC_ID.test(entry)) return null;
+  const home = level === NOTES
+    ? "a section of the `plan.md` of the arc it belongs to, or of the workstream's first open arc where it names none"
+    : "nowhere by hand: the `workstream` commands write `arcs/N<nnn>/`";
+  return `Denied: this write makes \`${level}/${entry}${folder ? "/" : ""}\`, and \`notes/\` and \`arcs/\` hold only arc folders, ` +
+    `\`N<nnn>/\` (01-workstream.md § The folder; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }
 
 /** The folders a `mkdir` in a command makes, as written. */
@@ -138,11 +166,11 @@ export function checkOwner(payload: Payload): Verdict {
   }
   const isRead = payload.tool_name === "Read" || payload.tool_name === "Grep" || payload.tool_name === "Glob";
   if (!isRead) for (const path of paths) {
-    const reason = ownedRefusal(path) ?? notesTreeRefusal(path);
+    const reason = ownedRefusal(path) ?? levelRefusal(path) ?? notesTreeRefusal(path);
     if (reason) return { deny: reason };
   }
   if (!isRead) for (const folder of folders) {
-    const reason = notesTreeRefusal(folder, true);
+    const reason = levelRefusal(folder, true) ?? notesTreeRefusal(folder, true);
     if (reason) return { deny: reason };
   }
   if (isRead) return null;

@@ -25,7 +25,7 @@ export function oldShapes(root: string): string[] {
 
 export const migration001: Migration = {
   id: "001",
-  version: "0.40.0",
+  version: "0.41.0",
   changed: "A workstream keeps each arc as data — its rows in `arcs/N<nnn>/state.json` with its log and facts beside it, " +
     "the agent's files in `notes/N<nnn>/` with one preview at `preview.html`, and each card as a record in `questions.jsonl`.",
   check: oldShapes,

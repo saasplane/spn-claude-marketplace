@@ -2,7 +2,7 @@
 // script owns is held to, the stamp of an arc's rows, the two generated blocks, and the front matter an
 // order and a report open with. Each rule is shown failing on a record that breaks it, and passing on
 // the record that keeps it.
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { arcData, approachPage, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
@@ -103,7 +103,7 @@ console.log("\n=== the generated blocks — progress and open");
   const data = arcData(); data.rows[0].state = "landed";
   const inside = lib.progressInside("/nowhere", [data]);
   ok("progress: rows done of all and arcs closed of all", inside.includes("Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed"), inside);
-  ok("progress: a bar per arc, linking its data", inside.includes('<a href="arcs/N001/state.json">N001</a> <span class="sds-small">1/2</span>') && inside.includes('style="width:50%"'));
+  ok("progress: a bar per arc, linking its row on the page, never its data", inside.includes('<a href="#N001">N001</a> <span class="sds-small">1/2</span>') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
   const { CARD } = await import("../../../helpers/workstream-fixture.mjs");
   const { title, ...card } = CARD;
   const html = lib.cardHtml({ id: "q7", title, card });
@@ -134,6 +134,8 @@ console.log("\n=== the folder — what a script owns, and where a reference poin
   ok("the workstream's questions and suggestions are", !!lib.scriptOwned(`${base}/questions.jsonl`) && !!lib.scriptOwned(`${base}/suggestions.jsonl`));
   ok("the workspace's own workstreams/state.json is not", lib.scriptOwned("/w/.spndevex/workstreams/state.json") === null);
   ok("the agent's preview and plan are not", lib.scriptOwned(`${base}/notes/N007/preview.html`) === null && lib.scriptOwned(`${base}/notes/N007/plan.md`) === null);
+  ok("the arc's name file beside its data is a script's", lib.scriptOwned(`${base}/arcs/N007/layout-model.md`)?.file === "arcs/N007/layout-model.md");
+  ok("an arc's address is its row on the approach page", lib.arcAddress("N013") === "approach.html#N013" && lib.arcAddress("N013", "../../") === "../../approach.html#N013");
   const { root, ws } = await dataWorkspace("t-workstream-lib");
   ok("an arc named with its workstream resolves", lib.resolveArc("031/N001", root).ws === ws);
   ok("an arc named alone resolves where one workstream holds it", lib.resolveArc("N001", root).arc === "N001");
@@ -144,6 +146,35 @@ console.log("\n=== the folder — what a script owns, and where a reference poin
   ok("its arcs are read from their folders", lib.arcIdsOf(ws).join() === "N001");
   ok("its page reads its progress block written", lib.writeProgress(ws) === "progress written" && readFileSync(join(ws, "approach.html"), "utf8").includes("Overall: 0 of 2 rows done"));
   ok("and a second write finds it current", lib.writeProgress(ws) === "progress current");
+}
+
+console.log("\n=== the name file — RD.DEVEX.WORKSPACE.264");
+{
+  const { ws } = await dataWorkspace("t-workstream-name");
+  const data = arcData();
+  const text = readFileSync(join(ws, "arcs", "N001", "probe.md"), "utf8");
+  const order = ["# N001 — the probe arc", "**Goal.** the probe is answered", "**Status.** DECIDED", "**Decides.** what it decides", "**Repos.** spn-x", "**Links.**"];
+  ok("it holds the title, the goal, the status, what it decides, its repos and its links, in that order",
+    order.every((part, at) => text.indexOf(part) >= 0 && (at === 0 || text.indexOf(part) > text.indexOf(order[at - 1]))), text);
+  ok("its links: the arc on the page first, then the preview and the plan that are on disk",
+    text.includes("[the arc on the approach page](../../approach.html#N001) · [preview](../../notes/N001/preview.html) · [plan](../../notes/N001/plan.md)") && !text.includes("samples"), text);
+  ok("no rows and no log", !text.includes("write the book") && !text.includes("log.jsonl"));
+  ok("it holds against its data", lib.nameFileHolds(ws, data, text));
+  ok("red: a hand edit of the goal does not hold", !lib.nameFileHolds(ws, data, text.replace("the probe is answered", "something else")));
+  mkdirSync(join(ws, "notes", "N001", "samples"), { recursive: true });
+  ok("a sample added since is no hand edit: the links line follows the next write", lib.nameFileHolds(ws, data, text));
+  lib.writeArc(ws, { ...data, subject: "renamed" });
+  ok("a subject changed renames the file, and the old one goes",
+    lib.markdownIn(ws, "N001").join() === "renamed.md" && readFileSync(join(ws, "arcs", "N001", "renamed.md"), "utf8").includes("[samples](../../notes/N001/samples/)"));
+}
+
+console.log("\n=== a short subject — RD.DEVEX.WORKSPACE.265");
+{
+  const { subjectFault } = schema;
+  ok("one to three words of at most 24 characters hold", ["lenses", "web-stack", "surface-app-patterns"].every((one) => subjectFault(one) === null));
+  ok("red: four words or more are refused", /is 5 words/.test(subjectFault("web-stack-and-partner-choices") ?? ""));
+  ok("red: more than 24 characters is refused", /is 25 characters/.test(subjectFault("aaaaaaaaaaaa-bbbbbbbbbbbb") ?? ""), subjectFault("aaaaaaaaaaaa-bbbbbbbbbbbb"));
+  ok("red: a sentence is not kebab-case", subjectFault("Layout model") !== null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream library` : `\n  all ${total} passed — workstream library`);

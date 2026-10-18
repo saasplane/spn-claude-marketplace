@@ -1,5 +1,5 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A preview shows, and an approach page argues
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A preview shows, and an approach page argues · § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `workstream state check`, as a function: whether each open and backlog workstream is whole. The
@@ -12,10 +12,11 @@ import { pastDecided } from "./arc-status.ts";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import {
-  FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcIdsOf, factsFileOf, isDataLayout, logFileOf, markdownArcsOf,
-  notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf, strayNotes, suggestionsFileOf, readJson, workstreamsOf,
+  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, isDataLayout, logFileOf, markdownArcsOf,
+  markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf,
 } from "../lib/workstream.ts";
-import { arcFaults, factFaults, logFaults, questionFaults, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -60,12 +61,38 @@ export function notesTreeFindings(ws: string, arc: string): string[] {
     .map(([entry, home]) => `\`${NOTES}/${arc}/${entry}\` is not one of the five entries of an arc's notes folder — it belongs in ${home}`);
 }
 
-/** S7: the arc's row in Cycles, its stamp against its rows, and its preview linked from `What`. */
+/**
+ * RD.DEVEX.WORKSPACE.264 and .265: the arc's goal, its subject's length, and its data folder — the three
+ * data files and one name file, which reads as the commands write it from the data.
+ */
+export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
+  const out: string[] = [];
+  if (!(typeof data.goal === "string" && data.goal.trim()))
+    out.push(`${arc} has no goal — \`spn-devex workstream row write ${arc} --goal "…"\`, the outcome once it is done, in a sentence or two`);
+  const short = subjectFault(data.subject);
+  if (short) out.push(`${arc}'s subject \`${data.subject}\` ${short} — \`spn-devex workstream row write ${arc} --subject <short-name>\``);
+  const name = `${data.subject}.md`;
+  const markdown = markdownIn(ws, arc);
+  for (const other of markdown.filter((one) => one !== name))
+    out.push(`\`arcs/${arc}/${other}\` is a second Markdown file — an arc's data folder holds one, \`${name}\`, which the commands write`);
+  for (const entry of listdir(arcDataDir(ws, arc)).filter((one) => !one.endsWith(".md") && !DATA_FILES.includes(one) && !one.startsWith(".")))
+    out.push(`\`arcs/${arc}/${entry}\` is not the arc's data — \`arcs/${arc}/\` holds \`state.json\`, \`log.jsonl\`, \`facts.jsonl\` and \`${name}\``);
+  let current: string | null = null;
+  try { current = readFileSync(nameFileOf(ws, arc, data.subject), "utf8"); } catch { /* absent */ }
+  if (current === null) out.push(`${arc} has no name file \`arcs/${arc}/${name}\` — \`spn-devex docs cycles write\` writes it`);
+  else if (!nameFileHolds(ws, data, current))
+    out.push(`\`arcs/${arc}/${name}\` is not what the commands write from the data — it is never edited by hand; \`spn-devex docs cycles write\` writes it again`);
+  return out;
+}
+
+/** S7: the arc's row in Cycles under its address, its stamp against its rows, and its preview linked from `What`. */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
   const out: string[] = [];
   const row = stampsOn(text).get(arc);
   if (!row) out.push(`${arc} has no row in Cycles carrying \`data-arc="arcs/${arc}/state.json"\``);
+  else if (!/\bid="([^"]*)"/.test(row.tag) || /\bid="([^"]*)"/.exec(row.tag)![1] !== arc)
+    out.push(`${arc}'s row in Cycles carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
   else if (row.stamp !== rowStamp(data))
     out.push(`${arc}'s part on the approach page is behind its rows — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
   if (isFile(previewOf(ws, arc)) && !sectionText(text, "What").includes(`${NOTES}/${arc}/${PREVIEW_FILE}`))
@@ -131,11 +158,15 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...previewFindings(ws, arc, data).map(say(arc, "preview")));
     if (!data) continue;
     out.push(...pageFindings(ws, arc, data, page, text).map(say(arc, "stamp")));
+    out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
   }
   // A notes folder with no arc data is an arc the page cannot show.
   for (const arc of listdir(join(ws, NOTES)))
     if (/^N\d+[a-z]?$/.test(arc) && !isFile(stateFileOf(ws, arc))) out.push(say(arc, "steps")(`\`${NOTES}/${arc}/\` has no \`arcs/${arc}/state.json\``));
+  // `notes/` and `arcs/` hold arc folders, and nothing else.
+  for (const [entry, home] of strayLevels(ws, firstOpenArc(ws)))
+    out.push(say(null, "notes")(`\`${entry}\` is not an arc's folder — \`notes/\` and \`arcs/\` hold only \`N<nnn>/\` folders; it belongs in ${home}`));
   // Every arc's notes folder holds the five, whether or not its data reads.
   for (const arc of listdir(join(ws, NOTES)))
     if (/^N\d+[a-z]?$/.test(arc) && isDir(join(ws, NOTES, arc))) out.push(...notesTreeFindings(ws, arc).map(say(arc, "notes")));

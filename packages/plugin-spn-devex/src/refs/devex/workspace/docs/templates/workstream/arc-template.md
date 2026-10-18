@@ -4,7 +4,9 @@
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- AN ARC IS KEPT AS DATA, IN TWO FOLDERS NAMED BY ONE NUMBER. `arcs/N<nnn>/` holds what the commands write:
-     `state.json`, `log.jsonl` and `facts.jsonl`. Nobody types in it, and the PreToolUse hook refuses an edit there.
+     `state.json`, `log.jsonl`, `facts.jsonl` and `<subject>.md`, the arc's name file. Nobody types in it, and the
+     PreToolUse hook refuses an edit there. The arc's address is its row on the approach page, `approach.html#N<nnn>`,
+     and every link to the arc points there, never at `state.json`.
      `notes/N<nnn>/` holds what the agent writes: `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`.
      This file is not copied into a workstream. It shows the commands that write the arc's data and what each field
      holds, then the agent's own files, so an arc is opened and run the same way every time. No card lives in an arc:
@@ -14,8 +16,9 @@
 ## Open it — the commands write `arcs/N{{nnn}}/`
 
 ```sh
-# open the arc as PROPOSED: its title names the cycle it pays, its subject is two to four words
-spn-devex workstream row write N{{nnn}} --title "{{the cycle it pays, named: R: the support release that carries X}}" --subject {{two-to-four-words}}
+# open the arc as PROPOSED: its title names the cycle it pays, its subject is one to three words of at most 24
+# characters, and its goal is the outcome once it is done, in a sentence or two
+spn-devex workstream row write N{{nnn}} --title "{{the cycle it pays, named: R: the support release that carries X}}" --subject {{short-name}} --goal "{{what is true once the arc is done}}"
 
 # its header: what it decides, the repositories in chain order, the cycle, what it follows, the coordinator's model
 spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{a book change · a support release · a plugin release and reinstall · a renumbering · a corpus pass · a symbols regeneration · a full verification}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
@@ -40,7 +43,8 @@ spn-devex workstream arc stamp write N{{nnn}}
 
 ```json
 { "schemaVersion": 1,
-  "arc": "N{{nnn}}", "subject": "{{two-to-four-words}}", "title": "{{the cycle it pays, named}}",
+  "arc": "N{{nnn}}", "subject": "{{short-name}}", "title": "{{the cycle it pays, named}}",
+  "goal": "{{what is true once the arc is done, in a reader's words}}",
   "status": "PROPOSED", "reason": null,
   "decides": "{{what this arc decides}}", "repos": ["{{repo}}", "{{repo}}"],
   "cycle": "{{the cycle it pays}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
@@ -66,6 +70,12 @@ spn-devex workstream arc stamp write N{{nnn}}
 ```text
 log.jsonl     {"at":"{{YYYY-MM-DDTHH:MM}}","kind":"{{what happened: opened · header · status · added · a row's new state · landed · stopped · needs-you · stamped · note}}","row":"{{row or null}}","note":"{{one line}}"}
 facts.jsonl   {"id":"f{{n}}","fact":"{{one line}}","source":"{{repo/path:line}}","commit":"{{sha}}","readAt":"{{YYYY-MM-DDTHH:MM}}","usedBy":["{{q<n> or row}}"]}
+```
+
+```text
+arcs/N{{nnn}}/{{short-name}}.md   the arc's name, written with its data: the title · the goal · the status and its reason ·
+                                  what it decides · its repositories · links to ../../approach.html#N{{nnn}}, the preview,
+                                  the plan and the samples. No rows and no log
 ```
 
 ## What the agent writes — `notes/N{{nnn}}/`

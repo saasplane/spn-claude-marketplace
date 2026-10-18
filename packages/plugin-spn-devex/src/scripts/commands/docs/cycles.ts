@@ -6,8 +6,10 @@
 // columns. Arc holds the title, the description and the facts as links separated by middots (the arc file, and the
 // previews and samples the arc's own `## Previews` table carries); Status holds the word, and for
 // HELD, CARRIED and DROPPED the reason below it. An arc kept as data (`arcs/N<nnn>/state.json`) gives
-// the preview by its fixed name and its samples, a badge for its status, and `data-arc` and its stamp on
-// the row; a rewrite keeps the stamp, which only `workstream arc stamp write` writes.
+// the preview by its fixed name and its samples, a badge for its status, and its number as the row's
+// id, so `approach.html#N013` opens it (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the
+// row; a rewrite keeps the stamp, which only `workstream arc stamp write` writes. `write` also writes
+// each arc's name file, `arcs/N<nnn>/<subject>.md` (RD.DEVEX.WORKSPACE.264).
 //
 //   spn-devex docs cycles show <workstream> [--json]   print the table, or the rows as data
 //   spn-devex docs cycles write <workstream>           write the parts of the page the arcs decide
@@ -28,7 +30,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { blockAt, stampsOn } from "../../lib/workstream.ts";
+import { arcIdsOf, blockAt, readArc, stampsOn, writeNameFile } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -332,14 +334,19 @@ export function rowCells(cycle: Cycle): string[] {
 }
 
 /**
- * The row's opening tag: an arc kept as data carries its data's path and the stamp the page held for
- * it, which only `workstream arc stamp write` writes, so a rewrite of the table keeps it.
+ * The row's opening tag: an arc kept as data carries its number as the row's id, which is the arc's
+ * address on the page (`approach.html#N013`), its data's path, and the stamp the page held for it,
+ * which only `workstream arc stamp write` writes, so a rewrite of the table keeps it.
  */
 export function rowTag(cycle: Cycle, stamps: Map<string, { stamp: string | null }> = new Map()): string {
   if (!cycle.kept || !cycle.id) return "<tr>";
   const stamp = stamps.get(cycle.id)?.stamp;
-  return `<tr data-arc="${ARCS}/${cycle.id}/state.json"${stamp ? ` data-arc-stamp="${attribute(stamp)}"` : ""}>`;
+  return `<tr id="${cycle.id}" data-arc="${ARCS}/${cycle.id}/state.json"${stamp ? ` data-arc-stamp="${attribute(stamp)}"` : ""}>`;
 }
+
+/** Whether a table holds the row of an arc kept as data under its address, `id="N013"`. */
+export const carriesAddress = (table: string, arc: string): boolean =>
+  new RegExp(`<tr\\b[^>]*\\bid="${arc}"[^>]*\\bdata-arc="`).test(table) || new RegExp(`<tr\\b[^>]*\\bdata-arc="[^"]*"[^>]*\\bid="${arc}"`).test(table);
 
 /** The table the approach template's Cycles subsection carries, ready to replace it. */
 export function tableOf(cycles: Cycle[], stamps: Map<string, { stamp: string | null }> = new Map()): string {
@@ -442,6 +449,8 @@ export function tableDifferences(table: string, cycles: Cycle[], withPreviews = 
       const expected = arcCell(cycle);
       if (cycle.kept && !new RegExp(`<tr\\b[^>]*\\bdata-arc="${ARCS}/${cycle.id}/state\\.json"`).test(table))
         stale.push(`${key}'s row does not carry \`data-arc="${ARCS}/${cycle.id}/state.json"\``);
+      else if (cycle.kept && requireBadge && !carriesAddress(table, cycle.id!))
+        stale.push(`${key}'s row carries no \`id="${cycle.id}"\`, so \`approach.html#${cycle.id}\` opens nothing`);
       if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
         stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
       if (lineOf(cells[0]) !== lineOf(expected))
@@ -647,6 +656,19 @@ export function workstreamFolder(target: string, workspace: string | null): stri
  * page that is already current is not written, so its bytes and its time stay as they are. A page
  * that links no shared stylesheet is refused with `OWN_COPY`, and no class of it is read.
  */
+/**
+ * Writes the name file of every arc kept as data, `arcs/N<nnn>/<subject>.md`, where it differs from
+ * the arc's data, and says which it wrote. A closed workstream's folder stays as it closed.
+ */
+function writeNameFiles(folder: string): string[] {
+  const wrote: string[] = [];
+  for (const arc of arcIdsOf(folder)) {
+    const data = readArc(folder, arc);
+    if (data && typeof data.subject === "string" && data.subject && writeNameFile(folder, data)) wrote.push(`${arc}/${data.subject}.md`);
+  }
+  return wrote;
+}
+
 function writePages(folder: string, target: string, cycles: Cycle[]): number {
   const named = resolve(target);
   const pages = isFile(named) && isApproachPage(named)
@@ -657,6 +679,8 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
     console.log(`${basename(folder)} is closed, and its page keeps what it closed with — nothing was written`);
     return 0;
   }
+  const names = writeNameFiles(folder);
+  if (names.length) console.log(`${basename(folder)}: wrote the name file of ${names.join(", ")}`);
   let code = 0;
   for (const page of pages) {
     const shown = relative(dirname(folder), page);

@@ -67,14 +67,15 @@
   <div class="sds-scroll"><table>
     <thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>
     <tbody>
-      <tr data-arc="arcs/N001/state.json" data-arc-stamp="{{the stamp `workstream arc stamp write` wrote}}"><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for HELD, CARRIED and DROPPED, the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
-      <tr data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
+      <tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="{{the stamp `workstream arc stamp write` wrote}}"><td><p><strong>N001 &mdash; {{Arc, named for the cycle it pays}}</strong></p><p>{{one line}}</p><span class="sds-small">Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/{{file}}">{{file}}</a> &middot; {{for HELD, CARRIED and DROPPED, the reason as a fact}}</span></td><td><span class="sds-badge sds-status sds-proposed">PROPOSED</span></td></tr>
+      <tr id="N002" data-arc="arcs/N002/state.json" data-arc-stamp="{{&hellip;}}"><td><p><strong>N002 &mdash; {{Arc}}</strong></p><p>{{&hellip;}}</p><span class="sds-small">Preview: <a href="notes/N002/preview.html">preview.html</a></span></td><td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>
     </tbody>
   </table></div>
-  <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped. -->
+  <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped.
+       Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <p>{{Overall: rows done of all, arcs closed of all, and a thin bar}}</p>
-  <p>{{For each arc: its number, a small bar, and done/total, linking its arc's data}}</p>
+  <p>{{For each arc: its number, a small bar, and done/total, linking its arc's row, #N001}}</p>
   <!-- /spn:generated -->
 </section>
 
