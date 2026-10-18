@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "2890c98d"
+      "seen": "1b0815c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "a081d440"
+      "seen": "66d2502e"
     }
   ]
 }
@@ -169,6 +169,8 @@ Each rule below is of one block or one prop. The props, their values and their d
   | `PILL` | a bar on the switch's muted track with no shadow unless `raised`, so its tabs read as one control; with `raised` the bar is on the raised surface, lifted by its shadow alone; no line, padded 5px either way, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour, and in weight only where the entry gives no fill; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`) | the pages of a website, in its top bar, with `raised` where the bar floats |
 
 - **`DSTabs` MUST be lifted only where `raised` asks, and MUST read no card or container look** (`RD.SUPPORT.SURFACE.215`). `raised` is a prop of the row, as on `DSCard`, with no default: unset, the row is not lifted. Tabs read neither `theme.card` nor `theme.container`. `raised` adds a soft shadow under the base line of `LINE`, the raised pill with its shadow on the open tab of `SWITCH`, and the raised bar with its shadow under `PILL`.
+
+- **The tabs of `SWITCH` and `PILL` MAY stand without their bar, with `grouped={false}`** (`RD.SUPPORT.SURFACE.218`). `grouped` is a prop of the row, `true` when unset, and `LINE` ignores it. `grouped={false}` drops the bar's fill, its padding and its bar shadow, so the tabs stand on the page and the open tab's fill alone marks it, with its rounding kept; where the entry gives no fill, the open tab's label alone marks it. With `raised`, the open tab of `SWITCH` takes its raised pill and the open tab of `PILL` takes a soft shadow, `ds:shadow-sm`, in place of the bar's. Each tab keeps its padding and the gaps, so no label moves. The name sits beside `DSButtonGroup` and `DSToggleGroup`.
 
 - **The tabs MUST take their colour, and the fill of their open tab, from the theme's navigation, `theme.layout.navigation`, and a row MAY override each** (`RD.SUPPORT.SURFACE.214`). Tabs mostly lead from page to page or switch what a part shows, as the navigation does, so they match it. No theme field is added, `DSTabs` draws its own tabs and never `DSNavEntry`, and unlike the navigation units, which take their look as one prop, it reads the theme's navigation.
 
@@ -547,6 +549,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.214` | `DSTabs` take their colour and the fill of their open tab from the theme's navigation, and a row may override each with `color` and `entry`, of the navigation's own types |
 | `RD.SUPPORT.SURFACE.215` | `DSTabs` are lifted only where `raised` asks, with no default, and read no card or container look |
 | `RD.SUPPORT.SURFACE.216` | `DSItem` stands vertically when `orientation` is `VERTICAL`, the picture on top and the end node at the top end, and `DSItemCard` holds it as it is |
+| `RD.SUPPORT.SURFACE.218` | the tabs of `SWITCH` and `PILL` may stand without their bar with `grouped={false}`, `true` when unset and ignored by `LINE`, the open tab's fill alone marking it |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof
