@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "731578da"
+      "seen": "bfeda195"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "dab380e7"
+      "seen": "66124962"
     }
   ]
 }
@@ -21,7 +21,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The rule — 🔮
 
-1. A showcase is a list of six sections in one order: Welcome, Sample apps, Layouts, Layers, Components and Standards. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
+1. A showcase is a list of eight sections in one order: Welcome, Sample apps, App, Layout, Container, Widget, Components and Standards. App, Layout, Container, Widget and Components are the Surface standard's groups, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
 2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them.
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
@@ -39,7 +39,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 | Showcase | a running catalogue that shows how every unit is used |
 | Partner | an organization that builds its own SaaS platform on SaaS Plane. It reads the showcase and opens the design library, and it does not hold the book |
 | Layer | the layer of the design system that a group belongs to: Core, Components, Widgets, Containers, Layouts or App |
-| Group | one part of the showcase's navigation, named by its path in the sidebar, such as `Components/Actions` or `Layers/Widget` |
+| Group | one part of the showcase's navigation, named by its path in the sidebar, such as `Components/Actions` or `Widget` |
 | Unit | one component, widget, container or layout of the library |
 | Main page | the first page of a unit: the opening, then its sections |
 | Playground | the page of a unit where every prop is a control |
@@ -54,16 +54,18 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The layers, the groups and the units — 🔮
 
-The showcase is six sections, each a root of the sidebar, in this order.
+The showcase is eight sections, each a root of the sidebar, in this order, none nested inside another. Five of them are the Surface standard's groups, the layers its architecture builds a surface from: App, Layout, Container, Widget and Components, so a reader who knows the standard finds each by its own name. The first layer, the core, is Standards. The levels of a page that are not groups, Page, Group, Content and Inline, hold no unit, so they are no section: the Standards page Page levels tells every level.
 
 | Section | What it holds |
 | --- | --- |
 | Welcome | three pages written as a small website: Overview, Showcase and Getting started. It opens on the Overview |
-| Sample apps | the sample apps, one page each, built only from the units of the design system |
-| Layouts | its Overview, the group App, then `DSLayout` |
-| Layers | Page, Container, Widget, Group, Content and Inline, outermost first. Each opens on an Overview of its level. Container and Widget hold their units |
+| Sample apps | the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device |
+| App | its Overview, then `DSApp`, `DSContext` and `DSAppContext` |
+| Layout | its Overview, then `DSLayout` and its layouts |
+| Container | its Overview, which names the level its units stand at and links Page levels, then the containers |
+| Widget | its Overview, which names the level its units stand at and links Page levels, then the widgets |
 | Components | Typography, Media, Actions, Data entry (Fields, Pickers, Composites), Data display, Navigation, Structure, Feedback, Overlays, Popovers, and Utility last |
-| Standards | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Patterns and Inline alignment |
+| Standards | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
 
 The group of a unit is its path in the sidebar, so the title of a unit is its group and its name. A unit does not choose its layer: the layer follows from the group.
 
@@ -71,14 +73,14 @@ The group of a unit is its path in the sidebar, so the title of a unit is its gr
 | --- | --- |
 | Core | Standards |
 | Components | `Components/Typography` · `Media` · `Actions` · `Data entry/Fields` · `Data entry/Pickers` · `Data entry/Composites` · `Data display` · `Navigation` · `Structure` · `Feedback` · `Overlays` · `Popovers` · `Utility` |
-| Widgets | `Layers/Widget` |
-| Containers | `Layers/Container` |
-| Layouts | `Layouts` |
-| App | `Layouts/App` |
+| Widgets | `Widget` |
+| Containers | `Container` |
+| Layouts | `Layout` |
+| App | `App` |
 
 The theme is not a page. The toolbar holds a Theme button that opens the theme's sheet on any page, and the theme a person chooses is saved in the browser and followed by every page.
 
-Welcome, Sample apps, Standards and the levels Page, Group, Content and Inline hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
+Welcome, Sample apps and Standards hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
 
 The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
 
@@ -107,9 +109,9 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Components/Overlays | Overlay · Content: `DSDialog` sizes, content · `DSConfirmDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` content |
 | Components/Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSConfirmPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Components/Utility | Display · Content · a table of types: `DSFormatCurrency` content · `DSFormatDate` none · `DSFormatDateTime` content · `DSFormatNumber` none · `DSFormatTime` none. Utility · Content: `DSAuthz` content · `DSAnchorContainer` states, content, opener · `DSElementObserver` content · `DSPortal` none · `DSSticky` states, content |
-| Layers/Widget | `DSDataTableWidget` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBarWidget` Composite · Full width · sizes, content, data; scenario page With overflow |
-| Layers/Container | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
-| Layouts | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav, Canvas |
+| Widget | `DSDataTableWidget` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBarWidget` Composite · Full width · sizes, content, data; scenario page With overflow |
+| Container | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
+| Layout | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav, Canvas |
 
 ## The pages of a unit — 🔮
 
