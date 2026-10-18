@@ -796,7 +796,9 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-control").length === 2 && !g.includes("sds-skel-border") && !g.includes('<path class="sds-skel-control"'));
   one("the pill stands inside the track, which is fully rounded", [pagePill, pageTrack], ([pill, track]) => pill[0] > track[0] && pill[0] + pill[2] < track[0] + track[2] && pill[3] < track[3]);
   one("the chosen word alone is heavy, and the others are words in the code style", [pageTabs.svg.match(/<text class="sds-label"[^>]*>([^<]+)</g)?.length, pageTabs.svg.match(/<text class="sds-code"/g)?.length], (g) => g[0] === 1 && g[1] === 2);
-  one("page-level tabs keep the words where the line drew them", [...pageTabs.svg.matchAll(/<text class="sds-(?:label|code)" x="([\d.]+)"/g)].map((m) => Number(m[1])), (g) => g.length === 3 && g[1] - g[0] > 0 && g.every((x) => x >= 24 + 16 - 1));
+  // The track's edge is the row's edge, where the page head and the parts under it start; the words stand inside it.
+  one("the pill's track starts where the row starts, lined up with the page head", pageTrack[0], 24 + 16);
+  one("page-level tabs stand their words inside the track", [...pageTabs.svg.matchAll(/<text class="sds-(?:label|code)" x="([\d.]+)"/g)].map((m) => Number(m[1])), (g) => g.length === 3 && g[1] - g[0] > 0 && g.every((x) => x > pageTrack[0]));
   const headTabs = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" }, actions: [{ control: "tabs", tabs: ["Day", "Week"], chosen: 0 }] }, frame: { rows: [{ items: [{ note: "x" }] }] } }] });
   one("tabs in the page head's actions are pills too", headTabs, (g) => g.findings.length === 0 && !g.svg.includes("sds-skel-border") && rect(g.svg, "sds-skel-surface").length >= 1);
   one("tabs inside a container still draw the line under the chosen one", (inBox({ control: "tabs", tabs: ["A", "B"] }).svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);

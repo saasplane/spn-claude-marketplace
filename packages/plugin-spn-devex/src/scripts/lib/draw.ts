@@ -2260,18 +2260,22 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
         findings.push(`\`chosen\` is \`${chosen}\`, and this row has ${words.length} tabs, counted from 0`);
       if (words.some((word) => word.includes("\n"))) findings.push("a control stands on one line, and a tab's word runs over more");
       const foot = iy + h - 1;
+      // THE PILL'S TRACK STARTS WHERE THE ROW STARTS, so its edge lines up with the page head and the parts under it;
+      // its words stand in from that edge by the pill's padding and the track's.
+      const pillPad = SKEL_LABEL_GAP, trackPad = 3;
+      const inset = it.atPage ? pillPad + trackPad : 0;
       if (it.atPage) {
         // THE PILL: a muted rounded track with an outline holds the words, and the chosen one stands in a filled pill.
-        const pillPad = SKEL_LABEL_GAP, trackPad = 3, pillH = h - trackPad * 2;
-        out.push(skelRect("sds-skel-surface", ix - pillPad - trackPad, iy, iw + (pillPad + trackPad) * 2, h, h / 2));
-        out.push(skelRect("sds-skel-control", ix - pillPad - trackPad, iy, iw + (pillPad + trackPad) * 2, h, h / 2));
-        let px = ix;
+        const pillH = h - trackPad * 2;
+        out.push(skelRect("sds-skel-surface", ix, iy, iw + inset * 2, h, h / 2));
+        out.push(skelRect("sds-skel-control", ix, iy, iw + inset * 2, h, h / 2));
+        let px = ix + inset;
         words.forEach((word, index) => {
           if (index === chosen) out.push(skelRect("sds-skel-control", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, pillH / 2));
           px += skelTabW(it, word) + SKEL_GAP;
         });
       } else out.push(`  <path class="sds-skel-control" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
-      let tx = ix;
+      let tx = ix + inset;
       words.forEach((word, index) => {
         const tw = skelTabW(it, word);
         if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
