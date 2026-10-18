@@ -118,8 +118,9 @@ export type SkeletonItem = {
   read?: boolean;
   /** A line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it;
    *  `meta`, several facts on the line under the title, each a word or a badge; and `end`, what stands at the end
-   *  of the line. */
-  item?: { media?: string; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[] };
+   *  of the line. `inline` marks a compact line at the level INLINE: with facts and no description, its facts stand on
+   *  the title's line after a dot ("v3 · Draft"). */
+  item?: { media?: string; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[]; inline?: boolean };
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
@@ -168,10 +169,16 @@ export type SkeletonFrame = {
   /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
   media?: string;
 };
-/** A part of the content of a container or a card: its title, the actions at the end of that title, its rows, and
- *  the unit of the design system it is, whose name stands at its corner. A part with a title and no unit is a group,
- *  the level `GROUP` of the design system: a dotted boundary round it, *Group* at its corner. */
-export type SkeletonSection = { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean; unit?: string };
+/** A section of the content of a container or a card: its title, the actions at the end of that title, its rows, and
+ *  the unit of the design system it is, whose name stands at its corner. A section with a title and no unit is a group,
+ *  the level `GROUP` of the design system: a dotted boundary round it, *Group* at its corner.
+ *
+ *  `part: true` makes the section a content part of a container (`DSContainer.Content`) and not a group: it takes no
+ *  dotted boundary and no corner word, only its title with its actions, and a line across the container's box above it
+ *  where it is not the first part. Its own `sections` are the groups that stand inside it, each with its dotted boundary.
+ *  A container's content is parts separated by lines, or groups, or both: parts by lines, groups inside a part. */
+export type SkeletonSection = { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean; unit?: string;
+  part?: boolean; sections?: SkeletonSection[] };
 /** One screen at one screen class: a whole frame of its own, never derived from another view. A spec
  *  holds `views` in place of `frame`, and the views are drawn in one figure. `page` is the view's page level. */
 export type SkeletonView = { viewport: "DESKTOP" | "TABLET" | "MOBILE"; page?: SkeletonPage; frame: SkeletonFrame };
@@ -1831,6 +1838,9 @@ const skelItemFacts = (it: SkeletonItem): (string | SkeletonItem)[] =>
  *  last two is there only where the data has it. Where both are, the description stands on a line of its own. */
 const skelItemOwnDescription = (it: SkeletonItem): string | undefined => (it.item?.meta?.length ? it.item?.description : undefined);
 const skelItemDescriptionH = (it: SkeletonItem) => (skelItemOwnDescription(it) !== undefined ? SKEL_ITEM_LINE : 0);
+/** AN ITEM MARKED `inline` WITH FACTS AND NO DESCRIPTION STANDS ONE LINE: its facts follow its title after a dot, as
+ *  the library's item draws a compact row at the level INLINE. */
+const skelItemInline = (it: SkeletonItem): boolean => it.item?.inline === true && skelItemFacts(it).length > 0 && skelItemOwnDescription(it) === undefined;
 /** A dot stands between every two facts, a badge among them: a line may hold two badges, or a badge with an icon,
  *  and one mark between all of them reads the same wherever it falls. */
 const SKEL_FACT_DOT = "·", SKEL_FACT_DOT_W = 16;
@@ -1848,13 +1858,15 @@ function skelItemFactsW(it: SkeletonItem, h: number): number {
 }
 const skelItemHasBadge = (it: SkeletonItem) => skelItemFacts(it).some((fact) => typeof fact !== "string");
 const skelItemStep = (it: SkeletonItem) => (it.page ? SKEL_STEP_PAGE : it.part ? SKEL_STEP_CONTAINER : SKEL_STEP_ITEM);
-const skelItemWordsW = (it: SkeletonItem, h: number) => Math.max(skelStepW(it.item?.title ?? "", skelItemStep(it)), skelItemFactsW(it, h), Math.ceil((skelItemOwnDescription(it) ?? "").length * SKEL_W_NOTE));
+const skelItemTitleW = (it: SkeletonItem) => skelStepW(it.item?.title ?? "", skelItemStep(it));
+const skelItemWordsW = (it: SkeletonItem, h: number) => skelItemInline(it) ? skelItemTitleW(it) + SKEL_FACT_DOT_W + skelItemFactsW(it, h)
+  : Math.max(skelItemTitleW(it), skelItemFactsW(it, h), Math.ceil((skelItemOwnDescription(it) ?? "").length * SKEL_W_NOTE));
 /** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
-const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length ? h
+const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length || skelItemInline(it) ? h
   : skelItemDescriptionH(it) + (skelItemHasBadge(it) ? Math.max(h, SKEL_ITEM_LINE + SKEL_PACK_GAP + SKEL_FACT_BADGE + SKEL_LABEL_GAP) : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP));
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
  *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
-const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length ? skelItemH(it, h) - 4 : h);
+const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length && !skelItemInline(it) ? skelItemH(it, h) - 4 : h);
 const skelItemW = (it: SkeletonItem, h: number): number =>
   (it.item?.media !== undefined ? skelItemMediaD(it, h) + SKEL_LABEL_GAP : 0) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
 
@@ -1941,6 +1953,9 @@ function skelSectionRows(section: SkeletonSection): SkeletonRow[] {
       ? [{ items: [...(section.label !== undefined ? [{ text: section.label, part: true }] : []), { spacer: true }, ...(section.actions ?? [])] }] : []),
     ...(section.rows ?? []),
   ];
+  // A CONTENT PART IS BOUNDED BY NO BOX OF ITS OWN: a line across the container's box sets it apart, and the groups
+  // inside it, each its own `sections` entry, draw their dotted boundary.
+  if (section.part && section.unit === undefined) return [...rows, ...(section.sections ?? []).flatMap(skelSectionRows)];
   // A PART THAT IS A UNIT OF THE DESIGN SYSTEM carries its name at its corner, over its first row, and each of its rows
   // knows the part it stands in, so its boundary reaches round all of them. A PART WITH A TITLE AND NO UNIT IS A GROUP,
   // the level `GROUP`: it is bounded the same way and named by its level, so its title stands inside it.
@@ -1962,7 +1977,8 @@ function skelDividers(frame: SkeletonFrame): Set<number> {
   (frame.sections ?? []).forEach((section, order) => {
     if (parts && order > 0) at.add(index);
     const count = skelSectionRows(section).length, own = (section.rows ?? []).length;
-    if (section.divided) for (let r = count - own + 1; r < count; r++) at.add(index + r);
+    const head = section.label !== undefined || section.actions?.length ? 1 : 0;
+    if (section.divided) for (let r = head + 1; r < head + own; r++) at.add(index + r);
     index += count;
   });
   if (parts && (frame.rows ?? []).length && index > 0) at.add(index);
@@ -1971,19 +1987,18 @@ function skelDividers(frame: SkeletonFrame): Set<number> {
   if (parts && frame.footer?.length && index > 0) at.add(index);
   return at;
 }
-/** The rows of a container that begin a part: its second part and each after it, its rows after its parts, and its
- *  footer. A line between two rows of one list is no boundary, and the default frame draws it. */
+/** The rows of a container that begin a part whose own boundary stands in place of a line: a group after the first
+ *  section, and its rows after its groups. A content part, and the footer, begin under a line across the box, and a
+ *  line between two rows of one list is no boundary, so the default frame draws those. */
 function skelPartStarts(frame: SkeletonFrame): Set<number> {
   const at = new Set<number>();
   if (frame.look !== "container") return at;
   let index = 0;
   (frame.sections ?? []).forEach((section, order) => {
-    if (order > 0) at.add(index);
+    if (order > 0 && !section.part) at.add(index);
     index += skelSectionRows(section).length;
   });
-  if ((frame.rows ?? []).length && index > 0) at.add(index);
-  index += (frame.rows ?? []).length;
-  if (frame.footer?.length && index > 0) at.add(index);
+  if ((frame.rows ?? []).length && index > 0 && !(frame.sections ?? []).some((section) => section.part)) at.add(index);
   return at;
 }
 /** Whether a container drawn for a surface has a header: a title, or actions. */
@@ -2200,13 +2215,20 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     }
     // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is of medium weight, the facts small and quiet.
     const facts = skelItemFacts(it), top = mid - ih / 2;
-    const titleY = facts.length ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
+    const inline = skelItemInline(it);
+    const titleY = facts.length && !inline ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
     out.push(skelStepText(item.title ?? "", skelItemStep(it), wx, titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
     const ownDescription = skelItemOwnDescription(it), below = skelItemDescriptionH(it);
     if (ownDescription !== undefined) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(titleY + SKEL_ITEM_LINE)}">${esc(ownDescription)}</text>`);
-    const factsMid = below + (skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
+    // AN INLINE ITEM'S FACTS STAND ON THE TITLE'S LINE, after the title and a dot.
+    const factsMid = inline ? titleY - 4 : below + (skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
     let fx = wx;
+    if (inline) {
+      fx += skelItemTitleW(it);
+      out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+      fx += SKEL_FACT_DOT_W;
+    }
     facts.forEach((fact, i) => {
       if (i) {
         out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
@@ -2598,8 +2620,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     }
     // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline. A line between two rows
     // of one part, as a list in a group draws, stays inside that part's boundary.
-    // In a container no line crosses its box between its parts, which are marked by their own boundaries; the line
-    // between two rows of one list stays.
+    // In a container a line crosses its box above each content part after the first and above its footer; a group is
+    // marked by its own boundary and takes no line, and the line between two rows of one list stays.
     if ((surface || frame.look === "card") && dividers.has(rowIndex)) {
       const inPart = row.within !== undefined && !row.lead ? SKEL_LABEL_GAP : 0;
       if (!partStarts.has(rowIndex)) out.push(`  <path class="sds-skel-control" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);

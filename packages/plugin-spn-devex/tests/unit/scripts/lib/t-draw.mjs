@@ -885,6 +885,18 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("an item whose facts hold a badge stands a little taller than one whose facts are words", rect(facts.svg, "sds-box")[0][3] > rect(line({ title: "x", description: "y" }).svg, "sds-box")[0][3], true);
   one("a fact that is neither a word nor a badge is a finding", line({ title: "x", meta: [{ control: "button", text: "Go" }] }).findings, says("a word or a badge"));
 
+  // 15a2 · an item marked `inline`: its facts stand on the title's line, after a dot
+  const compact = line({ title: "v3", inline: true, meta: [{ control: "badge", text: "Draft" }] });
+  const compactPlain = line({ title: "v3" });
+  const compactFacts = line({ title: "v3", meta: [{ control: "badge", text: "Draft" }] });
+  one("an inline item draws without a finding", compact.findings, none);
+  one("an inline item stands one line tall, as a title alone does", rect(compact.svg, "sds-box")[0][3], rect(compactPlain.svg, "sds-box")[0][3]);
+  one("an item with facts and not inline keeps its facts under the title and stands taller", rect(compactFacts.svg, "sds-box")[0][3] > rect(compactPlain.svg, "sds-box")[0][3], true);
+  one("an inline item's badge stands on the title's line, after the title and a dot",
+    [texts(compact.svg, "sds-title")[0], texts(compact.svg, "sds-note").find((t) => t[2] === "·"), rect(compact.svg, "sds-skel-control").find((r) => r[3] === 16)],
+    (g) => g[1][0] > g[0][0] && g[2][0] > g[1][0] && Math.abs((g[2][1] + g[2][3] / 2) - (g[0][1] - 4)) <= 3);
+  one("an inline item's dot stands level with its title's words", [texts(compact.svg, "sds-title")[0][1], texts(compact.svg, "sds-note").find((t) => t[2] === "·")[1]], (g) => g[0] === g[1]);
+
   // 15b · a card: a thin rounded outline, with a title of its own
   const card = (frame) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame }] }] } });
   const titled = card({ look: "card", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] });
@@ -906,14 +918,29 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     (g) => g[0][1] > g[2][1] && g[1][1] > g[0][1] && g[0][0] === g[2][0] + 16);
   one("its actions stand at the end of its header, inside the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === extent(boxed.svg)[0] + extent(boxed.svg)[2] - 16 && g[1] > extent(boxed.svg)[1]);
   // The default frame of a container (RD.DEVEX.WORKSPACE.269): a dotted extent, an unframed header, and one rounded box under the header.
-  one("its extent is a dotted outline, and the header has no line under it", [rect(boxed.svg, "sds-skel-guide").length, lineYs(boxed.svg).length], (g) => g[0] === 1 && g[1] === 0);
+  one("its extent is a dotted outline, and no line stands under the header: the one line is the footer's, inside the box", [rect(boxed.svg, "sds-skel-guide").length, lineYs(boxed.svg), outline(boxed.svg)[0]], (g) => g[0] === 1 && g[1].length === 1 && g[1][0] > g[2][1] + 16);
   one("its content and its footer stand in one thin rounded box under the header, to the extent's bottom and sides",
     [extent(boxed.svg), outline(boxed.svg), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app")],
     ([ext, boxes, note]) => boxes.length === 1 && boxes[0][0] === ext[0] && boxes[0][2] === ext[2] && boxes[0][1] + boxes[0][3] === ext[1] + ext[3] && boxes[0][1] > note[1]);
   one("no box goes round the header: the box begins under its words", [outline(boxed.svg)[0], texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in")], ([box, title]) => box[1] > title[1]);
   one("its content stands inside the outline", texts(boxed.svg, "sds-label").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
-  one("its footer stands in the same box as its content, with no line across the container", boxed.svg,
-    (g) => lineYs(g).length === 0 && outline(g).length === 1 && texts(g, "sds-code").some((t) => t[2] === "Follows the default" && t[1] > outline(g)[0][1] && t[1] < outline(g)[0][1] + outline(g)[0][3]));
+  // 15c · a footer sits under a line, inside the same box (RD.DEVEX.WORKSPACE.272)
+  one("its footer stands in the same box as its content, under a line that crosses the box", boxed.svg,
+    (g) => lineYs(g).length === 1 && outline(g).length === 1 && texts(g, "sds-code").some((t) => t[2] === "Follows the default" && t[1] > lineYs(g)[0] && t[1] < outline(g)[0][1] + outline(g)[0][3]) && lineYs(g)[0] > outline(g)[0][1]);
+  // 15c · the content of a container is one or more parts, a line between every two, and no dotted boundary on a part
+  const partOf = (label, extra = {}) => ({ part: true, label, rows: [{ items: [{ text: label + " field" }] }], ...extra });
+  const threeParts = card({ look: "container", label: "New job", sections: [partOf("Details"), partOf("Trigger"), partOf("Destinations")] });
+  one("three content parts draw without a finding", threeParts.findings, none);
+  one("three content parts draw two lines inside the box and no dotted boundary but the extent", [lineYs(threeParts.svg).length, rect(threeParts.svg, "sds-skel-guide").length, texts(threeParts.svg, "sds-note").filter((t) => t[2] === "Group").length],
+    (g) => g[0] === 2 && g[1] === 1 && g[2] === 0);
+  one("each part carries its own title", ["Details", "Trigger", "Destinations"].map((t) => texts(threeParts.svg, "sds-title").some((x) => x[2] === t) || texts(threeParts.svg, "sds-step").some((x) => x[2] === t) || JSON.stringify(threeParts.svg).includes(">" + t + "<")), (g) => g.every(Boolean));
+  const withGroup = card({ look: "container", label: "New job", sections: [partOf("Details"),
+    partOf("Destinations", { sections: [{ label: "Destination 1", rows: [{ items: [{ text: "Type" }] }] }] })] });
+  one("a group inside a part keeps its dotted boundary and the word Group", [withGroup.findings, rect(withGroup.svg, "sds-skel-guide").length, texts(withGroup.svg, "sds-note").filter((t) => t[2] === "Group").length],
+    (g) => g[0].length === 0 && g[1] === 2 && g[2] === 1);
+  one("a footer under two parts is a second line, under the last part", card({ look: "container", label: "x", sections: [partOf("A"), partOf("B")], footer: [{ items: [{ note: "n" }] }] }).svg, (g) => lineYs(g).length === 2);
+  one("sections with no `part` stay groups, with no line between them", card({ look: "container", label: "x", sections: [{ label: "A", rows: [{ items: [{ text: "a" }] }] }, { label: "B", rows: [{ items: [{ text: "b" }] }] }] }).svg,
+    (g) => lineYs(g).length === 0 && texts(g, "sds-note").filter((t) => t[2] === "Group").length === 2);
   one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
   one("a frame at the end of a container's header is a finding", card({ look: "container", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a container's header"));
   // 15c · content that is only cards stands flush (RD.DEVEX.WORKSPACE.269)

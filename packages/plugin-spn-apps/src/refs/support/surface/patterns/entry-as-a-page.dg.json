@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An entry that is a page",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A large form is a page of its own, and the page is one container: its header is the page level, the way back and the title with a line under it; its sections are the parts of its content, each with its own title and a line above it, and its actions stand in its footer. The sections are parts of one form that is saved once, so they are not containers of their own, and no list of the sections stands beside it. Each field is drawn as the form field of the design system lays it out: its title; the mark of its help at the end of the title's line, where the field has one; its control, as wide as its place; and one line under the control, which is its description, or its error where the value is refused; the room of that line is kept where a field has neither, so a form does not change its height when an error shows. A title never stands beside its control. Fields that are short and belong together share a row at a desktop, fewer share one on a tablet, and on a phone each takes a row. Every screen shows every field, and the last row of a destination keeps the action that removes it. The actions stand at the start of the footer.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A large form is a page of its own, and the page is one container: its header is the page level, the way back and the title with a line under it; its sections are the content parts of the container, all in its one rounded box, each with its own title and its actions, and a line between every two; a thing that repeats inside a part, such as Destination 1 in Destinations, is a group inside that part, with its dotted boundary. Its actions stand in its footer, under a line in the same box. The parts belong to one form that is saved once, so they are not containers of their own, and no list of the sections stands beside it. Each field is drawn as the form field of the design system lays it out: its title; the mark of its help at the end of the title's line, where the field has one; its control, as wide as its place; and one line under the control, which is its description, or its error where the value is refused; the room of that line is kept where a field has neither, so a form does not change its height when an error shows. A title never stands beside its control. Fields that are short and belong together share a row at a desktop, fewer share one on a tablet, and on a phone each takes a row. Every screen shows every field, and the last row of a destination keeps the action that removes it. The actions stand at the start of the footer.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -47,6 +47,7 @@
          "sections": [
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -81,6 +82,7 @@
           },
           {
            "label": "Trigger",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -111,31 +113,38 @@
           },
           {
            "label": "Destinations",
+           "part": true,
            "actions": [
             {
              "control": "button",
              "text": "Add another"
             }
            ],
-           "rows": [
+           "rows": [],
+           "sections": [
             {
-             "items": [
+             "label": "Destination 1",
+             "rows": [
               {
-               "standin": "field",
-               "fill": true,
-               "label": "Kind",
-               "text": "Webhook",
-               "control": "select"
-              },
-              {
-               "standin": "field",
-               "fill": true,
-               "label": "Address",
-               "text": "https://acme.com/hook",
-               "info": true
-              },
-              {
-               "icon": "close"
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                },
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
               }
              ]
             }
@@ -185,6 +194,7 @@
          "sections": [
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -219,6 +229,7 @@
           },
           {
            "label": "Trigger",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -256,31 +267,38 @@
           },
           {
            "label": "Destinations",
+           "part": true,
            "actions": [
             {
              "control": "button",
              "text": "Add another"
             }
            ],
-           "rows": [
+           "rows": [],
+           "sections": [
             {
-             "items": [
+             "label": "Destination 1",
+             "rows": [
               {
-               "standin": "field",
-               "fill": true,
-               "label": "Kind",
-               "text": "Webhook",
-               "control": "select"
-              },
-              {
-               "standin": "field",
-               "fill": true,
-               "label": "Address",
-               "text": "https://acme.com/hook",
-               "info": true
-              },
-              {
-               "icon": "close"
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                },
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
               }
              ]
             }
@@ -330,6 +348,7 @@
          "sections": [
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -368,6 +387,7 @@
           },
           {
            "label": "Trigger",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -406,35 +426,42 @@
           },
           {
            "label": "Destinations",
+           "part": true,
            "actions": [
             {
              "control": "button",
              "text": "Add another"
             }
            ],
-           "rows": [
+           "rows": [],
+           "sections": [
             {
-             "items": [
+             "label": "Destination 1",
+             "rows": [
               {
-               "standin": "field",
-               "fill": true,
-               "label": "Kind",
-               "text": "Webhook",
-               "control": "select"
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "standin": "field",
-               "fill": true,
-               "label": "Address",
-               "text": "https://acme.com/hook",
-               "info": true
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                }
+               ]
               },
               {
-               "icon": "close"
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
               }
              ]
             }

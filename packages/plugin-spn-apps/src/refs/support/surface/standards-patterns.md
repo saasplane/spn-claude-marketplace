@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "f95baf38"
+      "seen": "d850238b"
     }
   ]
 }
@@ -202,10 +202,11 @@ A part of a page takes the unit it is for (`RD.SUPPORT.SURFACE.217`, narrowed by
 | `DSContainer` | a part of the page with a header (title, description, actions), whose look follows the theme's container framing |
 | `DSCardWidget` | a card with a head: a title with its mark or icon, and actions in the head, often with titled parts under it |
 | `DSCard` | a card that shows its own info: a number with its caption, or a single thing with its words and an action under them; several side by side stay `DSCard`s, even when they come from data |
-| Group | a titled part inside a container or card; a level, not a unit |
+| Content part | one section of a container's content, a `DSContainer.Content`: one or more in a container, a line between every two, each with its own title and actions, no dotted boundary |
+| Group | a titled cluster inside a container, a card or a content part, with a dotted boundary; a level, not a unit |
 | `DSItem` | one line about one thing: its media, its title, a line under the title, and what stands at its end |
 
-A container whose content is only cards lets them stand flush; any other content sits in the container's one rounded box. A frame names its unit and leaves its look to it.
+A container whose content is only cards lets them stand flush; any other content sits in the container's one rounded box, which holds every content part and the footer, a line across it between every two parts and above the footer (`RD.DEVEX.WORKSPACE.272`). A container may separate its sections by lines (parts), by groups, or both: parts by lines, groups inside a part. A side column holds a container where its parts share one header, and widgets or cards on their own where each stands alone. A frame names its unit and leaves its look to it.
 
 ## Each page pattern, by level — 🔮
 

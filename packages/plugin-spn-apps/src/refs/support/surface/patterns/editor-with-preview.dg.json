@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An editor with its preview",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page is an entry that is a page, so it is one container, and its header is the page level: the way back, then the title. Its actions stand at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees the writing or the result, one at a time: a second row of tabs, Write and Result, moves between them, and the choice holds for every part at once. Bars stand for the running text of the message.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page is an entry that is a page, so it is one container, and its header is the page level: the way back, then the title. Its actions stand at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title, a line between every two parts inside the container's one rounded box. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees the writing or the result, one at a time: a second row of tabs, Write and Result, moves between them, and the choice holds for every part at once. Bars stand for the running text of the message.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -46,6 +46,7 @@
          "rows": [],
          "sections": [
           {
+           "part": true,
            "rows": [
             {
              "items": [
@@ -65,6 +66,7 @@
           },
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -87,6 +89,7 @@
           },
           {
            "label": "HTML body",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -148,6 +151,7 @@
           },
           {
            "label": "Plain text body",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -234,6 +238,7 @@
          "rows": [],
          "sections": [
           {
+           "part": true,
            "rows": [
             {
              "items": [
@@ -265,6 +270,7 @@
           },
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -287,6 +293,7 @@
           },
           {
            "label": "HTML body",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -314,6 +321,7 @@
           },
           {
            "label": "Plain text body",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -382,6 +390,7 @@
          "rows": [],
          "sections": [
           {
+           "part": true,
            "rows": [
             {
              "items": [
@@ -413,6 +422,7 @@
           },
           {
            "label": "Details",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -439,6 +449,7 @@
           },
           {
            "label": "HTML body",
+           "part": true,
            "rows": [
             {
              "items": [
@@ -466,6 +477,7 @@
           },
           {
            "label": "Plain text body",
+           "part": true,
            "rows": [
             {
              "items": [
