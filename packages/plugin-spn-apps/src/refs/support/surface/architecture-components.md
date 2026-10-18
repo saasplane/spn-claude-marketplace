@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "0e955b1c"
+      "seen": "2890c98d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "3aa03bd1"
+      "seen": "8939d681"
     }
   ]
 }
@@ -164,9 +164,11 @@ Each rule below is of one block or one prop. The props, their values and their d
 
   | `type` | Its look | Where it belongs |
   | --- | --- | --- |
-  | `LINE` | the underline: the open tab is the navigation's colour over a line, and no fill | the pages of an app, and the parts of its containers and cards |
-  | `SWITCH` | a sunken bar, with a pill on the open tab, filled as the navigation's entry says | two ways to show one thing, inside a part of a page |
-  | `PILL` | a floating bar on the raised surface, lifted by its shadow alone, with no line, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour and in weight; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`) | the pages of a website, in its top bar |
+  | `LINE` | the underline: the open tab is the navigation's colour over a line, and no fill; flat, and with `raised` a soft shadow under the base line | the pages of an app, and the parts of its containers and cards |
+  | `SWITCH` | a sunken bar, with a pill on the open tab, filled as the navigation's entry says, with no shadow; with `raised` the open tab is a raised pill with its soft shadow | two ways to show one thing, inside a part of a page |
+  | `PILL` | a bar with no surface and no shadow unless `raised`, the open tab's fill alone marking it; with `raised` the bar is on the raised surface, lifted by its shadow alone; no line, padded 5px either way, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour and in weight; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`) | the pages of a website, in its top bar, with `raised` where the bar floats |
+
+- **`DSTabs` MUST be lifted only where `raised` asks, and MUST read no card or container look** (`RD.SUPPORT.SURFACE.215`). `raised` is a prop of the row, as on `DSCard`, with no default: unset, the row is not lifted. Tabs read neither `theme.card` nor `theme.container`. `raised` adds a soft shadow under the base line of `LINE`, the raised pill with its shadow on the open tab of `SWITCH`, and the raised bar with its shadow under `PILL`.
 
 - **The tabs MUST take their colour, and the fill of their open tab, from the theme's navigation, `theme.layout.navigation`, and a row MAY override each** (`RD.SUPPORT.SURFACE.214`). Tabs mostly lead from page to page or switch what a part shows, as the navigation does, so they match it. No theme field is added, `DSTabs` draws its own tabs and never `DSNavEntry`, and unlike the navigation units, which take their look as one prop, it reads the theme's navigation.
 
@@ -542,6 +544,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.209` | `DSTabs` takes a `type`, `LINE`, `SWITCH` or `PILL`, the level giving the size and the look where no type is named, a website's pages taking `PILL`; a unit that takes a page level is given its `pageLevel` first and its `size` only to override |
 | `RD.SUPPORT.SURFACE.213` | the `PILL` bar is raised by its shadow alone with no line, its closed tab takes the brand one step softer under the pointer and the focus, and every type of `DSTabs` stands vertical and shares the width |
 | `RD.SUPPORT.SURFACE.214` | `DSTabs` take their colour and the fill of their open tab from the theme's navigation, and a row may override each with `color` and `entry`, of the navigation's own types |
+| `RD.SUPPORT.SURFACE.215` | `DSTabs` are lifted only where `raised` asks, with no default, and read no card or container look |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof

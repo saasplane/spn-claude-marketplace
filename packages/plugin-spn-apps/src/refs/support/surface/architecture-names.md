@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "30f2b230"
+      "seen": "0cf331fb"
     }
   ]
 }
@@ -69,7 +69,7 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 
 ### Names with a rule of their own
 
-A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTableWidget`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
+A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container, the card and the row of tabs (`DSTabs`, with no default) take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTableWidget`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
 A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
 
@@ -143,6 +143,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSTabs` | `type` | `LINE` · `SWITCH` · `PILL`, the look the `pageLevel` picks when unset | `DSTabsType` |
 | `DSTabs` | `color` | `BASE` · `DEFAULT` · `PRIMARY`, the theme's `layout.navigation.color` when unset | `DSSurfaceColorType` |
 | `DSTabs` | `entry` | `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN`, the theme's `layout.navigation.entry` when unset | `DSNavEntryType` |
+| `DSTabs` | `raised` | yes or no, no by default: a soft shadow under the line, the raised pill on the switch's open tab, the raised bar of the pill | none |
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
