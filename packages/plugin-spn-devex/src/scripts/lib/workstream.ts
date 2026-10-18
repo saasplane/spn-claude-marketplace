@@ -562,21 +562,26 @@ export function progressStep(done: number, total: number): string {
 }
 
 /**
- * One arc's chip in the sticky card: its number and short name, its status badge beside done/total, and a thin
- * bar. The bar's shade is the chip's second class, `sds-step-1` to `sds-step-5` by rows done and `sds-step-done`
+ * One arc's chip in the sticky card, two lines: its number without the N and its short name, with done/total on
+ * the right, and a thin bar. Its border colour says its status, and the status is in its tooltip and accessible name. The bar's shade is the chip's second class, `sds-step-1` to `sds-step-5` by rows done and `sds-step-done`
  * at the end, so it says how far along the arc is. The chip links the arc's Cycles row.
  */
 function arcChip(data: ArcData, done: number, total: number): string {
   const word = data.status.toLowerCase();
-  return `      <a class="sds-chip sds-${word} sds-step-${progressStep(done, total)}" href="#${data.arc}"><span class="sds-chip-name"><span class="sds-mono">${data.arc}</span><span class="sds-chip-subject"> ${escapeHtml(data.subject.replace(/-/g, " "))}</span></span>`
-    + `<span class="sds-chip-line"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><span class="sds-arc-count">${done}/${total}</span></span>`
-    + `<span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span></a>`;
+  const number = String(Number(data.arc.replace(/^N/, "")));
+  const name = escapeHtml(data.subject.replace(/-/g, " "));
+  const reason = data.reason ? `, ${escapeHtml(data.reason)}` : "";
+  const label = `${data.arc} ${name}, ${data.status}, ${done} of ${total} rows done${reason}`;
+  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><strong>${escapeHtml(data.title)}</strong><span>${done} of ${total} rows done</span>${data.reason ? `<span>${escapeHtml(data.reason)}</span>` : ""}</span>`;
+  return `      <a class="sds-chip sds-${word} sds-step-${progressStep(done, total)}" href="#${data.arc}" aria-label="${label}">`
+    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${done}/${total}</span></span>`
+    + `<span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>${tip}</a>`;
 }
 
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right, a highlighted section laid out as a chip: Overall, the workstream's status beside rows done, a full-width bar, and the arcs closed. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
+ * is on the right, a highlighted section of two lines like a chip: Overall with rows done, and a full-width bar; the workstream's status is its left edge's colour and its tooltip. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
  */
 function statusBar(ws: string, counts: readonly { data: ArcData; done: number; total: number }[], done: number, total: number, closed: number): string[] {
   if (!counts.length) return [];
@@ -586,11 +591,10 @@ function statusBar(ws: string, counts: readonly { data: ArcData; done: number; t
     `    <div class="sds-footbar-chips">`,
     ...counts.map((one) => arcChip(one.data, one.done, one.total)),
     `    </div>`,
-    `    <div class="sds-footbar-summary sds-step-${progressStep(done, total)}">`,
-    `      <span class="sds-chip-name">Overall</span>`,
-    `      <span class="sds-chip-line"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><span class="sds-arc-count">${done}/${total}</span></span>`,
+    `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} rows done, ${closed} of ${counts.length} arcs closed">`,
+    `      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">${done}/${total}</span></span>`,
     `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
-    `      <span class="sds-chip-note">${closed} of ${counts.length} arcs closed</span>`,
+    `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${counts.length} arcs closed</span><span>${done} of ${total} rows done</span></span>`,
     `    </div>`,
     `  </nav>`,
   ];

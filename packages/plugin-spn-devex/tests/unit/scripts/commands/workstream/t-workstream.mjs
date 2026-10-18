@@ -131,7 +131,7 @@ console.log("\n=== progress write, and arc stamp write");
 {
   const progress = cli(root, ["workstream", "progress", "write", "031"]);
   ok("the progress block is current after every write", progress.code === 0 && progress.out.trim() === "progress current", progress.out);
-  ok("it reads the rows done and the arcs", /<span class="sds-chip-note">0 of 2 arcs closed<\/span>/.test(readFileSync(join(ws, "approach.html"), "utf8")));
+  ok("it reads the rows done and the arcs", /<span>0 of 2 arcs closed<\/span>/.test(readFileSync(join(ws, "approach.html"), "utf8")));
   const wrong = cli(root, ["workstream", "arc", "stamp", "031/N001"]);
   ok("red: `arc stamp` with no `write` is refused in the chapter's words", wrong.code === 2 && wrong.out.includes("is typed `arc stamp write <arc>`."), wrong.out);
   const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N002"]);

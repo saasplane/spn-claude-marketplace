@@ -215,6 +215,25 @@
     if(!best)return;
     best.classList.add('sds-here');
   }
+  var cells=Array.prototype.slice.call(bar.parentNode.querySelectorAll('a.sds-chip,.sds-footbar-summary'));
+  var pop=document.createElement('div');pop.className='sds-tip-pop';pop.setAttribute('aria-hidden','true');pop.hidden=true;document.body.appendChild(pop);
+  function show(cell){
+    var tip=cell.querySelector('.sds-tip');if(!tip)return;
+    pop.innerHTML=tip.innerHTML;pop.hidden=false;
+    var box=cell.getBoundingClientRect(),width=pop.offsetWidth,height=pop.offsetHeight;
+    var left=Math.min(Math.max(8,box.left+box.width/2-width/2),window.innerWidth-width-8);
+    var top=box.top-height-6;if(top<8)top=box.bottom+6;
+    pop.style.left=left+'px';pop.style.top=top+'px';
+  }
+  function hide(){pop.hidden=true;}
+  cells.forEach(function(cell){
+    cell.addEventListener('mouseenter',function(){show(cell);});
+    cell.addEventListener('focus',function(){show(cell);});
+    cell.addEventListener('mouseleave',hide);
+    cell.addEventListener('blur',hide);
+  });
+  document.addEventListener('keydown',function(event){if(event.key==='Escape')hide();});
+  bar.addEventListener('scroll',hide,{passive:true});
   function ask(){if(!pending){pending=true;window.requestAnimationFrame(mark);}}
   window.addEventListener('scroll',ask,{passive:true});
   window.addEventListener('resize',ask);

@@ -54,7 +54,7 @@ console.log("=== a file a script owns is written only by its command");
 console.log("\n=== a generated block is written only by its command");
 {
   const text = readFileSync(page, "utf8");
-  const overall = /<span class="sds-chip-note">[^<]*<\/span>/.exec(text)[0];
+  const overall = /<span class="sds-arc-count">[^<]*<\/span>/.exec(text)[0];
   const [progress, why] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: overall, new_string: "<p>typed</p>" } }, root);
   ok("red: an Edit inside the progress block is refused", progress === "deny" && why.includes("generated `progress` block"), why.slice(0, 200));
   const [open] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "Open &mdash; no card is open", new_string: "Open &mdash; Q3" } }, root);

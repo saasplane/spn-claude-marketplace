@@ -73,17 +73,16 @@
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped.
        Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
-       The progress block holds the sticky card and nothing else: no overall line, bar or grid of tiles sits under this table. The card has one chip per arc from the arc's first row on, whatever its status, in the order the arcs run (done first, in the order they finished, then RUNNING and PART-LANDED, then DECIDED and PROPOSED by the arc's position); a chip's second and third classes are the status word and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100; the Overall section on the right carries the step class too. -->
+       The progress block holds the sticky card and nothing else: no overall line, bar or grid of tiles sits under this table. The card has one chip per arc from the arc's first row on, whatever its status, in the order the arcs run (done first, in the order they finished, then RUNNING and PART-LANDED, then DECIDED and PROPOSED by the arc's position); a chip's second and third classes are the status word, which colours its left stripe, and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100; the Overall section on the right carries the workstream's status word, which colours its left edge, and the step class too. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <nav class="sds-footbar" aria-label="Workstream status">
     <div class="sds-footbar-chips">
-      <a class="sds-chip sds-running sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001</span><span class="sds-chip-subject"> {{subject as words}}</span></span><span class="sds-chip-line"><span class="sds-badge sds-status sds-running">RUNNING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span></a>
+      <a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 {{subject as words}}, RUNNING, {{done}} of {{total}} rows done"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1</span><span class="sds-chip-subject"> &middot; {{subject as words}}</span></span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING</span><strong>{{the arc's full title}}</strong><span>{{done}} of {{total}} rows done</span><span>{{the reason, for HELD, CARRIED and DROPPED}}</span></span></a>
     </div>
-    <div class="sds-footbar-summary sds-step-3">
-      <span class="sds-chip-name">Overall</span>
-      <span class="sds-chip-line"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span>
+    <div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, {{done}} of {{total}} rows done, {{X}} of {{Y}} arcs closed">
+      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">{{done}}/{{total}}</span></span>
       <span class="sds-chip-bar"><i style="width:{{share}}%"></i></span>
-      <span class="sds-chip-note">{{X}} of {{Y}} arcs closed</span>
+      <span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING</span><strong>Overall</strong><span>{{X}} of {{Y}} arcs closed</span><span>{{done}} of {{total}} rows done</span></span>
     </div>
   </nav>
   <!-- /spn:generated -->
