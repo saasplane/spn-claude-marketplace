@@ -1753,5 +1753,28 @@ ${tableOf(cyclesOf(folder))}
   }
 }
 
+// A MIGRATION THE LEDGER LACKS THAT STILL FINDS OLD SHAPES IS OWED WORK (RD.DEVEX.AGENT.094), in any
+// window, because the workspace's files are what it moves. Every other case here runs in a fixture that
+// has applied every migration, so it hears nothing of this one.
+console.log("\n=== migration — a pending plugin migration holds the turn");
+{
+  const { checkMigrations } = await import("../../../../src/scripts/events/stop.ts");
+  const check = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  const files = { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING };
+  const old = workspace("migration-owed", files, [], { migrated: false });
+  const [warning] = checkMigrations(old);
+  check("red: an arc kept as Markdown and no ledger line — the turn is told 001 runs first",
+    warning?.check === "migration" && /001 \(1 place\(s\), such as open\/001-a-subject: 1 arc\(s\) kept as Markdown under arcs\/\)/.test(warning.message), warning?.message);
+  const hooked = run("node", [`${HOOKS}/src/scripts/events/stop.ts`], { cwd: old, session_id: "migration-owed", last_assistant_message: "Row 2 landed." }, old);
+  check("red: the hook itself says it, under its own name", /\[migration\] a plugin migration is pending/.test(hooked), hooked);
+  check("green: the same workspace with 001 recorded hears nothing", checkMigrations(workspace("migration-applied", files)).length === 0);
+  check("green: a workspace kept as data with nothing recorded hears nothing — there is no work owed",
+    checkMigrations(workspace("migration-idle", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1/state.json`]: "{}\n" }, [], { migrated: false })).length === 0);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

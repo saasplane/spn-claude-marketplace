@@ -5,6 +5,16 @@ import { mkdirSync, mkdtempSync, readdirSync, realpathSync, writeFileSync, rmSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { bindNamed, recordWrites } from "../../src/scripts/lib/window.ts";
+import { LEDGER, PLUGIN_NAME } from "../../src/scripts/lib/migration.ts";
+import { MIGRATIONS } from "../../src/scripts/lib/migrations/index.ts";
+
+/**
+ * The ledger of a workspace that has applied every migration this plugin ships. A fixture is a
+ * workspace of today, so a case about another check never hears that one is pending — even where it
+ * keeps an arc in the old shape on purpose, to prove a check that still reads that shape.
+ */
+export const LEDGER_APPLIED = MIGRATIONS.map((migration) => JSON.stringify({ plugin: PLUGIN_NAME, id: migration.id,
+  version: migration.version, at: "2026-10-18T10:00+05:30", by: "fixture", how: "agent" })).join("\n") + "\n";
 
 export const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-devex-fixtures-")));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -13,11 +23,13 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
  * @param name      folder under fixtures/
  * @param files     { "relative/path": "contents" } — folders are created as needed
  * @param folders   extra empty folders to create
+ * @param migrated  false leaves the migrations ledger out, for a case about a migration
  */
-export function workspace(name, files = {}, folders = []) {
+export function workspace(name, files = {}, folders = [], { migrated = true } = {}) {
   const root = join(BASE, name);
   rmSync(root, { recursive: true, force: true });
   mkdirSync(join(root, ".spndevex"), { recursive: true });
+  if (migrated) writeFileSync(join(root, ".spndevex", LEDGER), LEDGER_APPLIED, "utf8");
   for (const dir of folders) mkdirSync(join(root, dir), { recursive: true });
   for (const [path, body] of Object.entries(files)) {
     const full = join(root, path);

@@ -87,5 +87,18 @@ console.log("\n=== a card is raised, never typed");
   ok("green: the raised card stands on the page", /<h4 id="q1">Q1 &middot; Which way the <code>probe<\/code> goes<\/h4>/.test(text));
 }
 
+console.log("\n=== the migrations ledger is appended to only by `plugin migration write`");
+{
+  const ledger = join(root, ".spndevex", "migrations.jsonl");
+  const [write, why] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: ledger, content: "{}\n" } }, root);
+  ok("red: a Write to .spndevex/migrations.jsonl is refused, and names its command", write === "deny" && why.includes("`spn-devex plugin migration write`"), `${write}: ${why.slice(0, 200)}`);
+  const [bash] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `echo '{}' >> ${ledger}` } }, root);
+  ok("red: a shell append to it is refused", bash === "deny");
+  const [read] = hook({ tool_name: "Read", cwd: root, tool_input: { file_path: ledger } }, root);
+  ok("green: reading it is never refused", read !== "deny");
+  const command = cli(root, ["plugin", "migration", "show"]);
+  ok("green: the command reads it", command.code === 0 && /^001 · /.test(command.out), command.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream owner` : `\n  all ${total} passed — workstream owner`);
 process.exit(failed ? 1 : 0);

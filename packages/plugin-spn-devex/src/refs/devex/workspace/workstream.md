@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "bc5335b1"
+      "seen": "4b17c9e6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -182,7 +182,9 @@ read a second time.
 **Open and backlog workstreams follow the standard as it moves — MUST** (`RD.DEVEX.WORKSPACE.255`). A
 change to the standard brings every open and backlog workstream to it in the same step, its links
 rewritten from a move table first, and no old name is kept there. A closed workstream stays as it closed,
-and `state check` never reads it.
+and `state check` never reads it. Another workspace — a partner's — receives the same change as the
+plugin release's migration, which its first window applies before anything else (`refs/devex/agent/plugins.md`
+§ A release carries its migration, and a window applies what is pending first).
 
 ### Work is sized by its kind, and fixes gather into a round
 

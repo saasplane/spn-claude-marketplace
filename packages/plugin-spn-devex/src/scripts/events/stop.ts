@@ -19,6 +19,7 @@
 //              once while the step rows stand, and names each open card in one line
 //   page-stale an arc this window wrote left its workstream's page behind the arcs
 //   state      `workstream state check` fails for a workstream of this window kept as data
+//   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
 //   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
@@ -53,6 +54,8 @@ import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
 import { arcIdsOf, readArc, workstreamsOf } from "../lib/workstream.ts";
+import { applyLine, standings } from "../lib/migration.ts";
+import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, holdsOwnCopy, isInProgress, markedAgo,
          miscountLines, openWorkstreams, ownCopyLines, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
@@ -1394,6 +1397,22 @@ export function checkWorkstreamState(root: string, mine: Set<string>): Warning[]
     `the \`workstream\` commands, which are its only writers.` }];
 }
 
+/**
+ * A migration the workspace's ledger lacks whose check still finds old shapes is owed work, and it
+ * comes before any other (01-plugins.md § A release carries its migration, and a window runs what is
+ * pending first). It reads the workspace, not this window's workstreams, because a migration is the
+ * workspace's: work written in the old shape has to be moved again.
+ */
+export function checkMigrations(root: string): Warning[] {
+  let pending;
+  try { pending = standings(root, MIGRATIONS).filter((one) => one.state === "pending"); } catch { return []; }
+  if (!pending.length) return [];
+  const said = pending.map((one) => `${one.migration.id} (${one.found.length} place(s), such as ${one.found[0]}) — ${applyLine(one.migration)}`);
+  return [{ check: "migration", message:
+    `a plugin migration is pending, and it runs before any other work: ${said.join(" · ")}. ` +
+    "`spn-devex plugin migration show` lists each one and its steps." }];
+}
+
 // ---------------------------------------------------------------------------- a page with its own copy of the styles
 
 /**
@@ -1593,6 +1612,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
     ...span({ group: "stop", action: "state" }, () => checkWorkstreamState(root, mine)),
+    ...span({ group: "stop", action: "migration" }, () => checkMigrations(root)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),

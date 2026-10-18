@@ -616,5 +616,47 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE).includes(HEADING) || !IN_WORKSPACE);
 }
 
+// ── the plugin's migrations (RD.DEVEX.AGENT.094) ──
+//
+// A WINDOW'S START IS WHERE THE PLUGIN'S MIGRATIONS ARE COMPARED WITH THE WORKSPACE'S LEDGER, and what
+// is pending is told to the agent once, before anything else runs. The same workspace is read three
+// times: in the old shape with an empty ledger, with 001 recorded, and kept as data with nothing recorded.
+console.log("\n=== orientation — a pending plugin migration is the agent's first task");
+{
+  const says = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  const hook = (root) => {
+    try {
+      const out = execFileSync("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], {
+        input: JSON.stringify({ cwd: root, session_id: "t-orientation-migrations" }), encoding: "utf8", cwd: root,
+        env: { ...process.env, SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+      const parsed = JSON.parse(out);
+      return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
+    } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
+  };
+  const HEADING = "### Plugin migrations — before any other work";
+  const ground = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    ".spndevex/README.md": "state\n",
+  };
+  const old = fixture("migration-pending", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n" });
+  const pending = hook(old);
+  says("red: an arc kept as Markdown and an empty ledger — the agent is told 001 is pending, with its steps",
+    pending.context.includes(HEADING) && /- \*\*001\*\* \(spn-devex /.test(pending.context) && pending.context.includes("open/042-widget-pricing: 1 arc(s) kept as Markdown"),
+    pending.context.slice(pending.context.indexOf("### Plugin"), pending.context.indexOf("### Plugin") + 400));
+  says("it comes before the closing question", pending.context.indexOf(HEADING) < pending.context.indexOf("So — what are we building?"));
+  says("the developer's pane does not show it", !pending.message.includes(HEADING) && !pending.message.includes("migration"));
+  writeFileSync(join(old, ".spndevex", "migrations.jsonl"),
+    `${JSON.stringify({ plugin: "spn-devex", id: "001", version: "0.40.0", at: "2026-10-18T10:20+05:30", by: "t", how: "agent" })}\n`);
+  says("green: once the ledger records 001, the window's start says nothing of it", !hook(old).context.includes(HEADING));
+  const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
+  says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
+    current.context.includes(HEADING) && current.context.includes("- 001: the check finds nothing in the old shape — `spn-devex plugin migration write 001`"));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

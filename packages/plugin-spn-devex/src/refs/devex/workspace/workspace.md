@@ -24,6 +24,11 @@
       "seen": "5bb4305a"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "Two dot-homes",
+      "seen": "919526a6"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
       "seen": "b1bdbbce"
@@ -224,10 +229,11 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
     state.json                            `lastNumber`: the highest workstream number ever used
   .debug/                                 what the agent's own machinery says about itself
+  migrations.jsonl                        the plugin migrations this workspace has applied, one line each
   README.md
 ```
 
-**`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery says about itself. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries.
+**`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery says about itself. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 

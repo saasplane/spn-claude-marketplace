@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "166cec18"
+      "seen": "2293ceb4"
     }
   ]
 }
@@ -211,6 +211,41 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
 
+## A release carries its migration, and a window applies what is pending first
+
+**A release that changes a shape the agent writes or keeps ships a migration — MUST** (`RD.DEVEX.AGENT.094`). A shape is the layout of a file the agent works with: the workstream folder, an arc's state, the approach page, a preview, a seat file, a lens. Without a migration, a workspace taking the release holds both shapes, and each old file surfaces only as a check failing in some later window. Code works the same way: a schema change ships the step that moves the existing rows, and that step runs once.
+
+| A migration carries | Meaning |
+| --- | --- |
+| an id | `001`, `002`, …: the order they apply in; once released, never edited or renumbered |
+| a version | the release whose change it carries |
+| what changed | one sentence |
+| a check | each place still in the old shape; nothing once none is left |
+| how to apply it | a script for a mechanical change; steps for the agent where a page is rewritten |
+
+The plugin keeps its migrations in `scripts/lib/migrations/`, one file each, listed in id order by `index.ts`.
+
+**The ledger is `.spndevex/migrations.jsonl`**: one line per applied migration — plugin, id, version, time, who, and how (`script`, `agent`, or `nothing to do`). It is workspace state, not a rule. Only `spn-devex plugin migration write` appends to it, and the owner hook refuses a hand write. It lives in the workspace rather than the machine store because it records what this workspace's files went through, which every machine opening the workspace must agree on; appending one line at a time means two windows never overwrite each other. **A ledger line that does not parse stops every write** and is reported, never rewritten — the developer mends it.
+
+**At a window's start, pending migrations come before any other work — MUST.** The session-start hook runs the check of every migration the ledger lacks and tells the agent once, in its context and never on the developer's pane:
+
+| The check finds | What the agent does |
+| --- | --- |
+| old shapes; the migration has a script | `spn-devex plugin migration write <id>` runs it, checks again and records it |
+| old shapes; the migration has steps | the steps are the first task; `migration write <id> --steps-done` records it once the check is clean |
+| old shapes; the rewrite needs the developer's look | a needs-you that opens the reply; applied after the look |
+| nothing | `migration write <id>` records it with nothing to do |
+
+**The Stop hook holds the turn while a migration the ledger lacks still finds old shapes**, in any window, because the files are the workspace's. `write` applies in id order and refuses a later id while an earlier one is pending.
+
+```text
+spn-devex plugin migration show                         applied, pending, or nothing to do — each one
+spn-devex plugin migration check                        exit 1 while one is pending or the ledger does not read
+spn-devex plugin migration write <id>… [--steps-done]   apply and record, in id order
+```
+
+**Alpha does not change the retrofit rule.** A standard change still brings every existing open and backlog file to it in the same change (`RD.DEVEX.WORKSPACE.255`). The migration is how a workspace *elsewhere* — a partner's — gets that change when it takes the release: the builder's workspace is migrated before the cut, and its ledger says so.
+
 ## What a hook runs, and where its cache lives
 
 **A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
@@ -234,3 +269,6 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 | sync the plugins before releasing the tool that changed | the plugins restate a command surface the session cannot run |
 | replace a plugin by hand before running the workspace sync | you lose the one comparison that could tell you what actually changed |
 | type a plugin name into a repository's wiring instead of letting it derive | the repository stops correcting itself when its declared world changes |
+| release a change to a shape the agent keeps with no migration | every workspace that takes it finds its old files one failing check at a time |
+| edit or renumber a released migration | a ledger that recorded it now names something else |
+| start other work while a migration is pending | the work lands in the old shape and has to be moved again |

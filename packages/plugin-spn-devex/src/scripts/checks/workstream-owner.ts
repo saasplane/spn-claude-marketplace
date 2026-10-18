@@ -1,16 +1,19 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A script or an agent writes each file, never both · § The approach page keeps up with its arcs
+//           docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md § A release carries its migration, and a window runs what is pending first
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The refusal that makes one owner per file hold by force: a direct write to a file the `workstream`
-// commands own, an edit that touches a `progress` or `open` block, and a hand edit of an arc's stamp.
+// commands own, an edit that touches a `progress` or `open` block, a hand edit of an arc's stamp, and
+// a write to the workspace's migrations ledger, which `plugin migration write` alone appends to.
 // A command writes these through the library, never through a tool call, so nothing here refuses it.
 
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, sep } from "node:path";
 import { bashWrites } from "./doc-check.ts";
 import { type Payload, type Verdict } from "../lib/payload.ts";
 import { blocksIn, scriptOwned, stampsOn, workstreamAround } from "../lib/workstream.ts";
-import { DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DEVEX, DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { LEDGER } from "../lib/migration.ts";
 
 const WRITERS: Record<string, string> = {
   "state.json": "`workstream row write` (and `report write`)",
@@ -22,6 +25,10 @@ const WRITERS: Record<string, string> = {
 
 /** Why a path a call writes is a script's alone, or null. */
 export function ownedRefusal(path: string): string | null {
+  if (resolve(path).split(sep).join("/").endsWith(`/${DEVEX}/${LEDGER}`))
+    return `Denied: \`${DEVEX}/${LEDGER}\` is the workspace's ledger of applied plugin migrations, appended to only by ` +
+      "`spn-devex plugin migration write`, and never written by hand (01-plugins.md § A release carries its migration, and a window " +
+      "runs what is pending first). A ledger that does not read is the developer's to mend.";
   const owned = scriptOwned(path);
   if (!owned) return null;
   const name = owned.file.split("/").pop()!;
@@ -107,4 +114,5 @@ export function checkOwner(payload: Payload): Verdict {
 /** Only a path or a command inside a workstream folder. */
 export const applies = (path: string, command: string): boolean =>
   path.includes(`${DEVEX_WORKSTREAMS}/`) || command.includes(`${DEVEX_WORKSTREAMS}/`) || /\.jsonl|state\.json/.test(command) ||
+  path.endsWith(LEDGER) ||
   (/^[^/]/.test(path) && /\.(?:html|json|jsonl)$/.test(path));

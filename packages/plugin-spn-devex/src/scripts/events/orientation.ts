@@ -54,6 +54,8 @@ import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { windowStartLines } from "../lib/migration.ts";
+import { MIGRATIONS } from "../lib/migrations/index.ts";
 
 const MARKETPLACE = "saasplane";
 const CORE = "spn-devex";
@@ -690,6 +692,23 @@ function claim(repo: Repo): string {
   return repo.world + (repo.stack ? ` · ${repo.stack}` : "");
 }
 
+export const MIGRATIONS_HEADING = "### Plugin migrations — before any other work";
+
+/**
+ * The plugin's migrations the workspace's ledger does not hold, for the agent alone and once: a
+ * window's start is where they are compared, and what is pending runs before anything the prompt
+ * asks (01-plugins.md § A release carries its migration, and a window runs what is pending first).
+ * Nothing where nothing waits, and nothing a broken read could cost the window.
+ */
+export function migrationLines(root: string): string[] {
+  let found: string[] = [];
+  try { found = windowStartLines(root, MIGRATIONS); } catch { return []; }
+  if (!found.length) return [];
+  return [MIGRATIONS_HEADING, "",
+    "Each one runs before anything the prompt asks, in id order. Say so in one line under the status line, then apply it.", "",
+    ...found, ""];
+}
+
 /**
  * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
  * status line — and `context` is what the agent reads — the same, then the tables, the closing
@@ -796,6 +815,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
   lines.push("");
 
   lines.push(...workstreamLines(streams));
+  lines.push(...migrationLines(root));
   lines.push(...closingLines(streams, others));
   const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
