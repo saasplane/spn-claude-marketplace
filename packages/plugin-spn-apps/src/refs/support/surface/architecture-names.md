@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "0cf331fb"
+      "seen": "b6455239"
     }
   ]
 }
@@ -143,7 +143,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSTabs` | `type` | `LINE` · `SWITCH` · `PILL`, the look the `pageLevel` picks when unset | `DSTabsType` |
 | `DSTabs` | `color` | `BASE` · `DEFAULT` · `PRIMARY`, the theme's `layout.navigation.color` when unset | `DSSurfaceColorType` |
 | `DSTabs` | `entry` | `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN`, the theme's `layout.navigation.entry` when unset | `DSNavEntryType` |
-| `DSTabs` | `raised` | yes or no, no by default: a soft shadow under the line, the raised pill on the switch's open tab, the raised bar of the pill | none |
+| `DSTabs` | `raised` | yes or no, no by default: a soft shadow and no colour, on the switch's open tab, on the pill's bar, or on the open tab of either where it stands without a bar; the line ignores it | none |
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |

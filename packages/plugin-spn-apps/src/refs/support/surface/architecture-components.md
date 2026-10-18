@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "4bbcb849"
+      "seen": "1c07ff13"
     }
   ]
 }
@@ -164,27 +164,28 @@ Each rule below is of one block or one prop. The props, their values and their d
 
   | `type` | Its look | Where it belongs |
   | --- | --- | --- |
-  | `LINE` | the underline: the open tab is the navigation's colour over a line, and no fill; flat, and with `raised` a soft shadow under the base line | the pages of an app, and the parts of its containers and cards |
-  | `SWITCH` | a sunken bar, with a pill on the open tab, filled as the navigation's entry says, with no shadow; with `raised` the open tab is a raised pill with its soft shadow | two ways to show one thing, inside a part of a page |
-  | `PILL` | a bar on the switch's muted track with no shadow unless `raised`, so its tabs read as one control; with `raised` the bar is on the raised surface, lifted by its shadow alone; no line, padded 5px either way, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour, and in weight only where the entry gives no fill; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`) | the pages of a website, in its top bar, with `raised` where the bar floats |
+  | `LINE` | the underline: the open tab is the navigation's colour over a line, and no fill; it draws no surface, so it ignores `raised`, as it ignores `grouped` | the pages of an app, and the parts of its containers and cards |
+  | `SWITCH` | a bar that takes the navigation's colour, with a pill on the open tab, filled as the navigation's entry says; with `raised` the open tab takes a soft shadow, `ds:shadow-sm`, and no colour changes | two ways to show one thing, inside a part of a page |
+  | `PILL` | a bar on the same fill as the switch's bar, so its tabs read as one control; with `raised` the bar takes a soft shadow, `ds:shadow-sm`, and no colour changes; no line, padded 5px either way, the bar fully rounded across and every tab fully rounded across and down, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour, and in weight only where the entry gives no fill; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`, `RD.SUPPORT.SURFACE.220`) | the pages of a website, in its top bar, with `raised` where the bar floats |
 
-- **`DSTabs` MUST be lifted only where `raised` asks, and MUST read no card or container look** (`RD.SUPPORT.SURFACE.215`). `raised` is a prop of the row, as on `DSCard`, with no default: unset, the row is not lifted. Tabs read neither `theme.card` nor `theme.container`. `raised` adds a soft shadow under the base line of `LINE`, the raised pill with its shadow on the open tab of `SWITCH`, and the raised bar with its shadow under `PILL`.
+- **`DSTabs` MUST be lifted only where `raised` asks, and MUST read no card or container look** (`RD.SUPPORT.SURFACE.215`). `raised` is a prop of the row, as on `DSCard`, with no default: unset, the row is not lifted. Tabs read neither `theme.card` nor `theme.container`. `raised` lifts and never recolours (`RD.SUPPORT.SURFACE.220`): it adds a soft shadow, `ds:shadow-sm`, and no colour, as the rail, the top bar and the dock add `ds:shadow-md` alone. The shadow goes on the open tab of `SWITCH`, on the bar of `PILL`, and on the open tab of either where the tabs stand without a bar; `LINE` has no surface to lift and ignores `raised`, as it ignores `grouped`.
 
-- **The tabs of `SWITCH` and `PILL` MAY stand without their bar, with `grouped={false}`** (`RD.SUPPORT.SURFACE.218`). `grouped` is a prop of the row, `true` when unset, and `LINE` ignores it. `grouped={false}` drops the bar's fill, its padding and its bar shadow, so the tabs stand on the page and the open tab's fill alone marks it, with its rounding kept; where the entry gives no fill, the open tab's label alone marks it. With `raised`, the open tab of `SWITCH` takes its raised pill and the open tab of `PILL` takes a soft shadow, `ds:shadow-sm`, in place of the bar's. Each tab keeps its padding and the gaps, so no label moves. The name sits beside `DSButtonGroup` and `DSToggleGroup`.
+- **The tabs of `SWITCH` and `PILL` MAY stand without their bar, with `grouped={false}`** (`RD.SUPPORT.SURFACE.218`). `grouped` is a prop of the row, `true` when unset, and `LINE` ignores it. `grouped={false}` drops the bar's fill, its padding and its bar shadow, so the tabs stand on the page and the open tab's fill alone marks it, with its rounding kept; where the entry gives no fill, the open tab's label alone marks it. With `raised`, the open tab of either takes a soft shadow, `ds:shadow-sm`, in place of the bar's, where it has a fill, and no colour changes. Each tab keeps its padding and the gaps, so no label moves. The name sits beside `DSButtonGroup` and `DSToggleGroup`.
 
 - **The tabs MUST take their colour, and the fill of their open tab, from the theme's navigation, `theme.layout.navigation`, and a row MAY override each** (`RD.SUPPORT.SURFACE.214`). Tabs mostly lead from page to page or switch what a part shows, as the navigation does, so they match it. No theme field is added, `DSTabs` draws its own tabs and never `DSNavEntry`, and unlike the navigation units, which take their look as one prop, it reads the theme's navigation.
 
   | The navigation's | `LINE` | `SWITCH` | `PILL` |
   | --- | --- | --- | --- |
-  | `color` `PRIMARY` | the open label and its line in the brand, `--primary-fg` | the open tab's fill in the brand; a closed tab the brand's soft tint at half strength under the pointer and the focus | as the switch |
-  | `color` `BASE` · `DEFAULT` | the open label and its line in the full text colour, `--fg` | the open tab's fill in the neutral greys; a closed tab's label turns full under the pointer | the open tab's fill in the neutral greys; a closed tab `--neutral-subtle` under the pointer and the focus |
+  | `color` `PRIMARY` | the open label and its line in the brand, `--primary-fg` | the bar in the brand's soft tint, `--primary-subtle`, except under a soft open tab, where in light it stays on the neutral track; the open tab's fill in the brand; a closed tab the brand's soft tint at half strength under the pointer and the focus | as the switch |
+  | `color` `DEFAULT` | the open label and its line in the full text colour, `--fg` | the bar on the neutral track, `--surface-inset`; the open tab's fill in the neutral greys; a closed tab's label turns full under the pointer | the bar as the switch's; the open tab's fill in the neutral greys; a closed tab `--neutral-subtle` under the pointer and the focus |
+  | `color` `BASE` | as `DEFAULT` | the bar on the base surface, `--surface`; the open tab and the closed tab as `DEFAULT` | the bar as the switch's; the open tab and the closed tab as `DEFAULT` |
   | `entry` `SOLID` | no change | a strong fill: `--primary`, or `--fg` with the page's colour as its label | as the switch |
-  | `entry` `QUIET` · `SUBTLE` | no change | a soft fill: the raised pill, laid with the brand's soft tint in the brand | a soft fill: `--primary-subtle`, or `--neutral-quiet` |
+  | `entry` `QUIET` · `SUBTLE` | no change | a soft fill: `--primary-subtle`, or `--neutral-quiet` | as the switch |
   | `entry` `LINE` · `PLAIN` | no change | no fill: the label alone, stronger in colour and in weight | as the switch |
 
   The theme's default navigation is `DEFAULT` at `QUIET`, so tabs are neutral, with a soft fill on the open tab, until the navigation is `PRIMARY`. `color` takes `DSSurfaceColorType` and `entry` takes `DSNavEntryType`, the navigation's own types, mapped as its values are. A row names them only where it must differ from the navigation, such as a second row of tabs or the tabs of a busy card; unset, the navigation decides.
 
-- **Every `type` MUST stand one under another and share the whole width** (`RD.SUPPORT.SURFACE.213`). With `orientation` `VERTICAL` the line runs down the side, the switch is a sunken column and the pill a raised column with a raised panel's large radius, its tabs' corners nesting inside; with `fill` the tabs of every type share the width equally.
+- **Every `type` MUST stand one under another and share the whole width** (`RD.SUPPORT.SURFACE.213`). With `orientation` `VERTICAL` the line runs down the side, the switch is a column on the bar's fill and the pill a column on the same fill with a panel's large radius, its tabs fully rounded as across; with `fill` the tabs of every type share the width equally.
 
 - **A unit that takes a page level MUST be given its `pageLevel` first, and its `size` only to override the size the level gives** (`RD.SUPPORT.SURFACE.209`). `DSItem` and `DSItemFacts` take no `size`, so the level is all a page gives them.
 
@@ -552,6 +553,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.216` | `DSItem` stands vertically when `orientation` is `VERTICAL`, the picture on top and the end node at the top end, and `DSItemCard` holds it as it is |
 | `RD.SUPPORT.SURFACE.218` | the tabs of `SWITCH` and `PILL` may stand without their bar with `grouped={false}`, `true` when unset and ignored by `LINE`, the open tab's fill alone marking it |
 | `RD.SUPPORT.SURFACE.219` | a page may align the end node of a `DSItem` with `endAlign` (`TOP`, `CENTER`, `BOTTOM`), unset leaving a line centred and a vertical item at the top end |
+| `RD.SUPPORT.SURFACE.220` | `DSTabs` raised only lifts, with a soft shadow and no colour, and `LINE` ignores it; the bar of `SWITCH` and `PILL` takes the navigation's colour; every tab of a vertical `PILL` is fully rounded |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof
