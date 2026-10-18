@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "e45001b7"
+      "seen": "a081d440"
     }
   ]
 }
@@ -166,7 +166,7 @@ Each rule below is of one block or one prop. The props, their values and their d
   | --- | --- | --- |
   | `LINE` | the underline: the open tab is the navigation's colour over a line, and no fill; flat, and with `raised` a soft shadow under the base line | the pages of an app, and the parts of its containers and cards |
   | `SWITCH` | a sunken bar, with a pill on the open tab, filled as the navigation's entry says, with no shadow; with `raised` the open tab is a raised pill with its soft shadow | two ways to show one thing, inside a part of a page |
-  | `PILL` | a bar with no surface and no shadow unless `raised`, the open tab's fill alone marking it; with `raised` the bar is on the raised surface, lifted by its shadow alone; no line, padded 5px either way, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour and in weight; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`) | the pages of a website, in its top bar, with `raised` where the bar floats |
+  | `PILL` | a bar on the switch's muted track with no shadow unless `raised`, so its tabs read as one control; with `raised` the bar is on the raised surface, lifted by its shadow alone; no line, padded 5px either way, fully rounded across, roomier than the switch; the open tab filled as the navigation's entry says, with no line, and a label stronger in colour, and in weight only where the entry gives no fill; a closed tab a soft tint of the navigation's colour under the pointer and the focus (`RD.SUPPORT.SURFACE.213`, `RD.SUPPORT.SURFACE.214`, `RD.SUPPORT.SURFACE.215`) | the pages of a website, in its top bar, with `raised` where the bar floats |
 
 - **`DSTabs` MUST be lifted only where `raised` asks, and MUST read no card or container look** (`RD.SUPPORT.SURFACE.215`). `raised` is a prop of the row, as on `DSCard`, with no default: unset, the row is not lifted. Tabs read neither `theme.card` nor `theme.container`. `raised` adds a soft shadow under the base line of `LINE`, the raised pill with its shadow on the open tab of `SWITCH`, and the raised bar with its shadow under `PILL`.
 
