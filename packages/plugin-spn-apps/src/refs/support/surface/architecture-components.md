@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "d3f0b7a6"
+      "seen": "111cbe88"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
@@ -286,6 +286,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 - **A mark among the item line's pictures MUST take its default variant from the level: `QUIET` at `PAGE` and `CONTAINER`, and `SUBTLE` at `WIDGET`, `GROUP`, `CONTENT` and `INLINE`** (`RD.SUPPORT.SURFACE.194`). The fill carries the hierarchy: the mark of a page or a container head draws the stronger tint, which its badges share, and the mark from a widget down draws the lighter one. No level rings the mark. A `variant` the page writes on the mark wins. An avatar's ring is an emphasis the page sets, and the level gives none.
 - **A badge among the facts MUST take the size of its level, two levels to a size:** `MD` at `PAGE` and `CONTAINER`, `SM` at `WIDGET` and `GROUP`, and `XS` at `CONTENT` and `INLINE`. Its words are then 14, 13 and 12px. No badge is smaller than `XS`, the smallest of the standard sizes.
 - **The description MUST stand directly under the title, and the line of facts MUST stand 2px under whatever stands above it** (`RD.SUPPORT.SURFACE.135`). Each row of the text takes the line height of its own type step, 1.2 for a Heading, 1.3 for a Title and 1.5 for Content. A line of facts is as tall as its words, or as its badge where the badge is taller.
+- **A vertical item line MUST space its text by its level** (`RD.SUPPORT.SURFACE.228`). The description stands 8px under the title at `PAGE` and `CONTAINER`, 6px at `WIDGET` and `GROUP`, 4px at `CONTENT` and `INLINE`; the facts stand 12px under the description, or the title, from `PAGE` to `GROUP`, and 8px at `CONTENT` and `INLINE`. A horizontal item line keeps its rows touching, and no prop is added.
 - **An item line at `INLINE` with a title, a description and facts MUST draw two lines.** The first holds the title, a dot and the description, and the second holds the facts. Where the first line is full, the description wraps under the title within the text column. With a description alone or facts alone, and at every other level, the rows stand one under another.
 - **An item line at `INLINE` with a title and facts and no description MUST draw its facts on the title's line, after a dot** (`RD.SUPPORT.SURFACE.223`). The line reads "v3 · Draft": the facts stand at the level's badge size, and where the line is full the title is cut before the facts are. A compact list is a `DSList` of `DSList.Item`, each `content` an item line at `INLINE` and its actions in `endNode`.
 - **The picture MUST be read from a fixed table, by the level and the rows of the text** (`RD.SUPPORT.SURFACE.094`). It is not worked out from the height of the text, so a change to a line height or a gap moves no picture. A mark, an avatar and a group of avatars take the same box, and a mark holds the icon of its box's step. The rows are counted by kind: a description that wraps is still one row, and a line of facts that draws nothing is no row. The table gives the box in pixels.
@@ -556,6 +557,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.219` | a page may align the end node of a `DSItem` with `endAlign` (`TOP`, `CENTER`, `BOTTOM`), unset leaving a line centred and a vertical item at the top end |
 | `RD.SUPPORT.SURFACE.220` | `DSTabs` raised only lifts, with a soft shadow and no colour, and `LINE` ignores it; the bar of `SWITCH` and `PILL` takes the navigation's colour; every tab of a vertical `PILL` is fully rounded |
 | `RD.SUPPORT.SURFACE.223` | an item line at `INLINE` with a title and facts and no description draws its facts on the title's line after a dot ("v3 · Draft"), the title cut before the facts |
+| `RD.SUPPORT.SURFACE.228` | a vertical item line spaces its description and its facts by its level, and a horizontal one does not |
 | `RD.SUPPORT.SURFACE.224` | `DSTabs` at the level `PAGE` draw `PILL` where no `type` is named, grouped on its track and not raised; `LINE` stays at `CONTAINER` and `WIDGET` and `SWITCH` at the other levels |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
