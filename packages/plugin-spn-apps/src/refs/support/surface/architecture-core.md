@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "f0e2885c"
+      "seen": "1b4b8b60"
     }
   ]
 }
@@ -35,8 +35,8 @@ Read this before you ask what a block may read, or before you add a role, a step
 
 | Token group | Holds | A block reads it |
 | --- | --- | --- |
-| The seed | the one brand color of a theme | never |
-| The ramps | the raw palettes. Primary is worked out from the seed. Neutral, success, warning, error and info are fixed | never |
+| The seed | the one brand color of a theme, and the temperature of its greys | never |
+| The ramps | the raw palettes. Primary is worked out from the seed. Neutral's lightness is fixed and its hue and chroma are the theme's temperature. Success, warning, error and info are fixed | never |
 | The roles | tokens named for a job: surface, foreground, border and accent. Each one points at a ramp step, and dark points it at another | yes |
 | The type steps | a size and a line height for each step of text | yes |
 | The scale | the height, the padding, the gap between blocks, the gap between the parts of a control, the radius and the icon size of each size step | yes |
@@ -45,9 +45,13 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is the facts of an item and other secondary words. `fg-subtle` is for a placeholder, a disabled state, and a mark between two texts such as a dot. **Border** is the line a block draws, chosen by what it parts: `surface-divider` between rows, `surface-border` at the edge of a card, a container, a popover and the shell, and `surface-border-strong` at the edge of a control. The shell's look holds no colour of its own and points at these roles. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block, and the quiet and subtle tints and the line of the lighter variants. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one overlay role, `surface-overlay`, black at 40% in light and 60% in dark, and `DSBackdrop` draws it. Two scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is the facts of an item and other secondary words. `fg-subtle` is for a placeholder, a disabled state, and a mark between two texts such as a dot. **Border** is the line a block draws, chosen by what it parts: `surface-divider` between rows, `surface-border` at the edge of a card, a container, a popover and the shell, and `surface-border-strong` at the edge of a control. The shell's look holds no colour of its own and points at these roles. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block, and the quiet and subtle tints and the line of the lighter variants. The brand has two roles: `primary` is the brand as a fill, and `primary-fg` the brand as text and as a line, a link, `PRIMARY` text, a selected tab and a chosen card's ring. In light the two are the seed; dark parts them. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one overlay role, `surface-overlay`, black at 40% in light and 60% in dark, and `DSBackdrop` draws it. Two scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
-The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163` and `166`).
+The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163`, `166` and `203`).
+
+- **The greys MUST take their hue and chroma from the theme's temperature, and their lightness from the design system** (`RD.SUPPORT.SURFACE.203`). `neutralTemperature` is `COOL`, `NEUTRAL` or `WARM`, written by `applyTheme` as `--neutral-hue` and `--neutral-chroma`. `NEUTRAL`, the default, is no chroma, so every grey stays as it was. `WARM` takes hue 85 and `COOL` hue 250, at a chroma of 0.005 at the dark end and a share of it toward white, which stays white. Every grey of dark takes the same two tokens. The temperature is a choice of three and never a hue or a chroma as a value.
+- **In dark the body text MUST be an off-white, neutral 200, one step down from near-white**, with the quiet, muted and subtle tones in their order under it (`RD.SUPPORT.SURFACE.203`): 13.67 to 1 on the page and 12.17 on a raised surface.
+- **In dark the brand as a fill MUST keep the brand's strength, and the brand as text or a line MUST take its light step** (`RD.SUPPORT.SURFACE.203`). `primary` in dark is the seed's hue and chroma at 54% lightness, 49% under the pointer, with white text on it (5.07 to 1 for the default seed): a `SOLID` button, the on track of a switch (60% under the pointer, the white knob 3.94 to 1 off it), a checked box, a progress or slider fill, a chosen entry. `primary-fg` is step 400, 300 under the pointer, and the focus ring stays step 400. On a fill, `--primary-fg` follows `--surface-entry-fg`: white on `PRIMARY` `SOLID`, step 400 on `DEFAULT` `SOLID` in light and on every fill in dark.
 
 - **In dark, a surface MUST be a dark grey, and never black.** The sunken surface and the side bar stand a shade under the page, and the page, a raised surface and the fills under the pointer each stand a step lighter than the one before: 20%, 22%, 26.5% and 29% lightness, and 34% for the strong fill under the pointer. Light changes only by the two new roles. So a person tells them apart by their fill.
 - **Surfaces MUST be told apart by their fill first, and by a line second.** The border in dark is a quiet, opaque grey, a little lighter than a tinted fill.
@@ -135,6 +139,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.163` | the values of the roles and lines, the divider and the overlay, and the fills of cards, containers and overlays |
 | `RD.SUPPORT.SURFACE.164` | the display steps of the Heading and Title scales take smaller values on a phone |
 | `RD.SUPPORT.SURFACE.166` | the description of an item is quiet but for `INLINE`, the subtle tone, muted on a hovered or chosen row, and the outline badge's line |
+| `RD.SUPPORT.SURFACE.203` | the theme's temperature of the greys, the brand as a fill parted from the brand as text in dark, and the dark body text one step down |
 | `RD.SUPPORT.APPS.152` | the spacing and size scale is a token group beside the roles, and a block reads a role token and the scale, never a ramp step or a number of its own |
 
 ## Proof

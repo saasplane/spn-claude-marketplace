@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "f03491ce"
+      "seen": "d26e5dd4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -58,6 +58,8 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 | Light or dark | which ramp step each role token points at |
 | Default size | the size step a block takes when none is set on it |
 | Corner radius | one base value. The radius of every size step is worked out from it |
+| Motion speed | `motionSpeed`: the multiplier on every place's base duration |
+| Temperature of the greys | `neutralTemperature`: `COOL`, `NEUTRAL` (the default) or `WARM`. The greys, the surfaces, the lines and the text lean cool, stay neutral or lean warm, and a grey stays a grey. A choice of three, never a hue or a chroma as a value (`RD.SUPPORT.SURFACE.203`) |
 | Container look | `container`: `frames`, `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for every container. A card follows its choice where the card look says nothing |
 | Card look | `card`: `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the surface of every card |
 | Card widget look | `cardWidget`: what `DSCardWidget` adds to a card. `divided` is the lines between its head, its parts and its footer, `rowsDivided` the lines between the rows of its `ITEMS` and `LIST` parts, and `rowsHoverable` the hover of those rows |
@@ -109,6 +111,8 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   mode: DSThemeModeType.LIGHT,
   size: DSSizeType.SM,
   radius: DSThemeRadiusType.MEDIUM,
+  motionSpeed: DSMotionSpeedType.DEFAULT,
+  neutralTemperature: DSThemeNeutralTemperatureType.NEUTRAL,
   container: {
     frames: [DSPageLevelPartType.CONTENT, DSPageLevelPartType.FOOTER],
     color: DSSurfaceColorType.BASE,
@@ -202,6 +206,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
+| `RD.SUPPORT.SURFACE.203` | the theme holds the temperature of the greys, a choice of three |
 | `RD.SUPPORT.SURFACE.196` | the theme holds no font family: the typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans` |
 | `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is kept where the field can fail or has a description (`RD.SUPPORT.SURFACE.171`); the theme's form is built on it |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
