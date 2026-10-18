@@ -675,12 +675,13 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const edited = draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Text", "German", ""], cells: [["Sign in", "Anmelden", ""], ["Sign out", { control: "field", text: "Abmelden", fill: true }, { icon: "checkbox" }]] }] }] } });
   one("a box in a cell that takes fill is as wide as its column, and the action of the row stands beside it", [edited.findings.length, rect(edited.svg, "sds-skel-control")],
     ([found, boxes]) => found === 0 && boxes.length === 2 && boxes[0][2] > 300 && boxes[1][0] - (boxes[0][0] + boxes[0][2]) <= 24);
-  // A part with no border may be marked by a dotted line, where a spec asks: the header of a container, and a row beside it.
-  const backPage = (marked) => draw({ kind: "skeleton", frame: { rows: [{ ...(marked ? { marked: true } : {}), items: [{ icon: "previous", text: "Schedules" }] },
-    { items: [{ frame: { look: "container", label: "New schedule", ...(marked ? { marked: true } : {}), rows: [{ items: [{ standin: "field", label: "Name", fill: true }] }] } }] }] } });
-  one("a marked header and a marked row each have a dotted line, as wide as the container's outline", [backPage(true).findings.length, rect(backPage(true).svg, "sds-skel-guide"), rect(backPage(true).svg, "sds-skel-control")],
-    ([found, guides, boxes]) => { const outline = boxes.reduce((widest, box) => (box[2] > widest[2] ? box : widest)); return found === 0 && guides.length === 2 && guides.every((g) => g[0] === outline[0] && g[2] === outline[2]); });
+  // A row with no border may be marked by a dotted line, where a spec asks; a container's header stands inside its outline, so it takes none.
+  const backPage = (marked, onContainer = false) => draw({ kind: "skeleton", frame: { rows: [{ ...(marked ? { marked: true } : {}), items: [{ icon: "previous", text: "Schedules" }] },
+    { items: [{ frame: { look: "container", label: "New schedule", ...(onContainer ? { marked: true } : {}), rows: [{ items: [{ standin: "field", label: "Name", fill: true }] }] } }] }] } });
+  one("a marked row has a dotted line, as wide as the container's outline", [backPage(true).findings.length, rect(backPage(true).svg, "sds-skel-guide"), rect(backPage(true).svg, "sds-skel-control")],
+    ([found, guides, boxes]) => { const outline = boxes.reduce((widest, box) => (box[2] > widest[2] ? box : widest)); return found === 0 && guides.length === 1 && guides[0][0] === outline[0] && guides[0][2] === outline[2]; });
   one("a page that asks for no mark has no dotted line", rect(backPage(false).svg, "sds-skel-guide").length, 0);
+  one("a container takes no `marked`, since its header stands inside its outline", backPage(false, true).findings, says("a container takes no `marked`"));
   const choices = (words) => ({ items: words.map((text) => (text ? { control: "checkbox", text, fill: true } : { spacer: true })) });
   one("the choices of a set stand in columns, and a shorter row keeps them", draw({ kind: "skeleton", frame: { rows: [choices(["Members", "Roles", "Directory"]), choices(["Custom domain", "Sign-in policy", ""])] } }).svg,
     (g) => { const x = rect(g, "sds-skel-control").map((r) => r[0]); return x.length === 5 && x[0] === x[3] && x[1] === x[4] && x[1] > x[0]; });
@@ -707,9 +708,10 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     const g = centre.svg; const c = rect(g, "sds-skel-control").map((r) => r[1] + r[3] / 2);
     const label = Number((g.match(/<text class="sds-label" x="[\d.]+" y="([\d.]+)"/) ?? [])[1]) - 4;
     return new Set([...c, label]).size === 1 && none(centre.findings); });
-  const deep = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [{ items: [{ frame: { tag: "c", rows: [] } }] }] } }] }] } }] }] } };
-  one("a third named boundary is a finding that names it", draw(deep).findings, says("draw `c` as a skeleton of its own"));
-  one("two named boundaries are allowed", draw({ ...deep, frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [] } }] }] } }] }] } }).findings, none);
+  const nestOf = (tags) => tags.reduceRight((inner, tag) => ({ tag, rows: inner ? [{ items: [{ frame: inner }] }] : [] }), undefined);
+  const deep = { kind: "skeleton", frame: { rows: [{ items: [{ frame: nestOf(["a", "b", "c", "d"]) }] }] } };
+  one("a fourth named boundary is a finding that names it", draw(deep).findings, says("draw `d` as a skeleton of its own"));
+  one("three named boundaries are allowed: a container, a widget or a card, and a group", draw({ ...deep, frame: { rows: [{ items: [{ frame: nestOf(["a", "b", "c"]) }] }] } }).findings, none);
 
 
   // 12 · parts that share one frame (a container's `frames`, `raised`, `bordered`, `rounded`)
@@ -876,14 +878,17 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a card's head is lower than the head of a frame with a title", rect(titled.svg, "sds-box")[0][3] < rect(card({ tag: "x", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] }).svg, "sds-box")[0][3] - 16, true);
   one("a card with neither a title nor a tag is a finding", card({ look: "card", rows: [] }).findings, says("carries no name"));
 
-  // 15c · a container on a surface: its header above, its content and its footer inside a thin outline
+  // 15c · a container on a surface: one thin outline holding its header, its content and its footer (RD.DEVEX.WORKSPACE.268)
   const boxed = card({ look: "container", label: "Sign-in", note: "By app", actions: [{ control: "button", text: "Set our own" }],
     rows: [{ items: [{ text: "Account" }] }], footer: [{ items: [{ note: "Follows the default" }] }] });
   const outline = (g) => [...g.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="8"/g)].map((m) => m.slice(1).map(Number));
   one("a container draws without a finding", boxed.findings, none);
-  one("its title stands above its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), outline(boxed.svg)[0]],
-    (g) => g[0][1] < g[2][1] && g[1][1] < g[2][1] && g[0][0] === g[2][0]);
-  one("its actions stand at the end of its header, above the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === outline(boxed.svg)[0][0] + outline(boxed.svg)[0][2] && g[1] + g[3] <= outline(boxed.svg)[0][1]);
+  const lineYs = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M[\d.]+ ([\d.]+) H[\d.]+"\/>/g)].map((m) => Number(m[1]));
+  one("its title stands inside its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), outline(boxed.svg)[0]],
+    (g) => g[0][1] > g[2][1] && g[1][1] > g[0][1] && g[0][0] === g[2][0] + 16);
+  one("its actions stand at the end of its header, inside the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === outline(boxed.svg)[0][0] + outline(boxed.svg)[0][2] - 16 && g[1] > outline(boxed.svg)[0][1]);
+  one("a line across the outline closes its header, above its content", [lineYs(boxed.svg)[0], texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), texts(boxed.svg, "sds-label").find((t) => t[2] === "Account")],
+    ([line, note, content]) => line > note[1] && line < content[1]);
   one("its content stands inside the outline", texts(boxed.svg, "sds-label").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
   one("its footer begins under a line across the outline", boxed.svg, (g) => /<path class="sds-skel-control" d="M[\d.]+ [\d.]+ H[\d.]+"\/>/.test(g) && texts(g, "sds-code").some((t) => t[2] === "Follows the default"));
   one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
@@ -894,7 +899,10 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a container with two parts of content draws without a finding", parted.findings, none);
   one("each part has its own title, with its action at the end of that title", [texts(parted.svg, "sds-title").find((t) => t[2] === "Email domains"), rect(parted.svg, "sds-skel-control").filter((r) => r[3] === 32)],
     (g) => g[1].length === 2 && Math.abs((g[1][1][1] + 16) - (g[0][1] - 4)) < 1 && g[1][1][0] + g[1][1][2] === outline(parted.svg)[0][0] + outline(parted.svg)[0][2] - 16);
-  one("a line divides the second part from the first, and none stands above the first", (parted.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 1);
+  one("a line closes the header and one divides the second part from the first, and the first part keeps no line of its own", (parted.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 2);
+  one("a part of the content with a title and no unit is a group: a dotted boundary, *Group* at its corner, its title inside",
+    [rect(parted.svg, "sds-skel-guide"), texts(parted.svg, "sds-note").filter((t) => t[2] === "Group"), texts(parted.svg, "sds-title").find((t) => t[2] === "Sites")],
+    ([guides, names, title]) => guides.length === 2 && names.length === 2 && names[0][1] < title[1] && title[1] < guides[0][1] + guides[0][3]);
   // 15c · the titles of a surface stand in steps
   const stepOf = (g, words) => (g.match(new RegExp(`style="([^"]*)">${words}<`)) ?? [])[1];
   const stepped = card({ look: "container", label: "Sign-in", rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [
@@ -907,7 +915,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("an item on the page itself is the page's header, as large and heavy as a container's title", [headed.findings.length, stepOf(headed.svg, "SaaS Plane Platform")], (g) => g[0] === 0 && g[1] === "font-size:20px");
   const flushed = card({ look: "container", label: "Orders", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer"], cells: [["ORD-1", "Acme"], ["ORD-2", "Blue"]] }] }] });
   one("a flush table draws its lines from one edge of the container's outline to the other", [flushed.findings.length, outline(flushed.svg)[0], [...flushed.svg.matchAll(/<path class="sds-skel-(?:control|border)" d="M([\d.]+) [\d.]+ H([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])])],
-    (g) => g[0] === 0 && g[2].length === 2 && g[2].every((l) => l[0] === g[1][0] && l[1] === g[1][0] + g[1][2]));
+    (g) => g[0] === 0 && g[2].length === 3 && g[2].every((l) => l[0] === g[1][0] && l[1] === g[1][0] + g[1][2]));
   one("the head row of a flush table is a band, with its words in capitals", [flushed.svg.includes('class="sds-skel-surface"'), texts(flushed.svg, "sds-note").map((t) => t[2])], (g) => g[0] && g[1].includes("ORDER") && g[1].includes("CUSTOMER"));
   const cardWithMark = card({ look: "card", label: "Email", media: "default", rows: [{ items: [{ note: "SendGrid" }] }] });
   one("a card with a mark draws it before its title, and the title starts after it", [cardWithMark.findings.length, (cardWithMark.svg.match(/<circle/g) ?? []).length, texts(cardWithMark.svg, "sds-title").find((t) => t[2] === "Email")[0], texts(card({ look: "card", label: "Email", rows: [{ items: [{ note: "SendGrid" }] }] }).svg, "sds-title").find((t) => t[2] === "Email")[0]],
@@ -918,17 +926,20 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     (g) => g[0] === 0 && g[1][0] === "Sends the email of every app" && g[1].includes("Since 2 May") && g[2] === 18);
   one("an item with a description and no facts keeps itemOfTwo lines", texts(line({ title: "x", description: "y" }).svg, "sds-note").map((t) => t[2]), (g) => g.length === 1 && g[0] === "y");
   const listWithLines = card({ look: "container", label: "Users", divided: true, rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }, { items: [{ item: { title: "Li Wei" }, fill: true }] }, { items: [{ item: { title: "Omar" }, fill: true }] }] });
-  one("a divided container has a line between each itemOfTwo of its rows", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
+  one("a divided container has a line under its header and a line between each two of its rows", [listWithLines.findings.length, (listWithLines.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 3);
   const radius = (g) => [...g.matchAll(/<circle[^>]* r="([\d.]+)"/g)].map((m) => Number(m[1]));
   one("a mark that is a thing and tells its state is as tall as a control, and one that only tells a state is small",
     [radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", mark: true, on: true, text: "Google" }] }] }).svg)[0], radius(card({ look: "card", label: "x", rows: [{ items: [{ icon: "default", on: true }] }] }).svg)[0]], (g) => g[0] > g[1]);
   const listWithChosen = card({ look: "container", label: "Groups", divided: true, rows: [{ chosen: true, items: [{ item: { title: "Authentication" }, fill: true }] }, { items: [{ item: { title: "Billing" }, fill: true }] }] });
-  one("the chosen line of a list is a band across the outline, from its top to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "sds-skel-surface"), outline(listWithChosen.svg)[0]],
-    (g) => g[0] === 0 && g[1].length === 1 && g[1][0][0] === g[2][0] && g[1][0][2] === g[2][2] && g[1][0][1] === g[2][1]);
+  one("the chosen line of a list is a band across the outline, from the line under the header to the line under the row", [listWithChosen.findings.length, rect(listWithChosen.svg, "sds-skel-surface"), outline(listWithChosen.svg)[0], lineYs(listWithChosen.svg)[0]],
+    (g) => g[0] === 0 && g[1].length === 1 && g[1][0][0] === g[2][0] && g[1][0][2] === g[2][2] && g[1][0][1] === g[3]);
   const cardWithList = draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { look: "card", label: "Account", sections: [{ rows: [{ items: [{ control: "switch", text: "Open" }] }] },
     { label: "Directories", divided: true, rows: [{ items: [{ item: { title: "Acme Okta" }, fill: true }] }, { items: [{ item: { title: "Acme Entra" }, fill: true }] }, { items: [{ item: { title: "Acme Ping" }, fill: true }] }] }] } }] }] } });
   one("a list in a card has a line between each two of its rows, and no line above the part", [cardWithList.findings.length, (cardWithList.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length], (g) => g[0] === 0 && g[1] === 2);
-  one("a part of a card has no line above it", (stepped.svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
+  one("a part of a card has no line above it", (card({ look: "card", label: "Account", sections: [{ rows: [{ items: [{ text: "x" }] }] }, { label: "Directories", rows: [{ items: [{ text: "y" }] }] }] }).svg.match(/<path class="sds-skel-control" d="M/g) ?? []).length, 0);
+  const groupList = card({ look: "container", label: "Web addresses", sections: [{ label: "Sites", divided: true, rows: [{ items: [{ item: { title: "acme.spn.io" }, fill: true }] }, { items: [{ item: { title: "my.acme.com" }, fill: true }] }] }] });
+  one("the line between two rows of a list in a group stays inside the group's boundary", [groupList.findings.length, rect(groupList.svg, "sds-skel-guide")[0], [...groupList.svg.matchAll(/<path class="sds-skel-control" d="M([\d.]+) [\d.]+ H([\d.]+)"\/>/g)].map((m) => [Number(m[1]), Number(m[2])])],
+    ([found, group, lines]) => found === 0 && lines.length === 2 && lines[1][0] === group[0] && lines[1][1] === group[0] + group[2]);
   one("a plain word in a row keeps the weight of a word", texts(card({ look: "card", label: "x", rows: [{ items: [{ text: "plain" }] }] }).svg, "sds-label").map((t) => t[2]), (g) => g.includes("plain"));
   one("a look the skeleton lacks names the five it has", card({ tag: "x", look: "glass", rows: [] }).findings, says("raised · bordered · flat · card · container"));
 
@@ -943,7 +954,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
       { unit: "DSDataTableWidget", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer", ""], cells: [["#1042", "Acme Corp", { icon: "more" }]] }] }] }] });
   const paged = (viewport, layout, page = { item: { title: "Orders", description: "Every order placed" }, actions: [{ control: "button", text: "New order", main: true }] }, frame = { size: "XS", rows: [{ items: [{ frame: listing() }] }] }) =>
     judge({ kind: "skeleton", ...(layout ? { layout } : {}), views: [{ viewport, page, frame }] });
-  const RAIL = { type: "RAIL", body: { width: "WIDE" }, navigation: { nav: ["Dashboard", "Orders", "Customers"], chosen: 1 } };
+  const RAIL = { type: "RAIL", body: { width: "WIDE" }, navigation: { nav: ["Dashboard", "Orders", "Customers"], chosen: "Orders" } };
   const desk = paged("DESKTOP", RAIL);
   const win = (g) => outer(g)[0] ?? [];
   one("a page in a RAIL draws with no finding, its layout drawn round it, and the figure check reads it as a skeleton", [desk.findings, desk.figure, desk.svg.includes(">Dashboard<")], (g) => g[0].length === 0 && g[1].length === 0 && g[2]);
@@ -965,7 +976,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a navigation and a content that are not attached are rounded and stand 16 in",
     [win(apart.svg), boxes(apart.svg, "sds-skel-surface")[0], boxes(apart.svg, "sds-skel-border")[0]],
     ([w, nav, content]) => nav[0] === w[0] + 16 && nav[1] === w[1] + 16 && nav[4] === 8 && content[4] === 8 && content[0] === nav[0] + 131 + 16 && content[0] + content[2] === w[0] + w[2] - 16);
-  const top = paged("DESKTOP", { type: "TOPNAV", body: { width: "XWIDE" }, navigation: { nav: ["Dashboard", "Orders"], chosen: 0 } });
+  const top = paged("DESKTOP", { type: "TOPNAV", body: { width: "XWIDE" }, navigation: { nav: ["Dashboard", "Orders"], chosen: "Orders" } });
   one("a top bar runs across the window, 48 high, and the content stands under it at the body's width",
     [win(top.svg), boxes(top.svg, "sds-skel-surface")[0], boxes(top.svg, "sds-skel-border")[0]],
     ([w, bar, content]) => bar[0] === w[0] && bar[2] === 1052 && bar[3] === 48 && content[1] === w[1] + 48 && content[2] === 842 && content[0] === w[0] + (1052 - 842) / 2);
@@ -1001,24 +1012,45 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
 
   // 17b · each block's unit, at the level its name gives
   const notes = (g) => texts(g, "sds-note").map((t) => t[2]);
-  one("a container's unit is named at the corner of its outline, under its header",
+  one("a container's unit is named at the corner of its outline, over its header",
     [notes(desk.svg).includes("DSContainer"), texts(desk.svg, "sds-note").find((t) => t[2] === "DSContainer"), outline(desk.svg)[0]],
     ([named, name, box]) => named && name[0] === box[0] + 8 && name[1] > box[1] && name[1] < box[1] + 24);
+  const headedBox = paged("DESKTOP", RAIL, undefined, { size: "XS", rows: [{ items: [{ frame: { look: "container", unit: "DSContainer", label: "Desk lamps", note: "Lamps for a desk", actions: [{ control: "button", text: "Add product" }],
+    rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Product", "Price"], cells: [["Arc desk lamp", "$89.00"]] }] }] } }] }] });
+  one("a container's title, the line under it and its actions stand inside its outline, under its unit's name, as `DSContainer.Header`",
+    [headedBox.findings, texts(headedBox.svg, "sds-note").find((t) => t[2] === "DSContainer"), titleOf(headedBox.svg, "Desk lamps"), texts(headedBox.svg, "sds-note").find((t) => t[2] === "Lamps for a desk"), outline(headedBox.svg)[0]],
+    ([found, name, title, note, box]) => found.length === 0 && name[1] < title[1] && title[1] < note[1] && title[0] === box[0] + 16 && title[1] > box[1] && note[1] < box[1] + box[3]);
+  one("the rail's chosen entry is named by its word, and an index is a finding that names the word",
+    paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: 1 } }).findings, says("name the open entry by its word, one of `nav`"));
+  one("a chosen entry `nav` does not hold is a finding",
+    paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: "Team" } }).findings, says("`layout.navigation.chosen` is `Team`, and `nav` holds"));
+  one("the chosen entry is the page's own: a page that is an entry, under another entry's band, is a finding",
+    paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: "Customers" } }).findings, says("the `DESKTOP` view's page is `Orders`, an entry of the navigation, and the chosen entry is `Customers`"));
+  one("a navigation that names its entries and none open is a finding",
+    paged("DESKTOP", { ...RAIL, navigation: { nav: RAIL.navigation.nav } }).findings, says("no `chosen`"));
+  one("a container's unit is named once, at its outline's corner", notes(headedBox.svg).filter((name) => name === "DSContainer").length, 1);
   one("a part that is a widget is a dotted boundary round its rows, its name at its corner",
     [notes(desk.svg), boxes(desk.svg, "sds-skel-guide").length, outline(desk.svg)[0], boxes(desk.svg, "sds-skel-guide")[0]],
     ([names, guides, box, first]) => names.includes("DSFilterBarWidget") && names.includes("DSDataTableWidget") && guides === 2 && first[0] === box[0] + 8 && first[2] === box[2] - 16);
   one("a flush table in a widget reaches the widget's boundary, under its name",
     [boxes(desk.svg, "sds-skel-guide")[1], desk.svg.match(/<rect class="sds-skel-surface" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)"[^>]*rx="0"\/>\s*<text class="sds-note"[^>]*letter-spacing/)],
     ([widget, band]) => band !== null && Number(band[1]) === widget[0] && Number(band[3]) === widget[2] && Number(band[2]) > widget[1] + 20);
-  const unitFrames = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", rows: [{ items: [
+  const unitFrames = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSComparisonWidget", rows: [{ items: [
     { frame: { unit: "DSCard", label: "Revenue", rows: [{ items: [{ text: "$12,400" }] }] } }] }] } }] }] } });
-  one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline and title, with no name",
+  one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline, its name and its title",
     [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "sds-skel-guide").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
-    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSCardWidget") && !names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
-  const threeDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
-    { frame: { unit: "DSCardWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", rows: [] } }] }] } }] }] } }] }] } }] });
-  one("the count starts at the container: a card in a widget in a container is a third level, and a finding",
-    threeDeep.findings, says("the boundary `DSCard` sits inside 2 named boundaries"));
+    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparisonWidget") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
+  const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } }] }] } });
+  one("`DSCardWidget` is a card: its outline, its name at the corner and its title inside",
+    [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "sds-skel-guide").length, stepOf(cardWidget.svg, "Contacts")],
+    ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 1 && guides === 0 && step === "font-size:15px");
+  const fourDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
+    { frame: { unit: "DSComparisonWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", sections: [{ label: "This month", rows: [{ items: [{ text: "$12,400" }] }] }], rows: [] } }] }] } }] }] } }] }] } }] });
+  one("the count starts at the container: a container, a widget or a card, and a group are three, and a fourth level is a finding",
+    fourDeep.findings, says("the boundary `Group` sits inside 3 named boundaries"));
+  one("a card in a widget in a container is three levels, and allowed",
+    draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
+      { frame: { unit: "DSComparisonWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", rows: [] } }] }] } }] }] } }] }] } }] }).findings, none);
   one("a unit the barrel does not name is a finding that says what a unit is",
     paged("DESKTOP", RAIL, undefined, { rows: [{ items: [{ frame: { unit: "DSFormWidget", rows: [{ items: [{ control: "field", text: "Name" }] }] } }] }] }).findings,
     says("`DSFormWidget` is no unit of the design system"));

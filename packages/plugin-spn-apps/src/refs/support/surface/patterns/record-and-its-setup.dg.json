@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and its setup",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, with its title and its actions above its outline, and each smaller part of a thing set up is a card. At a desktop the large part is the main column, its cards one under another, and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, with its title and its actions in its header, inside its outline, and each smaller part of a thing set up is a card. At a desktop the large part is the main column, its cards one under another, and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -19,7 +19,7 @@
     "Team",
     "Settings"
    ],
-   "chosen": 5
+   "chosen": "Customers"
   },
   "content": {
    "attached": true

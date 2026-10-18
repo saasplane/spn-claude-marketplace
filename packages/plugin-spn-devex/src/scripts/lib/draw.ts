@@ -54,8 +54,9 @@ export type SkeletonLayout = {
   type: "RAIL" | "DOCK" | "TOPNAV" | "CANVAS";
   /** `IDSLayoutBodyLook.width`: the box the navigation and the content stand in, `FULL` where it is left out. */
   body?: { width?: "FULL" | "XWIDE" | "WIDE" | "MEDIUM" | "NARROW"; maxWidth?: unknown; className?: unknown };
-  /** `IDSLayoutNavigationLook.attached`, true where it is left out; the words of its entries as `nav`, and the open one, from 0. */
-  navigation?: { attached?: boolean; sticky?: unknown; className?: unknown; nav?: string[]; chosen?: number };
+  /** `IDSLayoutNavigationLook.attached`, true where it is left out; the words of its entries as `nav`, and the open one
+   *  as `chosen`, by its word: the entry that leads to the page the sketch shows. */
+  navigation?: { attached?: boolean; sticky?: unknown; className?: unknown; nav?: string[]; chosen?: string };
   /** `IDSLayoutContentLook.attached`, true where it is left out. */
   content?: { attached?: boolean; bordered?: unknown; raised?: unknown; className?: unknown };
 };
@@ -155,13 +156,15 @@ export type SkeletonFrame = {
   sections?: SkeletonSection[];
   /** With a `look` of `container`: a line across the outline between each two of its rows, as a list has. A part takes it too. */
   divided?: boolean;
-  /** With a `look` of `container`: a dotted line around its header, which has no border, to show how far it reaches. */
+  /** Never on a frame: a container's header stands inside its outline, so only a row with no border takes `marked`.
+   *  Read only to name it as a finding. */
   marked?: boolean;
   /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
   media?: string;
 };
 /** A part of the content of a container or a card: its title, the actions at the end of that title, its rows, and
- *  the unit of the design system it is, whose name stands at its corner. */
+ *  the unit of the design system it is, whose name stands at its corner. A part with a title and no unit is a group,
+ *  the level `GROUP` of the design system: a dotted boundary round it, *Group* at its corner. */
 export type SkeletonSection = { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean; unit?: string };
 /** One screen at one screen class: a whole frame of its own, never derived from another view. A spec
  *  holds `views` in place of `frame`, and the views are drawn in one figure. `page` is the view's page level. */
@@ -1653,8 +1656,9 @@ const SKEL_TAG_H = SKEL_LABEL_H + SKEL_LABEL_GAP;
 const SKEL_BAR = 6, SKEL_HEAD_BAR = 8, SKEL_BAR_STEP = SKEL_BAR + SKEL_LABEL_GAP;
 /** Controls of one packed group (a pager, a layout switch) sit this far apart. */
 const SKEL_PACK_GAP = 4;
-/** How many named boundaries may sit inside one another before the drawing is split. */
-const SKEL_NEST_MAX = 2;
+/** How many named boundaries may sit inside one another before the drawing is split: a container, a widget or a card
+ *  in it, and a group in that. */
+const SKEL_NEST_MAX = 3;
 const SKEL_LINES_W = 160, SKEL_FIELD_W = 160, SKEL_CARD_H = 64;
 const WIDTH_FRACTIONS: Record<string, number> = { "1/4": 1 / 4, "1/3": 1 / 3, "1/2": 1 / 2, "2/3": 2 / 3, "3/4": 3 / 4 };
 // THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-artifacts.md § The grid), as the hand-drawn
@@ -1665,8 +1669,9 @@ const SKEL_CANVAS = 1052;
 const SKEL_MIN_W = 200;
 
 const SKEL_LOOKS = ["raised", "bordered", "flat", "card", "container"];
-/** A container on a surface: the height of its header, which stands above its outline, and the room between the two. */
-const SKEL_CONTAINER_HEAD = 48;
+/** A container on a surface: the height of its header, a band inside its outline under its unit's name, from its top
+ *  to the line under it: its title alone, or its title with a note under it. */
+const SKEL_CONTAINER_HEAD = 44, SKEL_CONTAINER_HEAD_TWO = 52;
 /** How far the dotted line of a part with no border stands above and below what it marks. */
 const SKEL_GUIDE_OUT = 6;
 /** A card's head: its title on one line, or its title with a note under it. */
@@ -1715,18 +1720,23 @@ const SKEL_UNITS = new Set([
 type SkelLevel = "container" | "widget" | "card" | "component";
 /** THE LEVEL IS READ FROM THE UNIT'S NAME (RD.SUPPORT.SURFACE.098): a widget's ends in `Widget`, a container's in
  *  `Container`, and a component's takes no such word. A card stands at the level of a widget, and is told by its name. */
+// `DSCardWidget` IS A CARD, the widget a page sets in a container or on the page, so it is drawn as one: its outline,
+// its name and its title.
 const skelLevel = (unit: string): SkelLevel =>
-  /Container$/.test(unit) ? "container" : /Widget$/.test(unit) ? "widget" : /Card$/.test(unit) ? "card" : "component";
+  /Container$/.test(unit) ? "container" : /Card(Widget)?$/.test(unit) ? "card" : /Widget$/.test(unit) ? "widget" : "component";
 /** The look a level is drawn in where the frame names none: a container its outline, a card its outline and title,
  *  and a widget or a component a dotted boundary. */
 const SKEL_LEVEL_LOOK: Record<SkelLevel, SkeletonFrame["look"]> = { container: "container", card: "card", widget: "flat", component: "flat" };
-/** The name at a boundary's corner: its tag, and its unit. A card's title says what it is, so a card draws no unit's
- *  name, and a container on a surface draws its unit inside its outline, under its header. */
+/** The word at the corner of a group: a part of a container's or a card's content with a title of its own, the level
+ *  `GROUP` of the design system, which is no unit and so is named by its level. */
+const SKEL_GROUP = "Group";
+/** The name at a boundary's corner: its tag, and its unit. Every unit carries its name, a card as well as a widget, so a
+ *  reader reads the levels of a page at a glance; a container draws its own at the corner of its outline, over its header. */
 const skelCornerName = (frame: SkeletonFrame, surface = false): string | undefined => {
-  const unit = frame.unit !== undefined && skelLevel(frame.unit) !== "card" && !surface ? frame.unit : undefined;
+  const unit = frame.unit !== undefined && !surface ? frame.unit : undefined;
   return [frame.tag, unit].filter((s) => !!s).join(" · ") || undefined;
 };
-/** Whether a frame is a named boundary, which the two-deep count counts. */
+/** Whether a frame is a named boundary, which the nesting count counts. */
 const skelNamed = (frame: SkeletonFrame): boolean => !!frame.tag || frame.unit !== undefined;
 
 /** THE LAYOUT'S WORDS, and the fields of the three looks (`IDSLayoutBodyLook`, `IDSLayoutNavigationLook`,
@@ -1898,8 +1908,8 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
   }
   return Math.max(h, (it.height ?? 0) * slot);
 }
-/** The line a part's unit is named on, over its first row. A card's title says what it is, so a card takes none. */
-const skelLeadH = (row: SkeletonRow): number => (row.lead && row.within !== undefined && skelLevel(row.within) !== "card" ? SKEL_TAG_H : 0);
+/** The line a part's unit, or the word *Group*, is named on, over its first row. */
+const skelLeadH = (row: SkeletonRow): number => (row.lead && row.within !== undefined ? SKEL_TAG_H : 0);
 /** A row's height, independent of width: the tallest item it holds, or that plus the framed pad. */
 function skelRowHeight(row: SkeletonRow, ctl: number): number {
   const items = row.items.length ? row.items : [{}];
@@ -1925,9 +1935,11 @@ function skelSectionRows(section: SkeletonSection): SkeletonRow[] {
     ...(section.rows ?? []),
   ];
   // A PART THAT IS A UNIT OF THE DESIGN SYSTEM carries its name at its corner, over its first row, and each of its rows
-  // knows the part it stands in, so its boundary reaches round all of them.
-  if (section.unit === undefined) return rows;
-  return rows.map((row, i) => ({ ...row, within: section.unit, lead: i === 0 }));
+  // knows the part it stands in, so its boundary reaches round all of them. A PART WITH A TITLE AND NO UNIT IS A GROUP,
+  // the level `GROUP`: it is bounded the same way and named by its level, so its title stands inside it.
+  const within = section.unit ?? (section.label !== undefined ? SKEL_GROUP : undefined);
+  if (within === undefined) return rows;
+  return rows.map((row, i) => ({ ...row, within, lead: i === 0 }));
 }
 const skelRows = (frame: SkeletonFrame): SkeletonRow[] =>
   frame.look !== "container" && frame.look !== "card" ? frame.rows ?? []
@@ -1953,7 +1965,13 @@ function skelDividers(frame: SkeletonFrame): Set<number> {
   return at;
 }
 /** Whether a container drawn for a surface has a header: a title, or actions. */
-const skelContainerHead = (frame: SkeletonFrame): number => (frame.label || frame.actions?.length ? SKEL_CONTAINER_HEAD : 0);
+const skelContainerHead = (frame: SkeletonFrame): number =>
+  (frame.label || frame.actions?.length ? (frame.label && frame.note ? SKEL_CONTAINER_HEAD_TWO : SKEL_CONTAINER_HEAD) : 0);
+/** Where a container's header band begins, under the top of its outline: under its unit's name, or a step in. */
+const skelContainerBandTop = (frame: SkeletonFrame): number => (frame.unit !== undefined ? SKEL_TAG_H : SKEL_LABEL_GAP);
+/** Where a container's content begins under the top of its outline: the line under its header, or the outline itself
+ *  where it has no header. */
+const skelContainerEdge = (frame: SkeletonFrame): number => (skelContainerHead(frame) ? skelContainerBandTop(frame) + skelContainerHead(frame) : 0);
 /** The parts of a container: the one frame each of its rows holds. */
 const skelParts = (frame: SkeletonFrame): SkeletonFrame[] =>
   (frame.rows ?? []).flatMap((r) => (r.items.length === 1 && r.items[0].frame ? [r.items[0].frame] : []));
@@ -1961,8 +1979,10 @@ const skelParts = (frame: SkeletonFrame): SkeletonFrame[] =>
  *  starts its rows at its own padding. */
 function skelHead(frame: SkeletonFrame): number {
   const tag = skelCornerName(frame) ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
-  // A CONTAINER'S UNIT STANDS INSIDE ITS OUTLINE, at its corner, on a line of its own over its content.
-  if (frame.look === "container") return skelContainerHead(frame) + SKEL_PAD + (frame.unit !== undefined ? SKEL_TAG_H : 0);
+  // A CONTAINER HOLDS ITS HEADER: its unit's name at the corner of its outline, its header band under the name, and its
+  // content under the line that closes the band. With no header, the content stands under the name.
+  if (frame.look === "container")
+    return skelContainerHead(frame) ? skelContainerEdge(frame) + SKEL_PAD : (frame.unit !== undefined ? SKEL_TAG_H : 0) + SKEL_PAD;
   if (!frame.label) return Math.max(tag, SKEL_PAD);
   if (frame.look === "card") return tag + (frame.note ? SKEL_CARD_HEAD_TWO : SKEL_CARD_HEAD_ONE);
   return tag + (frame.note ? SKEL_H_TWO : SKEL_H_ONE);
@@ -2418,27 +2438,30 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   if (ownName && named >= SKEL_NEST_MAX)
     findings.push(`the boundary \`${ownName}\` sits inside ${named} named boundaries, and a skeleton nests ${SKEL_NEST_MAX} at most; draw \`${ownName}\` as a skeleton of its own`);
   // A CONTAINER HAS NO BOX OF ITS OWN: its frames are drawn behind its parts, below.
-  // A CONTAINER ON A SURFACE: its header stands above, with nothing around it, the title and the line under it at
-  // the start and its actions at the end; the thin rounded outline holds its content and, under a line, its footer.
+  // A CONTAINER ON A SURFACE IS ONE BOX THAT HOLDS ITS HEADER (RD.DEVEX.WORKSPACE.268): the thin rounded outline, its
+  // unit's name at the corner, its header as a band under the name, the title and the line under it at the start and
+  // its actions at the end, then under a line its content and, under another, its footer. The header is the container's
+  // own part, `DSContainer.Header`, so it is drawn inside the box and never as a heading standing over it.
   const surface = frame.look === "container" && !root;
+  if (frame.look === "container" && frame.marked)
+    findings.push("`marked` is for a row with no border; a container's header stands inside its outline, so a container takes no `marked`");
   if (surface) {
     const headH = skelContainerHead(frame);
-    // A PART WITH NO BORDER OF ITS OWN MAY BE MARKED BY A DOTTED LINE, where a figure is about how far it reaches and
-    // what it lines up with. The header of a container has none: with `marked`, its dotted line is as wide as the
-    // outline under it. A figure that shows a page for its content leaves it off.
-    if (headH && frame.marked) out.push(skelRect("sds-skel-guide", x, y - SKEL_GUIDE_OUT, w, headH - SKEL_GUIDE_OUT + 2, 0));
-    if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x, y + (frame.note ? 17 : 23)));
-    if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x}" y="${y + 34}">${esc(frame.note)}</text>`);
+    out.push(skelRect("sds-skel-control", x, y, w, h, SKEL_ROUND));
+    const bandY = y + skelContainerBandTop(frame);
+    if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x + SKEL_PAD, bandY + 23));
+    if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${bandY + 40}">${esc(frame.note)}</text>`);
     const actions = frame.actions ?? [];
-    let ax = x + w - (actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * Math.max(0, actions.length - 1));
-    const actionsTop = y + (headH - SKEL_LABEL_GAP * 2 - ctl) / 2;
+    let ax = x + w - SKEL_PAD - (actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * Math.max(0, actions.length - 1));
+    const actionsTop = bandY + (headH - SKEL_LABEL_GAP * 2 - ctl) / 2;
     for (const action of actions) {
       const actionKind = skelKind(action), aw = skelFixedWidth(action, ctl);
       if (!SKEL_CELL_KINDS.includes(actionKind)) findings.push("the actions of a container's header are words, a note, an icon or a control");
       else skelDrawLeaf(action, actionKind!, ax, actionsTop, aw, ctl, ctl, ctl, findings, out);
       ax += aw + SKEL_LABEL_GAP;
     }
-    out.push(skelRect("sds-skel-control", x, y + headH, w, h - headH, SKEL_ROUND));
+    // THE LINE UNDER THE HEADER closes the band, where content stands under it.
+    if (headH && rows.length) out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(y + skelContainerEdge(frame))} H${r2(x + w)}"/>`);
   }
   // A ROOT FRAME THAT STANDS IN A LAYOUT'S CONTENT IS BARE: the content's line is its edge.
   if (root && !bare) out.push(skelRect("sds-box", x, y, w, h));
@@ -2446,9 +2469,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const corner = skelCornerName(frame, frame.look === "container");
   const tagH = corner ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   if (corner) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(corner)}</text>`);
-  // A CONTAINER'S UNIT IS NAMED AT THE CORNER OF ITS OUTLINE, under its header, quiet, on the line the book gives a name.
+  // A CONTAINER'S UNIT IS NAMED AT THE CORNER OF ITS OUTLINE, over its header, quiet, on the line the book gives a name.
   if (frame.look === "container" && frame.unit !== undefined)
-    out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + skelContainerHead(frame) + SKEL_LABEL_H + 4}">${esc(frame.unit)}</text>`);
+    out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.unit)}</text>`);
   // A CARD MAY CARRY A MARK BEFORE ITS TITLE, for the kind of thing the card is about.
   const cardMark = frame.look === "card" && frame.media !== undefined ? SKEL_CARD_MARK + SKEL_LABEL_GAP : 0;
   if (cardMark) out.push(...skelIcon(frame.media!, x + SKEL_PAD + SKEL_CARD_MARK / 2, y + tagH + 21, SKEL_CARD_MARK, true, undefined, SKEL_CARD_MARK));
@@ -2505,30 +2528,33 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       out.push(skelRect("sds-skel-guide", itemsX, rowY - SKEL_GUIDE_OUT, w - SKEL_PAD - (itemsX - x), rh + SKEL_GUIDE_OUT * 2, 0));
     // THE CHOSEN LINE OF A LIST IS A BAND across the outline, from the line above it to the line under it.
     if (surface && row.chosen) {
-      const bandTop = rowIndex === 0 ? y + skelContainerHead(frame) : rowY - SKEL_GAP / 2;
+      const bandTop = rowIndex === 0 ? y + skelContainerEdge(frame) : rowY - SKEL_GAP / 2;
       const bandEnd = rowIndex === rows.length - 1 ? y + h : rowY + rh + SKEL_GAP / 2;
       out.push(skelRect("sds-skel-surface", x, bandTop, w, bandEnd - bandTop, 0));
     }
-    // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline.
-    if ((surface || frame.look === "card") && dividers.has(rowIndex))
-      out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w)}"/>`);
+    // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline. A line between two rows
+    // of one part, as a list in a group draws, stays inside that part's boundary.
+    if ((surface || frame.look === "card") && dividers.has(rowIndex)) {
+      const inPart = row.within !== undefined && !row.lead ? SKEL_LABEL_GAP : 0;
+      out.push(`  <path class="sds-skel-control" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);
+    }
     if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
-    // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the outline where it is the first row, or the line over its part.
-    // Where a unit's name stands over it, the table begins under the name.
-    const namedAbove = row.within !== undefined || (rowIndex === 0 && frame.unit !== undefined);
+    // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the line under the header, or the outline, where it is the first
+    // row, or the line over its part. Where a unit's name stands over it, the table begins under the name.
+    const namedAbove = row.within !== undefined || (rowIndex === 0 && frame.unit !== undefined && !skelContainerHead(frame));
     if (surface) for (const it of row.items ?? []) if (it.standin === "table" && it.flush) {
-      it.edgeTop = namedAbove ? undefined : rowIndex === 0 ? y + skelContainerHead(frame) : dividers.has(rowIndex) ? rowY - SKEL_GAP / 2 : undefined;
+      it.edgeTop = namedAbove ? undefined : rowIndex === 0 ? y + skelContainerEdge(frame) : dividers.has(rowIndex) ? rowY - SKEL_GAP / 2 : undefined;
       it.inPart = row.within !== undefined && skelLevel(row.within) !== "card";
     }
-    // A PART THAT IS A UNIT OF THE DESIGN SYSTEM is drawn at the level its name gives: a widget or a component a dotted
-    // boundary round its rows with its name at the corner, and a card its outline, whose title says what it is.
+    // A PART THAT IS A UNIT OF THE DESIGN SYSTEM is drawn at the level its name gives: a widget, a component or a group a
+    // dotted boundary round its rows, and a card its outline; each carries its name at its corner, a group the word *Group*.
     if (row.lead && row.within !== undefined) {
       let end = rowIndex;
       while (end + 1 < rows.length && rows[end + 1].within === row.within && !rows[end + 1].lead) end++;
       const bottom = rowY + heights.slice(rowIndex, end + 1).reduce((t, v) => t + v, 0) + SKEL_GAP * (end - rowIndex);
       const card = skelLevel(row.within) === "card";
       out.push(skelRect(card ? "sds-skel-control" : "sds-skel-guide", x + SKEL_LABEL_GAP, rowY - SKEL_LABEL_GAP, w - SKEL_LABEL_GAP * 2, bottom - rowY + SKEL_LABEL_GAP * 2, card ? SKEL_ROUND : 3));
-      if (!card) out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${rowY + SKEL_LABEL_GAP}">${esc(row.within)}</text>`);
+      out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${rowY + SKEL_LABEL_GAP}">${esc(row.within)}</text>`);
       if (named + (skelNamed(frame) ? 1 : 0) >= SKEL_NEST_MAX)
         findings.push(`the boundary \`${row.within}\` sits inside ${named + (skelNamed(frame) ? 1 : 0)} named boundaries, and a skeleton nests ${SKEL_NEST_MAX} at most; draw \`${row.within}\` as a skeleton of its own`);
     }
@@ -2615,6 +2641,15 @@ function skelLayoutFindings(layout: unknown, findings: string[]): layout is Skel
     for (const key of Object.keys(look)) if (!fields.includes(key))
       findings.push(`\`layout.${part}.${key}\` is no field of the ${part}'s look, which has ${fields.map((f) => `\`${f}\``).join(" · ")}`);
   }
+  // THE CHOSEN ENTRY IS NAMED BY ITS WORD, one of `nav`: the entry that leads to the page the sketch shows.
+  const navigation = given.navigation as { nav?: unknown; chosen?: unknown } | undefined;
+  const words = Array.isArray(navigation?.nav) ? navigation!.nav!.map(String) : [];
+  if (navigation?.chosen !== undefined && typeof navigation.chosen !== "string")
+    findings.push(`\`layout.navigation.chosen\` is \`${String(navigation.chosen)}\`; name the open entry by its word, one of \`nav\`, as \`"chosen": "${words[Number(navigation.chosen)] ?? words[0] ?? "Orders"}"\``);
+  else if (typeof navigation?.chosen === "string" && !words.includes(navigation.chosen))
+    findings.push(`\`layout.navigation.chosen\` is \`${navigation.chosen}\`, and \`nav\` holds ${words.length ? words.map((word) => `\`${word}\``).join(" · ") : "no word"}`);
+  else if (words.length && navigation?.chosen === undefined)
+    findings.push("`layout.navigation.nav` names its entries and no `chosen`: a page always stands under one entry of its navigation, so name it");
   const width = (given.body as { width?: unknown } | undefined)?.width;
   if (width !== undefined && !SKEL_BODY_WIDTHS.includes(width as string))
     findings.push(`\`layout.body.width\` is \`${String(width)}\`, and a body is ${SKEL_BODY_WIDTHS.join(" · ")}`);
@@ -2625,17 +2660,18 @@ function skelLayoutFindings(layout: unknown, findings: string[]): layout is Skel
   return true;
 }
 
-/** The entries of a navigation, down a column: the words of `nav` with the chosen one in a band, or bars where it
- *  names none; shut, each entry is a square and the chosen one is in a band. */
+/** The entries of a navigation, down a column: the words of `nav` with the chosen one, the page's own entry, in a band,
+ *  or bars where it names none; shut, each entry is a square and the chosen one is in a band. */
 function skelNavColumn(nav: SkeletonLayout["navigation"], nx: number, ny: number, nw: number, open: boolean, out: string[]): void {
   const words = Array.isArray(nav?.nav) ? nav!.nav!.map(String) : [];
   const count = words.length || 4;
   for (let i = 0; i < count; i++) {
     const top = ny + i * SKEL_NAV_STEP;
-    if (words.length && nav?.chosen === i) out.push(skelRect("sds-skel-surface", nx + 6, top, nw - 12, 24, 4));
+    const isChosen = words.length > 0 && words[i] === nav?.chosen;
+    if (isChosen) out.push(skelRect("sds-skel-surface", nx + 6, top, nw - 12, 24, 4));
     if (!open) out.push(skelRect("sds-skel-bar", nx + nw / 2 - 6, top + 6, 12, 12, 3));
     else if (!words.length) out.push(skelRect("sds-skel-bar", nx + 14, top + 9, 60, SKEL_BAR, 3));
-    else out.push(`  <text class="${nav?.chosen === i ? "sds-title" : "sds-label"}" x="${r2(nx + 14)}" y="${r2(top + 16)}">${esc(words[i])}</text>`);
+    else out.push(`  <text class="${isChosen ? "sds-title" : "sds-label"}" x="${r2(nx + 14)}" y="${r2(top + 16)}">${esc(words[i])}</text>`);
   }
 }
 /** The height a column of entries asks for: its head, its entries, and its foot. */
@@ -2721,8 +2757,8 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
       const words = Array.isArray(nav?.nav) ? nav!.nav!.map(String) : [];
       let wx = boxX + 16 + 80 + SKEL_GAP;
       words.forEach((word, i) => {
-        if (nav?.chosen === i) out.push(skelRect("sds-skel-surface", wx - 8, barY + 12, skelWordW(word) + 16, 24, 4));
-        out.push(`  <text class="${nav?.chosen === i ? "sds-title" : "sds-label"}" x="${r2(wx)}" y="${r2(barY + bar / 2 + 4)}">${esc(word)}</text>`);
+        if (word === nav?.chosen) out.push(skelRect("sds-skel-surface", wx - 8, barY + 12, skelWordW(word) + 16, 24, 4));
+        out.push(`  <text class="${word === nav?.chosen ? "sds-title" : "sds-label"}" x="${r2(wx)}" y="${r2(barY + bar / 2 + 4)}">${esc(word)}</text>`);
         wx += skelWordW(word) + SKEL_GAP;
       });
       out.push(...skelIcon("person", Math.min(boxX + boxW, barX + barW) - 16 - 12, barY + bar / 2, 24, true, undefined, 24));
@@ -2788,6 +2824,23 @@ function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined
   }
 }
 
+/**
+ * THE CHOSEN ENTRY IS THE PAGE'S OWN (RD.DEVEX.WORKSPACE.268). A page that is itself an entry of the navigation stands
+ * under that entry, so a view whose page level's title is a word of `nav` and is not the chosen one is a finding: the
+ * band would say the person is somewhere the page says they are not. A page below an entry, such as a record or a step,
+ * keeps the entry it was reached from, which the spec names as `chosen`.
+ */
+function skelChosenFindings(views: SkeletonView[], layout: SkeletonLayout | undefined, findings: string[]): void {
+  const words = Array.isArray(layout?.navigation?.nav) ? layout!.navigation!.nav!.map(String) : [];
+  const chosen = layout?.navigation?.chosen;
+  if (!words.length || typeof chosen !== "string") return;
+  for (const view of views) {
+    const title = view?.page?.item?.title;
+    if (typeof title === "string" && words.includes(title) && title !== chosen)
+      findings.push(`the \`${view.viewport}\` view's page is \`${title}\`, an entry of the navigation, and the chosen entry is \`${chosen}\`; the chosen entry is the page's own`);
+  }
+}
+
 /** A `skeleton` with neither `frame` nor `views` draws nothing: it is one outer frame, or one for each
  *  screen class, and there is no other claim this kind can make. The spec is read from a copy, since the
  *  drawer writes its own marks on what it reads. */
@@ -2805,6 +2858,7 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   if (spec.views !== undefined) {
     if (spec.frame) findings.push("a skeleton holds `frame` or `views`, never both; a view carries its own `frame`");
     if (!Array.isArray(spec.views) || !spec.views.length) return { svg: "", findings: [...findings, "a `skeleton` figure whose `views` holds no view; give each view a `viewport` and a `frame`"] };
+    skelChosenFindings(spec.views, layout, findings);
     skelDrawViews(spec.views, layout, findings, out);
     if (!out.length) return { svg: "", findings };
     return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };

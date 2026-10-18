@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "78593fca"
+      "seen": "40fc1882"
     }
   ]
 }
@@ -212,7 +212,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 - **When.** The data is one record and a few things set up for it. A person comes rarely, to see where things stand.
 - **Layout.** The page level, then the containers. An action that can do harm stands apart from the others, at the end.
 - **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the record, its picture, its name, and under the name its facts.
-- **Container.** One `DSContainer` for each thing set up, with its title and its actions above its outline.
+- **Container.** One `DSContainer` for each thing set up: its header, with its title and its actions, then its content.
 - **Widget.** None.
 - **Card.** `DSCard` for each smaller part.
 - **Component.** `DSSwitch` for a thing that is only on or off. `DSBadge` for a state that is not normal.
@@ -236,7 +236,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 - **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
 - **Container.** One `DSContainer`, holding the kinds.
 - **Widget.** `DSDataTableWidget` in its `GRID` layout, where the kinds come from a query that takes a page, a text or a filter. It draws one card for each kind.
-- **Card.** `DSCard`, one for each kind. Its title is the kind, with the icon of that kind before it.
+- **Card.** `DSCardWidget`, one for each kind, a widget of its own. Its title is the kind, with the icon of that kind before it.
 - **Component.** `DSItem` and `DSEmpty`. Under the title of a card stands the provider as an item. A kind with nothing yet says so and offers the action.
 - **On a tablet and a phone.** Three cards across at a desktop, two on a tablet, and one on a phone.
 - **Spec.** `set-up-by-kind.dg.json`.
