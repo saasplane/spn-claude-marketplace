@@ -103,7 +103,14 @@ console.log("\n=== the generated blocks — progress and open");
   const data = arcData(); data.rows[0].state = "landed";
   const inside = lib.progressInside("/nowhere", [data]);
   ok("progress: rows done of all and arcs closed of all", inside.includes("Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed"), inside);
-  ok("progress: a bar per arc, linking its row on the page, never its data", inside.includes('<a href="#N001">N001</a> <span class="sds-small">1/2</span>') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
+  ok("progress: a bar per arc, linking its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
+  ok("progress: the arcs are a grid of tiles, each carrying its status word to colour its bar",
+    inside.includes('<div class="sds-arcs">') && inside.includes('<div class="sds-arc sds-decided">'), inside);
+  ok("progress: a tile reads top to bottom — number and subject as words, then badge beside done/total, then the bar",
+    /<a class="sds-arc-name" href="#N001"><span class="sds-mono">N001<\/span> probe<\/a>\s*<div class="sds-arc-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/div>\s*<div class="sds-bar"><i style="width:50%"><\/i><\/div>/.test(inside), inside);
+  const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PART-LANDED" }]);
+  ok("progress: a subject is shown as words, and a two-word status is one class", words.includes("</span> workstream data</a>") && words.includes('class="sds-arc sds-part-landed"'), words);
+  ok("progress: no arc, no grid", !lib.progressInside("/nowhere", []).includes("sds-arcs"));
   const { CARD } = await import("../../../helpers/workstream-fixture.mjs");
   const { title, ...card } = CARD;
   const html = lib.cardHtml({ id: "q7", title, card });

@@ -10,7 +10,7 @@
 {"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NNN}} - {{TITLE}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.6.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -72,10 +72,18 @@
     </tbody>
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped.
-       Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json. -->
+       Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
+       In the progress grid below, each arc's tile carries the same word as its second class, sds-arc sds-running, which colours its bar. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
-  <p>{{Overall: rows done of all, arcs closed of all, and a thin bar}}</p>
-  <p>{{For each arc: its number, a small bar, and done/total, linking its arc's row, #N001}}</p>
+  <p>{{Overall: rows done of all &middot; arcs closed of all}}</p>
+  <div class="sds-bar"><i style="width:{{share}}%"></i></div>
+  <div class="sds-arcs">
+    <div class="sds-arc sds-running">
+      <a class="sds-arc-name" href="#N001"><span class="sds-mono">N001</span> {{subject as words}}</a>
+      <div class="sds-arc-line"><span class="sds-badge sds-status sds-running">RUNNING</span><span class="sds-arc-count">{{done}}/{{total}}</span></div>
+      <div class="sds-bar"><i style="width:{{share}}%"></i></div>
+    </div>
+  </div>
   <!-- /spn:generated -->
 </section>
 
@@ -125,4 +133,4 @@
   The approach template &middot; for the workstreams after 008 &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> and <code>01-workstream.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.6.0/sds-docs.js"></script>

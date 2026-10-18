@@ -531,10 +531,26 @@ export function inline(text: string): string {
     part.startsWith("`") && part.endsWith("`") && part.length > 1 ? `<code>${escapeHtml(part.slice(1, -1))}</code>` : escapeHtml(part)).join("");
 }
 
-const bar = (done: number, total: number): string =>
-  `<div class="sds-bar"><i style="width:${total ? Math.round((done / total) * 100) : 0}%"></i></div>`;
+const share = (done: number, total: number): number => (total ? Math.round((done / total) * 100) : 0);
+const bar = (done: number, total: number): string => `<div class="sds-bar"><i style="width:${share(done, total)}%"></i></div>`;
 
-/** The inside of the progress block: an overall line and bar, then a line and a small bar per arc, linking its Cycles row. */
+/**
+ * One arc's tile in the progress grid: its number and its subject as words, linking its Cycles row; its
+ * status badge beside done/total; and its bar, last. The status word is the tile's second class, and the
+ * stylesheet colours the bar from it.
+ */
+function arcTile(data: ArcData, done: number, total: number): string[] {
+  const word = data.status.toLowerCase();
+  return [
+    `    <div class="sds-arc sds-${word}">`,
+    `      <a class="sds-arc-name" href="#${data.arc}"><span class="sds-mono">${data.arc}</span> ${escapeHtml(data.subject.replace(/-/g, " "))}</a>`,
+    `      <div class="sds-arc-line"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><span class="sds-arc-count">${done}/${total}</span></div>`,
+    `      ${bar(done, total)}`,
+    `    </div>`,
+  ];
+}
+
+/** The inside of the progress block: an overall line and bar, then a grid of one tile per arc, each linking its Cycles row. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
   const counts = arcs.map((data) => ({ data, ...doneOf(data) }));
   const done = counts.reduce((sum, one) => sum + one.done, 0);
@@ -544,9 +560,7 @@ export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(w
     `  <p>Overall: ${done} of ${total} rows done &middot; ${closed} of ${arcs.length} arcs closed</p>`,
     `  ${bar(done, total)}`,
   ];
-  for (const one of counts)
-    lines.push(`  <p><a href="#${one.data.arc}">${one.data.arc}</a> <span class="sds-small">${one.done}/${one.total}</span></p>`,
-      `  ${bar(one.done, one.total)}`);
+  if (counts.length) lines.push(`  <div class="sds-arcs">`, ...counts.flatMap((one) => arcTile(one.data, one.done, one.total)), `  </div>`);
   return `${lines.join("\n")}\n`;
 }
 
