@@ -40,7 +40,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Users",
          "rows": [
           {
@@ -55,7 +55,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Roles",
          "rows": [
           {
@@ -70,7 +70,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Organizations",
          "rows": [
           {
@@ -85,7 +85,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Accounts",
          "rows": [
           {
@@ -230,7 +230,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Users",
          "rows": [
           {
@@ -245,7 +245,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Roles",
          "rows": [
           {
@@ -264,7 +264,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Organizations",
          "rows": [
           {
@@ -279,7 +279,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Accounts",
          "rows": [
           {
@@ -428,7 +428,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Users",
          "rows": [
           {
@@ -443,7 +443,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Roles",
          "rows": [
           {
@@ -462,7 +462,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Organizations",
          "rows": [
           {
@@ -477,7 +477,7 @@
        },
        {
         "frame": {
-         "unit": "DSCardWidget",
+         "unit": "DSCard",
          "label": "Accounts",
          "rows": [
           {

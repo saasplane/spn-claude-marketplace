@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "f719a785"
+      "seen": "94885638"
     }
   ]
 }
@@ -251,7 +251,7 @@ Each sub-component stands where it stands on the screen: the start or the end of
 - **A card stands at the level of a widget**: the design system gives a card's title the level `WIDGET`. `DSCard`, `DSItemCard` and `DSCardWidget` are drawn as cards.
 - **The page level is one place, whichever unit carries it**: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage` (`RD.SUPPORT.SURFACE.179`). A skeleton draws the two the same way.
 - **A spec names the book's units**, `DSContainer` and the core widgets, and never a unit one stack builds on top of them.
-- **The drawer refuses a unit that the rule names wrongly** (`RD.SUPPORT.SURFACE.217`): a `DSContainer` is a part with a header, a `DSCardWidget` one of several of a kind with titled parts, a `DSCard` a single thing with no parts, and a `DSItem` one line about one thing. A `DSCard` with titled parts, `DSCard`s of one kind side by side or alone in a container, a `DSCardWidget` with no titled parts and no sibling card, a loose row of words and an action on the page, a `look` the unit's level does not give, and a row built by hand where an `item` says it are each a finding. A frame names its unit and leaves its look to it.
+- **The drawer refuses a unit that the rule names wrongly** (`RD.SUPPORT.SURFACE.217`, `RD.SUPPORT.SURFACE.221`): a `DSContainer` is a part with a header, a `DSCardWidget` a card with a head (a title with its mark, actions in the head, often titled parts under it), a `DSCard` a card that shows its own info, several side by side included, and a `DSItem` one line about one thing. A `DSCard` with titled parts, a `DSCardWidget` with no head and no titled parts, a loose row of words and an action on the page, a `look` the unit's level does not give, and a row built by hand where an `item` says it are each a finding. A frame names its unit and leaves its look to it.
 - **The chosen entry of the navigation is the page's own** (`RD.DEVEX.WORKSPACE.268`): a page that is an entry stands under that entry, and a page below one, a record or a step, keeps the entry it was reached from. `chosen` names the entry by its word, and the check names a view whose page is an entry of `nav` drawn under another.
 - **The layout is the setting a page is drawn in, and never part of a page pattern.** A spec's `layout` is the layout of the page it shows.
 

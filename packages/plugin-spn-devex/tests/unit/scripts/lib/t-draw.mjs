@@ -1089,8 +1089,8 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline, its name and its title",
     [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "sds-skel-guide").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
     ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparisonWidget") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
-  const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } },
-    { frame: { unit: "DSCardWidget", label: "Teams", rows: [{ items: [{ item: { title: "Sales" }, fill: true }] }] } }] }] } });
+  const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", media: "person", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } },
+    { frame: { unit: "DSCardWidget", label: "Teams", media: "person", rows: [{ items: [{ item: { title: "Sales" }, fill: true }] }] } }] }] } });
   one("`DSCardWidget` is a card: its outline, its name at the corner and its title inside",
     [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "sds-skel-guide").length, stepOf(cardWidget.svg, "Contacts")],
     ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 2 && guides === 0 && step === "font-size:15px");
@@ -1132,18 +1132,21 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
     page(inPage([cardOf("DSCard", "Account", { sections: parts })])).findings, says("a card with parts is a `DSCardWidget`"));
   one("a `DSCardWidget` with titled parts is clean", page(inPage([cardOf("DSCardWidget", "Account", { sections: parts }), cardOf("DSCardWidget", "Platform", { sections: parts })])).findings, none);
 
-  // 2 · cards repeated from data are `DSCardWidget`s
-  one("two `DSCard`s side by side in a row are a finding: cards repeated from data are `DSCardWidget`s",
-    page(inPage([cardOf("DSCard", "Users"), cardOf("DSCard", "Roles")])).findings, says("cards repeated from data are `DSCardWidget`s"));
+  // 2 · a card shows its own info: several side by side stay `DSCard`s
   const container = (rows) => ({ frame: { unit: "DSContainer", label: "Providers", rows } });
-  one("two `DSCard`s that are the only content of a container, one under another, are a finding",
-    page(inPage([container([{ items: [cardOf("DSCard", "Email")] }, { items: [cardOf("DSCard", "SMS")] }])])).findings, says("a container holds only `DSCard`s: cards repeated from data are `DSCardWidget`s"));
+  one("four `DSCard`s side by side are clean: a number with its caption is a card, however many come from data",
+    page(inPage([cardOf("DSCard", "Users"), cardOf("DSCard", "Roles"), cardOf("DSCard", "Organizations"), cardOf("DSCard", "Accounts")])).findings, none);
+  one("two `DSCard`s that are the only content of a container, one under another, are clean",
+    page(inPage([container([{ items: [cardOf("DSCard", "Email")] }, { items: [cardOf("DSCard", "SMS")] }])])).findings, none);
   one("one `DSCard` on its own is clean", page(inPage([container([{ items: [cardOf("DSCard", "Owned by Dana Lee")] }])])).findings, none);
-  one("the same cards as `DSCardWidget`s are clean", page(inPage([cardOf("DSCardWidget", "Users"), cardOf("DSCardWidget", "Roles")])).findings, none);
 
-  // 3 · a `DSCardWidget` with no titled parts and no sibling card is a `DSCard`
-  one("a `DSCardWidget` with no titled parts and no sibling card is a finding: one thing with its own info and action is a `DSCard`",
-    page(inPage([cardOf("DSCardWidget", "Owned by Dana Lee")])).findings, says("one thing with its own info and action is a `DSCard`"));
+  // 3 · a `DSCardWidget` has a head: a mark, or actions in the head, or titled parts
+  one("a `DSCardWidget` with no head and no parts, among siblings, is a finding: a card with no head and no parts is a `DSCard`",
+    page(inPage([cardOf("DSCardWidget", "Users"), cardOf("DSCardWidget", "Roles")])).findings, says("a card with no head and no parts is a `DSCard`"));
+  one("a `DSCardWidget` with no head and no parts, on its own, is a finding as well",
+    page(inPage([cardOf("DSCardWidget", "Owned by Dana Lee")])).findings, says("a card with no head and no parts is a `DSCard`"));
+  one("a `DSCardWidget` with a mark in its head is clean", page(inPage([cardOf("DSCardWidget", "Email", { media: "person" }), cardOf("DSCardWidget", "SMS", { media: "bell" })])).findings, none);
+  one("a `DSCardWidget` with actions in its head is clean", page(inPage([cardOf("DSCardWidget", "Email", { actions: [{ icon: "more" }] })])).findings, none);
   one("the same card as a `DSCard` is clean", page(inPage([cardOf("DSCard", "Owned by Dana Lee")])).findings, none);
 
   // 4 · a page-level row that holds words and an action, outside any frame

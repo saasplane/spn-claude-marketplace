@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "55dcce18"
+      "seen": "f95baf38"
     }
   ]
 }
@@ -195,13 +195,13 @@ The two numbers of a small and a medium entry are proposed (`RD.SUPPORT.SURFACE.
 
 ## Which unit, when — 🔮
 
-A part of a page takes the unit it is for (`RD.SUPPORT.SURFACE.217`), and a skeleton that names another is refused.
+A part of a page takes the unit it is for (`RD.SUPPORT.SURFACE.217`, narrowed by `RD.SUPPORT.SURFACE.221`), and a skeleton that names another is refused.
 
 | Unit | Use it for |
 | --- | --- |
 | `DSContainer` | a part of the page with a header (title, description, actions), whose look follows the theme's container framing |
-| `DSCardWidget` | one thing among several of the same kind, built from data, with titled parts and its own action |
-| `DSCard` | a single thing on its own, with its own info and action, and no parts |
+| `DSCardWidget` | a card with a head: a title with its mark or icon, and actions in the head, often with titled parts under it |
+| `DSCard` | a card that shows its own info: a number with its caption, or a single thing with its words and an action under them; several side by side stay `DSCard`s, even when they come from data |
 | Group | a titled part inside a container or card; a level, not a unit |
 | `DSItem` | one line about one thing: its media, its title, a line under the title, and what stands at its end |
 

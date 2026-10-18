@@ -2698,20 +2698,12 @@ function skelWhichUnit(frame: SkeletonFrame | undefined, findings: string[], pag
     said(`the card \`${frame.label ?? named}\` has titled parts: a card with parts is a \`DSCardWidget\``);
   if (named !== undefined && frame.look !== undefined && !inFrames && SKEL_UNITS.has(named) && frame.look !== SKEL_LEVEL_LOOK[level!])
     said(`\`${named}\` writes \`look\` as \`${frame.look}\`, and its level gives \`${SKEL_LEVEL_LOOK[level!]}\`: the unit decides the look; drop \`look\``);
-  // CARDS REPEATED FROM DATA ARE `DSCardWidget`s: two or more `DSCard`s side by side, or the only content of a container.
-  for (const rows of rowLists) for (const row of rows)
-    if ((row?.items ?? []).filter((it) => it?.frame?.unit === "DSCard").length > 1)
-      said("two or more `DSCard`s stand side by side in a row: cards repeated from data are `DSCardWidget`s");
   const children = skelFrameChildren(frame);
-  const everyItem = rowLists.flat().flatMap((row) => row?.items ?? []).filter((it) => !it?.spacer);
-  if (level === "container" && children.length > 1 && everyItem.every((it) => it?.frame?.unit === "DSCard"))
-    said("a container holds only `DSCard`s: cards repeated from data are `DSCardWidget`s");
-  // A `DSCardWidget` with no titled parts and no sibling card is one thing with its own info and action.
-  for (const child of children) {
-    if (child.unit !== "DSCardWidget" || (child.sections ?? []).some((section) => section?.label !== undefined)) continue;
-    if (!children.some((other) => other !== child && typeof other.unit === "string" && skelLevel(other.unit) === "card"))
-      said(`the \`DSCardWidget\` \`${child.label ?? ""}\` has no titled parts and no sibling card: one thing with its own info and action is a \`DSCard\``);
-  }
+  // A `DSCardWidget` HAS A HEAD: a mark, or actions in the head, or titled parts under it. One with none of them
+  // shows its own info and is a `DSCard`, however many cards stand beside it.
+  const hasParts = (frame.sections ?? []).some((section) => section?.label !== undefined);
+  if (named === "DSCardWidget" && frame.media === undefined && (frame.actions ?? []).length === 0 && !hasParts)
+    said(`the \`DSCardWidget\` \`${frame.label ?? ""}\` has no head and no parts: a card with no head and no parts is a \`DSCard\``);
   // A ROW OF THE PAGE OUTSIDE ANY FRAME that holds words and an action is one thing with its own info and action.
   if (pageLevel) for (const row of frame.rows ?? []) {
     const line = skelHandLine(row);
