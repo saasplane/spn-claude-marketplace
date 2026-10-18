@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Compare across kinds",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The page reads first, as a plain table in one container: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. On a phone a person reads one kind at a time, as labelled values, with Edit in the footer. The kinds are a closed set, so tabs may be used.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The page reads first, as a plain table in one container: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. Every screen shows the same table, with every setting, every kind and the Edit of each kind; the words in its cells are short enough for four columns to fit a phone.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -57,13 +57,13 @@
              ],
              "cells": [
               [
-               "Password",
+               "Passkey",
                "Required",
                "Required",
                "Optional"
               ],
               [
-               "Two-step",
+               "2-step",
                "Optional",
                "Off",
                "Required"
@@ -82,7 +82,7 @@
               ],
               [
                "Sign-up",
-               "Invite only",
+               "Invite",
                "Open",
                "By review"
               ],
@@ -144,13 +144,13 @@
              ],
              "cells": [
               [
-               "Password",
+               "Passkey",
                "Required",
                "Required",
                "Optional"
               ],
               [
-               "Two-step",
+               "2-step",
                "Optional",
                "Off",
                "Required"
@@ -169,7 +169,7 @@
               ],
               [
                "Sign-up",
-               "Invite only",
+               "Invite",
                "Open",
                "By review"
               ],
@@ -213,19 +213,6 @@
      {
       "items": [
        {
-        "control": "tabs",
-        "tabs": [
-         "Enterprise",
-         "Consumer",
-         "Merchant"
-        ],
-        "chosen": 0
-       }
-      ]
-     },
-     {
-      "items": [
-       {
         "frame": {
          "look": "container",
          "unit": "DSContainer",
@@ -233,68 +220,62 @@
           {
            "items": [
             {
-             "standin": "field",
+             "standin": "table",
              "fill": true,
-             "read": true,
-             "label": "Password",
-             "text": "Required"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Two-step",
-             "text": "Optional"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Social",
-             "text": "On"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Session",
-             "text": "8 hours"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Sign-up",
-             "text": "Invite only"
-            }
-           ]
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "button",
-             "text": "Edit"
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "cells": [
+              [
+               "Passkey",
+               "Required",
+               "Required",
+               "Optional"
+              ],
+              [
+               "2-step",
+               "Optional",
+               "Off",
+               "Required"
+              ],
+              [
+               "Social",
+               "On",
+               "On",
+               "Off"
+              ],
+              [
+               "Session",
+               "8 hours",
+               "30 days",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite",
+               "Open",
+               "By review"
+              ],
+              [
+               "",
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               },
+               {
+                "control": "button",
+                "text": "Edit"
+               }
+              ]
+             ]
             }
            ]
           }

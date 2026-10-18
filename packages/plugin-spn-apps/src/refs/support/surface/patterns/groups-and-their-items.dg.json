@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, a closed set",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The groups are few and fixed, so all of it is one page with a container for each group. Under the name of an action stand its state, where it is not the normal one, and its channels. The end of a line holds its actions only. The actions of a group are the lines of a list, so a line stands between each two. On a phone the channels are one fact, a count.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The groups are few and fixed, so all of it is one page with a container for each group. Under the name of an action stand its state, where it is not the normal one, and its channels. The end of a line holds its actions only. The actions of a group are the lines of a list, so a line stands between each two. Every screen shows every channel of every action.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -235,6 +235,26 @@
              "fill": true
             }
            ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
           }
          ],
          "label": "Authentication",
@@ -327,11 +347,13 @@
              "item": {
               "title": "OTP verification",
               "meta": [
-               "3 channels"
+               "Email",
+               "SMS",
+               "Push"
               ],
               "end": [
                {
-                "icon": "next"
+                "icon": "more"
                }
               ]
              },
@@ -349,11 +371,33 @@
                 "control": "badge",
                 "text": "Published v3"
                },
-               "3 channels"
+               "Email",
+               "SMS",
+               "Push"
               ],
               "end": [
                {
-                "icon": "next"
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
                }
               ]
              },
@@ -381,11 +425,37 @@
              "item": {
               "title": "Member invited",
               "meta": [
-               "3 channels"
+               "Email",
+               "SMS",
+               "Push"
               ],
               "end": [
                {
-                "icon": "next"
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Ownership moved",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Off"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
                }
               ]
              },
@@ -394,7 +464,8 @@
            ]
           }
          ],
-         "label": "Organization"
+         "label": "Organization",
+         "divided": true
         }
        }
       ]

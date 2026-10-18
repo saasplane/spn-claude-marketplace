@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and its steps",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. On a phone the steps stand one under another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, where each part takes the width, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. Every screen shows every step and every check. On a phone the two actions of the page level fold into one *more* icon, since the way back, the picture, the title and two buttons do not fit one line.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -38,7 +38,7 @@
        "text": "In review"
       },
       "Merchant",
-      "blue-bakery"
+      "bluebakery"
      ]
     },
     "actions": [
@@ -187,12 +187,13 @@
        "text": "In review"
       },
       "Merchant",
-      "blue-bakery"
+      "bluebakery"
      ]
     },
     "actions": [
      {
-      "icon": "more"
+      "control": "button",
+      "text": "Reject"
      },
      {
       "control": "button",
@@ -338,7 +339,8 @@
        "control": "badge",
        "text": "In review"
       },
-      "Merchant"
+      "Merchant",
+      "bluebakery"
      ]
     },
     "actions": [
@@ -362,25 +364,13 @@
            "items": [
             {
              "note": "Submitted"
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "text": "In review"
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "note": "Approved"
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "note": "Live"
             }
@@ -429,6 +419,9 @@
              "read": true,
              "label": "Tax number",
              "text": "Verified"
+            },
+            {
+             "spacer": true
             }
            ]
           }
@@ -441,16 +434,49 @@
      {
       "items": [
        {
-        "control": "button",
-        "text": "Reject"
-       },
-       {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Approve",
-        "main": true
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Profile",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Catalogue",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Payouts",
+             "text": "Not started"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Onboarding"
+        }
        }
       ]
      }

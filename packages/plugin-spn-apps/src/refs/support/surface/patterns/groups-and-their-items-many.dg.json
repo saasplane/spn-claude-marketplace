@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, many groups",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. Where the groups are many, the part at the left is a data table widget in its LIST layout, under its filter bar: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone only one of the two is in view: the items of the chosen group take the place of the groups, and a back action returns to them. The tablet view shows the first step, and the phone view the second. On a phone the page level is the chosen group, with the way back to the groups.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. Where the groups are many, the part at the left is a data table widget in its LIST layout, under its filter bar: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone the two stand one under the other, the groups first and the items of the chosen group under them, and every screen shows both. On a phone the items are the lines of a list, as the groups are, and the boxes of the filter bar stand in two rows.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -289,16 +289,12 @@
                 "title": "Project",
                 "meta": [
                  "Work"
-                ],
-                "end": [
-                 {
-                  "icon": "next"
-                 }
                 ]
                },
                "fill": true
               }
-             ]
+             ],
+             "chosen": true
             },
             {
              "items": [
@@ -307,11 +303,6 @@
                 "title": "Customer",
                 "meta": [
                  "Sales"
-                ],
-                "end": [
-                 {
-                  "icon": "next"
-                 }
                 ]
                },
                "fill": true
@@ -325,11 +316,6 @@
                 "title": "Invoice",
                 "meta": [
                  "Billing"
-                ],
-                "end": [
-                 {
-                  "icon": "next"
-                 }
                 ]
                },
                "fill": true
@@ -343,11 +329,6 @@
                 "title": "Contract",
                 "meta": [
                  "Sales"
-                ],
-                "end": [
-                 {
-                  "icon": "next"
-                 }
                 ]
                },
                "fill": true
@@ -361,11 +342,6 @@
                 "title": "Shipment",
                 "meta": [
                  "Logistics"
-                ],
-                "end": [
-                 {
-                  "icon": "next"
-                 }
                 ]
                },
                "fill": true
@@ -379,15 +355,77 @@
           {
            "items": [
             {
-             "note": "1 to 20 of 64"
-            },
-            {
              "spacer": true
             },
             {
              "control": "pager"
             }
            ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              ""
+             ],
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "icon": "more"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
           }
          ]
         }
@@ -401,18 +439,144 @@
    "viewport": "MOBILE",
    "page": {
     "item": {
-     "title": "Project"
-    },
-    "actions": [
-     {
-      "icon": "add"
-     }
-    ],
-    "back": true
+     "title": "Custom fields"
+    }
    },
    "frame": {
     "size": "XS",
     "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [],
+         "label": "Record types",
+         "sections": [
+          {
+           "unit": "DSFilterBarWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTableWidget",
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Project",
+                "meta": [
+                 "Work"
+                ]
+               },
+               "fill": true
+              }
+             ],
+             "chosen": true
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Customer",
+                "meta": [
+                 "Sales"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Invoice",
+                "meta": [
+                 "Billing"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Contract",
+                "meta": [
+                 "Sales"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Shipment",
+                "meta": [
+                 "Logistics"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
      {
       "items": [
        {
@@ -426,10 +590,6 @@
              "item": {
               "title": "Budget",
               "meta": [
-               {
-                "control": "badge",
-                "text": "Required"
-               },
                "Number"
               ],
               "end": [
@@ -466,11 +626,25 @@
              "item": {
               "title": "Stage",
               "meta": [
-               {
-                "control": "badge",
-                "text": "Required"
-               },
                "Choice"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Notes",
+              "meta": [
+               "Text"
               ],
               "end": [
                {
@@ -483,16 +657,13 @@
            ]
           }
          ],
-         "footer": [
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
           {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "pager"
-            }
-           ]
+           "control": "button",
+           "text": "Add field",
+           "main": true
           }
          ],
          "divided": true

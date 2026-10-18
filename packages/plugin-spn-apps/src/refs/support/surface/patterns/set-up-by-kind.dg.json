@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Set up by kind",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title of the page. Every kind is shown, connected or not, as a card widget, in one container. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact, its state alone on a tablet. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, two on a tablet, and one on a phone, with the kinds in use first.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title of the page. Every kind is shown, connected or not, as a card widget, in one container. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, and one under another on a tablet and a phone, with the kinds in use first. Every screen shows every kind.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -274,7 +274,8 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    }
+                    },
+                    "Since 2 May"
                    ],
                    "end": [
                     {
@@ -289,7 +290,11 @@
               ],
               "media": "default"
              }
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "frame": {
               "look": "card",
@@ -306,7 +311,8 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    }
+                    },
+                    "Since 2 May"
                    ],
                    "end": [
                     {
@@ -342,7 +348,8 @@
                      "control": "badge",
                      "text": "Connected",
                      "icon": "default"
-                    }
+                    },
+                    "Since 2 May"
                    ],
                    "end": [
                     {
@@ -357,7 +364,11 @@
               ],
               "media": "default"
              }
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "frame": {
               "look": "card",
@@ -375,8 +386,7 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ],
-                   "meta": null
+                   ]
                   },
                   "fill": true
                  }
@@ -407,8 +417,7 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ],
-                   "meta": null
+                   ]
                   },
                   "fill": true
                  }
@@ -417,7 +426,11 @@
               ],
               "media": "default"
              }
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "frame": {
               "look": "card",
@@ -435,8 +448,7 @@
                      "text": "Connect",
                      "main": true
                     }
-                   ],
-                   "meta": null
+                   ]
                   },
                   "fill": true
                  }
@@ -553,7 +565,106 @@
              "frame": {
               "look": "card",
               "unit": "DSCardWidget",
+              "label": "Storage",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "S3",
+                   "meta": [
+                    {
+                     "control": "badge",
+                     "text": "Connected",
+                     "icon": "default"
+                    },
+                    "Since 2 May"
+                   ],
+                   "end": [
+                    {
+                     "icon": "more"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "unit": "DSCardWidget",
               "label": "WhatsApp",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "unit": "DSCardWidget",
+              "label": "Push",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "None yet",
+                   "end": [
+                    {
+                     "control": "button",
+                     "text": "Connect",
+                     "main": true
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "media": "default"
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "look": "card",
+              "unit": "DSCardWidget",
+              "label": "Payments",
               "rows": [
                {
                 "items": [

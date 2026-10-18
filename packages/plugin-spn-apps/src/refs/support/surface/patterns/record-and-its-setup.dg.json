@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and its setup",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, with its title and its actions in its header, inside its outline, and each smaller part of a thing set up is a card. At a desktop the large part is the main column, its cards one under another, and the short part stands beside it. On a tablet and a phone all of it is one column. Each brand of the social sign-in is a mark as tall as a control, with its name: it is what a person looks for and what they press to set it up. A filled mark is a brand that is set up, and an empty one is not yet.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. Every view shows the same record and the same setup; only the arrangement changes. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, its title and its actions in its header; a container whose content is cards lets the cards stand on their own. Each thing set up is a card, with its own action at the end of its title. At a desktop the cards stand two across in the main column and the short part stands beside it; on a tablet and a phone all of it is one column. Each brand of the social sign-in is a tile as tall as a control: a person presses it to set it up, and a small check at its corner says it is set up. Registration closes the card, a line with the switch at its end. Who owns the record is a plain card in the short column under the web addresses, with the action that hands it over.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -57,29 +57,24 @@
         "frame": {
          "look": "container",
          "unit": "DSContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
-              "unit": "DSCard",
+              "unit": "DSCardWidget",
               "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
               "rows": [],
               "sections": [
-               {
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": true
-                   }
-                  ]
-                 }
-                ]
-               },
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -87,36 +82,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -125,12 +111,6 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
                 "divided": true,
                 "rows": [
                  {
@@ -170,34 +150,46 @@
                   ]
                  }
                 ]
-               }
-              ]
-             }
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "frame": {
-              "look": "card",
-              "unit": "DSCard",
-              "label": "Platform",
-              "rows": [],
-              "sections": [
+               },
                {
                 "rows": [
                  {
                   "items": [
                    {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": false
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
                    }
                   ]
                  }
                 ]
-               },
+               }
+              ]
+             }
+            },
+            {
+             "frame": {
+              "look": "card",
+              "unit": "DSCardWidget",
+              "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -205,36 +197,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -243,17 +226,35 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
+                "divided": true,
                 "rows": [
                  {
                   "items": [
                    {
                     "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
                    }
                   ]
                  }
@@ -264,9 +265,7 @@
             }
            ]
           }
-         ],
-         "label": "Sign-in",
-         "note": "Who may register, and the providers, for each app"
+         ]
         }
        },
        {
@@ -408,20 +407,25 @@
           }
          ]
         }
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "note": "Owned by Dana Lee"
        },
        {
-        "spacer": true
-       },
-       {
-        "control": "button",
-        "text": "Transfer ownership"
+        "frame": {
+         "look": "card",
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
+            }
+           ]
+          }
+         ],
+         "width": "1/3"
+        }
        }
       ]
      }
@@ -459,29 +463,24 @@
         "frame": {
          "look": "container",
          "unit": "DSContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
-              "unit": "DSCard",
+              "unit": "DSCardWidget",
               "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
               "rows": [],
               "sections": [
-               {
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": true
-                   }
-                  ]
-                 }
-                ]
-               },
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -489,36 +488,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -527,12 +517,6 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
                 "divided": true,
                 "rows": [
                  {
@@ -572,6 +556,29 @@
                   ]
                  }
                 ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
                }
               ]
              }
@@ -583,23 +590,16 @@
             {
              "frame": {
               "look": "card",
-              "unit": "DSCard",
+              "unit": "DSCardWidget",
               "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
               "rows": [],
               "sections": [
-               {
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": false
-                   }
-                  ]
-                 }
-                ]
-               },
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -607,36 +607,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -645,17 +636,35 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
+                "divided": true,
                 "rows": [
                  {
                   "items": [
                    {
                     "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
                    }
                   ]
                  }
@@ -666,9 +675,7 @@
             }
            ]
           }
-         ],
-         "label": "Sign-in",
-         "note": "Registration and providers, for each app"
+         ]
         }
        }
       ]
@@ -815,6 +822,28 @@
         }
        }
       ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
      }
     ]
    }
@@ -830,12 +859,14 @@
        "control": "badge",
        "text": "Enterprise"
       },
-      "acme"
+      "acme",
+      "Owner: Dana Lee"
      ]
     },
     "actions": [
      {
-      "icon": "more"
+      "control": "button",
+      "text": "Edit"
      }
     ]
    },
@@ -848,29 +879,24 @@
         "frame": {
          "look": "container",
          "unit": "DSContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
          "rows": [
           {
            "items": [
             {
              "frame": {
               "look": "card",
-              "unit": "DSCard",
+              "unit": "DSCardWidget",
               "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
               "rows": [],
               "sections": [
-               {
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": true
-                   }
-                  ]
-                 }
-                ]
-               },
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -878,36 +904,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -916,12 +933,6 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
                 "divided": true,
                 "rows": [
                  {
@@ -961,6 +972,29 @@
                   ]
                  }
                 ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
                }
               ]
              }
@@ -972,23 +1006,16 @@
             {
              "frame": {
               "look": "card",
-              "unit": "DSCard",
+              "unit": "DSCardWidget",
               "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
               "rows": [],
               "sections": [
-               {
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "control": "switch",
-                    "text": "Open registration",
-                    "on": false
-                   }
-                  ]
-                 }
-                ]
-               },
                {
                 "label": "Social sign-in",
                 "rows": [
@@ -996,36 +1023,27 @@
                   "items": [
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "Google",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Facebook",
-                    "on": true
-                   },
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "X",
-                    "on": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "icon": "default",
-                    "mark": true,
-                    "text": "Apple",
+                    "mark": false,
                     "on": false
                    },
                    {
                     "icon": "default",
-                    "mark": true,
-                    "text": "GitHub",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
                     "on": true
                    }
                   ]
@@ -1034,17 +1052,35 @@
                },
                {
                 "label": "Directories",
-                "actions": [
-                 {
-                  "control": "button",
-                  "text": "Add"
-                 }
-                ],
+                "divided": true,
                 "rows": [
                  {
                   "items": [
                    {
                     "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
                    }
                   ]
                  }
@@ -1055,9 +1091,7 @@
             }
            ]
           }
-         ],
-         "label": "Sign-in",
-         "note": "Registration and providers"
+         ]
         }
        }
       ]
@@ -1159,6 +1193,66 @@
                "fill": true
               }
              ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "look": "card",
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
             }
            ]
           }

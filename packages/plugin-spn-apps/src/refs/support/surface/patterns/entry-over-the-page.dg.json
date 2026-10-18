@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An entry over the page",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the page the entry belongs to: the entry takes none of its own. A medium entry is a sheet beside its page at a desktop and a tablet, a third and two thirds of the width, and the full screen on a phone. It holds one container: its title and the action that closes it stand in its header, and its actions in its footer. A dialog over its page is not drawn here, because a skeleton lays no frame over another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the page the entry belongs to: the entry takes none of its own. A medium entry is a sheet beside its page at a desktop, a third and two thirds of the width, and under its page on a tablet and a phone. Every screen shows the page and the entry, with the same filter bar, the same records and the same fields. On a phone the records are the lines of a list and the boxes of the filter bar stand in two rows. It holds one container: its title and the action that closes it stand in its header, and its actions in its footer. A dialog over its page is not drawn here, because a skeleton lays no frame over another.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -221,37 +221,103 @@
         "frame": {
          "look": "container",
          "unit": "DSContainer",
-         "rows": [
+         "rows": [],
+         "sections": [
           {
-           "items": [
+           "unit": "DSFilterBarWidget",
+           "rows": [
             {
-             "standin": "table",
-             "fill": true,
-             "flush": true,
-             "columns": [
-              "Email"
-             ],
-             "cells": [
-              [
-               "omar@acme.com"
-              ],
-              [
-               "ines@acme.com"
-              ],
-              [
-               "raj@acme.com"
-              ]
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTableWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Email",
+                "Role",
+                "State",
+                ""
+               ],
+               "cells": [
+                [
+                 "omar@acme.com",
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "ines@acme.com",
+                 "Admin",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "raj@acme.com",
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Expired"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
              ]
             }
            ]
           }
          ]
         }
-       },
+       }
+      ]
+     },
+     {
+      "items": [
        {
         "frame": {
          "unit": "DSSheet",
-         "width": "2/3",
          "rows": [
           {
            "items": [
@@ -335,6 +401,125 @@
       "items": [
        {
         "frame": {
+         "look": "container",
+         "unit": "DSContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBarWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTableWidget",
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "omar@acme.com",
+                "meta": [
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "ines@acme.com",
+                "meta": [
+                 "Admin",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "raj@acme.com",
+                "meta": [
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Expired"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ],
+           "divided": true
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
          "unit": "DSSheet",
          "rows": [
           {
@@ -379,6 +564,10 @@
                 "items": [
                  {
                   "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Cancel"
                  },
                  {
                   "control": "button",

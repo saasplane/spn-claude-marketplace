@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "40fc1882"
+      "seen": "50a450d4"
     }
   ]
 }

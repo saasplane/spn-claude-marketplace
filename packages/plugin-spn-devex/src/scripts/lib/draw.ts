@@ -90,7 +90,8 @@ export type SkeletonItem = {
   /** Set by the drawer and never written in a spec: where the edge above a flush table is, and whether the table stands
    *  in a part that is a unit, whose boundary its lines reach. */
   edgeTop?: number; inPart?: boolean;
-  /** An icon that is a mark and not an action: it stands for a thing or a person, and is drawn in a circle. */
+  /** An icon that is a mark and not an action: it stands for a thing or a person, and is drawn in a circle.
+   *  `mark: false` with `on` keeps the icon an action, a tile, and `on: true` puts a small check at its corner. */
   mark?: boolean;
   /** The words of a row of tabs, and the place of the chosen one, counted from 0. */
   tabs?: string[]; chosen?: number;
@@ -1964,6 +1965,21 @@ function skelDividers(frame: SkeletonFrame): Set<number> {
   if (parts && frame.footer?.length && index > 0) at.add(index);
   return at;
 }
+/** The rows of a container that begin a part: its second part and each after it, its rows after its parts, and its
+ *  footer. A line between two rows of one list is no boundary, and the default frame draws it. */
+function skelPartStarts(frame: SkeletonFrame): Set<number> {
+  const at = new Set<number>();
+  if (frame.look !== "container") return at;
+  let index = 0;
+  (frame.sections ?? []).forEach((section, order) => {
+    if (order > 0) at.add(index);
+    index += skelSectionRows(section).length;
+  });
+  if ((frame.rows ?? []).length && index > 0) at.add(index);
+  index += (frame.rows ?? []).length;
+  if (frame.footer?.length && index > 0) at.add(index);
+  return at;
+}
 /** Whether a container drawn for a surface has a header: a title, or actions. */
 const skelContainerHead = (frame: SkeletonFrame): number =>
   (frame.label || frame.actions?.length ? (frame.label && frame.note ? SKEL_CONTAINER_HEAD_TWO : SKEL_CONTAINER_HEAD) : 0);
@@ -1972,6 +1988,14 @@ const skelContainerBandTop = (frame: SkeletonFrame): number => (frame.unit !== u
 /** Where a container's content begins under the top of its outline: the line under its header, or the outline itself
  *  where it has no header. */
 const skelContainerEdge = (frame: SkeletonFrame): number => (skelContainerHead(frame) ? skelContainerBandTop(frame) + skelContainerHead(frame) : 0);
+/** CONTENT THAT IS ONLY CARDS STANDS FLUSH: each card is its own box, so no box goes round them and they reach the
+ *  container's edges, as a framed content does. */
+const skelCardsOnly = (frame: SkeletonFrame): boolean => {
+  const rows = skelRows(frame);
+  return frame.look === "container" && rows.length > 0 && rows.every((row) => (row.items ?? []).every((item) => item.frame?.look === "card"));
+};
+/** How far a frame's rows stand in from its sides: its padding, or nothing where its content is only cards. */
+const skelInset = (frame: SkeletonFrame): number => (skelCardsOnly(frame) ? 0 : SKEL_PAD);
 /** The parts of a container: the one frame each of its rows holds. */
 const skelParts = (frame: SkeletonFrame): SkeletonFrame[] =>
   (frame.rows ?? []).flatMap((r) => (r.items.length === 1 && r.items[0].frame ? [r.items[0].frame] : []));
@@ -1984,7 +2008,8 @@ function skelHead(frame: SkeletonFrame): number {
   if (frame.look === "container")
     return skelContainerHead(frame) ? skelContainerEdge(frame) + SKEL_PAD : (frame.unit !== undefined ? SKEL_TAG_H : 0) + SKEL_PAD;
   if (!frame.label) return Math.max(tag, SKEL_PAD);
-  if (frame.look === "card") return tag + (frame.note ? SKEL_CARD_HEAD_TWO : SKEL_CARD_HEAD_ONE);
+  // A card whose title line holds an action stands a gap taller, so the action keeps clear of the first part under it.
+  if (frame.look === "card") return tag + (frame.note ? SKEL_CARD_HEAD_TWO : SKEL_CARD_HEAD_ONE) + (frame.actions?.length ? SKEL_LABEL_GAP * 2 : 0);
   return tag + (frame.note ? SKEL_H_TWO : SKEL_H_ONE);
 }
 /** The left column every row of a frame shares, sized to the widest row label — or none at all. */
@@ -2035,12 +2060,12 @@ function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   const head = Math.max(frame.label ? skelStepW(frame.label, frame.look === "container" ? SKEL_STEP_CONTAINER : frame.look === "card" ? SKEL_STEP_CARD : SKEL_STEP_PART) + (frame.look === "card" && frame.media !== undefined ? SKEL_CARD_MARK + SKEL_LABEL_GAP : 0) : 0, skelCornerName(frame) ? skelTagW(skelCornerName(frame)!) - SKEL_PAD : 0,
     frame.look === "container" && frame.unit !== undefined ? skelTagW(frame.unit) - SKEL_PAD : 0,
     frame.label && frame.note ? Math.ceil(frame.note.length * SKEL_W_NOTE) : 0);
-  // A CONTAINER'S HEADER HOLDS ITS ACTIONS AT THE END, so its title and its actions must both fit across.
-  const headActions = frame.look === "container" && frame.actions?.length
+  // A CONTAINER'S OR A CARD'S HEADER HOLDS ITS ACTIONS AT THE END, so its title and its actions must both fit across.
+  const headActions = (frame.look === "container" || frame.look === "card") && frame.actions?.length
     ? SKEL_GAP + frame.actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * (frame.actions.length - 1) : 0;
   if (frame.frames !== undefined) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
   const rows = Math.max(0, ...skelRows(frame).map((r) => skelRowMinWidth(r, ctl)));
-  return SKEL_PAD * 2 + Math.max(head + headActions, (labelCol ? labelCol + SKEL_GAP : 0) + rows);
+  return Math.max(SKEL_PAD * 2 + head + headActions, skelInset(frame) * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
 
 /** Whether an item takes the rest of its row's width. */
@@ -2132,7 +2157,9 @@ function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
  */
 function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean, on?: boolean, across = h): string[] {
   const circle = (cls: string, r: number) => `  <circle class="${cls}" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(r)}"/>`;
-  if (!mark) return [skelRect("sds-skel-control", cx - h / 2, cy - h / 2, h, h), ...skelGlyph(name, cx, cy, Math.round(h / 2))];
+  // A TILE THAT IS SET UP carries a small filled check at its top end corner, as a brand that is on does.
+  const check = on === true ? [circle("sds-skel-bar", 4).replace(`cx="${r2(cx)}" cy="${r2(cy)}"`, `cx="${r2(cx + h / 2)}" cy="${r2(cy - h / 2)}"`)] : [];
+  if (!mark) return [skelRect("sds-skel-control", cx - h / 2, cy - h / 2, h, h), ...skelGlyph(name, cx, cy, Math.round(h / 2)), ...check];
   if (name === "default") return [circle(on === false ? "sds-skel-control" : "sds-skel-bar", across / 2)];
   return [circle("sds-skel-control", across / 2), ...skelGlyph(name, cx, cy, Math.round(across / 2))];
 }
@@ -2195,7 +2222,8 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   }
   if (kind === "icon") {
     if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
-    out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, it.mark === true || it.on !== undefined, it.on, it.on !== undefined && it.mark !== true ? h - SKEL_MARK_DROP : h));
+    const mark = it.mark ?? it.on !== undefined;
+    out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, mark, it.on, mark && it.mark !== true ? h - SKEL_MARK_DROP : h));
     if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
     return;
   }
@@ -2422,10 +2450,11 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   else if (frame.raised !== undefined || frame.bordered !== undefined || frame.rounded !== undefined)
     findings.push("`raised`, `bordered` and `rounded` belong to a frame with `frames`; a frame that stands alone takes `look`");
   const labelCol = skelLabelCol(frame);
+  const inset = skelInset(frame);
   const rowContentW = forcedW !== undefined
-    ? Math.max(0, forcedW - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0))
-    : Math.max(SKEL_MIN_W, canvas - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0), ...rows.map((r) => skelRowMinWidth(r, ctl)));
-  const w = forcedW !== undefined ? forcedW : isContainer ? Math.max(canvas - SKEL_PAD * 2, skelFrameMinWidth(frame, inherited)) : SKEL_PAD * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rowContentW;
+    ? Math.max(0, forcedW - inset * 2 - (labelCol ? labelCol + SKEL_GAP : 0))
+    : Math.max(SKEL_MIN_W, canvas - inset * 2 - (labelCol ? labelCol + SKEL_GAP : 0), ...rows.map((r) => skelRowMinWidth(r, ctl)));
+  const w = forcedW !== undefined ? forcedW : isContainer ? Math.max(canvas - SKEL_PAD * 2, skelFrameMinWidth(frame, inherited)) : inset * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rowContentW;
   // A FRAME IN A ROW STANDS AS TALL AS THE ROW, so a rail and the main area beside it end on one line.
   const natural = skelFrameHeight(frame, inherited);
   const h = Math.max(natural, forcedH ?? 0);
@@ -2447,7 +2476,10 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     findings.push("`marked` is for a row with no border; a container's header stands inside its outline, so a container takes no `marked`");
   if (surface) {
     const headH = skelContainerHead(frame);
-    out.push(skelRect("sds-skel-control", x, y, w, h, SKEL_ROUND));
+    // BY DEFAULT A CONTAINER FRAMES ITS CONTENT AND ITS FOOTER, NOT ITS HEADER: the container's extent is a dotted
+    // outline, as a group's is, and the content and the footer stand in one thin rounded box under the header.
+    out.push(skelRect("sds-skel-guide", x, y, w, h));
+    if (rows.length && !skelCardsOnly(frame)) out.push(skelRect("sds-skel-control", x, y + skelContainerEdge(frame), w, h - skelContainerEdge(frame), SKEL_ROUND));
     const bandY = y + skelContainerBandTop(frame);
     if (frame.label) out.push(skelStepText(frame.label, SKEL_STEP_CONTAINER, x + SKEL_PAD, bandY + 23));
     if (frame.label && frame.note) out.push(`  <text class="sds-note" x="${x + SKEL_PAD}" y="${bandY + 40}">${esc(frame.note)}</text>`);
@@ -2460,8 +2492,6 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       else skelDrawLeaf(action, actionKind!, ax, actionsTop, aw, ctl, ctl, ctl, findings, out);
       ax += aw + SKEL_LABEL_GAP;
     }
-    // THE LINE UNDER THE HEADER closes the band, where content stands under it.
-    if (headH && rows.length) out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(y + skelContainerEdge(frame))} H${r2(x + w)}"/>`);
   }
   // A ROOT FRAME THAT STANDS IN A LAYOUT'S CONTENT IS BARE: the content's line is its edge.
   if (root && !bare) out.push(skelRect("sds-box", x, y, w, h));
@@ -2478,6 +2508,16 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   if (frame.label && !surface) out.push(frame.look === "card" ? skelStepText(frame.label, SKEL_STEP_CARD, x + SKEL_PAD + cardMark, y + tagH + 26)
     : `  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
   if (frame.label && frame.note && !surface) out.push(`  <text class="sds-code" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
+  // A CARD'S ACTIONS STAND AT THE END OF ITS TITLE'S LINE, as a container's stand at the end of its header.
+  if (frame.look === "card" && frame.actions?.length) {
+    let cx = x + w - SKEL_PAD - (frame.actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * (frame.actions.length - 1));
+    for (const action of frame.actions) {
+      const actionKind = skelKind(action), aw = skelFixedWidth(action, ctl);
+      if (!SKEL_CELL_KINDS.includes(actionKind)) findings.push("the actions of a card's header are words, a note, an icon or a control");
+      else skelDrawLeaf(action, actionKind!, cx, y + tagH + 22 - ctl / 2, aw, ctl, ctl, ctl, findings, out);
+      cx += aw + SKEL_LABEL_GAP;
+    }
+  }
 
   // A PART THAT TAKES THE HEIGHT LEFT: where the frame stands taller than its rows need, the rows whose
   // one item is a `fill` frame, slot or part share what is over.
@@ -2517,9 +2557,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const heights = rows.map((r) => skelRowHeight(r, ctl));
   if (growers.length && slack > 0) for (const i of growers) heights[i] += slack / growers.length;
 
-  const itemsX = x + SKEL_PAD + (labelCol ? labelCol + SKEL_GAP : 0);
+  const itemsX = x + inset + (labelCol ? labelCol + SKEL_GAP : 0);
   let rowY = y + skelHead(frame);
-  const dividers = skelDividers(frame);
+  const dividers = skelDividers(frame), partStarts = skelPartStarts(frame);
   // A ROW WITH NO BORDER, such as the way back or the header of a record, takes the same dotted line with `marked`,
   // as wide as the containers beside it, so their edges are seen to agree.
   rows.forEach((row, rowIndex) => {
@@ -2534,9 +2574,11 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     }
     // A PART OF A CONTAINER'S CONTENT, AND ITS FOOTER, BEGIN UNDER A LINE across the outline. A line between two rows
     // of one part, as a list in a group draws, stays inside that part's boundary.
+    // In a container no line crosses its box between its parts, which are marked by their own boundaries; the line
+    // between two rows of one list stays.
     if ((surface || frame.look === "card") && dividers.has(rowIndex)) {
       const inPart = row.within !== undefined && !row.lead ? SKEL_LABEL_GAP : 0;
-      out.push(`  <path class="sds-skel-control" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);
+      if (!partStarts.has(rowIndex)) out.push(`  <path class="sds-skel-control" d="M${r2(x + inPart)} ${r2(rowY - SKEL_GAP / 2)} H${r2(x + w - inPart)}"/>`);
     }
     if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
     // A FLUSH TABLE IS TOLD WHERE THE EDGE ABOVE IT IS: the line under the header, or the outline, where it is the first
