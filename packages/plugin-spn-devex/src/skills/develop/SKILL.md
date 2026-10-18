@@ -77,7 +77,7 @@ Edit the generator or its source when a generated file needs to be different. An
 
 ## Lenses
 
-Wear per layer: `refs/devex/agent/lenses/server-dev.md` on contract, service, and entry; `refs/devex/agent/lenses/web-dev.md` on ui; `refs/devex/agent/lenses/trust.md` on any mutation; `refs/devex/agent/lenses/partner.md` while writing contract states. At the close, convene the `spn-panel` subagent with `partner` if the published surface changed, and with `trust` if authorization, audit, or secrets moved. Convene it with `ux` over a page before the page lands.
+Wear per layer: `refs/devex/agent/lenses/server-dev.md` on contract, service, and entry; `refs/devex/agent/lenses/web-dev.md` on ui; `refs/devex/agent/lenses/trust.md` on any mutation; `refs/devex/agent/lenses/partner.md` while writing contract states. Convene no lens over the code as a routine; the hooks refuse at write time. A fresh `spn-panel` reading is held only at a judgment gate: `partner` when the published surface changed, and the lenses `LEAD` picks at the design gate and at a release.
 
 ## Finish
 

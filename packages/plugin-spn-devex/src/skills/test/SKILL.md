@@ -271,7 +271,7 @@ The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.js
 
 ## Lenses
 
-Wear `refs/devex/agent/lenses/qa.md` while writing tests. On every build's close, convene the `spn-panel` subagent with `qa`: a ✅ status with no test behind it stops the work.
+Wear `refs/devex/agent/lenses/qa.md` while writing tests. Convene no panel over a build's close; the hooks and the test gates refuse a ✅ status with no test behind it while you write, and `qa` is convened only at a judgment gate: the design gate, a change to the published surface, or a release.
 
 ## Finish
 

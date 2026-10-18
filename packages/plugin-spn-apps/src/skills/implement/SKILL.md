@@ -148,7 +148,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 
 ## Lenses
 
-The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `ux` when a page changed, `qa` always.
+The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close convenes no lens as a routine, because the lens is worn while you write and the hooks refuse at write time. The `spn-panel` is convened only at a judgment gate: `partner` when the published surface changed, and the lenses `LEAD` picks at the design gate and at a release.
 
 ## Write code the capability generator can read
 

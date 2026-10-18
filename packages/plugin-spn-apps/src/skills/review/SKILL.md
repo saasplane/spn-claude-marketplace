@@ -56,7 +56,7 @@ A change to a module's contract surface, schema, permissions, errors, or env wit
 
 ## Lenses
 
-Convene the `partner` lens for contract mode: run it through the `spn-panel` subagent with the spn-devex plugin's `refs/devex/agent/lenses/partner.md` over the contract diff. Code mode may additionally convene `trust` when the change touches authorization, audit, or secrets.
+Contract mode is a change to the published surface, a judgment gate: run the `partner` lens through the `spn-panel` subagent with the spn-devex plugin's `refs/devex/agent/lenses/partner.md` over the contract diff. Code mode convenes no lens; wear `trust` yourself when the change touches authorization, audit, or secrets.
 
 ## Verdict
 
