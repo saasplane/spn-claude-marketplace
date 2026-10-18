@@ -15,7 +15,7 @@ import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
-  type ArcData, type ArcRow, type Card, type Question, type RowState,
+  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
 } from "./workstream-schema.ts";
 
 // ---------------------------------------------------------------------------- the folder
@@ -532,22 +532,27 @@ export function inline(text: string): string {
 }
 
 const share = (done: number, total: number): number => (total ? Math.round((done / total) * 100) : 0);
-const bar = (done: number, total: number): string => `<div class="sds-bar"><i style="width:${share(done, total)}%"></i></div>`;
+
+/** When an arc finished: its last landed or status line on its log, else its last line of any kind; "" where it has none. */
+function finishedAt(ws: string, arc: string): string {
+  const lines = readJsonl(logFileOf(ws, arc)).filter((line): line is LogLine => !!line && typeof line === "object" && typeof (line as LogLine).at === "string");
+  const marks = lines.filter((line) => line.kind === "landed" || line.kind === "status");
+  return (marks.length ? marks : lines).map((line) => line.at).sort().at(-1) ?? "";
+}
 
 /**
- * One arc's tile in the progress grid: its number and its subject as words, linking its Cycles row; its
- * status badge beside done/total; and its bar, last. The status word is the tile's second class, and the
- * stylesheet colours the bar from it.
+ * The arcs in the order they run: the done ones first, in the order they finished (`CARRIED` and `DROPPED` at the
+ * time they closed); then `RUNNING`, `PART-LANDED` and `HELD`; then `DECIDED` and `PROPOSED` in the planned
+ * sequence, which is the arc's `position`, an arc without one after the others. The number breaks every tie.
  */
-function arcTile(data: ArcData, done: number, total: number): string[] {
-  const word = data.status.toLowerCase();
-  return [
-    `    <div class="sds-arc sds-${word}">`,
-    `      <a class="sds-arc-name" href="#${data.arc}"><span class="sds-mono">${data.arc}</span> ${escapeHtml(data.subject.replace(/-/g, " "))}</a>`,
-    `      <div class="sds-arc-line"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><span class="sds-arc-count">${done}/${total}</span></div>`,
-    `      ${bar(done, total)}`,
-    `    </div>`,
-  ];
+export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]): T[] {
+  const group = (data: ArcData): number => (TERMINAL.has(data.status) ? 0 : pastDecided(data.status) || data.status === "HELD" ? 1 : 2);
+  const finished = new Map(arcs.filter((data) => group(data) === 0).map((data) => [data.arc, finishedAt(ws, data.arc)]));
+  const position = (data: ArcData): number => (typeof data.position === "number" ? data.position : Number.MAX_SAFE_INTEGER);
+  return [...arcs].sort((left, right) => group(left) - group(right)
+    || (group(left) === 0 ? (finished.get(left.arc) ?? "").localeCompare(finished.get(right.arc) ?? "") : 0)
+    || (group(left) === 2 ? position(left) - position(right) : 0)
+    || left.arc.localeCompare(right.arc));
 }
 
 /** How far along an arc is, in five steps of one hue by rows done (0-19, 20-39, 40-59, 60-79, 80-99 per cent), and `done` at 100. */
@@ -571,7 +576,7 @@ function arcChip(data: ArcData, done: number, total: number): string {
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right, drawn as a chip of its own: Overall, the workstream's status beside rows done, a bar, and the arcs closed. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
+ * is on the right, a highlighted section laid out as a chip: Overall, the workstream's status beside rows done, a full-width bar, and the arcs closed. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
  */
 function statusBar(ws: string, counts: readonly { data: ArcData; done: number; total: number }[], done: number, total: number, closed: number): string[] {
   if (!counts.length) return [];
@@ -581,32 +586,24 @@ function statusBar(ws: string, counts: readonly { data: ArcData; done: number; t
     `    <div class="sds-footbar-chips">`,
     ...counts.map((one) => arcChip(one.data, one.done, one.total)),
     `    </div>`,
-    `    <div class="sds-footbar-summary">`,
-    `      <div class="sds-chip sds-overall sds-step-${progressStep(done, total)}">`,
-    `        <span class="sds-chip-name">Overall</span>`,
-    `        <span class="sds-chip-line"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><span class="sds-arc-count">${done}/${total}</span></span>`,
-    `        <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
-    `        <span class="sds-chip-note">${closed} of ${counts.length} arcs closed</span>`,
-    `      </div>`,
+    `    <div class="sds-footbar-summary sds-step-${progressStep(done, total)}">`,
+    `      <span class="sds-chip-name">Overall</span>`,
+    `      <span class="sds-chip-line"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><span class="sds-arc-count">${done}/${total}</span></span>`,
+    `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
+    `      <span class="sds-chip-note">${closed} of ${counts.length} arcs closed</span>`,
     `    </div>`,
     `  </nav>`,
   ];
 }
 
-/** The inside of the progress block: an overall line and bar, a grid of one tile per arc, each linking its Cycles row, and the sticky card. */
+/** The inside of the progress block: the sticky card alone, its chips in the order the arcs run. Progress shows nowhere else on the page. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
-  const counts = arcs.map((data) => ({ data, ...doneOf(data) }));
+  const counts = executionOrder(ws, arcs).map((data) => ({ data, ...doneOf(data) }));
   const done = counts.reduce((sum, one) => sum + one.done, 0);
   const total = counts.reduce((sum, one) => sum + one.total, 0);
   const closed = arcs.filter((data) => TERMINAL.has(data.status)).length;
-  const overall = `Overall: ${done} of ${total} rows done &middot; ${closed} of ${arcs.length} arcs closed`;
-  const lines = [
-    `  <p>${overall}</p>`,
-    `  ${bar(done, total)}`,
-  ];
-  if (counts.length) lines.push(`  <div class="sds-arcs">`, ...counts.flatMap((one) => arcTile(one.data, one.done, one.total)), `  </div>`);
-  lines.push(...statusBar(ws, counts, done, total, closed));
-  return `${lines.join("\n")}\n`;
+  const lines = statusBar(ws, counts, done, total, closed);
+  return lines.length ? `${lines.join("\n")}\n` : "";
 }
 
 /** Writes the progress block of a workstream's page. Says what it did in a line, and never throws. */

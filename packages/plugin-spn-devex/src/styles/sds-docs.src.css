@@ -142,12 +142,6 @@
     --sds-info-soft:#e0e8f4; --sds-success:#2a6459; --sds-success-soft:#dcece8; --sds-warning:#8f5714;
     --sds-warning-soft:#f7ecda; --sds-error:#a63d3d; --sds-error-soft:#f6e1e1; --sds-page-max:80rem;
     --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:21rem;
-    /* AN ARC'S BAR in the progress grid of an approach page, one token per status. Each reads a tone of the
-       palette, so it takes the tone's light value and its dark value. RUNNING is green, the work moving;
-       every other status is its badge's colour. */
-    --sds-arc-proposed:var(--sds-yellow); --sds-arc-decided:var(--sds-info); --sds-arc-running:var(--sds-ok);
-    --sds-arc-held:var(--sds-grey); --sds-arc-part-landed:var(--sds-olive); --sds-arc-landed:var(--sds-ok);
-    --sds-arc-carried:var(--sds-cyan); --sds-arc-dropped:var(--sds-fail);
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
@@ -187,7 +181,7 @@
   *{@apply box-border}
   /* TEXT ON A CARD. Four text tokens, each with a second value for the fill of a card or a table, so text keeps
      its contrast on the surface it stands on. */
-  .bg-card,.sds-scroll,.sds-tile,.sds-side,.sds-arc,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-tabs,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
+  .bg-card,.sds-scroll,.sds-tile,.sds-side,pre,.sds-open,.sds-record-group,.sds-decider,.sds-prose,.sds-nextnav-card,.sds-card,.sds-frame,.sds-tabs,.sds-index-side{--sds-text-heading:var(--sds-text-heading-card); --sds-text-title:var(--sds-text-title-card); --sds-text-description:var(--sds-text-description-card); --sds-text-fact:var(--sds-text-fact-card); color:var(--sds-text-description)}
   body{@apply m-0 bg-paper text-description font-ui; font-size:1rem; line-height:1.6; -webkit-font-smoothing:antialiased}
   p{margin:0 0 1rem; max-width:var(--sds-measure)}
   code,.sds-mono{@apply font-mono; font-size:0.87em}
@@ -561,38 +555,6 @@
   th.sds-status-col,table:has(th.sds-status-col:last-child) td:last-child{padding-left:1.5rem}
   .sds-section-head + .sds-standfirst{margin-top:-.5rem}
 
-  /* THE PROGRESS GRID of an approach page: under the Cycles table, one tile per arc, six to a row, three
-   below 60rem and two below 40rem. A tile holds the arc's name, linking its row; its status badge beside
-   done/total; and the bar of rows done, last. The tile carries the status word as its second class, which
-   picks the bar's token. A terminal arc is drawn quieter, so the arcs still live stand out. */
-  .sds-arcs{@apply grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.6rem; margin:1rem 0 0}
-  .sds-arc{@apply flex flex-col bg-card min-w-0; --sds-arc:var(--sds-accent); border:1px solid var(--sds-rule); border-radius:3px; padding:.6rem .65rem .7rem; gap:.5rem}
-  .sds-arc-name{@apply text-sm text-title no-underline; line-height:1.35; overflow-wrap:anywhere}
-  .sds-arc-name .sds-mono{@apply font-bold; font-size:.82em}
-  .sds-arc-name:hover{@apply text-accent}
-  .sds-arc-line{@apply flex flex-wrap items-center justify-between; gap:.3rem .4rem; margin-top:auto}
-  .sds-arc-line .sds-badge{padding:.02rem .42rem; font-size:.62rem; letter-spacing:.04em}
-  .sds-arc-count{@apply font-mono text-xs text-fact; font-variant-numeric:tabular-nums}
-  .sds-arc .sds-bar{@apply h-1.5}
-  .sds-arc .sds-bar i{background:var(--sds-arc)}
-  .sds-arc.sds-proposed{--sds-arc:var(--sds-arc-proposed)}
-  .sds-arc.sds-decided{--sds-arc:var(--sds-arc-decided)}
-  .sds-arc.sds-running{--sds-arc:var(--sds-arc-running)}
-  .sds-arc.sds-held{--sds-arc:var(--sds-arc-held)}
-  .sds-arc.sds-part-landed{--sds-arc:var(--sds-arc-part-landed)}
-  .sds-arc.sds-landed{--sds-arc:var(--sds-arc-landed)}
-  .sds-arc.sds-carried{--sds-arc:var(--sds-arc-carried)}
-  .sds-arc.sds-dropped{--sds-arc:var(--sds-arc-dropped)}
-  .sds-arc.sds-landed,.sds-arc.sds-carried,.sds-arc.sds-dropped{@apply bg-transparent}
-  .sds-arc.sds-landed .sds-arc-name,.sds-arc.sds-carried .sds-arc-name,.sds-arc.sds-dropped .sds-arc-name{@apply text-fact}
-  .sds-arc.sds-landed .sds-bar i,.sds-arc.sds-carried .sds-bar i,.sds-arc.sds-dropped .sds-bar i{opacity:.5}
-  @media (max-width:60rem){
-    .sds-arcs{grid-template-columns:repeat(3,minmax(0,1fr))}
-  }
-  @media (max-width:40rem){
-    .sds-arcs{grid-template-columns:repeat(2,minmax(0,1fr))}
-  }
-
   /* THE STICKY CARD of an approach page, fixed to the bottom of the window within the page's width, with a gap
    from the window's edges: one card of two sections side by side, divided by a line. The arcs are on the left,
    about 80%, one chip each in a row that scrolls sideways inside its section and is never scrolled by the page;
@@ -608,8 +570,7 @@
   }
   .sds-footbar{@apply bg-card fixed bottom-3 z-40 grid; left:0; right:0; margin:0 auto; width:min(calc(100vw - 1.5rem),var(--sds-page-max)); grid-template-columns:minmax(0,4fr) minmax(0,1fr); height:5.25rem; border:1px solid var(--sds-rule); border-radius:6px; box-shadow:0 4px 16px rgb(0 0 0 / .14); overflow:hidden}
   body:has(.sds-footbar){padding-bottom:6.5rem}
-  .sds-footbar-summary{@apply flex min-w-0; padding:.5rem .7rem; border-left:1px solid var(--sds-rule)}
-  .sds-chip.sds-overall{width:100%; gap:2px; background:var(--sds-overall-ground); border-color:var(--sds-overall-edge)}
+  .sds-footbar-summary{@apply flex flex-col justify-center min-w-0; --sds-arc:var(--sds-step-1); gap:2px; padding:.5rem .8rem; background:var(--sds-overall-ground); border-left:1px solid var(--sds-overall-edge)}
   .sds-chip-note{@apply font-mono text-fact whitespace-nowrap overflow-hidden; flex:none; font-size:.62rem; line-height:1.2; text-overflow:ellipsis}
   .sds-footbar-chips{@apply flex overflow-x-auto overflow-y-hidden; gap:.5rem; padding:.5rem .7rem; scroll-snap-type:x proximity; scroll-padding:0 .7rem; scrollbar-width:none; overscroll-behavior-x:contain; min-width:0;
     -webkit-mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%); mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%)}
@@ -623,17 +584,17 @@
   .sds-chip-line .sds-badge{padding:0 .4rem; font-size:.58rem; letter-spacing:.04em; line-height:1.4}
   .sds-chip-bar{@apply block bg-rule overflow-hidden; flex:none; height:4px; border-radius:999px}
   .sds-chip-bar i{@apply block h-full; background:var(--sds-arc)}
-  .sds-chip.sds-step-1{--sds-arc:var(--sds-step-1)}
-  .sds-chip.sds-step-2{--sds-arc:var(--sds-step-2)}
-  .sds-chip.sds-step-3{--sds-arc:var(--sds-step-3)}
-  .sds-chip.sds-step-4{--sds-arc:var(--sds-step-4)}
-  .sds-chip.sds-step-5{--sds-arc:var(--sds-step-5)}
-  .sds-chip.sds-step-done{--sds-arc:var(--sds-step-done)}
+  .sds-arc-count{@apply font-mono text-xs text-fact; font-variant-numeric:tabular-nums}
+  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1{--sds-arc:var(--sds-step-1)}
+  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2{--sds-arc:var(--sds-step-2)}
+  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3{--sds-arc:var(--sds-step-3)}
+  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4{--sds-arc:var(--sds-step-4)}
+  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5{--sds-arc:var(--sds-step-5)}
+  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done{--sds-arc:var(--sds-step-done)}
   @media (max-width:40rem){
     .sds-footbar{grid-template-columns:minmax(0,1fr) 8.6rem}
     .sds-footbar-summary{padding:.4rem .5rem}
-    .sds-chip.sds-overall{min-width:0}
-    .sds-chip.sds-overall .sds-badge{min-width:0; max-width:4.3rem; overflow:hidden; text-overflow:ellipsis}
+    .sds-footbar-summary .sds-badge{min-width:0; max-width:4.3rem; overflow:hidden; text-overflow:ellipsis}
     .sds-chip{width:auto; min-width:5.6rem}
     .sds-chip-subject{@apply hidden}
   }

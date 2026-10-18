@@ -2,7 +2,8 @@
 // script owns is held to, the stamp of an arc's rows, the two generated blocks, and the front matter an
 // order and a report open with. Each rule is shown failing on a record that breaks it, and passing on
 // the record that keeps it.
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { arcData, approachPage, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
@@ -102,22 +103,29 @@ console.log("\n=== the generated blocks — progress and open");
   ok("a page with no such block is not written", lib.withBlock("<p>no block</p>", "progress", "x") === null);
   const data = arcData(); data.rows[0].state = "landed";
   const inside = lib.progressInside("/nowhere", [data]);
-  ok("progress: rows done of all and arcs closed of all", inside.includes("Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed"), inside);
-  ok("progress: a bar per arc, linking its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
-  ok("progress: the arcs are a grid of tiles, each carrying its status word to colour its bar",
-    inside.includes('<div class="sds-arcs">') && inside.includes('<div class="sds-arc sds-decided">'), inside);
-  ok("progress: a tile reads top to bottom — number and subject as words, then badge beside done/total, then the bar",
-    /<a class="sds-arc-name" href="#N001"><span class="sds-mono">N001<\/span> probe<\/a>\s*<div class="sds-arc-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/div>\s*<div class="sds-bar"><i style="width:50%"><\/i><\/div>/.test(inside), inside);
+  ok("progress: the card alone — no Overall line, no long bar, no grid of tiles", !inside.includes("<p>") && !inside.includes('class="sds-bar"') && !inside.includes("sds-arcs") && inside.startsWith('  <nav class="sds-footbar"'), inside);
+  ok("progress: a chip links its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
   const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PART-LANDED" }]);
-  ok("progress: a subject is shown as words, and a two-word status is one class", words.includes("</span> workstream data</a>") && words.includes('class="sds-arc sds-part-landed"'), words);
-  ok("progress: no arc, no grid", !lib.progressInside("/nowhere", []).includes("sds-arcs"));
+  ok("progress: a subject is shown as words, and a two-word status is one class", words.includes("<span class=\"sds-chip-subject\"> workstream data</span>") && words.includes('class="sds-chip sds-part-landed '), words);
+  ok("progress: no arc, no card and nothing else", lib.progressInside("/nowhere", []) === "");
+  {
+    const order = (list) => lib.executionOrder("/nowhere", list).map((one) => one.arc).join(" ");
+    const arc = (id, status, position) => ({ ...arcData(), arc: id, status, ...(position === undefined ? {} : { position }) });
+    ok("progress order: the done arcs, then RUNNING and PART-LANDED, then DECIDED and PROPOSED by position, an arc without one last, the number breaking a tie",
+      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), arc("N003", "RUNNING"), arc("N001", "LANDED"), arc("N010", "PART-LANDED"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]) === "N001 N002 N003 N010 N004 N011 N008 N009");
+    const folder = mkdtempSync(join(tmpdir(), "order-"));
+    const written = [["N005", "2026-10-12T10:00+05:30"], ["N006", "2026-10-11T10:00+05:30"]];
+    for (const [id, at] of written) { const dir = join(folder, "arcs", id); mkdirSync(dir, { recursive: true }); writeFileSync(join(dir, "log.jsonl"), `${JSON.stringify({ at, kind: "landed", row: "1", note: "waiting → landed" })}\n`); }
+    ok("progress order: done arcs are in the order they finished, by their log, not by number", lib.executionOrder(folder, [arc("N005", "LANDED"), arc("N006", "LANDED")]).map((one) => one.arc).join(" ") === "N006 N005");
+    ok("progress: an arc's position is a whole number the schema accepts", schema.arcFaults({ ...arcData(), position: 3 }).length === 0 && schema.arcFaults({ ...arcData(), position: "x" }).length > 0);
+  }
   ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall chip, and no line along its top edge",
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
       && inside.includes('<span class="sds-chip-note">0 of 1 arcs closed</span>') && !inside.includes("sds-footbar-line"), inside);
   ok("progress: a chip links its row, carries its status word and its progress step, and holds number and name, badge beside done/total, and a thin bar",
     /<a class="sds-chip sds-decided sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001<\/span><span class="sds-chip-subject"> probe<\/span><\/span><span class="sds-chip-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><\/a>/.test(inside), inside);
-  ok("progress: the summary is a chip of its own — Overall, the workstream's status beside rows done, its bar in the same step shade, and the arcs closed",
-    /<div class="sds-chip sds-overall sds-step-3">\s*<span class="sds-chip-name">Overall<\/span>\s*<span class="sds-chip-line"><span class="sds-badge sds-status sds-planning">PLANNING<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-chip-note">0 of 1 arcs closed<\/span>/.test(inside), inside);
+  ok("progress: the summary is a highlighted section laid out as a chip — Overall, the workstream's status beside rows done, its bar in the same step shade, and the arcs closed",
+    /<div class="sds-footbar-summary sds-step-3">\s*<span class="sds-chip-name">Overall<\/span>\s*<span class="sds-chip-line"><span class="sds-badge sds-status sds-planning">PLANNING<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-chip-note">0 of 1 arcs closed<\/span>/.test(inside), inside);
   ok("progress: the shade steps are 0-19, 20-39, 40-59, 60-79, 80-99 and done at 100",
     [[0, 10, "1"], [1, 10, "1"], [2, 10, "2"], [4, 10, "3"], [6, 10, "4"], [8, 10, "5"], [99, 100, "5"], [10, 10, "done"], [0, 0, "1"]].every(([d, t, want]) => lib.progressStep(d, t) === want));
   ok("progress: the card is written with the first arc, whatever its status, and not before", lib.progressInside("/nowhere", [{ ...data, status: "PROPOSED" }]).includes("sds-footbar-chips") && !lib.progressInside("/nowhere", []).includes("sds-footbar"));
@@ -161,7 +169,7 @@ console.log("\n=== the folder — what a script owns, and where a reference poin
   ok("an arc no workstream holds is named as such", /in no open or backlog workstream/.test(said), said);
   ok("the workstream is kept as data", lib.isDataLayout(ws));
   ok("its arcs are read from their folders", lib.arcIdsOf(ws).join() === "N001");
-  ok("its page reads its progress block written", lib.writeProgress(ws) === "progress written" && readFileSync(join(ws, "approach.html"), "utf8").includes("Overall: 0 of 2 rows done"));
+  ok("its page reads its progress block written", lib.writeProgress(ws) === "progress written" && readFileSync(join(ws, "approach.html"), "utf8").includes("0/2</span>"));
   ok("and a second write finds it current", lib.writeProgress(ws) === "progress current");
 }
 

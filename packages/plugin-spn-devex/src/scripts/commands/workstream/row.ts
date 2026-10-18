@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The commands · § The formats · § The life of an arc, and every file it touches
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream row write <arc> [<row>] [--field value …] [--note "…"]
+//   spn-devex workstream row write <arc> [<row>] [--field value …] [--position <n>] [--note "…"]
 //
 // Given the arc alone, it opens the arc as PROPOSED (`--title` and `--subject` needed), or changes its
 // header and its status; `--goal` sets the outcome the arc's name file leads with, and `--subject` takes
@@ -24,11 +24,11 @@ const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", tou
 const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STATUSES, reason: VALUE, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
   model: VALUE, parent: VALUE, kind: ROW_KINDS, repo: VALUE, altitude: ALTITUDES, mechanism: VALUE, acceptance: VALUE,
-  "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE,
+  "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE, position: VALUE,
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows"];
+const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows", "position"];
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -39,6 +39,11 @@ function header(data: ArcData, words: Words): string[] {
   }
   const repos = listOf(words, "repos");
   if (repos) { data.repos = repos; changed.push("repos"); }
+  const position = words.value("position");
+  if (position !== null) {
+    if (!/^[1-9]\d*$/.test(position)) throw new UsageFault(`takes \`--position\` as a whole number from 1, the arc's place in the planned sequence: \`${position}\` is not one.`);
+    if (data.position !== Number(position)) { data.position = Number(position); changed.push("position"); }
+  }
   const status = words.value("status");
   if (status && status !== data.status) {
     data.status = status;
@@ -136,7 +141,7 @@ function write(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--note …] …",
+    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--note …] …",
     run: write,
   },
 };

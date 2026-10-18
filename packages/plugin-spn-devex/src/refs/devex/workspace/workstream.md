@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "6a8da653"
+      "seen": "0b522a52"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "94b10197"
+      "seen": "96abf6f2"
     }
   ]
 }
@@ -132,7 +132,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state show [<workstream>]` | where everything stands, in a line: `025 · N007 18/19 · 57b running · N010 proposed · 0 open cards · 1 suggestion shaped` |
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
-| `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), or changes its header and status, writing the arc's name file with its data; a `--subject` over three words or 24 characters is refused; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer |
+| `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), or changes its header and status, writing the arc's name file with its data; a `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer |
 | `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
 | `report write <workstream> <notes/N<nnn>/orders/<row>.report.md>` | folds a child's hand-back in from its front matter: state, proof, cost, commits, follow-ups. `ok · N007 18/19 · 57b added · 58 ready` |
 | `fact write <arc> --source <repository>/<path>[:<line>] --fact "…"` | one fact, its source's current commit pinned: `f12 · pinned 8b99ae92` |
