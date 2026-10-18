@@ -555,7 +555,7 @@
   th.sds-status-col,table:has(th.sds-status-col:last-child) td:last-child{padding-left:1.5rem}
   .sds-section-head + .sds-standfirst{margin-top:-.5rem}
 
-  /* THE STICKY CARD of an approach page, fixed to the bottom of the window within the page's width, with a gap
+  /* THE STICKY CARD of an approach page, fixed to the bottom of the window across the window's full width, with a gap
    from the window's edges: one card of two sections side by side, divided by a line. The arcs are on the left,
    about 80%, one chip each in a row that scrolls sideways inside its section and is never scrolled by the page;
    the overall line is on the right, about 20%. A chip is the number and short name, the status badge beside
@@ -568,7 +568,7 @@
     --sds-step-5:var(--sds-accent); --sds-step-done:var(--sds-ok);
     --sds-overall-ground:color-mix(in srgb,var(--sds-accent) 12%,var(--sds-card)); --sds-overall-edge:color-mix(in srgb,var(--sds-accent) 45%,var(--sds-rule));
   }
-  .sds-footbar{@apply bg-card fixed bottom-3 z-40 grid; left:0; right:0; margin:0 auto; width:min(calc(100vw - 1.5rem),var(--sds-page-max)); grid-template-columns:minmax(0,4fr) minmax(0,1fr); height:5.25rem; border:1px solid var(--sds-rule); border-radius:6px; box-shadow:0 4px 16px rgb(0 0 0 / .14); overflow:hidden}
+  .sds-footbar{@apply bg-card fixed bottom-3 z-40 grid; left:.75rem; right:.75rem; grid-template-columns:minmax(0,4fr) minmax(0,1fr); height:5.25rem; border:1px solid var(--sds-rule); border-radius:6px; box-shadow:0 4px 16px rgb(0 0 0 / .14); overflow:hidden}
   body:has(.sds-footbar){padding-bottom:6.5rem}
   .sds-footbar-summary{@apply flex flex-col justify-center min-w-0; --sds-arc:var(--sds-step-1); gap:2px; padding:.5rem .8rem; background:var(--sds-overall-ground); border-left:1px solid var(--sds-overall-edge)}
   .sds-chip-note{@apply font-mono text-fact whitespace-nowrap overflow-hidden; flex:none; font-size:.62rem; line-height:1.2; text-overflow:ellipsis}
