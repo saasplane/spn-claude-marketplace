@@ -16,6 +16,7 @@ import { dirname, join, resolve, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
+import { STATUSES } from "../../checks/arc-status.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
@@ -67,8 +68,8 @@ export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capa
                   "guide", "index"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
-/** The words a preview's Status chip shows, as the preview template writes them: the arc's own two. */
-export const PREVIEW_STATES = ["PROPOSED", "DECIDED"];
+/** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RD.DEVEX.WORKSPACE.266). */
+export const PREVIEW_STATES: readonly string[] = STATUSES;
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
 export const LENS_LABEL: Record<string, string> = {
@@ -733,9 +734,9 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
   } else if (block.variant === "preview") {
-    // A PREVIEW'S CHIP SAYS WHETHER THE DEVELOPER HAS ANSWERED IT, never the block's `status`. The
+    // A PREVIEW'S CHIP IS THE ARC'S STATUS, never the block's `status` (RD.DEVEX.WORKSPACE.266). The
     // block's word says how far the workstream's page has come; the chip reads `PROPOSED` until the
-    // developer answers and `DECIDED` after, so the two are not compared.
+    // developer decides the design and the arc's own status after, so the two are not compared.
     if (!statusChip) add("RULE", `no Status chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
     else if (!PREVIEW_STATES.includes(text(statusChip[1])))
       add("RULE", `the Status chip reads \`${text(statusChip[1])}\`; a preview shows ${PREVIEW_STATES.join(" · ")}`);

@@ -1413,12 +1413,11 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
   const at = `${notes}/previews/layout-preview.html`;
   const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
     summary: "This page shows the layout.", keywords: ["preview"] };
-  const state = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span></span>`;
+  const state = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</a></span>`;
   const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, own = "" } = {}) =>
     block(o) + `${linkLine}\n${own}<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
     `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
     `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span>` +
-    `<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span><span class="sds-separator">|</span>` +
     `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-01</span>${chip}</span></div>\n` +
     `<h1>${heading}</h1>\n<p class="sds-subtitle">Decides how the page is laid out.</p>\n` +
     `<p class="sds-standfirst">This page shows the layout.</p>\n</header>\n${scriptLine}\n`;
@@ -1428,15 +1427,17 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [at]: page(good) }), has("clean — 1 page"));
   one("a Status chip reading DECIDED is not compared with the block's PLANNING",
     audit({ [at]: page(good, { chip: state("DECIDED") }) }), has("clean — 1 page"));
+  one("a Status chip reading the arc's LANDED is clean, since the chip is the arc's status",
+    audit({ [at]: page(good, { chip: state("LANDED") }) }), has("clean — 1 page"));
   for (const word of ["UNDER REVIEW", "APPROVED", "SUPERSEDED"])
-    one(`known-bad: a Status chip reading ${word} is refused, because a preview is PROPOSED or DECIDED`,
+    one(`known-bad: a Status chip reading ${word} is refused, because a preview shows the arc's status`,
       audit({ [at]: page(good, { chip: `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">${word}</span></span>` }) }),
-      has(`the Status chip reads \`${word}\`; a preview shows PROPOSED · DECIDED`));
+      has(`the Status chip reads \`${word}\`; a preview shows PROPOSED · DECIDED · RUNNING`));
   one("known-bad: a Status chip carrying a page's status word is refused",
     audit({ [at]: page(good, { chip: `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">&#x1F52E; PLANNING</span></span>` }) }),
     has("the Status chip reads"));
   one("known-bad: a preview with no Status chip is refused",
-    audit({ [at]: page(good, { chip: "" }) }), has("no Status chip — a preview shows PROPOSED · DECIDED"));
+    audit({ [at]: page(good, { chip: "" }) }), has("no Status chip — a preview shows PROPOSED · DECIDED · RUNNING"));
   one("known-bad: a header line whose third part is not the preview's title is refused",
     audit({ [at]: page(good, { named: "001 - A" }) }), has("the header title `001 - A` is not the block's `Layout`"));
   one("known-bad: an `<h1>` that is not the preview's title is refused",

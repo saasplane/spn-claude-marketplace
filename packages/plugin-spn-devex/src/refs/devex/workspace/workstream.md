@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "0b522a52"
+      "seen": "20c31a26"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "4c0d04a9"
+      "seen": "627b7305"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "882eb4d1"
+      "seen": "36d1423f"
     }
   ]
 }
@@ -830,9 +830,11 @@ An arc has one preview, by a fixed name, `notes/N<nnn>/preview.html`, copied fro
 proposal the arc makes is a section of its one page, and a `*preview*.html` anywhere else under an arc
 fails `workstream state check`. A sample is a real file of the kind
 the work produces — a template, a report, a document. It keeps its own format and its own name, lives
-in `notes/N<nnn>/samples/`, and is never written in the preview layout. Make a sample only when the
-work produces such a file. Each one reads `PROPOSED` until the developer answers and `DECIDED` after: the preview in its
-masthead, and a sample with the section of the preview that links it. Rewrite a proposal a later one
+in `notes/N<nnn>/samples/`, and is never written in the preview layout or built with the page template
+(`RD.DEVEX.WORKSPACE.267`). Make a sample only when the
+work produces such a file. Each one reads `PROPOSED` until the developer answers: the preview in its
+masthead, whose one status is the arc's, written by the arc's commands (`RD.DEVEX.WORKSPACE.266`), and a
+sample with the section of the preview that links it. Rewrite a proposal a later one
 replaces in place, and say so in the arc's log. The approach page links the preview and every sample.
 Writing the first section of a preview or the first sample opens the arc as `PROPOSED`, and an arc past
 `PROPOSED` with no preview fails `workstream state check`. A preview belongs to its arc: a later arc that needs an earlier arc's
@@ -881,6 +883,20 @@ this point, because the approach page holds that. A question is asked on the app
 and its card links the preview that shows the options. **A preview never frames a sample file**: it shows
 a thing with the page's own blocks, such as a table, a tree, a figure or a code block, and where the
 thing is a real file it links that file in the arc's `samples/` folder.
+
+**A preview's masthead shows one status, labelled *Status*, and it is the arc's — MUST**
+(`RD.DEVEX.WORKSPACE.266`). It reads `PROPOSED` while the design is not decided, and once decided the
+arc's own status (`DECIDED`, `RUNNING`, `PART-LANDED`, `LANDED` …), since every status after `PROPOSED`
+implies the design was decided. The badge links `../../approach.html#N<nnn>`, is read from `state.json`
+and is written by every `workstream` write and `docs cycles write`: never type it. Plugin migration 003
+writes it into the previews of every open and backlog workstream.
+
+**A sample is the work's own file, never a page built with the page template — MUST**
+(`RD.DEVEX.WORKSPACE.267`). It keeps the format the work produces, and does not link the shared stylesheet
+and open with a masthead. Many samples are browsed through `samples/index.html`, which opens each one as it
+is. `workstream state check` names a sample built with the page template; a sample of a book page the work
+produces passes, its masthead's `Type` naming the page kind, such as `Approach`, or its name the book
+template it is a review copy of, such as `blocks-template.html`.
 
 **Draw *Where it lands* as one folder tree for each repository — MUST** (`RD.DEVEX.WORKSPACE.238`). A
 reviewer understands a change by browsing folders, and a path in a table cell has to be put together in
@@ -941,7 +957,7 @@ how thorough you were goes into the arc's log.
 **A preview outside any workstream uses the same template — MUST** (`RD.DEVEX.WORKSPACE.209`). When
 the developer asks for something no workstream owns and it must be shown as a page, copy
 `approach-preview-template.html`, name the page `<subject>-preview.html`, and write it into the
-session's scratch folder. Leave out the link back to an approach page and the arc field. Hand it over
+session's scratch folder. Leave out the link back to an approach page; the status badge links nothing and reads `PROPOSED` until the developer answers and `DECIDED` after. Hand it over
 as its full path. Publish it only when the developer asks, and then give them the link. When a
 workstream opens for the work, move the page to its first arc's `notes/N<nnn>/preview.html`.
 A sample the page links is a file beside it: publish or move it with the page.

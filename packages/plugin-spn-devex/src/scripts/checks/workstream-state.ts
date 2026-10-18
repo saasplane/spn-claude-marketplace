@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A preview shows, and an approach page argues · § `How` ends in Cycles, and the arcs are the state
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // `workstream state check`, as a function: whether each open and backlog workstream is whole. The
@@ -11,6 +11,7 @@ import { basename, join, relative } from "node:path";
 import { pastDecided } from "./arc-status.ts";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
+import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, isDataLayout, logFileOf, markdownArcsOf,
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
@@ -48,6 +49,39 @@ export function previewFindings(ws: string, arc: string, data: ArcData | null): 
         out.push(`\`${under}/${file}\` is a second preview — an arc has one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   if (data && data.status !== "PROPOSED" && !isFile(previewOf(ws, arc)))
     out.push(`${arc} is ${data.status} and has no preview at \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+  return out;
+}
+
+/** The kinds of page the book has. A sample whose masthead names one is a page of the book the work produces. */
+export const BOOK_PAGE_KINDS: readonly string[] = ["approach", "preview", "construct", "overview", "report", "guide", "index", "hub"];
+
+/** A review copy of one of the book's templates, named for it: `blocks-template.html`, `approach-template-v2.html`. */
+const TEMPLATE_COPY = /-template(?:-[^/.]+)?\.html?$/i;
+
+/** The page kind a page says it is: its `spn:doc` block's `variant`, else its masthead's `Type`, lowercased; "" where it says none. */
+function pageKind(text: string): string {
+  const variant = /<!--\s*spn:doc[\s\S]*?"variant"\s*:\s*"([^"]+)"/.exec(text)?.[1];
+  const type = /<span class="sds-label">Type:<\/span>\s*<span\b[^>]*class="[^"]*sds-type[^"]*"[^>]*>([^<]*)<\/span>/.exec(text)?.[1];
+  return (variant ?? type ?? "").trim().toLowerCase();
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.267: a sample is the work's own file, so a page under `samples/` built with the page template —
+ * linking the shared docs stylesheet and opening with a masthead — is named. A sample of a page of the book the
+ * work produces passes, by the page kind its masthead names, or as a review copy of a book template named for it.
+ */
+export function sampleFindings(ws: string, arc: string): string[] {
+  const samples = join(notesDirOf(ws, arc), "samples");
+  const out: string[] = [];
+  for (const file of filesUnder(samples).filter((one) => /\.html?$/i.test(one)).sort()) {
+    let text = "";
+    try { text = readFileSync(join(samples, file), "utf8"); } catch { continue; }
+    if (!linksSharedStyles(text) || !/<header\b[^>]*class="[^"]*\bsds-masthead\b/.test(text)) continue;
+    if (BOOK_PAGE_KINDS.includes(pageKind(text)) || TEMPLATE_COPY.test(basename(file))) continue;
+    out.push(`\`${NOTES}/${arc}/samples/${file}\` is built with the page template, the shared docs stylesheet and a masthead — ` +
+      "a sample is the work's own file in its own format, browsed through `samples/index.html`; only a sample of a book page " +
+      "the work produces carries a masthead, its `Type` naming the page kind or its name the template it copies");
+  }
   return out;
 }
 
@@ -156,6 +190,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...linesFindings(factsFileOf(ws, arc), `arcs/${arc}/${FACTS_FILE}`, factFaults).map(say(arc, "schema")));
     const data = faults.length ? null : raw as ArcData;
     out.push(...previewFindings(ws, arc, data).map(say(arc, "preview")));
+    out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
     out.push(...pageFindings(ws, arc, data, page, text).map(say(arc, "stamp")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));

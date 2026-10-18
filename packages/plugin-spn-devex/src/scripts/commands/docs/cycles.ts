@@ -9,7 +9,8 @@
 // the preview by its fixed name and its samples, a badge for its status, and its number as the row's
 // id, so `approach.html#N013` opens it (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the
 // row; a rewrite keeps the stamp, which only `workstream arc stamp write` writes. `write` also writes
-// each arc's name file, `arcs/N<nnn>/<subject>.md` (RD.DEVEX.WORKSPACE.264).
+// each arc's name file, `arcs/N<nnn>/<subject>.md` (RD.DEVEX.WORKSPACE.264), and the status in the
+// header of each arc's preview, read from the arc (RD.DEVEX.WORKSPACE.266).
 //
 //   spn-devex docs cycles show <workstream> [--json]   print the table, or the rows as data
 //   spn-devex docs cycles write <workstream>           write the parts of the page the arcs decide
@@ -30,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { arcIdsOf, blockAt, readArc, stampsOn, writeNameFile } from "../../lib/workstream.ts";
+import { arcIdsOf, blockAt, readArc, stampsOn, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -682,6 +683,8 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
   }
   const names = writeNameFiles(folder);
   if (names.length) console.log(`${basename(folder)}: wrote the name file of ${names.join(", ")}`);
+  const previews = writePreviewStatus(folder);
+  if (previews.length) console.log(`${basename(folder)}: wrote the status of ${previews.join(", ")}`);
   let code = 0;
   for (const page of pages) {
     const shown = relative(dirname(folder), page);

@@ -93,5 +93,5 @@ function check(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   show: { describe: "where each open and backlog workstream stands, in a line; with --json, as data", usage: "[<workstream>] [--json]", run: show },
-  check: { describe: "whether each open and backlog workstream is whole: its data, previews, notes folders, stamps, cards and step files", usage: "[<workstream>] [--facts] [--json]", run: check },
+  check: { describe: "whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files", usage: "[<workstream>] [--facts] [--json]", run: check },
 };

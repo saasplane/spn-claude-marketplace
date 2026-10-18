@@ -193,6 +193,41 @@ console.log("\n=== the name file — RD.DEVEX.WORKSPACE.264");
     lib.markdownIn(ws, "N001").join() === "renamed.md" && readFileSync(join(ws, "arcs", "N001", "renamed.md"), "utf8").includes("[samples](../../notes/N001/samples/)"));
 }
 
+console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266");
+{
+  const eyebrow = (line) => `<header class="sds-masthead">\n  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 031 &nbsp;|&nbsp; Probe</span>${line}</div>\n  <h1>Probe</h1>\n</header>\n`;
+  const type = `<span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span>`;
+  const sep = `<span class="sds-separator">|</span>`;
+  const shown = `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-17</span>`;
+  const status = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}" href="../../approach.html#N001">${word}</a></span>`;
+  const want = eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("LANDED")}</span>`);
+  const before = eyebrow(`<span class="sds-line">${type}${sep}<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span> <span class="sds-small"><a href="../../approach.html#N001">approach.html#N001</a></span>${sep}${shown}<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span></span>`);
+  const written = lib.previewWithStatus(before, "N001", "LANDED");
+  ok("the header's own DECIDED gives way to the arc's LANDED, one badge labelled Status that links the arc's row, and the Arc fact goes",
+    written === want, written);
+  ok("a second write finds it current", lib.previewWithStatus(written, "N001", "LANDED") === written);
+  ok("an arc still PROPOSED reads PROPOSED, since its design is not decided",
+    lib.previewWithStatus(written, "N001", "PROPOSED") === eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("PROPOSED")}</span>`));
+  ok("the arc's status moving moves only the badge", lib.previewWithStatus(written, "N001", "PART-LANDED") === eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("PART-LANDED")}</span>`));
+  const two = eyebrow(`<span class="sds-line">${type}${sep}${shown}<span class="sds-state"><span class="sds-label">Design:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span>${sep}<span class="sds-label">Arc:</span> <a href="../../approach.html#N001">N001</a> <span class="sds-badge sds-status sds-landed">LANDED</span></span></span>`);
+  ok("a header showing two statuses, Design and Arc, becomes the one", lib.previewWithStatus(two, "N001", "LANDED") === want, lib.previewWithStatus(two, "N001", "LANDED"));
+  const fileFact = eyebrow(`<span class="sds-line">${type}${sep}<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span>${sep}${shown}<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span>${sep}<span class="sds-label">Arc file:</span> <a href="../../approach.html#N001">approach.html#N001</a></span>`);
+  ok("an Arc file fact after the state goes, so the arc is linked once", lib.previewWithStatus(fileFact, "N001", "LANDED") === want, lib.previewWithStatus(fileFact, "N001", "LANDED"));
+  ok("a header with no status gains it", lib.previewWithStatus(eyebrow(`<span class="sds-line">${type}${sep}${shown}</span>`), "N001", "LANDED") === want);
+  ok("a page with no header line stays as it is", lib.previewWithStatus("<p>no header</p>\n", "N001", "LANDED") === "<p>no header</p>\n");
+
+  const { root, ws } = await dataWorkspace("t-workstream-preview-status");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  writeFileSync(preview, `<meta charset="utf-8">\n${before}<section id="s1"><h2>Overview</h2></section>\n`);
+  ok("the writer writes the arc's status from its state.json, and names the preview it wrote",
+    lib.writePreviewStatus(ws).join() === "notes/N001/preview.html" && readFileSync(preview, "utf8").includes(status("DECIDED")), readFileSync(preview, "utf8"));
+  ok("and a second run writes nothing", lib.writePreviewStatus(ws).length === 0);
+  const { cli } = await import("../../../helpers/workstream-fixture.mjs");
+  const moved = cli(root, ["workstream", "row", "write", "031/N001", "--status", "RUNNING"]);
+  ok("a command that writes the arc writes the preview's status with it",
+    moved.code === 0 && readFileSync(preview, "utf8").includes(`${status("RUNNING")}</span></div>`), `${moved.out}\n${readFileSync(preview, "utf8")}`);
+}
+
 console.log("\n=== a short subject — RD.DEVEX.WORKSPACE.265");
 {
   const { subjectFault } = schema;

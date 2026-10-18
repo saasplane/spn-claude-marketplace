@@ -1,11 +1,12 @@
 // What every `workstream` command shares: a reference read as a usage fault where it names nothing,
-// a list option read from its words, and what runs after every write — the progress block refreshed
-// and the workstream's own `state check`, printed as lines the agent reads.
+// a list option read from its words, and what runs after every write — the progress block refreshed,
+// each preview's status written from its arc, and the workstream's own `state check`, printed as
+// lines the agent reads.
 
 import { basename } from "node:path";
 import { UsageFault, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { checkWorkstream } from "../../checks/workstream-state.ts";
-import { findWorkstream, resolveArc, workspaceOf, writeProgress } from "../../lib/workstream.ts";
+import { findWorkstream, resolveArc, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
 
 /** A library call whose plain error is a fault in what was typed. */
 export function typed<T>(read: () => T): T {
@@ -34,11 +35,12 @@ export function listOf(words: Words, name: string): string[] | null {
   return items.length === 1 && items[0] === "none" ? [] : items;
 }
 
-/** After a write: the progress block refreshed, and the workstream's check, each finding on a line. */
+/** After a write: the progress block refreshed, each preview's status written, and the workstream's check, each finding on a line. */
 export function afterWrite(ws: string): string[] {
   const lines: string[] = [];
   const progress = writeProgress(ws);
   if (!/^progress (?:current|written)$/.test(progress)) lines.push(`! ${progress}`);
+  writePreviewStatus(ws);
   for (const finding of checkWorkstream(ws))
     lines.push(`! state check · ${basename(ws)}${finding.arc ? ` ${finding.arc}` : ""} · ${finding.message}`);
   return lines;

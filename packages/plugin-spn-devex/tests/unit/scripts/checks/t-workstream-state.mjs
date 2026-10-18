@@ -131,6 +131,35 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("green: samples stay beside the one preview", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
+console.log("\n=== RD.DEVEX.WORKSPACE.267 — a sample is the work's own file, never a page built with the page template");
+{
+  const { root, ws } = await dataWorkspace("state-samples");
+  const samples = join(ws, "notes", "N001", "samples");
+  const stylesheet = `<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.7.0/sds-docs.css">`;
+  const masthead = (type) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line">${type ? `<span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span>` : ""}</span></div><h1>Find in a list</h1></header>`;
+  mkdirSync(join(samples, "patterns"), { recursive: true });
+  writeFileSync(join(samples, "patterns", "find-in-a-list.html"), `<meta charset="utf-8">\n${stylesheet}\n<div class="sds-page">${masthead("Sample")}<svg class="sds-drawing"></svg></div>\n`);
+  writeFileSync(join(samples, "about.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
+  const red = checkWorkstream(ws);
+  ok("red: a sample with the shared stylesheet and a masthead whose Type is Sample is named, in a sub-folder too",
+    has(red, "samples", /`notes\/N001\/samples\/patterns\/find-in-a-list\.html` is built with the page template/), said(red));
+  ok("red: one with a masthead and no Type is named", has(red, "samples", /`notes\/N001\/samples\/about\.html` is built with the page template/), said(red));
+  ok("the finding says what a sample is and where many are browsed", has(red, "samples", /the work's own file in its own format, browsed through `samples\/index\.html`/), said(red));
+  const command = cli(root, ["workstream", "state", "check", "031"]);
+  ok("the command exits 1 and prints the [samples] finding", command.code === 1 && /031-probe N001 \[samples\]/.test(command.out), command.out);
+  writeFileSync(join(samples, "patterns", "find-in-a-list.html"), `<!doctype html>\n${stylesheet}\n<main><svg class="sds-drawing"></svg></main>\n`);
+  rmSync(join(samples, "about.html"));
+  writeFileSync(join(samples, "index.html"), `<!doctype html>\n<title>Samples of N001</title>\n<nav><a href="patterns/find-in-a-list.html">Find in a list</a></nav>\n`);
+  writeFileSync(join(samples, "approach-sample.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("Approach")}\n`);
+  writeFileSync(join(samples, "screen.html"), `<!doctype html>\n<header class="sds-masthead">its own look</header>\n`);
+  mkdirSync(join(samples, "template-review"), { recursive: true });
+  writeFileSync(join(samples, "template-review", "blocks-template.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
+  writeFileSync(join(samples, "template-review", "approach-template-v2.html"), `<meta charset="utf-8">\n${stylesheet}\n${masthead("")}\n`);
+  const green = checkWorkstream(ws);
+  ok("green: a drawing that borrows the stylesheet with no masthead, a plain index, a book page the work produces, a review copy of a book template named for it, and a page with its own styles pass",
+    green.length === 0, said(green));
+}
+
 console.log("\n=== RD.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");
 {
   const { root, ws } = await dataWorkspace("state-notes-tree");

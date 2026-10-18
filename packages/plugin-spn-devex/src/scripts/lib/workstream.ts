@@ -1,9 +1,9 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
-//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The shared state library: where each file a script owns sits, how it is read and written, the
-// stamp of an arc's rows, and the two generated blocks a page holds. Every `workstream` command, the
+// stamp of an arc's rows, the two generated blocks a page holds, and a preview's status. Every `workstream` command, the
 // checks and the hooks read through it, so a path or a format is spelled once.
 
 import { createHash } from "node:crypto";
@@ -620,6 +620,77 @@ export function writeProgress(ws: string): string {
   if (next === text) return "progress current";
   writeFileSync(page, next, "utf8");
   return "progress written";
+}
+
+// ---------------------------------------------------------------------------- a preview's status
+
+const SEPARATOR = `<span class="sds-separator">|</span>`;
+const LINE_OPEN = `<span class="sds-line">`;
+const STATE_OPEN = `<span class="sds-state">`;
+
+/** Where the span opening at `from` closes: the index just past its `</span>`, counting the spans inside it; -1 where it never does. */
+function spanEnd(text: string, from: number): number {
+  const tag = /<span\b[^>]*>|<\/span>/g;
+  tag.lastIndex = from;
+  let depth = 0;
+  for (let found = tag.exec(text); found; found = tag.exec(text)) {
+    depth += found[0].startsWith("</") ? -1 : 1;
+    if (depth === 0) return found.index + found[0].length;
+  }
+  return -1;
+}
+
+/**
+ * The header's status as the commands write it: the arc's status, `PROPOSED` until the design is decided, as its
+ * badge, which links the arc's row on the approach page.
+ */
+export function previewState(arc: string, status: string): string {
+  return `${STATE_OPEN}<span class="sds-label">Status:</span> `
+    + `<a class="sds-badge sds-status sds-${status.toLowerCase()}" href="${arcAddress(arc, "../../")}">${escapeHtml(status)}</a></span>`;
+}
+
+/**
+ * A preview's page with its header showing the arc's status (RD.DEVEX.WORKSPACE.266): the header line keeps its
+ * other facts, loses any `Arc:` or `Arc file:` fact of its own and the status it showed, and ends in the state
+ * `previewState` writes. The page as it was where it has no header line.
+ */
+export function previewWithStatus(text: string, arc: string, status: string): string {
+  const eyebrow = text.indexOf(`<div class="sds-eyebrow"`);
+  if (eyebrow < 0) return text;
+  const lineAt = text.indexOf(LINE_OPEN, eyebrow);
+  const eyebrowEnd = text.indexOf("</div>", eyebrow);
+  if (lineAt < 0 || (eyebrowEnd >= 0 && lineAt > eyebrowEnd)) return text;
+  const lineEnd = spanEnd(text, lineAt);
+  if (lineEnd < 0) return text;
+  let inner = text.slice(lineAt + LINE_OPEN.length, lineEnd - "</span>".length);
+  const stateAt = inner.indexOf(STATE_OPEN);
+  if (stateAt >= 0) {
+    const stateEnd = spanEnd(inner, stateAt);
+    if (stateEnd < 0) return text;
+    inner = inner.slice(0, stateAt) + inner.slice(stateEnd);
+  }
+  const facts = inner.split(SEPARATOR).filter((fact) => fact.trim() && !/^\s*<span class="sds-label">Arc(?: file)?:<\/span>/.test(fact));
+  const line = `${LINE_OPEN}${facts.join(SEPARATOR)}${previewState(arc, status)}</span>`;
+  return text.slice(0, lineAt) + line + text.slice(lineEnd);
+}
+
+/**
+ * Writes the arc's status into the header of each preview of an arc kept as data, from the arc's `state.json`.
+ * Every `workstream` write and `docs cycles write` call it, so the status there is never typed. A closed
+ * workstream's previews stay as they closed. Returns the previews it changed, from the workstream.
+ */
+export function writePreviewStatus(ws: string): string[] {
+  if (basename(dirname(resolve(ws))) === "closed") return [];
+  const wrote: string[] = [];
+  for (const arc of arcIdsOf(ws)) {
+    const data = readArc(ws, arc);
+    const path = previewOf(ws, arc);
+    if (!data || typeof data.status !== "string" || !isFile(path)) continue;
+    const text = readFileSync(path, "utf8");
+    const next = previewWithStatus(text, arc, data.status);
+    if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path)); }
+  }
+  return wrote;
 }
 
 /** One question rendered as the approach template's card. */

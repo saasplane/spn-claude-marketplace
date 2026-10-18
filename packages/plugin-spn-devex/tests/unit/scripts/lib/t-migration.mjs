@@ -1,7 +1,7 @@
 // `lib/migration.ts` — the migrations a release ships, the workspace's ledger, and where each one
 // stands. Each case is a throwaway workspace: migration 001's own check over a workstream kept in the
 // old shape and one kept as data, and made-up migrations for a script, steps and the id order.
-import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { arcData, cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
@@ -32,7 +32,7 @@ const current = (name) => workspace(name, {
   [`${OLD}/notes/N001/preview.html`]: "<p>the probe</p>\n",
 }, [], { migrated: false });
 
-const [m001, m002] = MIGRATIONS;
+const [m001, m002, m003] = MIGRATIONS;
 
 console.log("=== the plugin's migrations");
 {
@@ -75,7 +75,7 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -138,6 +138,25 @@ console.log("\n=== 002 — each arc's address, goal and name file, and the level
   cli(root, ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered", "--subject", "probe"]);
   cli(root, ["docs", "cycles", "write", "031"]);
   ok("green: links rewritten, goal and short subject written, cycles write run — 002 finds nothing", m002.check(root).length === 0, m002.check(root).join(" | "));
+}
+
+console.log("\n=== 003 — a preview's header shows the arc's status");
+{
+  ok("the plugin ships 003 third, with a version, one sentence and a script", m003.id === "003" && /^\d+\.\d+\.\d+$/.test(m003.version) && m003.changed.endsWith(".") && typeof m003.script === "function");
+  const { root, ws } = await dataWorkspace("statuses-003");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  const old = `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N001</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span></span></div><h1>Probe</h1></header>\n`;
+  writeFileSync(preview, old);
+  mkdirSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001"), { recursive: true });
+  writeFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), old);
+  const found = m003.check(root);
+  ok("red: 003 names the preview whose header shows its own status, not the arc's", found.length === 1 && found[0] === "open/031-probe/notes/N001/preview.html: its header does not show the arc's status → the arc's commands write it", found.join(" | "));
+  const lines = m003.script(root);
+  ok("its script writes it, and names the preview", lines.join() === "open/031-probe/notes/N001/preview.html: wrote the arc's status", lines.join(" | "));
+  ok("green: 003 then finds nothing", m003.check(root).length === 0, m003.check(root).join(" | "));
+  ok("the preview reads Status DECIDED, the arc's own, linking its row, and its Arc fact is gone",
+    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
+  ok("a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 
 console.log("\n=== a broken ledger → reported, never written over");
