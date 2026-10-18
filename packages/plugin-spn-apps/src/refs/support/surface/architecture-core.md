@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "da59e6e3"
+      "seen": "a3b5b804"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "c7134025"
+      "seen": "02f63dfe"
     }
   ]
 }
@@ -112,6 +112,7 @@ Text is drawn in one of three families, and each family has its steps.
 - **Title runs from `TITLE_XXS` to `TITLE_XXL5`, and Heading from `HEADING_XXS` to `HEADING_XXL5`. Content runs to `CONTENT_XXL5`** (`RD.SUPPORT.SURFACE.102`, `RD.SUPPORT.SURFACE.225`). `CONTENT_XXL` to `CONTENT_XXL5` are 20, 24, 28, 32 and 36px with lines of 1.5, 1.45, 1.4, 1.35 and 1.3, each under the Title step of the same name. The steps from `XXL` to `XXL5` carry the names of the larger scale sizes, so a title, an icon, a mark and an avatar of one step name stand together.
 - **The Heading scale MUST start at `HEADING_XXS`, 14px, with `HEADING_XS` at 18px and `HEADING_SM` at 22px** (`RD.SUPPORT.SURFACE.142`). Each is semibold. From `HEADING_MD` up the steps keep their sizes on a desktop, so each level of a page has a step for its title.
 - **A title and a heading may have the same size, and they then differ by weight.** Both families have a step at 14px, at 18px and from 24 to 56px. Which family a title takes is the level of the page it names (`architecture-components.md`).
+- **A website's words are 14px or larger; only data and code shown inside a demo may be smaller** (`RD.SUPPORT.SURFACE.227`). A lead, a caption, a line under tabs, a footer line and a step's description are `CONTENT_MD` or above.
 - **A type step sets the size and the weight of a text, and nothing else** (`RD.SUPPORT.SURFACE.103`). Whether a text is a heading of the page is its element, which `DSText` takes through `element`. So a large number in a heading step is not announced as a section unless the page says so. The element of a title comes from the nesting of its boxes, never from its family (`RD.SUPPORT.SURFACE.106`).
 - **The steps `HEADING_XXS` to `HEADING_XL` MUST take a line of 1.2 times their size, and `HEADING_XXL` to `HEADING_XXL5` a tighter line of 1.1.** A Title step takes a line of 1.3, and a Content step a line of 1.5.
 
@@ -131,6 +132,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.141` | the neutral shades of the surfaces and the text in light and in dark, and small text a person reads is never subtle |
 | `RD.SUPPORT.SURFACE.101` | the pixels an icon, a mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content runs to `CONTENT_XXL5` |
+| `RD.SUPPORT.SURFACE.227` | a website's words are 14px or larger, and only data and code shown inside a demo may be smaller |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
 | `RD.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |
