@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "bfeda195"
+      "seen": "352732fd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "66124962"
+      "seen": "e80978b0"
     }
   ]
 }
@@ -21,7 +21,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The rule — 🔮
 
-1. A showcase is a list of eight sections in one order: Welcome, Sample apps, App, Layout, Container, Widget, Components and Standards. App, Layout, Container, Widget and Components are the Surface standard's groups, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
+1. A showcase is a list of seven sections in one order: Welcome, Standards, App, Layout, Container, Widget and Components. Welcome holds the sample apps as a folder. Standards is the ground every group stands on, and App, Layout, Container, Widget and Components are the Surface standard's groups, from the whole app inwards, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
 2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them.
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
@@ -54,18 +54,17 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The layers, the groups and the units — 🔮
 
-The showcase is eight sections, each a root of the sidebar, in this order, none nested inside another. Five of them are the Surface standard's groups, the layers its architecture builds a surface from: App, Layout, Container, Widget and Components, so a reader who knows the standard finds each by its own name. The first layer, the core, is Standards. The levels of a page that are not groups, Page, Group, Content and Inline, hold no unit, so they are no section: the Standards page Page levels tells every level.
+The showcase is seven sections, each a root of the sidebar, in this order, none nested inside another. Five of them are the Surface standard's groups, the layers its architecture builds a surface from: App, Layout, Container, Widget and Components, so a reader who knows the standard finds each by its own name. The first layer, the core, is Standards, and it comes straight after Welcome, because every group stands on it; the groups follow from the outside in, the order a screen is built in. The levels of a page that are not groups, Page, Group, Content and Inline, hold no unit, so they are no section: the Standards page Page levels tells every level.
 
 | Section | What it holds |
 | --- | --- |
-| Welcome | three pages written as a small website: Overview, Showcase and Getting started. It opens on the Overview |
-| Sample apps | the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device |
+| Welcome | three pages written as a small website, Overview, Showcase and Getting started, then the folder Sample apps. It opens on the Overview. Showcase opens on *How a screen is built*: one live picture of the groups, one inside the next on the ground of the standards, each labelled, linked to its section and named with its file of the library, then one line for each, Standards first. Sample apps holds the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device |
+| Standards | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
 | App | its Overview, then `DSApp`, `DSContext` and `DSAppContext` |
 | Layout | its Overview, then `DSLayout` and its layouts |
 | Container | its Overview, which names the level its units stand at and links Page levels, then the containers |
 | Widget | its Overview, which names the level its units stand at and links Page levels, then the widgets |
 | Components | Typography, Media, Actions, Data entry (Fields, Pickers, Composites), Data display, Navigation, Structure, Feedback, Overlays, Popovers, and Utility last |
-| Standards | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
 
 The group of a unit is its path in the sidebar, so the title of a unit is its group and its name. A unit does not choose its layer: the layer follows from the group.
 
@@ -80,7 +79,7 @@ The group of a unit is its path in the sidebar, so the title of a unit is its gr
 
 The theme is not a page. The toolbar holds a Theme button that opens the theme's sheet on any page, and the theme a person chooses is saved in the browser and followed by every page.
 
-Welcome, Sample apps and Standards hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none.
+Welcome, with its sample apps, and Standards hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
 
 The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
 
