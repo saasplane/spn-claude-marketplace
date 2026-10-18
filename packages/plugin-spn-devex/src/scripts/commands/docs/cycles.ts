@@ -302,11 +302,14 @@ export function arcCell(cycle: Cycle): string {
   return `${CELL_LINE}<strong>${escape(arcLabel(cycle))}</strong></p>${description}<span class="sds-small">${factsCell(cycle)}</span>`;
 }
 
-/** The Status cell's HTML: the word, then for HELD, CARRIED and DROPPED the reason below it in small text. */
+/**
+ * The Status cell's HTML: the status as its badge, whether the arc is kept as data or as Markdown, then for HELD,
+ * CARRIED and DROPPED the reason below it in small text.
+ */
 export function statusCell(cycle: Cycle): string {
   if (!cycle.status) return escape(statusLabel(cycle));
-  if (cycle.kept) return `<span class="sds-badge sds-status sds-${cycle.status.toLowerCase()}">${escape(cycle.status)}</span>`;
-  return cycle.detail ? `${escape(cycle.status)}<br><span class="sds-small">${escape(cycle.detail)}</span>` : escape(cycle.status);
+  const badge = `<span class="sds-badge sds-status sds-${cycle.status.toLowerCase()}">${escape(cycle.status)}</span>`;
+  return cycle.detail ? `${badge}<br><span class="sds-small">${escape(cycle.detail)}</span>` : badge;
 }
 
 /**
@@ -342,7 +345,7 @@ export function rowTag(cycle: Cycle, stamps: Map<string, { stamp: string | null 
 export function tableOf(cycles: Cycle[], stamps: Map<string, { stamp: string | null }> = new Map()): string {
   const rows = cycles.map((cycle) =>
     `      ${rowTag(cycle, stamps)}${rowCells(cycle).map((cell) => `<td>${cell}</td>`).join("")}</tr>`);
-  const statusHead = cycles.some((cycle) => cycle.kept) ? `<th class="sds-status-col">` : "<th>";
+  const statusHead = `<th class="sds-status-col">`;
   return [
     `  <div class="sds-scroll"><table>`,
     `    <thead><tr>${CYCLES_COLUMNS.map((column) => `${column === "Status" ? statusHead : "<th>"}${column}</th>`).join("")}</tr></thead>`,

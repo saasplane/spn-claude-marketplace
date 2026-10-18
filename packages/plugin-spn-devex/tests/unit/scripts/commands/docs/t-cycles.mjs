@@ -128,12 +128,12 @@ try {
   {
     const table = tableOf(cyclesOf(folder));
     ok("the header is Arc · Status, two columns",
-      table.includes("<thead><tr><th>Arc</th><th>Status</th></tr></thead>") && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
+      table.includes('<thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>') && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
     ok("a row is two cells: the Arc cell, and the Status cell with a HELD arc's reason below its word",
       table.includes(`<tr><td><p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p>` +
         `<span class="sds-small">Arc: <a href="arcs/N10-the-release.md">N10-the-release.md</a></span></td>` +
-        `<td>HELD<br><span class="sds-small">waits on Q7</span></td></tr>`), table);
-    ok("a RUNNING arc's Status cell is its word alone", table.includes("<td>RUNNING</td></tr>"), table);
+        `<td><span class="sds-badge sds-status sds-held">HELD</span><br><span class="sds-small">waits on Q7</span></td></tr>`), table);
+    ok("a RUNNING arc's Status cell is its badge alone", table.includes('<td><span class="sds-badge sds-status sds-running">RUNNING</span></td></tr>'), table);
     ok("an arc with no number still links its file",
       table.includes(`<p><strong>a legacy arc with no number</strong></p><p>Prepared: 2026-08-31</p><span class="sds-small">Arc: <a href="arcs/arc-legacy.md">arc-legacy.md</a></span>`), table);
 
@@ -318,7 +318,7 @@ ${linesFor("1.0.0").script}
     ok("[MKT.SCRIPTS.79] the heading of Open names each open card by its number",
       after.includes("<h2>Open &mdash; Q3</h2>") && openHeadingRule(page, after).length === 0);
     ok("[MKT.SCRIPTS.79] one table, one badge and one heading are replaced, each exactly once",
-      count(after, "<table") === count(before, "<table") && count(after, "sds-badge sds-status") === 1 && count(after, "<h2") === count(before, "<h2") &&
+      count(after, "<table") === count(before, "<table") && count(after, "sds-badge sds-status") === 1 + count(after, '<td><span class="sds-badge sds-status') && count(after, "<h2") === count(before, "<h2") &&
       count(after, "<th>Arc</th>") === 1 && !after.includes("<th>Previews</th>") && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
     ok("[MKT.SCRIPTS.79] it adds no generated marker to the page", !after.includes("spn:generated"));
     const writtenAt = stamp(page);
