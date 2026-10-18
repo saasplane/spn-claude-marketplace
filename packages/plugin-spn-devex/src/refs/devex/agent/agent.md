@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "95217087"
+      "seen": "8e6ea6e3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -52,7 +52,14 @@ beside it.
 — MUST** (`RD.DEVEX.AGENT.084`). A discussion about a shape is any exchange with the developer that
 decides what a thing is before it is built. It can open when a workstream is opened, while a preview
 is read, and in the middle of a run. A **view** is a lens speaking through the one agent in that
-discussion: the same lens file that is worn while writing and convened at review, used a third way.
+discussion: the same lens file that is worn while writing and convened at a judgment gate, used a third way.
+
+**There is one lens for each engineering function and each chair at a partner's leadership table**, from the
+CEO's to the partners', each with its real-world title (`refs/devex/agent/lenses.md` § *One file per engineering
+function, and per chair at the table*). The agent stays one: a lens changes what it looks for, never who is reading
+or what was said three turns ago. **The ask router names the lens that owns the kind of thing the developer asked**,
+and that lens is the one the agent puts on; the router and the SaaS Plane way are in every window
+(`refs/devex/agent/way.md`).
 
 | Part | What the agent does |
 | --- | --- |
@@ -64,7 +71,9 @@ discussion: the same lens file that is worn while writing and convened at review
 **The reply says which views it brought, and why those.** One line is enough. `refs/devex/agent/lenses.md`
 says which views speak, how many, and how each one is made. **A view is never a second agent in the
 conversation**: the discussion stays one discussion. A view the one agent makes for itself blocks
-nothing. The review after a draft stays as it is, and only a lens read by a fresh reviewer may block.
+nothing. Only a lens read by a fresh reviewer at a judgment gate may block — the design gate, a change to the
+published surface, or a release (`refs/devex/agent/lenses.md` § *Built right while it is made, convened only at a
+judgment gate*).
 
 **How a view is made follows the signs of complexity.** Below two of the three signs, the one agent speaks from the view's lens file, in one sentence when there is no sign. From two signs up, each view is a fresh agent. Whenever a view's word is to count as a review that can block a gate, it is a fresh agent, because a worn lens is never a review. The reply says which way each view was made.
 

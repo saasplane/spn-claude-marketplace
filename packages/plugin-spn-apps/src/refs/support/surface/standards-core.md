@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "7a55e6dd"
+      "seen": "f6edd84b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "5fdeecbf"
+      "seen": "257fb95c"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Standards construct (`docs/02-constructs/02-support/03-surface/01-standards-core.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/01-standards-core/`). Standards is the first of thirteen Surface constructs, in three groups: Standards, Architecture and Delivery.
 
-Read this before you design a page, before you review one, or before you add a second kind of surface. It states what a surface is built in and what one page is for, before any block is named. `standards-interaction.md`, `standards-patterns.md` and the ten `architecture-*` and `delivery-*` refs in this folder carry the rest of the domain; this one is the first.
+Read this before you design a page, before you review one, or before you add a second kind of surface. It states what a surface is built in, what one page is for and how its words follow that, before any block is named. `standards-interaction.md`, `standards-patterns.md` and the ten `architecture-*` and `delivery-*` refs in this folder carry the rest of the domain; this one is the first.
 
 ## Terms
 
@@ -109,6 +109,35 @@ Never write a second version of a page for a density, a theme, a device type or 
 
 An application and a site are built from the same blocks, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. It needs three additions the standard names and states no rule for yet: larger type steps, a full-width section, and site widgets (such as the opening block and a footer in columns). They add to the design system and read the same tokens, so one theme tints a partner's site and their app together.
 
+## The words of a page, by what it is for — 🔮
+
+A page is read in one of three ways, and its words follow the way it is read. In **a doc** — a guide, a reference, a help article — the reader came to learn or to follow steps. On **an app's screen** — an admin, a profile, a sign-in — the person is in the middle of a task. On **a marketing page** — a product site, a landing page, the design system's public landing — the reader is deciding whether to care. This is not a kind of surface: all three can run on the web.
+
+- The writer **MUST** decide what a page is for, from its purpose, before writing a word of it — the question § A page has one purpose asks: what did the person come here to do?
+- A page **MUST** be one of the three, and never two at once. A product site's sign-in is an app's screen; a help article opened from a screen is a doc. A sign-in that argues for the product, a landing page holding a form of settings, and a guide that sells are each a finding.
+- `VOICE` writes the words in all three modes, and `MARKETING` owns what a marketing page says and to whom (the spn-devex plugin's `refs/devex/agent/lenses/`).
+
+**A doc** follows the readability bar (the spn-devex plugin's `refs/devex/workspace/docs/doc-sets.md`), holds no persuasion, and each step names the real command, the real path and what the reader will see.
+
+**An app's screen** gets the task done and stays out of the way.
+
+| Its words | Their rule |
+| --- | --- |
+| A label | short, in the product's own words, and held to the rule of a label above |
+| An action | **MUST** start with a verb that says what happens, such as *Save changes*. *OK* or *Submit* alone is a finding |
+| An error | **MUST** say what went wrong and how to fix it, on the line under the field it belongs to |
+| A number | is data the person acts on, never there to impress |
+| What it never holds | persuasion, a slogan or a marketing claim |
+
+**A marketing page** shows a reader who has not decided what they get, and why it matters to them.
+
+- Name the personas first, and what each one needs to hear: a buyer the outcome and the cost of going without it, a builder that it works and how to start.
+- Lead with the problem and the outcome; the how comes lower down, as the proof.
+- Each section **MUST** answer one question a reader asks: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
+- A headline states the outcome, and the line under it gives the proof. A headline that describes the system is a finding.
+- The words **MUST** be a buyer's and a builder's. A word of the system's own — a layer, a task intent, a unit, a seat, a pattern's name — **MUST NOT** stand on the page unless the same sentence explains it.
+- A number **MUST** stand in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear.
+
 ## Motion — ✅
 
 One set of tokens moves every surface. A place has its own clamped duration (`clamp(min, base x --motion-speed, max)`) for the hover, the icon's emphasis, the tooltip, the menu, the collapse, the toast, the dialog, the sheet and the rail. Three eases are shared: `enter` (ease-out) for what arrives, `exit` (ease-in) for what leaves, `move` (ease-in-out) for what changes size or place. `--motion-speed` is the multiplier a theme sets as `motionSpeed` (`DEFAULT` x 1, `FAST` x 0.75, `SLOW` x 1.25), and `--motion-amount` is how far things move.
@@ -149,6 +178,7 @@ A review asks the same questions of any page, each answered from one part of thi
 | --- | --- |
 | Does the page have one purpose, and one main action? | this ref |
 | Does each label, state, count, field and line of a list follow its rule of content? | this ref |
+| Do its words fit what the page is for: a doc, an app's screen or a marketing page? | this ref |
 | Does each intent use its pattern, built from blocks of the design system? | `standards-interaction.md`, `standards-patterns.md` |
 | Does every block drawn from data show every task state? | `standards-interaction.md` |
 | Does every action answer the person: working, done or failed? | `standards-interaction.md` |
@@ -181,6 +211,7 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.061` | a field a person reads has its title above its value, and readings stand in a grid |
 | `RD.SUPPORT.SURFACE.062` | the choices of one set stand in columns |
 | `RD.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
+| `RD.SUPPORT.SURFACE.208` | the words of a page follow what it is for, a doc, an app's screen or a marketing page, decided before a word is written |
 
 ## Proof
 

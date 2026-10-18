@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "02c93b76"
+      "seen": "8d438425"
     }
   ]
 }
@@ -175,6 +175,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 - **Read the tree by level of that pattern in `standards-patterns.md`.** It names the page level, the containers, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
 - **The spec names the layout and the page level a tree starts from** (`RD.DEVEX.WORKSPACE.260`). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
 - **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement. Every title, description and value the tree writes is in the product's own words, and never the name of a pattern, a unit or a level.
+- **The words follow what the page is for** (`RD.SUPPORT.SURFACE.208`). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once: on an app's screen a label is short, an action starts with a verb that says what happens, an error says how to fix it, and nothing persuades; on a marketing page the personas come first, each section answers one reader question, and every number is real. The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.
 
 ## 3. Decide the containers
@@ -350,12 +351,12 @@ The page is a use case, composed from the published library in a file that is no
 
 ## Close
 
-- **Convene the `ux` lens over the tree**, and over the drawing where one exists. Run it through the `spn-panel` subagent, with the spn-devex plugin's `refs/devex/agent/lenses/ux.md`. The context that designed the page does not review it.
-- **Report** the purpose, the facts, the page pattern with its spec, the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. Then give the findings of the lens.
+- **Convene the `ux` and `ui` lenses over the tree at the design gate**, and over the drawing where one exists, and `marketing` as well on a marketing page. Run each through the `spn-panel` subagent, with the spn-devex plugin's `refs/devex/agent/lenses/ux.md`, `ui.md` and `marketing.md`. The context that designed the page does not review it.
+- **Report** the purpose, the facts, the page pattern with its spec, the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. Then give the findings of each lens.
 - **Hand off by name.** The `implement` skill builds the page, in its `ui` step.
 
 ## Lenses
 
-Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you design. The close's review is the same lens convened.
+Wear the spn-devex plugin's `refs/devex/agent/lenses/ux.md` while you place the page — its purpose, pattern, containers and tasks — and `refs/devex/agent/lenses/ui.md` while you choose the blocks, their props and their look. On a marketing page, wear `marketing.md` while you write its words. The close convenes the same lenses at the design gate.
 
 **This file and its step are the standard for anyone reading them.** Their provenance is the foundation book's Surface chapters: standards, interaction, patterns, names, layout and container, and the design library. Those chapters carry the reasoning behind each rule, for a reader who holds the book. Nothing here is deferred to them.

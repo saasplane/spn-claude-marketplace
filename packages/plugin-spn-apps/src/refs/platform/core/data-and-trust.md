@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "ed9ac113"
+      "seen": "388b1f6f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "2f1629dd"
+      "seen": "dc8af578"
     }
   ]
 }
@@ -116,6 +116,12 @@ A value that does not open gives the caller nothing, and nothing falls back to a
 Nothing sensitive is stored where a caller can read it, and nothing is decided there — a control the browser hides is a courtesy, the server refusing the call is the guard. When you write an error path, disclose only what to do next, never what the platform is made of — MUST NOT leak a stack detail, an internal identifier, or anything that turns an error message into a reconnaissance tool.
 
 Every guarantee on this page carries a test identified by a behaviour id, so a trust claim is never just a sentence nobody checked — write your own guarantees the same way, with a case that proves them, so a guarantee that stops holding shows up as a red test rather than a paragraph that quietly became false.
+
+## What a partner follows, by what they build and deliver
+
+A fixed list of security standards would be wrong for most partners, so the answer starts from the product. **The `TRUST` lens guides a partner by what they build and deliver, and never hands them one fixed list — MUST** (`RD.PLATFORM.CORE.042`). It asks who buys the product, in which markets and regions, what data it holds, and whether it takes payments or runs AI, then names the standards that apply, in order, with what each asks of the code and of the estate.
+
+**The floor is met by construction, and a partner inherits it from the modules they compose — MUST**: OWASP ASVS 5.0 Level 2, the OWASP Top 10 and API Security Top 10, and NIST SP 800-63B AAL2, with AAL3 for an administrator's step-up. Every other standard — SOC 2, ISO/IEC 27001 and 27701, GDPR, HIPAA, PCI DSS, FedRAMP, the AI standards, the CIS Benchmarks — is added by the partner's answers. The whole guide, row by row, is the spn-devex plugin's `refs/devex/agent/lenses/trust.md`. A standard's full text is never carried; its detail is read from its own source when a case needs it.
 
 ## The five pre-ship questions
 

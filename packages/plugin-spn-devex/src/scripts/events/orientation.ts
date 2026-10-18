@@ -542,6 +542,28 @@ export function shortRules(): string {
   return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
 }
 
+/**
+ * The always-loaded index: the SaaS Plane way and the ask router, one line each (RD.DEVEX.AGENT.102).
+ *
+ * IT IS READ FROM THE REF, NEVER TYPED HERE. `refs/devex/agent/way.md` restates the way chapter and the
+ * router, and `restates check` holds it to the book; a copy in this file would be a second home that
+ * drifts. The ref sits two folders above this script both in `scripts/events/` and in `dist/events/`,
+ * because the installed plugin IS `src/`.
+ *
+ * EVERYTHING ELSE IS READ ON DEMAND. A lens file is loaded only for the task that calls for it, so a
+ * window starts with this index and nothing more; a test holds it under 2,000 tokens. A missing ref
+ * costs the index and never the window: the block is dropped and orientation carries on.
+ */
+export function wayIndex(): string {
+  let text: string;
+  try { text = read(fileURLToPath(new URL("../../refs/devex/agent/way.md", import.meta.url))); }
+  catch { return ""; }
+  if (!text) return "";
+  const body = text.replace(/<!--[\s\S]*?-->\s*/g, "").trim();
+  // One level down, so the index sits under the context's own headings rather than beside its title.
+  return body.replace(/^(#{1,5}) /gm, "#$1 ") + "\n\n";
+}
+
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
                 unwired: number; stale: string | null; behind: string | null; rung: string | null };
 
@@ -764,7 +786,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
           "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, message + note + "\n" + shortRules()];
+    return [message, message + note + "\n" + wayIndex() + shortRules()];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -846,7 +868,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
     "anything.\n";
-  return [message, message + "\n\n" + clean(lines) + note + "\n" + shortRules()];
+  return [message, message + "\n\n" + clean(lines) + note + "\n" + wayIndex() + shortRules()];
 }
 
 if (runAlone("orientation.ts")) {
