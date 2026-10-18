@@ -111,12 +111,14 @@ console.log("\n=== the generated blocks — progress and open");
   const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PART-LANDED" }]);
   ok("progress: a subject is shown as words, and a two-word status is one class", words.includes("</span> workstream data</a>") && words.includes('class="sds-arc sds-part-landed"'), words);
   ok("progress: no arc, no grid", !lib.progressInside("/nowhere", []).includes("sds-arcs"));
-  ok("progress: a sticky status bar closes the block — a thick line filled to rows done of all, the overall text, then a chip row",
-    inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.includes('<div class="sds-footbar-line"><i style="width:50%"></i></div>')
-      && inside.includes('<p class="sds-footbar-text">Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed</p>') && inside.includes('<div class="sds-footbar-chips">'), inside);
-  ok("progress: a chip links its row, carries its status word, and holds number and name, badge beside done/total, and a thin bar",
-    /<a class="sds-chip sds-decided" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001<\/span><span class="sds-chip-subject"> probe<\/span><\/span><span class="sds-chip-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><\/a>/.test(inside), inside);
-  ok("progress: no arc, a bar with its line and no chip row", (() => { const none = lib.progressInside("/nowhere", []); return none.includes("sds-footbar-line") && !none.includes("sds-footbar-chips"); })());
+  ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall line, and no line along its top edge",
+    inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-text')
+      && inside.includes('<p class="sds-footbar-text">Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed</p>') && !inside.includes("sds-footbar-line"), inside);
+  ok("progress: a chip links its row, carries its status word and its progress step, and holds number and name, badge beside done/total, and a thin bar",
+    /<a class="sds-chip sds-decided sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001<\/span><span class="sds-chip-subject"> probe<\/span><\/span><span class="sds-chip-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><\/a>/.test(inside), inside);
+  ok("progress: the shade steps are 0-19, 20-39, 40-59, 60-79, 80-99 and done at 100",
+    [[0, 10, "1"], [1, 10, "1"], [2, 10, "2"], [4, 10, "3"], [6, 10, "4"], [8, 10, "5"], [99, 100, "5"], [10, 10, "done"], [0, 0, "1"]].every(([d, t, want]) => lib.progressStep(d, t) === want));
+  ok("progress: the card is written with the first arc, whatever its status, and not before", lib.progressInside("/nowhere", [{ ...data, status: "PROPOSED" }]).includes("sds-footbar-chips") && !lib.progressInside("/nowhere", []).includes("sds-footbar"));
   const { CARD } = await import("../../../helpers/workstream-fixture.mjs");
   const { title, ...card } = CARD;
   const html = lib.cardHtml({ id: "q7", title, card });

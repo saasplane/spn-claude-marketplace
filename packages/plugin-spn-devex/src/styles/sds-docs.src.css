@@ -593,45 +593,44 @@
     .sds-arcs{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
 
-  /* THE STICKY STATUS BAR of an approach page, fixed to the bottom of the window and about 72px tall: the overall
-   progress as a thick line along its top edge with the overall text at its left, and under it one row of arc
-   chips. A chip is the number and short name, the status badge beside done/total, and a thin bar in the tile's
-   colours. The row scrolls sideways inside itself, snapping to a chip and fading at both edges, so the page
-   never scrolls sideways. The chip whose arc is on screen carries `sds-here`, set by the page script. The page
-   gains room at its foot so nothing is covered, a phone keeps the number and the badge, and print hides it. */
-  .sds-footbar{@apply bg-card fixed inset-x-0 bottom-0 z-40 grid; grid-template-rows:4px auto minmax(0,1fr); height:72px; border-top:1px solid var(--sds-rule); box-shadow:0 -4px 12px rgb(0 0 0 / .08)}
-  body:has(.sds-footbar){padding-bottom:72px}
-  .sds-footbar-line{@apply bg-rule; height:4px}
-  .sds-footbar-line i{@apply block h-full bg-accent}
-  .sds-footbar-text{@apply font-mono text-xs text-fact whitespace-nowrap overflow-hidden; max-width:none; margin:0; padding:.15rem 12px 0; line-height:1.2; text-overflow:ellipsis}
-  .sds-footbar-chips{@apply flex overflow-x-auto overflow-y-hidden; gap:.5rem; padding:1px 12px 5px; scroll-snap-type:x proximity; scroll-padding:0 12px; scrollbar-width:none; overscroll-behavior-x:contain;
-    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%); mask-image:linear-gradient(to right,transparent 0,#000 12px,#000 calc(100% - 12px),transparent 100%)}
+  /* THE STICKY CARD of an approach page, fixed to the bottom of the window within the page's width, with a gap
+   from the window's edges: one card of two sections side by side, divided by a line. The arcs are on the left,
+   about 80%, one chip each in a row that scrolls sideways inside its section and is never scrolled by the page;
+   the overall line is on the right, about 20%. A chip is the number and short name, the status badge beside
+   done/total, and a thin bar whose shade says how far along the arc is: five steps of one hue by rows done, and
+   the success green at 100%. The chip whose arc is on screen carries `sds-here`. The page gains room at its foot,
+   a phone keeps the summary to its numbers, and print hides the card. */
+  :root{
+    --sds-step-1:color-mix(in srgb,var(--sds-accent) 22%,var(--sds-rule)); --sds-step-2:color-mix(in srgb,var(--sds-accent) 38%,var(--sds-rule));
+    --sds-step-3:color-mix(in srgb,var(--sds-accent) 55%,var(--sds-rule)); --sds-step-4:color-mix(in srgb,var(--sds-accent) 75%,var(--sds-rule));
+    --sds-step-5:var(--sds-accent); --sds-step-done:var(--sds-ok);
+  }
+  .sds-footbar{@apply bg-card fixed bottom-3 z-40 grid; left:0; right:0; margin:0 auto; width:min(calc(100vw - 1.5rem),var(--sds-page-max)); grid-template-columns:minmax(0,4fr) minmax(0,1fr); height:4.75rem; border:1px solid var(--sds-rule); border-radius:6px; box-shadow:0 4px 16px rgb(0 0 0 / .14); overflow:hidden}
+  body:has(.sds-footbar){padding-bottom:6rem}
+  .sds-footbar-text{@apply font-mono text-xs text-fact; max-width:none; margin:0; padding:.5rem .8rem; line-height:1.4; border-left:1px solid var(--sds-rule); display:flex; align-items:center; overflow:hidden}
+  .sds-footbar-chips{@apply flex overflow-x-auto overflow-y-hidden; gap:.5rem; padding:.5rem .7rem; scroll-snap-type:x proximity; scroll-padding:0 .7rem; scrollbar-width:none; overscroll-behavior-x:contain; min-width:0;
+    -webkit-mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%); mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%)}
   .sds-footbar-chips::-webkit-scrollbar{display:none}
-  .sds-chip{@apply flex flex-col bg-card no-underline text-title; --sds-arc:var(--sds-accent); flex:0 0 auto; width:11.5rem; min-width:0; scroll-snap-align:start; gap:1px; justify-content:center; border:1px solid var(--sds-rule); border-radius:3px; padding:1px .5rem 2px}
+  .sds-chip{@apply flex flex-col bg-card no-underline text-title; --sds-arc:var(--sds-step-1); flex:0 0 auto; width:12rem; min-width:0; scroll-snap-align:start; gap:.3rem; justify-content:space-between; border:1px solid var(--sds-rule); border-radius:4px; padding:.35rem .55rem .4rem}
   .sds-chip:hover{@apply border-accent}
   .sds-chip.sds-here{@apply border-accent; box-shadow:0 0 0 1px var(--sds-accent)}
-  .sds-chip-name{@apply text-xs whitespace-nowrap overflow-hidden; line-height:1.2; text-overflow:ellipsis}
+  .sds-chip-name{@apply text-xs whitespace-nowrap overflow-hidden; flex:none; line-height:1.5; text-overflow:ellipsis}
   .sds-chip-name .sds-mono{@apply font-bold}
-  .sds-chip-line{@apply flex items-center justify-between; gap:.4rem}
-  .sds-chip-line .sds-badge{padding:0 .4rem; font-size:.58rem; letter-spacing:.04em; line-height:1.3}
-  .sds-chip-bar{@apply block bg-rule overflow-hidden; height:3px; border-radius:999px}
+  .sds-chip-line{@apply flex items-center justify-between; flex:none; gap:.4rem}
+  .sds-chip-line .sds-badge{padding:0 .4rem; font-size:.58rem; letter-spacing:.04em; line-height:1.4}
+  .sds-chip-bar{@apply block bg-rule overflow-hidden; flex:none; height:4px; border-radius:999px}
   .sds-chip-bar i{@apply block h-full; background:var(--sds-arc)}
-  .sds-chip.sds-proposed{--sds-arc:var(--sds-arc-proposed)}
-  .sds-chip.sds-decided{--sds-arc:var(--sds-arc-decided)}
-  .sds-chip.sds-running{--sds-arc:var(--sds-arc-running)}
-  .sds-chip.sds-held{--sds-arc:var(--sds-arc-held)}
-  .sds-chip.sds-part-landed{--sds-arc:var(--sds-arc-part-landed)}
-  .sds-chip.sds-landed{--sds-arc:var(--sds-arc-landed)}
-  .sds-chip.sds-carried{--sds-arc:var(--sds-arc-carried)}
-  .sds-chip.sds-dropped{--sds-arc:var(--sds-arc-dropped)}
-  .sds-chip.sds-landed,.sds-chip.sds-carried,.sds-chip.sds-dropped{@apply bg-transparent text-fact}
-  .sds-chip.sds-landed .sds-chip-bar i,.sds-chip.sds-carried .sds-chip-bar i,.sds-chip.sds-dropped .sds-chip-bar i{opacity:.5}
+  .sds-chip.sds-step-1{--sds-arc:var(--sds-step-1)}
+  .sds-chip.sds-step-2{--sds-arc:var(--sds-step-2)}
+  .sds-chip.sds-step-3{--sds-arc:var(--sds-step-3)}
+  .sds-chip.sds-step-4{--sds-arc:var(--sds-step-4)}
+  .sds-chip.sds-step-5{--sds-arc:var(--sds-step-5)}
+  .sds-chip.sds-step-done{--sds-arc:var(--sds-step-done)}
   @media (max-width:40rem){
-    .sds-chip{width:auto; min-width:5.2rem}
+    .sds-footbar{grid-template-columns:minmax(0,1fr) 6.2rem}
+    .sds-footbar-text{font-size:.62rem; padding:.4rem .5rem}
+    .sds-chip{width:auto; min-width:5.6rem}
     .sds-chip-subject{@apply hidden}
-  }
-  @media (prefers-reduced-motion:reduce){
-    .sds-footbar-chips{scroll-behavior:auto}
   }
   @media print{
     .sds-footbar{@apply hidden}

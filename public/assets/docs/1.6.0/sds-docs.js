@@ -191,13 +191,12 @@
   });
 })();
 
-/* The sticky status bar: mark the chip whose arc is on screen, and keep it in view inside the bar's own row.
-   The page never scrolls sideways: only the row's scrollLeft moves. */
+/* The sticky card: mark the chip whose arc is on screen. The row of chips never scrolls by itself; it moves only
+   when the person scrolls it. */
 (function(){
   var bar=document.querySelectorAll('.sds-footbar-chips')[0];
   if(!bar)return;
   var chips=Array.prototype.slice.call(bar.querySelectorAll('a.sds-chip'));
-  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var pending=false,current=null;
   function mark(){
     pending=false;
@@ -215,9 +214,6 @@
     current=best;
     if(!best)return;
     best.classList.add('sds-here');
-    var left=best.offsetLeft-bar.offsetLeft,right=left+best.offsetWidth;
-    if(left<bar.scrollLeft||right>bar.scrollLeft+bar.clientWidth)
-      bar.scrollTo({left:Math.max(0,left-12),behavior:reduce?'auto':'smooth'});
   }
   function ask(){if(!pending){pending=true;window.requestAnimationFrame(mark);}}
   window.addEventListener('scroll',ask,{passive:true});
