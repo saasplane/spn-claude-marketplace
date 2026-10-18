@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "0a8dc01b"
+      "seen": "96e36300"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "e8c9aca9"
+      "seen": "98eaaba3"
     }
   ]
 }
@@ -62,6 +62,7 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163`, `166` and 
 - **The surface a block stands on is one value, a `color` and a `strength`, set by what draws a fill and read by the tokens** (`RD.SUPPORT.SURFACE.199`). A block that draws a fill writes `data-surface-color` and `data-surface-strength`, and the stylesheet re-points every role token under them, in one set named `--surface-*` (`--surface-color-fill`, `--surface-fg`, `--surface-color-hover`, `--surface-line`, the entry set). Where a surface has a colour, the `PRIMARY` main action takes the colours of the open `SOLID` entry, so on `PRIMARY` `SOLID` it is white with the brand's text.
 - **A control that draws its own box stands on the page inside it** (`RD.SUPPORT.SURFACE.199`). Its text, muted text, lines and field are the page's, held as `--page-*`, so its text reads on its field on every colour; its label and description outside the box keep the surface's colours, and a borderless field in another's addon, marked `ds-control-bare`, reads the surface.
 - **Where a surface has a colour other than `BASE`, the neutral and the primary tint are a share of the surface's own text colour** (`RD.SUPPORT.SURFACE.199`). An avatar's fallback, the chip of an avatar group and a neutral or primary `SUBTLE` or `QUIET` badge take `--surface-tint-subtle` and `--surface-tint-quiet` and the surface's text; on `BASE` the tints stay the page's. A status badge (`INFO`, `SUCCESS`, `WARNING`, `ERROR`) keeps its own wash on a fill, so states draw apart as on the page, and its words take the surface's text, so they read at 4.5 to 1.
+- **A `PRIMARY` badge on a grey fill MUST keep the brand's own tint and words** (`RD.SUPPORT.SURFACE.210`). On `DEFAULT` at `SUBTLE` or `QUIET` the badge, shown or with an anchor, reads the page's primary tint and its text, the `--page-primary-*` tokens, so a wash of the brand stands off the grey as it does off the page. On `DEFAULT` `SOLID` and on a fill of the brand the rule above stands, and every other unit keeps the surface's tints.
 - **A unit that is shown and never chosen MUST take the lighter tints on a fill other than `BASE`.** A mark, an avatar and a badge with no anchor name the shown tints, `--shown-*`, with the entry's tint as their fallback; a fill other than `BASE` sets them and `BASE` inside a fill resets them, so no unit reads the surface itself. On a fill, `SUBTLE` is the surface's text at 12 %, the strength a `SUBTLE` tint has on the page, `QUIET` the entry's `SUBTLE` step, and their initials and icons the surface's muted text. A status hue keeps its own wash; the entries of a navigation keep the stronger tints.
 - **A card or a container takes `color` and `strength`, `BASE` by default. A dialog, a sheet and a drawer are `BASE`, and a popover, a menu and a tooltip are raised, each fixed.**
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. The fill of `SUBTLE` in the default hue is the text colour mixed into transparency.
@@ -138,6 +139,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.199` | the surface is one value, a colour and a strength, set by what draws a fill; the tokens are `--surface-*` and the main action reads the fill |
 | `RD.SUPPORT.SURFACE.163` | the values of the roles and lines, the divider and the overlay, and the fills of cards, containers and overlays |
 | `RD.SUPPORT.SURFACE.164` | the display steps of the Heading and Title scales take smaller values on a phone |
+| `RD.SUPPORT.SURFACE.210` | a `PRIMARY` badge on a grey fill, `DEFAULT` at `SUBTLE` or `QUIET`, keeps the brand's own tint and words, the page's |
 | `RD.SUPPORT.SURFACE.166` | the description of an item is quiet but for `INLINE`, the subtle tone, muted on a hovered or chosen row, and the outline badge's line |
 | `RD.SUPPORT.SURFACE.203` | the theme's temperature of the greys, the brand as a fill parted from the brand as text in dark, and the dark body text one step down |
 | `RD.SUPPORT.APPS.152` | the spacing and size scale is a token group beside the roles, and a block reads a role token and the scale, never a ramp step or a number of its own |

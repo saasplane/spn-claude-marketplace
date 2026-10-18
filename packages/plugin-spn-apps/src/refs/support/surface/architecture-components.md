@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "40ee458d"
+      "seen": "8f8af9f2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "c34a4d16"
+      "seen": "461252e0"
     }
   ]
 }
@@ -131,7 +131,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
 | `DSColorPicker` | **A swatch that opens the colour picker of the device, with the colour's code beside it.** `showValue` shows the code in a field, and a person may type the code there in place of picking. **It MUST write and show a hex code in capitals, such as `#1A365D`,** whether typed or picked. A code stored in small letters is shown in capitals and left as stored until a person changes the colour. **A typed colour MUST be a hex code of six digits with its `#`,** in either case, taken when the person presses Enter or leaves the field. A text that is no such code leaves the colour as it was, and the field shows its error state. **It MAY hold no colour:** the swatch then has a dashed edge and no fill, and `clearable` offers an action that empties it |
 | `DSProgressCircle` | **Progress as a ring.** The ring fills to `value` out of `max`, and `showValue` writes the value inside it. With `indeterminate` the ring turns and reads no value. It is a block of its own beside `DSProgress`: the bar and the ring share no picture |
-| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel. **The page level of the tabs MUST decide their look** (`RD.SUPPORT.SURFACE.113`): `DSTabs` takes `pageLevel`, with the level of its box when unset, and a page chooses no look for them. "The tabs by level" below states each look |
+| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel. **The page level of the tabs MUST decide their size, and their look where the page names no `type`** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`): `DSTabs` takes `pageLevel`, with the level of its box when unset, and an app's page chooses no look for them. A website's pages name `type` `PILL`. "The tabs by level" below states each look |
 | `DSPagination` | **The pager MUST arrange itself by the width of its own place, and not by the width of the window** (`RD.SUPPORT.SURFACE.133`). A pager stands in the footer of a full page and in a narrow column of a wide window, and the device type is the same in both. With no choice of rows on a page, the page controls stand in the middle. With the choice, the choice stands at the start and the page controls at the end. In a narrow place the choice is not drawn, and the page controls stand alone in the middle. A page offers no choice where the number of rows is decided already, such as a data table at the side of a detail |
 | `DSFormatDate` · `DSFormatDateTime` | **A line that says when something happened MAY show how long ago it was, through `type`** (`RD.SUPPORT.SURFACE.122`). `type` takes `DSFormatDateType`: `DEFAULT`, the date as it is written, and `AGO`, how long ago in words, such as *yesterday* or *2 days ago*, in the app's language and in the largest whole unit. Such a line says roughly when a thing last changed: a version, a record in a list, a comment. `AGO` stays how long ago however old the moment is. On `DSFormatDate` it counts days of the calendar and never shows a unit under a day. **The exact date and time MUST be reachable from it:** it is the tooltip of the words, and it is in their accessible name. **Where a page is a log of what happened, each line MUST show the date and the time, and not how long ago:** an audit log, a log of the notifications sent, the runs of a scheduled job, a list of sign-ins |
 | `DSFormatTime` · `DSFormatDateTime` · a picker of a time | **A block that shows or takes a time MUST use the format the page gives it, else the app's, and it MUST hold no time format of its own** (`RD.SUPPORT.SURFACE.123`). The app context always holds a time format. A picker of a time with no clock of its own reads in the clock of that format |
@@ -154,14 +154,24 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 ### The tabs by level
 
-| `pageLevel` | The tabs are | Their look | At the size of the theme, `SM` |
+| `pageLevel` | The tabs are | Their look, with no `type` | At the size of the theme, `SM` |
 | --- | --- | --- | --- |
-| `PAGE` | the sub-pages of a page | the line: the open tab has a line under it in the primary colour, and no fill | a label of 16px in a row of 40px |
-| `CONTAINER` · `WIDGET` | the parts of a container or of a card | the line | a label of 14px in a row of 36px |
-| `GROUP` · `CONTENT` · `INLINE` | two ways to show one thing | the filled row: the open tab is a raised pill on a filled bar | a label of 13px in a row of 32px |
+| `PAGE` | the sub-pages of a page | `LINE` | a label of 16px in a row of 40px |
+| `CONTAINER` · `WIDGET` | the parts of a container or of a card | `LINE` | a label of 14px in a row of 36px |
+| `GROUP` · `CONTENT` · `INLINE` | two ways to show one thing | `SWITCH` | a label of 13px in a row of 32px |
+
+- **A page MUST name the `type` of its tabs only where the level's look does not belong, and the pages of a website MUST take `PILL`** (`RD.SUPPORT.SURFACE.209`). `type` takes `DSTabsType` and changes the look alone: the level still gives the size, and the keys and the focus ring are the same in each type. An app keeps choosing by level.
+
+  | `type` | Its look | Where it belongs |
+  | --- | --- | --- |
+  | `LINE` | the underline: the open tab is the primary colour over a line, and no fill | the pages of an app, and the parts of its containers and cards |
+  | `SWITCH` | a sunken bar, with a raised pill on the open tab | two ways to show one thing, inside a part of a page |
+  | `PILL` | a floating bar, raised in the fill and the line of its surface, fully rounded, roomier than the switch; the open tab a soft fill of the brand with a label stronger in colour and in weight | the pages of a website, in its top bar |
+
+- **A unit that takes a page level MUST be given its `pageLevel` first, and its `size` only to override the size the level gives** (`RD.SUPPORT.SURFACE.209`). `DSItem` and `DSItemFacts` take no `size`, so the level is all a page gives them.
 
 - **The `size` of the tabs picks the step, and the level says how far above it the tabs are drawn.** At `GROUP`, `CONTENT` and `INLINE` a tab is drawn at the step of its size. At `CONTAINER` and `WIDGET` it is drawn one step above, and at `PAGE` two steps above, and never above `XL`. A step gives the label its content step and the row the height of a control.
-- **Tabs that say no level draw the filled row.** The tabs of the parts of a container or of a card say `CONTAINER` or `WIDGET`, and the tabs that lead to the sub-pages of a whole page say `PAGE`.
+- **Tabs that say no level and no type draw the switch.** The tabs of the parts of a container or of a card say `CONTAINER` or `WIDGET`, and the tabs that lead to the sub-pages of a whole page say `PAGE`.
 - **In a `flush` part, the tabs MUST place their first tab and their panel by the inset of their place** (`RD.SUPPORT.SURFACE.118`). The label of the first tab starts at that inset, so it starts where the text under it starts. The line of the tabs still runs from edge to edge. The panel takes the same inset at its sides, and what it holds stands in a padded place. So a title in the panel takes no inset of its own, and a code view or a table in the panel keeps its border.
 - **A page MUST NOT write a padding for the tabs or for their panel.** The part says that it is `flush`, and the tabs do the rest.
 
@@ -515,6 +525,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.190` | every overlay takes its width from one scale, `extent`, `XS` 320 px to `XL` 720, and its padding from `size`; a sheet and a drawer default to `MD`, a dialog to `XL` |
 | `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens, a role for each kind of unit, icon motions moved only by their holder, and one reduced-motion rule |
 | `RD.SUPPORT.SURFACE.204` | a row that scrolls sideways is `DSHScroll`, its arrows sized from its size and standing on the ground the row stands on, or on a scrim over a picture |
+| `RD.SUPPORT.SURFACE.209` | `DSTabs` takes a `type`, `LINE`, `SWITCH` or `PILL`, the level giving the size and the look where no type is named, a website's pages taking `PILL`; a unit that takes a page level is given its `pageLevel` first and its `size` only to override |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof
