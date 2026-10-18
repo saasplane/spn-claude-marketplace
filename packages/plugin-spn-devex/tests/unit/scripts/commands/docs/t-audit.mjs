@@ -1628,5 +1628,17 @@ console.log("\n=== the set `--finding` takes is the names the audit's own findin
   one("and a name of another command, such as `page` or `face`, is not in the set", FINDINGS.includes("page") || FINDINGS.includes("face"), false);
 }
 
+// A NAMED PATH THAT IS NOT THERE IS A FINDING (N010-25). `check` once threw an ENOENT stack for it.
+{
+  const root = repo({});
+  const gone = join(root, "no", "such", "page.html");
+  const said = run(root, ["audit", "check", gone]);
+  let status = 0;
+  try { execFileSync(process.execPath, [TOOL, "docs", "audit", "check", gone], { cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); } catch (error) { status = error.status; }
+  one("[MKT.SCRIPTS.130] `audit check` of a path that does not exist names it as a RULE finding, with no stack",
+    said, (got) => got.includes("✗ RULE audit") && got.includes("no such file or folder") && !got.includes("ENOENT"));
+  one("[MKT.SCRIPTS.130] and exits 1", status, 1);
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

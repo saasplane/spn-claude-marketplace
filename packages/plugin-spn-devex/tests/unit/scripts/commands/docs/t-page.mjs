@@ -366,5 +366,22 @@ console.log("\n=== `docs page` needs its action as a word, and both actions need
   delete process.env.SPN_TEMPLATES;
 }
 
+// A NAMED PATH THAT IS NOT THERE IS A FINDING (N010-25). `check` once exited 0 and printed nothing for
+// a path that did not exist, so a mistyped path read as a clean run.
+{
+  const root = repo({});
+  const gone = join(root, "no", "such", "page.md");
+  const exitOfRun = (args) => { try { execFileSync(process.execPath, [TOOL, "docs", ...args], { cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; } catch (error) { return error.status; } };
+  one("[MKT.SCRIPTS.130] `check` of a path that does not exist names it as a RULE finding",
+    run(root, ["page", "check", gone]), (got) => got.includes("✗ RULE page") && got.includes("no such file or folder"));
+  one("[MKT.SCRIPTS.130] and exits 1", exitOfRun(["page", "check", gone]), 1);
+  const bare = join(root, "docs", "notes.md");
+  mkdirSync(dirname(bare), { recursive: true });
+  writeFileSync(bare, "# Notes\n");
+  one("a run that read no construct seat says so rather than printing nothing",
+    run(root, ["page", "check", bare]), (got) => got.includes("no construct seat file under that path"));
+  one("and exits 1", exitOfRun(["page", "check", bare]), 1);
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

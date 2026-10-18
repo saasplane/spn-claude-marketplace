@@ -135,5 +135,14 @@ console.log("\n=== a finding is exit 1, whatever the count, and a typing fault i
   one("`restates check` refuses a second book with exit 2", run([book, book], market).code === 2 && run([book, book], market).out.includes("takes one book."));
 }
 
+console.log("\n=== a named book that is not there is a finding, not a quiet pass");
+{
+  const gone = join(BASE, "no-such-book");
+  const refused = typed(["docs", "check", gone], market);
+  one("[MKT.SCRIPTS.167] `restates docs check` of a path that is no book says so as a RULE finding",
+    refused.out.includes("✗ RULE restates") && refused.out.includes("no foundation book"));
+  one("[MKT.SCRIPTS.167] and exits 1", refused.code === 1);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

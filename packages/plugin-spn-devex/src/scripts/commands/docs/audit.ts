@@ -13,7 +13,7 @@
 //
 // Grades: RULE refuses, SOFT reports.
 
-import { readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { type Action, FLAG, OPTIONAL, REQUIRED, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { VARIANTS, audit, gapReport, isAuditedPage, readBlock, resolveWorkspace, walkFiles } from "./_lib.ts";
@@ -46,7 +46,10 @@ function check(args: string[]): number {
   // and the documents it names itself; a path in no repository brings only those.
   const read = new Set<string>();
   const named = new Set<string>();
-  for (const path of paths) {
+  // A NAMED PATH THAT IS NOT THERE IS A FINDING, never a crash and never a quiet pass.
+  const missing = paths.filter((path) => !existsSync(path));
+  for (const gone of missing) console.log(`✗ RULE audit     ${relative(workspace, resolve(gone))}\n         no such file or folder`);
+  for (const path of paths.filter((one) => !missing.includes(one))) {
     const repository = repositoryOf(path);
     if (repository) for (const file of documentsAt(repository)) read.add(file);
     for (const file of documentsAt(path)) { read.add(file); named.add(file); }
@@ -65,6 +68,7 @@ function check(args: string[]): number {
   const selected = (file: string): boolean => !variants.length || variants.includes(variantOf(file));
   const pages = [...named].filter(isAuditedPage).filter(selected);
   if (!pages.length) {
+    if (missing.length) return 1;
     console.log(variants.length && named.size ? `no page under that path declares the variant ${variants.join(" · ")}`
       : named.size ? "no page under that path — a sample, a template and a bundled copy are not audited as pages"
       : "no document under that path");
@@ -82,7 +86,7 @@ function check(args: string[]): number {
   console.log(found.length
     ? `\n${found.length} finding${found.length > 1 ? "s" : ""} — ${rule.length} RULE, ${found.length - rule.length} SOFT, over ${pages.length} page${pages.length > 1 ? "s" : ""}`
     : `\nclean — ${pages.length} page${pages.length > 1 ? "s" : ""}`);
-  return rule.length ? 1 : 0;
+  return rule.length || missing.length ? 1 : 0;
 }
 
 function report(args: string[]): number {

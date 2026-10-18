@@ -116,6 +116,12 @@ export const describe = "the `docs`-kind restatement alone — a drift here owes
 function check(args: string[]): number {
   const { paths } = readWords(args);
   if (paths.length > 1) throw new UsageFault("takes one book.");
+  // A NAMED BOOK THAT IS NOT THERE IS A FINDING. `findBook` answers null for it, and `main` reads
+  // null as "no sibling book, stay quiet" — which let a mistyped path pass as a clean run.
+  if (paths.length && findBook(paths[0], process.cwd()) === null) {
+    console.log(`✗ RULE restates  ${paths[0]}\n         no foundation book here — the path does not exist, or carries no decisions register`);
+    return 1;
+  }
   return main(paths, process.cwd()) > 0 ? 1 : 0;
 }
 
