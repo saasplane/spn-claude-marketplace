@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "6d197120"
+      "seen": "5b4e222a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "7c05f426"
+      "seen": "81749425"
     }
   ]
 }
@@ -65,7 +65,7 @@ The design library holds one file for each layer of the design system that is dr
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
-| A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page, then `footerNode`; a dock's `headerNode` is a band at the top of the content |
+| A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `headerNode`, in a dock or a top nav, is a band directly under the bar, the window's width, and the content's box starts under it; `footerNode` is a band at the page's end |
 | The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
@@ -85,8 +85,9 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw each part of a container with what the tree puts in it.** The header holds the title of the container at its start and its actions after it, as one group at the end; the actions write no size and no variant, because their place gives both (`RD.SUPPORT.SURFACE.178`). The footer holds what closes its work, such as the paging of a listing or the two actions of an entry. The action of one part of the content stands at the end of that part's title.
 - **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
 - **Draw a part named in `unframed` flat.** It takes no frame in any theme, so a change of the top frame's look leaves it as it is. One such part is a header that is the header of the page.
+- **Draw the band of `headerNode` only where the tree fills it.** It stands directly under the bar, the window's width at every body width, with no fill or line of the layout's own: the body's colours stand behind what it holds.
 - **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the page, a band at its end as the top bar is at its start. It runs the window's width, and beside a rail the area's, and what it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content.
-- **Draw the layout as its three parts.** The top frame's fill is the body's, and below `FULL` the body's box is the width, centred, with the body showing on both sides. An attached navigation meets the window's edge: a rail the left, the window's height, and a top bar the top, its fill across the window and its items in the box. An attached content is the box itself, from the navigation, or the window's top, to the bottom, with square corners; beside a rail it is centred in the area beside the rail. A part that is not attached is a rounded container in the box, `--layout-space` from the window and from the part beside it. On a phone every part attaches, and the layout draws its bar with the menu at its start.
+- **Draw the layout as its three parts.** The top frame's fill is the body's, and below `FULL` the body's box is the width, centred, with the body showing on both sides. An attached navigation meets the window's edge: a rail the left, the window's height, and a top bar the top, its fill across the window and its items in the box. An attached content is the box itself, from the navigation, or the window's top, to the bottom, with square corners; beside a rail it is centred in the area beside the rail. A part that is not attached is a rounded container in the box, `--layout-space` from the window and from the part beside it. A raised content beside a navigation that is not raised stands above it, so its shadow falls on the navigation; where both are raised, the navigation stands above. On a phone every part attaches, and the layout draws its bar: the menu at its start, or the way back where a dock has `backTo`, then the nodes `phone` puts in the bar, and the account's avatar at its end.
 - **Draw a card at the level of a widget.** A `DSCard`, a `DSItemCard` or a card of `DSCardWidget` stands in a container's content or on the page. Its title is at `WIDGET`, a part of it at `GROUP`, and its item lines at `CONTENT`.
 - **Draw the parts of a card inside its one frame.** A part of a card pads itself, and `flush` on a part drops that padding. A card hands its size to what it holds, and a `flush` part of a card says so to the blocks in it. A `flush` part of a container around a card does not reach into it. An item line draws no padding or highlight of its own: the part that holds a title gives it no padding at its two sides, and in a `flush` part the inset of its place, and a row of a list gives the line it holds its room and its highlight. The book states these before the library draws them. `divided` is the line between each two parts.
 - **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.

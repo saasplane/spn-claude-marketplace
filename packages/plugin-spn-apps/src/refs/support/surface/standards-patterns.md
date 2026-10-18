@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "fd7c3330"
+      "seen": "ad49771b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "4b074e54"
+      "seen": "78593fca"
     }
   ]
 }
@@ -410,6 +410,22 @@ A listing page is a page whose whole content is the records of one kind. It foll
 - **A listing page whose query takes a page, a text or a filter MUST stay a data table, also where its set is small today** (`RD.SUPPORT.SURFACE.054`). Its search and its paging are sent to the server. A plain table or a list would do neither.
 - **A list of groups and the list of their items are one page.** The two follow Groups and their items, and neither is a listing page of its own.
 
+## The sign-in page — 🔮
+
+A sign-in is not one of the fourteen patterns: it is the page a person passes before any of them, and every app has one, so its shape is stated once (`RD.SUPPORT.SURFACE.205`).
+
+| Level | The sign-in |
+| --- | --- |
+| Layout | `CANVAS`, the body alone, with the container centred in the window, across and down, in a column as wide as a form reads well. A legal line, where the app has one, is the layout's `footerNode` |
+| Page level | none apart from the container: its header holds an item with the step's title, such as *Sign in to Nimbus*, and its line |
+| Container | one `DSContainer` at `SM`, in the theme's look, with `divided` set to `CONTENT`: the first content signs in, and a second content, set apart by its line, holds the other task, *New to Nimbus? Create an account* |
+| Components | in the first content, in this order: the brand as an item at the level `CONTAINER` with its mark; the providers as one centred row of icon buttons of one size, each named by its tooltip; a `DSSeparator` with the label *or*; the fields; the main action across the content; a `DSSeparator` with the label *Other ways to sign in*; and the other ways, such as a passkey, a code by email and single sign-on, as one row of equal outline buttons |
+
+- **A sign-in is one compact container, so the whole of it is seen without a scroll.** Each group stands one step of the scale from the next, and the fields stand one under another, their message lines the space between them.
+- **Every control is a `DSForm.Field`.** A choice between two ways to say who you are, such as an email or a phone, is a `DSToggleGroup` above the one field it switches. The action of a field, such as *Forgot password?*, stands at the end of its label line as `labelEndNode`. A checkbox alone on its line, such as *Remember me*, is a field with `showBlankLabel={false}`.
+- **The providers are icons alone, one row, centred, each its own size with one gap between them**, and never a column of wide buttons.
+- **An alternative stands as an equal of the others, and opens its own step in place.** A one-time code or single sign-on changes the header's title and the content's fields, with a way back to the password, and the page does not move.
+
 ## What every spec shows the same way — 🔮
 
 Every spec draws a part of a page the same way, whichever pattern it belongs to. The rule behind each row is stated once, in the ref the last column names.
@@ -453,6 +469,7 @@ This ref states which pattern covers a given task, and what blocks carry it. It 
 | `RD.SUPPORT.SURFACE.115` | an editor with its preview is one container, and each thing a person writes stands beside its own result |
 | `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole, and a section of one thing is never a container of its own |
 | `RD.SUPPORT.SURFACE.117` | the page that reads a record and the page that changes it hold the same parts in the same order |
+| `RD.SUPPORT.SURFACE.205` | a sign-in is one compact container on a canvas, its providers one row of icons and every control a form field |
 
 ## Proof
 

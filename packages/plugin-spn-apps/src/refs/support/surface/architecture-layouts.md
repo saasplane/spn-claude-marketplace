@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "ccbb022e"
+      "seen": "9db61f74"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "7c05f426"
+      "seen": "81749425"
     }
   ]
 }
@@ -37,12 +37,14 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 ## The types — 🔮
 
-| Layout type | The navigation |
-| --- | --- |
-| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons |
-| `DOCK` | a bar across the top, and the entries in a column beside one page |
-| `TOPNAV` | a bar across the top, with the content below it |
-| `CANVAS` | none: the body alone, for a marketing page, a sign-in or a page of an error |
+| Layout type | The navigation | What it is for |
+| --- | --- | --- |
+| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons | an app a person works in, with many sections: an admin console, the platform |
+| `DOCK` | a bar across the top, and the entries in a column beside one page | one person's or one thing's settings: a profile, an account, set inside another frame |
+| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line |
+| `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
+
+- **Choose a layout by the job of the app, as the table says, and never by how it looks** (`RD.SUPPORT.SURFACE.206`). One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
 
 A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
 
@@ -191,6 +193,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.SURFACE.173` | a top navigation holds the few entries that fit, on one line, and moves none of them |
 | `RD.SUPPORT.SURFACE.199` | each part that draws a fill gives its surface, and the dock's column and band stand by the content |
 | `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |
+| `RD.SUPPORT.SURFACE.206` | a layout is chosen by the job of the app: an admin app, a profile, a website or a sign-in |
 
 ## Proof
 

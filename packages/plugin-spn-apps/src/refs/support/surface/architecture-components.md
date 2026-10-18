@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "a4d67448"
+      "seen": "40ee458d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "f22fffec"
+      "seen": "c34a4d16"
     }
   ]
 }
@@ -138,6 +138,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 - **A block on a fill is `DSSurface`, and what draws a fill gives its surface** (`RD.SUPPORT.SURFACE.199`). `DSSurface` takes `color`, `strength` and `painted`, draws the fill and nothing else, and what it holds reads the fill, the main action included. `useDSSurface` reads the surface for a choice, never to paint; a popover, a menu, a hover card, the body of an overlay and a tooltip give the page's surface again.
 - **A card or a container frame that draws its own fill inside a coloured surface is a surface of its own** (`RD.SUPPORT.SURFACE.199`). It writes `data-surface-color` and `ds-shell` with its colour, or with `BASE` where it has none, so its text and its main action are its own; on the page's own surface a `BASE` block writes nothing.
+- **A row that scrolls sideways is `DSHScroll`, and its arrows stand on the ground the row stands on** (`RD.SUPPORT.SURFACE.204`). With `arrow`, each edge that hides more of the row shows a round arrow button one scale step below the row's `size`, on a fade 40 to 72 px wide, and a press moves the row by four fifths of its width. `arrowType` is `DEFAULT`, the fade from the fill of the page or of the surface the row is on (a band of the brand included), or `OVERLAY`, the scrim, for a row over a picture, the arrow then glass. An arrow fades out at the end it has reached, and a coarse pointer shows none. `DSTabs` turns `arrow` on and passes its size.
 
 ### The overlays, and the two confirmations
 
@@ -434,7 +435,7 @@ An icon moves only because what holds it is hovered, pressed or open; it never m
 | `TURN_90`, `TURN_180` | a quarter or half turn while open |
 
 - The nudges, zooms, turns, lift and fades take the hover duration; `SPIN_ONCE` and `WIGGLE` take the icon's emphasis duration.
-- `hoverNode` shows another icon while the holder is hovered or pressed; the two cross-fade. `DSButton`'s icons, `DSIconMark` and `DSItem`'s media pass both through.
+- `hoverNode` shows another icon while the holder is hovered or pressed; the two cross-fade. `DSButton`'s icons, `DSMark` and `DSItem`'s media pass both through.
 - Under reduced motion an icon swaps but does not move; fades and `hoverNode` stay.
 - The theme's speed is `motionSpeed`: `DEFAULT`, `FAST` or `SLOW`. The loader (`DSSpinner`) is not motion and owns its turning.
 
@@ -513,6 +514,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.199` | the surface a block stands on is one value, a colour and a strength, carried by context and read by tokens; `DSSurface` puts a block on a fill, `painted` stands it on a picture, and a popup sets the page's surface again |
 | `RD.SUPPORT.SURFACE.190` | every overlay takes its width from one scale, `extent`, `XS` 320 px to `XL` 720, and its padding from `size`; a sheet and a drawer default to `MD`, a dialog to `XL` |
 | `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens, a role for each kind of unit, icon motions moved only by their holder, and one reduced-motion rule |
+| `RD.SUPPORT.SURFACE.204` | a row that scrolls sideways is `DSHScroll`, its arrows sized from its size and standing on the ground the row stands on, or on a scrim over a picture |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof

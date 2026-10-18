@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "c2d4a863"
+      "seen": "6d3b9240"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "04e2f1b5"
+      "seen": "3eae90f6"
     }
   ]
 }
@@ -293,7 +293,10 @@ A unit whose props take objects explains each object under its props table, in a
 
 The pages of `DSContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
-App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app under its Usage, in the layout types Rail, Dock and Top nav and floating, with the theme's form in a sheet, and the sample app takes the theme the form applies. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
+App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app for each job of a layout under its Usage, one tab each: an admin app in Rail, a profile in Dock, a website in Top nav and a sign-in on Canvas, with the theme's form in a sheet, and the sample app takes the theme the form applies (`RD.SUPPORT.SURFACE.207`). The pages of `DSLayout` draw the same samples, and the admin app holds one working page for each of the fourteen page patterns. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
+
+- **A sample is designed from its purpose before its units are chosen** (`RD.SUPPORT.SURFACE.207`). Name what the person came to do and the one main action, group the controls by intent, place each beside what it relates to and draw alternatives as equals, then pick the units that carry that. A sample built from a list of parts is a page of parts.
+- **A sample speaks as the product it stands for.** Its titles, descriptions and values are the product's own, such as *Northwind Traders* and *Every order your customers placed*, and never the name of a pattern, a unit or a level. The pattern a page follows is named in the code and in the tables of the Overview, never on the page.
 
 ## Built from the design system's own units — 🔮
 

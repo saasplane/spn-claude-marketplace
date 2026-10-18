@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "6d197120"
+      "seen": "5b4e222a"
     }
   ]
 }
@@ -139,7 +139,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSAttachment` · `DSAttachmentMulti` | `acceptedFileTypes` (a list of these) | `TEXT` · `DOC` · `EXCEL` · `CSV` · `IMAGES` · `PDF` · `ZIP` | `IDSAttachmentType` |
 | Every entry control | `validationType` | `ERROR`; unset, no error is drawn | `DSEntryControlValidationType` |
 | `DSToast` | `placement` | `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT`, `TOP_RIGHT` when unset | `DSToastPlacementType` |
-| `DSHScroll` | `arrowType` | `DEFAULT` · `PRIMARY` · `OVERLAY`, `DEFAULT` when unset | `DSHScrollArrowType` |
+| `DSHScroll` | `arrowType` | `DEFAULT` · `OVERLAY`, `DEFAULT` when unset | `DSHScrollArrowType` |
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |

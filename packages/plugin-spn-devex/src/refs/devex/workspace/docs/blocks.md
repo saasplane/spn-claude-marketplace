@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "7704fd1e"
+      "seen": "a12da83d"
     }
   ]
 }
@@ -260,7 +260,7 @@ Each sub-component stands where it stands on the screen: the start or the end of
 | a frame's own look | a background for `raised`, a solid line for `bordered`, neither for `flat`, and a thin rounded outline for a `card` and for a `container` | the parts of one frame, together. Never a colour that stands for one place against another |
 | a control, a title or a stand-in | nothing of its own | see below |
 
-A **control** carries no tag and takes its own size: the height its real component has at the size step drawn, never stretched to its row and never shrunk to a label's line. **Its state is told by position and by weight, never by a colour**: a switch's knob stands at the end of its track when it is on and at the start when it is off; the chosen tab is heavier and has a line under it; a badge is a small framed word, lower than a button and never with the weight of a main action, so nobody reads it as something to press. A **title** is plain text, never a tagged box and never `em`. **Sample values fill the rest**: a title, a button, a field or a record carries a value a real screen could show, and where the content is many of one thing a stand-in shows the kind with no name. An **icon** is a small square holding one of a small set of plain line shapes the drawer draws itself, with one default where none fits; a skeleton shows no icon of the library. So the icon of an enum, the icon of one of its values and a brand's mark are all the default: a skeleton says that an icon is there, never which one. A badge and a tab may carry an icon before their word, with no square around it.
+A **control** carries no tag and takes its own size: the height its real component has at the size step drawn, never stretched to its row and never shrunk to a label's line. **Its state is told by position and by weight, never by a colour**: a switch's knob stands at the end of its track when it is on and at the start when it is off; the chosen tab is heavier and has a line under it; a badge is a small framed word, lower than a button and never with the weight of a main action, so nobody reads it as something to press. A **title** is plain text, never a tagged box and never `em`. **Sample values fill the rest**: a title, a button, a field or a record carries a value a real screen could show, in the words of the product it stands for and never the name of a pattern, a unit or a level, and where the content is many of one thing a stand-in shows the kind with no name. An **icon** is a small square holding one of a small set of plain line shapes the drawer draws itself, with one default where none fits; a skeleton shows no icon of the library. So the icon of an enum, the icon of one of its values and a brand's mark are all the default: a skeleton says that an icon is there, never which one. A badge and a tab may carry an icon before their word, with no square around it.
 
 One outer `frame`, or `views` and never both: a box with an optional `label` (its title), `look`, `note` and `tag`, holding `rows` top to
 bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame

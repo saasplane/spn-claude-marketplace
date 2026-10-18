@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "de4bd6a3"
+      "seen": "02c93b76"
     }
   ]
 }
@@ -53,21 +53,25 @@ The decisions run in one order. Each level of a page owns one thing, and the lev
 - **List each task the person does on the page.** Read the tasks from the behavior rows of the owning docs. Where a task has no row, say so: the `ideate` skill writes the row.
 - **Name the kind of surface.** It is web today. A rule that names hover or a pointer holds for the web alone.
 - **Read what the app holds already**: its theme, and the layout its other pages use.
+- **Place by purpose before you pick a unit** (`RD.SUPPORT.SURFACE.207`). Group the controls of each task by intent, put each beside what it relates to, and draw alternatives as equals. Only then choose the units that carry that. A page built from a list of parts reads as a page of parts.
 
 ## 1. Pick the layout
 
 A layout frames the page. It draws the navigation, and it hands the page a main area. It owns nothing inside that area.
 
-| Layout type | The navigation |
-| --- | --- |
-| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons |
-| `DOCK` | a bar across the top, and the entries in a column beside one page |
-| `TOPNAV` | a bar across the top, with the content below it |
+| Layout type | The navigation | What it is for |
+| --- | --- | --- |
+| `RAIL` | a sidebar at the side, with a fixed head and foot, which a person opens and shuts to icons | an app a person works in, with many sections: an admin console |
+| `DOCK` | a bar across the top, and the entries in a column beside one page | one person's or one thing's settings: a profile, an account |
+| `TOPNAV` | a bar across the top, with the content below it | a website, with the few entries that fit on one line |
+| `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
 
 - **The theme styles the layout in three parts, the body, the navigation and the content, and a page writes no look for any of them** (`RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.200`). The body is the whole window, with the fill behind everything and the width of the box the others stand in; the navigation moves a person around the app; the content is the main area. The navigation is attached to the window's edge or floats, the layout's space in (`--layout-space`); the content is attached, a box at the body's width that meets the navigation with the body showing around it, or floats; and the top bar is sticky or not. The width is the body's: `FULL`, `XWIDE`, `WIDE`, `MEDIUM` or `NARROW`. A phone draws one drawer for all three layouts. The layouts alone read the theme. `architecture-layouts.md` states them.
-- **The page chooses its layout, and the theme never does.** Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
-- **Fill the places, named by where they stand** (`RD.SUPPORT.SURFACE.157`): `startNode`, the navigation, `endNode`, `actionsNode`, the main area and `footerNode`, and in a dock `headerNode`. Every layout type with a navigation takes them in its config, and `phone` says whether each node stands in the bar, the drawer or both on a phone; `CANVAS` is the body alone, with no navigation and no overlay, for a marketing page, a sign-in or a page of an error.
-- **The footer is optional, and it closes the main area.** Where the content is short it stands at the bottom edge of the main area, and where the content is long it stands after the content. An app that gives no footer has none. The layout places it, and decides nothing about what it holds.
+- **The page chooses its layout, and the theme never does.** Choose it by the job of the app, as the table says, and never by its look (`RD.SUPPORT.SURFACE.206`). Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
+- **Fill the places, named by where they stand** (`RD.SUPPORT.SURFACE.157`): `startNode`, the navigation, `endNode`, `actionsNode`, the main area and `footerNode`, and in a dock or a top nav `headerNode`. Every layout type with a navigation takes them in its config; `CANVAS` is the body alone, with no navigation and no overlay.
+- **`headerNode` is a band directly under the bar, the window's width at every body width**, for a hero, a slideshow, or the head of an account or a project. It scrolls with the page, and the content's box starts under it.
+- **The footer is optional, and it is a band at the page's end, the window's width**, and beside a rail the width of the area beside it. What it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content. An app that gives no footer has none, and the layout decides nothing about what it holds.
+- **Say where each node stands on a phone.** `phone` places `startNode`, `actionsNode` and `endNode` in the bar, the drawer or both: by default `startNode` both, `actionsNode` the drawer and `endNode` the bar. The bar starts with the menu, or with the way back where a dock has `backTo`, and a node in the bar takes its collapsed form where the page gives one.
 - **Mark the place the person is in.** The navigation shows it with the selected state.
 - **Leave the navigation to the layout.** A page that draws its own navigation has taken the layout's job.
 
@@ -124,6 +128,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 
 - **The first eight are a whole page.** The last six are how a person enters or changes something, and each opens from one of the eight.
 - **Where the data and the person point to two patterns, say so and ask.** A list that grows, used by a person who comes once a year, is a different page from the same list used every day.
+- **A sign-in has a shape of its own** (`RD.SUPPORT.SURFACE.205`). It is not one of the fourteen: start from *The sign-in page* in `standards-patterns.md`.
 - **A page that fits no pattern is named in the result, and it waits.** A new page pattern joins the patterns chapter of the book first.
 
 **Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSDataTableWidget`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
@@ -169,7 +174,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 - **Open the spec of the pattern you named, in `refs/support/surface/patterns/`.** It is a skeleton with a view for each screen class. Draw it with `spn-devex docs figure draw <spec>` where you want to see it.
 - **Read the tree by level of that pattern in `standards-patterns.md`.** It names the page level, the containers, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
 - **The spec names the layout and the page level a tree starts from** (`RD.DEVEX.WORKSPACE.260`). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
-- **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement.
+- **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement. Every title, description and value the tree writes is in the product's own words, and never the name of a pattern, a unit or a level.
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.
 
 ## 3. Decide the containers
@@ -199,6 +204,7 @@ A container is optional. Use one where a part of the page has a header, content 
 - **Write the parts in one order**: `DSContainer.Header`, then `DSContainer.Content`, then `DSContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
 - **The page decides what fills a part.** Write `flush` on a part whose content reaches the edge of the frame, such as a table. A part without `flush` insets everything it holds.
 - **In a `flush` part, a block that draws a border of its own draws none.** Those blocks are a table, a list, a code block, an accordion and an empty state. Every other block reaches the edge.
+- **Write `divided` on a bordered container only where it needs other lines than the default.** Unset, the frame draws a line between every two parts; `false` draws none; a list draws a line above each part it names, as `CONTENT` sets a second content, another task, apart. A sign-in's *Create an account* is such a content.
 - **Never put a container inside a container.** A card, an accordion or a set of tabs goes inside the content.
 - **Leave the look to the theme.** The look is `frames`, `raised`, `bordered` and `rounded`, and one more prop, `unframed`, that holds a part out of the frame. Set one on a container only where that container differs from the app.
 - **Write `unframed` for a part that no theme should frame on this page** (`RD.SUPPORT.SURFACE.092`). It is a list: any of `HEADER`, `CONTENT`, `FOOTER`. A part listed there sits flat on the page, whatever `frames` and the theme give, and the rest of the look stays the theme's. One such part is a header that is the header of the page. The book states `unframed` before the web builds it, so say so where the tree writes it.
@@ -242,6 +248,7 @@ Take each block from the tree by layer of the page pattern, and from the list it
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
 - **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
+- **Every control a person sets is a `DSForm.Field`**, a lone checkbox or switch too (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`). A field with no label of its own keeps a blank label line, so it lines up beside labelled fields in a row; alone on its line in a column, write `showBlankLabel={false}`. A field's own action, such as *Forgot password?*, goes to `labelEndNode`, and never under the field. A switch and a checkbox take their own `label`.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
 - **Under the picture an item line holds its title, its description, then its line of facts.** The facts go to `facts`, and they stand under the description, so a line that has both shows both (`RD.SUPPORT.SURFACE.086`). Write each fact as data, in one of four forms: plain words; `TEXT`, with a `label` and icons where it needs them; `BADGE`, with a `color`; or `CUSTOM`, a block of the page's own (`RD.SUPPORT.SURFACE.096`). A fact whose value cannot be read alone, such as a count, a date or a person, carries its label before it, as *Members: 12*. A state is a `BADGE` fact.
 - **Give the picture of an item line to `media` as data of one kind, and what stands at its end to `endNode`** (`RD.SUPPORT.SURFACE.130`, `RD.SUPPORT.SURFACE.131`). The kinds are `ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` and `CUSTOM`. A kind holds no size, because the item owns the size of its picture. `DSItem` takes no `startIcon` and no `actions`. `endNode` holds the actions of the thing, a badge, or both, and it stands outside the link of the line.
@@ -256,8 +263,13 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **A card drawn from data is `DSCardWidget`** (`RD.SUPPORT.SURFACE.127`). Give it `header`, the props of `DSItem`, then `parts`, then `footer`, any node. A part is `ITEMS`, with item lines, `LIST`, with rows of a list, or `FREE`, with any node. The widget has no paging, no search and no working state: a set that needs them is a data table. The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`).
 - **Subjects compared across the same settings are `DSComparisonWidget`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects` (each may carry its own `actions`, such as an Edit, which stand in its head and take their look from the place: `RD.SUPPORT.SURFACE.193`), `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
 - **A line that says roughly when a thing last changed may show how long ago it was** (`RD.SUPPORT.SURFACE.122`). Write `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`. A page that is a log of what happened shows the date and the time on each line.
-- **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). `DSMark` draws an icon as a mark, with `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`. Choose rounded or square where the thing is better shown so, such as an app or a file. Its `variant` takes the shared vocabulary, and `GHOST` and `LINK` draw the icon alone, with no fill (`RD.SUPPORT.SURFACE.124`). A mark is never pressed.
+- **A mark says what, and an avatar says who.** `DSMark` holds an icon, or `text`, a symbol of one to three characters, such as a step's number or a file's type; it never holds a name. `DSAvatar` holds a picture or the initials of a person, a workspace or a company. Both take `color`, and `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`.
+- **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). Choose rounded or square where the thing is better shown so, such as an app or a file. Its `variant` takes the shared vocabulary, and `GHOST` and `LINK` draw the icon alone, with no fill (`RD.SUPPORT.SURFACE.124`). A mark is never pressed.
 - **`scaleSize` says how large a picture is drawn, and `size` stays the density step** (`RD.SUPPORT.SURFACE.100`). `DSIcon`, `DSMark`, `DSAvatar` and `DSAvatarGroup` take it, from `XXS` to `XXL5`. Inside an item line the item gives the picture its scale size, so write none there. In a component of your own, a picture beside a title takes the scale size of the title's own step name (`RD.SUPPORT.SURFACE.104`); `architecture-components.md` states what stands beside a heading.
+- **A number of things that wait is `count` on the navigation entry or on the button**, never a badge the page places. The entry shows it as a quiet badge, and as a dot when shut; a button with a label shows a badge after it, and an icon alone a dot. Write it only where the data gives the number (`RD.SUPPORT.SURFACE.050`).
+- **A row that scrolls sideways is `DSHScroll`, with `arrow` where a pointer needs the arrows** (`RD.SUPPORT.SURFACE.204`). Leave `arrowType` at `DEFAULT` on a page, a card or a band of the brand, and write `OVERLAY` only for a row over a picture. A row of tabs scrolls by itself.
+- **Write no `variant` or `color` to make a mark, an avatar or a badge lighter on a coloured navigation or band.** A unit that is shown takes the lighter tints of the ground it stands on by itself, and a status badge keeps its hue (`architecture-core.md`).
+- **Write no duration, ease or animation.** Each unit enters and leaves by its role, at the theme's `motionSpeed` (`standards-core.md`, *Motion*). An icon moves only through what holds it: write `motion` and `hoverNode` on `DSIcon`, `startIconMotion` or `endIconMotion` on `DSButton`, or `iconMotion` on `DSMark`, where the movement says something, such as `NUDGE_START` on a way back.
 - **Give `DSDataTableWidget` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSFilterBarWidget` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
 - **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
