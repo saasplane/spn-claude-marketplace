@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -30,6 +30,70 @@ export const SUGGESTIONS_FILE = "suggestions.jsonl";
 export const PREVIEW_FILE = "preview.html";
 /** The states whose workstreams are held to the standard of the day. A closed one stays as it closed. */
 export const HELD_STATES: readonly WorkstreamState[] = ["open", "backlog"];
+
+/**
+ * What an arc's notes folder holds, and nothing else (RD.DEVEX.WORKSPACE.262): each entry's name and
+ * whether it is a file or a folder. `samples/` may hold folders of its own; the others are flat.
+ */
+export const NOTES_ENTRIES: ReadonlyMap<string, "file" | "folder"> = new Map([
+  [PREVIEW_FILE, "file"], ["samples", "folder"], ["plan.md", "file"], ["orders", "folder"], ["scripts", "folder"],
+]);
+
+const SAMPLE_KINDS = /\.(?:png|jpe?g|gif|webp|svg|avif|mp4|mov|webm|pdf)$/i;
+const SCRIPT_KINDS = /\.(?:mjs|cjs|js|ts|py|sh)$/i;
+const DATA_KINDS = /\.(?:json|csv|tsv|ya?ml)$/i;
+const ORDER_NAME = /(?:^\d+[a-z]?(?:[-.][^/]*)?\.md$|\.(?:report|ledger)\.md$)/i;
+
+/**
+ * Where an entry found beside the five in an arc's notes folder belongs, by its name and kind, as the
+ * words a finding or a refusal ends with. One that names a second preview belongs in the one preview.
+ */
+export function strayHome(name: string, folder: boolean): string {
+  const lower = name.toLowerCase();
+  const cards = "records in the workstream's `questions.jsonl`, by `workstream question raise`, once each is checked against the records already there";
+  const facts = "records in the arc's `facts.jsonl`, by `workstream fact write`, each with the commit it was read at";
+  const named = (pattern: RegExp): boolean => pattern.test(lower.replace(/\.[a-z0-9]+$/, ""));
+  if (lower === "previews" || /preview[^/]*\.html$/.test(lower)) return `a section of the arc's one \`${PREVIEW_FILE}\``;
+  if (folder) {
+    if (named(/cards?|questions?/)) return cards;
+    if (named(/(?:^|[-_.])facts?(?:[-_.]|$)/)) return facts;
+    if (named(/shots?|screens?|images?|img|looks?|views?|captures?|renders?|pages?/)) return "`samples/`, as a folder of its own there if it helps";
+    if (named(/orders?|briefs?|reports?/)) return "`orders/`, each brief named by its row";
+    if (named(/scripts?|bin|tools?/)) return "`scripts/`";
+    return `its screenshots and real files in \`samples/${name}/\`, and each note in it a section of \`plan.md\``;
+  }
+  if (SAMPLE_KINDS.test(lower)) return "`samples/`";
+  if (SCRIPT_KINDS.test(lower)) return "`scripts/`";
+  if (named(/cards?|questions?/)) return cards;
+  if (named(/(?:^|[-_.])facts?(?:[-_.]|$)/)) return facts;
+  if (ORDER_NAME.test(lower)) return "`orders/`, named by its row";
+  if (/\.(?:md|txt)$/.test(lower)) return "a section of `plan.md`";
+  if (DATA_KINDS.test(lower) || lower.endsWith(".jsonl")) return "`scripts/`, beside the script that reads it, or else a section of `plan.md`";
+  if (lower.endsWith(".html")) return "`samples/` if it is a real page the work produces, or else a section of the arc's one `preview.html`";
+  return "`samples/` if it is a real file the work produces, or else a section of `plan.md`";
+}
+
+/** Where an entry of the five belongs when it was made as the other kind: in itself, as its own kind. */
+export const wrongKind = (entry: string, kind: "file" | "folder"): string =>
+  `\`${entry}\` itself, which is a ${kind} and never a ${kind === "file" ? "folder" : "file"}`;
+
+/**
+ * Each entry of one arc's notes folder outside the five, with where it belongs, as `[entry, home]`.
+ * A dot-name is no one's entry and is passed. `skipPreviews` leaves out the `previews/` folder and a
+ * second `*preview*.html`, which the one-preview check names in its own words.
+ */
+export function strayNotes(notesDir: string, skipPreviews = false): Array<[string, string]> {
+  const out: Array<[string, string]> = [];
+  for (const entry of listdir(notesDir)) {
+    const folder = isDir(join(notesDir, entry));
+    const kind = NOTES_ENTRIES.get(entry);
+    if (kind === (folder ? "folder" : "file")) continue;
+    if (kind) { out.push([`${entry}${folder ? "/" : ""}`, wrongKind(entry, kind)]); continue; }
+    if (skipPreviews && (entry === "previews" || /preview[^/]*\.html$/i.test(entry))) continue;
+    out.push([`${entry}${folder ? "/" : ""}`, strayHome(entry, folder)]);
+  }
+  return out;
+}
 
 export const arcDataDir = (ws: string, arc: string): string => join(ws, ARCS, arc);
 export const stateFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), STATE_FILE);

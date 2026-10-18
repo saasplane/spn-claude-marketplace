@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A preview shows, and an approach page argues
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -13,7 +13,7 @@ import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import {
   FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcIdsOf, factsFileOf, isDataLayout, logFileOf, markdownArcsOf,
-  notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf, suggestionsFileOf, readJson, workstreamsOf,
+  notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf, strayNotes, suggestionsFileOf, readJson, workstreamsOf,
 } from "../lib/workstream.ts";
 import { arcFaults, factFaults, logFaults, questionFaults, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
@@ -48,6 +48,16 @@ export function previewFindings(ws: string, arc: string, data: ArcData | null): 
   if (data && data.status !== "PROPOSED" && !isFile(previewOf(ws, arc)))
     out.push(`${arc} is ${data.status} and has no preview at \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   return out;
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`
+ * and `scripts/`, and nothing else. Each other entry is named with where it belongs. The `previews/`
+ * folder and a second preview are left to the one-preview check, which names them in its own words.
+ */
+export function notesTreeFindings(ws: string, arc: string): string[] {
+  return strayNotes(notesDirOf(ws, arc), true)
+    .map(([entry, home]) => `\`${NOTES}/${arc}/${entry}\` is not one of the five entries of an arc's notes folder — it belongs in ${home}`);
 }
 
 /** S7: the arc's row in Cycles, its stamp against its rows, and its preview linked from `What`. */
@@ -126,6 +136,9 @@ export function checkWorkstream(ws: string): Finding[] {
   // A notes folder with no arc data is an arc the page cannot show.
   for (const arc of listdir(join(ws, NOTES)))
     if (/^N\d+[a-z]?$/.test(arc) && !isFile(stateFileOf(ws, arc))) out.push(say(arc, "steps")(`\`${NOTES}/${arc}/\` has no \`arcs/${arc}/state.json\``));
+  // Every arc's notes folder holds the five, whether or not its data reads.
+  for (const arc of listdir(join(ws, NOTES)))
+    if (/^N\d+[a-z]?$/.test(arc) && isDir(join(ws, NOTES, arc))) out.push(...notesTreeFindings(ws, arc).map(say(arc, "notes")));
   out.push(...linesFindings(suggestionsFileOf(ws), "suggestions.jsonl", suggestionFaults).map(say(null, "schema")));
   const questionLines = linesFindings(questionsFileOf(ws), "questions.jsonl", questionFaults);
   out.push(...questionLines.map(say(null, "schema")));

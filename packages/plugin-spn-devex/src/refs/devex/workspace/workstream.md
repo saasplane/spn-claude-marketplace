@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "829020b6"
+      "seen": "32b59b0d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "69315e33"
+      "seen": "154805ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "c992fa1b"
+      "seen": "10dd58cd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -589,7 +589,20 @@ its own number and its own tie to a window, so you never create one alone.
 
 **So a step acting on a set carries the members, never the count.** *Sixteen questions*, *twenty-eight moves*, *nine rules* — a step that names the number and not the things has left the specification somewhere you cannot reach, and a conversation is not a place. **The failure looks exactly like success**: the arc reads complete, every step has a sentence, and you invent a different sixteen.
 
-**Where the set is too large for the step, it goes to `notes/N<nnn>/<subject>.<ext>`, in that arc's own folder, and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
+**Where the set is too large for the step, it goes to a section of that arc's `plan.md`, and the step names it by path and heading**, such as `notes/N007/plan.md#the-move-table`. A set a script reads sits beside the script, in `scripts/`. `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
+
+**An arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`, and nothing else — MUST** (`RD.DEVEX.WORKSPACE.262`). Never create a sixth entry there; each kind of thing you keep already has its place.
+
+| What you have in hand | Where it goes |
+| --- | --- |
+| a screenshot, a rendered page, any real file of the kind the work produces | `samples/`, which may hold sub-folders of its own |
+| a fact, a how-to, an inventory, a measurement, an ideation note | a section of `plan.md` |
+| a fact pinned to the commit it was read at | a record in the arc's `facts.jsonl`, by `workstream fact write` |
+| a question card, open, answered or parked | a record in `questions.jsonl`, by the `workstream question` commands |
+| a brief for a delegated run, its report or its ledger | `orders/` |
+| what a mechanical row runs, and the data it reads | `scripts/` |
+
+`workstream state check` names any other entry with where it belongs, and the PreToolUse hook refuses a write that would create one. Plugin migration 002 brings open and backlog workstreams to this tree, never `closed/`. The developer's words: *"allowing dynamic structure at certain folders will not help drive better"*.
 
 **Three rules follow.**
 

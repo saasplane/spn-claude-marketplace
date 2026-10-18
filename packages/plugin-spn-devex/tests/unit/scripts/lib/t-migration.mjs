@@ -1,7 +1,7 @@
 // `lib/migration.ts` — the migrations a release ships, the workspace's ledger, and where each one
 // stands. Each case is a throwaway workspace: migration 001's own check over a workstream kept in the
 // old shape and one kept as data, and made-up migrations for a script, steps and the id order.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
 
@@ -31,7 +31,7 @@ const current = (name) => workspace(name, {
   [`${OLD}/notes/N001/preview.html`]: "<p>the probe</p>\n",
 }, [], { migrated: false });
 
-const [m001] = MIGRATIONS;
+const [m001, m002] = MIGRATIONS;
 
 console.log("=== the plugin's migrations");
 {
@@ -62,7 +62,7 @@ console.log("\n=== applied → recorded, and never pending again");
   ok("recording hands back the same line", entry.id === line.id && entry.at === line.at);
   const [one] = standings(root, MIGRATIONS);
   ok("001 stands applied, though its old shapes are still on disk: a recorded migration is not checked again", one.state === "applied" && one.found.length === 0);
-  ok("the window's start says nothing", windowStartLines(root, MIGRATIONS).length === 0);
+  ok("the window's start says nothing of it", windowStartLines(root, [m001]).length === 0 && !windowStartLines(root, MIGRATIONS).some((line) => line.includes("001")));
   let refused = "";
   try { record(root, m001, "agent"); } catch (thrown) { refused = thrown.message; }
   ok("red: recording it twice is refused", /recorded already/.test(refused), refused);
@@ -74,13 +74,42 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001: the check finds nothing in the old shape — `spn-devex plugin migration write 001` records it, with nothing to do.");
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
   ok("writing it records it with nothing to do", applied.code === 0 && line.how === "nothing to do" && applied.out.join() === "001 · recorded · nothing to do", applied.out.join(" | "));
   const again = applyMigrations(root, MIGRATIONS, ["001"]);
   ok("writing it again says it is applied, and adds no line",
     again.code === 0 && /^001 · applied already/.test(again.out[0]) && readFileSync(ledgerOf(root), "utf8").trim().split("\n").length === 1, again.out.join(" | "));
+}
+
+console.log("\n=== 002 — an arc's notes folder holds the five, and nothing else");
+{
+  ok("the plugin ships 002 second, with a version, one sentence and steps", m002.id === "002" && /^\d+\.\d+\.\d+$/.test(m002.version) && m002.changed.endsWith(".") && m002.steps.length > 0);
+  const root = workspace("notes-tree", {
+    [`${OLD}/arcs/N001/state.json`]: "{}\n",
+    [`${OLD}/notes/N001/preview.html`]: "<p>the probe</p>\n",
+    [`${OLD}/notes/N001/plan.md`]: "# plan\n",
+    [`${OLD}/notes/N001/shots/rail.png`]: "png",
+    [`${OLD}/notes/N001/parked-cards.md`]: "# parked\n",
+    [`${OLD}/notes/N001/samples/looks/a.png`]: "png",
+    ".spndevex/workstreams/closed/020-done/notes/N001/shots/a.png": "png",
+  }, [], { migrated: false });
+  const [, two] = standings(root, MIGRATIONS);
+  ok("red: 002 is pending, and its check names each stray with where it belongs",
+    two.state === "pending" && two.found.length === 2 && two.found.some((place) => place.startsWith("open/031-probe/notes/N001/shots/ → `samples/`"))
+      && two.found.some((place) => /^open\/031-probe\/notes\/N001\/parked-cards\.md → .*questions\.jsonl/.test(place)), two.found.join(" | "));
+  ok("a closed workstream is never read", !two.found.some((place) => place.includes("020-done")));
+  ok("its steps fold card files into questions.jsonl after a check for duplicates, and rewrite links first",
+    m002.steps.some((step) => /duplicate/.test(step) && /question raise/.test(step)) && m002.steps.some((step) => /move table/.test(step) && /links?/.test(step)));
+  const owed = applyMigrations(root, MIGRATIONS, ["002"], true);
+  ok("red: write 002 refuses while 001 is pending, and 001 has nothing to do here so it is recorded as it passes, and 002 is not",
+    owed.code === 1 && owed.out[0] === "001 · recorded · nothing to do" && owed.out.some((line) => line.startsWith("002 · not recorded")), owed.out.join(" | "));
+  renameSync(join(root, OLD, "notes/N001/shots"), join(root, OLD, "notes/N001/samples/shots"));
+  rmSync(join(root, OLD, "notes/N001/parked-cards.md"));
+  const done = applyMigrations(root, MIGRATIONS, ["002"], true);
+  ok("green: once folded, write 002 --steps-done records it as the agent's work", done.code === 0 && done.out.join() === "002 · recorded · by the agent's steps", done.out.join(" | "));
 }
 
 console.log("\n=== a broken ledger → reported, never written over");

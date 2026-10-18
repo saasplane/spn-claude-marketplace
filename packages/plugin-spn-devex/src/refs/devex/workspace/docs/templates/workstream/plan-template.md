@@ -41,8 +41,10 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
 ## The specification
 
 <!-- The sets, moves and worked example the rows act on. A set is named by its members, never a count; a move is a
-     table whose targets are unique; a step producing many files carries one worked example. Too large for here →
-     `notes/N<nnn>/<subject>.<ext>`, named by path in the row. -->
+     table whose targets are unique; a step producing many files carries one worked example. Each large set is a
+     section here of its own, named by path and heading in the row (`notes/N<nnn>/plan.md#<heading>`). A set a
+     script reads sits in `scripts/`; a screenshot or a real file sits in `samples/`. Nothing else is written
+     beside this plan. -->
 
 ## Traps — read before any row
 

@@ -68,6 +68,35 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("green: samples stay beside the one preview", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
+console.log("\n=== RD.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");
+{
+  const { root, ws } = await dataWorkspace("state-notes-tree");
+  const notes = join(ws, "notes", "N001");
+  mkdirSync(join(notes, "shots"), { recursive: true });
+  writeFileSync(join(notes, "shots", "rail-dark.png"), "png");
+  writeFileSync(join(notes, "answered-cards.md"), "# answered\n");
+  writeFileSync(join(notes, "inventory.md"), "# what exists\n");
+  writeFileSync(join(notes, "orders"), "not a folder");
+  const red = checkWorkstream(ws);
+  ok("red: a folder of screenshots beside the five is named, and sent to samples/", has(red, "notes", /`notes\/N001\/shots\/` is not one of the five .* belongs in `samples\/`/), said(red));
+  ok("red: a card file is sent to questions.jsonl, checked for duplicates", has(red, "notes", /answered-cards\.md` .* `questions\.jsonl`.*checked against the records/), said(red));
+  ok("red: a note is sent to a section of plan.md", has(red, "notes", /inventory\.md` .* a section of `plan\.md`/), said(red));
+  ok("red: one of the five made as the other kind is named", has(red, "notes", /`notes\/N001\/orders` .* `orders` itself, which is a folder and never a file/), said(red));
+  const command = cli(root, ["workstream", "state", "check"]);
+  ok("the command exits 1 and prints the [notes] finding", command.code === 1 && /031-probe N001 \[notes\]/.test(command.out), command.out);
+  rmSync(join(notes, "orders"));
+  mkdirSync(join(notes, "samples"), { recursive: true });
+  renameSync(join(notes, "shots"), join(notes, "samples", "shots"));
+  writeFileSync(join(notes, "plan.md"), "# N001 plan\n\n## What exists\n");
+  rmSync(join(notes, "inventory.md"));
+  rmSync(join(notes, "answered-cards.md"));
+  writeFileSync(join(notes, ".DS_Store"), "");
+  ok("green: folded into the five — a folder inside samples/ and a dot-file are no one's finding", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  mkdirSync(join(notes, "previews"), { recursive: true });
+  const previews = checkWorkstream(ws);
+  ok("a previews/ folder is named once, by the one-preview check", previews.length === 1 && previews[0].check === "preview", said(previews));
+}
+
 console.log("\n=== the life of an arc — the files of every step it has passed");
 {
   const { ws } = await dataWorkspace("state-steps");

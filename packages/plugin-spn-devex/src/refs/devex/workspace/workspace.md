@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "829020b6"
+      "seen": "32b59b0d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -229,7 +229,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             log.jsonl                     one line per event
             facts.jsonl                   each fact read, pinned to its commit
         notes/
-          N<nnn>/                         one arc's work order
+          N<nnn>/                         one arc's work order: these five entries, and nothing else
             preview.html                  the arc's one preview
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       how the arc will be done: steps, commands, traps

@@ -652,10 +652,11 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   says("the developer's pane does not show it", !pending.message.includes(HEADING) && !pending.message.includes("migration"));
   writeFileSync(join(old, ".spndevex", "migrations.jsonl"),
     `${JSON.stringify({ plugin: "spn-devex", id: "001", version: "0.40.0", at: "2026-10-18T10:20+05:30", by: "t", how: "agent" })}\n`);
-  says("green: once the ledger records 001, the window's start says nothing of it", !hook(old).context.includes(HEADING));
+  const recorded = hook(old).context;
+  says("green: once the ledger records 001, the window's start says nothing of it", !/\*\*001\*\*|- 001[:,]/.test(recorded), recorded.slice(recorded.indexOf(HEADING), recorded.indexOf(HEADING) + 300));
   const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
   says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
-    current.context.includes(HEADING) && current.context.includes("- 001: the check finds nothing in the old shape — `spn-devex plugin migration write 001`"));
+    current.context.includes(HEADING) && current.context.includes("- 001, 002: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002`"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

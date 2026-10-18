@@ -1,17 +1,18 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A script or an agent writes each file, never both · § The approach page keeps up with its arcs
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A script or an agent writes each file, never both · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md § A release carries its migration, and a window runs what is pending first
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The refusal that makes one owner per file hold by force: a direct write to a file the `workstream`
 // commands own, an edit that touches a `progress` or `open` block, a hand edit of an arc's stamp, and
-// a write to the workspace's migrations ledger, which `plugin migration write` alone appends to.
+// a write to the workspace's migrations ledger, which `plugin migration write` alone appends to, and
+// a write that would create a sixth entry in an arc's notes folder of an open or backlog workstream.
 // A command writes these through the library, never through a tool call, so nothing here refuses it.
 
-import { readFileSync } from "node:fs";
-import { resolve, sep } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, resolve, sep } from "node:path";
 import { bashWrites } from "./doc-check.ts";
 import { type Payload, type Verdict } from "../lib/payload.ts";
-import { blocksIn, scriptOwned, stampsOn, workstreamAround } from "../lib/workstream.ts";
+import { NOTES, NOTES_ENTRIES, blocksIn, scriptOwned, stampsOn, strayHome, workstreamAround, wrongKind } from "../lib/workstream.ts";
 import { DEVEX, DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { LEDGER } from "../lib/migration.ts";
 
@@ -35,6 +36,38 @@ export function ownedRefusal(path: string): string | null {
   return `Denied: \`${owned.file}\` is written only by ${WRITERS[name] ?? "the `workstream` commands"}, and never by hand ` +
     `(01-workstream.md § A script or an agent writes each file, never both). Run \`spn-devex workstream\` for the change, ` +
     `or \`spn-devex workstream state show\` to read it.`;
+}
+
+const NOTES_ENTRY = new RegExp(`^(.*/${DEVEX_WORKSTREAMS.replace(/\./g, "\\.")}/(?:open|backlog)/[^/]+/${NOTES}/N\\d+[a-z]?)/([^/]+)(/.*)?$`);
+
+/**
+ * Why a write may not make this path, or null: one that would create an entry beside the five in an
+ * arc's notes folder (RD.DEVEX.WORKSPACE.262). An entry already on disk is not refused, so the tidy
+ * that folds a stray away can still rewrite its links first. A closed workstream is never read.
+ */
+export function notesTreeRefusal(path: string, makesFolder = false): string | null {
+  const found = NOTES_ENTRY.exec(resolve(path).split(sep).join("/"));
+  if (!found) return null;
+  const [, arcDir, entry, below] = found;
+  if (entry.startsWith(".") || existsSync(`${arcDir}/${entry}`)) return null;
+  const kind = NOTES_ENTRIES.get(entry);
+  const folder = below !== undefined || makesFolder;
+  if (kind === (folder ? "folder" : "file")) return null;
+  const arc = basename(arcDir);
+  const home = kind ? wrongKind(entry, kind) : strayHome(entry, folder);
+  return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`preview.html\`, ` +
+    `\`samples/\`, \`plan.md\`, \`orders/\` and \`scripts/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
+    `or names the note that holds it; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
+}
+
+/** The folders a `mkdir` in a command makes, as written. */
+export function mkdirTargets(command: string): string[] {
+  const out: string[] = [];
+  for (const segment of command.split(/&&|\|\||[;|\n]/)) {
+    const words = segment.trim().split(/\s+/).map((word) => word.replace(/^['"]|['"]$/g, ""));
+    if (words[0] && basename(words[0]) === "mkdir") out.push(...words.slice(1).filter((word) => word && !word.startsWith("-")));
+  }
+  return out;
 }
 
 /** The page an `Edit` or `Write` leaves, or null where the call is neither. */
@@ -97,13 +130,19 @@ function blockRefusal(kind: string): string {
 export function checkOwner(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
   const paths: string[] = [];
+  const folders: string[] = [];
   if (supplied.file_path) paths.push(resolve(payload.cwd ?? process.cwd(), supplied.file_path));
   else if (supplied.command) {
     try { paths.push(...bashWrites(supplied.command).map(([path]) => resolve(payload.cwd ?? process.cwd(), path))); } catch { /* no route read */ }
+    folders.push(...mkdirTargets(supplied.command).map((path) => resolve(payload.cwd ?? process.cwd(), path)));
   }
   const isRead = payload.tool_name === "Read" || payload.tool_name === "Grep" || payload.tool_name === "Glob";
   if (!isRead) for (const path of paths) {
-    const reason = ownedRefusal(path);
+    const reason = ownedRefusal(path) ?? notesTreeRefusal(path);
+    if (reason) return { deny: reason };
+  }
+  if (!isRead) for (const folder of folders) {
+    const reason = notesTreeRefusal(folder, true);
     if (reason) return { deny: reason };
   }
   if (isRead) return null;
@@ -114,5 +153,5 @@ export function checkOwner(payload: Payload): Verdict {
 /** Only a path or a command inside a workstream folder. */
 export const applies = (path: string, command: string): boolean =>
   path.includes(`${DEVEX_WORKSTREAMS}/`) || command.includes(`${DEVEX_WORKSTREAMS}/`) || /\.jsonl|state\.json/.test(command) ||
-  path.endsWith(LEDGER) ||
+  path.endsWith(LEDGER) || /(?:^|\/)notes\/N\d/.test(path) || /(?:^|[\s'"/])notes\/N\d/.test(command) ||
   (/^[^/]/.test(path) && /\.(?:html|json|jsonl)$/.test(path));

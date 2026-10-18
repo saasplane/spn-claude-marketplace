@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { CARD, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 
-const { ownedRefusal, pageRefusal } = await import("../../../../src/scripts/checks/workstream-owner.ts");
+const { notesTreeRefusal, ownedRefusal, pageRefusal } = await import("../../../../src/scripts/checks/workstream-owner.ts");
 const HOOK = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
 
 let total = 0, failed = 0;
@@ -98,6 +98,32 @@ console.log("\n=== the migrations ledger is appended to only by `plugin migratio
   ok("green: reading it is never refused", read !== "deny");
   const command = cli(root, ["plugin", "migration", "show"]);
   ok("green: the command reads it", command.code === 0 && /^001 · /.test(command.out), command.out);
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.262 — a write that would make a sixth entry in an arc's notes folder");
+{
+  const notes = join(ws, "notes", "N001");
+  const [shot, why] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(notes, "shots", "rail.png"), content: "png" } }, root);
+  ok("red: a Write into a new shots/ folder is refused, and names samples/", shot === "deny" && why.includes("`notes/N001/shots/`") && why.includes("belongs in `samples/`"), `${shot}: ${why.slice(0, 300)}`);
+  const [note, noteWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(notes, "inventory.md"), content: "# x\n" } }, root);
+  ok("red: a new note beside the plan is refused, and sent to a section of plan.md", note === "deny" && noteWhy.includes("a section of `plan.md`"), `${note}: ${noteWhy.slice(0, 300)}`);
+  const [made, madeWhy] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(notes, "screens")}` } }, root);
+  ok("red: a mkdir of a new folder there is refused", made === "deny" && madeWhy.includes("`notes/N001/screens/`"), `${made}: ${madeWhy.slice(0, 300)}`);
+  const [moved] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mv /tmp/a.png ${join(notes, "looks")}/a.png` } }, root);
+  ok("red: a move into a new folder there is refused", moved === "deny");
+  const [sample] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(notes, "samples", "shots", "rail.png"), content: "png" } }, root);
+  ok("green: a folder inside samples/ is the agent's", sample !== "deny");
+  const [samplesDir] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `mkdir -p ${join(notes, "samples", "looks")} ${join(notes, "orders")}` } }, root);
+  ok("green: a mkdir of samples/ and orders/ goes through", samplesDir !== "deny");
+  const [plan] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(notes, "plan.md"), content: "# plan\n" } }, root);
+  ok("green: the plan is written", plan !== "deny");
+  const [fresh] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "notes", "N002", "preview.html"), content: "<p>x</p>" } }, root);
+  ok("green: a new arc's preview is written", fresh !== "deny");
+  put(root, ".spndevex/workstreams/open/031-probe/notes/N001/old-note.md", "# old\n");
+  const [existing] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: join(notes, "old-note.md"), old_string: "# old", new_string: "# old, links rewritten" } }, root);
+  ok("green: a stray already on disk can still be edited, so its links are rewritten before it is folded", existing !== "deny");
+  const closed = join(root, ".spndevex", "workstreams", "closed", "020-done", "notes", "N001", "shots", "a.png");
+  ok("green: a closed workstream is never judged", ownedRefusal(closed) === null && notesTreeRefusal(closed) === null);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream owner` : `\n  all ${total} passed — workstream owner`);

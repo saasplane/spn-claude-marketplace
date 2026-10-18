@@ -58,7 +58,7 @@ console.log("\n=== the workstream moved to the data layout: write records it");
   const line = JSON.parse(read(ledger).trim());
   ok("the ledger holds its one line", line.id === "001" && line.plugin === "spn-devex" && line.how === "agent", read(ledger));
   const checked = cli(root, ["plugin", "migration", "check"]);
-  ok("check passes", checked.code === 0 && /ok · 1 migration\(s\), none pending/.test(checked.out), checked.out);
+  ok("check passes", checked.code === 0 && /ok · \d+ migration\(s\), none pending/.test(checked.out), checked.out);
   const shown = cli(root, ["plugin", "migration", "show"]);
   ok("show says when, by whom and how", /001 · spn-devex \S+ · applied \d{4}-\d\d-\d\dT\d\d:\d\d[+-]\d\d:\d\d by \S+ \(agent\)/.test(shown.out), shown.out);
 }

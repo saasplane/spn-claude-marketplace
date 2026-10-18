@@ -6,5 +6,6 @@
 
 import { type Migration } from "../migration.ts";
 import { migration001 } from "./001-workstream-as-data.ts";
+import { migration002 } from "./002-fixed-notes-tree.ts";
 
-export const MIGRATIONS: readonly Migration[] = [migration001];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002];
