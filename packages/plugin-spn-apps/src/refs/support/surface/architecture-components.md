@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "1b0815c7"
+      "seen": "de27e42e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "f1af42da"
+      "seen": "645ca30c"
     }
   ]
 }
@@ -131,7 +131,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
 | `DSColorPicker` | **A swatch that opens the colour picker of the device, with the colour's code beside it.** `showValue` shows the code in a field, and a person may type the code there in place of picking. **It MUST write and show a hex code in capitals, such as `#1A365D`,** whether typed or picked. A code stored in small letters is shown in capitals and left as stored until a person changes the colour. **A typed colour MUST be a hex code of six digits with its `#`,** in either case, taken when the person presses Enter or leaves the field. A text that is no such code leaves the colour as it was, and the field shows its error state. **It MAY hold no colour:** the swatch then has a dashed edge and no fill, and `clearable` offers an action that empties it |
 | `DSProgressCircle` | **Progress as a ring.** The ring fills to `value` out of `max`, and `showValue` writes the value inside it. With `indeterminate` the ring turns and reads no value. It is a block of its own beside `DSProgress`: the bar and the ring share no picture |
-| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel. **The page level of the tabs MUST decide their size, and their look where the page names no `type`** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`): `DSTabs` takes `pageLevel`, with the level of its box when unset, and an app's page chooses no look for them. A website's pages name `type` `PILL`. "The tabs by level" below states each look |
+| `DSTabs` | **A tab that has an address MUST be a link.** A person can then open it in a new browser tab or copy its address. A plain press still opens the tab in its row. A tab with no address stays a control that opens its panel. **The page level of the tabs MUST decide their size, and their look where the page names no `type`** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`): `DSTabs` takes `pageLevel`, with the level of its box when unset, and a page chooses no look for them: `PAGE` draws `PILL` (`RD.SUPPORT.SURFACE.224`). A website's pages name `type` `PILL` at any level. "The tabs by level" below states each look |
 | `DSPagination` | **The pager MUST arrange itself by the width of its own place, and not by the width of the window** (`RD.SUPPORT.SURFACE.133`). A pager stands in the footer of a full page and in a narrow column of a wide window, and the device type is the same in both. With no choice of rows on a page, the page controls stand in the middle. With the choice, the choice stands at the start and the page controls at the end. In a narrow place the choice is not drawn, and the page controls stand alone in the middle. A page offers no choice where the number of rows is decided already, such as a data table at the side of a detail |
 | `DSFormatDate` · `DSFormatDateTime` | **A line that says when something happened MAY show how long ago it was, through `type`** (`RD.SUPPORT.SURFACE.122`). `type` takes `DSFormatDateType`: `DEFAULT`, the date as it is written, and `AGO`, how long ago in words, such as *yesterday* or *2 days ago*, in the app's language and in the largest whole unit. Such a line says roughly when a thing last changed: a version, a record in a list, a comment. `AGO` stays how long ago however old the moment is. On `DSFormatDate` it counts days of the calendar and never shows a unit under a day. **The exact date and time MUST be reachable from it:** it is the tooltip of the words, and it is in their accessible name. **Where a page is a log of what happened, each line MUST show the date and the time, and not how long ago:** an audit log, a log of the notifications sent, the runs of a scheduled job, a list of sign-ins |
 | `DSFormatTime` · `DSFormatDateTime` · a picker of a time | **A block that shows or takes a time MUST use the format the page gives it, else the app's, and it MUST hold no time format of its own** (`RD.SUPPORT.SURFACE.123`). The app context always holds a time format. A picker of a time with no clock of its own reads in the clock of that format |
@@ -156,7 +156,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 | `pageLevel` | The tabs are | Their look, with no `type` | At the size of the theme, `SM` |
 | --- | --- | --- | --- |
-| `PAGE` | the sub-pages of a page | `LINE` | a label of 16px in a row of 40px |
+| `PAGE` | the sub-pages of a page | `PILL`, grouped on its track and not raised | a label of 16px in a row of 40px |
 | `CONTAINER` · `WIDGET` | the parts of a container or of a card | `LINE` | a label of 14px in a row of 36px |
 | `GROUP` · `CONTENT` · `INLINE` | two ways to show one thing | `SWITCH` | a label of 13px in a row of 32px |
 
@@ -556,6 +556,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.219` | a page may align the end node of a `DSItem` with `endAlign` (`TOP`, `CENTER`, `BOTTOM`), unset leaving a line centred and a vertical item at the top end |
 | `RD.SUPPORT.SURFACE.220` | `DSTabs` raised only lifts, with a soft shadow and no colour, and `LINE` ignores it; the bar of `SWITCH` and `PILL` takes the navigation's colour; every tab of a vertical `PILL` is fully rounded |
 | `RD.SUPPORT.SURFACE.223` | an item line at `INLINE` with a title and facts and no description draws its facts on the title's line after a dot ("v3 · Draft"), the title cut before the facts |
+| `RD.SUPPORT.SURFACE.224` | `DSTabs` at the level `PAGE` draw `PILL` where no `type` is named, grouped on its track and not raised; `LINE` stays at `CONTAINER` and `WIDGET` and `SWITCH` at the other levels |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof
