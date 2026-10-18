@@ -305,13 +305,14 @@ export function arcCell(cycle: Cycle): string {
 }
 
 /**
- * The Status cell's HTML: the status as its badge, whether the arc is kept as data or as Markdown, then for HELD,
- * CARRIED and DROPPED the reason below it in small text.
+ * The Status cell's HTML: the status as its badge. An arc kept as data stops there, because its HELD, CARRIED or
+ * DROPPED reason is one of its facts and is shown once, in the Arc cell; an arc kept as Markdown has no such fact,
+ * so its reason stands below the badge in small text.
  */
 export function statusCell(cycle: Cycle): string {
   if (!cycle.status) return escape(statusLabel(cycle));
   const badge = `<span class="sds-badge sds-status sds-${cycle.status.toLowerCase()}">${escape(cycle.status)}</span>`;
-  return cycle.detail ? `${badge}<br><span class="sds-small">${escape(cycle.detail)}</span>` : badge;
+  return cycle.detail && !cycle.kept ? `${badge}<br><span class="sds-small">${escape(cycle.detail)}</span>` : badge;
 }
 
 /**

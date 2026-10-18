@@ -137,8 +137,8 @@
     --sds-md:0.97rem; --sds-lg:1.32rem; --sds-xl:1.62rem; --sds-xxl:2.5rem; --sds-tk-k:#6d3a9c; --sds-tk-s:#2a6459;
     --sds-tk-c:#7c8794; --sds-tk-t:#2f4e7a; --sds-tk-n:#8f5714; --sds-tk-add:#2a6459; --sds-tk-del:#a63d3d;
     --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
-    --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a34412; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
-    --sds-orange-soft:#fae5d8; --sds-grey:#48525f; --sds-grey-soft:#e6eaee; --sds-info:#2f4e7a;
+    --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a55000; --sds-yellow:#6b5300; --sds-yellow-soft:#fbf1c4;
+    --sds-orange-soft:#fdebd3; --sds-grey:#48525f; --sds-grey-soft:#e6eaee; --sds-info:#2f4e7a;
     --sds-info-soft:#e0e8f4; --sds-success:#2a6459; --sds-success-soft:#dcece8; --sds-warning:#8f5714;
     --sds-warning-soft:#f7ecda; --sds-error:#a63d3d; --sds-error-soft:#f6e1e1; --sds-page-max:80rem;
     --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:21rem;
@@ -152,7 +152,7 @@
       --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
       --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
       --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
-      --sds-olive-soft:#22260f; --sds-orange:#ee9a66; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#2e1b10; --sds-grey:#a3adb9;
+      --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a; --sds-grey:#a3adb9;
       --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
       --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
       --sds-error-soft:#2b1818;
@@ -166,7 +166,7 @@
     --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
     --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
     --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
-    --sds-olive-soft:#22260f; --sds-orange:#ee9a66; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#2e1b10; --sds-grey:#a3adb9;
+    --sds-olive-soft:#22260f; --sds-orange:#f59e3a; --sds-yellow:#f2d24a; --sds-yellow-soft:#2b2508; --sds-orange-soft:#33200a; --sds-grey:#a3adb9;
     --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
     --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
     --sds-error-soft:#2b1818;
