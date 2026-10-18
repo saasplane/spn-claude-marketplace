@@ -73,7 +73,7 @@
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped.
        Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
-       In the progress grid below, each arc's tile carries the same word as its second class, sds-arc sds-running, which colours its bar. The sticky card after the grid has one chip per arc from the arc's first row on, whatever its status; a chip's second and third classes (and the summary's second, beside the overall line) are the status word and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100. -->
+       In the progress grid below, each arc's tile carries the same word as its second class, sds-arc sds-running, which colours its bar. The sticky card after the grid has one chip per arc from the arc's first row on, whatever its status; a chip's second and third classes (and the overall chip's second) are the status word and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <p>{{Overall: rows done of all &middot; arcs closed of all}}</p>
   <div class="sds-bar"><i style="width:{{share}}%"></i></div>
@@ -88,9 +88,13 @@
     <div class="sds-footbar-chips">
       <a class="sds-chip sds-running sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001</span><span class="sds-chip-subject"> {{subject as words}}</span></span><span class="sds-chip-line"><span class="sds-badge sds-status sds-running">RUNNING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span></a>
     </div>
-    <div class="sds-footbar-summary sds-step-3">
-      <p class="sds-footbar-text">{{Overall: rows done of all &middot; arcs closed of all}}</p>
-      <span class="sds-chip-bar"><i style="width:{{share}}%"></i></span>
+    <div class="sds-footbar-summary">
+      <div class="sds-chip sds-overall sds-step-3">
+        <span class="sds-chip-name">Overall</span>
+        <span class="sds-chip-line"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span>
+        <span class="sds-chip-bar"><i style="width:{{share}}%"></i></span>
+        <span class="sds-chip-note">{{X}} of {{Y}} arcs closed</span>
+      </div>
     </div>
   </nav>
   <!-- /spn:generated -->

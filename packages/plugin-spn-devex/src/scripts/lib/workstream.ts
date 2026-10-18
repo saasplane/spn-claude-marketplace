@@ -9,7 +9,7 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { TERMINAL } from "../checks/arc-status.ts";
+import { TERMINAL, pastDecided } from "../checks/arc-status.ts";
 import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -571,18 +571,23 @@ function arcChip(data: ArcData, done: number, total: number): string {
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right, with a bar of rows done of all under it. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
+ * is on the right, drawn as a chip of its own: Overall, the workstream's status beside rows done, a bar, and the arcs closed. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
  */
-function statusBar(counts: readonly { data: ArcData; done: number; total: number }[], overall: string, done: number, total: number): string[] {
+function statusBar(ws: string, counts: readonly { data: ArcData; done: number; total: number }[], done: number, total: number, closed: number): string[] {
   if (!counts.length) return [];
+  const word = basename(dirname(resolve(ws))) === "closed" ? "DONE" : counts.some((one) => pastDecided(one.data.status)) ? "IMPLEMENTING" : "PLANNING";
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
     ...counts.map((one) => arcChip(one.data, one.done, one.total)),
     `    </div>`,
-    `    <div class="sds-footbar-summary sds-step-${progressStep(done, total)}">`,
-    `      <p class="sds-footbar-text">${overall}</p>`,
-    `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
+    `    <div class="sds-footbar-summary">`,
+    `      <div class="sds-chip sds-overall sds-step-${progressStep(done, total)}">`,
+    `        <span class="sds-chip-name">Overall</span>`,
+    `        <span class="sds-chip-line"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><span class="sds-arc-count">${done}/${total}</span></span>`,
+    `        <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
+    `        <span class="sds-chip-note">${closed} of ${counts.length} arcs closed</span>`,
+    `      </div>`,
     `    </div>`,
     `  </nav>`,
   ];
@@ -600,7 +605,7 @@ export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(w
     `  ${bar(done, total)}`,
   ];
   if (counts.length) lines.push(`  <div class="sds-arcs">`, ...counts.flatMap((one) => arcTile(one.data, one.done, one.total)), `  </div>`);
-  lines.push(...statusBar(counts, overall, done, total));
+  lines.push(...statusBar(ws, counts, done, total, closed));
   return `${lines.join("\n")}\n`;
 }
 

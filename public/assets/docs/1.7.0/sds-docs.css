@@ -3121,6 +3121,14 @@
     }
     --sds-step-5: var(--sds-accent);
     --sds-step-done: var(--sds-ok);
+    --sds-overall-ground: var(--sds-accent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --sds-overall-ground: color-mix(in srgb,var(--sds-accent) 12%,var(--sds-card));
+    }
+    --sds-overall-edge: var(--sds-accent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --sds-overall-edge: color-mix(in srgb,var(--sds-accent) 45%,var(--sds-rule));
+    }
   }
   .sds-footbar {
     position: fixed;
@@ -3133,33 +3141,36 @@
     margin: 0 auto;
     width: min(calc(100vw - 1.5rem),var(--sds-page-max));
     grid-template-columns: minmax(0,4fr) minmax(0,1fr);
-    height: 4.75rem;
+    height: 5.25rem;
     border: 1px solid var(--sds-rule);
     border-radius: 6px;
     box-shadow: 0 4px 16px rgb(0 0 0 / .14);
     overflow: hidden;
   }
   body:has(.sds-footbar) {
-    padding-bottom: 6rem;
+    padding-bottom: 6.5rem;
   }
   .sds-footbar-summary {
     display: flex;
     min-width: 0px;
-    flex-direction: column;
-    justify-content: center;
-    --sds-arc: var(--sds-step-1);
-    gap: .4rem;
-    padding: .5rem .8rem;
+    padding: .5rem .7rem;
     border-left: 1px solid var(--sds-rule);
   }
-  .sds-footbar-text {
-    font-family: var(--sds-mono);
-    font-size: var(--sds-xs);
-    color: var(--sds-text-fact);
-    max-width: none;
-    margin: 0;
-    line-height: 1.4;
+  .sds-chip.sds-overall {
+    width: 100%;
+    gap: 2px;
+    background: var(--sds-overall-ground);
+    border-color: var(--sds-overall-edge);
+  }
+  .sds-chip-note {
     overflow: hidden;
+    font-family: var(--sds-mono);
+    white-space: nowrap;
+    color: var(--sds-text-fact);
+    flex: none;
+    font-size: .62rem;
+    line-height: 1.2;
+    text-overflow: ellipsis;
   }
   .sds-footbar-chips {
     display: flex;
@@ -3240,33 +3251,39 @@
     height: 100%;
     background: var(--sds-arc);
   }
-  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1 {
+  .sds-chip.sds-step-1 {
     --sds-arc: var(--sds-step-1);
   }
-  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2 {
+  .sds-chip.sds-step-2 {
     --sds-arc: var(--sds-step-2);
   }
-  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3 {
+  .sds-chip.sds-step-3 {
     --sds-arc: var(--sds-step-3);
   }
-  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4 {
+  .sds-chip.sds-step-4 {
     --sds-arc: var(--sds-step-4);
   }
-  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5 {
+  .sds-chip.sds-step-5 {
     --sds-arc: var(--sds-step-5);
   }
-  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done {
+  .sds-chip.sds-step-done {
     --sds-arc: var(--sds-step-done);
   }
   @media (max-width:40rem) {
     .sds-footbar {
-      grid-template-columns: minmax(0,1fr) 6.2rem;
+      grid-template-columns: minmax(0,1fr) 8.6rem;
     }
     .sds-footbar-summary {
       padding: .4rem .5rem;
     }
-    .sds-footbar-text {
-      font-size: .62rem;
+    .sds-chip.sds-overall {
+      min-width: 0;
+    }
+    .sds-chip.sds-overall .sds-badge {
+      min-width: 0;
+      max-width: 4.3rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .sds-chip {
       width: auto;
