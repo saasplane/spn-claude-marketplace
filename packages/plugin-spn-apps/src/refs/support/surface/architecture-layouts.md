@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "9db61f74"
+      "seen": "08547938"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "81749425"
+      "seen": "70a8c7ab"
     }
   ]
 }
@@ -61,6 +61,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 - **A layout MUST have three parts, the body, the navigation and the content, and each MUST own only what the table gives it** (`RD.SUPPORT.SURFACE.200`). The width and the fill behind everything are the body's, and the content owns nothing inside its area (`RD.SUPPORT.APPS.146`).
 - **Each part that draws a fill MUST give its surface** (`RD.SUPPORT.SURFACE.199`): the body for what stands straight on it, the navigation for its entries, and the content for the page.
 - **The page's fill is `page/fill`, and the colour of the body sets it** (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. No page and no story sets a fill of its own.
+- **A navigation's colour stays in the navigation** (`RD.SUPPORT.SURFACE.226`). The bar, the rail, the dock's column and the phone's bar and drawer carry the navigation's surface; the body and the content each carry their own, `BASE` by default or the theme's colour, so a tile, a card or a text box in the page never takes the navigation's tint. A unit in the navigation, such as an item card in the rail, may take the navigation's tint; a unit in the content takes the content's.
 - **The content MUST fill from its own colour and strength**, `BASE` where the app left it out. Its `bordered` and `raised` are its own: they follow neither the navigation's nor each other's.
 - **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `QUIET`, and the content flat, at the whole width.
 - **The three parts take one surface scale**: a colour and a strength give the same fill on every part, so contrast between parts is a choice of values. The default sets the navigation (`DEFAULT` at `SUBTLE`) apart from a `BASE` body and content; a body one step stronger than the parts on it makes floating parts stand out; the same pair on two parts makes them one; all at `BASE` with floating on reads only through borders and shadows.
@@ -181,6 +182,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | --- | --- |
 | `RD.SUPPORT.APPS.146` | a layout owns the navigation and the main area, and nothing inside that area |
 | `RD.SUPPORT.APPS.160` | the page's fill is the body's colour, and no page sets a fill behind itself |
+| `RD.SUPPORT.SURFACE.226` | a navigation's colour stays in the navigation; the body and the content carry their own surface |
 | `RD.SUPPORT.APPS.161` | the layout keeps one spacing, `--layout-space`, from the theme's size, with no gutter |
 | `RD.SUPPORT.APPS.163` | an item's actions are reachable without hover, in every layout type |
 | `RD.SUPPORT.SURFACE.139` | the theme styles a layout by its layout look, with no setting for one layout type |
