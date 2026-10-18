@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "0034d161"
+      "seen": "d72d6f8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -107,7 +107,7 @@ The theme is one type, `IDSTheme`, with a value in every field but the mode. Wha
 
 ```ts
 export const DS_THEME_DEFAULT: IDSTheme = {
-  primary: DS_DEFAULT_PRIMARY,                  // '#3373C4'
+  primary: DS_DEFAULT_PRIMARY,                  // '#084A75'
                                                 // no mode: the default theme follows the device
   size: DSSizeType.SM,
   radius: DSThemeRadiusType.MEDIUM,
