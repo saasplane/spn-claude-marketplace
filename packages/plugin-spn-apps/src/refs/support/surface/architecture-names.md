@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "b6455239"
+      "seen": "979d4e11"
     }
   ]
 }
@@ -103,7 +103,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | Block | Prop | Values | Vocabulary |
 | --- | --- | --- | --- |
 | `DSAlert` · `DSToast` | `color` | `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType`, limited to these four |
-| `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XXS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XL` to `CONTENT_XXS` | `DSTypographyType` |
+| `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XXS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XXL5` to `CONTENT_XXS` | `DSTypographyType` |
 | `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
 | `DSLink` · `DSText` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
