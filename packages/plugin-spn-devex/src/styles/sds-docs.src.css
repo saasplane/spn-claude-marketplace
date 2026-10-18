@@ -607,7 +607,8 @@
   }
   .sds-footbar{@apply bg-card fixed bottom-3 z-40 grid; left:0; right:0; margin:0 auto; width:min(calc(100vw - 1.5rem),var(--sds-page-max)); grid-template-columns:minmax(0,4fr) minmax(0,1fr); height:4.75rem; border:1px solid var(--sds-rule); border-radius:6px; box-shadow:0 4px 16px rgb(0 0 0 / .14); overflow:hidden}
   body:has(.sds-footbar){padding-bottom:6rem}
-  .sds-footbar-text{@apply font-mono text-xs text-fact; max-width:none; margin:0; padding:.5rem .8rem; line-height:1.4; border-left:1px solid var(--sds-rule); display:flex; align-items:center; overflow:hidden}
+  .sds-footbar-summary{@apply flex flex-col justify-center min-w-0; --sds-arc:var(--sds-step-1); gap:.4rem; padding:.5rem .8rem; border-left:1px solid var(--sds-rule)}
+  .sds-footbar-text{@apply font-mono text-xs text-fact; max-width:none; margin:0; line-height:1.4; overflow:hidden}
   .sds-footbar-chips{@apply flex overflow-x-auto overflow-y-hidden; gap:.5rem; padding:.5rem .7rem; scroll-snap-type:x proximity; scroll-padding:0 .7rem; scrollbar-width:none; overscroll-behavior-x:contain; min-width:0;
     -webkit-mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%); mask-image:linear-gradient(to right,transparent 0,#000 .5rem,#000 calc(100% - .5rem),transparent 100%)}
   .sds-footbar-chips::-webkit-scrollbar{display:none}
@@ -620,15 +621,16 @@
   .sds-chip-line .sds-badge{padding:0 .4rem; font-size:.58rem; letter-spacing:.04em; line-height:1.4}
   .sds-chip-bar{@apply block bg-rule overflow-hidden; flex:none; height:4px; border-radius:999px}
   .sds-chip-bar i{@apply block h-full; background:var(--sds-arc)}
-  .sds-chip.sds-step-1{--sds-arc:var(--sds-step-1)}
-  .sds-chip.sds-step-2{--sds-arc:var(--sds-step-2)}
-  .sds-chip.sds-step-3{--sds-arc:var(--sds-step-3)}
-  .sds-chip.sds-step-4{--sds-arc:var(--sds-step-4)}
-  .sds-chip.sds-step-5{--sds-arc:var(--sds-step-5)}
-  .sds-chip.sds-step-done{--sds-arc:var(--sds-step-done)}
+  .sds-chip.sds-step-1,.sds-footbar-summary.sds-step-1{--sds-arc:var(--sds-step-1)}
+  .sds-chip.sds-step-2,.sds-footbar-summary.sds-step-2{--sds-arc:var(--sds-step-2)}
+  .sds-chip.sds-step-3,.sds-footbar-summary.sds-step-3{--sds-arc:var(--sds-step-3)}
+  .sds-chip.sds-step-4,.sds-footbar-summary.sds-step-4{--sds-arc:var(--sds-step-4)}
+  .sds-chip.sds-step-5,.sds-footbar-summary.sds-step-5{--sds-arc:var(--sds-step-5)}
+  .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done{--sds-arc:var(--sds-step-done)}
   @media (max-width:40rem){
     .sds-footbar{grid-template-columns:minmax(0,1fr) 6.2rem}
-    .sds-footbar-text{font-size:.62rem; padding:.4rem .5rem}
+    .sds-footbar-summary{padding:.4rem .5rem}
+    .sds-footbar-text{font-size:.62rem}
     .sds-chip{width:auto; min-width:5.6rem}
     .sds-chip-subject{@apply hidden}
   }

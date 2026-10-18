@@ -571,16 +571,19 @@ function arcChip(data: ArcData, done: number, total: number): string {
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
+ * is on the right, with a bar of rows done of all under it. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
  */
-function statusBar(counts: readonly { data: ArcData; done: number; total: number }[], overall: string): string[] {
+function statusBar(counts: readonly { data: ArcData; done: number; total: number }[], overall: string, done: number, total: number): string[] {
   if (!counts.length) return [];
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
     ...counts.map((one) => arcChip(one.data, one.done, one.total)),
     `    </div>`,
-    `    <p class="sds-footbar-text">${overall}</p>`,
+    `    <div class="sds-footbar-summary sds-step-${progressStep(done, total)}">`,
+    `      <p class="sds-footbar-text">${overall}</p>`,
+    `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
+    `    </div>`,
     `  </nav>`,
   ];
 }
@@ -597,7 +600,7 @@ export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(w
     `  ${bar(done, total)}`,
   ];
   if (counts.length) lines.push(`  <div class="sds-arcs">`, ...counts.flatMap((one) => arcTile(one.data, one.done, one.total)), `  </div>`);
-  lines.push(...statusBar(counts, overall));
+  lines.push(...statusBar(counts, overall, done, total));
   return `${lines.join("\n")}\n`;
 }
 

@@ -116,6 +116,8 @@ console.log("\n=== the generated blocks — progress and open");
       && inside.includes('<p class="sds-footbar-text">Overall: 1 of 2 rows done &middot; 0 of 1 arcs closed</p>') && !inside.includes("sds-footbar-line"), inside);
   ok("progress: a chip links its row, carries its status word and its progress step, and holds number and name, badge beside done/total, and a thin bar",
     /<a class="sds-chip sds-decided sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001<\/span><span class="sds-chip-subject"> probe<\/span><\/span><span class="sds-chip-line"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><\/a>/.test(inside), inside);
+  ok("progress: the summary carries a bar of rows done of all under the overall line, in the same step shade",
+    inside.includes('<div class="sds-footbar-summary sds-step-3">') && /<p class="sds-footbar-text">[^<]*<\/p>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>/.test(inside), inside);
   ok("progress: the shade steps are 0-19, 20-39, 40-59, 60-79, 80-99 and done at 100",
     [[0, 10, "1"], [1, 10, "1"], [2, 10, "2"], [4, 10, "3"], [6, 10, "4"], [8, 10, "5"], [99, 100, "5"], [10, 10, "done"], [0, 0, "1"]].every(([d, t, want]) => lib.progressStep(d, t) === want));
   ok("progress: the card is written with the first arc, whatever its status, and not before", lib.progressInside("/nowhere", [{ ...data, status: "PROPOSED" }]).includes("sds-footbar-chips") && !lib.progressInside("/nowhere", []).includes("sds-footbar"));

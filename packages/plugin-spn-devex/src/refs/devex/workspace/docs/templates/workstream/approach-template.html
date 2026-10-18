@@ -10,7 +10,7 @@
 {"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NNN}} - {{TITLE}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.6.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.7.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -73,7 +73,7 @@
   </table></div>
   <!-- The badge class is the status word in lower case: sds-proposed, sds-decided, sds-running, sds-held, sds-part-landed, sds-landed, sds-carried, sds-dropped.
        Each row's id is the arc's number, so approach.html#N001 opens the arc; every link to an arc points there, never at its state.json.
-       In the progress grid below, each arc's tile carries the same word as its second class, sds-arc sds-running, which colours its bar. The sticky card after the grid has one chip per arc from the arc's first row on, whatever its status; a chip's second and third classes are the status word and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100. -->
+       In the progress grid below, each arc's tile carries the same word as its second class, sds-arc sds-running, which colours its bar. The sticky card after the grid has one chip per arc from the arc's first row on, whatever its status; a chip's second and third classes (and the summary's second, beside the overall line) are the status word and the progress step, sds-step-1 to sds-step-5 for 0-19 to 80-99 per cent of rows done and sds-step-done at 100. -->
   <!-- spn:generated progress — do not edit inside these markers; `workstream progress write` writes it from the arcs -->
   <p>{{Overall: rows done of all &middot; arcs closed of all}}</p>
   <div class="sds-bar"><i style="width:{{share}}%"></i></div>
@@ -88,7 +88,10 @@
     <div class="sds-footbar-chips">
       <a class="sds-chip sds-running sds-step-3" href="#N001"><span class="sds-chip-name"><span class="sds-mono">N001</span><span class="sds-chip-subject"> {{subject as words}}</span></span><span class="sds-chip-line"><span class="sds-badge sds-status sds-running">RUNNING</span><span class="sds-arc-count">{{done}}/{{total}}</span></span><span class="sds-chip-bar"><i style="width:{{share}}%"></i></span></a>
     </div>
-    <p class="sds-footbar-text">{{Overall: rows done of all &middot; arcs closed of all}}</p>
+    <div class="sds-footbar-summary sds-step-3">
+      <p class="sds-footbar-text">{{Overall: rows done of all &middot; arcs closed of all}}</p>
+      <span class="sds-chip-bar"><i style="width:{{share}}%"></i></span>
+    </div>
   </nav>
   <!-- /spn:generated -->
 </section>
@@ -139,4 +142,4 @@
   The approach template &middot; for the workstreams after 008 &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> and <code>01-workstream.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.6.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.7.0/sds-docs.js"></script>
