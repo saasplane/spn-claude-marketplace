@@ -152,6 +152,9 @@ try {
       threeRead.stale.length === 0 && threeRead.missing.includes("N2") && !threeRead.unknown.length, JSON.stringify(threeRead));
     const two = tableOf(cycles);
     ok("a two-column table written from the arcs has no difference", JSON.stringify(tableDifferences(two, cycles)) === JSON.stringify({ missing: [], unknown: [], stale: [] }), JSON.stringify(tableDifferences(two, cycles)));
+    const plainWord = two.replace('<span class="sds-badge sds-status sds-running">RUNNING</span>', "RUNNING");
+    ok("an arc kept as Markdown whose Status is its plain word is named stale: every status is its badge",
+      plainWord !== two && tableDifferences(plainWord, cycles).stale.some((line) => /Status is not its badge/.test(line)), JSON.stringify(tableDifferences(plainWord, cycles)));
     const reasonless = two.replace('<br><span class="sds-small">waits on Q7</span>', "");
     ok("a HELD arc's reason missing from the Status cell is named",
       tableDifferences(reasonless, cycles).stale.some((line) => /N10's Status does not carry the arc's reason/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));

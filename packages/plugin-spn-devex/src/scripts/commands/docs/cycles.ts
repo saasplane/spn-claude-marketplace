@@ -450,7 +450,7 @@ export function tableDifferences(table: string, cycles: Cycle[], withPreviews = 
       const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
       if (facts(cells[0]) !== facts(expected))
         stale.push(`${key}'s links are not the arc file and the previews and samples the arc's Previews table lists`);
-      if (cycle.kept && cycle.status && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
+      if (cycle.status && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
         stale.push(`${key}'s Status is not its badge, \`sds-badge sds-status sds-${cycle.status.toLowerCase()}\``);
       if (cycle.status && cycle.detail && !cycle.kept && status !== flat(statusCell(cycle)))
         stale.push(`${key}'s Status does not carry the arc's reason`);
