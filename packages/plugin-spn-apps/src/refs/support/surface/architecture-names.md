@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "fb63b242"
+      "seen": "30f2b230"
     }
   ]
 }
@@ -141,6 +141,8 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSToast` | `placement` | `TOP` · `BOTTOM` · `TOP_LEFT` · `TOP_RIGHT` · `BOTTOM_LEFT` · `BOTTOM_RIGHT`, `TOP_RIGHT` when unset | `DSToastPlacementType` |
 | `DSHScroll` | `arrowType` | `DEFAULT` · `OVERLAY`, `DEFAULT` when unset | `DSHScrollArrowType` |
 | `DSTabs` | `type` | `LINE` · `SWITCH` · `PILL`, the look the `pageLevel` picks when unset | `DSTabsType` |
+| `DSTabs` | `color` | `BASE` · `DEFAULT` · `PRIMARY`, the theme's `layout.navigation.color` when unset | `DSSurfaceColorType` |
+| `DSTabs` | `entry` | `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN`, the theme's `layout.navigation.entry` when unset | `DSNavEntryType` |
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
