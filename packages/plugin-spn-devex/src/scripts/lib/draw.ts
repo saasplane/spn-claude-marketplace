@@ -92,6 +92,9 @@ export type SkeletonItem = {
   /** Set by the drawer and never written in a spec: where the edge above a flush table is, and whether the table stands
    *  in a part that is a unit, whose boundary its lines reach. */
   edgeTop?: number; inPart?: boolean;
+  /** Set by the drawer and never written in a spec: this row of tabs stands at the page level, in the root frame's rows
+   *  or in the page head's actions, and is drawn as pills. Tabs inside a container, a card or a widget keep the line. */
+  atPage?: boolean;
   /** An icon that is a mark and not an action: it stands for a thing or a person, and is drawn in a circle.
    *  `mark: false` with `on` keeps the icon an action, a tile, and `on: true` puts a small check at its corner. */
   mark?: boolean;
@@ -2247,7 +2250,9 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       return;
     }
     if (it.control === "tabs") {
-      // THE CHOSEN TAB IS HEAVIER AND HAS A LINE UNDER IT. A thin line runs under the whole row, as the rule of a tab list does.
+      // TABS AT THE PAGE LEVEL ARE PILLS; TABS INSIDE A CONTAINER, A CARD OR A WIDGET ARE THE LINE. The chosen tab is
+      // heavier in both. Each word keeps its place in the row either way, so the pill reaches out into the gap around it.
+      // THE LINE: a thin line runs under the whole row, as the rule of a tab list does, and the chosen word has a heavier one.
       const words = skelTabWords(it);
       const chosen = it.chosen ?? 0;
       if (!words.length) { findings.push("a row of tabs names its words in `tabs`, and this one names none"); return; }
@@ -2255,13 +2260,23 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
         findings.push(`\`chosen\` is \`${chosen}\`, and this row has ${words.length} tabs, counted from 0`);
       if (words.some((word) => word.includes("\n"))) findings.push("a control stands on one line, and a tab's word runs over more");
       const foot = iy + h - 1;
-      out.push(`  <path class="sds-skel-control" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
+      if (it.atPage) {
+        // THE PILL: a muted rounded track with an outline holds the words, and the chosen one stands in a filled pill.
+        const pillPad = SKEL_LABEL_GAP, trackPad = 3, pillH = h - trackPad * 2;
+        out.push(skelRect("sds-skel-surface", ix - pillPad - trackPad, iy, iw + (pillPad + trackPad) * 2, h, h / 2));
+        out.push(skelRect("sds-skel-control", ix - pillPad - trackPad, iy, iw + (pillPad + trackPad) * 2, h, h / 2));
+        let px = ix;
+        words.forEach((word, index) => {
+          if (index === chosen) out.push(skelRect("sds-skel-control", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, pillH / 2));
+          px += skelTabW(it, word) + SKEL_GAP;
+        });
+      } else out.push(`  <path class="sds-skel-control" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
       let tx = ix;
       words.forEach((word, index) => {
         const tw = skelTabW(it, word);
         if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
         out.push(`  <text class="${index === chosen ? "sds-label" : "sds-code"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
-        if (index === chosen) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
+        if (index === chosen && !it.atPage) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
         tx += tw + SKEL_GAP;
       });
       return;
@@ -2448,6 +2463,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   // title is as large and as heavy as a container's, and not the title of one thing among many.
   // Where the page level stands above the frame, it is the head of the page, and an item in the frame is not.
   if (root && !frame.headed) for (const row of rows) for (const it of row.items ?? []) if (it.item) it.part = true;
+  // TABS IN THE ROOT FRAME'S ROWS STAND AT THE PAGE LEVEL, as the page head's actions do (they are the root frame's own row).
+  if (root) for (const row of rows) for (const it of row.items ?? []) if (it.control === "tabs") it.atPage = true;
   const parts = skelParts(frame);
   if (isContainer) skelContainerFindings(frame, parts, findings);
   else if (frame.raised !== undefined || frame.bordered !== undefined || frame.rounded !== undefined)

@@ -779,20 +779,34 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("the two knobs stand at different places in their tracks", row({ control: "switch" }, { control: "switch", on: true }).svg,
     (g) => { const track = rect(g, "sds-skel-control"), knob = circles(g); return knob[0][1] - track[0][0] < track[0][2] / 2 && knob[1][1] - track[1][0] > track[1][2] / 2; });
   one("a switch's track stands 12 lower than a control", rect(switches.svg, "sds-skel-control")[0][3], 20);
-  const tabs = row({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
+  // Tabs inside a container, a card or a widget are the line; the same tabs at the page level are pills (below).
+  const inBox = (...items) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { rows: [{ items }] } }] }] } });
+  const tabs = inBox({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
   one("a row of tabs draws without a finding", tabs.findings, none);
   one("the chosen tab alone is heavy", [...tabs.svg.matchAll(/<text class="sds-label"[^>]*>([^<]+)</g)].map((m) => m[1]).join(), "SMS");
   one("the chosen tab alone has a line under it", (tabs.svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);
-  one("with no `chosen`, the first tab is the chosen one", row({ control: "tabs", tabs: ["A", "B"] }).svg, (g) => g.includes('<text class="sds-label"') && /sds-label"[^>]*>A</.test(g));
-  one("a `chosen` the row lacks is a finding that counts the tabs", row({ control: "tabs", tabs: ["A", "B"], chosen: 2 }).findings, says("has 2 tabs, counted from 0"));
-  one("a row of tabs with no words is a finding", row({ control: "tabs" }).findings, says("names its words in `tabs`"));
+  one("with no `chosen`, the first tab is the chosen one", inBox({ control: "tabs", tabs: ["A", "B"] }).svg, (g) => g.includes('<text class="sds-label"') && /sds-label"[^>]*>A</.test(g));
+  one("a `chosen` the row lacks is a finding that counts the tabs", inBox({ control: "tabs", tabs: ["A", "B"], chosen: 2 }).findings, says("has 2 tabs, counted from 0"));
+  one("a row of tabs with no words is a finding", inBox({ control: "tabs" }).findings, says("names its words in `tabs`"));
+  // Tabs that stand at the page level, in the root frame's rows or in the page head's actions, are a track holding a pill.
+  const pageTabs = row({ control: "tabs", tabs: ["Email", "SMS", "WhatsApp"], chosen: 1 });
+  const pageTrack = rect(pageTabs.svg, "sds-skel-surface")[0], pagePill = rect(pageTabs.svg, "sds-skel-control")[1];
+  one("tabs at the page level draw without a finding", pageTabs.findings, none);
+  one("tabs at the page level are a muted track and a pill, with no line under anything", pageTabs.svg,
+    (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-control").length === 2 && !g.includes("sds-skel-border") && !g.includes('<path class="sds-skel-control"'));
+  one("the pill stands inside the track, which is fully rounded", [pagePill, pageTrack], ([pill, track]) => pill[0] > track[0] && pill[0] + pill[2] < track[0] + track[2] && pill[3] < track[3]);
+  one("the chosen word alone is heavy, and the others are words in the code style", [pageTabs.svg.match(/<text class="sds-label"[^>]*>([^<]+)</g)?.length, pageTabs.svg.match(/<text class="sds-code"/g)?.length], (g) => g[0] === 1 && g[1] === 2);
+  one("page-level tabs keep the words where the line drew them", [...pageTabs.svg.matchAll(/<text class="sds-(?:label|code)" x="([\d.]+)"/g)].map((m) => Number(m[1])), (g) => g.length === 3 && g[1] - g[0] > 0 && g.every((x) => x >= 24 + 16 - 1));
+  const headTabs = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" }, actions: [{ control: "tabs", tabs: ["Day", "Week"], chosen: 0 }] }, frame: { rows: [{ items: [{ note: "x" }] }] } }] });
+  one("tabs in the page head's actions are pills too", headTabs, (g) => g.findings.length === 0 && !g.svg.includes("sds-skel-border") && rect(g.svg, "sds-skel-surface").length >= 1);
+  one("tabs inside a container still draw the line under the chosen one", (inBox({ control: "tabs", tabs: ["A", "B"] }).svg.match(/<path class="sds-skel-border"/g) ?? []).length, 1);
   const badge = row({ control: "badge", text: "Published v2" }, { control: "button", text: "Publish" });
   one("a badge draws without a finding", badge.findings, none);
   one("a badge stands 8 lower than the button beside it", rect(badge.svg, "sds-skel-control").map((r) => r[3]).join(), "24,32");
   one("a badge and a button share the row's centre line", rect(badge.svg, "sds-skel-control"), (g) => g[0][1] + g[0][3] / 2 === g[1][1] + g[1][3] / 2);
   one("a badge with `main` is a finding: it is never something to press", row({ control: "badge", text: "x", main: true }).findings, says("never takes the weight of a main action"));
   one("a badge with no word is a finding", row({ control: "badge" }).findings, says("carries its word in `text`"));
-  one("a badge and a tab may carry an icon, drawn with no square around it", row({ control: "badge", text: "Platform", icon: "default" }, { control: "tabs", tabs: ["Email"], icon: "default" }),
+  one("a badge and a tab may carry an icon, drawn with no square around it", inBox({ control: "badge", text: "Platform", icon: "default" }, { control: "tabs", tabs: ["Email"], icon: "default" }),
     (g) => g.findings.length === 0 && (g.svg.match(/<circle class="sds-skel-glyph /g) ?? []).length === 2 && rect(g.svg, "sds-skel-control").length === 1);
   one("an icon the set lacks, on a badge, is a finding that names the default", row({ control: "badge", text: "x", icon: "rocket" }).findings, says("`default`"));
   one("the three carry no tag, as every control", row({ control: "switch", tag: "name" }).findings, says("a control carries no tag"));
