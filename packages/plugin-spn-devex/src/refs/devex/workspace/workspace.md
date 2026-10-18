@@ -24,6 +24,11 @@
       "seen": "5bb4305a"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "An arc reopens by the moment, and a closed workstream reopens nothing",
+      "seen": "4a4a839a"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
       "seen": "919526a6"
@@ -44,6 +49,11 @@
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.058",
       "seen": "1f6e8b76"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.261",
+      "seen": "f1560c2a"
     },
     {
       "repo": "spn-foundation",
@@ -488,6 +498,19 @@ written in one week because a second spelling had appeared.
 a stop without recording what it waits for moves the question somewhere nobody can find it.
 
 **A terminal status means the arc is finished, so its unlanded rows are history rather than work.**
+
+### An arc reopens by the moment, and a closed workstream reopens nothing
+
+**The kind of change decides the status (`RD.DEVEX.WORKSPACE.261`).**
+
+| Moment | Status |
+| --- | --- |
+| A small decision while building, inside what was agreed | stays `DECIDED` or `RUNNING`; the decision is logged on its card and the arc |
+| New scope after `LANDED` while the workstream is open | back to `PROPOSED`, with the new information in the preview and new rows; `DECIDED` at the developer's word |
+| A change that stops the building | back to `PROPOSED`; its rows stop until the developer decides |
+| The workstream is closed | nothing reopens; new scope is a new workstream |
+
+**A `LANDED` arc with a row that is not landed, carried or deferred has gained scope after it landed.** The Stop hook reports it for an arc this sitting wrote, and the finding says *reopen it as `PROPOSED`*.
 
 
 ## Producer and partner — two shapes of workspace

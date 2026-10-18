@@ -1504,12 +1504,21 @@ ${tableOf(cyclesOf(folder))}
     move(built, "LANDED", "⊘ deferred until a partner asks");
     check("[MKT.HOOKS.36] an arc that lands with every row accounted for gets none", !/\[arc-landed\]/.test(stop(built, "h-whole")));
   }
-  // UNTOUCHED: the arc already read LANDED at the last Stop, and this turn only wrote it again.
+  // KNOWN-BAD (RD.DEVEX.WORKSPACE.261): the arc already read LANDED at the last Stop, and this turn wrote a row nobody accounted for.
   {
     const built = build("n006-stop-landed-already", "LANDED", "");
     stop(built, "h-already");
     move(built, "LANDED", "");
-    check("[MKT.HOOKS.36] an arc that already read LANDED at the last Stop is not read again", !/\[arc-landed\]/.test(stop(built, "h-already")));
+    const out = stop(built, "h-already");
+    check("[MKT.HOOKS.36] known-bad: a LANDED arc that gains an unaccounted row is told to reopen as PROPOSED",
+      count(out, "[arc-landed]") === 1 && /Reopen it as `PROPOSED`/.test(out), out);
+  }
+  // UNTOUCHED: the arc already read LANDED at the last Stop, and this turn wrote it again with every row accounted for.
+  {
+    const built = build("n006-stop-landed-already-whole", "LANDED", "⊘ deferred until a partner asks");
+    stop(built, "h-already-whole");
+    move(built, "LANDED", "⊘ deferred until a partner asks");
+    check("[MKT.HOOKS.36] a LANDED arc written again with every row accounted for gets none", !/\[arc-landed\]/.test(stop(built, "h-already-whole")));
   }
   // UNTOUCHED: another window landed the arc, and this session only read it.
   {

@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "4b17c9e6"
+      "seen": "69315e33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -222,8 +222,15 @@ changes. A title is a name somebody chose on the day, and it rarely lists everyt
 | no arc in this workstream owns it, but it belongs to the subject | a new arc in the open workstream |
 | it belongs to another workstream's subject | a note in that workstream's folder, often one in `backlog/` |
 
-**A terminal arc takes no new row.** An arc that is `LANDED`, `CARRIED` or `DROPPED` is history, so
-an ask it would have owned goes to the next arc that changes the same files, or to a new one.
+**A terminal arc takes no new row unless it is reopened (`RD.DEVEX.WORKSPACE.261`).** An arc that is
+`CARRIED` or `DROPPED` is history, so an ask it would have owned goes to the next arc that changes the
+same files, or to a new one. New scope on a `LANDED` arc of an open workstream sends the arc back to
+`PROPOSED`, with the new information in the preview and the new rows, and `DECIDED` waits for the
+developer's word. A small decision inside what was agreed leaves `DECIDED` or `RUNNING` where it is and
+is logged on its card and the arc. A change that stops the building sends the arc back to `PROPOSED`, and
+its rows stop until the developer decides. A closed workstream reopens nothing: new scope is a new
+workstream. A `LANDED` arc that holds a row not landed, carried or deferred is reported at Stop with the
+words *reopen it as `PROPOSED`*.
 
 **Say which arc and which row took the ask — MUST.** One sentence is enough: *"Added to N117 as row
 4, which already edits that chapter."* Without it the developer cannot tell whether the ask was

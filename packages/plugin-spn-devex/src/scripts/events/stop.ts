@@ -1451,24 +1451,34 @@ export function checkOwnCopy(root: string, mine: Set<string>, told: string[] = [
 export function checkArcLanded(root: string, before: Record<string, ArcMark> | undefined, touched: Set<string> | null): Warning[] {
   if (!before || !touched) return [];
   const reports: string[] = [];
+  const reopen: string[] = [];
   for (const arc of [...touched].sort()) {
     const was = before[arc];
-    if (!was || was.status === "LANDED" || statusOf(arc) !== "LANDED") continue;
+    if (!was || statusOf(arc) !== "LANDED") continue;
     const text = read(arc);
     const rows = arcRowsOf(text, arcName(arc));
     const miscounted = miscountLines(arcName(arc), text);
     const owed = rows.some((row) => !accounted(row) || (stateOf(row) === "carried" && carryFault(root, row) !== null));
     if (!owed && !miscounted.length) continue;
-    reports.push(`\`${workstreamOf(arc)}\` · \`${fromWorkspace(root, arc)}\`:\n` +
-      [...reportLines(root, basename(arc), rows), ...miscounted].join("\n"));
+    const report = `\`${workstreamOf(arc)}\` · \`${fromWorkspace(root, arc)}\`:\n` +
+      [...reportLines(root, basename(arc), rows), ...miscounted].join("\n");
+    // An arc that read LANDED at the last Stop and now holds a row nobody accounted for gained scope
+    // after it landed, and a landed arc owes nothing (01-workstream.md § An arc reopens by the moment).
+    (was.status === "LANDED" ? reopen : reports).push(report);
   }
-  if (!reports.length) return [];
-  return [{ check: "arc-landed", message:
+  const out: Warning[] = [];
+  if (reports.length) out.push({ check: "arc-landed", message:
     `An arc reached \`LANDED\` this turn with a row nobody accounted for. The close gate's report for it:\n${reports.join("\n")}\n` +
     `Give each row one of three states now, while the arc is in front of you: \`✅ landed\` with its date and ` +
     `commit, \`↷ carried\` with the workstream that takes it on, or \`⊘ deferred\` with the event that brings ` +
     `it back. A tick with no date and no landed word reads as pending ` +
-    `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).` }];
+    `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).` });
+  if (reopen.length) out.push({ check: "arc-landed", message:
+    `A \`LANDED\` arc holds a row that is not landed, carried or deferred, so it gained scope after it landed. ` +
+    `Reopen it as \`PROPOSED\`, with the new information in the preview and the new rows, and \`DECIDED\` waits for the ` +
+    `developer's word. If the row is a small decision inside what was agreed, give it its landed state instead:\n` +
+    `${reopen.join("\n")}\n(02-workstream/01-workstream.md § An arc reopens by the moment, RD.DEVEX.WORKSPACE.261).` });
+  return out;
 }
 
 // ---------------------------------------------------------------------------- welcome
