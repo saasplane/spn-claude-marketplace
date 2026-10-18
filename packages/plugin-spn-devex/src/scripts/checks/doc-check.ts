@@ -342,7 +342,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
       "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
-  const { missing, unknown, stale } = tableDifferences(table!, cyclesOf(home.folder), withPreviews);
+  const { missing, unknown, stale } = tableDifferences(table!, cyclesOf(home.folder), withPreviews, current && !inClosedWorkstream(path));
   const out: Finding[] = [];
   if (missing.length)
     out.push([CYCLES, `Cycles has no row for ${listed(missing)} — every arc in arcs/ is one row ` +

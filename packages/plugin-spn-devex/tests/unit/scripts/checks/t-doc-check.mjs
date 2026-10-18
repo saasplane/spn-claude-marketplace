@@ -115,8 +115,10 @@ ${STYLES.stylesheet}
 
 // The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
 // title, the line and the link pills, and the Status cell the word.
+// A status as an open page draws it: its badge (05-artifacts.md § How ends in Cycles).
+const BADGE = (word) => `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span>`;
 const TWO_ROW = (id, name, file, line, status) =>
-  `<tr><td><p><strong>${id} &mdash; ${name}</strong></p><p>${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${status}</td></tr>`;
+  `<tr><td><p><strong>${id} &mdash; ${name}</strong></p><p>${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${BADGE(status)}</td></tr>`;
 const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
   `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
   `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
@@ -458,7 +460,7 @@ try {
     write(page, CLEAN), "silent");
 
   one("a Cycles status the arc does not carry",
-    write(page, CLEAN.replace("<td>DECIDED</td>", "<td>RUNNING</td>")),
+    write(page, CLEAN.replace(`<td>${BADGE("DECIDED")}</td>`, `<td>${BADGE("RUNNING")}</td>`)),
     "reports", "N2 reads RUNNING and the arc reads DECIDED");
 
   one("an arc with no row in Cycles",
@@ -470,7 +472,7 @@ try {
     "reports", "lists N3");
 
   one("a status cell carrying its blocker still reads as its word",
-    write(join(stream(TMP, "043-held"), "held-approach.html"), CLEAN.replace("<td>RUNNING</td>", "<td>RUNNING &middot; since today</td>")),
+    write(join(stream(TMP, "043-held"), "held-approach.html"), CLEAN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("RUNNING")} &middot; since today</td>`)),
     "silent");
 
   one("the same rows in another order — a person chooses the order the arcs run in",
@@ -670,7 +672,7 @@ try {
   mkdirSync(join(planning, ARCS), { recursive: true });
   writeFileSync(join(planning, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "PROPOSED"));
   writeFileSync(join(planning, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
-  const PLANNED = CLEAN.replace("<td>RUNNING</td>", "<td>PROPOSED</td>");
+  const PLANNED = CLEAN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("PROPOSED")}</td>`);
   one("[MKT.HOOKS.40] a page reading PLANNING while no arc is past DECIDED is left alone",
     write(join(planning, "approach.html"), withStatus(PLANNED, "PLANNING")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page reading IMPLEMENTING while no arc is past DECIDED",
@@ -690,7 +692,7 @@ try {
   mkdirSync(join(landing, ARCS), { recursive: true });
   writeFileSync(join(landing, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "LANDED"));
   writeFileSync(join(landing, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DROPPED"));
-  const LANDED_PAGE = CLEAN.replace("<td>RUNNING</td>", "<td>LANDED</td>").replace("<td>DECIDED</td>", `<td>DROPPED<br><span class="sds-small">2026-09-29</span></td>`);
+  const LANDED_PAGE = CLEAN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("LANDED")}</td>`).replace(`<td>${BADGE("DECIDED")}</td>`, `<td>${BADGE("DROPPED")}<br><span class="sds-small">2026-09-29</span></td>`);
   one("[MKT.HOOKS.40] a page in open/ stamped DONE once every arc is terminal is left alone",
     write(join(landing, "approach.html"), withStatus(LANDED_PAGE, "DONE", "&#x2705;")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page in open/ stamped DONE while an arc still runs",
@@ -723,7 +725,7 @@ try {
   // stylesheet. It links nothing, it carries a style block, and its classes have no prefix. Read by
   // the shared names it has no opening and no card in the open shape.
   const OWN = CLEAN.replace(`${STYLES.stylesheet}\n`, "<style>.eyebrow{font-size:.8rem} .standfirst{font-size:1.2rem} .open{border-left:2px solid orange}</style>\n")
-    .replace(/class="sds-section-head"/g, 'class="sec-head"').replace(/class="sds-small"/g, 'class="s"').replace(/sds-badge sds-lens/g, "badge lens").replace(/class="sds-/g, 'class="')
+    .replace(/class="sds-section-head"/g, 'class="sec-head"').replace(/class="sds-small"/g, 'class="s"').replace(/sds-badge sds-lens/g, "badge lens").replace(/sds-badge sds-status sds-([a-z]+)/g, "badge status $1").replace(/class="sds-/g, 'class="')
     + `<section id="s4"><div class="sec-head"><h2>Open &mdash; Q1</h2></div><div class="open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>\n`;
   const ownHome = stream(TMP, "060-own-copy");
   const ownPage = join(ownHome, "approach.html");
@@ -735,7 +737,7 @@ try {
   const reported = checkDoc(write(ownPage, OWN));
   tell("[MKT.SCRIPTS.108] the hook reports it as it reports any RULE: a note, and the write is not refused",
     typeof reported?.note === "string" && reported.note.includes(`[RULE] ${OWN_COPY}`) && reported.deny === undefined, JSON.stringify(reported));
-  const stale = check(ownPage, OWN.replace("<td>RUNNING</td>", "<td>PROPOSED</td>").replace(/<p class="standfirst">[^\n]*\n/, ""));
+  const stale = check(ownPage, OWN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("PROPOSED")}</td>`).replace(/<p class="standfirst">[^\n]*\n/, ""));
   tell("[MKT.SCRIPTS.108] no markup of it is read: a stale table, a missing opening and a card with no options draw nothing",
     stale.length === 1 && stale[0][1] === OWN_COPY, JSON.stringify(stale));
   tell("[MKT.SCRIPTS.108] untouched: the same page in the shared form is read, and its card with no options is reported",

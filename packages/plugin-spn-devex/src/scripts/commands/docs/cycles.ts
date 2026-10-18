@@ -419,7 +419,7 @@ function arcsByKey(cycles: Cycle[]): Map<string, Cycle> {
  * so a page may list the arcs in the order a person chooses. With `withPreviews` false only the rows
  * and their statuses are compared, which is what a closed workstream's three-column table is held to.
  */
-export function tableDifferences(table: string, cycles: Cycle[], withPreviews = true): { missing: string[]; unknown: string[]; stale: string[] } {
+export function tableDifferences(table: string, cycles: Cycle[], withPreviews = true, requireBadge = true): { missing: string[]; unknown: string[]; stale: string[] } {
   const onPage = tableRows(table);
   const inArcs = arcsByKey(cycles);
   const stale: string[] = [];
@@ -450,7 +450,8 @@ export function tableDifferences(table: string, cycles: Cycle[], withPreviews = 
       const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
       if (facts(cells[0]) !== facts(expected))
         stale.push(`${key}'s links are not the arc file and the previews and samples the arc's Previews table lists`);
-      if (cycle.status && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
+      // An open page draws every status as its badge; a closed workstream's page stays as it closed, its word read as it is.
+      if (cycle.status && (requireBadge || cycle.kept) && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
         stale.push(`${key}'s Status is not its badge, \`sds-badge sds-status sds-${cycle.status.toLowerCase()}\``);
       if (cycle.status && cycle.detail && !cycle.kept && status !== flat(statusCell(cycle)))
         stale.push(`${key}'s Status does not carry the arc's reason`);
