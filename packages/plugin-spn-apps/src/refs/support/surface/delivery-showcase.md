@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "352732fd"
+      "seen": "2011fc98"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "e80978b0"
+      "seen": "a4ce383a"
     }
   ]
 }
@@ -77,7 +77,9 @@ The group of a unit is its path in the sidebar, so the title of a unit is its gr
 | Layouts | `Layout` |
 | App | `App` |
 
-The theme is not a page. The toolbar holds a Theme button that opens the theme's sheet on any page, and the theme a person chooses is saved in the browser and followed by every page.
+The theme is not a page. A floating theme bar on every page is the one place it is set (`RD.SUPPORT.SURFACE.212`): the brand colours, the mode (System, Light and Dark, System first) and Theme, which opens the theme's one sheet, and no page draws a Theme button of its own. The theme a person chooses is saved in the browser and followed by every page. The bar stands on the page itself alone, never in a frame, a picture, a thumbnail or a screen opened full screen; it never covers content, keeping room at a page's end, shrinking to a small pill on a reference page while the reader scrolls down and opening on hover or focus, and on a phone showing the colours and a *more* button.
+
+The tool's chrome keeps only what a reader of the public site uses (`RD.SUPPORT.SURFACE.212`): the search, the sidebar, the device as one group of icon toggles (the sample apps' devices, each named, the chosen one pressed, kept between pages) and the code toggle in the toolbar, a link to the page, and on a component page the controls and the accessibility checks. The sidebar opens with every section and folder expanded and keeps a reader's own collapse. A tool or menu that serves the people who build a component goes, by the tool's configuration where it has a setting and by its stylesheet only where it has none. The public site is a static build: every page comes from code at build time, and nothing in a browser creates, changes or saves a story, an argument or a source file.
 
 Welcome, with its sample apps, and Standards hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
 

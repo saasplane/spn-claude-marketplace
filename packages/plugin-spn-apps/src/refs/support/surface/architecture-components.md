@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "8f8af9f2"
+      "seen": "33497d2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "461252e0"
+      "seen": "a0b53043"
     }
   ]
 }
@@ -166,7 +166,9 @@ Each rule below is of one block or one prop. The props, their values and their d
   | --- | --- | --- |
   | `LINE` | the underline: the open tab is the primary colour over a line, and no fill | the pages of an app, and the parts of its containers and cards |
   | `SWITCH` | a sunken bar, with a raised pill on the open tab | two ways to show one thing, inside a part of a page |
-  | `PILL` | a floating bar, raised in the fill and the line of its surface, fully rounded, roomier than the switch; the open tab a soft fill of the brand with a label stronger in colour and in weight | the pages of a website, in its top bar |
+  | `PILL` | a floating bar, raised in the fill of its surface by its shadow alone, with no line, fully rounded, roomier than the switch; the open tab a soft fill of the brand, with no line, and a label stronger in colour and in weight; a closed tab the brand one step softer, with the open tab's label colour, under the pointer and the focus (`RD.SUPPORT.SURFACE.213`) | the pages of a website, in its top bar |
+
+- **Every `type` MUST stand one under another and share the whole width** (`RD.SUPPORT.SURFACE.213`). With `orientation` `VERTICAL` the line runs down the side, the switch is a sunken column and the pill a raised rounded column; with `fill` the tabs of every type share the width equally.
 
 - **A unit that takes a page level MUST be given its `pageLevel` first, and its `size` only to override the size the level gives** (`RD.SUPPORT.SURFACE.209`). `DSItem` and `DSItemFacts` take no `size`, so the level is all a page gives them.
 
@@ -526,6 +528,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens, a role for each kind of unit, icon motions moved only by their holder, and one reduced-motion rule |
 | `RD.SUPPORT.SURFACE.204` | a row that scrolls sideways is `DSHScroll`, its arrows sized from its size and standing on the ground the row stands on, or on a scrim over a picture |
 | `RD.SUPPORT.SURFACE.209` | `DSTabs` takes a `type`, `LINE`, `SWITCH` or `PILL`, the level giving the size and the look where no type is named, a website's pages taking `PILL`; a unit that takes a page level is given its `pageLevel` first and its `size` only to override |
+| `RD.SUPPORT.SURFACE.213` | the `PILL` bar is raised by its shadow alone with no line, its closed tab takes the brand one step softer under the pointer and the focus, and every type of `DSTabs` stands vertical and shares the width |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
 
 ## Proof

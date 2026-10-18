@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "f1c476f3"
+      "seen": "bf8515a1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "d26e5dd4"
+      "seen": "0034d161"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -36,7 +36,7 @@ Read this before you mount a surface, write a theme, or ask what a block already
 Exactly two contexts cross between an app and its design system, one direction each. The application supplies session, permissions, locale facts, the translate implementation and the unauthenticated policy. The design system supplies theme, device, navigation, media resolution and density.
 
 - **Service calls**: run every call of a screen through the service executor. It never throws: it resolves to what the call returns, or to nothing when the call fails. An unauthenticated failure goes to the app's policy alone. Before the app is mounted there is no policy, so that failure goes to the caller's own handler. Any other failure is shown once, by the screen's handler or by a toast. A failure that nothing takes is logged as an error, so none is silent.
-- **Theming**: derive the brand from a single seed. Treat light and dark as a mode flip on the role layer. A block with no `mode` follows the theme around it; a block whose `mode` names light or dark draws in that mode's own values wherever it stands, in both directions. Read the roles and the scale from a component, never a ramp step and never a raw value. Let the design-system root own theme state, the choice and the theme beside it, with the setter of the choice reachable from any depth.
+- **Theming**: derive the brand from a single seed. Treat light and dark as a mode flip on the role layer. A theme that names no mode follows the device's light or dark, live, and the mode in force is always one of the two (`RD.SUPPORT.SURFACE.211`). A block with no `mode` follows the theme around it; a block whose `mode` names light or dark draws in that mode's own values wherever it stands, in both directions. Read the roles and the scale from a component, never a ramp step and never a raw value. Let the design-system root own theme state, the choice and the theme beside it, with the setter of the choice reachable from any depth.
 - **Formatting**: ship one formatting capability per preference vocabulary. Never format by hand in a component or a module. Resolve an absent optional preference to the vocabulary's declared default, never to the device's locale. The app always holds the time format, as it holds the date format and the number format (`RD.SUPPORT.SURFACE.123`). A block that shows or takes a time uses the format the page gives it, else the app's, and it holds no time format of its own. A console that states no preference of a person or of an organization gives the 12-hour form with AM or PM, `HH_MM_DAY_FORMAT`.
 - **Translation**: pass every user-facing string through the design system's translate capability, with a key, a source message and named variables. The application supplies the implementation.
 - **Navigation**: declare a `navigate` seam in the design system, and bind the application's router to it once. Never import a router, read a route or touch history from a design-system component.
@@ -50,12 +50,12 @@ A conforming design system answers a fixed set of groups (`architecture-componen
 
 ## The theme — 🔮
 
-A theme is one declared object, `IDSTheme`, and it holds a closed list of choices. Every choice is optional, the brand colour, the mode and the size among them, and a choice left out takes the value of the default theme.
+A theme is one declared object, `IDSTheme`, and it holds a closed list of choices. Every choice is optional, the brand colour, the mode and the size among them, and a choice left out takes the value of the default theme. The mode alone has no default: left out, the theme follows the device.
 
 | Choice | What it sets |
 | --- | --- |
 | Brand color | the seed the primary ramp is worked out from |
-| Light or dark | which ramp step each role token points at |
+| Light or dark | which ramp step each role token points at; `LIGHT` or `DARK`, and left unset the device's, followed live (`RD.SUPPORT.SURFACE.211`) |
 | Default size | the size step a block takes when none is set on it |
 | Corner radius | one base value. The radius of every size step is worked out from it |
 | Motion speed | `motionSpeed`: the multiplier on every place's base duration |
@@ -103,12 +103,12 @@ A partner changes the look of an app through one theme, and in no other way (`RD
 
 ## The whole theme, and its form — 🔮
 
-The theme is one type, `IDSTheme`, with a value in every field. What an app hands in is its choice: the same type with every field optional, worked out by one helper type, so no part is written twice. The theme the blocks draw is the choice laid over one default object, field by field.
+The theme is one type, `IDSTheme`, with a value in every field but the mode. What an app hands in is its choice: the same type with every field optional, worked out by one helper type, so no part is written twice. The theme the blocks draw is the choice laid over one default object, field by field.
 
 ```ts
 export const DS_THEME_DEFAULT: IDSTheme = {
-  primary: DS_DEFAULT_PRIMARY,                  // '#1A365D'
-  mode: DSThemeModeType.LIGHT,
+  primary: DS_DEFAULT_PRIMARY,                  // '#3373C4'
+                                                // no mode: the default theme follows the device
   size: DSSizeType.SM,
   radius: DSThemeRadiusType.MEDIUM,
   motionSpeed: DSMotionSpeedType.DEFAULT,
@@ -153,6 +153,7 @@ export const DS_THEME_DEFAULT: IDSTheme = {
 
 - **The app and its context MUST hold the whole theme, `theme`, and the choice beside it, `themeChoice`** (`RD.SUPPORT.SURFACE.161`). So a form can mark a default and reset a choice. `DSApp`, `setTheme` and the form take the choice. A second, resolved type exists nowhere.
 - **The defaults MUST be written in one place, the default theme.** A unit and a layout read the theme, and keep no fallback of their own for a value of it. A unit's own prop, optional, still wins.
+- **A theme that names no mode MUST follow the device, and the mode in force MUST stay light or dark** (`RD.SUPPORT.SURFACE.211`). `DSThemeModeType` keeps `LIGHT` and `DARK`, with no third member. `DSApp` reads `prefers-color-scheme` and follows its change; `data-mode` and every token stay light or dark. A unit that draws by mode reads `useDSResolvedMode()`, never `theme.mode`. The form offers System, Light and Dark, System first and the default, System leaving the mode out.
 - **Some values MUST be worked out from the choice, and not fixed.** A value of the card look follows the container's choice where the app chose one, else the default.
 - **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, filled in as a chosen value is, and carries no reset and no default note of its own; a choice equal to the default is left out of the theme. Resetting is the *Reset* of a part and *Reset to defaults*, which clears every choice, so the page receives an empty choice. The form arranges its settings in six parts that follow the theme's keys, as the sections of an accordion (`RD.SUPPORT.SURFACE.191`), and offers no font family. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`), and a switch stands with its own label.
 - **The theme MUST hold no font family** (`RD.SUPPORT.SURFACE.196`). The typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans`. A family name without its file only falls back, so a brand font is a file and a licence an app decides once.
@@ -207,6 +208,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
 | `RD.SUPPORT.SURFACE.203` | the theme holds the temperature of the greys, a choice of three |
+| `RD.SUPPORT.SURFACE.211` | a theme that names no mode follows the device's light or dark, live, the mode in force staying light or dark, and the form offers System, Light and Dark |
 | `RD.SUPPORT.SURFACE.196` | the theme holds no font family: the typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans` |
 | `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is kept where the field can fail or has a description (`RD.SUPPORT.SURFACE.171`); the theme's form is built on it |
 | `RD.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
