@@ -31,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { arcIdsOf, blockAt, readArc, stampsOn, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { approachOf, arcIdsOf, blockAt, readArc, stampsOn, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -669,6 +669,51 @@ function writeNameFiles(folder: string): string[] {
     if (data && typeof data.subject === "string" && data.subject && writeNameFile(folder, data)) wrote.push(`${arc}/${data.subject}.md`);
   }
   return wrote;
+}
+
+/** The views of an arc's status that the approach page holds, as a refresh names them. */
+export const VIEW_NAMES: Record<keyof typeof PRODUCED_PARTS, string> = { status: "card", table: "cycles", open: "headings" };
+
+/**
+ * Every view of the arcs' state, brought current from the arcs' data in one pass: the name files, each
+ * preview's Status badge, and the approach page's status card, Cycles table and headings, across all
+ * the workstream's arcs. It is what `docs cycles write` does, as a function the `workstream` writes
+ * call. `views` names what changed, `skipped` says why a part that differs could not be written. A
+ * closed workstream stays as it closed.
+ */
+export function refreshViews(folder: string): { views: string[]; skipped: string[] } {
+  const views: string[] = [];
+  const skipped: string[] = [];
+  if (isClosed(folder)) return { views, skipped };
+  writeNameFiles(folder);
+  const previews = writePreviewStatus(folder);
+  const page = approachOf(folder);
+  if (page) {
+    const text = read(page);
+    if (!linksSharedStyles(text)) skipped.push(`${basename(page)}: ${OWN_COPY}`);
+    else {
+      const produced = producedPage(folder, text);
+      if (!produced) skipped.push(`${basename(page)} has no Cycles table to write`);
+      else {
+        skipped.push(...produced.skipped.map((reason) => `${basename(page)}: ${reason}`));
+        if (produced.text !== text) writeFileSync(page, produced.text, "utf8");
+        const named = (Object.keys(PRODUCED_PARTS) as Array<keyof typeof PRODUCED_PARTS>).filter((key) => produced.wrote.includes(PRODUCED_PARTS[key]));
+        if (named.length) views.push(`approach: ${named.map((key) => VIEW_NAMES[key]).join(", ")}`);
+      }
+    }
+  }
+  if (previews.length) views.push("preview badge");
+  return { views, skipped };
+}
+
+/** The status each arc's row in the page's Cycles table shows: the word, and whether its cell is the arc's badge. */
+export function tableStatuses(text: string): Map<string, { word: string | null; cell: string }> {
+  const at = cyclesTableAt(text);
+  if (!at) return new Map();
+  const table = text.slice(at.from, at.to);
+  const headers = [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase());
+  const statusAt = headers.indexOf("status") >= 0 ? headers.indexOf("status") : 2;
+  return new Map([...tableRows(table)].map(([key, cells]) => [key, { word: statusWord(flat(cells[statusAt] ?? "")), cell: cells[statusAt] ?? "" }]));
 }
 
 function writePages(folder: string, target: string, cycles: Cycle[]): number {

@@ -13,7 +13,7 @@ import { type Action, UsageFault, readWords } from "../../../../../plugin-suppor
 import { frontMatter } from "../../lib/front-matter.ts";
 import { doneOf, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost } from "../../lib/workstream-schema.ts";
-import { afterWrite, typed, workstreamNamed } from "./_shared.ts";
+import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { projectFolder, report as tokensReport } from "../workspace/tokens.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
@@ -51,6 +51,7 @@ function write(args: string[]): number {
   if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc}.`);
 
   const before = new Set(readyRows(ws, data).map((one) => one.id));
+  const signatures = arcSignatures(ws);
   row.state = outcome === "landed" ? "landed" : "stopped";
   if (typeof matter.proof === "string") row.proof = matter.proof;
   if (matter.commits && typeof matter.commits === "object" && !Array.isArray(matter.commits)) {
@@ -80,10 +81,11 @@ function write(args: string[]): number {
   for (const id of added) logEvent(ws, arc, "added", id, `follow-up of ${rowId}`);
 
   const ready = readyRows(ws, data, readQuestions(ws)).map((one) => one.id).filter((id) => !before.has(id) && !added.includes(id));
+  const refreshed = refreshIfMoved(ws, signatures);
   const { done, total } = doneOf(data);
   console.log(["ok", `${arc} ${done}/${total}`, ...added.map((id) => `${id} added`), ...ready.map((id) => `${id} ready`),
-    ...(outcome === "needs-you" ? [`${rowId} needs you`] : [])].join(" · "));
-  for (const line of afterWrite(ws)) console.log(line);
+    ...(outcome === "needs-you" ? [`${rowId} needs you`] : []), ...refreshed.said].join(" · "));
+  for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   return 0;
 }
 

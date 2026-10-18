@@ -17,7 +17,7 @@ import {
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
 import { QUESTION_ID, cardFaults, type Card, type Question } from "../../lib/workstream-schema.ts";
-import { afterWrite, arcNamed, typed } from "./_shared.ts";
+import { afterWrite, arcNamed, arcSignatures, refreshIfMoved, typed } from "./_shared.ts";
 
 export const describe = "a question card, from raised to answered or withdrawn: the record and every page's Open";
 
@@ -104,13 +104,15 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
   if (state === "answered" && (!key || !record.card.options.some((option) => option.key === key)))
     throw new UsageFault(`needs \`--key\`, one of ${record.card.options.map((option) => option.key).join(" · ")}.`);
   const off = pagesOf(record);
+  const before = arcSignatures(ws);
   record.state = state;
   record.answer = { key, words: said, at: now() };
   const lines = finish(ws, records);
   if (readArc(ws, record.arc)) logEvent(ws, record.arc, state, null, `${record.id}${key ? ` ${key}` : ""} · ${said}`);
+  const refreshed = refreshIfMoved(ws, before);
   const owed = state === "answered" ? `owed: ${record.arc}'s What, its Log line` : "owed: its Log line";
-  console.log(`${record.id} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"} · ${owed}`);
-  for (const line of lines) console.log(line);
+  console.log(`${[`${record.id} · ${state}${key ? ` ${key}` : ""} · off ${off} page${off === 1 ? "" : "s"}`, ...refreshed.said, owed].join(" · ")}`);
+  for (const line of [...refreshed.lines, ...lines]) console.log(line);
   return 0;
 }
 

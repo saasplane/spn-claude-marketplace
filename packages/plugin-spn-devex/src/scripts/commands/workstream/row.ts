@@ -7,13 +7,14 @@
 // header and its status; `--goal` sets the outcome the arc's name file leads with, and `--subject` takes
 // one to three words of at most 24 characters. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
-// `--note` alone writes a line on the arc's log, which has no other writer.
+// `--note` alone writes a line on the arc's log, which has no other writer. A write that moves an arc's
+// status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which.
 
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
-import { afterWrite, arcNamed, listOf, typed } from "./_shared.ts";
+import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 
 export const describe = "open an arc or change its header, or add a row or change its fields and its state";
 
@@ -82,6 +83,7 @@ function write(args: string[]): number {
   if (short) throw new UsageFault(`takes a short subject: \`${subject}\` ${short}, such as \`layout-model\` (RD.DEVEX.WORKSPACE.265).`);
   let data = readArc(ws, arc);
   const said: string[] = [];
+  const before = arcSignatures(ws);
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
@@ -132,9 +134,10 @@ function write(args: string[]): number {
       said.push(changed.length ? `row ${rowId} · ${changed.join(", ")}` : `row ${rowId} · log line written`);
     }
   }
+  const refreshed = refreshIfMoved(ws, before);
   const { done, total } = doneOf(data);
-  console.log(`ok · ${arc} ${done}/${total} · ${said.join(" · ")}`);
-  for (const line of afterWrite(ws)) console.log(line);
+  console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
+  for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   return 0;
 }
 

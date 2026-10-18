@@ -6,7 +6,8 @@
 import { basename } from "node:path";
 import { UsageFault, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { checkWorkstream } from "../../checks/workstream-state.ts";
-import { findWorkstream, resolveArc, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
+import { refreshViews } from "../docs/cycles.ts";
+import { arcIdsOf, findWorkstream, readArc, resolveArc, stateOfRow, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
 
 /** A library call whose plain error is a fault in what was typed. */
 export function typed<T>(read: () => T): T {
@@ -44,4 +45,31 @@ export function afterWrite(ws: string): string[] {
   for (const finding of checkWorkstream(ws))
     lines.push(`! state check · ${basename(ws)}${finding.arc ? ` ${finding.arc}` : ""} · ${finding.message}`);
   return lines;
+}
+
+/** Where each arc stands: its status, and the state of each row by id. Taken before a write, to see what it moved. */
+export function arcSignatures(ws: string): Map<string, { status: string; rows: Map<string, string> }> {
+  const out = new Map<string, { status: string; rows: Map<string, string> }>();
+  for (const arc of arcIdsOf(ws)) {
+    const data = readArc(ws, arc);
+    if (data) out.set(arc, { status: data.status, rows: new Map(data.rows.map((row) => [row.id, stateOfRow(data.rows, row)])) });
+  }
+  return out;
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.273: when a write moved the status of an arc, or the state of a row it already had,
+ * every view of it is refreshed in the same command, across all the workstream's arcs. An arc just
+ * opened or a row just added moves no status, so `docs cycles write` and the stamp still bring them in.
+ * `said` names each view rewritten, for the command's one line; `lines` carries a part that could not be written.
+ */
+export function refreshIfMoved(ws: string, before: ReturnType<typeof arcSignatures>): { said: string[]; lines: string[] } {
+  const after = arcSignatures(ws);
+  const moved = [...before].some(([arc, was]) => {
+    const now = after.get(arc);
+    return !!now && (now.status !== was.status || [...was.rows].some(([id, state]) => now.rows.has(id) && now.rows.get(id) !== state));
+  });
+  if (!moved) return { said: [], lines: [] };
+  const { views, skipped } = refreshViews(ws);
+  return { said: views, lines: skipped.map((reason) => `! ${reason}`) };
 }

@@ -50,6 +50,30 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row");
   ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
+console.log("\n=== RD.DEVEX.WORKSPACE.273 — a view of an arc's status that disagrees with the arc is a finding");
+{
+  const { root, ws } = await dataWorkspace("state-views");
+  const page = join(ws, "approach.html");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  const original = readFileSync(page, "utf8");
+  const badge = (word) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}" href="../../approach.html#N001">${word}</a></span></span></div><h1>Probe</h1></header>\n<div class="sds-wrap"></div>\n`;
+  writeFileSync(preview, badge("DECIDED"));
+  ok("green: a preview badge that shows the arc's status passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  writeFileSync(preview, badge("LANDED"));
+  const redBadge = checkWorkstream(ws);
+  ok("red: a hand-edited preview badge fails, naming the arc, the view and the command", has(redBadge, "views", /N001's preview badge does not show DECIDED — `spn-devex docs cycles write 031`/), said(redBadge));
+  const mended = cli(root, ["docs", "cycles", "write", "031"]);
+  ok("`docs cycles write` mends it", mended.code === 0 && checkWorkstream(ws).length === 0, `${mended.out} ${said(checkWorkstream(ws))}`);
+  writeFileSync(page, original.replace('sds-decided">DECIDED', 'sds-running">RUNNING'));
+  const redRow = checkWorkstream(ws);
+  ok("red: a Cycles row showing another status fails", has(redRow, "views", /N001 reads RUNNING in the approach page's Cycles table and its data reads DECIDED — `spn-devex docs cycles write 031`/), said(redRow));
+  writeFileSync(page, original.replace('sds-planning">&#x1F52E; PLANNING', 'sds-implementing">&#x1F6A7; IMPLEMENTING'));
+  const redCard = checkWorkstream(ws);
+  ok("red: a status card that disagrees with the arcs fails", has(redCard, "views", /status card reads IMPLEMENTING and the arcs give PLANNING/), said(redCard));
+  writeFileSync(page, original);
+  ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+}
+
 console.log("\n=== RD.DEVEX.WORKSPACE.263 — every arc has an address, its Cycles row's id");
 {
   const { root, ws } = await dataWorkspace("state-address");

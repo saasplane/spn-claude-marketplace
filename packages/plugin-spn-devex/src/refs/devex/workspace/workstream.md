@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "20c31a26"
+      "seen": "a3aefeaf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -1079,6 +1079,15 @@ stamp's only writer. A `What` or `How` subsection that has a preview ends in a *
 preview →* line. The subsection says the decision in two or three sentences, and the preview holds
 the detail. The page never states a preview's tables, trees or lists a second time, and one section
 of the page never repeats another (`RD.DEVEX.WORKSPACE.223`).
+
+**A write that changes an arc's status, or a row's state, refreshes every view of it in the same command —
+MUST** (`RD.DEVEX.WORKSPACE.273`). The views are the approach page's status card, its Cycles table and
+headings, and the arc preview's Status badge. `workstream row write` (and `report write`) rewrites them across
+all the workstream's arcs when `status` or a row's `state` moved, and says each view in its line:
+`ok · N015 · status · approach: card, cycles · preview badge`. A `question` write does the same when an answer
+moves a status. Never run `docs cycles write` by hand to catch up after a status write. A view that disagrees
+with the arc's data is a finding of `workstream state check`, naming the arc, the view and the command that
+fixes it. What a status leaves in prose, an arc's `What` or its Log line, stays yours.
 
 **The page is written for the developer who decides — MUST** (`RD.DEVEX.WORKSPACE.225`). It holds
 what they need to decide, in plain words: the problem, the decision, the options weighed and what

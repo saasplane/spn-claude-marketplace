@@ -10,12 +10,13 @@ import { readFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import { pastDecided } from "./arc-status.ts";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
+import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, isDataLayout, logFileOf, markdownArcsOf,
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
-  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
 } from "../lib/workstream.ts";
 import { arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
@@ -134,6 +135,27 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
   return out;
 }
 
+/**
+ * RD.DEVEX.WORKSPACE.273: the views of an arc's status against its data. The Cycles row's word and badge,
+ * and the preview's Status badge, each name the arc, the view and the command that mends it.
+ */
+export function viewFindings(ws: string, arc: string, data: ArcData, text: string): string[] {
+  const out: string[] = [];
+  const fix = `\`spn-devex docs cycles write ${basename(ws).slice(0, 3)}\``;
+  const row = text ? tableStatuses(text).get(arc) : undefined;
+  if (row && row.word !== data.status)
+    out.push(`${arc} reads ${row.word ?? "no status"} in the approach page's Cycles table and its data reads ${data.status} — ${fix} writes the page from the arcs`);
+  else if (row && !row.cell.includes(`sds-status sds-${data.status.toLowerCase()}`))
+    out.push(`${arc}'s Status in the Cycles table is not its badge, \`sds-status sds-${data.status.toLowerCase()}\` — ${fix} writes it`);
+  const preview = previewOf(ws, arc);
+  if (isFile(preview)) {
+    const shown = readFileSync(preview, "utf8");
+    if (previewWithStatus(shown, arc, data.status) !== shown)
+      out.push(`${arc}'s preview badge does not show ${data.status} — ${fix} writes it from the arc`);
+  }
+  return out;
+}
+
 /** The files of every step an arc has passed: its plan once decided, and the report of each landed row with an order. */
 export function stepFindings(ws: string, arc: string, data: ArcData): string[] {
   const out: string[] = [];
@@ -193,9 +215,14 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
     out.push(...pageFindings(ws, arc, data, page, text).map(say(arc, "stamp")));
+    out.push(...viewFindings(ws, arc, data, text).map(say(arc, "views")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
   }
+  // The status card is read from every arc together, so it belongs to none of them.
+  const card = page ? headerStatusRule(ws, text, cyclesOf(ws)) : null;
+  if (card)
+    out.push(say(null, "views")(`the approach page's status card reads ${card.shows} and the arcs give ${card.gives} — \`spn-devex docs cycles write ${name.slice(0, 3)}\` writes it`));
   // A notes folder with no arc data is an arc the page cannot show.
   for (const arc of listdir(join(ws, NOTES)))
     if (/^N\d+[a-z]?$/.test(arc) && !isFile(stateFileOf(ws, arc))) out.push(say(arc, "steps")(`\`${NOTES}/${arc}/\` has no \`arcs/${arc}/state.json\``));

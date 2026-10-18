@@ -134,7 +134,8 @@ console.log("\n=== progress write, and arc stamp write");
   ok("it reads the rows done and the arcs", /<span>0 of 2 arcs closed<\/span>/.test(readFileSync(join(ws, "approach.html"), "utf8")));
   const wrong = cli(root, ["workstream", "arc", "stamp", "031/N001"]);
   ok("red: `arc stamp` with no `write` is refused in the chapter's words", wrong.code === 2 && wrong.out.includes("is typed `arc stamp write <arc>`."), wrong.out);
-  const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N002"]);
+  cli(root, ["workstream", "row", "write", "031/N009", "--title", "an arc the page does not list", "--subject", "unlisted"]);
+  const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N009"]);
   ok("red: an arc with no Cycles row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("the arc is stamped", stamped.code === 0 && /N001 · stamped [0-9a-f]{12}/.test(stamped.out), stamped.out);
@@ -174,14 +175,35 @@ console.log("\n=== question — raise, show, answer, withdraw");
   ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /q8 A · Q8 - A/.test(line.note)));
 }
 
+console.log("\n=== row write — a status or a row state moved refreshes every view of it (RD.DEVEX.WORKSPACE.273)");
+{
+  const views = await dataWorkspace("commands-views");
+  const header = (badge) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span>${badge}</span></div><h1>Probe</h1></header>\n`;
+  const stale = '<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span>';
+  put(views.ws, "notes/N001/preview.html", `${header(stale)}<div class="sds-wrap"><section id="s1"><h2>Overview</h2></section></div>\n`);
+  const page = join(views.ws, "approach.html");
+  const preview = join(views.ws, "notes", "N001", "preview.html");
+  const landed = cli(views.root, ["workstream", "row", "write", "031/N001", "--status", "LANDED"]);
+  ok("red before the change: the line names each view it rewrote", landed.code === 0 && /N001 0\/2 · N001 · status · approach: card, cycles · preview badge/.test(landed.out), landed.out);
+  const text = readFileSync(page, "utf8");
+  ok("the Cycles table row shows LANDED as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
+  ok("the status card moves with the arcs", /<div class="sds-eyebrow">(?:(?!<\/div>).)*sds-status sds-implementing">[^<]*IMPLEMENTING/s.test(text), text);
+  ok("the preview's badge shows LANDED", readFileSync(preview, "utf8").includes('sds-status sds-landed" href="../../approach.html#N001">LANDED</a>'));
+  ok("no state check finding follows", !/state check/.test(landed.out), landed.out);
+  const moved = cli(views.root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+  ok("a row's state moving with the views current writes none and names none", moved.code === 0 && !/approach:|preview badge/.test(moved.out), moved.out);
+  const note = cli(views.root, ["workstream", "row", "write", "031/N001", "--note", "a line"]);
+  ok("a note alone refreshes nothing", note.code === 0 && !/approach:|preview badge/.test(note.out), note.out);
+}
+
 console.log("\n=== state show and state check");
 {
   const show = cli(root, ["workstream", "state", "show", "031"]);
-  ok("show: one line, the arcs, the cards and the suggestions", show.code === 0 && /^031 · N001 \d+\/\d+ · .*N002 proposed · 0 open cards · 1 suggestion raised/.test(show.out.trim()), show.out);
+  ok("show: one line, the arcs, the cards and the suggestions", show.code === 0 && /^031 · N001 \d+\/\d+ · .*N002 proposed · N009 proposed · 0 open cards · 1 suggestion raised/.test(show.out.trim()), show.out);
   const asData = JSON.parse(cli(root, ["workstream", "state", "show", "031", "--json"]).out);
-  ok("show --json: the same, as data", asData[0].workstream === "031-probe" && asData[0].arcs.length === 2);
+  ok("show --json: the same, as data", asData[0].workstream === "031-probe" && asData[0].arcs.length === 3);
   const check = cli(root, ["workstream", "state", "check", "031"]);
-  ok("check: N002 has no preview of its own and no Cycles row, and the check says so", check.code === 1 && /N002 \[stamp\] N002 has no row in Cycles/.test(check.out), check.out);
+  ok("check: N009 has no Cycles row, and the check says so", check.code === 1 && /N009 \[stamp\] N009 has no row in Cycles/.test(check.out), check.out);
   const legacy = workspace("commands-legacy", { ".spndevex/workstreams/open/026-old/arcs/N001-old.md": "# N001 — old\n\nStatus: **RUNNING**\n" });
   const old = cli(legacy, ["workstream", "state", "show"]);
   ok("show: a workstream not moved yet says so", old.out.trim() === "026 · keeps its arcs as Markdown — not moved to the data layout yet", old.out);
