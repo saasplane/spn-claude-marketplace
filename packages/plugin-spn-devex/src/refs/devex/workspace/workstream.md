@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "36d1423f"
+      "seen": "a4c199e6"
     }
   ]
 }
@@ -887,7 +887,8 @@ thing is a real file it links that file in the arc's `samples/` folder.
 **A preview's masthead shows one status, labelled *Status*, and it is the arc's — MUST**
 (`RD.DEVEX.WORKSPACE.266`). It reads `PROPOSED` while the design is not decided, and once decided the
 arc's own status (`DECIDED`, `RUNNING`, `PART-LANDED`, `LANDED` …), since every status after `PROPOSED`
-implies the design was decided. The badge links `../../approach.html#N<nnn>`, is read from `state.json`
+implies the design was decided. The badge links `../../approach.html#N<nnn>` with no underline (shared
+files `1.8.0`), is read from `state.json`
 and is written by every `workstream` write and `docs cycles write`: never type it. Plugin migration 003
 writes it into the previews of every open and backlog workstream.
 

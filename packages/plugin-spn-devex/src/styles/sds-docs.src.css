@@ -551,6 +551,10 @@
   .sds-badge.sds-status.sds-landed{@apply border-ok text-ok bg-ok-soft}
   .sds-badge.sds-status.sds-carried{@apply border-cyan text-cyan bg-cyan-soft}
   .sds-badge.sds-status.sds-dropped{@apply border-fail text-fail bg-fail-soft}
+  /* A BADGE THAT IS A LINK, such as a preview's Status, shows no underline; hover moves its border toward the ink, and focus shows the ring. */
+  a.sds-badge{@apply no-underline}
+  a.sds-badge[href]:hover{border-color:color-mix(in srgb,currentColor 55%,var(--sds-ink))}
+  a.sds-badge[href]:focus-visible{@apply outline-offset-2; outline:2px solid var(--sds-accent)}
   th.sds-status-col{width:9.5rem}
   th.sds-status-col,table:has(th.sds-status-col:last-child) td:last-child{padding-left:1.5rem}
   .sds-section-head + .sds-standfirst{margin-top:-.5rem}
