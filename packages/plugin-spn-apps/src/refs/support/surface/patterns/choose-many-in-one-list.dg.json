@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Choose many, where the data has no groups",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. A permission is a code and a name and nothing else, so no heading is made up: the page level holds the way back and the title, then one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row: three at a desktop and on a tablet, and one on a phone. Every screen shows every choice, with its search and its count.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A permission is a code and a name and nothing else, so no heading is made up: the page level holds the way back and the title, then one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row: three at a desktop and on a tablet, and one on a phone. Every screen shows every choice, with its search and its count.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -41,7 +41,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -154,7 +153,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -267,7 +265,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {

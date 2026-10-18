@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An overview",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. How much there is, then what waits for the person beside the places they often go to. A tablet is as a desktop, and on a phone the same stand one under another. Every screen shows every number, every line that waits and every place. Each number is a card of its own, at the level of a widget, and a line that waits ends with its action.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title. How much there is, then what waits for the person beside the places they often go to. The numbers stand four across at a desktop and two across on a tablet and a phone. The two containers stand side by side at a desktop, and one under another on a tablet and a phone. Every screen shows every number, every line that waits and every place. Each number is a card of its own, at the level of a widget, and a line that waits ends with its action.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,8 +40,7 @@
       "items": [
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Users",
          "rows": [
           {
@@ -56,8 +55,7 @@
        },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Roles",
          "rows": [
           {
@@ -72,8 +70,7 @@
        },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Organizations",
          "rows": [
           {
@@ -88,8 +85,7 @@
        },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Accounts",
          "rows": [
           {
@@ -108,7 +104,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -175,7 +170,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -236,8 +230,7 @@
       "items": [
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Users",
          "rows": [
           {
@@ -252,8 +245,7 @@
        },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Roles",
          "rows": [
           {
@@ -265,11 +257,14 @@
           }
          ]
         }
-       },
+       }
+      ]
+     },
+     {
+      "items": [
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Organizations",
          "rows": [
           {
@@ -284,8 +279,7 @@
        },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Accounts",
          "rows": [
           {
@@ -304,7 +298,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -368,10 +361,13 @@
          "label": "Needs you",
          "divided": true
         }
-       },
+       }
+      ]
+     },
+     {
+      "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -432,8 +428,7 @@
       "items": [
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Users",
          "rows": [
           {
@@ -445,15 +440,10 @@
           }
          ]
         }
-       }
-      ]
-     },
-     {
-      "items": [
+       },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Roles",
          "rows": [
           {
@@ -472,8 +462,7 @@
       "items": [
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Organizations",
          "rows": [
           {
@@ -485,15 +474,10 @@
           }
          ]
         }
-       }
-      ]
-     },
-     {
-      "items": [
+       },
        {
         "frame": {
-         "look": "card",
-         "unit": "DSCard",
+         "unit": "DSCardWidget",
          "label": "Accounts",
          "rows": [
           {
@@ -512,7 +496,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -583,7 +566,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {

@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, many groups",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. Where the groups are many, the part at the left is a data table widget in its LIST layout, under its filter bar: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone the two stand one under the other, the groups first and the items of the chosen group under them, and every screen shows both. On a phone the items are the lines of a list, as the groups are, and the boxes of the filter bar stand in two rows.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title. Where the groups are many, the part at the left is a data table widget in its LIST layout, under its filter bar: it keeps its search and its paging, and each group is a line, with its name and one fact under it, a line between each two and a band behind the chosen one, as the messages of a mailbox are. It is not the TABLE layout, because the part is narrow and a person picks one group and does not compare them across columns. At a desktop the chosen one stays open at the right while a person goes from one to the next. On a tablet and a phone one part shows at a time: the items of the chosen group take the place of the groups, with a back action before the title, and the groups, with their filter bar, are the screen before it. On a phone the filter bar is one button that says how many filters are on, and the items are the lines of a list, as the groups are.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,7 +40,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Record types",
@@ -165,7 +164,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -234,7 +232,8 @@
    "page": {
     "item": {
      "title": "Custom fields"
-    }
+    },
+    "back": true
    },
    "frame": {
     "size": "XS",
@@ -242,193 +241,62 @@
      {
       "items": [
        {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [],
-         "label": "Record types",
-         "sections": [
-          {
-           "unit": "DSFilterBarWidget",
-           "rows": [
-            {
-             "items": [
+        "unit": "DSContainer",
+        "rows": [
+         {
+          "items": [
+           {
+            "standin": "table",
+            "fill": true,
+            "flush": true,
+            "columns": [
+             "Name",
+             "Type",
+             ""
+            ],
+            "cells": [
+             [
+              "Budget",
+              "Number",
               {
-               "icon": "default",
-               "mark": true
-              },
-              {
-               "control": "field",
-               "text": "Search",
-               "fill": true
-              },
-              {
-               "icon": "add"
-              },
-              {
-               "note": "|"
-              },
-              {
-               "icon": "search"
-              },
-              {
-               "icon": "close"
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "unit": "DSDataTableWidget",
-           "divided": true,
-           "rows": [
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Project",
-                "meta": [
-                 "Work"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
              ],
-             "chosen": true
-            },
-            {
-             "items": [
+             [
+              "Due date",
+              "Date",
               {
-               "item": {
-                "title": "Customer",
-                "meta": [
-                 "Sales"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Invoice",
-                "meta": [
-                 "Billing"
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Contract",
-                "meta": [
-                 "Sales"
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Shipment",
-                "meta": [
-                 "Logistics"
-                ]
-               },
-               "fill": true
-              }
-             ]
-            }
-           ]
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "pager"
-            }
-           ]
-          }
-         ]
-        }
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "standin": "table",
-             "fill": true,
-             "flush": true,
-             "columns": [
-              "Name",
-              "Type",
-              ""
              ],
-             "cells": [
-              [
-               "Budget",
-               "Number",
-               {
-                "icon": "more"
-               }
-              ],
-              [
-               "Due date",
-               "Date",
-               {
-                "icon": "more"
-               }
-              ],
-              [
-               "Stage",
-               "Choice",
-               {
-                "icon": "more"
-               }
-              ],
-              [
-               "Notes",
-               "Text",
-               {
-                "icon": "more"
-               }
-              ]
+             [
+              "Stage",
+              "Choice",
+              {
+               "icon": "more"
+              }
+             ],
+             [
+              "Notes",
+              "Text",
+              {
+               "icon": "more"
+              }
              ]
-            }
-           ]
-          }
-         ],
-         "label": "Project",
-         "note": "Fields of this record type",
-         "actions": [
-          {
-           "control": "button",
-           "text": "Add field",
-           "main": true
-          }
-         ]
-        }
+            ]
+           }
+          ]
+         }
+        ],
+        "label": "Project",
+        "note": "Fields of this record type",
+        "actions": [
+         {
+          "control": "button",
+          "text": "Add field",
+          "main": true
+         }
+        ]
        }
       ]
      }
@@ -440,7 +308,8 @@
    "page": {
     "item": {
      "title": "Custom fields"
-    }
+    },
+    "back": true
    },
    "frame": {
     "size": "XS",
@@ -448,226 +317,91 @@
      {
       "items": [
        {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [],
-         "label": "Record types",
-         "sections": [
-          {
-           "unit": "DSFilterBarWidget",
-           "rows": [
-            {
-             "items": [
-              {
-               "icon": "default",
-               "mark": true
-              },
-              {
-               "control": "field",
-               "text": "Search",
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "icon": "add"
-              },
-              {
-               "note": "|"
-              },
-              {
-               "icon": "search"
-              },
-              {
-               "icon": "close"
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "unit": "DSDataTableWidget",
-           "divided": true,
-           "rows": [
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Project",
-                "meta": [
-                 "Work"
-                ]
-               },
-               "fill": true
-              }
+        "unit": "DSContainer",
+        "rows": [
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Budget",
+             "meta": [
+              "Number"
              ],
-             "chosen": true
-            },
-            {
-             "items": [
+             "end": [
               {
-               "item": {
-                "title": "Customer",
-                "meta": [
-                 "Sales"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
              ]
             },
-            {
-             "items": [
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Due date",
+             "meta": [
+              "Date"
+             ],
+             "end": [
               {
-               "item": {
-                "title": "Invoice",
-                "meta": [
-                 "Billing"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
              ]
             },
-            {
-             "items": [
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Stage",
+             "meta": [
+              "Choice"
+             ],
+             "end": [
               {
-               "item": {
-                "title": "Contract",
-                "meta": [
-                 "Sales"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
              ]
             },
-            {
-             "items": [
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Notes",
+             "meta": [
+              "Text"
+             ],
+             "end": [
               {
-               "item": {
-                "title": "Shipment",
-                "meta": [
-                 "Logistics"
-                ]
-               },
-               "fill": true
+               "icon": "more"
               }
              ]
-            }
-           ]
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
             },
-            {
-             "control": "pager"
-            }
-           ]
-          }
-         ]
-        }
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Budget",
-              "meta": [
-               "Number"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Due date",
-              "meta": [
-               "Date"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Stage",
-              "meta": [
-               "Choice"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Notes",
-              "meta": [
-               "Text"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          }
-         ],
-         "label": "Project",
-         "note": "Fields of this record type",
-         "actions": [
-          {
-           "control": "button",
-           "text": "Add field",
-           "main": true
-          }
-         ],
-         "divided": true
-        }
+            "fill": true
+           }
+          ]
+         }
+        ],
+        "label": "Project",
+        "note": "Fields of this record type",
+        "actions": [
+         {
+          "control": "button",
+          "text": "Add field",
+          "main": true
+         }
+        ],
+        "divided": true
        }
       ]
      }

@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Find in a list",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title, a line under it and the main action: it is the header of the one container, which is the page. The container's content is two parts: the filter bar widget, and the data table widget, whose records reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its number, and under the number the customer, the state and the total. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. Every screen holds the same boxes and the same actions; on a phone they stand in two rows, and the main action keeps its words. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows every column of a desktop.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title, a line under it and the main action: it is the header of the one container, which is the page. The container's content is two parts: the filter bar widget, and the data table widget, whose records reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its number, and under the number the customer, the state and the total. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. A tablet's filter bar holds fewer boxes, and on a phone it is one button that says how many filters are on; the main action keeps its words. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows fewer columns, with the state left out; on a phone every column stands in the line of a record.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -48,7 +48,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -197,7 +196,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -213,11 +211,6 @@
               {
                "control": "field",
                "text": "Search",
-               "fill": true
-              },
-              {
-               "control": "select",
-               "text": "Status",
                "fill": true
               },
               {
@@ -248,7 +241,6 @@
                "columns": [
                 "Order",
                 "Customer",
-                "Status",
                 "Total",
                 ""
                ],
@@ -256,7 +248,6 @@
                 [
                  "#1042",
                  "Acme Corp",
-                 "",
                  "$1,240.00",
                  {
                   "icon": "more"
@@ -265,10 +256,6 @@
                 [
                  "#1041",
                  "Blue Bakery",
-                 {
-                  "control": "badge",
-                  "text": "Pending"
-                 },
                  "$86.50",
                  {
                   "icon": "more"
@@ -277,7 +264,6 @@
                 [
                  "#1040",
                  "Dana Lee",
-                 "",
                  "$412.00",
                  {
                   "icon": "more"
@@ -286,10 +272,6 @@
                 [
                  "#1039",
                  "Omar Haddad",
-                 {
-                  "control": "badge",
-                  "text": "Refunded"
-                 },
                  "$59.90",
                  {
                   "icon": "more"
@@ -346,7 +328,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -360,30 +341,9 @@
                "mark": true
               },
               {
-               "control": "field",
-               "text": "Search",
+               "control": "button",
+               "text": "1 filter on",
                "fill": true
-              },
-              {
-               "control": "select",
-               "text": "Status",
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "icon": "add"
-              },
-              {
-               "note": "|"
-              },
-              {
-               "icon": "search"
-              },
-              {
-               "icon": "close"
               }
              ]
             }

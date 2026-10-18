@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "ad49771b"
+      "seen": "d65f07af"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "50a450d4"
+      "seen": "55dcce18"
     }
   ]
 }
@@ -192,6 +192,20 @@ The two numbers of a small and a medium entry are proposed (`RD.SUPPORT.SURFACE.
 - **A spec holds a view for each screen class its pattern differs at.** So one file shows the page at a desktop, at a tablet and on a phone.
 - **A spec is strict JSON.** It holds no comment. Draw one with `spn-devex docs figure draw <spec>`.
 - **Never edit a file in that folder.** It is a copy of the book's folder. A spec in the plugin MUST equal the spec of the same name in the book (`RD.SUPPORT.SURFACE.053`).
+
+## Which unit, when — 🔮
+
+A part of a page takes the unit it is for (`RD.SUPPORT.SURFACE.217`), and a skeleton that names another is refused.
+
+| Unit | Use it for |
+| --- | --- |
+| `DSContainer` | a part of the page with a header (title, description, actions), whose look follows the theme's container framing |
+| `DSCardWidget` | one thing among several of the same kind, built from data, with titled parts and its own action |
+| `DSCard` | a single thing on its own, with its own info and action, and no parts |
+| Group | a titled part inside a container or card; a level, not a unit |
+| `DSItem` | one line about one thing: its media, its title, a line under the title, and what stands at its end |
+
+A container whose content is only cards lets them stand flush; any other content sits in the container's one rounded box. A frame names its unit and leaves its look to it.
 
 ## Each page pattern, by level — 🔮
 
@@ -470,6 +484,7 @@ This ref states which pattern covers a given task, and what blocks carry it. It 
 | `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole, and a section of one thing is never a container of its own |
 | `RD.SUPPORT.SURFACE.117` | the page that reads a record and the page that changes it hold the same parts in the same order |
 | `RD.SUPPORT.SURFACE.205` | a sign-in is one compact container on a canvas, its providers one row of icons and every control a form field |
+| `RD.SUPPORT.SURFACE.217` | a part of a page takes the unit it is for, a container, a card widget, a card or an item, and a skeleton naming another is refused |
 
 ## Proof
 

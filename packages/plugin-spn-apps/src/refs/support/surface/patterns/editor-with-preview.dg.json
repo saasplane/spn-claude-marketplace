@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An editor with its preview",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page is an entry that is a page, so it is one container, and its header is the page level: the way back, then the title. Its actions stand at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. Every screen shows every editor and every result. The editor stands beside its own result in each part at a desktop and on a tablet, and on a phone the result stands under the editor. Bars stand for the running text of the message.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page is an entry that is a page, so it is one container, and its header is the page level: the way back, then the title. Its actions stand at the start of its footer. A row of tabs at the top of its content chooses the form of the message, and one save holds every form. Under the tabs the content has a part for the details that have no preview, and then one part for each thing a person writes, under that thing's title. At a desktop the editor stands beside its own result in each part. On a tablet and a phone a person sees the writing or the result, one at a time: a second row of tabs, Write and Result, moves between them, and the choice holds for every part at once. Bars stand for the running text of the message.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -42,7 +42,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -231,7 +230,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -248,6 +246,18 @@
                ],
                "chosen": 0,
                "icon": "default"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Write",
+                "Result"
+               ],
+               "chosen": 0
               }
              ]
             }
@@ -294,40 +304,6 @@
                    }
                   ]
                  }
-                ],
-                "width": "1/2"
-               }
-              },
-              {
-               "frame": {
-                "look": "flat",
-                "tag": "result",
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "text": "Reset your password"
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "standin": "rows",
-                    "lines": 3,
-                    "fill": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "control": "button",
-                    "text": "Reset password",
-                    "main": true
-                   }
-                  ]
-                 }
                 ]
                },
                "fill": true
@@ -351,24 +327,6 @@
                    {
                     "standin": "rows",
                     "lines": 4,
-                    "fill": true
-                   }
-                  ]
-                 }
-                ],
-                "width": "1/2"
-               }
-              },
-              {
-               "frame": {
-                "look": "flat",
-                "tag": "result",
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "standin": "rows",
-                    "lines": 3,
                     "fill": true
                    }
                   ]
@@ -420,7 +378,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -437,6 +394,18 @@
                ],
                "chosen": 0,
                "icon": "default"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "tabs",
+               "tabs": [
+                "Write",
+                "Result"
+               ],
+               "chosen": 0
               }
              ]
             }
@@ -488,43 +457,6 @@
                   ]
                  }
                 ]
-               }
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "frame": {
-                "look": "flat",
-                "tag": "result",
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "text": "Reset your password"
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "standin": "rows",
-                    "lines": 3,
-                    "fill": true
-                   }
-                  ]
-                 },
-                 {
-                  "items": [
-                   {
-                    "control": "button",
-                    "text": "Reset password",
-                    "main": true
-                   }
-                  ]
-                 }
-                ]
                },
                "fill": true
               }
@@ -547,27 +479,6 @@
                    {
                     "standin": "rows",
                     "lines": 4,
-                    "fill": true
-                   }
-                  ]
-                 }
-                ]
-               }
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "frame": {
-                "look": "flat",
-                "tag": "result",
-                "rows": [
-                 {
-                  "items": [
-                   {
-                    "standin": "rows",
-                    "lines": 3,
                     "fill": true
                    }
                   ]

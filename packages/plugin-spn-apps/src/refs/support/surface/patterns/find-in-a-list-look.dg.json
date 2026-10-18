@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A small record opens as a look",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. A record of a few facts and nothing else opens beside its list at a desktop, as a drawer, and under its list on a tablet and a phone. In the drawer its name is the title and the action that closes it stands in its header. Its facts are readings, each a title with its value under it, with no table. Every screen shows the list and the record, with the same facts; on a phone the records are the lines of a list and the boxes of the filter bar stand in two rows.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A record of a few facts and nothing else opens beside its list at a desktop, as a drawer, under its list on a tablet, and as a screen of its own on a phone. In the drawer its name is the title and the action that closes it stands in its header. Its facts are readings, each a title with its value under it, with no table. Every screen shows the same facts of the record; on a phone the record has the screen to itself, drawn here without the list.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -47,7 +47,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -135,75 +134,87 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSDrawer",
+         "width": "1/3",
          "rows": [
           {
            "items": [
             {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Type",
-             "text": "Project"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Colour",
-             "text": "Red"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Made",
-             "text": "2 May"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "By",
-             "text": "Dana Lee"
+             "frame": {
+              "unit": "DSContainer",
+              "look": "container",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Type",
+                  "text": "Project"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Colour",
+                  "text": "Red"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Made",
+                  "text": "2 May"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "By",
+                  "text": "Dana Lee"
+                 }
+                ]
+               }
+              ],
+              "label": "Urgent",
+              "note": "Tag",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Edit"
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
             }
            ]
           }
-         ],
-         "label": "Urgent",
-         "note": "Tag",
-         "actions": [
-          {
-           "icon": "close"
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "button",
-             "text": "Edit"
-            }
-           ]
-          }
-         ],
-         "width": "1/3"
+         ]
         }
        }
       ]
@@ -232,7 +243,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -324,70 +334,82 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSDrawer",
          "rows": [
           {
            "items": [
             {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Type",
-             "text": "Project"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Colour",
-             "text": "Red"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Made",
-             "text": "2 May"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "By",
-             "text": "Dana Lee"
-            }
-           ]
-          }
-         ],
-         "label": "Urgent",
-         "note": "Tag",
-         "actions": [
-          {
-           "icon": "close"
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "button",
-             "text": "Edit"
+             "frame": {
+              "unit": "DSContainer",
+              "look": "container",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Type",
+                  "text": "Project"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Colour",
+                  "text": "Red"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Made",
+                  "text": "2 May"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "By",
+                  "text": "Dana Lee"
+                 }
+                ]
+               }
+              ],
+              "label": "Urgent",
+              "note": "Tag",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Edit"
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
             }
            ]
           }
@@ -401,18 +423,6 @@
   },
   {
    "viewport": "MOBILE",
-   "page": {
-    "item": {
-     "title": "Tags"
-    },
-    "actions": [
-     {
-      "control": "button",
-      "text": "New tag",
-      "main": true
-     }
-    ]
-   },
    "frame": {
     "size": "XS",
     "rows": [
@@ -420,200 +430,88 @@
       "items": [
        {
         "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [],
-         "sections": [
-          {
-           "unit": "DSFilterBarWidget",
-           "rows": [
-            {
-             "items": [
-              {
-               "icon": "default",
-               "mark": true
-              },
-              {
-               "control": "field",
-               "text": "Search",
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "icon": "add"
-              },
-              {
-               "note": "|"
-              },
-              {
-               "icon": "search"
-              },
-              {
-               "icon": "close"
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "unit": "DSDataTableWidget",
-           "rows": [
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Urgent",
-                "meta": [
-                 "Project"
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Blocked",
-                "meta": [
-                 "Project"
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "VIP",
-                "meta": [
-                 "Customer"
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "Overdue",
-                "meta": [
-                 "Invoice"
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            }
-           ],
-           "divided": true
-          }
-         ]
-        }
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "frame": {
-         "look": "container",
          "unit": "DSDrawer",
          "rows": [
           {
            "items": [
             {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Type",
-             "text": "Project"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Colour",
-             "text": "Red"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "Made",
-             "text": "2 May"
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "standin": "field",
-             "fill": true,
-             "read": true,
-             "label": "By",
-             "text": "Dana Lee"
-            }
-           ]
-          }
-         ],
-         "label": "Urgent",
-         "note": "Tag",
-         "actions": [
-          {
-           "icon": "close"
-          }
-         ],
-         "footer": [
-          {
-           "items": [
-            {
-             "spacer": true
-            },
-            {
-             "control": "button",
-             "text": "Edit"
+             "frame": {
+              "unit": "DSContainer",
+              "look": "container",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Type",
+                  "text": "Project"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Colour",
+                  "text": "Red"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "Made",
+                  "text": "2 May"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "read": true,
+                  "label": "By",
+                  "text": "Dana Lee"
+                 }
+                ]
+               }
+              ],
+              "label": "Urgent",
+              "note": "Tag",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Edit"
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
             }
            ]
           }
          ]
-        }
+        },
+        "fill": true
        }
       ]
      }

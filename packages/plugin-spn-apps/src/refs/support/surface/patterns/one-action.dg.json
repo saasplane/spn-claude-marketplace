@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "One action, read first",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. An action reads first: the page level holds the title, the states of the versions on the line under it, and the action at its end. Any version can be opened to be read, and only the draft is edited. The versions stand beside the message at a desktop and on a tablet, and under it on a phone. Every screen shows every version.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. An action reads first: the page level holds the title, the states of the versions on the line under it, and the action at its end. Any version can be opened to be read, and only the draft is edited. The versions stand beside the message at a desktop and on a tablet, and under it on a phone. Every screen shows every version.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -71,7 +71,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -105,7 +104,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -204,7 +202,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -238,7 +235,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -337,7 +333,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -375,7 +370,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {

@@ -986,15 +986,17 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const paged = (viewport, layout, page = { item: { title: "Orders", description: "Every order placed" }, actions: [{ control: "button", text: "New order", main: true }] }, frame = { size: "XS", rows: [{ items: [{ frame: listing() }] }] }) =>
     judge({ kind: "skeleton", ...(layout ? { layout } : {}), views: [{ viewport, page, frame }] });
   const RAIL = { type: "RAIL", body: { width: "WIDE" }, navigation: { nav: ["Dashboard", "Orders", "Customers"], chosen: "Orders" } };
-  const desk = paged("DESKTOP", RAIL);
+  // A SKELETON DRAWS A RAIL SHUT TO ITS ICONS ON EVERY DEVICE; only a figure about the rail itself asks for it open, with `open`.
+  const RAIL_OPEN = { ...RAIL, navigation: { ...RAIL.navigation, open: true } };
+  const desk = paged("DESKTOP", RAIL_OPEN);
   const win = (g) => outer(g)[0] ?? [];
-  one("a page in a RAIL draws with no finding, its layout drawn round it, and the figure check reads it as a skeleton", [desk.findings, desk.figure, desk.svg.includes(">Dashboard<")], (g) => g[0].length === 0 && g[1].length === 0 && g[2]);
-  one("an attached rail is a surface at the window's left edge, 131 wide at a desktop, the window's height",
+  one("a page in a RAIL that is open draws with no finding, its layout drawn round it, and the figure check reads it as a skeleton", [desk.findings, desk.figure, desk.svg.includes(">Dashboard<")], (g) => g[0].length === 0 && g[1].length === 0 && g[2]);
+  one("an attached rail that is open is a surface at the window's left edge, 131 wide at a desktop, the window's height",
     [win(desk.svg), boxes(desk.svg, "sds-skel-surface")[0]], ([w, nav]) => nav[0] === w[0] && nav[1] === w[1] && nav[2] === 131 && nav[3] === w[3] && nav[4] === 0);
-  one("a WIDE body at a desktop is a box 701 wide, square where it is attached, centred in the area beside the rail",
+  one("a WIDE body at a desktop is a box 701 wide, square where it is attached, centred in the area beside the open rail",
     [win(desk.svg), boxes(desk.svg, "sds-skel-border")], ([w, content]) => content.length === 1 && content[0][2] === 701 && content[0][4] === 0
       && content[0][0] === w[0] + 131 + (1052 - 131 - 701) / 2 && content[0][1] === w[1] && content[0][3] === w[3]);
-  one("the rail holds the words of `nav`, and the chosen one is heavier, in a band",
+  one("the open rail holds the words of `nav`, and the chosen one is heavier, in a band",
     [texts(desk.svg, "sds-label").map((t) => t[2]), texts(desk.svg, "sds-title").map((t) => t[2])], ([plain, heavy]) => plain.includes("Dashboard") && plain.includes("Customers") && heavy.includes("Orders") && !plain.includes("Orders"));
   const tablet = paged("TABLET", RAIL);
   one("at a tablet the rail is shut to 40 and the box is the screen beside it, since a width only bounds",
@@ -1003,7 +1005,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("on a phone every part attaches: one bar 48 high across the top, the menu at its start, and the content the screen under it",
     [win(phone.svg), boxes(phone.svg, "sds-skel-surface")[0], boxes(phone.svg, "sds-skel-border")[0], phone.svg.match(/M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ M/) !== null],
     ([w, bar, content, menu]) => bar[2] === 411 && bar[3] === 48 && bar[1] === w[1] && content[1] === w[1] + 48 && content[2] === 411 && content[4] === 0 && menu);
-  const apart = paged("DESKTOP", { type: "RAIL", body: { width: "FULL" }, navigation: { attached: false }, content: { attached: false } });
+  const apart = paged("DESKTOP", { type: "RAIL", body: { width: "FULL" }, navigation: { attached: false, open: true }, content: { attached: false } });
   one("a navigation and a content that are not attached are rounded and stand 16 in",
     [win(apart.svg), boxes(apart.svg, "sds-skel-surface")[0], boxes(apart.svg, "sds-skel-border")[0]],
     ([w, nav, content]) => nav[0] === w[0] + 16 && nav[1] === w[1] + 16 && nav[4] === 8 && content[4] === 8 && content[0] === nav[0] + 131 + 16 && content[0] + content[2] === w[0] + w[2] - 16);
@@ -1023,7 +1025,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a view that needs more room than its content has is a finding that names the content's width",
     paged("DESKTOP", RAIL, undefined, wideTable).findings, says("its content in a `RAIL` with a `WIDE` body stands at 701"));
   const fullBody = paged("DESKTOP", { ...RAIL, body: { width: "FULL" } }, undefined, wideTable);
-  one("the same view fits a FULL body, which is all the window beside the rail", [fullBody.findings, boxes(fullBody.svg, "sds-skel-border")[0]?.[2]], (g) => g[0].length === 0 && g[1] === 1052 - 131);
+  one("the same view fits a FULL body, which is all the window beside the shut rail", [fullBody.findings, boxes(fullBody.svg, "sds-skel-border")[0]?.[2]], (g) => g[0].length === 0 && g[1] === 1052 - 40);
 
   // 17a · the page level: first in the content, the largest title, its actions at the end, the way back before the title
   const titleOf = (g, words) => texts(g, "sds-title").filter((t) => t[2] === words).at(-1);
@@ -1071,10 +1073,11 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline, its name and its title",
     [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "sds-skel-guide").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
     ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparisonWidget") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
-  const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } }] }] } });
+  const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } },
+    { frame: { unit: "DSCardWidget", label: "Teams", rows: [{ items: [{ item: { title: "Sales" }, fill: true }] }] } }] }] } });
   one("`DSCardWidget` is a card: its outline, its name at the corner and its title inside",
     [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "sds-skel-guide").length, stepOf(cardWidget.svg, "Contacts")],
-    ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 1 && guides === 0 && step === "font-size:15px");
+    ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 2 && guides === 0 && step === "font-size:15px");
   const fourDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
     { frame: { unit: "DSComparisonWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", sections: [{ label: "This month", rows: [{ items: [{ text: "$12,400" }] }] }], rows: [] } }] }] } }] }] } }] }] } }] });
   one("the count starts at the container: a container, a widget or a card, and a group are three, and a fourth level is a finding",
@@ -1097,6 +1100,70 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a layout type the design system lacks is refused by name", paged("DESKTOP", { type: "SIDEBAR" }).findings, says("`layout.type` is `SIDEBAR`, and a layout is RAIL · DOCK · TOPNAV · CANVAS"));
   one("a `layout` beside one `frame` is a finding: the layout is where the views stand",
     draw({ kind: "skeleton", layout: RAIL, frame: frameOf("x") }).findings, says("a spec with a `layout` holds `views`"));
+}
+
+console.log("=== SKELETON — which unit, when: taught by the book, refused by the drawer");
+{
+  // Each case draws a deliberately wrong spec and wants the drawer to name the rule; its right form draws clean.
+  const page = (frame, layout, page = { item: { title: "Orders" } }) =>
+    draw({ kind: "skeleton", ...(layout ? { layout } : {}), views: [{ viewport: "DESKTOP", page, frame: { size: "XS", ...frame } }] });
+  const cardOf = (unit, label, extra = {}) => ({ frame: { unit, label, rows: [{ items: [{ text: "180" }] }], ...extra } });
+  const inPage = (items) => ({ rows: [{ items }] });
+
+  // 1 · a card with parts is a `DSCardWidget`
+  const parts = [{ label: "Sign-in", rows: [{ items: [{ text: "Email" }] }] }];
+  one("a `DSCard` with titled parts is a finding: a card with parts is a `DSCardWidget`",
+    page(inPage([cardOf("DSCard", "Account", { sections: parts })])).findings, says("a card with parts is a `DSCardWidget`"));
+  one("a `DSCardWidget` with titled parts is clean", page(inPage([cardOf("DSCardWidget", "Account", { sections: parts }), cardOf("DSCardWidget", "Platform", { sections: parts })])).findings, none);
+
+  // 2 · cards repeated from data are `DSCardWidget`s
+  one("two `DSCard`s side by side in a row are a finding: cards repeated from data are `DSCardWidget`s",
+    page(inPage([cardOf("DSCard", "Users"), cardOf("DSCard", "Roles")])).findings, says("cards repeated from data are `DSCardWidget`s"));
+  const container = (rows) => ({ frame: { unit: "DSContainer", label: "Providers", rows } });
+  one("two `DSCard`s that are the only content of a container, one under another, are a finding",
+    page(inPage([container([{ items: [cardOf("DSCard", "Email")] }, { items: [cardOf("DSCard", "SMS")] }])])).findings, says("a container holds only `DSCard`s: cards repeated from data are `DSCardWidget`s"));
+  one("one `DSCard` on its own is clean", page(inPage([container([{ items: [cardOf("DSCard", "Owned by Dana Lee")] }])])).findings, none);
+  one("the same cards as `DSCardWidget`s are clean", page(inPage([cardOf("DSCardWidget", "Users"), cardOf("DSCardWidget", "Roles")])).findings, none);
+
+  // 3 · a `DSCardWidget` with no titled parts and no sibling card is a `DSCard`
+  one("a `DSCardWidget` with no titled parts and no sibling card is a finding: one thing with its own info and action is a `DSCard`",
+    page(inPage([cardOf("DSCardWidget", "Owned by Dana Lee")])).findings, says("one thing with its own info and action is a `DSCard`"));
+  one("the same card as a `DSCard` is clean", page(inPage([cardOf("DSCard", "Owned by Dana Lee")])).findings, none);
+
+  // 4 · a page-level row that holds words and an action, outside any frame
+  const loose = { rows: [{ items: [{ text: "Owned by Dana Lee" }, { spacer: true }, { control: "button", text: "Transfer ownership" }] }] };
+  one("a row of the page outside any frame that holds words and an action is a finding: it is a `DSCard`",
+    page(loose).findings, says("a row of the page outside any frame holds words and an action: one thing with its own info and action is a `DSCard`"));
+  one("the same row in a `DSCard` is clean", page(inPage([{ frame: { unit: "DSCard", label: "Owned by Dana Lee", rows: [{ items: [{ control: "button", text: "Transfer ownership" }] }] } }])).findings, none);
+
+  // 5 · a frame that writes both `look` and `unit`, where the look is not the unit's
+  one("a frame that writes a `look` its unit's level does not give is a finding: the unit decides the look",
+    page(inPage([{ frame: { unit: "DSDrawer", look: "container", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, says("the unit decides the look; drop `look`"));
+  one("a frame that writes the look its unit gives is not a finding", page(inPage([{ frame: { unit: "DSContainer", look: "container", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, none);
+  one("a frame that names only its unit is clean, and is drawn in the look of its level",
+    [page(inPage([{ frame: { unit: "DSDrawer", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, page(inPage([{ frame: { unit: "DSContainer", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).svg.includes(">DSContainer<")],
+    (g) => g[0].length === 0 && g[1]);
+
+  // 6 · a row built by hand as words, a note and an action is an `item`
+  const byHand = { unit: "DSContainer", label: "Sign-in", rows: [{ items: [{ text: "Acme Okta" }, { note: "Connected 2 May" }, { spacer: true }, { icon: "more" }] }] };
+  one("a row built by hand as words, a note and an action is a finding: write it as an `item`",
+    page(inPage([{ frame: byHand }])).findings, says("one line about one thing is a `DSItem`; write it as an `item`"));
+  one("the same line as an `item` is clean",
+    page(inPage([{ frame: { ...byHand, rows: [{ items: [{ item: { title: "Acme Okta", description: "Connected 2 May", end: [{ icon: "more" }] }, fill: true }] }] } }])).findings, none);
+  one("a filter bar's row, with its field and its separator, is not a hand-built line",
+    page(inPage([{ frame: { unit: "DSContainer", label: "Orders", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { note: "|" }, { icon: "search" }] }] } }])).findings, none);
+
+  // 7 · a skeleton draws a rail shut to its icons on a desktop too; `open: true` is the exception
+  const RAIL = { type: "RAIL", body: { width: "FULL" }, navigation: { nav: ["Orders", "Customers"], chosen: "Orders" } };
+  const railW = (g) => [...g.matchAll(/<rect class="sds-skel-surface" x="[\d.]+" y="[\d.]+" width="([\d.]+)"/g)].map((m) => Number(m[1]))[0];
+  const body = inPage([{ frame: { unit: "DSContainer", label: "Orders", rows: [{ items: [{ text: "180" }] }] } }]);
+  one("a rail at a desktop is shut to its icons, 40 wide, and the words of its entries are not drawn",
+    [railW(page(body, RAIL).svg), page(body, RAIL).svg.includes(">Customers<"), page(body, RAIL).findings], (g) => g[0] === 40 && !g[1] && g[2].length === 0);
+  one("a rail with `open: true` is the exception: open at a desktop, 131 wide, with the words of its entries",
+    [railW(page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: true } }).svg), page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: true } }).svg.includes(">Customers<"), page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: true } }).findings],
+    (g) => g[0] === 131 && g[1] && g[2].length === 0);
+  one("`open` on a layout that is no `RAIL` is a finding", page(body, { type: "DOCK", navigation: { open: true } }).findings, says("only a `RAIL` takes `open`"));
+  one("`open` that is not true or false is a finding", page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: "yes" } }).findings, says("only a `RAIL` takes `open`"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

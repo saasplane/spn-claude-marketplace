@@ -56,7 +56,9 @@ export type SkeletonLayout = {
   body?: { width?: "FULL" | "XWIDE" | "WIDE" | "MEDIUM" | "NARROW"; maxWidth?: unknown; className?: unknown };
   /** `IDSLayoutNavigationLook.attached`, true where it is left out; the words of its entries as `nav`, and the open one
    *  as `chosen`, by its word: the entry that leads to the page the sketch shows. */
-  navigation?: { attached?: boolean; sticky?: unknown; className?: unknown; nav?: string[]; chosen?: string };
+  navigation?: { attached?: boolean; sticky?: unknown; className?: unknown; nav?: string[]; chosen?: string;
+    /** On a `RAIL` only: a figure about the rail itself draws it open at a desktop. Left out, the rail stands shut to its icons on every device. */
+    open?: boolean };
   /** `IDSLayoutContentLook.attached`, true where it is left out. */
   content?: { attached?: boolean; bordered?: unknown; raised?: unknown; className?: unknown };
 };
@@ -1745,14 +1747,15 @@ const skelNamed = (frame: SkeletonFrame): boolean => !!frame.tag || frame.unit !
 const SKEL_LAYOUT_TYPES = ["RAIL", "DOCK", "TOPNAV", "CANVAS"];
 const SKEL_LAYOUT_PARTS: Record<string, string[]> = {
   body: ["width", "maxWidth", "className"],
-  navigation: ["attached", "sticky", "className", "nav", "chosen"],
+  navigation: ["attached", "sticky", "className", "nav", "chosen", "open"],
   content: ["bordered", "raised", "attached", "className"],
 };
 /** Below `FULL`, the body's box at a desktop: its share of a window 1920 wide, drawn in the view's 1052. */
 const SKEL_BODY_W: Record<string, number> = { NARROW: 421, MEDIUM: 561, WIDE: 701, XWIDE: 842 };
 const SKEL_BODY_WIDTHS = ["FULL", "XWIDE", "WIDE", "MEDIUM", "NARROW"];
-/** A rail open at a desktop and shut to icons at a tablet; a top bar and a phone's bar; how far a part that is not
- *  attached stands in; and the step of an entry of the navigation. */
+/** A rail shut to icons on every device, and open only where a figure about the rail itself asks (`open`), at a desktop; a
+ *  dock's column open at a desktop; a top bar and a phone's bar; how far a part that is not attached stands in; and the
+ *  step of an entry of the navigation. */
 const SKEL_RAIL_OPEN = 131, SKEL_RAIL_SHUT = 40, SKEL_LAYOUT_BAR = 48, SKEL_APART = 16, SKEL_NAV_STEP = 28;
 /** The title of the page level is the largest of a surface's titles, a step over a container's. */
 const SKEL_STEP_PAGE = 24;
@@ -2642,6 +2645,68 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
 }
 
 /**
+ * WHICH UNIT, WHEN (05-artifacts.md § `SKELETON`, standards-patterns § Which unit, when). The unit a spec names decides
+ * the look, and the drawer refuses a unit the rule names wrongly: a `DSCard` is one thing on its own, with no titled
+ * parts; a `DSCardWidget` is one thing among several of its kind, built from data, with titled parts; a container is a
+ * part of the page with a header; and a line about one thing is a `DSItem`. It reads the spec as written, before
+ * `skelUnits` gives a frame the look of its level.
+ */
+const skelFrameChildren = (frame: SkeletonFrame): SkeletonFrame[] =>
+  [...(frame.sections ?? []).flatMap((section) => section?.rows ?? []), ...(frame.rows ?? []), ...(frame.footer ?? [])]
+    .flatMap((row) => (row?.items ?? []).map((it) => it?.frame).filter((child): child is SkeletonFrame => !!child));
+/** Whether a row is a line built by hand: words, a note with words in it, and an action, and nothing else but room. */
+const skelHandLine = (row: SkeletonRow): { words: boolean; note: boolean; action: boolean; only: boolean } => {
+  const kinds = (row.items ?? []).map((it) => ({ it, kind: skelKind(it) }));
+  const letters = (text: unknown) => typeof text === "string" && /[\p{L}\p{N}]/u.test(text);
+  const isAction = ({ it, kind }: { it: SkeletonItem; kind: SkelKind | null }) =>
+    (kind === "control" && it.control === "button") || (kind === "icon" && it.text === undefined && it.mark === undefined && it.on === undefined);
+  return {
+    words: kinds.some(({ it, kind }) => kind === "plain" && letters(it.text)),
+    note: kinds.some(({ it, kind }) => kind === "note" && letters(it.note)),
+    action: kinds.some(isAction),
+    only: kinds.every((entry) => entry.kind === "plain" || entry.kind === "note" || entry.kind === "spacer" || isAction(entry) || (entry.kind === "control" && entry.it.control === "badge")),
+  };
+};
+function skelWhichUnit(frame: SkeletonFrame | undefined, findings: string[], pageLevel = false, inFrames = false): void {
+  if (!frame || typeof frame !== "object") return;
+  const said = (message: string) => { if (!findings.includes(message)) findings.push(message); };
+  const named = typeof frame.unit === "string" ? frame.unit : undefined;
+  const level = named !== undefined ? skelLevel(named) : undefined;
+  const rowLists = [...(frame.sections ?? []).map((section) => section?.rows ?? []), frame.rows ?? [], frame.footer ?? []];
+  if (named === "DSCard" && (frame.sections ?? []).some((section) => section?.label !== undefined))
+    said(`the card \`${frame.label ?? named}\` has titled parts: a card with parts is a \`DSCardWidget\``);
+  if (named !== undefined && frame.look !== undefined && !inFrames && SKEL_UNITS.has(named) && frame.look !== SKEL_LEVEL_LOOK[level!])
+    said(`\`${named}\` writes \`look\` as \`${frame.look}\`, and its level gives \`${SKEL_LEVEL_LOOK[level!]}\`: the unit decides the look; drop \`look\``);
+  // CARDS REPEATED FROM DATA ARE `DSCardWidget`s: two or more `DSCard`s side by side, or the only content of a container.
+  for (const rows of rowLists) for (const row of rows)
+    if ((row?.items ?? []).filter((it) => it?.frame?.unit === "DSCard").length > 1)
+      said("two or more `DSCard`s stand side by side in a row: cards repeated from data are `DSCardWidget`s");
+  const children = skelFrameChildren(frame);
+  const everyItem = rowLists.flat().flatMap((row) => row?.items ?? []).filter((it) => !it?.spacer);
+  if (level === "container" && children.length > 1 && everyItem.every((it) => it?.frame?.unit === "DSCard"))
+    said("a container holds only `DSCard`s: cards repeated from data are `DSCardWidget`s");
+  // A `DSCardWidget` with no titled parts and no sibling card is one thing with its own info and action.
+  for (const child of children) {
+    if (child.unit !== "DSCardWidget" || (child.sections ?? []).some((section) => section?.label !== undefined)) continue;
+    if (!children.some((other) => other !== child && typeof other.unit === "string" && skelLevel(other.unit) === "card"))
+      said(`the \`DSCardWidget\` \`${child.label ?? ""}\` has no titled parts and no sibling card: one thing with its own info and action is a \`DSCard\``);
+  }
+  // A ROW OF THE PAGE OUTSIDE ANY FRAME that holds words and an action is one thing with its own info and action.
+  if (pageLevel) for (const row of frame.rows ?? []) {
+    const line = skelHandLine(row);
+    if (!(row?.items ?? []).some((it) => it?.frame) && (line.words || line.note) && line.action)
+      said("a row of the page outside any frame holds words and an action: one thing with its own info and action is a `DSCard`");
+  }
+  // A ROW BUILT BY HAND as words, a note and an action is one line about one thing.
+  for (const rows of rowLists) for (const row of rows) {
+    const line = skelHandLine(row);
+    if (line.words && line.note && line.action && line.only)
+      said("a row is built by hand as words, a note and an action: one line about one thing is a `DSItem`; write it as an `item`");
+  }
+  for (const child of children) skelWhichUnit(child, findings, false, frame.frames !== undefined);
+}
+
+/**
  * THE UNITS OF A SPEC, read once before anything is drawn. A `unit` the barrel does not name is a finding, on a
  * frame and on a part of the content alike. A frame that names a unit and no `look` is drawn in its level's look:
  * a container its outline, a card its outline and title, a widget or a component a dotted boundary. A part of a
@@ -2684,7 +2749,9 @@ function skelLayoutFindings(layout: unknown, findings: string[]): layout is Skel
       findings.push(`\`layout.${part}.${key}\` is no field of the ${part}'s look, which has ${fields.map((f) => `\`${f}\``).join(" · ")}`);
   }
   // THE CHOSEN ENTRY IS NAMED BY ITS WORD, one of `nav`: the entry that leads to the page the sketch shows.
-  const navigation = given.navigation as { nav?: unknown; chosen?: unknown } | undefined;
+  const navigation = given.navigation as { nav?: unknown; chosen?: unknown; open?: unknown } | undefined;
+  if (navigation?.open !== undefined && (typeof navigation.open !== "boolean" || given.type !== "RAIL"))
+    findings.push(`\`layout.navigation.open\` is \`${String(navigation.open)}\`: only a \`RAIL\` takes \`open\`, as \`true\`, for a figure about the rail itself; a skeleton draws every rail shut to its icons`);
   const words = Array.isArray(navigation?.nav) ? navigation!.nav!.map(String) : [];
   if (navigation?.chosen !== undefined && typeof navigation.chosen !== "string")
     findings.push(`\`layout.navigation.chosen\` is \`${String(navigation.chosen)}\`; name the open entry by its word, one of \`nav\`, as \`"chosen": "${words[Number(navigation.chosen)] ?? words[0] ?? "Orders"}"\``);
@@ -2744,8 +2811,11 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
   const width = layout?.body?.width ?? "FULL";
   const boxW = desk && SKEL_BODY_W[width] !== undefined ? SKEL_BODY_W[width] : W;
   const bar = type !== undefined && type !== "CANVAS" && (phone || type === "TOPNAV") ? SKEL_LAYOUT_BAR : 0;
-  const side = type !== undefined && !phone && (type === "RAIL" || type === "DOCK") ? (desk ? SKEL_RAIL_OPEN : SKEL_RAIL_SHUT) : 0;
   const nav = layout?.navigation;
+  // A SKELETON DRAWS A RAIL SHUT TO ITS ICONS ON EVERY DEVICE, so the content gets the room: there are many skeletons, and a
+  // desktop's open rail is only the subject of a figure about the rail itself, which asks for it with `navigation.open`.
+  const navOpen = desk && (type === "DOCK" || (type === "RAIL" && nav?.open === true));
+  const side = type !== undefined && !phone && (type === "RAIL" || type === "DOCK") ? (navOpen ? SKEL_RAIL_OPEN : SKEL_RAIL_SHUT) : 0;
 
   // THE CONTENT'S BOX: beside a rail, centred in the area beside it; otherwise centred in the window.
   const areaX = type === "RAIL" && !phone ? x + inset(navAt) + side : x;
@@ -2809,9 +2879,9 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
       const nx = type === "RAIL" ? x + inset(navAt) : contentX + inset(navAt), ny = (type === "RAIL" ? y : contentTop) + inset(navAt);
       const nh = (type === "RAIL" ? H : contentH) - inset(navAt) * 2;
       out.push(skelRect("sds-skel-surface", nx, ny, side, nh, navAt ? 0 : SKEL_ROUND));
-      out.push(...skelAppHead(desk ? nx + 14 : nx + side / 2 - 7, ny + SKEL_LAYOUT_BAR / 2, desk));
-      skelNavColumn(nav, nx, ny + SKEL_LAYOUT_BAR, side, desk, out);
-      out.push(...skelIcon("person", desk ? nx + 14 + 12 : nx + side / 2, ny + nh - SKEL_LAYOUT_BAR / 2, 24, true, undefined, 24));
+      out.push(...skelAppHead(navOpen ? nx + 14 : nx + side / 2 - 7, ny + SKEL_LAYOUT_BAR / 2, navOpen));
+      skelNavColumn(nav, nx, ny + SKEL_LAYOUT_BAR, side, navOpen, out);
+      out.push(...skelIcon("person", navOpen ? nx + 14 + 12 : nx + side / 2, ny + nh - SKEL_LAYOUT_BAR / 2, 24, true, undefined, 24));
     }
   }
   // THE CONTENT, a solid line round its box: square where it is attached, rounded where it stands in.
@@ -2890,6 +2960,8 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   const findings: string[] = [];
   const out: string[] = [];
   const spec: Spec = structuredClone(given);
+  skelWhichUnit(spec.frame, findings);
+  if (Array.isArray(spec.views)) for (const view of spec.views) skelWhichUnit(view?.frame, findings, true);
   skelUnits(spec.frame, findings);
   if (Array.isArray(spec.views)) for (const view of spec.views) skelUnits(view?.frame, findings);
   let layout: SkeletonLayout | undefined;

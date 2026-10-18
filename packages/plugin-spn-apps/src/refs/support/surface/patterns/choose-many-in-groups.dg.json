@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Choose many, where the data has groups",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The choices are saved once, so the page is one container, and its header is the page level: the way back, the kind the choices are for, and a line under it. Its actions stand at the start of its footer. The groups come from the data, so each is a part of the content under its own title, with a line above it. The choices stand in columns: each column starts at the same place in every row and in every group, so a person reads down a column as well as along a row. A row with fewer choices leaves its last places empty. Every screen shows every group and every choice. They stand four across at a desktop and on a tablet, and on a phone one under another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The choices are saved once, so the page is one container, and its header is the page level: the way back, the kind the choices are for, and a line under it. Its actions stand at the start of its footer. The groups come from the data, so each is a part of the content under its own title, with a line above it. The choices stand in columns: each column starts at the same place in every row and in every group, so a person reads down a column as well as along a row. A row with fewer choices leaves its last places empty. Every screen shows every group and every choice. They stand four across at a desktop and on a tablet, and on a phone one under another.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -42,7 +42,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -163,7 +162,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -284,7 +282,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [

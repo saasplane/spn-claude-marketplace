@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Set up by kind",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title of the page. Every kind is shown, connected or not, as a card widget, in one container. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, and one under another on a tablet and a phone, with the kinds in use first. Every screen shows every kind.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title of the page. Every kind is shown, connected or not, as a card widget, in one container. The title of a card is the kind, with the icon of that kind before it. Under it stands the provider: its name, and on the line under the name its state and a fact. Only its actions stand at the end of the line. A kind with no provider yet says so and offers Connect. Three across at a desktop, two across on a tablet and one under another on a phone, with the kinds in use first. Every screen shows every kind.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,14 +40,12 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Email",
               "rows": [
@@ -62,7 +60,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -80,7 +78,6 @@
             },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "SMS",
               "rows": [
@@ -95,7 +92,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -113,7 +110,6 @@
             },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Storage",
               "rows": [
@@ -128,7 +124,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -150,7 +146,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "WhatsApp",
               "rows": [
@@ -177,7 +172,6 @@
             },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Push",
               "rows": [
@@ -204,7 +198,6 @@
             },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Payments",
               "rows": [
@@ -253,14 +246,12 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Email",
               "rows": [
@@ -275,7 +266,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -290,14 +281,9 @@
               ],
               "media": "default"
              }
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "SMS",
               "rows": [
@@ -312,7 +298,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -334,7 +320,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Storage",
               "rows": [
@@ -349,7 +334,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -364,14 +349,9 @@
               ],
               "media": "default"
              }
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "WhatsApp",
               "rows": [
@@ -402,7 +382,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Push",
               "rows": [
@@ -426,14 +405,9 @@
               ],
               "media": "default"
              }
-            }
-           ]
-          },
-          {
-           "items": [
+            },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Payments",
               "rows": [
@@ -482,14 +456,12 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Email",
               "rows": [
@@ -504,7 +476,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -526,7 +498,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "SMS",
               "rows": [
@@ -541,7 +512,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -563,7 +534,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Storage",
               "rows": [
@@ -578,7 +548,7 @@
                      "text": "Connected",
                      "icon": "default"
                     },
-                    "Since 2 May"
+                    "Since May"
                    ],
                    "end": [
                     {
@@ -600,7 +570,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "WhatsApp",
               "rows": [
@@ -631,7 +600,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Push",
               "rows": [
@@ -662,7 +630,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Payments",
               "rows": [

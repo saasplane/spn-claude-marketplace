@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and its steps",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, where each part takes the width, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. Every screen shows every step and every check. On a phone the two actions of the page level fold into one *more* icon, since the way back, the picture, the title and two buttons do not fit one line.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, where each part takes the width, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. Every screen shows every step and every check; on a phone the steps stand one under another. On a phone the page level folds its actions into one *more* icon when they do not fit beside the way back, the picture and the title: here two buttons do not.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -61,7 +61,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -89,7 +88,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -131,7 +129,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -210,7 +207,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -238,7 +234,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -284,7 +279,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -357,20 +351,31 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
              "note": "Submitted"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "text": "In review"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "note": "Approved"
-            },
+            }
+           ]
+          },
+          {
+           "items": [
             {
              "note": "Live"
             }
@@ -385,7 +390,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -435,7 +439,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {

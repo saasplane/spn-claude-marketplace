@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Compare across kinds",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The page reads first, as a plain table in one container: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. Every screen shows the same table, with every setting, every kind and the Edit of each kind; the words in its cells are short enough for four columns to fit a phone.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title. The page reads first, as a plain table in one container: a setting is a row and a kind is a column, with no search and no paging, because the settings are few and fixed. Each kind has its own Edit, under its column. A desktop and a tablet show the same table, with every setting, every kind and the Edit of each kind. On a phone a person reads one kind at a time, as labelled values, with the kinds as tabs and Edit in the footer; tabs fit here because the kinds are a closed set.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,7 +40,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -127,7 +126,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -214,68 +212,86 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
            "items": [
             {
-             "standin": "table",
-             "fill": true,
-             "flush": true,
-             "columns": [
-              "Setting",
+             "control": "tabs",
+             "tabs": [
               "Enterprise",
               "Consumer",
               "Merchant"
              ],
-             "cells": [
-              [
-               "Passkey",
-               "Required",
-               "Required",
-               "Optional"
-              ],
-              [
-               "2-step",
-               "Optional",
-               "Off",
-               "Required"
-              ],
-              [
-               "Social",
-               "On",
-               "On",
-               "Off"
-              ],
-              [
-               "Session",
-               "8 hours",
-               "30 days",
-               "8 hours"
-              ],
-              [
-               "Sign-up",
-               "Invite",
-               "Open",
-               "By review"
-              ],
-              [
-               "",
-               {
-                "control": "button",
-                "text": "Edit"
-               },
-               {
-                "control": "button",
-                "text": "Edit"
-               },
-               {
-                "control": "button",
-                "text": "Edit"
-               }
-              ]
-             ]
+             "chosen": 0
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Passkey",
+             "text": "Required"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "2-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite"
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Edit"
             }
            ]
           }

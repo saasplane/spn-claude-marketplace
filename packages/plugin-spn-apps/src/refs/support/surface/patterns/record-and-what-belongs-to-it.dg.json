@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and what belongs to it",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the record: the way back, the picture of the person, the name, and the email on the line under it, with the state before it on that line: the end of the page level holds actions only. Then the lists attached to the record, each a container. A list a person adds to has a box at its top that finds a record as they type, with Add beside it, so one is attached without leaving the page; a list that is only read has none. The lists stand side by side at a desktop, and one under another on a tablet and a phone. Every screen shows every list. Each line ends with the action that removes it. No list shows a count.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the record: the way back, the picture of the person, the name, and the email on the line under it, with the state before it on that line: the end of the page level holds actions only. Then the lists attached to the record, each a container. A list a person adds to has a box at its top that finds a record as they type, with Add beside it, so one is attached without leaving the page; a list that is only read has none. The lists stand side by side at a desktop, and one under another on a tablet and a phone. Every screen shows every list. Each line ends with the action that removes it. No list shows a count.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -58,7 +58,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
@@ -144,7 +143,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
@@ -208,7 +206,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -289,7 +286,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
@@ -379,7 +375,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
@@ -447,7 +442,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -528,7 +522,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Roles",
@@ -618,7 +611,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Groups",
@@ -686,7 +678,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {

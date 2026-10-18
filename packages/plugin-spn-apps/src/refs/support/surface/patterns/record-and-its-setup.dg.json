@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "A record and its setup",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. Every view shows the same record and the same setup; only the arrangement changes. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, its title and its actions in its header; a container whose content is cards lets the cards stand on their own. Each thing set up is a card, with its own action at the end of its title. At a desktop the cards stand two across in the main column and the short part stands beside it; on a tablet and a phone all of it is one column. Each brand of the social sign-in is a tile as tall as a control: a person presses it to set it up, and a small check at its corner says it is set up. Registration closes the card, a line with the switch at its end. Who owns the record is a plain card in the short column under the web addresses, with the action that hands it over.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. Every view shows the same record and the same setup; only the arrangement changes. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, its title and its actions in its header; a container whose content is cards lets the cards stand on their own. Each thing set up is a card, with its own action at the end of its title. At a desktop the cards stand two across in the main column and the short part stands beside it; on a tablet and a phone all of it is one column. Each brand of the social sign-in is a tile as tall as a control: a person presses it to set it up, and a small check at its corner says it is set up. Registration closes the card, a line with the switch at its end. Who owns the record is a plain card in the short column under the web addresses, with the action that hands it over.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -55,7 +55,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
@@ -64,7 +63,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Account",
               "actions": [
@@ -179,7 +177,6 @@
             },
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Platform",
               "actions": [
@@ -270,7 +267,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
@@ -376,7 +372,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -410,7 +405,6 @@
        },
        {
         "frame": {
-         "look": "card",
          "unit": "DSCard",
          "label": "Owned by Dana Lee",
          "note": "Hand it to another member",
@@ -461,7 +455,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
@@ -470,7 +463,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Account",
               "actions": [
@@ -589,7 +581,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Platform",
               "actions": [
@@ -684,7 +675,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
@@ -789,7 +779,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -827,7 +816,6 @@
       "items": [
        {
         "frame": {
-         "look": "card",
          "unit": "DSCard",
          "label": "Owned by Dana Lee",
          "note": "Hand it to another member",
@@ -877,7 +865,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
@@ -886,7 +873,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Account",
               "actions": [
@@ -1005,7 +991,6 @@
            "items": [
             {
              "frame": {
-              "look": "card",
               "unit": "DSCardWidget",
               "label": "Platform",
               "actions": [
@@ -1100,7 +1085,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "label": "Web addresses",
@@ -1205,7 +1189,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -1243,7 +1226,6 @@
       "items": [
        {
         "frame": {
-         "look": "card",
          "unit": "DSCard",
          "label": "Owned by Dana Lee",
          "note": "Hand it to another member",

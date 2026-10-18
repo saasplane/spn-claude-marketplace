@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "An entry over the page",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level is the page the entry belongs to: the entry takes none of its own. A medium entry is a sheet beside its page at a desktop, a third and two thirds of the width, and under its page on a tablet and a phone. Every screen shows the page and the entry, with the same filter bar, the same records and the same fields. On a phone the records are the lines of a list and the boxes of the filter bar stand in two rows. It holds one container: its title and the action that closes it stand in its header, and its actions in its footer. A dialog over its page is not drawn here, because a skeleton lays no frame over another.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the page the entry belongs to: the entry takes none of its own. A medium entry is a sheet beside its page at a desktop, a third and two thirds of the width, and on a phone it takes the full screen, drawn here without its page. A tablet keeps the sheet beside its page; the sketch draws it under the page, since a sheet and a table side by side do not fit the width of a tablet in a skeleton. It holds one container: its title and the action that closes it stand in its header, and its actions in its footer. A dialog over its page is not drawn here, because a skeleton lays no frame over another.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,7 +40,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -141,7 +140,6 @@
            "items": [
             {
              "frame": {
-              "look": "container",
               "unit": "DSContainer",
               "rows": [
                {
@@ -219,7 +217,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [],
          "sections": [
@@ -323,7 +320,6 @@
            "items": [
             {
              "frame": {
-              "look": "container",
               "unit": "DSContainer",
               "rows": [
                {
@@ -389,133 +385,9 @@
   },
   {
    "viewport": "MOBILE",
-   "page": {
-    "item": {
-     "title": "Invites"
-    }
-   },
    "frame": {
     "size": "XS",
     "rows": [
-     {
-      "items": [
-       {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [],
-         "sections": [
-          {
-           "unit": "DSFilterBarWidget",
-           "rows": [
-            {
-             "items": [
-              {
-               "icon": "default",
-               "mark": true
-              },
-              {
-               "control": "field",
-               "text": "Search",
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "icon": "add"
-              },
-              {
-               "note": "|"
-              },
-              {
-               "icon": "search"
-              },
-              {
-               "icon": "close"
-              }
-             ]
-            }
-           ]
-          },
-          {
-           "unit": "DSDataTableWidget",
-           "rows": [
-            {
-             "items": [
-              {
-               "item": {
-                "title": "omar@acme.com",
-                "meta": [
-                 "Member",
-                 {
-                  "control": "badge",
-                  "text": "Pending"
-                 }
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "ines@acme.com",
-                "meta": [
-                 "Admin",
-                 {
-                  "control": "badge",
-                  "text": "Pending"
-                 }
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            },
-            {
-             "items": [
-              {
-               "item": {
-                "title": "raj@acme.com",
-                "meta": [
-                 "Viewer",
-                 {
-                  "control": "badge",
-                  "text": "Expired"
-                 }
-                ],
-                "end": [
-                 {
-                  "icon": "more"
-                 }
-                ]
-               },
-               "fill": true
-              }
-             ]
-            }
-           ],
-           "divided": true
-          }
-         ]
-        }
-       }
-      ]
-     },
      {
       "items": [
        {
@@ -526,7 +398,6 @@
            "items": [
             {
              "frame": {
-              "look": "container",
               "unit": "DSContainer",
               "rows": [
                {
@@ -583,7 +454,8 @@
            ]
           }
          ]
-        }
+        },
+        "fill": true
        }
       ]
      }

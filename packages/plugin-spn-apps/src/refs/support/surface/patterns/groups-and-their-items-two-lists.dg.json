@@ -1,7 +1,7 @@
 {
  "kind": "skeleton",
  "title": "Groups and their items, a list and a list",
- "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail is open at a desktop and shut to its icons on a tablet, and on a phone one bar stands at the top. The page level holds the title. The groups of the notification actions are a list, with a line between each two and a band behind the chosen one, and the actions of the chosen group are a list too. Each part is chosen by its own data: the groups are a few names, and an action is a name, a state and its channels, which a line of a list holds under its title. On a tablet the groups stay beside the actions as at a desktop, and on a phone the actions stand under the groups. Every screen shows both.",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title. The groups of the notification actions are a list, with a line between each two and a band behind the chosen one, and the actions of the chosen group are a list too. Each part is chosen by its own data: the groups are a few names, and an action is a name, a state and its channels, which a line of a list holds under its title. At a desktop both parts are in view. On a tablet and a phone one part shows at a time: the actions of the chosen group take the place of the groups, with a back action before the title, and the groups are the screen before it.",
  "layout": {
   "type": "RAIL",
   "body": {
@@ -40,7 +40,6 @@
       "items": [
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -92,7 +91,6 @@
        },
        {
         "frame": {
-         "look": "container",
          "unit": "DSContainer",
          "rows": [
           {
@@ -175,7 +173,8 @@
    "page": {
     "item": {
      "title": "Notifications"
-    }
+    },
+    "back": true
    },
    "frame": {
     "size": "XS",
@@ -183,131 +182,76 @@
      {
       "items": [
        {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Authentication"
-             },
-             "fill": true
-            }
-           ],
-           "chosen": true
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Organization"
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Billing"
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Security"
-             },
-             "fill": true
-            }
-           ]
-          }
-         ],
-         "label": "Groups",
-         "width": "1/3",
-         "divided": true
-        }
-       },
-       {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "item": {
-              "title": "OTP verification",
-              "meta": [
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Password reset",
-              "meta": [
-               {
-                "control": "badge",
-                "text": "Published v3"
-               },
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "New device",
-              "meta": [
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          }
-         ],
-         "label": "Authentication",
-         "note": "Actions of this group",
-         "divided": true
-        }
+        "unit": "DSContainer",
+        "rows": [
+         {
+          "items": [
+           {
+            "item": {
+             "title": "OTP verification",
+             "meta": [
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Password reset",
+             "meta": [
+              {
+               "control": "badge",
+               "text": "Published v3"
+              },
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "New device",
+             "meta": [
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         }
+        ],
+        "label": "Authentication",
+        "note": "Actions of this group",
+        "divided": true
        }
       ]
      }
@@ -319,7 +263,8 @@
    "page": {
     "item": {
      "title": "Notifications"
-    }
+    },
+    "back": true
    },
    "frame": {
     "size": "XS",
@@ -327,134 +272,76 @@
      {
       "items": [
        {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Authentication"
-             },
-             "fill": true
-            }
-           ],
-           "chosen": true
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Organization"
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Billing"
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Security"
-             },
-             "fill": true
-            }
-           ]
-          }
-         ],
-         "label": "Groups",
-         "divided": true
-        }
-       }
-      ]
-     },
-     {
-      "items": [
-       {
-        "frame": {
-         "look": "container",
-         "unit": "DSContainer",
-         "rows": [
-          {
-           "items": [
-            {
-             "item": {
-              "title": "OTP verification",
-              "meta": [
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "Password reset",
-              "meta": [
-               {
-                "control": "badge",
-                "text": "Published v3"
-               },
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          },
-          {
-           "items": [
-            {
-             "item": {
-              "title": "New device",
-              "meta": [
-               "Email",
-               "SMS",
-               "Push"
-              ],
-              "end": [
-               {
-                "icon": "more"
-               }
-              ]
-             },
-             "fill": true
-            }
-           ]
-          }
-         ],
-         "label": "Authentication",
-         "note": "Actions of this group",
-         "divided": true
-        }
+        "unit": "DSContainer",
+        "rows": [
+         {
+          "items": [
+           {
+            "item": {
+             "title": "OTP verification",
+             "meta": [
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "Password reset",
+             "meta": [
+              {
+               "control": "badge",
+               "text": "Published v3"
+              },
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         },
+         {
+          "items": [
+           {
+            "item": {
+             "title": "New device",
+             "meta": [
+              "Email",
+              "SMS",
+              "Push"
+             ],
+             "end": [
+              {
+               "icon": "more"
+              }
+             ]
+            },
+            "fill": true
+           }
+          ]
+         }
+        ],
+        "label": "Authentication",
+        "note": "Actions of this group",
+        "divided": true
        }
       ]
      }
