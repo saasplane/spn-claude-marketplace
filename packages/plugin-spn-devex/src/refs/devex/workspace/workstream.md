@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "c6b94a88"
+      "seen": "742b9f45"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "6aefd0c4"
+      "seen": "dad4f7d2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -204,7 +204,7 @@ has nothing to decide; a written order on Sonnet; shaping, cards, previews and r
 with you on the largest. Every launch names its model, and a fork is refused (`RD.DEVEX.AGENT.104`).
 **An order quotes the facts it needs, each with its commit, and points to the rules it follows**
 (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`), and you offer a
-new window by the phase of the arc (`RD.DEVEX.AGENT.103`). **A small fix gets code and its test, and no line in the book.** **A round ends
+new window from 200k at a clean point, always past 450k (`RD.DEVEX.AGENT.103`). **A small fix gets code and its test, and no line in the book.** **A round ends
 in one gate:** the whole test tiers, one restart of the showcase or the app, and the shots run once,
 before a release.
 

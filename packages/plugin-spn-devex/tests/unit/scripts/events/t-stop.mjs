@@ -8,7 +8,8 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 import { execFileSync } from "node:child_process";
 import { bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.mjs";
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 import { bindNamed, recordWrites } from "../../../../src/scripts/lib/window.ts";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -1803,7 +1804,7 @@ console.log("\n=== migration — a pending plugin migration holds the turn");
     checkMigrations(workspace("migration-idle", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1/state.json`]: "{}\n" }, [], { migrated: false })).length === 0);
 }
 
-console.log("\n=== window — a new window is offered by phase, at a clean point");
+console.log("\n=== window — a new window is offered from 200k at a clean point, always past 450k, in any phase");
 {
   // THE TRANSCRIPT IS BUILT FROM LINES OF A REAL ONE (`fixtures/window-transcript-lines.json`, trimmed),
   // with only the size of the last call chosen here.
@@ -1813,15 +1814,21 @@ console.log("\n=== window — a new window is offered by phase, at a clean point
     usage: { input_tokens: 2, cache_creation_input_tokens: 1000, cache_read_input_tokens: kilo * 1000 - 1002, output_tokens: 10 } } });
   const feedback = (kilo) => ({ ...lines["stop-feedback"], message: { role: "user",
     content: `Stop hook feedback:\n[node stop.mjs]: [window] This window is at ${kilo}k, past the point.` } });
-  const arcStatus = (status) => ({ ".spndevex/workstreams/open/025-partner-web/arcs/N017/state.json": JSON.stringify({ arc: "N017", status, rows: [] }) });
+  // A WHOLE WORKSTREAM, kept as data (`dataWorkspace`), so `workstream state check` finds nothing in it unless the case breaks it.
   let counter = 0;
-  const hear = ({ status = "RUNNING", parts = [lines["bash-row-write"]], kilo, extra = {} }) => {
+  const hear = async ({ status = "DECIDED", parts = [lines["bash-row-write"]], kilo, extra = {}, running = false, broken = false }) => {
     counter += 1;
-    const root = workspace(`window-${counter}`, status ? arcStatus(status) : {});
+    const { root, ws } = await dataWorkspace(`window-${counter}`);
+    const file = join(ws, "arcs", "N001", "state.json");
+    const data = JSON.parse(readFileSync(file, "utf8"));
+    data.status = status;
+    if (running) data.rows[0].state = "running";
+    writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
+    if (status !== "DECIDED" || running) cli(root, ["docs", "cycles", "write", "031"]);
+    if (broken) rmSync(join(ws, "notes", "N001", "preview.html"));
+    bindNamed(root, `window-${counter}`, "031-probe", "prompt");   // the window works on this workstream
     const transcript = join(root, "transcript.jsonl");
-    // A fixture line carries the cwd of the window it came from; here it stands in the fixture's own workstream.
-    const here = join(root, ".spndevex", "workstreams", "open", "025-partner-web");
-    writeFileSync(transcript, [...parts, sized(kilo, `msg_w${counter}`)].map((line) => JSON.stringify({ ...line, cwd: here })).join("\n") + "\n");
+    writeFileSync(transcript, [...parts, sized(kilo, `msg_w${counter}`)].map((line) => JSON.stringify({ ...line, cwd: ws })).join("\n") + "\n");
     return run("node", [`${HOOKS}/src/scripts/events/stop.ts`],
       { cwd: root, session_id: `window-${counter}`, transcript_path: transcript, last_assistant_message: "done", ...extra }, root);
   };
@@ -1830,23 +1837,27 @@ console.log("\n=== window — a new window is offered by phase, at a clean point
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`);
   };
   const asks = (out) => /\[window\]/.test(out);
-
-  const building = hear({ kilo: 312 });
-  check("building: asks at 312k, and the reason names the size, the phase and the arc",
-    asks(building) && /312k/.test(building) && /300k point for building/.test(building) && /N017 RUNNING/.test(building), building);
-  check("ideating: silent at 400k when the arc is PROPOSED", !asks(hear({ status: "PROPOSED", kilo: 400 })));
-  check("ideating: silent at 400k when the window has written to no arc", !asks(hear({ status: null, parts: [], kilo: 400 })));
-  const ideating = hear({ status: "PROPOSED", kilo: 452 });
-  check("ideating: asks at 452k, past 450k", asks(ideating) && /450k point for ideating/.test(ideating), ideating);
-  check("building: silent below 300k", !asks(hear({ kilo: 290 })));
-  check("does not ask again until the window grows 50k", !asks(hear({ parts: [lines["bash-row-write"], sized(312, "msg_first"), feedback(312)], kilo: 340 })));
-  check("asks again once the window has grown 50k", asks(hear({ parts: [lines["bash-row-write"], sized(312, "msg_first"), feedback(312)], kilo: 365 })));
-  const waiting = hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 320 });
+  const clean = await hear({ kilo: 210 });
+  check("clean: offers at 210k, and the message names the size, the written points and the small asks",
+    asks(clean) && /210k/.test(clean) && /S<n>/.test(clean) && /question as a card/.test(clean) && /small/.test(clean) && /whole size/.test(clean), clean);
+  check("clean: silent below 200k", !asks(await hear({ kilo: 190 })));
+  check("phase does not matter: a PROPOSED arc gets the same offer at 210k", asks(await hear({ status: "PROPOSED", kilo: 210 })));
+  check("phase does not matter: a RUNNING arc gets the same offer at 210k", asks(await hear({ status: "RUNNING", kilo: 210 })));
+  check("phase does not matter: a window that wrote to no arc gets the same offer at 210k", asks(await hear({ parts: [], kilo: 210 })));
+  const busy = await hear({ status: "RUNNING", running: true, kilo: 210 });
+  check("a child running at 210k: no offer", !asks(busy), busy);
+  const found = await hear({ broken: true, kilo: 210 });
+  check("a state finding at 210k: no offer", !asks(found) && /\[state\]/.test(found), found);
+  const always = await hear({ status: "RUNNING", running: true, kilo: 460 });
+  check("a child running at 460k: the always-message", asks(always) && /past 450k/.test(always) && /Write every open point first/.test(always) && /whatever is running/.test(always), always);
+  check("does not ask again until the window grows 50k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
+  check("asks again once the window has grown 50k", asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
+  const waiting = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 220 });
   check("waits while a background Agent has no notification", !asks(waiting), waiting);
   check("asks when every background Agent has its notification",
-    asks(hear({ parts: [lines["bash-row-write"], lines["agent-background-notified"], lines["notification"]], kilo: 320 })));
-  check("silent for a subagent's stop (agent_id)", !asks(hear({ kilo: 320, extra: { agent_id: "a1" } })));
-  check("silent under stop_hook_active", !asks(hear({ kilo: 320, extra: { stop_hook_active: true } })));
+    asks(await hear({ parts: [lines["bash-row-write"], lines["agent-background-notified"], lines["notification"]], kilo: 220 })));
+  check("silent for a subagent's stop (agent_id)", !asks(await hear({ kilo: 220, extra: { agent_id: "a1" } })));
+  check("silent under stop_hook_active", !asks(await hear({ kilo: 220, extra: { stop_hook_active: true } })));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
