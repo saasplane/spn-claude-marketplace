@@ -1710,7 +1710,7 @@ const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next"
 
 /**
  * THE UNITS A SPEC MAY NAME: every unit the design system's barrel exports (`spn-support-ts`
- * `packages/support-web-ds-ts/src/index.ts` @ `596fd115`), leaving out its contexts and its observers, which
+ * `packages/support-web-ds-ts/src/index.ts` @ `368b3262`), leaving out its contexts and its observers, which
  * are no unit a page is drawn from. A `unit` that is not here is a finding, since a sketch names the real unit.
  */
 const SKEL_UNITS = new Set([
@@ -1720,13 +1720,13 @@ const SKEL_UNITS = new Set([
   "DSCarousel", "DSCheckbox", "DSCheckboxGroup", "DSCodeBlockView", "DSCollapsible", "DSColorPicker", "DSColorView", "DSCommand",
   "DSCommandPalette", "DSComparison", "DSConfirmDialog", "DSConfirmPopover", "DSContextMenu", "DSDataFieldBuilder",
   "DSDataFieldForm", "DSDataFieldView", "DSDataTable", "DSDataTableContainer", "DSDataUnit", "DSDataUnitGroup", "DSDatePicker",
-  "DSDateRangePicker", "DSDateTimePicker", "DSDialog", "DSDrawer", "DSDropdownMenu", "DSEmpty", "DSEntryOverlay", "DSFilterBar",
+  "DSDateRangePicker", "DSDateTimePicker", "DSDialog", "DSDrawer", "DSDropdownMenu", "DSEmpty", "DSEntryOverlay", "DSFeature", "DSFilterBar",
   "DSForm", "DSFormatCurrency", "DSFormatDate", "DSFormatDateTime", "DSFormatNumber", "DSFormatTime", "DSHScroll", "DSHoverCard",
   "DSIcon", "DSImage", "DSImagePicker", "DSInput", "DSInputNumber", "DSInputOTP", "DSInputPhone", "DSItem", "DSItemCard",
   "DSItemFacts", "DSJSONControl", "DSJSONView", "DSKbd", "DSLabel", "DSLayout", "DSLink", "DSList", "DSListDetail", "DSMark",
   "DSMenubar", "DSNavBarSide", "DSNavBarTop", "DSNavEntry", "DSNavList", "DSNavMenu", "DSOverlayContainer", "DSPageLevel",
   "DSPagination", "DSPanelContainer", "DSPopover", "DSPortal", "DSProgress", "DSProgressCircle", "DSRadio", "DSRadioGroup",
-  "DSScrollArea", "DSSelect", "DSSelectMulti", "DSSeparator", "DSSheet", "DSSkeleton", "DSSlider", "DSSliderRange", "DSSpinner",
+  "DSScrollArea", "DSSectionContainer", "DSSelect", "DSSelectMulti", "DSSeparator", "DSSheet", "DSSkeleton", "DSSlider", "DSSliderRange", "DSSpinner",
   "DSStatusActiveView", "DSSticky", "DSSurface", "DSSwitch", "DSTable", "DSTabs", "DSTagGroup", "DSText", "DSTextarea",
   "DSThemeForm", "DSTimePicker", "DSToast", "DSToggle", "DSToggleGroup", "DSToggleGroupMulti", "DSToolbar", "DSTooltip",
 ]);
