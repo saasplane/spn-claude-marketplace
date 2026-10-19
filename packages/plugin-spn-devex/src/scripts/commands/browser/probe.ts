@@ -23,57 +23,120 @@ const list = (values: string[]): string[] => values.flatMap((value) => value.spl
 const READ = (job: { select: string; props: string[]; ancestors: string[]; rules: string[] }) => {
   const sheetName = (sheet: CSSStyleSheet): string =>
     sheet.href || (sheet.ownerNode as Element | null)?.getAttribute?.("data-vite-dev-id") || "inline";
-  // Specificity of one selector, as a number a comparison can use.
-  const specificity = (selector: string): number => {
-    const bare = selector.replace(/\[[^\]]*\]/g, " [a] ").replace(/"[^"]*"|'[^']*'/g, "");
-    const ids = (bare.match(/#[\w-]+/g) ?? []).length;
-    const classes = (bare.match(/\.[\w-]+|\[a\]|:(?!:|is\(|where\(|not\()[\w-]+/g) ?? []).length;
-    const types = (bare.replace(/\[a\]/g, "").match(/(^|[\s>+~(])[a-zA-Z][\w-]*|::[\w-]+/g) ?? []).length;
-    return ids * 1e6 + classes * 1e3 + types;
-  };
   const topLevel = (text: string): string[] => {
     const out: string[] = []; let depth = 0, start = 0;
     for (let i = 0; i < text.length; i += 1) {
       const c = text[i];
+      if (c === "\\") { i += 1; continue; }
       if (c === "(" || c === "[") depth += 1; else if (c === ")" || c === "]") depth -= 1;
       else if (c === "," && depth === 0) { out.push(text.slice(start, i)); start = i + 1; }
     }
     out.push(text.slice(start));
     return out.map((part) => part.trim()).filter(Boolean);
   };
-  type Entry = { sheet: string; selector: string; value: string; important: boolean; specificity: number; order: number };
+  // Specificity of one complex selector as [ids, classes, types] folded into one number: `:is()`, `:not()` and `:has()`
+  // count their most specific argument, `:where()` counts nothing.
+  const specificity = (selector: string): number => {
+    let ids = 0, classes = 0, types = 0;
+    const text = selector.replace(/"(?:\\.|[^"])*"|'(?:\\.|[^'])*'/g, "\"\"");
+    const ident = /^(?:\\.|[\w-])+/;
+    for (let i = 0; i < text.length;) {
+      const rest = text.slice(i);
+      const c = text[i];
+      if (c === "#") { ids += 1; i += 1 + (rest.slice(1).match(ident)?.[0].length ?? 0); }
+      else if (c === ".") { classes += 1; i += 1 + (rest.slice(1).match(ident)?.[0].length ?? 0); }
+      else if (c === "[") { classes += 1; let depth = 0; for (; i < text.length; i += 1) { if (text[i] === "[") depth += 1; else if (text[i] === "]" && --depth === 0) { i += 1; break; } } }
+      else if (rest.startsWith("::")) { types += 1; i += 2 + (rest.slice(2).match(ident)?.[0].length ?? 0); if (text[i] === "(") { let depth = 0; for (; i < text.length; i += 1) { if (text[i] === "(") depth += 1; else if (text[i] === ")" && --depth === 0) { i += 1; break; } } } }
+      else if (c === ":") {
+        const name = (rest.slice(1).match(ident)?.[0] ?? "").toLowerCase();
+        i += 1 + name.length;
+        let args = "";
+        if (text[i] === "(") { const open = i; let depth = 0; for (; i < text.length; i += 1) { if (text[i] === "(") depth += 1; else if (text[i] === ")" && --depth === 0) { i += 1; break; } } args = text.slice(open + 1, i - 1); }
+        if (name === "where") continue;
+        if (name === "is" || name === "not" || name === "has" || name === "matches") {
+          const best = Math.max(0, ...topLevel(args).map(specificity));
+          ids += Math.floor(best / 1e6); classes += Math.floor((best % 1e6) / 1e3); types += best % 1e3;
+        } else if (name === "before" || name === "after" || name === "first-line" || name === "first-letter") types += 1;
+        else classes += 1;
+      }
+      else if (/[a-zA-Z\\]/.test(c)) { types += 1; i += rest.match(ident)?.[0].length ?? 1; }
+      else i += 1;
+    }
+    return ids * 1e6 + classes * 1e3 + types;
+  };
+  // A nested rule's selector, made whole from its parent's: `&` stands for the parent, and a selector with no `&` is a
+  // descendant of it. Matched alone, a bare `&` would match every element.
+  const nest = (selector: string, parent: string | null): string =>
+    parent === null ? selector : selector.includes("&") ? selector.split("&").join(`:is(${parent})`) : `:is(${parent}) ${selector}`;
+  // The shorthands that can set a longhand: `background` for `background-color`, `border-top`, `border-color` and
+  // `border` for `border-top-color`. A shorthand written with `var()` leaves its longhands empty in the rule's style.
+  // A custom property has none.
+  const shorthands = (prop: string): string[] => {
+    if (prop.startsWith("--")) return [];
+    const parts = prop.split("-");
+    const out: string[] = [];
+    for (let k = parts.length - 1; k >= 1; k -= 1) out.push(parts.slice(0, k).join("-"));
+    if (parts.length > 2) out.push(`${parts[0]}-${parts[parts.length - 1]}`);
+    return out;
+  };
+  // A cascade layer's place: unlayered rules come after every layer, and a layer ranks by the first time it is named.
+  const layerRank = new Map<string, number>();
+  const rankOf = (layer: string | null): number => {
+    if (layer === null) return Number.MAX_SAFE_INTEGER;
+    if (!layerRank.has(layer)) layerRank.set(layer, layerRank.size);
+    return layerRank.get(layer) as number;
+  };
+  type Entry = { sheet: string; selector: string; value: string; shorthand: string | null; important: boolean; layer: number; specificity: number; order: number };
   const collected: { el: Element; prop: string; entry: Entry }[] = [];
   const els = [...document.querySelectorAll(job.select)];
   let order = 0;
-  const walk = (rules: CSSRuleList, sheet: string): void => {
+  const walk = (rules: CSSRuleList, sheet: string, parent: string | null, layer: string | null): void => {
     for (const rule of rules as unknown as CSSRule[]) {
-      const grouped = (rule as CSSGroupingRule).cssRules;
       const media = (rule as CSSMediaRule).media;
       if (media && !window.matchMedia(media.mediaText).matches) continue;
+      if (rule.constructor.name === "CSSSupportsRule" && !CSS.supports((rule as CSSSupportsRule).conditionText)) continue;
+      if (rule.constructor.name === "CSSLayerStatementRule") {
+        for (const name of (rule as CSSLayerStatementRule).nameList) rankOf(layer === null ? name : `${layer}.${name}`);
+        continue;
+      }
+      let inner = layer;
+      if (rule.constructor.name === "CSSLayerBlockRule") {
+        const name = (rule as CSSLayerBlockRule).name;
+        inner = layer === null ? name : `${layer}.${name}`;
+        rankOf(inner);
+      }
       const selectorText = (rule as CSSStyleRule).selectorText;
-      if (selectorText) {
+      // Declarations after a nested rule sit in a rule of their own, with no selector: they apply to the parent's.
+      const own = selectorText ? topLevel(selectorText).map((part) => nest(part, parent))
+        : rule.constructor.name === "CSSNestedDeclarations" && parent !== null ? [parent] : [];
+      const style = (rule as CSSStyleRule).style;
+      if (own.length && style) {
         order += 1;
-        for (const part of topLevel(selectorText)) {
+        for (const part of own) {
           for (const el of els) {
             let hit = false;
             try { hit = el.matches(part); } catch { hit = false; }
             if (!hit) continue;
             for (const prop of job.rules) {
-              const style = (rule as CSSStyleRule).style;
-              const value = style.getPropertyValue(prop);
-              if (!value) continue;
-              collected.push({ el, prop, entry: { sheet, selector: part, value, important: style.getPropertyPriority(prop) === "important",
-                specificity: specificity(part), order } });
+              let value = style.getPropertyValue(prop), shorthand: string | null = null, priority = style.getPropertyPriority(prop);
+              if (!value) {
+                shorthand = shorthands(prop).find((name) => style.getPropertyValue(name)) ?? null;
+                if (shorthand === null) continue;
+                value = style.getPropertyValue(shorthand); priority = style.getPropertyPriority(shorthand);
+              }
+              collected.push({ el, prop, entry: { sheet, selector: part, value, shorthand, important: priority === "important",
+                layer: rankOf(inner), specificity: specificity(part), order } });
             }
           }
         }
       }
-      if (grouped) walk(grouped, sheet);
+      const grouped = (rule as CSSGroupingRule).cssRules;
+      if (grouped) walk(grouped, sheet, selectorText ? topLevel(selectorText).map((part) => nest(part, parent)).join(", ") : parent, inner);
     }
   };
   if (job.rules.length) {
     for (const sheet of document.styleSheets) {
-      try { walk(sheet.cssRules, sheetName(sheet)); } catch { /* a sheet from another origin cannot be read */ }
+      try { walk(sheet.cssRules, sheetName(sheet), null, null); } catch { /* a sheet from another origin cannot be read */ }
     }
   }
   return els.map((el, index) => {
@@ -89,11 +152,16 @@ const READ = (job: { select: string; props: string[]; ancestors: string[]; rules
         if (Object.keys(attrs).length) ancestors.push({ tag: up.tagName.toLowerCase(), slot: up.getAttribute("data-slot"), attrs });
       }
     }
-    const rules: Record<string, { sheet: string; selector: string; value: string }[]> = {};
+    // The cascade's order, winner first: important before normal; among normal rules the later layer and unlayered win,
+    // among important ones the earlier layer; then specificity, then the later rule.
+    const rules: Record<string, { sheet: string; selector: string; value: string; shorthand?: string }[]> = {};
     for (const prop of job.rules) {
       rules[prop] = collected.filter((c) => c.el === el && c.prop === prop)
-        .sort((a, b) => Number(b.entry.important) - Number(a.entry.important) || b.entry.specificity - a.entry.specificity || b.entry.order - a.entry.order)
-        .map(({ entry }) => ({ sheet: entry.sheet, selector: entry.selector, value: entry.value }));
+        .sort((a, b) => Number(b.entry.important) - Number(a.entry.important)
+          || (a.entry.important ? a.entry.layer - b.entry.layer : b.entry.layer - a.entry.layer)
+          || b.entry.specificity - a.entry.specificity || b.entry.order - a.entry.order)
+        .map(({ entry }) => ({ sheet: entry.sheet, selector: entry.selector, value: entry.value,
+          ...(entry.shorthand === null ? {} : { shorthand: entry.shorthand }) }));
     }
     return { select: job.select, index, text: (el.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 60), props,
       box: { x: box.x, y: box.y, width: box.width, height: box.height }, ancestors, rules };

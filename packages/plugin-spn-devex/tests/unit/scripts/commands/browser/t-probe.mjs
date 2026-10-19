@@ -73,6 +73,22 @@ if (!hasBrowser) {
   one("and the winning rule is first (the dark-mode one, more specific)", found[0].sheet === "/src/first.css" && found[0].value === "rgb(0, 0, 255)", JSON.stringify(found));
   one("and of two rules equally specific, the later sheet comes before the earlier", found.findIndex((r) => r.sheet === "/src/second.css") < found.findIndex((r) => r.selector === ".card" && r.sheet === "/src/first.css"), JSON.stringify(found));
 
+  const layered = read(["--select", ".card", "--rules", "color"]).json.matches[0].rules.color;
+  one("rules: an unlayered rule comes before a layered one, though the layered one is later", layered[0]?.sheet === "/src/first.css"
+    && layered[0]?.value === "rgb(0, 0, 0)" && layered.some((r) => r.sheet === "/src/third.css"), JSON.stringify(layered));
+
+  const filled = read(["--select", ".fill", "--rules", "background-color", "--props", "background-color"]).json.matches[0];
+  one("rules: a value set through a shorthand with var() is found through the shorthand, and named", filled.rules["background-color"].length === 1
+    && filled.rules["background-color"][0].selector === ".fill" && filled.rules["background-color"][0].shorthand === "background"
+    && filled.rules["background-color"][0].value === "var(--fill)" && filled.props["background-color"] === "rgb(10, 20, 30)", JSON.stringify(filled));
+
+  const custom = read(["--select", ".fill", "--rules=--fill-tone"]).json.matches[0].rules["--fill-tone"];
+  one("rules: a custom property has no shorthand, so `--fill` is not reported for `--fill-tone`", custom.length === 0, JSON.stringify(custom));
+
+  const nested = read(["--select", ".fill", "--rules", "outline-color"]).json.matches[0].rules["outline-color"];
+  one("rules: a nested rule is matched with its parent's selector, so another parent's nested rule is not listed", nested.length === 1
+    && nested[0].selector.includes(":is(.tint)") && nested[0].value === "rgb(9, 9, 9)", JSON.stringify(nested));
+
   const aria = read(["--select", ".card", "--aria"]);
   one("aria: a match carries its accessibility snapshot, with the aria-label", String(aria.json.matches[0].aria).includes("region \"Quarterly card\""), JSON.stringify(aria.json.matches[0].aria));
   const ariaPage = read(["--aria", "--select", ".none"]);
