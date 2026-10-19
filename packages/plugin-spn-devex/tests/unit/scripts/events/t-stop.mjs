@@ -1147,7 +1147,9 @@ console.log("\n=== welcome — a session's first turn opens with the welcome, wo
 
 console.log("\n=== welcome — the hook reads the first turn from the transcript, and only on the first Stop");
 {
-  const lines = (texts) => texts.map((text) => JSON.stringify({ type: "assistant", message: { content: [{ type: "text", text }] } })).join("\n") + "\n";
+  const prompt = (text) => JSON.stringify({ type: "user", message: { role: "user", content: text } });
+  const lines = (texts, prompts = 1) => [...Array.from({ length: prompts }, (_, at) => prompt(`prompt ${at + 1}`)),
+    ...texts.map((text) => JSON.stringify({ type: "assistant", message: { content: [{ type: "text", text }] } }))].join("\n") + "\n";
   const { welcome } = await import("../../../../src/scripts/events/orientation.ts");
   const root = build("f1-welcome", { arcNames: ["N1-a-subject.md"], pageOpts: { names: ["N1-a-subject.md"] } });
   const bad = join(root, "bad.jsonl"), good = join(root, "good.jsonl");
@@ -1159,6 +1161,22 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
     { session: "f1-good", extra: { transcript_path: good }, parity: false, why: "a new check" });
   one("the second Stop of the same session is not read for the welcome", root, "silent",
     { session: "f1-bad", extra: { transcript_path: bad }, parity: false, why: "a new check" });
+  // N019 row 7: THE FIRST TURN IS READ FROM THE TRANSCRIPT, AND A CHILD NEVER TOUCHES THE WINDOW'S BASELINE.
+  const later = join(root, "later.jsonl");
+  writeFileSync(later, lines(["I'll start by reading the arc file.", "Done."], 3), "utf8");
+  one("a later turn (three prompts) with no baseline raises no welcome", root, "silent",
+    { session: "f1-later", extra: { transcript_path: later }, parity: false, why: "a new check" });
+  const baselineFile = (sid) => join(root, ".spndevex", ".debug", "stop", "sessions", `${sid}.json`);
+  const marked = JSON.stringify({ at: 1, steps: { "arc": "x" }, fired: [], cards: [], arcs: {}, ownCopy: [] });
+  mkdirSync(join(root, ".spndevex", ".debug", "stop", "sessions"), { recursive: true });
+  writeFileSync(baselineFile("f1-window"), marked, "utf8");
+  n += 1;
+  bindOpen(root, "f1-window");
+  run("node", [`${HOOKS}/src/scripts/events/stop.ts`],
+    { cwd: root, last_assistant_message: "done", session_id: "f1-window", agent_id: "child-1", transcript_path: bad }, root);
+  const kept = readFileSync(baselineFile("f1-window"), "utf8") === marked && existsSync(baselineFile("f1-window").replace(".json", "_child-1.json"));
+  if (!kept) failed += 1;
+  console.log(`  ${kept ? "PASS" : "FAIL"}  a child's Stop leaves the window's baseline as it was and writes its own`);
 }
 
 console.log("\n=== stop — a check speaks once in a turn, and only about this session's work (RD.DEVEX.WORKSPACE.198)");

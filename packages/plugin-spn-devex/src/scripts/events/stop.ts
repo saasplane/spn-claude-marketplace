@@ -1490,6 +1490,29 @@ function plain(text: string): string {
 }
 
 /**
+ * How many prompts the developer has given in a transcript: the user entries that carry text of their own.
+ * A tool result, a meta entry, a helper's side chain and a Stop hook's feedback are not prompts. The welcome
+ * is judged only where this is exactly one, so a lost baseline can never make a later turn look like the first.
+ */
+export function promptCount(transcript: string): number {
+  let raw = "";
+  try { raw = readFileSync(transcript, "utf8"); } catch { return 0; }
+  let count = 0;
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    let entry: { type?: string; isMeta?: boolean; isSidechain?: boolean; message?: { content?: unknown } };
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (entry.type !== "user" || entry.isMeta || entry.isSidechain) continue;
+    const content = entry.message?.content;
+    const text = typeof content === "string" ? content
+      : Array.isArray(content) ? content.filter((part) => (part as { type?: string }).type === "text")
+          .map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
+    if (text.trim() && !text.startsWith("Stop hook feedback:")) count += 1;
+  }
+  return count;
+}
+
+/**
  * Every assistant text block of a session's first turn, joined — the transcript from its start to
  * the first Stop. `last_assistant_message` is the turn's LAST text, and the welcome is its first.
  */
@@ -1694,15 +1717,20 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // read: it was bound by names found anywhere in a write, and a log line mentioning another workstream
   // bound it for ever. A window with no binding gets the empty set and hears nothing about a card, a page,
   // an arc or a row (RD.DEVEX.WORKSPACE.236).
-  const baseline = readBaseline(root, session);
+  // A CHILD AGENT SHARES THE WINDOW'S session_id, so it keeps its own baseline file and never reads or
+  // writes the window's: its view (no steps, no arcs) must not stand for the window's last turn.
+  const baselineKey = event.agent_id ? `${session}_${event.agent_id}` : session;
+  const baseline = readBaseline(root, baselineKey);
   const mine = windowSet(root, session);
   const touched = baseline ? arcsWrittenSince(root, session, baseline.at) : new Set<string>();
   // A CHECK THAT SPOKE AT THIS SESSION'S LAST STOP HAS HAD ITS ANSWER. `stop_hook_active` says this
   // turn continues because a Stop hook spoke, so the reply is the answer to what it said. Judging it
   // with the same check again is the loop that held sessions until the harness ended the turn.
   const spoken = new Set(event.stop_hook_active === true ? baseline?.fired ?? [] : []);
-  // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
-  const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
+  // The welcome belongs to the session's first prompt, read from the transcript: exactly one prompt so far.
+  // No baseline alone never makes a turn the first.
+  const firstTurn = !baseline && event.transcript_path && !event.agent_id && promptCount(event.transcript_path) === 1
+    ? firstTurnText(event.transcript_path) : "";
   const where = cardsByWorkstream(root, mine);
   const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
   // THE ARCS THIS WINDOW WROTE THIS TURN, IN ITS OWN WORKSTREAMS.
@@ -1751,7 +1779,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // AFTER the checks, never before: they compare against this and would compare against now. `fired`
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
   // the first reply's check either.
-  writeBaseline(root, session, { at: kept ? kept.at : Date.now(),
+  writeBaseline(root, baselineKey, { at: kept ? kept.at : Date.now(),
                                  steps: kept ? { ...currentSteps(root), ...kept.steps } : currentSteps(root),
                                  fired: [...new Set([...spoken, ...said.map((warning) => warning.check)])],
                                  cards: waiting,
