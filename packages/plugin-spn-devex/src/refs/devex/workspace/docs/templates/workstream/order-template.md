@@ -1,6 +1,6 @@
 ---
 row: "{{row}}"                          # the row this order carries out; the file is orders/{{row}}.md
-model: {{sonnet}}                       # the smallest model that can do it
+model: {{sonnet}}                       # Sonnet for a written order; Opus only where the order designs, and says why
 blockedBy: ["{{row or q<n>}}"]          # what must land first; [] when nothing
 touches: ["{{repository:place}}"]       # what the row writes, so two orders never write one file
 decisions: [{{q<n>}}]                   # the cards the row rests on, by id
@@ -20,9 +20,8 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
      for each fix, the book updated once per round, no shots; the heavy checks run once, at the gate before a release.
      FULL FORM, for a new prop, token, rule or construct: a fail-first test, the book row, the shots, and a section that names every
      new construct before anything is added. -->
-<!-- POINT, DON'T COPY. The order names a card, a register row and a fact by its id, and the section, the function or the
-     lines to read, and never pastes them. A fact that lives in the arc's data, the book or the preview is pointed to, so it
-     cannot go stale in the order. -->
+<!-- AN ORDER QUOTES THE FACTS IT NEEDS AND POINTS TO THE RULES IT FOLLOWS. A fact is one line with its source and commit, as
+     plan.md pins it, so `state check` still finds one that moved. A rule is a named section, never a whole page or a report. -->
 # Order {{row}} — {{what this agent does}}
 
 | | |
@@ -31,7 +30,8 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | **Workstream** | `{{NNN-subject}}` · **Arc:** [`N{{nnn}}`](../../../approach.html#N{{nnn}}), row {{row}} — `spn-devex workstream rows show {{NNN}}` reads it |
 | **Pinned** | the facts named above, each pinned to its commit; `spn-devex workstream state check` lists any source that moved since |
 | **Form** | {{light · full}} |
-| **Read first** | Only these parts: `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · the preview's section `{{absolute path}}/notes/N{{nnn}}/preview.html#{{part}}` · `{{absolute path}}/notes/N{{nnn}}/plan.md` § Traps, § Commands · the facts and cards named in the front matter |
+| **Read first** | A few items: the preview's section `{{absolute path}}/notes/N{{nnn}}/preview.html#{{part}}` · `{{absolute path}}/notes/N{{nnn}}/plan.md` § Traps · the facts quoted below with their pins |
+| **Look** | {{none · the look decided on `notes/N{{nnn}}/preview.html#{{part}}`, with the developer's go of {{date}}}} |
 
 **Launch no agent.** **Read only:** the parts named in *Read first*, above, and the file you change. **Hand back** at most {{10 for the light form · 15 for the full form}} lines; save the same as `orders/{{row}}.report.md` beside this order, its front matter first.
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "2293ceb4"
+      "seen": "eb10aba3"
     }
   ]
 }
@@ -251,6 +251,10 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 **A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
 
 **A plugin's cache lives in the machine store, keyed by content, and never in the shared workspace folder — MUST.** `.spndevex/` is shared by every parallel window and every workstream, so a mutable file written there is overwritten by whichever window finishes second, and neither session did anything wrong — they only disagree about which verdict is current. A cache kept in the machine store and keyed by content sidesteps the race rather than resolving it: two windows either compute the identical verdict or never touch the same key at all.
+
+**The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript and the phase of the arc the window last wrote to, asks once at the phase's size, then again only after another 50k, and never while a helper launched in the window has not handed back (`RD.DEVEX.AGENT.103`).
+
+**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RD.DEVEX.AGENT.104`).
 
 ## Who a hook's line is for
 

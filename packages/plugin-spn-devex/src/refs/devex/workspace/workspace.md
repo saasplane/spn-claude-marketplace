@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "937d0f27"
+      "seen": "c6b94a88"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -272,6 +272,8 @@ exception, each with one owner: the progress block and the `Open` block, which t
 named by its number, `N<nnn>`, and its short subject, its title and its goal are fields of its data; one
 number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
 on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
+
+**A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RD.DEVEX.WORKSPACE.274`). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RD.DEVEX.AGENT.104`). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`).
 
 **A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
 

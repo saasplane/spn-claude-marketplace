@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "937d0f27"
+      "seen": "c6b94a88"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "a3aefeaf"
+      "seen": "c3560547"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "627b7305"
+      "seen": "fb7f7e5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -200,8 +200,11 @@ bring the developer only results and real decisions.
 | parts in different repositories | separate orders, run side by side; inside one repository, one after another |
 
 **The model follows the kind of work.** Mechanical work runs on the smallest model, only where the order
-has nothing to decide; specified code and documents on the middle one; shaping, cards, sizing and reading
-hand-backs stay with you. **A small fix gets code and its test, and no line in the book.** **A round ends
+has nothing to decide; a written order on Sonnet; shaping, cards, previews and reading hand-backs stay
+with you on the largest. Every launch names its model, and a fork is refused (`RD.DEVEX.AGENT.104`).
+**An order quotes the facts it needs, each with its commit, and points to the rules it follows**
+(`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`), and you offer a
+new window by the phase of the arc (`RD.DEVEX.AGENT.103`). **A small fix gets code and its test, and no line in the book.** **A round ends
 in one gate:** the whole test tiers, one restart of the showcase or the app, and the shots run once,
 before a release.
 
@@ -840,6 +843,9 @@ Writing the first section of a preview or the first sample opens the arc as `PRO
 `PROPOSED` with no preview fails `workstream state check`. A preview belongs to its arc: a later arc that needs an earlier arc's
 preview or sample links it, and never copies it, says it again or edits it
 (`RD.DEVEX.WORKSPACE.224`). A copy is a second version, and nothing keeps the two in step.
+**A change to how something looks is made in the preview first, as often as the developer likes, with no
+test** (`RD.DEVEX.WORKSPACE.274`). It reaches code only through a preview the developer said go on, and is
+built once, in one order, with its tests once.
 
 **You pick the form of a preview, and the developer's word overrides it — MUST**
 (`RD.DEVEX.WORKSPACE.201`). The book lists no fixed kinds: show lines that change, a layout, a diagram,
@@ -984,7 +990,9 @@ A go lives in the arc's `## Log`, as a line opening with the date and the word:
 ```
 
 **Nothing else counts, because nothing else survives.** A go held in the conversation ends with the
-window, and the next session opens on a page it cannot tell from a proposal. So the first
+window, and the next session opens on a page it cannot tell from a proposal. **The log gets one note per
+milestone, not one per step** (`RD.DEVEX.WORKSPACE.275`): a row that lands or is blocked, an arc that
+changes status, a decision of the developer's, and a handover. So the first
 repository write in a window is checked: one open workstream, no go recorded, one warning. Writing
 the plan never warns, because that is how a session earns the go.
 
