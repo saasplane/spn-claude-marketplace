@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/04-resources/",
-      "seen": "d6c1c5f8"
+      "seen": "e916e299"
     }
   ]
 }
