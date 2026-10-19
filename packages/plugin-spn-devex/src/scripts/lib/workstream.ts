@@ -640,6 +640,11 @@ function spanEnd(text: string, from: number): number {
   return -1;
 }
 
+/** The header's arc fact as the commands write it: the arc's badge, which links the arc's row on the approach page. */
+export function previewArc(arc: string): string {
+  return `<span class="sds-label">Arc:</span> <a class="sds-badge" href="${arcAddress(arc, "../../")}">${escapeHtml(arc)}</a>`;
+}
+
 /**
  * The header's status as the commands write it: the arc's status, `PROPOSED` until the design is decided, as its
  * badge, which links the arc's row on the approach page.
@@ -650,9 +655,10 @@ export function previewState(arc: string, status: string): string {
 }
 
 /**
- * A preview's page with its header showing the arc's status (RD.DEVEX.WORKSPACE.266): the header line keeps its
- * other facts, loses any `Arc:` or `Arc file:` fact of its own and the status it showed, and ends in the state
- * `previewState` writes. The page as it was where it has no header line.
+ * A preview's page with its header naming its arc and showing the arc's status (RD.DEVEX.WORKSPACE.266): the header
+ * line keeps its other facts, loses any `Arc:` or `Arc file:` fact of its own and the status it showed, gains the
+ * arc fact `previewArc` writes right after the type, and ends in the state `previewState` writes. The page as it
+ * was where it has no header line.
  */
 export function previewWithStatus(text: string, arc: string, status: string): string {
   const eyebrow = text.indexOf(`<div class="sds-eyebrow"`);
@@ -670,6 +676,8 @@ export function previewWithStatus(text: string, arc: string, status: string): st
     inner = inner.slice(0, stateAt) + inner.slice(stateEnd);
   }
   const facts = inner.split(SEPARATOR).filter((fact) => fact.trim() && !/^\s*<span class="sds-label">Arc(?: file)?:<\/span>/.test(fact));
+  const typeAt = facts.findIndex((fact) => /^\s*<span class="sds-label">Type:<\/span>/.test(fact));
+  facts.splice(typeAt + 1, 0, previewArc(arc));
   const line = `${LINE_OPEN}${facts.join(SEPARATOR)}${previewState(arc, status)}</span>`;
   return text.slice(0, lineAt) + line + text.slice(lineEnd);
 }

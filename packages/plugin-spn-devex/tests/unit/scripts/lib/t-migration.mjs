@@ -154,8 +154,8 @@ console.log("\n=== 003 — a preview's header shows the arc's status");
   const lines = m003.script(root);
   ok("its script writes it, and names the preview", lines.join() === "open/031-probe/notes/N001/preview.html: wrote the arc's status", lines.join(" | "));
   ok("green: 003 then finds nothing", m003.check(root).length === 0, m003.check(root).join(" | "));
-  ok("the preview reads Status DECIDED, the arc's own, linking its row, and its Arc fact is gone",
-    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
+  ok("the preview reads Status DECIDED, the arc's own, linking its row, and its Arc fact is the linked badge after the type",
+    readFileSync(preview, "utf8").includes(`<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-decided" href="../../approach.html#N001">DECIDED</a></span></span>`), readFileSync(preview, "utf8"));
   ok("a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 

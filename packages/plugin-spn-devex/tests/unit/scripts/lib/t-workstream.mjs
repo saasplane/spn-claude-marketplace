@@ -200,20 +200,25 @@ console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266"
   const sep = `<span class="sds-separator">|</span>`;
   const shown = `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-17</span>`;
   const status = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-${word.toLowerCase()}" href="../../approach.html#N001">${word}</a></span>`;
-  const want = eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("LANDED")}</span>`);
+  const arc = `<span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N001">N001</a>`;
+  const want = eyebrow(`<span class="sds-line">${type}${sep}${arc}${sep}${shown}${status("LANDED")}</span>`);
   const before = eyebrow(`<span class="sds-line">${type}${sep}<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span> <span class="sds-small"><a href="../../approach.html#N001">approach.html#N001</a></span>${sep}${shown}<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span></span>`);
   const written = lib.previewWithStatus(before, "N001", "LANDED");
-  ok("the header's own DECIDED gives way to the arc's LANDED, one badge labelled Status that links the arc's row, and the Arc fact goes",
+  ok("the header's own DECIDED gives way to the arc's LANDED, one badge labelled Status that links the arc's row, and the stale Arc fact is rewritten as the linked badge after the type",
     written === want, written);
   ok("a second write finds it current", lib.previewWithStatus(written, "N001", "LANDED") === written);
   ok("an arc still PROPOSED reads PROPOSED, since its design is not decided",
-    lib.previewWithStatus(written, "N001", "PROPOSED") === eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("PROPOSED")}</span>`));
-  ok("the arc's status moving moves only the badge", lib.previewWithStatus(written, "N001", "PART-LANDED") === eyebrow(`<span class="sds-line">${type}${sep}${shown}${status("PART-LANDED")}</span>`));
+    lib.previewWithStatus(written, "N001", "PROPOSED") === eyebrow(`<span class="sds-line">${type}${sep}${arc}${sep}${shown}${status("PROPOSED")}</span>`));
+  ok("the arc's status moving moves only the badge", lib.previewWithStatus(written, "N001", "PART-LANDED") === eyebrow(`<span class="sds-line">${type}${sep}${arc}${sep}${shown}${status("PART-LANDED")}</span>`));
   const two = eyebrow(`<span class="sds-line">${type}${sep}${shown}<span class="sds-state"><span class="sds-label">Design:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span>${sep}<span class="sds-label">Arc:</span> <a href="../../approach.html#N001">N001</a> <span class="sds-badge sds-status sds-landed">LANDED</span></span></span>`);
   ok("a header showing two statuses, Design and Arc, becomes the one", lib.previewWithStatus(two, "N001", "LANDED") === want, lib.previewWithStatus(two, "N001", "LANDED"));
   const fileFact = eyebrow(`<span class="sds-line">${type}${sep}<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span>${sep}${shown}<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-decided">DECIDED</span></span>${sep}<span class="sds-label">Arc file:</span> <a href="../../approach.html#N001">approach.html#N001</a></span>`);
-  ok("an Arc file fact after the state goes, so the arc is linked once", lib.previewWithStatus(fileFact, "N001", "LANDED") === want, lib.previewWithStatus(fileFact, "N001", "LANDED"));
-  ok("a header with no status gains it", lib.previewWithStatus(eyebrow(`<span class="sds-line">${type}${sep}${shown}</span>`), "N001", "LANDED") === want);
+  ok("an Arc file fact after the state goes, and the arc stays named by its one badge", lib.previewWithStatus(fileFact, "N001", "LANDED") === want, lib.previewWithStatus(fileFact, "N001", "LANDED"));
+  ok("a header with no Arc fact and no status gains both", lib.previewWithStatus(eyebrow(`<span class="sds-line">${type}${sep}${shown}</span>`), "N001", "LANDED") === want);
+  const stale = eyebrow(`<span class="sds-line">${type}${sep}<span class="sds-label">Arc:</span> <span class="sds-badge">N009</span>${sep}${shown}${status("LANDED")}</span>`);
+  ok("a stale Arc fact naming another arc is rewritten, once", lib.previewWithStatus(stale, "N001", "LANDED") === want, lib.previewWithStatus(stale, "N001", "LANDED"));
+  ok("a second write of the rewritten header changes nothing", lib.previewWithStatus(lib.previewWithStatus(stale, "N001", "LANDED"), "N001", "LANDED") === want);
+  ok("the Arc fact stands right after the type and the page names the arc once", written.indexOf("Type:") < written.indexOf("Arc:") && written.indexOf("Arc:") < written.indexOf("Shown:") && written.split("Arc:").length === 2);
   ok("a page with no header line stays as it is", lib.previewWithStatus("<p>no header</p>\n", "N001", "LANDED") === "<p>no header</p>\n");
 
   const { root, ws } = await dataWorkspace("t-workstream-preview-status");
