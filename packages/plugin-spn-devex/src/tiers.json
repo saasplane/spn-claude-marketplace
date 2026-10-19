@@ -1,6 +1,7 @@
 {
   "groups": {
     "behaviours": "allow",
+    "browser": "allow",
     "coverage": "allow",
     "docs": "allow",
     "plan": "allow",

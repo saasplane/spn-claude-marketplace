@@ -299,6 +299,44 @@ export function checkAgentModel(payload: Payload): Verdict {
   return null;
 }
 
+/** A step that asks for a picture: shot, screenshot, a `.png`, "take a picture", `page.screenshot`. */
+const PICTURE = /\bscreen-?shots?\b|\bshots?\b|\.png\b|take a picture|page\.screenshot/i;
+/** A line that says no picture is taken, or a section that forbids one, asks for none. */
+const NO_PICTURE = /\b(never|no|not|don't|without|nothing)\b/i;
+/** The developer's ask, cited: the words, or a quoted ask with a time. */
+const CITED_ASK = /the developer asked to see|["“][^"”\n]+["”][^\n]*\b\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/i;
+
+/** Whether a path is an order's brief: `notes/N<nnn>/orders/*.md`, and not its `.report.md`. */
+export function isOrderBrief(path: string): boolean {
+  return /\/notes\/N\d+[a-z]?\/orders\/[^/]+\.md$/.test(path) && !path.endsWith(".report.md");
+}
+
+/**
+ * THE ORDER-PICTURE CHECK: an order checks a page by its computed values, with `spn-devex browser probe`.
+ * A step asking for a screenshot is refused unless the order cites the developer's ask to see a look.
+ * Returns null where the write is fine.
+ */
+export function checkOrderPicture(payload: Payload): Verdict {
+  const input = (payload.tool_input ?? {}) as { file_path?: string; content?: string; new_string?: string };
+  const path = input.file_path ?? "";
+  if (!isOrderBrief(path)) return null;
+  const written = input.content ?? input.new_string ?? "";
+  let whole = written;
+  if (input.content === undefined) {
+    // An edit's fragment may sit beside a citation the file already holds.
+    try { whole = `${readFileSync(resolve(payload.cwd ?? process.cwd(), path), "utf8")}\n${written}`; } catch { /* a new file */ }
+  }
+  if (CITED_ASK.test(whole)) return null;
+  let forbidden = false;
+  for (const line of written.split("\n")) {
+    if (/^#{1,6}\s/.test(line)) forbidden = /\b(do not|never|no)\b/i.test(line);
+    if (!forbidden && PICTURE.test(line) && !NO_PICTURE.test(line)) {
+      return { deny: `A step of ${basename(path)} asks for a screenshot ("${line.trim().slice(0, 60)}"). An order checks a page by its computed values: use \`spn-devex browser probe <url> --select <css> --props …\`. A picture is taken only where the developer asked to see a look, and the order cites it with a line containing "the developer asked to see" (RD.DEVEX.WORKSPACE.277).` };
+    }
+  }
+  return null;
+}
+
 export function dispatch(payload: Payload): Verdict {
   // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
   if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
@@ -306,6 +344,13 @@ export function dispatch(payload: Payload): Verdict {
   }
 
   const supplied = payload.tool_input ?? {};
+
+  // AN ORDER'S BRIEF is judged for the pictures it asks for.
+  if (payload.tool_name && FILE_WRITERS.has(payload.tool_name)) {
+    let refused: Verdict = null;
+    try { refused = span({ group: "order-picture", action: "order-picture" }, () => checkOrderPicture(payload)); } catch { refused = null; }
+    if (refused) return refused;
+  }
 
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
   // reminder (RD.DEVEX.WORKSPACE.117), and a refusal where the page it names loads its styles from

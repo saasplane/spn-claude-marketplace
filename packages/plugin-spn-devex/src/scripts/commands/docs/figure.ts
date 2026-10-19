@@ -173,7 +173,7 @@ function stylesheetLine(): string | null {
 }
 
 /** Where the global install lives today. `null` where there is none, which is not an error. */
-function playwrightPath(): string | null {
+export function playwrightPath(): string | null {
   try {
     const root = execFileSync("npm", ["root", "-g"], { encoding: "utf8" }).trim();
     const entry = join(root, "playwright", "index.mjs");

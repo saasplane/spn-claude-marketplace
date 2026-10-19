@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c3560547"
+      "seen": "6aefd0c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "fb7f7e5f"
+      "seen": "e5a41108"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -196,7 +196,7 @@ bring the developer only results and real decisions.
 | --- | --- |
 | a one-line fix | inline, by you, with its test, and no order |
 | several fixes in one area | one order for the batch, in its light form, with a targeted test for each |
-| a new prop, token, rule or construct | one order in its full form: the test that fails first, the book's row, the shots |
+| a new prop, token, rule or construct | one order in its full form: the test that fails first, the book's row, the page's values from `browser probe` |
 | parts in different repositories | separate orders, run side by side; inside one repository, one after another |
 
 **The model follows the kind of work.** Mechanical work runs on the smallest model, only where the order
@@ -207,6 +207,13 @@ with you on the largest. Every launch names its model, and a fork is refused (`R
 new window by the phase of the arc (`RD.DEVEX.AGENT.103`). **A small fix gets code and its test, and no line in the book.** **A round ends
 in one gate:** the whole test tiers, one restart of the showcase or the app, and the shots run once,
 before a release.
+
+**An order checks a page by its computed values, and takes a picture only where the developer asked to
+see a look — MUST** (`RD.DEVEX.WORKSPACE.277`). A step that has to know what a page paints runs
+`spn-devex browser probe <url> --select <css>` and reads the computed properties, the attributes of each
+ancestor, the stylesheet and selector of each rule that sets a property, and the accessibility tree. An
+order that asks for a screenshot cites the developer's ask in a line containing *the developer asked to
+see*, or in a quoted ask with its time; a hook refuses an order that asks for one and cites none.
 
 ## A new ask goes to the arc that already owns it
 
@@ -890,8 +897,9 @@ and its card links the preview that shows the options. **A preview never frames 
 a thing with the page's own blocks, such as a table, a tree, a figure or a code block, and where the
 thing is a real file it links that file in the arc's `samples/` folder.
 
-**A preview's masthead shows one status, labelled *Status*, and it is the arc's — MUST**
-(`RD.DEVEX.WORKSPACE.266`). It reads `PROPOSED` while the design is not decided, and once decided the
+**A preview's masthead names its arc and shows one status, labelled *Status*, and it is the arc's — MUST**
+(`RD.DEVEX.WORKSPACE.266`). It reads Type · Arc · Shown · Status, and the *Arc* fact is a badge `N<nnn>`
+right after the type, linking the arc's row on the approach page. The status reads `PROPOSED` while the design is not decided, and once decided the
 arc's own status (`DECIDED`, `RUNNING`, `PART-LANDED`, `LANDED` …), since every status after `PROPOSED`
 implies the design was decided. The badge links `../../approach.html#N<nnn>` with no underline (shared
 files `1.8.0`), is read from `state.json`

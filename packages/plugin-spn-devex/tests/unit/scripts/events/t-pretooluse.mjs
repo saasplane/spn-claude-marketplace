@@ -360,6 +360,29 @@ console.log("\n=== pretooluse — a launch of a helper agent names its model, an
   one("agent-model: a prompt naming no order, with a model, is allowed", launch({ model: "haiku" }), "silent", waived);
 }
 
+console.log("\n=== pretooluse — an order asks for no screenshot unless the developer asked to see a look");
+{
+  const orders = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "notes", "N1", "orders");
+  mkdirSync(orders, { recursive: true });
+  const write = (name, content, tool = "Write") => ({ tool_name: tool, session_id: "order-picture", cwd: WORKSPACE,
+    tool_input: { file_path: join(orders, name), ...(tool === "Write" ? { content } : { old_string: "x", new_string: content }) } });
+  const waived = { parity: false, why: "the Python has no order-picture check" };
+  one("order-picture: a step asking for screenshots is refused, naming the probe",
+    write("03-look.md", "# Order\n\n1. Open the page and take a screenshot of the card.\n"), "deny", { says: "browser probe", ...waived });
+  one("order-picture: a `.png` in a step is refused", write("03-look.md", "Save the result to card.png.\n"), "deny", { says: "277", ...waived });
+  one("order-picture: `page.screenshot` is refused under the name Edit too", write("03-look.md", "Run page.screenshot on it.\n", "Edit"), "deny", { says: "browser probe", ...waived });
+  one("order-picture: a screenshot with the developer's ask cited is allowed",
+    write("03-look.md", "The developer asked to see the card in dark.\n\n1. Take a screenshot of the card.\n"), "silent", waived);
+  one("order-picture: a quoted ask with a time is allowed",
+    write("03-look.md", 'The developer: "show me the card" 2026-10-19 17:10.\n\n1. Take a screenshot.\n'), "silent", waived);
+  one("order-picture: a line saying never to take one is allowed", write("03-look.md", "Never take a screenshot; read the values.\n"), "silent", waived);
+  one("order-picture: a Do not section naming screenshots is allowed", write("03-look.md", "## Do not\n\nTake any screenshot.\n"), "silent", waived);
+  one("order-picture: an order that asks for values only is allowed", write("03-look.md", "1. Run `spn-devex browser probe <url> --select .card`.\n"), "silent", waived);
+  one("order-picture: a report is not judged", write("03-look.report.md", "I took a screenshot.\n"), "silent", waived);
+  one("order-picture: a file outside orders is not judged", { tool_name: "Write", session_id: "order-picture", cwd: WORKSPACE,
+    tool_input: { file_path: join(WORKSPACE, "notes.md"), content: "take a screenshot\n" } }, "silent", waived);
+}
+
 console.log("\n=== pretooluse — the chain's cost per call");
 {
   const RUNS = 15;
