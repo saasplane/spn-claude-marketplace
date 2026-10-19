@@ -268,7 +268,43 @@ function docFindingHeard(payload: Payload, path: string, finding: string): boole
   } catch { return false; }
 }
 
+/** The three model families an order and a launch are compared by. */
+const FAMILY = /opus|sonnet|haiku/i;
+
+/**
+ * THE AGENT-MODEL CHECK: a launch of a helper agent names its model, and a launch of an order runs on the
+ * model the order's own `model:` line names. A fork takes no model, since it runs on the window's own with
+ * the window's whole context, so a fork is refused. Returns null where the launch is fine.
+ */
+export function checkAgentModel(payload: Payload): Verdict {
+  const input = (payload.tool_input ?? {}) as { model?: string; subagent_type?: string; prompt?: string };
+  if (input.subagent_type === "fork") {
+    return { deny: "A fork runs on this window's own model with its whole context. Launch the agent with a `subagent_type` and the `model` its order names (sonnet for a written order)." };
+  }
+  const launched = FAMILY.exec(input.model ?? "")?.[0].toLowerCase();
+  if (!input.model) {
+    return { deny: "This launch names no `model`. Add `model` to the call: the one the order's `model:` line names (sonnet for a written order, opus for design)." };
+  }
+  const cwd = payload.cwd ?? process.cwd();
+  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
+    try {
+      const path = resolve(cwd, named[0]);
+      const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
+      const wanted = FAMILY.exec(/^model:\s*(.*)$/m.exec(front)?.[1] ?? "")?.[0].toLowerCase();
+      if (wanted && wanted !== launched) {
+        return { deny: `The order ${basename(path)} names \`model: ${wanted}\` and this launch names \`${input.model}\`. Launch it with \`model: "${wanted}"\`, or change the order's \`model:\` line first.` };
+      }
+    } catch { /* an order that cannot be read is not judged */ }
+  }
+  return null;
+}
+
 export function dispatch(payload: Payload): Verdict {
+  // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
+  if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
+    try { return span({ group: "agent-model", action: "agent-model" }, () => checkAgentModel(payload)); } catch { return null; }
+  }
+
   const supplied = payload.tool_input ?? {};
 
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one

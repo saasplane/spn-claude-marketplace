@@ -42,6 +42,15 @@ export function turnsIn(text: string): Turn[] {
   return [...byId.values()];
 }
 
+/**
+ * What the window held at its last model turn: what was sent fresh, what was written to the cache and
+ * what was read from it. Zero where the text holds no turn.
+ */
+export function windowSize(text: string): number {
+  const last = turnsIn(text).at(-1);
+  return last ? last.input + last.cache_read + last.cache_write : 0;
+}
+
 /** Whole lines of `file` from byte `from`, and the byte the next read starts at. */
 function readFrom(file: string, from: number): { text: string; next: number } | null {
   const size = statSync(file).size;

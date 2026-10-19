@@ -339,6 +339,27 @@ one("2l: an asset upload to a page already published is silent",
   console.log(`  ${ok ? "PASS" : "FAIL"}  2l: hooks.json routes the Artifact tool through PreToolUse\n        matchers ${JSON.stringify(matchers)}`);
 }
 
+console.log("\n=== pretooluse — a launch of a helper agent names its model, and the order's");
+{
+  const orders = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "notes", "N1", "orders");
+  mkdirSync(orders, { recursive: true });
+  writeFileSync(join(orders, "01-the-thing.md"), '---\nrow: "1"\nmodel: sonnet\n---\n# Order 1\n');
+  const order = join(orders, "01-the-thing.md");
+  const launch = (extra, tool = "Agent") => ({ tool_name: tool, session_id: "agent-model", cwd: WORKSPACE,
+    tool_input: { description: "a helper", prompt: "Do the work.", ...extra } });
+  const waived = { parity: false, why: "the Python has no Agent branch" };
+  one("agent-model: a launch with no model is refused", launch({ subagent_type: "general-purpose" }), "deny", { says: "model", ...waived });
+  one("agent-model: the same under the name Task", launch({}, "Task"), "deny", { says: "model", ...waived });
+  one("agent-model: a fork is refused", launch({ subagent_type: "fork", model: "sonnet" }), "deny", { says: "fork", ...waived });
+  one("agent-model: an order saying sonnet, launched on opus, is refused",
+    launch({ model: "opus", prompt: `Carry out the order at ${order} exactly.` }), "deny", { says: "sonnet", ...waived });
+  one("agent-model: an order saying sonnet, launched on sonnet, is allowed",
+    launch({ model: "sonnet", prompt: `Carry out the order at ${order} exactly.` }), "silent", waived);
+  one("agent-model: a full model name in the same family is allowed",
+    launch({ model: "claude-sonnet-5-5", prompt: `Carry out the order at ${order} exactly.` }), "silent", waived);
+  one("agent-model: a prompt naming no order, with a model, is allowed", launch({ model: "haiku" }), "silent", waived);
+}
+
 console.log("\n=== pretooluse — the chain's cost per call");
 {
   const RUNS = 15;

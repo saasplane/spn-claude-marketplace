@@ -25,7 +25,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Read|Write|Edit|Bash|Grep|Glob|NotebookRead|Artifact",
+        "matcher": "Read|Write|Edit|Bash|Grep|Glob|NotebookRead|Artifact|Agent|Task",
         "hooks": [
           {
             "type": "command",

@@ -53,7 +53,7 @@ import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { arcIdsOf, readArc, workstreamsOf } from "../lib/workstream.ts";
+import { arcIdsOf, findWorkstream, readArc, workstreamAround, workstreamsOf } from "../lib/workstream.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, holdsOwnCopy, isInProgress, markedAgo,
@@ -65,7 +65,7 @@ import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
-import { recordUsage } from "../lib/usage.ts";
+import { recordUsage, windowSize } from "../lib/usage.ts";
 import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
 
 type Warning = { check: string; message: string };
@@ -1541,7 +1541,7 @@ export function checkWelcome(firstTurn: string): Warning[] {
 
 // THE CHECKS WHOSE FINDING IS ABOUT THE REPLY ITSELF: a card it raised or a decision it put, a handover
 // block, and the welcome of a first reply. The developer is reading that reply, so the finding cannot wait.
-const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "handover", "welcome"]);
+const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "handover", "welcome", "window"]);
 
 /**
  * The findings a turn end says now, and the ones it holds (RD.DEVEX.WORKSPACE.244). While a row of this
@@ -1555,6 +1555,108 @@ export function splitFindings(found: Warning[], running: boolean): { said: Warni
   if (!running) return { said: found, held: [] };
   return { said: found.filter((warning) => ABOUT_THE_REPLY.has(warning.check)),
            held: found.filter((warning) => !ABOUT_THE_REPLY.has(warning.check)) };
+}
+
+// ---------------------------------------------------------------------------- the window's size
+
+// WHEN A NEW WINDOW IS OFFERED, in tokens of context, all three in this one place. A window working out
+// an idea (an arc not yet RUNNING, or none) loses its thread when it ends, so it goes further; a window
+// building holds nothing that is not in a file, so it is offered a new one sooner. After an offer the
+// next one waits for the window to grow by STEP.
+const IDEATING = 450_000;
+const BUILDING = 300_000;
+const STEP = 50_000;
+
+const ARC_ID = "N\\d+[a-z]?";
+
+/** The arc (workstream folder and number) one tool call of the transcript wrote to, or null. */
+function arcOfCall(root: string, cwd: string, name: string, input: Record<string, unknown>): { folder: string; arc: string } | null {
+  if (name === "Write" || name === "Edit" || name === "NotebookEdit") {
+    const path = String(input.file_path ?? input.notebook_path ?? "");
+    const found = new RegExp(`^(.*/workstreams/(?:open|backlog|closed)/[^/]+)/(?:arcs|notes)/(${ARC_ID})/`).exec(path);
+    return found ? { folder: found[1], arc: found[2] } : null;
+  }
+  if (name !== "Bash") return null;
+  const command = String(input.command ?? "");
+  const named = new RegExp(`\\bworkstream\\b[^\\n|;&]*?(?:(?<![\\w.-])([\\w.-]+)/)?\\b(${ARC_ID})\\b`).exec(command);
+  if (!named) return null;
+  const arc = named[2];
+  const inPath = /workstreams\/(?:open|backlog|closed)\/([\w.-]+)/.exec(command);
+  const folder = (inPath && findWorkstream(inPath[1], root, cwd)) || (named[1] && findWorkstream(named[1], root, cwd))
+    || workstreamAround(cwd)
+    || (() => {
+      const holding = workstreamsOf(root).filter((one) => readArc(one, arc));
+      return holding.length === 1 ? holding[0] : null;
+    })();
+  return folder ? { folder, arc } : null;
+}
+
+/** The arc this window last wrote to, read from its transcript, with the status its `state.json` holds now. */
+function arcOfWindow(root: string, lines: string[]): { arc: string; status: string } | null {
+  for (let at = lines.length - 1; at >= 0; at -= 1) {
+    const line = lines[at];
+    if (!line.includes('"tool_use"') || !line.includes('"type":"assistant"') && !line.includes('"type": "assistant"')) continue;
+    try {
+      const entry = JSON.parse(line) as { type?: string; cwd?: string; message?: { content?: unknown } };
+      if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) continue;
+      for (const block of [...entry.message!.content as Array<Record<string, unknown>>].reverse()) {
+        if (block.type !== "tool_use") continue;
+        const one = arcOfCall(root, entry.cwd || root, String(block.name), (block.input ?? {}) as Record<string, unknown>);
+        const status = one ? readArc(one.folder, one.arc)?.status : undefined;
+        if (one && status) return { arc: one.arc, status };
+      }
+    } catch { /* a torn line is skipped */ }
+  }
+  return null;
+}
+
+/**
+ * THE WINDOW CHECK: past the size its phase names, the turn is told to offer a new window at a clean point.
+ * It reads the transcript and the arc's status and keeps no state. It waits while a helper agent launched in
+ * the background has not handed back, and asks again only after the window has grown by STEP.
+ */
+export function checkWindow(root: string, transcript: string): Warning[] {
+  const lines = transcript.split("\n");
+  const size = Math.floor(windowSize(transcript) / 1000) * 1000;
+  if (size < Math.min(IDEATING, BUILDING)) return [];
+  const arc = arcOfWindow(root, lines);
+  const building = arc?.status === "RUNNING";
+  const point = building ? BUILDING : IDEATING;
+  if (size < point) return [];
+  // THE LAST OFFER, from the hook's own feedback in the transcript and never from other text.
+  let offered = 0;
+  for (const line of lines) {
+    if (!line.includes("Stop hook feedback:") || !line.includes("[window] This window is at ")) continue;
+    try {
+      const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
+      const content = entry.message?.content;
+      const text = typeof content === "string" ? content
+        : Array.isArray(content) ? content.map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
+      const told = /^Stop hook feedback:[\s\S]*?\[window\] This window is at (\d+)k/.exec(text);
+      if (entry.type === "user" && told) offered = Number(told[1]) * 1000;
+    } catch { /* a torn line is skipped */ }
+  }
+  if (offered && size < offered + STEP) return [];
+  // A BACKGROUND HELPER THAT HAS NOT HANDED BACK HOLDS THE POINT: it has no clean point yet.
+  const launched = new Map<string, number>();
+  lines.forEach((line, at) => {
+    if (!line.includes('"Agent"') || !line.includes("run_in_background")) return;
+    try {
+      const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
+      if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) return;
+      for (const block of entry.message!.content as Array<Record<string, unknown>>) {
+        const input = (block.input ?? {}) as Record<string, unknown>;
+        if (block.type === "tool_use" && block.name === "Agent" && input.run_in_background === true) launched.set(String(block.id), at);
+      }
+    } catch { /* a torn line is skipped */ }
+  });
+  for (const [id, at] of launched) {
+    const handed = `<tool-use-id>${id}</tool-use-id>`;
+    if (!lines.slice(at + 1).some((line) => line.includes(handed))) return [];
+  }
+  const where = arc ? `arc ${arc.arc} ${arc.status}` : "no arc written to yet";
+  return [{ check: "window", message: `This window is at ${size / 1000}k, past the ${point / 1000}k point for ${building ? "building" : "ideating"} (${where}). `
+    + "At a clean point — no idea half-made, no card half-raised, no helper running — end your reply with the offer of a new window and its handover; if the point is not clean, carry on." }];
 }
 
 // ---------------------------------------------------------------------------- the hook
@@ -1630,6 +1732,11 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given)),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
+    // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
+    ...span({ group: "stop", action: "window" }, () => {
+      if (event.agent_id || event.stop_hook_active === true || !event.transcript_path) return [];
+      try { return checkWindow(root, readFileSync(event.transcript_path, "utf8")); } catch { return []; }
+    }),
   ];
   // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RD.DEVEX.WORKSPACE.244).
   const { said, held } = splitFindings(found.filter((warning) => !spoken.has(warning.check)), running);

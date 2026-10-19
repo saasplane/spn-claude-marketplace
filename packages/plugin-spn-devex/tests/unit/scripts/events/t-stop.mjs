@@ -1785,5 +1785,51 @@ console.log("\n=== migration — a pending plugin migration holds the turn");
     checkMigrations(workspace("migration-idle", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1/state.json`]: "{}\n" }, [], { migrated: false })).length === 0);
 }
 
+console.log("\n=== window — a new window is offered by phase, at a clean point");
+{
+  // THE TRANSCRIPT IS BUILT FROM LINES OF A REAL ONE (`fixtures/window-transcript-lines.json`, trimmed),
+  // with only the size of the last call chosen here.
+  const lines = JSON.parse(readFileSync(resolve(HOOKS, "tests", "fixtures", "window-transcript-lines.json"), "utf8"));
+  const sized = (kilo, id) => ({ ...lines["bash-row-write"], message: { ...lines["bash-row-write"].message, id,
+    content: [{ type: "text", text: "ok" }],
+    usage: { input_tokens: 2, cache_creation_input_tokens: 1000, cache_read_input_tokens: kilo * 1000 - 1002, output_tokens: 10 } } });
+  const feedback = (kilo) => ({ ...lines["stop-feedback"], message: { role: "user",
+    content: `Stop hook feedback:\n[node stop.mjs]: [window] This window is at ${kilo}k, past the point.` } });
+  const arcStatus = (status) => ({ ".spndevex/workstreams/open/025-partner-web/arcs/N017/state.json": JSON.stringify({ arc: "N017", status, rows: [] }) });
+  let counter = 0;
+  const hear = ({ status = "RUNNING", parts = [lines["bash-row-write"]], kilo, extra = {} }) => {
+    counter += 1;
+    const root = workspace(`window-${counter}`, status ? arcStatus(status) : {});
+    const transcript = join(root, "transcript.jsonl");
+    // A fixture line carries the cwd of the window it came from; here it stands in the fixture's own workstream.
+    const here = join(root, ".spndevex", "workstreams", "open", "025-partner-web");
+    writeFileSync(transcript, [...parts, sized(kilo, `msg_w${counter}`)].map((line) => JSON.stringify({ ...line, cwd: here })).join("\n") + "\n");
+    return run("node", [`${HOOKS}/src/scripts/events/stop.ts`],
+      { cwd: root, session_id: `window-${counter}`, transcript_path: transcript, last_assistant_message: "done", ...extra }, root);
+  };
+  const check = (label, ok, detail = "") => {
+    n += 1; if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`);
+  };
+  const asks = (out) => /\[window\]/.test(out);
+
+  const building = hear({ kilo: 312 });
+  check("building: asks at 312k, and the reason names the size, the phase and the arc",
+    asks(building) && /312k/.test(building) && /300k point for building/.test(building) && /N017 RUNNING/.test(building), building);
+  check("ideating: silent at 400k when the arc is PROPOSED", !asks(hear({ status: "PROPOSED", kilo: 400 })));
+  check("ideating: silent at 400k when the window has written to no arc", !asks(hear({ status: null, parts: [], kilo: 400 })));
+  const ideating = hear({ status: "PROPOSED", kilo: 452 });
+  check("ideating: asks at 452k, past 450k", asks(ideating) && /450k point for ideating/.test(ideating), ideating);
+  check("building: silent below 300k", !asks(hear({ kilo: 290 })));
+  check("does not ask again until the window grows 50k", !asks(hear({ parts: [lines["bash-row-write"], sized(312, "msg_first"), feedback(312)], kilo: 340 })));
+  check("asks again once the window has grown 50k", asks(hear({ parts: [lines["bash-row-write"], sized(312, "msg_first"), feedback(312)], kilo: 365 })));
+  const waiting = hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 320 });
+  check("waits while a background Agent has no notification", !asks(waiting), waiting);
+  check("asks when every background Agent has its notification",
+    asks(hear({ parts: [lines["bash-row-write"], lines["agent-background-notified"], lines["notification"]], kilo: 320 })));
+  check("silent for a subagent's stop (agent_id)", !asks(hear({ kilo: 320, extra: { agent_id: "a1" } })));
+  check("silent under stop_hook_active", !asks(hear({ kilo: 320, extra: { stop_hook_active: true } })));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
