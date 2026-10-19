@@ -3,19 +3,19 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "136514a2"
+      "seen": "e1d41d8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "979d4e11"
+      "seen": "c8933ab9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0bcf8593"
+      "seen": "10fc18ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "70a8c7ab"
+      "seen": "6c7f367b"
     }
   ]
 }
@@ -31,7 +31,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
 - **The library holds the core units, which are the ones the book names, and no other unit** (`RD.SUPPORT.SURFACE.082`). It draws no component for a unit that a stack provides on its own, and nothing of a pattern: no task pattern, no page pattern, no skeleton and no sample page (`RD.SUPPORT.SURFACE.099`). So a page pattern is drawn as its units, and never as one instance.
-- **A widget is told by its name, which ends in `Widget`** (`RD.SUPPORT.SURFACE.098`). A container's name ends in `Container` and a layout's in `Layout`, a component takes no such word, and no block carries a letter for its layer before its name. The core widgets are `DSDataTableWidget`, `DSFilterBarWidget` and `DSCardWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetailWidget` is the web stack's own unit and has no drawing.
+- **A suffix names where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RD.SUPPORT.SURFACE.229`). A component takes no such word, a composite is a component, and no block carries a letter for its layer before its name. The core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and the core widget is `DSCardWidget`. A page of groups and their items has no core unit that places its two parts, so draw the two containers themselves; `DSListDetail` is the web stack's own unit and has no drawing.
 - **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are two: saving a named version before the connector's first change in a library file, and publishing a file. Nothing else is asked. When the library lacks something, the connector changes the library, as `refs/support/surface/delivery-library.md` states under "A developer's hands are two, and you change the library through the connector". Before a connector write, read its heading "The connector's facts". Name the developer's next step.
 
 ## Before you draw
@@ -66,7 +66,7 @@ The design library holds one file for each layer of the design system that is dr
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
 | A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `headerNode`, in a dock or a top nav, is a band directly under the bar, the window's width, and the content's box starts under it; `footerNode` is a band at the page's end |
-| The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
+| The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSPanelContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
 | Content | the text of the instance, typed as the tree gives it |

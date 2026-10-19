@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "7735b618"
+      "seen": "836d241e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -623,8 +623,9 @@ lands* shows the files that change as one folder tree for each repository, with 
 own `How`. The
 reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
 sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
-folder. Its masthead shows one status, labelled *Status*: the arc's, `PROPOSED` until the design is decided,
-as a badge linking the arc's row, which the arc's commands write (RD.DEVEX.WORKSPACE.266). A sample is the
+folder. Its masthead names its arc, as a badge after the type that links the arc's row, and shows one status,
+labelled *Status*: the arc's, `PROPOSED` until the design is decided, both written by the arc's commands
+(RD.DEVEX.WORKSPACE.266). A sample is the
 work's own file, never a page built with the page template; only a sample of a book page the work produces
 carries a masthead, its `Type` naming the page kind or its name the template it copies (RD.DEVEX.WORKSPACE.267).
 

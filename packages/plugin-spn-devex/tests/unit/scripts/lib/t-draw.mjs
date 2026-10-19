@@ -1023,9 +1023,9 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
 
   // 17 · a page's skeleton draws every level: the layout, the page level and each block's unit (RD.DEVEX.WORKSPACE.260)
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
-  const listing = (extra = {}) => ({ look: "container", unit: "DSContainer", rows: [], ...extra,
-    sections: [{ unit: "DSFilterBarWidget", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { icon: "close" }] }] },
-      { unit: "DSDataTableWidget", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer", ""], cells: [["#1042", "Acme Corp", { icon: "more" }]] }] }] }] });
+  const listing = (extra = {}) => ({ look: "container", unit: "DSPanelContainer", rows: [], ...extra,
+    sections: [{ unit: "DSFilterBar", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { icon: "close" }] }] },
+      { unit: "DSDataTable", rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Order", "Customer", ""], cells: [["#1042", "Acme Corp", { icon: "more" }]] }] }] }] });
   const paged = (viewport, layout, page = { item: { title: "Orders", description: "Every order placed" }, actions: [{ control: "button", text: "New order", main: true }] }, frame = { size: "XS", rows: [{ items: [{ frame: listing() }] }] }) =>
     judge({ kind: "skeleton", ...(layout ? { layout } : {}), views: [{ viewport, page, frame }] });
   const RAIL = { type: "RAIL", body: { width: "WIDE" }, navigation: { nav: ["Dashboard", "Orders", "Customers"], chosen: "Orders" } };
@@ -1089,12 +1089,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 17b · each block's unit, at the level its name gives
   const notes = (g) => texts(g, "sds-note").map((t) => t[2]);
   one("a container's unit is named at the corner of its outline, over its header",
-    [notes(desk.svg).includes("DSContainer"), texts(desk.svg, "sds-note").find((t) => t[2] === "DSContainer"), extent(desk.svg)],
+    [notes(desk.svg).includes("DSPanelContainer"), texts(desk.svg, "sds-note").find((t) => t[2] === "DSPanelContainer"), extent(desk.svg)],
     ([named, name, box]) => named && name[0] === box[0] + 8 && name[1] > box[1] && name[1] < box[1] + 24);
-  const headedBox = paged("DESKTOP", RAIL, undefined, { size: "XS", rows: [{ items: [{ frame: { look: "container", unit: "DSContainer", label: "Desk lamps", note: "Lamps for a desk", actions: [{ control: "button", text: "Add product" }],
+  const headedBox = paged("DESKTOP", RAIL, undefined, { size: "XS", rows: [{ items: [{ frame: { look: "container", unit: "DSPanelContainer", label: "Desk lamps", note: "Lamps for a desk", actions: [{ control: "button", text: "Add product" }],
     rows: [{ items: [{ standin: "table", fill: true, flush: true, columns: ["Product", "Price"], cells: [["Arc desk lamp", "$89.00"]] }] }] } }] }] });
-  one("a container's title, the line under it and its actions stand inside its outline, under its unit's name, as `DSContainer.Header`",
-    [headedBox.findings, texts(headedBox.svg, "sds-note").find((t) => t[2] === "DSContainer"), titleOf(headedBox.svg, "Desk lamps"), texts(headedBox.svg, "sds-note").find((t) => t[2] === "Lamps for a desk"), extent(headedBox.svg)],
+  one("a container's title, the line under it and its actions stand inside its outline, under its unit's name, as `DSPanelContainer.Header`",
+    [headedBox.findings, texts(headedBox.svg, "sds-note").find((t) => t[2] === "DSPanelContainer"), titleOf(headedBox.svg, "Desk lamps"), texts(headedBox.svg, "sds-note").find((t) => t[2] === "Lamps for a desk"), extent(headedBox.svg)],
     ([found, name, title, note, box]) => found.length === 0 && name[1] < title[1] && title[1] < note[1] && title[0] === box[0] + 16 && title[1] > box[1] && note[1] < box[1] + box[3]);
   one("the rail's chosen entry is named by its word, and an index is a finding that names the word",
     paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: 1 } }).findings, says("name the open entry by its word, one of `nav`"));
@@ -1104,36 +1104,36 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     paged("DESKTOP", { ...RAIL, navigation: { ...RAIL.navigation, chosen: "Customers" } }).findings, says("the `DESKTOP` view's page is `Orders`, an entry of the navigation, and the chosen entry is `Customers`"));
   one("a navigation that names its entries and none open is a finding",
     paged("DESKTOP", { ...RAIL, navigation: { nav: RAIL.navigation.nav } }).findings, says("no `chosen`"));
-  one("a container's unit is named once, at its outline's corner", notes(headedBox.svg).filter((name) => name === "DSContainer").length, 1);
+  one("a container's unit is named once, at its outline's corner", notes(headedBox.svg).filter((name) => name === "DSPanelContainer").length, 1);
   one("a part that is a widget is a dotted boundary round its rows, its name at its corner",
     [notes(desk.svg), boxes(desk.svg, "sds-skel-guide").length, extent(desk.svg), boxes(desk.svg, "sds-skel-guide")[1]],
-    ([names, guides, box, first]) => names.includes("DSFilterBarWidget") && names.includes("DSDataTableWidget") && guides === 3 && first[0] === box[0] + 8 && first[2] === box[2] - 16);
+    ([names, guides, box, first]) => names.includes("DSFilterBar") && names.includes("DSDataTable") && guides === 3 && first[0] === box[0] + 8 && first[2] === box[2] - 16);
   one("a flush table in a widget reaches the widget's boundary, under its name",
     [boxes(desk.svg, "sds-skel-guide")[2], desk.svg.match(/<rect class="sds-skel-surface" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)"[^>]*rx="0"\/>\s*<text class="sds-note"[^>]*letter-spacing/)],
     ([widget, band]) => band !== null && Number(band[1]) === widget[0] && Number(band[3]) === widget[2] && Number(band[2]) > widget[1] + 20);
-  const unitFrames = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSComparisonWidget", rows: [{ items: [
+  const unitFrames = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSComparison", rows: [{ items: [
     { frame: { unit: "DSCard", label: "Revenue", rows: [{ items: [{ text: "$12,400" }] }] } }] }] } }] }] } });
   one("a frame that names a widget and no look is a dotted boundary with its name, and a card its outline, its name and its title",
     [unitFrames.findings, notes(unitFrames.svg), boxes(unitFrames.svg, "sds-skel-guide").length, outline(unitFrames.svg).length, stepOf(unitFrames.svg, "Revenue")],
-    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparisonWidget") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
+    ([found, names, guides, cards, step]) => found.length === 0 && names.includes("DSComparison") && names.includes("DSCard") && guides === 1 && cards === 1 && step === "font-size:15px");
   const cardWidget = judge({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { unit: "DSCardWidget", label: "Contacts", media: "person", rows: [{ items: [{ item: { title: "Dana Lee" }, fill: true }] }] } },
     { frame: { unit: "DSCardWidget", label: "Teams", media: "person", rows: [{ items: [{ item: { title: "Sales" }, fill: true }] }] } }] }] } });
   one("`DSCardWidget` is a card: its outline, its name at the corner and its title inside",
     [cardWidget.findings, notes(cardWidget.svg), outline(cardWidget.svg).length, boxes(cardWidget.svg, "sds-skel-guide").length, stepOf(cardWidget.svg, "Contacts")],
     ([found, names, cards, guides, step]) => found.length === 0 && names.includes("DSCardWidget") && cards === 2 && guides === 0 && step === "font-size:15px");
-  const fourDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
-    { frame: { unit: "DSComparisonWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", sections: [{ label: "This month", rows: [{ items: [{ text: "$12,400" }] }] }], rows: [] } }] }] } }] }] } }] }] } }] });
+  const fourDeep = draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSPanelContainer", rows: [{ items: [
+    { frame: { unit: "DSComparison", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", sections: [{ label: "This month", rows: [{ items: [{ text: "$12,400" }] }] }], rows: [] } }] }] } }] }] } }] }] } }] });
   one("the count starts at the container: a container, a widget or a card, and a group are three, and a fourth level is a finding",
     fourDeep.findings, says("the boundary `Group` sits inside 3 named boundaries"));
   one("a card in a widget in a container is three levels, and allowed",
-    draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSContainer", rows: [{ items: [
-      { frame: { unit: "DSComparisonWidget", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", rows: [] } }] }] } }] }] } }] }] } }] }).findings, none);
+    draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", page: { item: { title: "Overview" } }, frame: { rows: [{ items: [{ frame: { unit: "DSPanelContainer", rows: [{ items: [
+      { frame: { unit: "DSComparison", rows: [{ items: [{ frame: { unit: "DSCard", label: "Revenue", rows: [] } }] }] } }] }] } }] }] } }] }).findings, none);
   one("a unit the barrel does not name is a finding that says what a unit is",
     paged("DESKTOP", RAIL, undefined, { rows: [{ items: [{ frame: { unit: "DSFormWidget", rows: [{ items: [{ control: "field", text: "Name" }] }] } }] }] }).findings,
     says("`DSFormWidget` is no unit of the design system"));
   one("a part of a container that names a unit the barrel does not have is a finding as well",
-    paged("DESKTOP", RAIL, undefined, { rows: [{ items: [{ frame: { look: "container", rows: [], sections: [{ unit: "DSFilterBar", rows: [{ items: [{ text: "x" }] }] }] } }] }] }).findings,
-    says("`DSFilterBar` is no unit of the design system"));
+    paged("DESKTOP", RAIL, undefined, { rows: [{ items: [{ frame: { look: "container", rows: [], sections: [{ unit: "DSFilterBarWidget", rows: [{ items: [{ text: "x" }] }] }] } }] }] }).findings,
+    says("`DSFilterBarWidget` is no unit of the design system"));
 
   // 17c · the layout's fields are the looks' own
   one("a layout field the looks do not have is a finding that names the fields they have",
@@ -1160,7 +1160,7 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
   one("a `DSCardWidget` with titled parts is clean", page(inPage([cardOf("DSCardWidget", "Account", { sections: parts }), cardOf("DSCardWidget", "Platform", { sections: parts })])).findings, none);
 
   // 2 · a card shows its own info: several side by side stay `DSCard`s
-  const container = (rows) => ({ frame: { unit: "DSContainer", label: "Providers", rows } });
+  const container = (rows) => ({ frame: { unit: "DSPanelContainer", label: "Providers", rows } });
   one("four `DSCard`s side by side are clean: a number with its caption is a card, however many come from data",
     page(inPage([cardOf("DSCard", "Users"), cardOf("DSCard", "Roles"), cardOf("DSCard", "Organizations"), cardOf("DSCard", "Accounts")])).findings, none);
   one("two `DSCard`s that are the only content of a container, one under another, are clean",
@@ -1185,24 +1185,26 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
   // 5 · a frame that writes both `look` and `unit`, where the look is not the unit's
   one("a frame that writes a `look` its unit's level does not give is a finding: the unit decides the look",
     page(inPage([{ frame: { unit: "DSDrawer", look: "container", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, says("the unit decides the look; drop `look`"));
-  one("a frame that writes the look its unit gives is not a finding", page(inPage([{ frame: { unit: "DSContainer", look: "container", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, none);
+  one("a composite is a component by its name: it takes the look of a component, so a container look on it is a finding and its own is not",
+    [page(inPage([{ frame: { unit: "DSDataTable", look: "container", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings.length, page(inPage([{ frame: { unit: "DSDataTable", look: "flat", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings.length], (g) => g[0] === 1 && g[1] === 0);
+  one("a frame that writes the look its unit gives is not a finding", page(inPage([{ frame: { unit: "DSPanelContainer", look: "container", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, none);
   one("a frame that names only its unit is clean, and is drawn in the look of its level",
-    [page(inPage([{ frame: { unit: "DSDrawer", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, page(inPage([{ frame: { unit: "DSContainer", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).svg.includes(">DSContainer<")],
+    [page(inPage([{ frame: { unit: "DSDrawer", rows: [{ items: [{ text: "Urgent" }] }] } }])).findings, page(inPage([{ frame: { unit: "DSPanelContainer", label: "Tags", rows: [{ items: [{ text: "Urgent" }] }] } }])).svg.includes(">DSPanelContainer<")],
     (g) => g[0].length === 0 && g[1]);
 
   // 6 · a row built by hand as words, a note and an action is an `item`
-  const byHand = { unit: "DSContainer", label: "Sign-in", rows: [{ items: [{ text: "Acme Okta" }, { note: "Connected 2 May" }, { spacer: true }, { icon: "more" }] }] };
+  const byHand = { unit: "DSPanelContainer", label: "Sign-in", rows: [{ items: [{ text: "Acme Okta" }, { note: "Connected 2 May" }, { spacer: true }, { icon: "more" }] }] };
   one("a row built by hand as words, a note and an action is a finding: write it as an `item`",
     page(inPage([{ frame: byHand }])).findings, says("one line about one thing is a `DSItem`; write it as an `item`"));
   one("the same line as an `item` is clean",
     page(inPage([{ frame: { ...byHand, rows: [{ items: [{ item: { title: "Acme Okta", description: "Connected 2 May", end: [{ icon: "more" }] }, fill: true }] }] } }])).findings, none);
   one("a filter bar's row, with its field and its separator, is not a hand-built line",
-    page(inPage([{ frame: { unit: "DSContainer", label: "Orders", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { note: "|" }, { icon: "search" }] }] } }])).findings, none);
+    page(inPage([{ frame: { unit: "DSPanelContainer", label: "Orders", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { note: "|" }, { icon: "search" }] }] } }])).findings, none);
 
   // 7 · a skeleton draws a rail shut to its icons on a desktop too; `open: true` is the exception
   const RAIL = { type: "RAIL", body: { width: "FULL" }, navigation: { nav: ["Orders", "Customers"], chosen: "Orders" } };
   const railW = (g) => [...g.matchAll(/<rect class="sds-skel-surface" x="[\d.]+" y="[\d.]+" width="([\d.]+)"/g)].map((m) => Number(m[1]))[0];
-  const body = inPage([{ frame: { unit: "DSContainer", label: "Orders", rows: [{ items: [{ text: "180" }] }] } }]);
+  const body = inPage([{ frame: { unit: "DSPanelContainer", label: "Orders", rows: [{ items: [{ text: "180" }] }] } }]);
   one("a rail at a desktop is shut to its icons, 40 wide, and the words of its entries are not drawn",
     [railW(page(body, RAIL).svg), page(body, RAIL).svg.includes(">Customers<"), page(body, RAIL).findings], (g) => g[0] === 40 && !g[1] && g[2].length === 0);
   one("a rail with `open: true` is the exception: open at a desktop, 131 wide, with the words of its entries",

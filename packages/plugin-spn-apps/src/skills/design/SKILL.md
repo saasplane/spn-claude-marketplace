@@ -27,7 +27,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Then read `refs/support/surface/standards-core.md`, `architecture-names.md`, `architecture-containers.md`, `architecture-layouts.md` and `architecture-app.md`, in this plugin.** They hold the levels of a page, the rules of content, the names, the container, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by level of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-widgets.md` and `architecture-components.md` where the pattern names a data table, a filter bar, an item line, a badge or a field.
+**Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by level of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -131,13 +131,13 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 - **A sign-in has a shape of its own** (`RD.SUPPORT.SURFACE.205`). It is not one of the fourteen: start from *The sign-in page* in `standards-patterns.md`.
 - **A page that fits no pattern is named in the result, and it waits.** A new page pattern joins the patterns chapter of the book first.
 
-**Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSDataTableWidget`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
+**Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSDataTable`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
 
 | What the contract says of the list | What one of them holds | Shown as |
 | --- | --- | --- |
-| the query takes a page, a text or a filter | several facts a person compares across rows | `DSDataTableWidget`, in its `TABLE` layout |
-| the same | a title and a line under it | `DSDataTableWidget`, in its `LIST` layout |
-| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTableWidget`, in its `GRID` layout |
+| the query takes a page, a text or a filter | several facts a person compares across rows | `DSDataTable`, in its `TABLE` layout |
+| the same | a title and a line under it | `DSDataTable`, in its `LIST` layout |
+| the same | a thing of its own: a kind to set up, an app, a file with a preview | `DSDataTable`, in its `GRID` layout |
 | the whole set, a few and fixed | a name | a list, `DSList` |
 | the whole set, a few and fixed, and its order is the meaning | a name, or a few facts | a list, `DSList`, or a plain table, `DSTable`, with `reorder` |
 | the whole set, a few | a picture, a title, a line under it, and an action | a list of item lines, `DSList` holding one `DSItem` for each |
@@ -152,8 +152,8 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 
 | At a desktop | At a tablet | On a phone |
 | --- | --- | --- |
-| `DSDataTableWidget`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
-| `DSDataTableWidget`, layout `GRID` | the same, with fewer across | layout `LIST` |
+| `DSDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
+| `DSDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
 | two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; the address changes | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
@@ -202,7 +202,7 @@ A container is optional. Use one where a part of the page has a header, content 
 - **A page that holds several containers has its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). It is an item line at the level `PAGE`. A page with one container puts its head in the header of that container. Write the title and the address to go back to, and no row, back button or padding for them.
 - **Write no padding for tabs in a `flush` part, or for their panel** (`RD.SUPPORT.SURFACE.118`). The first tab starts where the text under it starts, and the line of the tabs still reaches the edge.
 - **A card may hold `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`, and it still frames one thing** (`RD.SUPPORT.SURFACE.091`). Its parts all sit inside its one frame, in every theme. A part pads itself, and `flush` on a part drops that padding, for a part whose content reaches the edge of the card. `divided` draws a line between each two parts. A part of a page that has a title, actions and data of its own stays a container.
-- **Write the parts in one order**: `DSContainer.Header`, then `DSContainer.Content`, then `DSContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
+- **Write the parts in one order**: `DSPanelContainer.Header`, then `DSPanelContainer.Content`, then `DSPanelContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
 - **The page decides what fills a part.** Write `flush` on a part whose content reaches the edge of the frame, such as a table. A part without `flush` insets everything it holds.
 - **In a `flush` part, a block that draws a border of its own draws none.** Those blocks are a table, a list, a code block, an accordion and an empty state. Every other block reaches the edge.
 - **Write `divided` on a bordered container only where it needs other lines than the default.** Unset, the frame draws a line between every two parts; `false` draws none; a list draws a line above each part it names, as `CONTENT` sets a second content, another task, apart. A sign-in's *Create an account* is such a content.
@@ -220,7 +220,7 @@ The page pattern says where the parts of the page sit. A task pattern says how e
 | Intent | The person | Blocks that carry it | Task states |
 | --- | --- | --- | --- |
 | Move | goes to another place, and knows where they are | the layout · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSTabs` · `DSBreadcrumb` · `DSLink` | working, then done or failed |
-| Find | searches, filters, sorts and pages through records | `DSFilterBarWidget` · `DSDataTableWidget` · `DSCommandPalette` · `DSPagination` | all six |
+| Find | searches, filters, sorts and pages through records | `DSFilterBar` · `DSDataTable` · `DSCommandPalette` · `DSPagination` | all six |
 | Read | reads records as a table, a list or a grid, or one record in detail | `DSTable` · `DSList` · `DSDataFieldView` · `DSEmpty` · `DSSkeleton` | all six |
 | Enter | fills fields, sees the check on each one, and sends the form | `DSForm` and the entry fields | idle, working, then done or failed |
 | Choose | picks one or many from a set | `DSSelect` · `DSRadioGroup` · `DSCheckboxGroup` · `DSToggleGroup` and the pickers | idle, then done. All six when the set is loaded |
@@ -259,10 +259,10 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **Write the `pageLevel` of a row of tabs first, and a look only for a website's pages** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`). In an app, choose by level and write no `type`: the tabs that lead to the sub-pages of a whole page say `PAGE` and draw the pill, on its track and not raised (`RD.SUPPORT.SURFACE.224`), and the tabs of the parts of a container or of a card say `CONTAINER` or `WIDGET`, each drawing the line under the open tab; tabs that say no level draw the switch, for two ways to show one thing. The top bar of a website's pages writes `type={DSTabsType.PILL}`, the floating bar. Write `size` on a unit that takes a page level only to override the size its level gives. Write no colour on tabs: they take the theme's navigation colour and entry, neutral by default (`RD.SUPPORT.SURFACE.214`); write `color` or `entry`, of the navigation's own types, only on a row that must differ from the navigation, such as a second row of tabs or the tabs of a busy card.
 - **Write `showArrow` on a line that leads to a page and has no action at its end.** It is a chevron at the end of the line, and it is off unless the page writes it.
 - **In a list the row carries the link, the chosen fill and the reaction to the pointer, and the item line inside it carries none** (`RD.SUPPORT.SURFACE.097`). `DSItem` takes no `selected`: write `selected`, `anchor`, `endNode` and `showArrow` on the row, `DSList.Item`. A chosen row is drawn as a fill across the row, with no check. A row holds plain words, a line of facts through `DSItemFacts`, or an item line (`RD.SUPPORT.SURFACE.132`). An item line that stands alone, in a card or a header, carries its own `anchor` and `showArrow`. Write `hoverable` on a `DSList` whose rows a person acts on; it is off by default.
-- **A line of the `LIST` layout of `DSDataTableWidget` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
-- **Where a page shows one record beside the data table or under it, give the table the id of that record** (`RD.SUPPORT.SURFACE.125`). It is `selectedRecordId` in the `data` of the widget's config. The `LIST` and `TABLE` layouts draw its row as a chosen row of a list. The record in view is selected, and the records a person ticks are checked.
+- **A line of the `LIST` layout of `DSDataTable` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
+- **Where a page shows one record beside the data table or under it, give the table the id of that record** (`RD.SUPPORT.SURFACE.125`). It is `selectedRecordId` in the `data` of the table's config. The `LIST` and `TABLE` layouts draw its row as a chosen row of a list. The record in view is selected, and the records a person ticks are checked.
 - **A card with a head, drawn from data, is `DSCardWidget`** (`RD.SUPPORT.SURFACE.127`, narrowed by `RD.SUPPORT.SURFACE.221`): a title with its mark, actions in the head, often titled parts. A card that shows its own info, such as a number with its caption, is a `DSCard`, however many stand side by side. Give it `header`, the props of `DSItem`, then `parts`, then `footer`, any node. A part is `ITEMS`, with item lines, `LIST`, with rows of a list, or `FREE`, with any node. The widget has no paging, no search and no working state: a set that needs them is a data table. The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`).
-- **Subjects compared across the same settings are `DSComparisonWidget`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects` (each may carry its own `actions`, such as an Edit, which stand in its head and take their look from the place: `RD.SUPPORT.SURFACE.193`), `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
+- **Subjects compared across the same settings are `DSComparison`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects` (each may carry its own `actions`, such as an Edit, which stand in its head and take their look from the place: `RD.SUPPORT.SURFACE.193`), `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
 - **A line that says roughly when a thing last changed may show how long ago it was** (`RD.SUPPORT.SURFACE.122`). Write `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`. A page that is a log of what happened shows the date and the time on each line.
 - **A mark says what, and an avatar says who.** `DSMark` holds an icon, or `text`, a symbol of one to three characters, such as a step's number or a file's type; it never holds a name. `DSAvatar` holds a picture or the initials of a person, a workspace or a company. Both take `color`, and `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`.
 - **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). Choose rounded or square where the thing is better shown so, such as an app or a file. Its `variant` takes the shared vocabulary, and `GHOST` and `LINK` draw the icon alone, with no fill (`RD.SUPPORT.SURFACE.124`). A mark is never pressed.
@@ -271,8 +271,8 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **A row that scrolls sideways is `DSHScroll`, with `arrow` where a pointer needs the arrows** (`RD.SUPPORT.SURFACE.204`). Leave `arrowType` at `DEFAULT` on a page, a card or a band of the brand, and write `OVERLAY` only for a row over a picture. A row of tabs scrolls by itself.
 - **Write no `variant` or `color` to make a mark, an avatar or a badge lighter on a coloured navigation or band.** A unit that is shown takes the lighter tints of the ground it stands on by itself, and a status badge keeps its hue (`architecture-core.md`).
 - **Write no duration, ease or animation.** Each unit enters and leaves by its role, at the theme's `motionSpeed` (`standards-core.md`, *Motion*). An icon moves only through what holds it: write `motion` and `hoverNode` on `DSIcon`, `startIconMotion` or `endIconMotion` on `DSButton`, or `iconMotion` on `DSMark`, where the movement says something, such as `NUDGE_START` on a way back.
-- **Give `DSDataTableWidget` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSFilterBarWidget` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
-- **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-widgets.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
+- **Give `DSDataTable` the layout that step 2 chose, and the `LIST` layout for a phone** (`RD.SUPPORT.SURFACE.068`). Give `DSFilterBar` its fields, and say which stay in view. Never rearrange the bar (`RD.SUPPORT.SURFACE.073`).
+- **Where a ref says a unit does not do a thing yet, name it under *Missing*.** `architecture-components.md` says so plainly, under *Not there yet*. Write the tree as the pattern asks, and say which line waits for the unit.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
 - **Leave `size` unset**, unless one block must differ. A block takes the size that the container, the card, the widget or the composite above it passes on, and then the app's.
@@ -294,7 +294,7 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | The page | its route, its purpose in one sentence, its main action, and its page pattern |
 | The layout | `DSLayout`, then its type |
 | A block | its name in the book, then each prop as `name=VALUE` |
-| A part of a block | the name of the part: `DSContainer.Header`, or a named place of the layout. A part of a container carries `flush` after its name, where the page writes it |
+| A part of a block | the name of the part: `DSPanelContainer.Header`, or a named place of the layout. A part of a container carries `flush` after its name, where the page writes it |
 | Content | the text a person reads, in quotes |
 | A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look. Where the stack provides a unit for it, the tree may name that unit |
 | A task | at the right of the block that carries it: the intent, and what the block does |
@@ -305,7 +305,7 @@ facts    one order holds a number, a customer, a state, a total and a date     t
          the set grows as people work                                         the contract
          the sales team comes many times a day, to find one order             asked
 pattern  Find in a list · spec: find-in-a-list.dg.json
-shows    the orders: DSDataTableWidget, layout TABLE; on a phone, layout LIST
+shows    the orders: DSDataTable, layout TABLE; on a phone, layout LIST
 
 page  /orders · purpose: find an order · main action: New order · pattern: Find in a list
 └── DSLayout  RAIL
@@ -314,14 +314,14 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
     ├── endNode           DSAvatar
     ├── actionsNode       DSButton variant=GHOST "Help"
     └── main area
-        └── DSContainer
-            ├── DSContainer.Header
+        └── DSPanelContainer
+            ├── DSPanelContainer.Header
             │   ├── DSText    typography=TITLE_LG "Orders"
             │   └── DSButton  variant=SOLID color=PRIMARY "New order"             Move · leads to /orders/new
-            ├── DSContainer.Content
-            │   └── DSFilterBarWidget                                                  Find
-            └── DSContainer.Content  flush
-                └── DSDataTableWidget                                                  Find · Read
+            ├── DSPanelContainer.Content
+            │   └── DSFilterBar                                                  Find
+            └── DSPanelContainer.Content  flush
+                └── DSDataTable                                                  Find · Read
 ```
 
 Under the tree, give one line for each task: what the person sees in each task state, and the way back from a failure. Then name what is missing.
@@ -329,7 +329,7 @@ Under the tree, give one line for each task: what the person sees in each task s
 For a flow, write the trees in the order a person meets the pages. Each Move names the page it leads to.
 
 ```text
-Find · Read   DSDataTableWidget   idle: the filters, with no search asked yet
+Find · Read   DSDataTable   idle: the filters, with no search asked yet
                              working: the skeleton of the table
                              done: the orders, one row each
                              empty: nothing matches, and the filters stay shown
@@ -345,7 +345,7 @@ A tree is complete with no drawing. Draw it where the window holds the Figma con
 
 The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, name the developer's next step, and show the result. A child agent that sends `use_figma` cannot read the connector's own skill, so give a writer of one page `skills/design/steps/writer-brief.md` with its order, and any other child `skills/design/steps/connector-rules.md`. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
 
-**Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface's core widgets are `DSDataTableWidget`, `DSFilterBarWidget` and `DSCardWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetailWidget`, so the library holds none for it (`RD.SUPPORT.SURFACE.099`).
+**Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface's core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and its core widget is `DSCardWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetail`, so the library holds none for it (`RD.SUPPORT.SURFACE.099`).
 
 **The library draws nothing of a pattern** (`RD.SUPPORT.SURFACE.099`). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no page pattern, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 

@@ -40,12 +40,12 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Record types",
          "sections": [
           {
-           "unit": "DSFilterBarWidget",
+           "unit": "DSFilterBar",
            "rows": [
             {
              "items": [
@@ -75,7 +75,7 @@
            ]
           },
           {
-           "unit": "DSDataTableWidget",
+           "unit": "DSDataTable",
            "divided": true,
            "rows": [
             {
@@ -164,7 +164,7 @@
        },
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -241,7 +241,7 @@
      {
       "items": [
        {
-        "unit": "DSContainer",
+        "unit": "DSPanelContainer",
         "rows": [
          {
           "items": [
@@ -317,7 +317,7 @@
      {
       "items": [
        {
-        "unit": "DSContainer",
+        "unit": "DSPanelContainer",
         "rows": [
          {
           "items": [

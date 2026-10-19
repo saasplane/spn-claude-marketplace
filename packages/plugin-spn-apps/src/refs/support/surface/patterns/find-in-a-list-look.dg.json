@@ -47,11 +47,11 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "sections": [
           {
-           "unit": "DSFilterBarWidget",
+           "unit": "DSFilterBar",
            "rows": [
             {
              "items": [
@@ -81,7 +81,7 @@
            ]
           },
           {
-           "unit": "DSDataTableWidget",
+           "unit": "DSDataTable",
            "rows": [
             {
              "items": [
@@ -141,7 +141,7 @@
            "items": [
             {
              "frame": {
-              "unit": "DSContainer",
+              "unit": "DSPanelContainer",
               "look": "container",
               "rows": [
                {
@@ -243,11 +243,11 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "sections": [
           {
-           "unit": "DSFilterBarWidget",
+           "unit": "DSFilterBar",
            "rows": [
             {
              "items": [
@@ -277,7 +277,7 @@
            ]
           },
           {
-           "unit": "DSDataTableWidget",
+           "unit": "DSDataTable",
            "rows": [
             {
              "items": [
@@ -340,7 +340,7 @@
            "items": [
             {
              "frame": {
-              "unit": "DSContainer",
+              "unit": "DSPanelContainer",
               "look": "container",
               "rows": [
                {
@@ -436,7 +436,7 @@
            "items": [
             {
              "frame": {
-              "unit": "DSContainer",
+              "unit": "DSPanelContainer",
               "look": "container",
               "rows": [
                {

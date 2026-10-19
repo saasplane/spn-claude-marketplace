@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "a3b5b804"
+      "seen": "4e2323a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "02f63dfe"
+      "seen": "ae74bbd8"
     }
   ]
 }
@@ -120,6 +120,30 @@ Text is drawn in one of three families, and each family has its steps.
 
 The weights are `REGULAR` · `MEDIUM` · `SEMIBOLD` · `BOLD`. A text also carries a tone (`DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE`), for how strongly it stands out from its surface. A block draws an icon from one closed set, `DSIconType`, with one name for each icon, never a file of its own choosing — the full list of names is declared member by member in the capability chapter. `BUILDING_2`, `MOON`, `PALETTE`, `STORE` and `SUN` are among them.
 
+### The level tokens
+
+A pitch is sized by the level of the page it stands at, and the sizes must not be chosen in code. So each level from `PAGE` to `GROUP` holds one set of tokens, `--level-<level>-<part>`, where the level is written in lower case (`RD.SUPPORT.SURFACE.238`). A unit reads them and a page never does. A theme may change them.
+
+| Token | Holds |
+| --- | --- |
+| `--level-<level>-title` | the size token of the level's display step, the step the title of a feature is drawn in |
+| `--level-<level>-gap` | the gap between the words of a feature: the eyebrow, the title, the description and the facts |
+| `--level-<level>-actions-gap` | the room before the actions |
+| `--level-<level>-media-gap` | the room between the words and the media |
+| `--level-<level>-inset` | the inset of a feature that has a frame |
+| `--level-<level>-box` | the side of the square a small picture stands in |
+
+| Level | Display step | On a desktop | On a phone | Gap between the words | Before the actions | Words to media | Inset | Box of a small picture |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `PAGE` | `HEADING_XXL4` | 72px | 48px | 24px | 40px | 64px | 64px | 56px |
+| `CONTAINER` | `HEADING_XL` | 40px | 32px | 16px | 32px | 48px | 48px | 48px |
+| `WIDGET` | `HEADING_SM` | 22px | 22px | 12px | 24px | 24px | 32px | 44px |
+| `GROUP` | `HEADING_XS` | 18px | 18px | 8px | 16px | 16px | 24px | 40px |
+
+- **A unit MUST read the title through the type step.** `--level-<level>-title` names the type step's own size token, which carries its phone value, so the phone size follows with nothing written. A unit that sizes its title by a level token never asks what the device is.
+- **A page MUST NOT write a level token.** A level is a position, and a theme that wants another rhythm changes the token once.
+- **The words of a feature's points MUST be 14px or larger, with no exception** (`RD.SUPPORT.SURFACE.239`).
+
 ## Boundary
 
 This ref names every role, every step of the scale, every scale size, and the family of every type step. It gives none of them a value in the general vocabulary sense beyond what is listed above — the full worked value of every role in light and dark lives in the capability chapter this ref restates. It does not say which block reads which role, or which prop carries a type step — that is `architecture-components.md` and `architecture-names.md`.
@@ -133,6 +157,8 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.101` | the pixels an icon, a mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content runs to `CONTENT_XXL5` |
 | `RD.SUPPORT.SURFACE.227` | a website's words are 14px or larger, and only data and code shown inside a demo may be smaller |
+| `RD.SUPPORT.SURFACE.238` | each level from `PAGE` to `GROUP` holds one set of level tokens, and a unit reads a title through the type step so the phone size follows |
+| `RD.SUPPORT.SURFACE.239` | the words of a feature's points are 14px or larger, with no exception |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
 | `RD.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |

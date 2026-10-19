@@ -1506,9 +1506,9 @@ console.log("\n=== page.js — a set crossed beyond the rule");
     same("a property the book names for a unit passes for that unit, and the answer counts the set", [ownUnit.findings.crossedBeyondTheRule.items.length, ownUnit.passedByException], [0, 1]);
     const otherUnit = await named("DSThing", narrowNames);
     same("the same property on another unit is still named, and the set is not counted as passed by exception", [otherUnit.findings.crossedBeyondTheRule.items.map((item) => item.property), otherUnit.passedByException], [["narrow"], 0]);
-    // The book names the filter bar `DSFilterBarWidget`. The library carries it as `DSWFilterBar`, and arc 025 N006 renames
+    // The book names the filter bar `DSFilterBar`. The library carries it as `DSWFilterBar`, and arc 025 N006 renames
     // the component there. Until then the scan's table holds both names, so the second name below is the library's own.
-    const bookName = await named("DSFilterBarWidget", narrowNames);
+    const bookName = await named("DSFilterBar", narrowNames);
     const libraryName = await named("DSWFilterBar", narrowNames);
     same("the filter bar keeps narrow crossed under the book's name and under the name the library carries",
       [bookName.findings.crossedBeyondTheRule.items.length, bookName.passedByException, libraryName.findings.crossedBeyondTheRule.items.length, libraryName.passedByException], [0, 1, 0, 1]);

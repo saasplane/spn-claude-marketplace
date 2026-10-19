@@ -42,7 +42,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "sections": [
           {
@@ -189,7 +189,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "sections": [
           {
@@ -343,7 +343,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "sections": [
           {

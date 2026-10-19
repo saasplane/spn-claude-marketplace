@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "111cbe88"
+      "seen": "451d4adf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
@@ -34,6 +34,7 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Page level | `DSPageLevelType` — the level of a page a block stands at: `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. The item line and the tabs take it through `pageLevel` |
 | Item media align | `DSItemMediaAlignType` — where the picture of an item line stands against its text: `TOP` · `CENTER` · `BOTTOM`, with `CENTER` when unset |
 | Mark | a picture or an icon that stands for a thing or a person. It is round unless a page chooses another shape |
+| Composite | a block built from components that carries one task end to end, and that no other component is built from |
 | Core unit | a block the book names, which every stack builds under that name. A stack may provide further units of its own |
 
 An **item line** is not the Item of a host. A host may draw an item line for each entry, and an item line also stands alone, for one thing shown by itself.
@@ -42,7 +43,7 @@ A **block** is any unit a surface is built from — a layout, a container, a wid
 
 ## The groups — 🔮
 
-Eleven groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
+Twelve groups, each answering one need of a surface. The list holds the core units: the library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new core unit joins this list before it is drawn or built anywhere. A stack may provide further units of its own beside them, and this list names none of those.
 
 | Group | Answers | Blocks |
 | --- | --- | --- |
@@ -50,7 +51,8 @@ Eleven groups, each answering one need of a surface. The list holds the core uni
 | Data display | how records and values are shown | `DSAccordion` · `DSAccordionGroup` · `DSAddressView` · `DSAvatar` · `DSAvatarGroup` · `DSBadge` · `DSCard` · `DSCarousel` · `DSCodeBlockView` · `DSColorView` · `DSDataFieldView` · `DSDataUnit` · `DSItem` · `DSItemCard` · `DSItemFacts` · `DSJSONView` · `DSList` · `DSTable` |
 | Data entry · Fields | every input a form is built from | `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSLabel` · `DSCheckbox` · `DSCheckboxGroup` · `DSRadio` · `DSRadioGroup` · `DSSwitch` · `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` · `DSSlider` · `DSSliderRange` · `DSTagGroup` |
 | Data entry · Pickers | choosing from a set, a date or a time | `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` · `DSCommand` · `DSCommandPalette` · `DSDatePicker` · `DSDateRangePicker` · `DSTimePicker` · `DSDateTimePicker` · `DSCalendar` · `DSColorPicker` |
-| Data entry · Composites | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSThemeForm` · `DSImagePicker` |
+| Data entry · Compound fields | the form frame, and inputs built from other inputs | `DSForm` · `DSAddressForm` · `DSAttachment` · `DSAttachmentMulti` · `DSJSONControl` · `DSDataFieldForm` · `DSDataFieldBuilder` · `DSThemeForm` · `DSImagePicker` |
+| Composites | blocks built from components that carry one task end to end and that no other component is built from | `DSDataTable` · `DSFilterBar` · `DSComparison` · `DSFeature` |
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
 | Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSMark` · `DSImage` |
@@ -60,7 +62,7 @@ Eleven groups, each answering one need of a surface. The list holds the core uni
 | Typography | text | `DSText` · `DSKbd` |
 | Utility | blocks with a behaviour and little or no look: they format, gate, place or observe another block, stated by their behaviour and their feedback | `DSFormatCurrency` · `DSFormatDate` · `DSFormatDateTime` · `DSFormatNumber` · `DSFormatTime` · `DSAuthz` · `DSAnchorContainer` · `DSElementObserver` · `DSPortal` · `DSSticky` |
 
-The library draws a sheet for each block of Utility whose behaviour a person feels: a sheet of states for `DSAuthz` (allowed, denied, fallback), `DSSticky` (in flow, stuck) and `DSAnchorContainer`, and one sheet of formats for the formatters. `DSAnchor` of Navigation has a small sheet of states, and `DSAspectRatio` of Media has one sheet of ratios. `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. The widgets, `DSDataTableWidget` and `DSFilterBarWidget`, the container and the layout sit one layer up and each have a construct of their own: `architecture-widgets.md`, `architecture-containers.md`, `architecture-layouts.md`.
+The library draws a sheet for each block of Utility whose behaviour a person feels: a sheet of states for `DSAuthz` (allowed, denied, fallback), `DSSticky` (in flow, stuck) and `DSAnchorContainer`, and one sheet of formats for the formatters. `DSAnchor` of Navigation has a small sheet of states, and `DSAspectRatio` of Media has one sheet of ratios. `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. The composites are stated under Composites below. The widget, the container and the layout sit one layer up and each have a construct of their own: `architecture-widgets.md`, `architecture-containers.md`, `architecture-layouts.md`.
 
 **A prop that takes a vocabulary is marked in the book's rows of props.** Beside the prop, the row names the vocabulary, as `type` (`DSTimePickerType`) of `DSTimePicker` or `format` (`SPDateFormatType`) of `DSDatePicker`. The values, and for the design system's own vocabularies the default, are in the tables of `architecture-names.md`. A shared vocabulary of the platform, one named `SP…Type`, is stated in the second of those tables. `variant`, `color` and `size` name no vocabulary in a row, because they take the three shared names and their vocabularies.
 
@@ -221,6 +223,240 @@ The navigation is drawn by units of its own, and the layouts are built from them
 
 The web builds the navigation units in a change not released yet, and the library is owed.
 
+## Composites — 🔮
+
+A composite is a block built from components that carries one task end to end, and a page places it whole: a data table finds and shows records, a filter bar narrows them, a comparison sets subjects side by side, a feature pitches a thing and asks the reader to act. A page never reaches inside one to rearrange its parts (`RD.SUPPORT.SURFACE.230`).
+
+**A composite carries one task end to end, and no other component is built from it.** A component that others are built from stays in its group, however many parts it has: the item line, the list, the table and the card stay in Data display, because the rows of a list, the records of a data table, `DSCardWidget` and the header of a panel are built from them.
+
+| Unit | Others built from it | Group |
+| --- | --- | --- |
+| `DSItem`, `DSList`, `DSTable`, `DSCard` | yes: a list's row, `DSItemCard`, `DSItemFacts`, a data table's records, `DSCardWidget`, the header of a panel | Data display |
+| `DSDataTable`, `DSFilterBar`, `DSComparison` | no: only containers and pages use them | Composites |
+| `DSFeature` | no | Composites |
+
+A composite owns its inner wiring and its size. It takes one size, from its own prop or from the block above it, and **passes that size to every part inside it**, so a page sets one size for the whole composite and never dresses its parts separately. A composite adds no states of its own: the states its records can be in are the task state of `standards-interaction.md`, and this ref carries no second definition of them.
+
+| Unit | The question it answers |
+| --- | --- |
+| `DSDataTable` | How does a page show many records as one block, with its own search, sort and paging? |
+| `DSFilterBar` | How does a page let a person narrow those records, and see what is narrowed? |
+| `DSComparison` | How does a page set a few subjects side by side across the same settings, from data alone? |
+| `DSFeature` | How does a page make a claim at any level and ask the reader to act, from data alone? |
+
+**Surface's core composites are the data table, the filter bar, the comparison and the feature** (`RD.SUPPORT.SURFACE.230`, `RD.SUPPORT.SURFACE.181`). Every stack builds each of them, and the design library draws each of them. A stack may provide further composites of its own, as the core units above state. The web stack has one, `DSListDetail`, which places a list beside the detail of its chosen row. It is not a core unit (`RD.SUPPORT.SURFACE.099`), and the book states no rule for it: `architecture-containers.md` states what a person sees on such a page.
+
+### DSDataTable
+
+Shows many records as one block: a bar (the control that ticks every record, with its menu of the bulk actions, present only when the table has bulk actions and shows records; then `headerNode`, a place that takes any node the page gives it, such as a search or a filter bar; then the sort, present only when records are shown; then the layout switch), its records (one shape for the whole composite: table, list or grid of cards), and a footer (the count of what is shown, and the pagination).
+
+| Task state | What it shows |
+| --- | --- |
+| Idle | nothing has been asked for yet |
+| Working | a placeholder the shape of the page that is coming, so records do not jump when they land |
+| Done | the records, in the chosen shape |
+| Empty, nothing to show | one centered message: there is nothing here yet |
+| Empty, a filter leaves nothing | its own message, so a person can tell *nothing is there* from *nothing matches* |
+| Failed | the read failed; it says so, and offers a retry |
+| Denied | a record, column or action the person may not see or use is left out: hidden or disabled, never drawn and then blocked |
+
+- The bar holds no search and no filter bar of its own. A search or a filter bar is the page's, and goes into `headerNode`.
+- A read that fails **MUST** offer a retry.
+- A read refused because the person is no longer signed in belongs to the app, which sends the person to sign in. The table shows its refused state for a read the person may not make.
+- The two empty messages **MUST** differ.
+- An empty message given as plain text **MUST** be drawn as the standard empty state, `DSEmpty`, with the text as its title and a default icon: an inbox, `INBOX`, where there is no record at all, and a magnifier, `SEARCH`, where the filter found none. It shows no line under the title. A page that gives a block of its own as the message gets that block, drawn as it is, so a page that needs a description or an action writes its own `DSEmpty` there. The web builds the default icon of each case.
+- `DSDataTable` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.
+- When its records are shown as a table, `DSDataTable` **MUST** turn the table's `hoverable` prop on. A person acts on a record of this composite, so a row under the pointer says that it answers. A plain `DSTable` leaves it off unless the theme turns it on, because a row that does nothing when it is pressed should not react. The page sets nothing for it, and the theme does not turn it off, because the composite gives the table its `hoverable` and a prop that is given wins over the theme.
+- The `striped` of the table layout **MUST** follow the order of the table: the setting where the page gives it, else the value of the theme, which stripes by default (`RD.SUPPORT.SURFACE.126`).
+- The footer **MUST** arrange itself by the width of its own place, as its pager does (`RD.SUPPORT.SURFACE.133`). In a wide place the count stands at the start and the pager at the end of one line. In a narrow place the count stands on a line of its own above the pager, each in the middle.
+
+#### The three layouts
+
+The records take one of three layouts, and the data decides which. The composite is the same in each: it keeps its bar, its paging and its task states. So a page changes a layout and builds nothing new.
+
+| Layout | Shows one record as | Used when |
+| --- | --- | --- |
+| `TABLE` | a row of cells, under headings | one record holds several facts a person compares across rows, at a desktop and a tablet |
+| `LIST` | a line: a title, with a line of facts under it | one record is read by its name; and on a phone, in place of `TABLE` and of `GRID`; and where the records are many groups a person searches |
+| `GRID` | a card | the set is shown as cards, because each record is a thing of its own: a kind to set up, an app, a file with a preview |
+
+- **A page MUST choose the layout from the data, by the table above** (`RD.SUPPORT.SURFACE.068`). It lists the layout in the composite's `layouts`, with the columns or the renderer of that layout.
+- **On a phone the records MUST be in the `LIST` layout.** A phone has no room for columns, or for cards side by side. At a tablet `TABLE` shows fewer columns, and `GRID` fewer cards across. That `LIST` stands on a phone, also in place of `GRID`, is proposed and not yet confirmed.
+- **Many groups that a person searches MUST be in the `LIST` layout, and never in `TABLE`** (`RD.SUPPORT.SURFACE.069`). A group is read by its name, as a line, and the groups stand in a narrow part of the page. A person picks one group and does not compare groups across columns.
+- **A line of the `LIST` layout MUST be an item line, `DSItem`** (`RD.SUPPORT.SURFACE.097`). The page gives the title, the description and the facts of a record, and every list of every data table then reads the same way. The composite's rows carry no padding of their own, and the composite gives each line its room: the padding of an item line above and below, and the inset of the table at its two sides, so the line lines up with the title of the container it stands in. The item line draws no padding of its own. A block of the page's own in place of an item line stands in the same room.
+- **When its records are shown as a list, `DSDataTable` MUST turn `hoverable` on, as it does for a table.** The row under the pointer answers in both layouts. The row carries the reaction, and the item line inside it carries none.
+- **A line of the `LIST` layout MUST follow the rules of content of `standards-core.md`.** Its state is a badge on the line of facts, the normal state shows none, and a line stands between each two lines. The composite draws the line between each two lines itself. What a line holds is the page's renderer, so the badge and its place are the page's to write.
+
+**What the composite does.** The composite draws the layouts a page lists, and it reads no device type. The page chooses, and the composite follows what the page lists each time it draws: the layout a person chose while the page still lists it, and the first of the list otherwise. So the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone, and the composite shows the list at once when the screen becomes a phone. The composite does not change to `LIST` by itself. A page that lists `TABLE` alone shows a table on a phone.
+
+#### The record in view
+
+A page may show one record of the table beside the table or under it, such as the detail of an order. The table then marks that record, so a person sees which row the detail belongs to.
+
+- **`DSDataTable` MUST take the id of the record in view, as `selectedRecordId` in the `data` of its config** (`RD.SUPPORT.SURFACE.125`). The composite compares that id with the id of each record, which it reads through `getRecordId` of its data.
+- **The `LIST` layout and the `TABLE` layout MUST draw the row of that record as the row in view,** with the band of a chosen row of a list and `aria-current="true"`. The `GRID` layout ignores the setting.
+- **The page MUST give the id, and the composite MUST hold no state for it.** The page usually reads the id from the address. A person who presses a row follows the link or the action of that row, and the page then gives the new id. A page with no record in view gives no id, and no row is marked.
+- **The record in view is not a record that a person ticked.** The bulk select of the bar ticks records to act on many of them, and it keeps its own look. A ticked record is checked, and the record in view is selected. A record may be both at once.
+
+#### The bar above the records
+
+- **A control that acts on records MUST be drawn only where there are records to act on** (`RD.SUPPORT.SURFACE.147`). The control that ticks every record, with its menu, and the sort are not drawn while the first page is read, on a page that came back empty, first or after a filter, or where the read failed or was refused. They stay while a later page is read over records already shown. The layout's control and `headerNode` are drawn in every state, because they do not depend on records. A bar left with nothing to draw draws nothing and takes no height.
+- **The control that ticks every record MUST be a bare checkbox on the line of the rows' tick boxes** (`RD.SUPPORT.SURFACE.148`). It has no border and no fill around it. It is the checkbox a row draws, at the size of the rows, and its start edge and its centre are those of a row's tick box, in the `TABLE` and the `LIST` layout, on a plain page and in a `flush` part. In the `GRID` layout it stands at the start edge of the grid.
+- **The checkbox MUST say whether no record, every record or some records of the page are checked.** Some is the mixed state of a checkbox. A press checks every record of the page, also from the mixed state, and clears them where every record is checked.
+- **After the checkbox, an icon-only ghost button MUST open the menu of the actions on the checked records.** Its name is its tooltip. A table with no bulk action, or none the person may use, has no tick box on a row and no control in the bar.
+
+#### A search and a filter go to the server
+
+- **A search and a filter of the records MUST be sent to the server** (`RD.SUPPORT.SURFACE.070`). They **MUST NOT** be run in the page over the records already loaded. The composite holds one page of the records. A search over what is loaded would miss every record on another page, and a person would read *nothing matches* when something does.
+
+The composite asks the page for each page of records through `getData`, with the page number, the records for each page and the sort. The page sends its search and its filters to the server in that same read.
+
+#### A row ends with its actions
+
+- **In every layout the actions of a record MUST stand at the end of its row, its line or its card** (`RD.SUPPORT.SURFACE.071`). They are shown as icons, or behind one action that opens them. A person then finds them in the same place on every record.
+- **What else stands at the end of a row is the page's own** (`RD.SUPPORT.SURFACE.059`). A badge may stand there with the actions, as the rules of content of `standards-core.md` state.
+- **Three more parts of this rule are proposed, and not yet confirmed.** One action stands on the row itself. Two or more go behind one action. A press on a row opens the record.
+
+#### The widths of the columns
+
+- **In the `TABLE` layout, the tick column and the actions column MUST be as wide as what they hold** (`RD.SUPPORT.SURFACE.134`). Neither column takes a share of the spare width of the table, at any size.
+- **The spare width MUST go to the data columns that state no width.** A data column that states a width keeps it.
+- **Where every data column states a width, each width MUST be a least width, and the columns share the spare width in proportion to it.** A table narrower than its columns scrolls sideways, and no column is narrower than the width it states.
+- **The cells at the two ends of the head MUST take the insets of the cells of the body under them.** So in every column what the head holds starts where what the rows hold starts.
+
+#### The pinned columns
+
+- **Wherever the `TABLE` layout may scroll sideways, the composite MUST pin its tick column at the start edge and its actions column at the end edge** (`RD.SUPPORT.SURFACE.149`). A person who scrolls a wide table can then still tick a record and reach its actions. The page sets nothing for it, and no setting of the composite turns it on or off. Where the table may not scroll sideways, nothing is pinned.
+- **The columns a page pins MUST join the composite's own as one block on each side, with the composite's own column the outermost.** No cell scrolls beneath the actions column.
+- **The shadow at the edge of a pinned block MUST be drawn only while content is beneath that edge.** A table that fits its place, and a table scrolled to the end of that side, draw none. A pinned cell draws the fill of its row in every state, so a table that fits looks as a table with no pinned column looks. This holds for every `DSTable` with a pinned column.
+
+#### A value changed in a table is changed in its cell
+
+A row is read until a person chooses to change it.
+
+| Step | What the person sees |
+| --- | --- |
+| The row is read | each cell shows its value as words, and the action at the end of the row opens the row |
+| The row is opened | the cell turns from words into a box as wide as the cell. The action that saves the value stands beside the box, and the action that leaves it unchanged stands after that |
+| On a phone | the same table is in its `LIST` layout. A row that is read is a line. The row that is being changed is its text with the box under it, and the same two actions beside the box |
+
+- **A value changed in a table MUST be changed in its cell** (`RD.SUPPORT.SURFACE.072`). Nothing opens over the page, and the page holds no form.
+- **One row MUST be changed at a time.** So one value is saved at a time, and a person always knows what a save will write.
+
+**What the composite does.** `DSDataTable` does this for a value that is text. A page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout: `getValue(record)`, `onSave(record, value)` and an optional `placeholder`. The composite then adds the action that opens a row, first among the actions at the end of the row. It draws the box and the two actions, keeps one row open at a time, and closes a row that is open when a person opens another, without saving it. After a save it reads its page again. A save that fails keeps the box open with what was typed, and says why. The renderer of the `LIST` layout gets `isEditing` as its second argument, so it leaves the value's own line out of the row that is open. A second column with `edit` in one layout is refused.
+
+**Not there yet.** A value of another kind, such as a choice or a date, is not changed in a cell.
+
+### DSFilterBar
+
+A row of fields a person narrows records by. It holds one field for each filter: a text, a choice of one, a choice of several, a yes-or-no, a date, or a range of dates. Each field matches one field of the records underneath. The bar also holds the actions that search and that clear every filter at once.
+
+- A field **MAY** sit inline, or wait behind the action that shows the hidden filters. A bar with many fields keeps the few a person reaches for most, and folds the rest away.
+- What is applied **MUST** show back to the person in the bar itself. Each field keeps its chosen value, and on a phone the count on *Filters (n)* says how many are applied.
+- A text field **MUST** apply on the key that submits a form. A person who types a search term and presses it does not also have to find a button.
+
+#### The form of the bar
+
+The bar has one form, read from its start to its end. A person who has used one filter bar then knows every other.
+
+| Place in the bar | Holds | Why |
+| --- | --- | --- |
+| Its start | the filter icon. It is a mark and not an action, so it is round | it says what the bar is, and its round shape tells it from the actions at the end of the bar |
+| Its fields | the boxes of the filters in view, which share the width of the bar equally | no filter looks more important than the next, and the bar keeps one shape whatever its fields are |
+| After the fields | the action that shows the filters that are hidden | it belongs to the fields, so it stands with them |
+| Its end | a line, and after it the two actions that search and clear | the line sets apart the actions that run the filters from the action that only shows more of them |
+
+- **A realization MUST draw the bar in this form, and a page MUST NOT rearrange it** (`RD.SUPPORT.SURFACE.073`). The page gives the bar its fields and says which stay in view.
+- **At a tablet the bar MUST hold fewer fields in view, and the rest wait behind the action that shows them.** A tablet has less width than a desktop, so fewer boxes fit across it.
+- **On a phone the bar MUST be one button that says how many filters are on, such as *Filters (2)*, with the action that clears them beside it.** A phone has no room for a row of boxes. One button keeps the records in view. Its number tells a person that the records are narrowed before they open anything.
+
+**What the composite does.** `DSFilterBar` draws the fields, the action that shows the hidden ones, the line, and the search and clear actions in this order. Its fields share the width equally. It draws the filter icon in a round shape, as tall as the fields beside it. It keeps in view the fields a page marks `primary`, and beside them a number of the others: up to `moreLimit` at a desktop, three unless the page sets it, and up to `moreLimitTablet` at a tablet, one unless the page sets it. So the bar holds fewer fields at a tablet by itself. On a phone it is the one button: the button opens the fields in a drawer from the bottom of the screen. With no filter on, the button reads *Filters* and the clear action is not shown.
+
+
+### DSComparison
+
+`DSComparison` sets subjects side by side across the same settings: plans against their limits, roles against their permissions. A page gives it data only (`RD.SUPPORT.SURFACE.181`), and the composite draws a table through `DSTable`, the head of each subject and each group through `DSItem`, and each value through `DSDataFieldView`.
+
+| Setting | The page gives | What the composite draws |
+| --- | --- | --- |
+| `subjects` | each a `key`, a `header`, the props of `DSItem`, and `actions` where the subject has some of its own | one column for each subject, headed by its item and its actions, after the column of labels |
+| `groups` | each a `key`, a `header` where the page gives one, and `rows` | a head row at the level `GROUP`, then its rows |
+| `differencesOnly` | a yes-or-no, no by default | only the rows whose values are not all equal |
+
+A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` gives `config`, an `SPDataFieldConfig`, and `values`, a value or null for each subject by its `key`; `CUSTOM` gives `label` and `renderer`, which draws the cell of one subject.
+
+- **The composite MUST draw every value of a `FIELD` row through `DSDataFieldView`.** A page gives the config and the stored values, never a node for a value a field can read. A value that is null, or missing, reads *not set* in the muted tone, translated.
+- **A value that differs from the most common value of its row MUST be marked as the cell that stands out in its row, or, where the page gives `baselineKey`, one that differs from that subject's** (`RD.SUPPORT.SURFACE.184`). A row whose most common value is a tie marks none, an unknown key marks none, and a `CUSTOM` row is never marked.
+- **With `differencesOnly` the composite MUST keep only the `FIELD` rows whose values are not all equal, and every `CUSTOM` row.** A group with no row left is not drawn, and with no row at all the composite draws the empty state.
+- **A subject's `actions` MUST stand in its own head cell, at the end beside its item, and take their size and look from the place as the actions in the head of a card do** (`RD.SUPPORT.SURFACE.193`). The head is a header of the level the composite stands at: the item at the start and the actions as one group at the end, below the item on a phone. A button writes no size, no variant and no class; a head with actions and a head without stand at one height; a `DSItem` holds no action, so the actions belong to the head that holds it.
+- **The first column MUST hold the label of each row and stay pinned while the subjects scroll sideways.**
+- **The composite fills a `flush` content part of a container, as `DSDataTable` does.** A set that needs paging, a search or a sort is a data table.
+
+### DSFeature
+
+`DSFeature` pitches one thing and ends on what to do: a hero, the head of a section with its points, a closing call, the tile of an integration. A page that draws these by hand gives each its own sizes and its own phone size, so no two match. A page gives the feature data only, and its level and its form are all it chooses about how it looks (`RD.SUPPORT.SURFACE.233`).
+
+| Part of DSFeature | Holds | Its prop |
+| --- | --- | --- |
+| An eyebrow | the line over the title: one of the item line's facts, such as a badge or a short phrase | `eyebrow` |
+| A title and a description | the claim in one colour, and a sentence under it | `title`, `description` |
+| Facts | one quiet line of short facts | `facts`, `factsPlacement` |
+| Points | item lines drawn inside the feature, one level below its own | `items`, `itemsType`, `itemsNumbered`, `itemsOrientation` |
+| A part of the page's own | what only the page can draw, such as a stepper, in the place of the points | `contentNode` |
+| Actions | what to do next, the main action first | `actions` |
+| Media | a small picture in the item line's shape, or a node of art as wide as the feature | `media`, `mediaNode` |
+| The whole feature as a link | the feature pressed as one tile | `anchor` |
+| A frame | the fill, the edge and the corners around the words, the media, or both | `frames`, `unframed`, `color`, `strength`, `raised`, `bordered`, `rounded` |
+| Its size and its form | the level that sizes it, and where the media stands against the words | `pageLevel`, `type` |
+
+`type` takes `DSFeatureType`, `pageLevel` takes `DSPageLevelType` (unset, the level of the box it stands in, and `PAGE` straight on a page), `itemsType` takes `DSFeatureItemsType` (`GRID`, `LIST`, `STATS`; `GRID` when unset), `itemsOrientation` takes `DSOrientationType` (unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST`), `factsPlacement` takes `DSItemFactsPlacementType` (`AFTER_DESCRIPTION` when unset) and `frames` and `unframed` take `DSFeaturePartType` (`TEXT`, `MEDIA`). `eyebrow` is one `IDSItemFact`, `items` are the props of `DSItem` whole but `pageLevel`, `orientation` and `backAnchor`, and `actions` are the props of `DSButton` whole but `size`, each with a `key`. A node a page hands in ends in `Node`, so the node of art is `mediaNode` and `media` is data, as on `DSItem`.
+
+#### The level and the form
+
+- **A feature MUST be sized by its `pageLevel` alone, and placed by its `type`** (`RD.SUPPORT.SURFACE.233`). The level sets the size of the title, the step of the description, the gaps, the box of a small picture, the size of the buttons and the inset of a frame. A page writes no type step, no gap and no class for any of them.
+- **A feature MUST draw the type the level allows, and a type the level does not allow MUST draw as the default of that level.** The design system warns in development. A type is only ever added to the vocabulary.
+
+| `type` | Where the media stands | `PAGE` | `CONTAINER` | `WIDGET` | `GROUP` | `CONTENT` · `INLINE` |
+| --- | --- | --- | --- | --- | --- | --- |
+| `SPLIT_END` | the words at the start, the media at the end, side by side | default | default | — | — | — |
+| `SPLIT_START` | the media at the start, the words at the end | allowed | allowed | — | — | — |
+| `MEDIA_TOP` | the media over the words, the width of the feature | — | allowed | default | default | default |
+| `MEDIA_BOTTOM` | the words over the media | — | allowed | allowed | — | — |
+| `MEDIA_INLINE` | the media on the title's line, in the box of the level, the words under both | — | — | — | allowed | allowed |
+| `CENTER` | the words centred, the actions under them, and the media under the actions | allowed | allowed | allowed | allowed | — |
+| `BACKDROP` | the media fills the feature and the words stand over it | allowed | allowed | — | — | — |
+
+- **A small media MUST stand in a square of the level's box, on step 1 of the surface, with `MEDIA_TOP` at `GROUP` and below and with `MEDIA_INLINE`.** At `PAGE`, `CONTAINER` and `WIDGET` the media is drawn as given.
+- **`BACKDROP` MUST keep the words readable.** The words stand at the start over the media, on a scrim of the surface's own fill, and on a phone the scrim covers the whole width.
+
+| Level | Title: step, desktop · phone | Description | Gap between the words | Before the actions | Words to media | Inset, framed | Box of a small media | Buttons | Points at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `PAGE` | `HEADING_XXL4`, 72 · 48px | `CONTENT_XXL`, 20px | 24px | 40px | 64px | 64px | 56px | `LG` | `CONTAINER` |
+| `CONTAINER` | `HEADING_XL`, 40 · 32px | `CONTENT_XL`, 18px | 16px | 32px | 48px | 48px | 48px | `LG` | `WIDGET` |
+| `WIDGET` | `HEADING_SM`, 22px | `CONTENT_LG`, 16px | 12px | 24px | 24px | 32px | 44px | `MD` | `GROUP` |
+| `GROUP` | `HEADING_XS`, 18px | `CONTENT_MD`, 14px | 8px | 16px | 16px | 24px | 40px | `SM` | `GROUP` |
+| `CONTENT` · `INLINE` | the item line's rows, 13 and 12px | the item line's rows | the item line's rhythm | 12px | 12px | 16px | the item line's picture | `SM` · `XS` | `GROUP` |
+
+Each is a token of the level (`architecture-core.md`), and the title is a type step, so its phone size follows with nothing written.
+
+#### The points, the actions and the facts
+
+- **A feature MUST draw its points as item lines one level below its own, and never below `GROUP`** (`RD.SUPPORT.SURFACE.235`). A feature at `PAGE` draws its points at `CONTAINER` and one at `CONTAINER` draws them at `WIDGET`. One at `WIDGET` draws them at `GROUP`, and so does one at `GROUP`, `CONTENT` or `INLINE`. The stop at `GROUP` keeps the words of a website 14px or larger.
+- **`itemsType` MUST decide how the points stand.** `GRID` stands them side by side in as many columns as there are points, up to three, and in one column on a phone; four points fall into two rows of two. `LIST` stands them one under another with a line between each two. `STATS` stands them side by side, each title a number at the display size of the level below and each description its label.
+- **The feature MUST give the orientation to every point, and a point MUST NOT set its own.**
+- **`itemsNumbered` MUST draw the numbers 1 to n as text on the title's line,** in the title's size and weight and the muted tone. It applies to `GRID` and `LIST` only. A stepper with a bar from one number to the next is a part only the page can draw, so it is a `contentNode`.
+- **`contentNode` MUST stand where the points stand, in place of them.** A feature with both draws the node.
+- **A feature's actions MUST be data, and each MUST take its size from the level** (`RD.SUPPORT.SURFACE.234`). The buttons are `LG` at `PAGE` and `CONTAINER`, `MD` at `WIDGET` and `SM` at `GROUP`. The main action stands first, and a feature leads with at most one `SOLID` `PRIMARY`. An `href` draws a link, and a function draws a button. On a `SOLID` fill the surface gives every button the colours that read on it.
+- **A feature MAY take `facts` and `factsPlacement` of its own** (`RD.SUPPORT.SURFACE.236`): after the description where `factsPlacement` is `AFTER_DESCRIPTION`, the default, and under the title where it is `AFTER_TITLE`.
+- **A feature MAY take an `anchor`, and then it MUST take no `actions`** (`RD.SUPPORT.SURFACE.236`). The whole feature is then pressable as a tile, and a link cannot hold another link or a button.
+- **A feature MAY take a small `media` in the item line's shape of `DSItemMediaType`,** drawn in the box of its level, and a `mediaNode` for art that is drawn as given.
+
+#### The phone and the frame
+
+- **A feature MUST fold its form on a phone by its type, and it MUST read no device** (`RD.SUPPORT.SURFACE.237`). `SPLIT_END` becomes `MEDIA_BOTTOM`, `SPLIT_START` becomes `MEDIA_TOP`, and every other type keeps its shape. The size of the title on a phone is the phone value of its type step, and a page never chooses a smaller step for a phone.
+- **A feature MUST take its frame from its own props, else from the theme's `feature`** (`RD.SUPPORT.SURFACE.240`). `frames` lists the parts the frame holds and `unframed` the parts it leaves out. The inset of a frame is the level's. There is no `divided`. Left unset, a field never falls back to the look of the container or the card the feature stands in (`architecture-app.md`).
+- **It is not a grid of features.** Features stand side by side in the band of a page (`architecture-containers.md`). Pricing tables and carousels are not its job.
+
 ## The item line, the badge and the mark — 🔮
 
 Three things show a record and its facts on most pages: a line for the record, a badge for a state, and a mark for a picture. Each has one form here. These are the blocks that carry the rules of content of `standards-core.md`.
@@ -232,9 +468,10 @@ The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a
 | Part of the item line | Holds | Its prop on `DSItem` |
 | --- | --- | --- |
 | A picture | a picture or an icon of the thing, at the start of the line | `media`, given as data of one kind |
+| An eyebrow | one fact over the title, such as a kind or a period, at the facts step of the level | `eyebrow` |
 | A title | the name of the thing | `title` |
 | A description | a short summary of the thing, under its title, drawn whole | `description` |
-| A line of facts | the short facts of the thing, under its description, with a dot between each two. A badge stands among them, before the other facts | `facts` |
+| A line of facts | the short facts of the thing, under its description, or under its title where `factsPlacement` says so, with a dot between each two. A badge stands among them, before the other facts | `facts`, `factsPlacement` |
 | The end | what stands at the end of the line: the actions of the thing, a badge, or both | `endNode` |
 | An arrow | a chevron after the actions, on a line that leads somewhere | `showArrow` |
 
@@ -245,11 +482,11 @@ The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a
   | Form | What the page gives | What the block draws |
   | --- | --- | --- |
   | Plain words | the words alone | the words, in the muted tone |
-  | `TEXT` | `text`, and where it needs them a `label`, a `startIcon` and an `endIcon` | the words in the muted tone, with the icons at their two sides. A `label` stands before the words with a colon, as *Members: 12* |
+  | `TEXT` | `text`, and where it needs them a `label`, a `color`, a `startIcon` and an `endIcon` | the words in the muted tone, or in the `color` the page gives, with the icons at their two sides. A `label` stands before the words with a colon, as *Members: 12* |
   | `BADGE` | `text`, and where it needs them a `color`, a `customColor`, a `variant`, a `startIcon` and an `endIcon` | a badge, at the size of the level of the line. A `variant` that is given wins; else `QUIET` at `PAGE` and `CONTAINER`, and `SUBTLE_OUTLINE` at the others. The page chooses its colour, its icons and its variant, and never its size |
   | `CUSTOM` | `node`, a block of the page's own | the block as it is given, in its place on the line |
 
-- **The words, the label and the icons of a fact MUST take the muted tone, and the dot between two facts the subtle tone** (`RD.SUPPORT.SURFACE.141`). The facts are small text that a person reads, and the subtle tone does not reach 4.5 to 1 there.
+- **The words, the label and the icons of a fact MUST take the muted tone, unless a `TEXT` fact gives a `color`, and the dot between two facts the subtle tone** (`RD.SUPPORT.SURFACE.141`). The facts are small text that a person reads, and the subtle tone does not reach 4.5 to 1 there.
 - **A fact MAY carry its label before it, where the value cannot be read alone.** A count, a date and a person are such values. A state, a kind and a code are read alone and take no label. This is the one place a title stands beside its value.
 - **A fact that is empty MUST be left out, with its dot.**
 - **The picture of an item line MUST be given to `media` as data of one kind, and never as a block the page has sized** (`RD.SUPPORT.SURFACE.130`). The picture states its kind in `mtype`, which takes `DSItemMediaType`. The item draws the unit of that kind, so the heads of two pages hold one picture at one size.
@@ -277,11 +514,12 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 | `PAGE` | the whole page, such as the header of a record or of a listing that is the page | `HEADING_SM`, 22px | `CONTENT_LG`, 16px | `CONTENT_MD`, 14px | `MD` | `QUIET` |
 | `CONTAINER` | a container, and a dialog, a sheet or a drawer | `HEADING_XS`, 18px | `CONTENT_LG`, 16px | `CONTENT_MD`, 14px | `MD` | `QUIET` |
 | `WIDGET` | a widget or a card, and a confirmation | `TITLE_LG`, 16px | `CONTENT_MD`, 14px | `CONTENT_MD`, 14px | `SM` | `SUBTLE` |
-| `GROUP` | an inner part of a widget, such as the head of a part of a card | `HEADING_XXS`, 14px, in the quiet tone | `CONTENT_SM`, 13px | `CONTENT_MD`, 14px | `SM` | `SUBTLE` |
+| `GROUP` | an inner part of a widget, such as the head of a part of a card | `HEADING_XXS`, 14px, in the quiet tone | `CONTENT_MD`, 14px | `CONTENT_MD`, 14px | `SM` | `SUBTLE` |
 | `CONTENT` | a row among others, such as a row of a list or of a card. It is the default | `TITLE_SM`, 13px | `CONTENT_SM`, 13px | `CONTENT_SM`, 13px | `XS` | `SUBTLE` |
 | `INLINE` | a value inside another unit, such as a row of a popover, of a menu or of a cell | `TITLE_XS`, 12px | `CONTENT_XS`, 12px | `CONTENT_XS`, 12px | `XS` | `SUBTLE` |
 
 - **The `pageLevel` of an item line MUST alone decide the type of its title, its description and its facts, the size of a badge among its facts, and the size of its picture** (`RD.SUPPORT.SURFACE.094`). A page chooses the level, and writes no type step, no badge size and no scale size. `DSItem` takes no `size`. So the header of a record, the title of a container, of a widget and of a group, and a row keep one shape on every page. The titles run 22, 18, 16, 14, 13 and 12px from the page down to a small row.
+- **The description of an item line at `GROUP` MUST be `CONTENT_MD`, 14px** (`RD.SUPPORT.SURFACE.239`). A feature draws its points at `GROUP` at the lowest, and the words of a website are 14px or larger. The description at `CONTENT` stays 13px.
 - **The title MUST take the body tone, and the title of a group the quiet tone. The description MUST take the quiet tone at every level but `INLINE`, where it and the facts take the muted tone** (`RD.SUPPORT.SURFACE.143`, `166`). So a group's bold 14px title stands a step back from the rows under it. On a row under the pointer or a chosen row the muted words step to the quiet tone.
 - **A mark among the item line's pictures MUST take its default variant from the level: `QUIET` at `PAGE` and `CONTAINER`, and `SUBTLE` at `WIDGET`, `GROUP`, `CONTENT` and `INLINE`** (`RD.SUPPORT.SURFACE.194`). The fill carries the hierarchy: the mark of a page or a container head draws the stronger tint, which its badges share, and the mark from a widget down draws the lighter one. No level rings the mark. A `variant` the page writes on the mark wins. An avatar's ring is an emphasis the page sets, and the level gives none.
 - **A badge among the facts MUST take the size of its level, two levels to a size:** `MD` at `PAGE` and `CONTAINER`, `SM` at `WIDGET` and `GROUP`, and `XS` at `CONTENT` and `INLINE`. Its words are then 14, 13 and 12px. No badge is smaller than `XS`, the smallest of the standard sizes.
@@ -302,6 +540,8 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 
 - **A title alone at `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` MUST keep the room of a control, 36px, whether or not it holds actions.** Its title and its picture stand in the middle of that room, level with the middle of an action beside it. So a head does not move when an action appears or leaves. A title with a description or facts under it is taller than a control already. A row at `CONTENT` or `INLINE` keeps no such room.
 - **A `DSItem` MAY stand vertical, with `orientation` `VERTICAL`** (`RD.SUPPORT.SURFACE.216`). The picture stands on top, then the title, the description and the facts last, all aligned to the start, with the end node at the top end on the picture's row and one step of the item's level between the picture and the text. The picture keeps the size its level gives, and `mediaAlign` does not apply. Unset or `HORIZONTAL`, the line is as before. `DSItemCard` holds a vertical item as it holds any other.
+- **A `DSItem` MAY take an `eyebrow`, one `IDSItemFact`, and a `TEXT` fact MAY take a `color`** (`RD.SUPPORT.SURFACE.242`). The eyebrow stands over the title, in the text column, at the facts step of the level and in the muted tone, for a short phrase such as *MRR · 90D*. A `CUSTOM` fact puts a node of the page's own there, and the item has no eyebrow type of its own. The `color` of a `TEXT` fact takes `DSColorType` and says how a thing is going, such as a count that grew. Unset, the words take the muted tone.
+- **A `DSItem` MAY place its facts after the title, with `factsPlacement`** (`RD.SUPPORT.SURFACE.242`). It takes `DSItemFactsPlacementType`: `AFTER_DESCRIPTION`, the default, and `AFTER_TITLE`, the facts under the title and over the description. With no description the two are the same.
 - **A `DSItem` MAY align its end node, with `endAlign`** (`RD.SUPPORT.SURFACE.219`). It takes `DSItemMediaAlignType`. On a line, `TOP` puts the centre of the end node on the centre of the title's first line, `CENTER` on the middle of the text block, and `BOTTOM` on the last line of the text block. On a vertical item, `TOP` keeps it at the top end beside the picture, `CENTER` centres it on the text below the picture, and `BOTTOM` puts it on that text's last line. The arrow stands with the end node and takes the same alignment. Unset, a line keeps its end node centred and a vertical item keeps it at the top end.
 - **The picture MUST stand at the middle of the text at every level, and `mediaAlign` MAY move it.** `mediaAlign` takes `DSItemMediaAlignType`: `TOP`, its top at the top of the title's first line; `CENTER`, the default; and `BOTTOM`, its foot at the foot of the text's last line. A title alone keeps its picture in the middle of its room, whatever `mediaAlign` says.
 - **A bare icon MUST follow the line of the title.** It is as large as the title, or the next icon step up where no step is equal, and it stands in the middle of the title's first line. `mediaAlign` does not move it.
@@ -480,7 +720,7 @@ An overlay a block opens — a popover, a tooltip, a dropdown menu — is a priv
 
 ## Boundary
 
-This ref states which components exist, in which group, and what every one must give. It stops at the edge of one block. It does not state what makes a block a widget, or what the container or the layout are — those are `architecture-widgets.md`, `architecture-containers.md` and `architecture-layouts.md`. It does not state how a prop is named or where a role or scale step comes from — those are `architecture-names.md` and `architecture-core.md`. It does not name the units a stack provides on its own: each stack states those in its own docs.
+This ref states which components exist, in which group, and what every one must give. It stops at the edge of one block. It does not state what makes a unit a widget, or what the container or the layout are — those are `architecture-widgets.md`, `architecture-containers.md` and `architecture-layouts.md`. It does not state how a prop is named or where a role or scale step comes from — those are `architecture-names.md` and `architecture-core.md`. It does not name the units a stack provides on its own: each stack states those in its own docs.
 
 ## Binds
 
@@ -541,7 +781,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, and only its label shrinks |
 | `RD.SUPPORT.SURFACE.171` | `DSForm.Field` keeps its message line while its field can fail, a condition `RD.SUPPORT.SURFACE.189` replaces |
 | `RD.SUPPORT.SURFACE.189` | `DSForm.Field` always keeps its message line, so the line is the space between fields, and a field standing in one row keeps none |
-| `RD.SUPPORT.SURFACE.195` | a field carries no space around it, whoever places the fields spaces them, and the composites of the design system stack theirs 8 px apart |
+| `RD.SUPPORT.SURFACE.195` | a field carries no space around it, whoever places the fields spaces them, and the compound fields of the design system stack theirs 8 px apart |
 | `RD.SUPPORT.SURFACE.191` | `DSThemeForm` arranges its settings in six parts, as the sections of one accordion a page may control with `expandedKeys`, and an accordion fits a settings form while a task form uses one scroll or steps |
 | `RD.SUPPORT.SURFACE.192` | a partner paints one container, card or card widget with a class of their own, and the class sets the block's paint tokens `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` and nothing else |
 | `RD.SUPPORT.SURFACE.199` | the surface a block stands on is one value, a colour and a strength, carried by context and read by tokens; `DSSurface` puts a block on a fill, `painted` stands it on a picture, and a popup sets the page's surface again |
@@ -560,6 +800,28 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.228` | a vertical item line spaces its description and its facts by its level, and a horizontal one does not |
 | `RD.SUPPORT.SURFACE.224` | `DSTabs` at the level `PAGE` draw `PILL` where no `type` is named, grouped on its track and not raised; `LINE` stays at `CONTAINER` and `WIDGET` and `SWITCH` at the other levels |
 | `RD.SUPPORT.SURFACE.187` | a default mark draws its icon muted and a ringed mark its ring in the icon's colour, and a `PAGE` item's description is `CONTENT_LG`, 16px |
+| `RD.SUPPORT.SURFACE.230` | a block built from components for one task is a component of the group Composites; the data table, the filter bar, the comparison and the feature are core composites, and the unit for a list beside its detail is not a core unit |
+| `RD.SUPPORT.SURFACE.233` | a feature is sized by its level alone, placed by its type, and draws the default of its level for a type the level does not allow |
+| `RD.SUPPORT.SURFACE.234` | a feature's actions are data and take their size from its level, with at most one solid primary |
+| `RD.SUPPORT.SURFACE.235` | a feature draws its points as item lines one level below its own and never below `GROUP`, and gives their orientation |
+| `RD.SUPPORT.SURFACE.236` | a feature takes its own facts, an anchor that makes it pressable and takes no actions, and a small picture |
+| `RD.SUPPORT.SURFACE.237` | a feature folds its form on a phone by its type and reads no device |
+| `RD.SUPPORT.SURFACE.239` | the description of an item line at `GROUP` is 14px |
+| `RD.SUPPORT.SURFACE.240` | a feature takes its frame from its own props, else from the theme's `feature` |
+| `RD.SUPPORT.SURFACE.242` | an item line takes an eyebrow, a colour on a fact in words, and a place for its facts after the title |
+| `RD.SUPPORT.SURFACE.181` | the comparison is a core composite that compares subjects across the same settings, draws every value through the data field view, marks a differing value and keeps the label column pinned |
+| `RD.SUPPORT.SURFACE.184` | a comparison marks a value that differs from the most common value of its row, or from the subject `baselineKey` names; a tie or an unknown key marks none |
+| `RD.SUPPORT.SURFACE.193` | a subject of a comparison carries its own actions in its head, beside its item, taking their size and look from the place |
+| `RD.SUPPORT.SURFACE.068` | the layout of the data table is chosen from the data, and it is `LIST` on a phone. That `LIST` also takes the place of `GRID` on a phone is proposed |
+| `RD.SUPPORT.SURFACE.069` | many groups a person searches are in the `LIST` layout, and never in `TABLE` |
+| `RD.SUPPORT.SURFACE.134` | the tick column and the actions column are as wide as what they hold, and where the spare width of a table goes |
+| `RD.SUPPORT.SURFACE.147` | the bar of a data table draws the control that ticks every record, and the sort, only where there are records |
+| `RD.SUPPORT.SURFACE.148` | the control that ticks every record is a bare checkbox on the line of the rows' tick boxes |
+| `RD.SUPPORT.SURFACE.149` | a data table pins its tick column and its actions column wherever it may scroll sideways, and a pinned edge shows its shadow only while content is beneath it |
+| `RD.SUPPORT.SURFACE.070` | a search and a filter of the records are sent to the server |
+| `RD.SUPPORT.SURFACE.071` | the actions of a record stand at the end of its row, its line or its card. How many stand on the row, and what a press on a row does, are proposed |
+| `RD.SUPPORT.SURFACE.072` | a value changed in a table is changed in its cell, one row at a time |
+| `RD.SUPPORT.SURFACE.073` | the one form of the filter bar, at a desktop, at a tablet and on a phone |
 
 ## Proof
 

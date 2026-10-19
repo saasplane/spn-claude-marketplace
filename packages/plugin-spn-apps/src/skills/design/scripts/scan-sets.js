@@ -84,17 +84,23 @@ const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
 // library chapter). Unlike the list above, a pair here is admitted to the rule, for its own unit only: the same property on any
 // other unit is still named. `passedByException` counts a set that passes only because of this list too.
 //
-// The book names the three units of DS 3-Widgets `DSFilterBarWidgetField`, `DSFilterBarWidget` and `.DSDataTableWidgetEmpty`
-// (RD.SUPPORT.SURFACE.098: a widget's name ends in `Widget`). The library file carries them as `DSWFilterField`,
-// `DSWFilterBar` and `.DSWDataTableEmpty` until arc 025 N006 renames them, so the table holds both forms of each name, and
-// the scan reads the library with either. The three library names leave this table with that rename.
+// The book names the three units of DS 3-Widgets `DSFilterBarField`, `DSFilterBar` and `.DSDataTableEmpty`, and the four
+// units of DS 4-Containers `.DSPanelContainerFrames` and `DSPanelContainer.Header`, `.Content` and `.Footer`
+// (RD.SUPPORT.SURFACE.229: a suffix names where a unit is placed). The library file carries the first three as
+// `DSWFilterField`, `DSWFilterBar` and `.DSWDataTableEmpty`, and the last four as `.DSContainerFrames` and
+// `DSContainer.Header`, `.Content` and `.Footer`, until arc 025 N018 row 2 renames them, so the table holds both forms of
+// each name, and the scan reads the library with either. The library names leave this table with that rename.
 const PROPERTIES_A_UNIT_KEEPS_CROSSED = {
-  DSFilterBarWidgetField: ["kind"],
-  DSFilterBarWidget: ["narrow"],
-  ".DSDataTableWidgetEmpty": ["filtered"],
+  DSFilterBarField: ["kind"],
+  DSFilterBar: ["narrow"],
+  ".DSDataTableEmpty": ["filtered"],
   DSWFilterField: ["kind"],
   DSWFilterBar: ["narrow"],
   ".DSWDataTableEmpty": ["filtered"],
+  ".DSPanelContainerFrames": ["frames"],
+  "DSPanelContainer.Header": ["flush"],
+  "DSPanelContainer.Content": ["flush"],
+  "DSPanelContainer.Footer": ["flush"],
   ".DSContainerFrames": ["frames"],
   "DSContainer.Header": ["flush"],
   "DSContainer.Content": ["flush"],

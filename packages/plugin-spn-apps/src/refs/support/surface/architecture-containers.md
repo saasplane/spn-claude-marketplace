@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
-      "seen": "a31271ee"
+      "seen": "403e2c18"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0bcf8593"
+      "seen": "10fc18ee"
     }
   ]
 }
@@ -23,23 +23,26 @@ Read this before you frame a part of a page, or before you draw or build the con
 
 | Term | What it means |
 | --- | --- |
-| Container | `DSContainer` — an optional block that frames a part of a page as a header, content and a footer |
-| Part | `DSContainer.Header` · `DSContainer.Content` · `DSContainer.Footer` — a named place in a container. It holds anything, and takes only `flush` |
+| Container | `DSPanelContainer` — an optional block that frames a part of a page as a header, content and a footer: the head, content and foot unit. `DSDataTableContainer` is built on it, for a data table |
+| Part | `DSPanelContainer.Header` · `DSPanelContainer.Content` · `DSPanelContainer.Footer` — a named place in a container. It holds anything, and takes only `flush` |
 | Frame | `frames` — the drawn edge and fill of a container. A frame is drawn once on any part of a page |
 | Part of a box | `DSPageLevelPartType` — the closed set of the three parts of a box (`HEADER`, `CONTENT`, `FOOTER`): the parts a frame holds, the parts of a card, and the part a block stands in |
 | Inset | the space a part keeps between the frame and what it holds |
 | Flush | `flush` — the one word on a part that turns its inset off, because its content reaches the edge of the frame |
 | Card | `DSCard` — the block that frames one thing. It stays beside the container |
+| Band | `DSSectionContainer` — a full-width part of a page with the page's spacing, width and gutter, and a fill of its own. It holds features side by side with `columns` and `divided` |
 
 ## The parts — 🔮
 
 A container is an optional block. A page uses one when a part of it has a header, content and a footer as one unit.
 
+The unit is `DSPanelContainer`, the head, content and foot unit, and its look is the theme's `panelContainer` (`RD.SUPPORT.SURFACE.231`). **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.panelContainer`; a card reads `theme.card` alone.
+
 | Part | Named | How many | What it takes |
 | --- | --- | --- | --- |
-| Header | `DSContainer.Header` | none or one | `flush`, and no other prop |
-| Content | `DSContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
-| Footer | `DSContainer.Footer` | none or one | `flush`, and no other prop |
+| Header | `DSPanelContainer.Header` | none or one | `flush`, and no other prop |
+| Content | `DSPanelContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
+| Footer | `DSPanelContainer.Footer` | none or one | `flush`, and no other prop |
 
 The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a container and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and a fifth, `unframed`, that holds a part out of the frame.
 
@@ -57,7 +60,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
 - **A container MUST give the title in its header the level of its box, `CONTAINER` unless the container is the whole page, and a container that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A container takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this container is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the container gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table container takes `fullPage` too and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
-- **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
+- **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several containers MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one container puts its head in the header of that container. A page with several has no one container that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
 - **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
@@ -71,7 +74,7 @@ Here is how the parts serve the pages most apps have.
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
 | A dashboard | flat | raised, holding widgets that show numbers | none |
 
-**What the units do.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSDataTableWidget` hands its paging to a place the page gives it. The page puts an element in `DSContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no container, because a widget is a layer before the container. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
+**What the units do.** A listing's paging in the footer of the container is the form the page patterns are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no container, because a composite is a component, a layer before the container. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -87,7 +90,7 @@ Here is how the parts serve the pages most apps have.
 | `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
 
 - **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first six is a choice that does not depend on the others (`RD.SUPPORT.SURFACE.163`). The theme holds the app's default for each, and a container may set its own.
-- **A partner MAY paint one container with a class of their own, through the paint tokens** (`RD.SUPPORT.SURFACE.192`). `DSContainer` takes `className`, which goes on its root, and `opacity`; the class sets `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` from the partner's own tokens, in light and in `[data-mode='dark']`, and each frame the container draws reads them. Anything else a class sets on the container is unsupported, and a card inside a painted container keeps its own fill. A card takes `className` and `opacity` the same way, and no `style`.
+- **A partner MAY paint one container with a class of their own, through the paint tokens** (`RD.SUPPORT.SURFACE.192`). `DSPanelContainer` takes `className`, which goes on its root, and `opacity`; the class sets `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` from the partner's own tokens, in light and in `[data-mode='dark']`, and each frame the container draws reads them. Anything else a class sets on the container is unsupported, and a card inside a painted container keeps its own fill. A card takes `className` and `opacity` the same way, and no `style`.
 - **A part listed in `unframed` MUST take no frame, whatever `frames` and the theme give.** A page that sets `frames` takes the whole choice from the theme. A page that sets `unframed` takes one part out and leaves the rest to the theme. So a theme can still change the look of that container, and the named part stays flat in every theme.
 - **`unframed` is for a part that no theme should frame on this page.** One such part is a header that is the header of the page, which the rules of content keep out of a frame (`standards-core.md`). A page that wants a look sets `frames`, or leaves it to the theme. The book states `unframed` before the web builds it.
 
@@ -118,6 +121,12 @@ Write `flush` on a part whose content reaches the edge of the frame, such as a t
 
 A container takes no background color, no padding value, no margin, no container inside it, and no prop named `variant`. It takes no child that is not one of its parts.
 
+### The band of a page
+
+A band is a full-width part of a page with no header, no footer and no frame: the section of a marketing page, the strip behind a closing call. `DSSectionContainer` is the unit (`RD.SUPPORT.SURFACE.243`). It is a surface with the page's spacing, width and gutter, so a pitch inside it stands as it would straight on the page, and every band of a site has the same room. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, and it holds features side by side with `columns`, from one to three and one on a phone, and `divided`, a line between the children, no by default (`RD.SUPPORT.SURFACE.244`). Its `columns` are its own, and not a block for a row or a grid (`RD.SUPPORT.SURFACE.084`).
+
+**The band stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The band frames nothing: it sets one part of a page apart from the next. A band is for the pages of a website, and an app part with a title and actions is a panel container.
+
 ### The card
 
 The card, `DSCard`, stays a separate block beside the container, taking `color`, `strength`, `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own. Where the app chose no card value, the theme takes the container's choice, else the default (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
@@ -144,8 +153,8 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 | A block in a `flush` part | What it does |
 | --- | --- |
 | `DSTable` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | draws no border and no rounding of its own. Its own `bordered` still wins |
-| `DSAccordion` · `DSDataTableWidget` | keeps its own text off the edge of the frame |
-| `DSList` · `DSDataTableWidget` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
+| `DSAccordion` · `DSDataTable` | keeps its own text off the edge of the frame |
+| `DSList` · `DSDataTable` | draws no border on any page, so it has none to leave out, and takes no `bordered` |
 | `DSItem` at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` | it takes the inset of its place at its two sides, so the title starts where the rows under it start their text. In a part that is not `flush` it takes none |
 | `DSTabs` | the label of its first tab starts at the inset of its place, and its line still reaches the edge. Its panel takes that inset at its sides, and what the panel holds stands in a padded place |
 | Any other block | nothing. It reaches the edge |
@@ -198,13 +207,13 @@ Some pages hold things in groups: the fields of each record type, or the actions
 - **The swap MUST change the address.** It happens in place, and the address still changes to name the chosen group. So the back of the browser does the same as the back action. A reload stays on the chosen group, and a link to one group opens that group on every screen.
 - **Each part MUST be shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`). The groups and the items seldom hold data of the same shape.
 - **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
-- **Many groups that a person searches MUST be a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, stated in `architecture-widgets.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
+- **Many groups that a person searches MUST be a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, stated in `architecture-components.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
 
 Where the groups are few and fixed, the page needs no swap. Each group is a container of its own, one under another on one page, and nothing is hidden.
 
-**What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
+**What the units do.** The page patterns draw the back action on the title line of the container that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
 
-**The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetailWidget`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
+**The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetail`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
 
 ## Boundary
 
@@ -215,6 +224,9 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.147` | the parts of a container, the six props of its look, and what it refuses |
+| `RD.SUPPORT.SURFACE.231` | the framing unit is `DSPanelContainer`, `DSDataTableContainer` is built on it, and a level is a position and not a unit |
+| `RD.SUPPORT.SURFACE.243` | a band of a page is `DSSectionContainer`, the one unit that gives a part of a page its fill and its room, and it frames nothing |
+| `RD.SUPPORT.SURFACE.244` | a band holds features side by side with `columns` and `divided` |
 | `RD.SUPPORT.SURFACE.163` | a container and a card take a `color` and a `strength`, `BASE` by default |
 | `RD.SUPPORT.SURFACE.092` | `unframed` names the parts that take no frame, whatever `frames` and the theme give |
 | `RD.SUPPORT.APPS.162` | inside a bordered frame, a line divides each two parts the frame holds |

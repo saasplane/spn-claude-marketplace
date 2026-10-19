@@ -58,7 +58,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -143,7 +143,7 @@
        },
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -206,7 +206,7 @@
        },
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -286,7 +286,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -375,7 +375,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -442,7 +442,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -522,7 +522,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Roles",
          "sections": [
@@ -611,7 +611,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Groups",
          "sections": [
@@ -678,7 +678,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [

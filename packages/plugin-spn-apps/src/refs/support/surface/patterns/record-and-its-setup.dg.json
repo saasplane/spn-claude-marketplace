@@ -55,7 +55,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
          "rows": [
@@ -267,7 +267,7 @@
        },
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",
@@ -372,7 +372,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -455,7 +455,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
          "rows": [
@@ -675,7 +675,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",
@@ -779,7 +779,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -865,7 +865,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "label": "Sign-in",
          "note": "Who may register, and the providers, for each app",
          "rows": [
@@ -1085,7 +1085,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [],
          "label": "Web addresses",
          "note": "Sites and email domains",
@@ -1189,7 +1189,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [

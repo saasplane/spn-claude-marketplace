@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/01-standards-core.md",
-      "seen": "f6edd84b"
+      "seen": "2e35a1b5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/",
-      "seen": "257fb95c"
+      "seen": "604b9a1a"
     }
   ]
 }
@@ -63,7 +63,7 @@ A page has one purpose: one main intent, and one main action. A page with two pu
 
 A page is made of small things that come back on every page: a label, a state, a count, a field, a line of a list. Each has one rule here. A person who has read one page can then read the next, because the same thing stands in the same place on both.
 
-None of these rules names a block, so each holds on every kind of surface. The blocks that carry them are named where they belong. The item line, the badge and the two blocks of a field are in `architecture-components.md`. The data table is in `architecture-widgets.md`. A form and its footer are in `architecture-containers.md`.
+None of these rules names a block, so each holds on every kind of surface. The blocks that carry them are named where they belong. The item line, the badge and the two blocks of a field are in `architecture-components.md`. The data table is in `architecture-components.md`, under Composites. A form and its footer are in `architecture-containers.md`.
 
 The first five rules say what a page shows, and where.
 
@@ -190,7 +190,7 @@ A question that cannot be answered from a part is a matter of taste, and it is n
 
 ## The web's own standards — 🔮
 
-A device type is two closed sets, stated in full in the web's chapter (`docs/04-capabilities/02-support/03-surface/01-standards-core/02-web/01-standards.md`): screen class (`MOBILE` · `TABLET` · `DESKTOP`) and orientation (`PORTRAIT` · `LANDSCAPE`). A page holds at each screen class and each orientation; a block decides its layout from the device type, read from the context it is drawn in, and never measures a width of its own. There is one exception: a unit that can stand in a narrow place inside a wide window **MAY** arrange itself by the width of its place (`RD.SUPPORT.SURFACE.133`). The device type says how wide the window is, and it cannot say how wide a column of that window is. Such a unit reads the width of its own place, and never the width of the window. `DSPagination` and the footer of `DSDataTableWidget` are such units. On the web, a pattern states the keys that carry it and what the pointer does, and whatever the pointer can do the keyboard must be able to do too. Hover is a shown state of the web alone, never a prop, and never the only way to reach something a person needs. A prop **MAY** state whether a block answers to the pointer at all, and **never** that a pointer is over it: `hoverable` on `DSTable` is such a prop, and the row's hover fill stays a shown state that the caller cannot claim.
+A device type is two closed sets, stated in full in the web's chapter (`docs/04-capabilities/02-support/03-surface/01-standards-core/02-web/01-standards.md`): screen class (`MOBILE` · `TABLET` · `DESKTOP`) and orientation (`PORTRAIT` · `LANDSCAPE`). A page holds at each screen class and each orientation; a block decides its layout from the device type, read from the context it is drawn in, and never measures a width of its own. There is one exception: a unit that can stand in a narrow place inside a wide window **MAY** arrange itself by the width of its place (`RD.SUPPORT.SURFACE.133`). The device type says how wide the window is, and it cannot say how wide a column of that window is. Such a unit reads the width of its own place, and never the width of the window. `DSPagination` and the footer of `DSDataTable` are such units. On the web, a pattern states the keys that carry it and what the pointer does, and whatever the pointer can do the keyboard must be able to do too. Hover is a shown state of the web alone, never a prop, and never the only way to reach something a person needs. A prop **MAY** state whether a block answers to the pointer at all, and **never** that a pointer is over it: `hoverable` on `DSTable` is such a prop, and the row's hover fill stays a shown state that the caller cannot claim.
 
 ## Boundary
 

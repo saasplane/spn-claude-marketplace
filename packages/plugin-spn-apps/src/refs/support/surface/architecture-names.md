@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "7ee77eb6"
+      "seen": "9c0b15cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "979d4e11"
+      "seen": "c8933ab9"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/03-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
 
-Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the word that says a block's layer, to the kinds of prop and the states a design and its code share.
+Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the kinds of prop and the states a design and its code share.
 
 ## Terms
 
@@ -69,7 +69,7 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 
 ### Names with a rule of their own
 
-A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container, the card and the row of tabs (`DSTabs`, with no default) take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTableWidget`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
+A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container, the card, the feature and the row of tabs (`DSTabs`, with no default) take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTable`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
 A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
 
@@ -114,7 +114,16 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
-| `DSItem` · `DSItemFacts` · `DSTabs` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
+| `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |
+| `DSItem`, on a fact whose `mtype` is `TEXT` | `color` (the hue of the words of the fact; unset, the muted tone) | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
+| `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `MEDIA_INLINE` · `CENTER` · `BACKDROP`. Unset, the default of the level | `DSFeatureType` |
+| `DSFeature` | `itemsType` (how the points are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
+| `DSFeature` | `itemsNumbered` (whether the numbers 1 to n stand before the titles of the points) | yes or no, no by default | none |
+| `DSFeature` | `itemsOrientation` (how every point stands; a point sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
+| `DSFeature` | `frames` · `unframed` (the parts the frame holds, and the parts it leaves out) | a list of `TEXT` · `MEDIA`. Unset, the theme's `feature` | `DSFeaturePartType` |
+| `DSFeature` | `mediaNode` · `contentNode` (art drawn as given, and a part of the page's own in the place of the points; `media` is data, as on `DSItem`) | a node | none |
 | `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSItemMediaAlignType` |
 | `DSFormatDateTime` · `DSFormatDate` | `type` (the form the date is written in: the date as it is, or how long ago in words) | `DEFAULT` · `AGO`, `DEFAULT` when unset | `DSFormatDateType` |
 | `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
@@ -152,7 +161,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts` and `DSTabs` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -172,44 +181,49 @@ A format prop that is not set takes the person's preference from the app context
 | Design-system layer | Holds | May use |
 | --- | --- | --- |
 | Core | the tokens, the vocabularies and the icons | nothing |
-| Components | the smallest blocks | core |
-| Widgets | blocks built for one purpose | components and core |
-| Containers | the container | components and core |
+| Components | the smallest blocks, and the composites: blocks built from components for one task | core |
+| Widgets | units placed beside others or in a sidebar | components and core |
+| Containers | the containers | components and core |
 | Layouts | the layout | every layer before it |
 | App | the root block `DSApp`, the app's contract and the theme | every layer before it |
 
 A layer uses only the layers named before it, so the direction between two blocks is never an argument: the block in the later layer is the one that depends. The vocabulary is `CORE` · `COMPONENTS` · `WIDGETS` · `CONTAINERS` · `LAYOUTS` · `APP`.
 
-**App is the last layer, so no block of another layer uses the root block.** A block reads what the root block hands down from where it sits (`architecture-app.md`). Reading a setting that was handed down is not using the block that handed it. In a web package, each layer from components to layouts is one folder of the `ui` taxonomy, and the root block stands beside those folders.
+**App is the last layer, so no block of another layer uses the root block.** A block reads what the root block hands down from where it sits (`architecture-app.md`). Reading a setting that was handed down is not using the block that handed it. In a web package, each layer is one folder of the `ui` taxonomy: the root block, its boot and its managers stand in the folder of the app layer.
 
 ## A name says its layer — ✅
 
-A widget, a container and a layout carry their layer as the last word of the name. A component carries no such word.
+A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`. A component carries none, and a composite is a component.
 
-| Layer of the block | Its name ends in | Example |
+| Where the unit is placed | Its name ends in | Example |
 | --- | --- | --- |
-| Components | no word for the layer | `DSButton` · `DSTable` |
-| Widgets | `Widget` | `DSDataTableWidget` · `DSFilterBarWidget` · `DSCardWidget` |
-| Containers | `Container` | `DSContainer` |
-| Layouts | `Layout` | `DSLayout` |
+| Nowhere in particular: a component, a composite included | no word | `DSButton` · `DSTable` · `DSDataTable` · `DSFilterBar` · `DSFeature` |
+| Beside others, or in a sidebar, inside a container or not | `Widget` | `DSCardWidget` |
+| Around a part of a page | `Container` | `DSPanelContainer` · `DSDataTableContainer` |
+| Around a page | `Layout` | `DSLayout` |
+| Around an app | `App` | `DSApp` |
 
-- **A widget's name MUST end in `Widget`, a container's in `Container` and a layout's in `Layout`** (`RD.SUPPORT.SURFACE.098`). A reader then tells the layer of a block from its name alone, in the book, in the design library and in every stack.
-- **A component MUST take no such word.** A component is the smallest block, and most blocks are components, so a name with no word for its layer is a component's.
+- **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RD.SUPPORT.SURFACE.229`). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
+- **A component MUST take no such word.** A composite is placed nowhere in particular, so it is a component and takes none: a data table is `DSDataTable`, never a widget by name.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
-- **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core widgets.
-- **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own widget for a list beside its detail is `DSListDetailWidget`.
+- **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core composites and the core widget.
+- **A unit that a stack provides on its own MUST follow the same rule**, because it keeps every rule of the book that a core unit keeps (`architecture-components.md`). So the web stack's own composite for a list beside its detail is `DSListDetail`.
 
 | Belongs to | What it is | Its name |
 | --- | --- | --- |
-| `DSDataTableWidget` | its settings | `IDSDataTableWidgetConfig` |
-| `DSDataTableWidget` | the vocabulary of its layouts | `DSDataTableWidgetConfigLayoutType` |
-| `DSDataTableWidget` | its private part for the empty state, in the design library | `.DSDataTableWidgetEmpty` |
-| `DSFilterBarWidget` | its item, one field | `DSFilterBarWidgetField`, with its shape `IDSFilterBarWidgetField` |
-| `DSFilterBarWidget` | the vocabulary of the kinds of field | `DSFilterBarWidgetFieldType` |
+| `DSDataTable` | its settings | `IDSDataTableConfig` |
+| `DSDataTable` | the vocabulary of its layouts | `DSDataTableConfigLayoutType` |
+| `DSDataTable` | its private part for the empty state, in the design library | `.DSDataTableEmpty` |
+| `DSFilterBar` | its item, one field | `DSFilterBarField`, with its shape `IDSFilterBarField` |
+| `DSFilterBar` | the vocabulary of the kinds of field | `DSFilterBarFieldType` |
 | `DSCardWidget` | its settings | `IDSCardWidgetProps` |
 | `DSCardWidget` | the vocabulary of the kinds of part | `DSCardWidgetPartType` |
 | `DSCardWidget` | the shape every part shares, and the shape of each kind of part | `IDSCardWidgetPartBase`, with `IDSCardWidgetPartItems`, `IDSCardWidgetPartList` and `IDSCardWidgetPartFree` |
 | `DSCardWidget` | an item of an `ITEMS` part, and a row of a `LIST` part | `IDSCardWidgetItem` and `IDSCardWidgetRow` |
+| `DSFeature` | its props | `IDSFeatureProps` |
+| `DSFeature` | the vocabulary of its forms, of the ways it draws its points, and of the parts its frame holds | `DSFeatureType`, `DSFeatureItemsType` and `DSFeaturePartType` |
+| `DSFeature` | an action, and a point | `IDSFeatureAction` and `IDSFeatureItem` |
+| `DSFeature` | the theme's look for it | `IDSThemeFeature`, held in `theme.feature` |
 
 `DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
 
@@ -223,7 +237,7 @@ A block drawn from data is a host and an item: one item serves every host that t
 
 ## Boundary
 
-This ref states which three props mean one thing everywhere, which of the two sizes a block takes, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, which word of a name says the layer, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
+This ref states which three props mean one thing everywhere, which of the two sizes a block takes, what kind every other prop is, which props take a vocabulary and with which values, which six layers a block is built from, which suffix of a name says where a unit is placed, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
 
 ## Binds
 
@@ -231,7 +245,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | --- | --- |
 | `RD.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
-| `RD.SUPPORT.SURFACE.098` | a widget's name ends in `Widget`, a container's in `Container` and a layout's in `Layout`; a component takes no such word, and no block carries a letter for its layer before its name |
+| `RD.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Container`, `Widget`); a component, a composite included, takes none, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the mark, the avatar and the avatar group take `scaleSize` |
 | `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
 | `RD.SUPPORT.SURFACE.154` | the values of `variant` are named by their strength and read from the strongest to the faintest, and every variant of every hue, and of a colour the page chooses, keeps its text readable |

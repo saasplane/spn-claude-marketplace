@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "136514a2"
+      "seen": "e1d41d8d"
     }
   ]
 }
@@ -52,7 +52,7 @@ A file can use only what another file has published. SaaS Plane's own library is
 | --- | --- |
 | DS 1-core | Colour · Type · Scale · Icons · States, the pages of the showcase's Core entries that show tokens |
 | DS 2-Components | one page for each group of the showcase, in its order: Actions · Data display · Feedback · Structure · Media · Navigation · Overlays · Popovers · Typography · Utility, then the three pages of Data entry: Fields, Pickers and Composites. Each set sits in its unit's section on its group's page |
-| DS 3-Widgets | Widgets: `DSDataTableWidget`, then `DSFilterBarWidget` with its item `DSFilterBarWidgetField` |
+| DS 3-Widgets | Widgets: `DSDataTable`, then `DSFilterBar` with its item `DSFilterBarField` |
 | DS 4-Containers | Containers |
 | DS 5-Layouts | Layouts |
 | DS 9-Lab | drafts, never published |
@@ -607,14 +607,14 @@ A property that changes nothing a person can see in any state is drawn by no cas
 
 | Library file | Unit | Property | Reason |
 | --- | --- | --- | --- |
-| DS 3-Widgets | `DSFilterBarWidgetField` | `kind` | each kind of field is a different control, and a person must see the field of every kind next to the others |
-| DS 3-Widgets | `DSFilterBarWidget` | `narrow` | a narrow bar folds its fields away and a wide bar shows them inline, so the two forms must be seen together |
-| DS 3-Widgets | `.DSDataTableWidgetEmpty` | `filtered` | a table empty because no record exists and a table empty because the filter left none say different things |
+| DS 3-Widgets | `DSFilterBarField` | `kind` | each kind of field is a different control, and a person must see the field of every kind next to the others |
+| DS 3-Widgets | `DSFilterBar` | `narrow` | a narrow bar folds its fields away and a wide bar shows them inline, so the two forms must be seen together |
+| DS 3-Widgets | `.DSDataTableEmpty` | `filtered` | a table empty because no record exists and a table empty because the filter left none say different things |
 | DS 2-Components | `DSCard.Header` · `DSCard.Content` · `DSCard.Footer` | `flush` | a part with its padding and a part without it are two forms of the part, and what it holds reaches the edge of the card only in one of them |
-| DS 4-Containers | `.DSContainerFrames` | `frames` | the parts a frame holds decide where its edges and fills fall, and every combination of parts is a form of the frame |
-| DS 4-Containers | `DSContainer.Header` | `flush` | a part with its inset and a part without it are two forms of the part |
-| DS 4-Containers | `DSContainer.Content` | `flush` | the same reason as for the header |
-| DS 4-Containers | `DSContainer.Footer` | `flush` | the same reason as for the header |
+| DS 4-Containers | `.DSPanelContainerFrames` | `frames` | the parts a frame holds decide where its edges and fills fall, and every combination of parts is a form of the frame |
+| DS 4-Containers | `DSPanelContainer.Header` | `flush` | a part with its inset and a part without it are two forms of the part |
+| DS 4-Containers | `DSPanelContainer.Content` | `flush` | the same reason as for the header |
+| DS 4-Containers | `DSPanelContainer.Footer` | `flush` | the same reason as for the header |
 | DS 5-Layouts | `DSLayoutNavNode` | `open` | an open group shows its children and a shut group does not |
 | DS 5-Layouts | `DSLayoutNavNode` | `inGroup` | an item inside a group sits indented under it, and an item outside a group does not |
 | DS 5-Layouts | `DSLayoutNavNode` | `inMenu` | an item drawn in a menu is a row of the menu and not of the rail |

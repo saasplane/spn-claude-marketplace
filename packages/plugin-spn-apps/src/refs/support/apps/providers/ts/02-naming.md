@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "a92f56a9"
+      "seen": "d1f7c56e"
     }
   ]
 }
@@ -84,7 +84,7 @@
 
 ### Units of a web module
 
-**Every unit of a web module ends in the word for what it is, and only a plain component needs none — MUST** (`RD.SUPPORT.APPS.202`). A reader then knows what a unit is from its name, before opening its file.
+**Every unit of a web module ends in the word for where it is placed or what it is, and only a plain component needs none — MUST** (`RD.SUPPORT.APPS.202`, amended by `RD.SUPPORT.SURFACE.229`). A reader then knows what a unit is from its name, before opening its file.
 
 | Unit | Its name | Example |
 | --- | --- | --- |
@@ -99,7 +99,7 @@
 
 **A unit that chooses records ends in `Autocomplete`.** `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card` or `Picker` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
 
-**The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
+**A suffix names where a unit is placed: `App`, `Layout`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
 
 **A module's route keys are one enum, and its routes are one constant. Proposed** (`RD.SUPPORT.APPS.203`). The enum is `<MOD>RouteType`. Each key is in capitals and matches its value, and each value begins with the module's code: `IAMRouteType.ROLE_DETAIL = 'IAM_ROLE_DETAIL'`. The list is the constant `<MOD>_ROUTES`, typed `ISPRoute[]`. The developer has not seen this choice.
 

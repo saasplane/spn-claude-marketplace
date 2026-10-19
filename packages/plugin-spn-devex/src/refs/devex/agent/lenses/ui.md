@@ -111,7 +111,7 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **The surface answers with the design system's own blocks.** A loading or failure picture the page drew itself is a finding, and so is anything only hover reaches.
   - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` the hue, `size` the density step `XS` to `XL` with `SM` the default; `CUSTOM` is the one named way a page owns a colour (names § The three shared names).
   - **A prop that takes a vocabulary carries the book's name and the book's values** (`RD.SUPPORT.SURFACE.041`).
-  - **A name says its layer**: `Widget`, `Container`, `Layout`; a component takes no such word, and a block's own name comes first (`RD.SUPPORT.SURFACE.098`).
+  - **A suffix names where a unit is placed**: `App`, `Layout`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RD.SUPPORT.SURFACE.229`).
   - **An icon beside a title or running text takes the scale size of that text's step, on one centre line**; `size` is density and `scaleSize` is how large an icon, mark or avatar is drawn (`RD.SUPPORT.SURFACE.008`, `.100`).
   - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark; a control the page built owes all of it on its own (accessibility § The baseline).
   - **One page holds at each density, theme, device type, language and direction.** A second version of a page, or a block restyled for dark, is a finding.

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "bf8515a1"
+      "seen": "37e5fff7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
-      "seen": "d72d6f8d"
+      "seen": "7bd2e2d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -60,8 +60,10 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 | Corner radius | one base value. The radius of every size step is worked out from it |
 | Motion speed | `motionSpeed`: the multiplier on every place's base duration |
 | Temperature of the greys | `neutralTemperature`: `COOL`, `NEUTRAL` (the default) or `WARM`. The greys, the surfaces, the lines and the text lean cool, stay neutral or lean warm, and a grey stays a grey. A choice of three, never a hue or a chroma as a value (`RD.SUPPORT.SURFACE.203`) |
-| Container look | `container`: `frames`, `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for every container. A card follows its choice where the card look says nothing |
+| Panel container look | `panelContainer`: `frames`, `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for every container. Only containers read it; a card reads the card look alone |
 | Card look | `card`: `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the surface of every card |
+| Feature look | `feature`: `frames`, the parts of a feature the frame holds (`DSFeaturePartType[]`), `color`, `strength`, `raised`, `bordered` and `rounded`, as the default for the frame of every `DSFeature`. Only a feature reads it |
+| Facts' face | `factsFont`: whether the line of facts of an item line and of a feature is set in the theme's own face, which is the default, or in the design system's monospaced face |
 | Card widget look | `cardWidget`: what `DSCardWidget` adds to a card. `divided` is the lines between its head, its parts and its footer, `rowsDivided` the lines between the rows of its `ITEMS` and `LIST` parts, and `rowsHoverable` the hover of those rows |
 | Table look | `table`: `striped` and `hoverable`, as the default for every table |
 | Layout look | `layout`: how a layout is drawn, in three parts, `body`, `navigation` and `content` |
@@ -69,7 +71,9 @@ A theme is one declared object, `IDSTheme`, and it holds a closed list of choice
 In `card`, `cardWidget` and `table` each value is yes or no.
 
 - **A table MUST take `striped` and `hoverable` from its own prop where the prop is given, else from the theme's `table`** (`RD.SUPPORT.SURFACE.126`). The default theme stripes a table and gives it no hover. A partner changes them once for every table of an app, and one table that says otherwise still wins.
-- **A card MUST take `color`, `strength`, `raised`, `bordered` and `rounded` from its own prop where the prop is given, else from the theme's `card`** (`RD.SUPPORT.SURFACE.128`). Each of the props is decided by itself, so a `card` that sets `bordered` alone leaves the others as they were. Where the app chose no card value, the theme takes the container's choice, else the default: raised, bordered and rounded. So a theme can say flat containers with bordered cards.
+- **A card MUST take `color`, `strength`, `raised`, `bordered` and `rounded` from its own prop where the prop is given, else from the theme's `card`** (`RD.SUPPORT.SURFACE.128`). Each of the props is decided by itself, so a `card` that sets `bordered` alone leaves the others as they were. Where the app chose no card value, the card takes the default: raised, bordered and rounded, whatever the panel container look chose (`RD.SUPPORT.SURFACE.232`). So a theme can say flat containers with bordered cards.
+- **A feature MUST take `frames`, `unframed`, `color`, `strength`, `raised`, `bordered` and `rounded` from its own prop where the prop is given, else from the theme's `feature`** (`RD.SUPPORT.SURFACE.240`). It reads the feature look and no other. The default `frames` is an empty list, so a feature draws no frame under the default theme, and the feature look holds no `divided`.
+- **A theme MUST choose the face of the facts, and the theme's own face is the default** (`RD.SUPPORT.SURFACE.241`). `factsFont` holds one of two choices: the theme's own face, or the monospaced face of the design system, `--font-mono`. It names no family, so the theme still holds none. The choice reaches the line of facts of `DSItem`, `DSItemFacts` and `DSFeature`, and the eyebrow of an item line.
 - **The card look holds the surface of a card and nothing else.** The line between the parts of a plain `DSCard`, `divided`, is a prop of the card that the page writes.
 - **`DSCardWidget` MUST take what it adds to a card from the theme's `cardWidget`, where its own prop says nothing.** Its `divided` is its own prop, else `divided` of `cardWidget`, no by default. The rows of a part take `divided` from the prop of the part, else from `rowsDivided`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default. The surface of the widget's card follows the card look.
 - **The theme holds no block for a list.** The `divided` and the `hoverable` of `DSList` are props that the page writes.
@@ -113,7 +117,7 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   radius: DSThemeRadiusType.MEDIUM,
   motionSpeed: DSMotionSpeedType.DEFAULT,
   neutralTemperature: DSThemeNeutralTemperatureType.NEUTRAL,
-  container: {
+  panelContainer: {
     frames: [DSPageLevelPartType.CONTENT, DSPageLevelPartType.FOOTER],
     color: DSSurfaceColorType.BASE,
     strength: DSSurfaceStrengthType.SUBTLE,
@@ -123,6 +127,15 @@ export const DS_THEME_DEFAULT: IDSTheme = {
   },
   card: { color: DSSurfaceColorType.BASE, strength: DSSurfaceStrengthType.SUBTLE, raised: true, bordered: true, rounded: true },
   cardWidget: { divided: false, rowsDivided: true, rowsHoverable: true },
+  feature: {
+    frames: [],
+    color: DSSurfaceColorType.BASE,
+    strength: DSSurfaceStrengthType.SUBTLE,
+    raised: false,
+    bordered: false,
+    rounded: true,
+  },
+                                                // factsFont: the theme's own face, the default
   table: { striped: true, hoverable: false },
   layout: {
     body: {
@@ -154,7 +167,7 @@ export const DS_THEME_DEFAULT: IDSTheme = {
 - **The app and its context MUST hold the whole theme, `theme`, and the choice beside it, `themeChoice`** (`RD.SUPPORT.SURFACE.161`). So a form can mark a default and reset a choice. `DSApp`, `setTheme` and the form take the choice. A second, resolved type exists nowhere.
 - **The defaults MUST be written in one place, the default theme.** A unit and a layout read the theme, and keep no fallback of their own for a value of it. A unit's own prop, optional, still wins.
 - **A theme that names no mode MUST follow the device, and the mode in force MUST stay light or dark** (`RD.SUPPORT.SURFACE.211`). `DSThemeModeType` keeps `LIGHT` and `DARK`, with no third member. `DSApp` reads `prefers-color-scheme` and follows its change; `data-mode` and every token stay light or dark. A unit that draws by mode reads `useDSResolvedMode()`, never `theme.mode`. The form offers System, Light and Dark, System first and the default, System leaving the mode out.
-- **Some values MUST be worked out from the choice, and not fixed.** A value of the card look follows the container's choice where the app chose one, else the default.
+- **Some values MUST be worked out from the choice, and not fixed.** A value of the card look is the card look's own default where the app chose none, whatever the panel container look chose.
 - **The theme's form MUST edit the choice and show the theme** (`RD.SUPPORT.SURFACE.162`). A field with no choice shows the value applied, filled in as a chosen value is, and carries no reset and no default note of its own; a choice equal to the default is left out of the theme. Resetting is the *Reset* of a part and *Reset to defaults*, which clears every choice, so the page receives an empty choice. The form arranges its settings in six parts that follow the theme's keys, as the sections of an accordion (`RD.SUPPORT.SURFACE.191`), and offers no font family. The form is built on `DSForm.Field` (`RD.SUPPORT.SURFACE.169`), and a switch stands with its own label.
 - **The theme MUST hold no font family** (`RD.SUPPORT.SURFACE.196`). The typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans`. A family name without its file only falls back, so a brand font is a file and a licence an app decides once.
 
@@ -176,7 +189,7 @@ the app's own setting
 | Size | whoever composes a region: a container, a card, an overlay, a widget or a composite, written from its `size`, or the page by writing `size` on the box that holds the region | all the way down, until a block that passes its size on sets another |
 | Frame | a part of a container or of a card that has `flush` | to the block that uses it. A card and an overlay stop the setting that comes from outside them |
 
-Only these blocks pass their size on: `DSContainer` to every block inside it, and where none did the theme's size stands; `DSCard` to every block inside it, and a card that states no size hands on the size it stands in; a widget or a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls). No other block passes its size on — a dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a container or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
+Only these blocks pass their size on: `DSPanelContainer` to every block inside it, and where none did the theme's size stands; `DSCard` to every block inside it, and a card that states no size hands on the size it stands in; a widget or a composite to its own parts (a data table to its table and its pager, a form to its fields, a button group to its buttons, a filter bar to its controls). No other block passes its size on — a dialog, a drawer, a sheet, an alert, tabs, a tooltip, a menu, a popover and a collapsible do not. A popover draws its own surface: the fill, the edge, the radius and the shadow. A frame is drawn once on any part of a page (`architecture-containers.md`); a block reacts to one thing only: sitting in a `flush` part, of a container or of a card. A `flush` part of a card sets the frame setting again for what that part holds.
 
 ## What only a browser needs — ✅
 
@@ -204,7 +217,10 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
 | `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in three parts, the body, the navigation and the content, and a surface takes a colour and a strength |
 | `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; the width is the body's, attached and sticky are the navigation's and the content's, and the spacing follows the theme's size |
-| `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
+| `RD.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the panel container look, and the card widget look, the order each is read in, and the theme holds no block for a list |
+| `RD.SUPPORT.SURFACE.232` | each theme look is read only by its own component, and an unset field takes its own look's default |
+| `RD.SUPPORT.SURFACE.240` | a feature takes its frame from its own props, else from the theme's `feature` |
+| `RD.SUPPORT.SURFACE.241` | a theme chooses the face of the facts, the theme's own by default, and no unit sets it |
 | `RD.SUPPORT.SURFACE.161` | the theme is one type with every value, over one default theme, the app's choice is the same type with every field optional, and no unit keeps a fallback of its own |
 | `RD.SUPPORT.SURFACE.162` | the theme's form shows every value applied, marks each default, and clears or resets the choices |
 | `RD.SUPPORT.SURFACE.203` | the theme holds the temperature of the greys, a choice of three |

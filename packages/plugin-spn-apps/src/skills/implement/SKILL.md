@@ -11,15 +11,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "b792894e"
+      "seen": "bffcdb0f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "1a467a6b"
+      "seen": "8fca20e5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "0bcf8593"
+      "seen": "10fc18ee"
     }
   ],
   "decisions": [
@@ -95,24 +95,24 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Use one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never containers of their own. Two things that are read or saved apart are two containers. An editor with its preview is one container, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
-- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTableWidget`, in the layout the tree names. Send its search and its filters to the server, in the read the widget asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
+- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
 - **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 - **Style the page with the app's own styles rule** (`refs/support/apps/providers/ts/03-structure.md`, "An app's own styles"). A repeated pattern is a component of the app's own, values come from the design system's tokens, and no selector reaches the design system's insides.
 
-**A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-widgets.md` and `architecture-containers.md` state each one.
+**A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state each one.
 
 | The pattern asks | What the page writes |
 | --- | --- |
-| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTableWidget` reads no device type, and follows the layouts its page lists each time it draws |
+| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTable` reads no device type, and follows the layouts its page lists each time it draws |
 | a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
 | the picture and the end of an item line | the page gives the picture to `media` as data of one kind, `ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, with no size (`RD.SUPPORT.SURFACE.130`). It gives what stands at the end, which is data, a badge, a count or a status and never an action, to `endNode` (`RD.SUPPORT.SURFACE.131`, `RD.SUPPORT.SURFACE.178`). The actions of a head are the other blocks of its header, and they take their size and look from the place. `DSItem` takes no `startIcon` and no `actions` |
-| the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the widget's config, usually read from the address. The widget holds no state for it (`RD.SUPPORT.SURFACE.125`) |
+| the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the table's config, usually read from the address. The table holds no state for it (`RD.SUPPORT.SURFACE.125`) |
 | a card with a head, drawn from data (a card that shows its own info is a `DSCard`) | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
-| subjects compared across the same settings | the page gives `DSComparisonWidget` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The widget draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
+| subjects compared across the same settings | the page gives `DSComparison` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The composite draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
-| the paging in the footer of the container | the page puts an element in `DSContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
+| the paging in the footer of the container | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back on the title line | the page gives `DSContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetailWidget` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
+| a way back on the title line | the page gives `DSPanelContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetail` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
 | the head of a page that holds several containers | the head stands above the containers, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
 | tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
 | the head of a page, or of a part of a page | the title of a header is an item line. A container that is the whole page says so with `fullPage`, and its header is then the page head (`RD.SUPPORT.SURFACE.179`); any other box gives the level of its kind: `CONTAINER` for a container or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element follows the level (`RD.SUPPORT.SURFACE.106`). A page that holds several containers writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RD.SUPPORT.SURFACE.178`). The page writes no type step and no heading element |
@@ -125,13 +125,13 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
 | a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |
 | a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
-| fewer fields in the filter bar at a tablet | nothing. `DSFilterBarWidget` holds fewer by itself, and `moreLimitTablet` sets how many |
+| fewer fields in the filter bar at a tablet | nothing. `DSFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
 
-**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-widgets.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
+**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-components.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
 
 | The unit | What it does not do yet |
 | --- | --- |
-| `DSDataTableWidget` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
+| `DSDataTable` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
 | a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
 
 - **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.

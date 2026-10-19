@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "174e3a5a"
+      "seen": "96019bb8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "39e85b32"
+      "seen": "0696add2"
     }
   ]
 }
@@ -64,14 +64,14 @@ The showcase is seven sections, each a root of the sidebar, in this order, none 
 | Layout | its Overview, then `DSLayout` and its layouts |
 | Container | its Overview, which names the level its units stand at and links Page levels, then the containers |
 | Widget | its Overview, which names the level its units stand at and links Page levels, then the widgets |
-| Components | Typography, Media, Actions, Data entry (Fields, Pickers, Composites), Data display, Navigation, Structure, Feedback, Overlays, Popovers, and Utility last |
+| Components | Typography, Media, Actions, Data entry (Fields, Pickers, Compound fields), Composites, Data display, Navigation, Structure, Feedback, Overlays, Popovers, and Utility last |
 
 The group of a unit is its path in the sidebar, so the title of a unit is its group and its name. A unit does not choose its layer: the layer follows from the group.
 
 | Layer | Its groups, in order |
 | --- | --- |
 | Core | Standards |
-| Components | `Components/Typography` · `Media` · `Actions` · `Data entry/Fields` · `Data entry/Pickers` · `Data entry/Composites` · `Data display` · `Navigation` · `Structure` · `Feedback` · `Overlays` · `Popovers` · `Utility` |
+| Components | `Components/Typography` · `Media` · `Actions` · `Data entry/Fields` · `Data entry/Pickers` · `Data entry/Compound fields` · `Composites` · `Data display` · `Navigation` · `Structure` · `Feedback` · `Overlays` · `Popovers` · `Utility` |
 | Widgets | `Widget` |
 | Containers | `Container` |
 | Layouts | `Layout` |
@@ -102,7 +102,8 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Components/Actions | `DSButton` Control · Inline · sizes, colours, variants, states, content, opener. Control · Content · sizes, content each: `DSButtonGroup` · `DSToolbar` |
 | Components/Data entry/Fields | Control · Content: `DSInput` · `DSInputNumber` · `DSInputOTP` · `DSTextarea` · `DSRadio` sizes, states, content, value each · `DSInputPhone` · `DSCheckbox` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` · `DSRadioGroup` sizes, states, content, value, data each · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, content, value, data each · `DSTagGroup` sizes, states. `DSLabel` Control · Inline · sizes, states |
 | Components/Data entry/Pickers | Control · Content: `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` sizes, states, content, value, data each · `DSDatePicker` · `DSTimePicker` · `DSDateTimePicker` sizes, states, content, value each · `DSDateRangePicker` sizes, states, content, value, data · `DSCalendar` states, value · `DSColorPicker` sizes, states, value. `DSCommand` Composite · Content · sizes, states, content, data. `DSCommandPalette` Overlay · Content · sizes, states, content, opener, data |
-| Components/Data entry/Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` sizes, states, content, value, data · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, content, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
+| Components/Data entry/Compound fields | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` sizes, states, content, value, data · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, content, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
+| Components/Composites | `DSDataTable` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBar` Composite · Full width · sizes, content, data; scenario page With overflow |
 | Components/Data display | Display · Content: `DSAccordion` sizes, states, content · `DSAccordionGroup` sizes, content, data · `DSAddressView` sizes, states, content, data · `DSCard` sizes, content, opener · `DSCarousel` content · `DSCodeBlockView` sizes, content · `DSDataFieldView` sizes, states, content, data · `DSDataUnit` sizes, states, content · `DSItem` sizes, content, opener · `DSItemCard` sizes, states, content, opener · `DSJSONView` data · `DSList` sizes, states, content, opener · `DSTable` sizes, content. Display · Inline: `DSAvatar` sizes, content · `DSAvatarGroup` sizes, content · `DSBadge` sizes, colours, variants, states, content, opener · `DSColorView` states, content |
 | Components/Navigation | Control · Content: `DSBreadcrumb` states, content, data · `DSMenubar` sizes, states, content, data · `DSNavList` sizes, states, content, data · `DSNavMenu` sizes, states, content, data · `DSNavBarSide` sizes, states, content, data · `DSNavBarTop` sizes, states, content, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
 | Components/Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
@@ -110,8 +111,8 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Components/Overlays | Overlay · Content: `DSDialog` sizes, content · `DSConfirmDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` content |
 | Components/Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSConfirmPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Components/Utility | Display · Content · a table of types: `DSFormatCurrency` content · `DSFormatDate` none · `DSFormatDateTime` content · `DSFormatNumber` none · `DSFormatTime` none. Utility · Content: `DSAuthz` content · `DSAnchorContainer` states, content, opener · `DSElementObserver` content · `DSPortal` none · `DSSticky` states, content |
-| Widget | `DSDataTableWidget` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSFilterBarWidget` Composite · Full width · sizes, content, data; scenario page With overflow |
-| Container | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
+| Widget | `DSCardWidget` Composite · Content · sizes, content |
+| Container | `DSPanelContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
 | Layout | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav, Canvas |
 
 ## The pages of a unit — 🔮
@@ -307,7 +308,7 @@ A unit whose props take objects explains each object under its props table, in a
 
 ## The container's pages, and the units of App — 🔮
 
-The pages of `DSContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
+The pages of `DSPanelContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
 App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app for each job of a layout under its Usage, one tab each: an admin app in Rail, a profile in Dock, a website in Top nav and a sign-in on Canvas, with the theme's form in a sheet, and the sample app takes the theme the form applies (`RD.SUPPORT.SURFACE.207`). The pages of `DSLayout` draw the same samples, and the admin app holds one working page for each of the fourteen page patterns. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
 
@@ -323,7 +324,7 @@ App is three units, and none has a page beyond its Overview, its main page and i
 | a pill of the opening | `DSBadge` |
 | the first line, a label, a title, a muted line and a summary | `DSText` |
 | a bar between two parts of a line | `DSSeparator` |
-| a section | `DSContainer` |
+| a section | `DSPanelContainer` |
 | the row of tabs of a card | `DSTabs` |
 | the props table, and the table of a config object's fields | `DSTable` |
 | the code of an example | `DSCodeBlockView` |

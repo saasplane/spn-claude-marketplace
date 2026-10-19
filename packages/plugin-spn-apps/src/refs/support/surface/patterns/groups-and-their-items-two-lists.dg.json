@@ -40,7 +40,7 @@
       "items": [
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -91,7 +91,7 @@
        },
        {
         "frame": {
-         "unit": "DSContainer",
+         "unit": "DSPanelContainer",
          "rows": [
           {
            "items": [
@@ -182,7 +182,7 @@
      {
       "items": [
        {
-        "unit": "DSContainer",
+        "unit": "DSPanelContainer",
         "rows": [
          {
           "items": [
@@ -272,7 +272,7 @@
      {
       "items": [
        {
-        "unit": "DSContainer",
+        "unit": "DSPanelContainer",
         "rows": [
          {
           "items": [

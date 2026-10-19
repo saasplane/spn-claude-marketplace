@@ -173,7 +173,7 @@ export type SkeletonFrame = {
  *  the unit of the design system it is, whose name stands at its corner. A section with a title and no unit is a group,
  *  the level `GROUP` of the design system: a dotted boundary round it, *Group* at its corner.
  *
- *  `part: true` makes the section a content part of a container (`DSContainer.Content`) and not a group: it takes no
+ *  `part: true` makes the section a content part of a container (`DSPanelContainer.Content`) and not a group: it takes no
  *  dotted boundary and no corner word, only its title with its actions, and a line across the container's box above it
  *  where it is not the first part. Its own `sections` are the groups that stand inside it, each with its dotted boundary.
  *  A container's content is parts separated by lines, or groups, or both: parts by lines, groups inside a part. */
@@ -1710,7 +1710,7 @@ const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next"
 
 /**
  * THE UNITS A SPEC MAY NAME: every unit the design system's barrel exports (`spn-support-ts`
- * `packages/support-web-ds-ts/src/index.ts` @ `f3f9e6fd`), leaving out its contexts and its observers, which
+ * `packages/support-web-ds-ts/src/index.ts` @ `596fd115`), leaving out its contexts and its observers, which
  * are no unit a page is drawn from. A `unit` that is not here is a finding, since a sketch names the real unit.
  */
 const SKEL_UNITS = new Set([
@@ -1718,21 +1718,22 @@ const SKEL_UNITS = new Set([
   "DSApp", "DSAspectRatio", "DSAttachment", "DSAttachmentMulti", "DSAuthz", "DSAutocomplete", "DSAutocompleteMulti", "DSAvatar",
   "DSAvatarGroup", "DSBackdrop", "DSBadge", "DSBreadcrumb", "DSButton", "DSButtonGroup", "DSCalendar", "DSCard", "DSCardWidget",
   "DSCarousel", "DSCheckbox", "DSCheckboxGroup", "DSCodeBlockView", "DSCollapsible", "DSColorPicker", "DSColorView", "DSCommand",
-  "DSCommandPalette", "DSComparisonWidget", "DSConfirmDialog", "DSConfirmPopover", "DSContainer", "DSContextMenu",
-  "DSDataFieldBuilder", "DSDataFieldForm", "DSDataFieldView", "DSDataTableContainer", "DSDataTableWidget", "DSDataUnit",
-  "DSDataUnitGroup", "DSDatePicker", "DSDateRangePicker", "DSDateTimePicker", "DSDialog", "DSDrawer", "DSDropdownMenu", "DSEmpty",
-  "DSEntryOverlay", "DSFilterBarWidget", "DSForm", "DSFormatCurrency", "DSFormatDate", "DSFormatDateTime", "DSFormatNumber",
-  "DSFormatTime", "DSHScroll", "DSHoverCard", "DSIcon", "DSImage", "DSImagePicker", "DSInput", "DSInputNumber", "DSInputOTP",
-  "DSInputPhone", "DSItem", "DSItemCard", "DSItemFacts", "DSJSONControl", "DSJSONView", "DSKbd", "DSLabel", "DSLayout", "DSLink",
-  "DSList", "DSListDetailWidget", "DSMark", "DSMenubar", "DSNavBarSide", "DSNavBarTop", "DSNavEntry", "DSNavList", "DSNavMenu",
-  "DSOverlayContainer", "DSPageLevel", "DSPagination", "DSPopover", "DSPortal", "DSProgress", "DSProgressCircle", "DSRadio",
-  "DSRadioGroup", "DSScrollArea", "DSSelect", "DSSelectMulti", "DSSeparator", "DSSheet", "DSSkeleton", "DSSlider", "DSSliderRange",
-  "DSSpinner", "DSStatusActiveView", "DSSticky", "DSSurface", "DSSwitch", "DSTable", "DSTabs", "DSTagGroup", "DSText", "DSTextarea",
+  "DSCommandPalette", "DSComparison", "DSConfirmDialog", "DSConfirmPopover", "DSContextMenu", "DSDataFieldBuilder",
+  "DSDataFieldForm", "DSDataFieldView", "DSDataTable", "DSDataTableContainer", "DSDataUnit", "DSDataUnitGroup", "DSDatePicker",
+  "DSDateRangePicker", "DSDateTimePicker", "DSDialog", "DSDrawer", "DSDropdownMenu", "DSEmpty", "DSEntryOverlay", "DSFilterBar",
+  "DSForm", "DSFormatCurrency", "DSFormatDate", "DSFormatDateTime", "DSFormatNumber", "DSFormatTime", "DSHScroll", "DSHoverCard",
+  "DSIcon", "DSImage", "DSImagePicker", "DSInput", "DSInputNumber", "DSInputOTP", "DSInputPhone", "DSItem", "DSItemCard",
+  "DSItemFacts", "DSJSONControl", "DSJSONView", "DSKbd", "DSLabel", "DSLayout", "DSLink", "DSList", "DSListDetail", "DSMark",
+  "DSMenubar", "DSNavBarSide", "DSNavBarTop", "DSNavEntry", "DSNavList", "DSNavMenu", "DSOverlayContainer", "DSPageLevel",
+  "DSPagination", "DSPanelContainer", "DSPopover", "DSPortal", "DSProgress", "DSProgressCircle", "DSRadio", "DSRadioGroup",
+  "DSScrollArea", "DSSelect", "DSSelectMulti", "DSSeparator", "DSSheet", "DSSkeleton", "DSSlider", "DSSliderRange", "DSSpinner",
+  "DSStatusActiveView", "DSSticky", "DSSurface", "DSSwitch", "DSTable", "DSTabs", "DSTagGroup", "DSText", "DSTextarea",
   "DSThemeForm", "DSTimePicker", "DSToast", "DSToggle", "DSToggleGroup", "DSToggleGroupMulti", "DSToolbar", "DSTooltip",
 ]);
 type SkelLevel = "container" | "widget" | "card" | "component";
-/** THE LEVEL IS READ FROM THE UNIT'S NAME (RD.SUPPORT.SURFACE.098): a widget's ends in `Widget`, a container's in
- *  `Container`, and a component's takes no such word. A card stands at the level of a widget, and is told by its name. */
+/** THE LEVEL IS READ FROM THE UNIT'S SUFFIX (RD.SUPPORT.SURFACE.229): a suffix names where a unit is placed, so `Container` is
+ *  around a part of a page and `Widget` beside others, and a component, a composite included (`DSDataTable`, `DSFilterBar`),
+ *  takes no suffix. A card stands at the level of a widget, and is told by its name. */
 // `DSCardWidget` IS A CARD, the widget a page sets in a container or on the page, so it is drawn as one: its outline,
 // its name and its title.
 const skelLevel = (unit: string): SkelLevel =>
@@ -2516,7 +2517,7 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   // A CONTAINER ON A SURFACE IS ONE BOX THAT HOLDS ITS HEADER (RD.DEVEX.WORKSPACE.268): the thin rounded outline, its
   // unit's name at the corner, its header as a band under the name, the title and the line under it at the start and
   // its actions at the end, then under a line its content and, under another, its footer. The header is the container's
-  // own part, `DSContainer.Header`, so it is drawn inside the box and never as a heading standing over it.
+  // own part, `DSPanelContainer.Header`, so it is drawn inside the box and never as a heading standing over it.
   const surface = frame.look === "container" && !root;
   if (frame.look === "container" && frame.marked)
     findings.push("`marked` is for a row with no border; a container's header stands inside its outline, so a container takes no `marked`");
@@ -2751,7 +2752,7 @@ function skelUnits(frame: SkeletonFrame | undefined, findings: string[], inFrame
   if (!frame || typeof frame !== "object") return;
   const known = (unit: unknown) => {
     if (typeof unit === "string" && SKEL_UNITS.has(unit)) return;
-    const said = `\`${String(unit)}\` is no unit of the design system: a \`unit\` is a name its barrel exports, such as \`DSContainer\`, \`DSFilterBarWidget\`, \`DSCard\` or \`DSForm\``;
+    const said = `\`${String(unit)}\` is no unit of the design system: a \`unit\` is a name its barrel exports, such as \`DSPanelContainer\`, \`DSFilterBar\`, \`DSCard\` or \`DSForm\``;
     if (!findings.includes(said)) findings.push(said);
   };
   if (frame.unit !== undefined) {
