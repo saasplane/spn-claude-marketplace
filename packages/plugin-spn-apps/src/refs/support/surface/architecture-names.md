@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "c8933ab9"
+      "seen": "9a2c7a36"
     }
   ]
 }
@@ -95,6 +95,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 - **A prop whose values are a vocabulary is stated with its values.** A long code list may be stated by the vocabulary's name and the place its values are stated, as the icons are. The first table below holds the vocabularies of the design system, and the second holds the shared ones.
 - **The design library carries such a prop under the same name and the same values, and every stack takes it under the same name and the same values.** This is the rule that a name is the contract, applied to the values of a prop.
 - **A vocabulary is either the design system's own or a shared one of the platform.** The design system's own is `DS<Component><Word>Type`, and it drops the component where several blocks take it, as `DSOrientationType` does. A shared one is `SP…Type`. It is realized once, in the Support contract, so that a service and a surface use the same values, and a design system never defines a shared one again.
+- **An alignment takes the core's vocabulary of its axis, on any unit** (`RD.SUPPORT.SURFACE.249`). There is one for each axis: `DSHorizontalAlignType`, `START` · `CENTER` · `END` in the reading direction, and `DSVerticalAlignType`, `TOP` · `CENTER` · `BOTTOM`. They are the design system's own and drop the component, as `DSOrientationType` does, because any unit takes them. The prop keeps the unit's word, such as `mediaAlign`, `endAlign`, `verticalAlignment` or `textAlign`, and no unit defines an alignment vocabulary of its own (`architecture-core.md`).
 - **A unit or a prop of the design library follows one order: the construct in the book, then the library in Figma as its visual proof, then each stack, then the showcase.** Each step follows the one before it. A component that belongs to one app does not follow this order.
 - **The order binds a core unit and its props, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RD.SUPPORT.SURFACE.082`). The foundation does not drive such a unit, as `architecture-components.md` states. The stack builds it and states it in its own docs, and the showcase shows it marked as the stack's own. A stack's own unit that is to join the core units takes the order from its first step.
 
@@ -113,18 +114,22 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSNavBarSide` | `placement` (where the bar stands: at the edge of the screen, where it folds to icons, or inline in the page as a column) | `EDGE` · `INLINE`, `EDGE` when unset | `DSNavBarSidePlacementType` |
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
-| `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL`, `MD` when unset | `DSOverlayExtentType` |
-| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL` · `FIT`, `MD` when unset | `DSOverlayExtentType` |
+| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` · `DSSectionContainer` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
 | `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
 | `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |
 | `DSItem`, on a fact whose `mtype` is `TEXT` | `color` (the hue of the words of the fact; unset, the muted tone) | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
-| `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `MEDIA_INLINE` · `CENTER` · `BACKDROP`. Unset, the default of the level | `DSFeatureType` |
-| `DSFeature` | `itemsType` (how the points are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
-| `DSFeature` | `itemsNumbered` (whether the numbers 1 to n stand before the titles of the points) | yes or no, no by default | none |
-| `DSFeature` | `itemsOrientation` (how every point stands; a point sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
+| `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `BACKDROP`. Unset, the default of the level | `DSFeatureType` |
+| `DSFeature` | `textAlign` (how the text part lines up inside the place its type gives it: the words, the actions and a small picture, in the reading direction) | `START` · `CENTER` · `END`, `START` when unset | `DSHorizontalAlignType` |
+| `DSFeature` | `actionsPlacement` (where the actions stand against the items: after them, closing the feature, or before them, under the words) | `BEFORE_ITEMS` · `AFTER_ITEMS`, `AFTER_ITEMS` when unset | `DSFeatureActionsPlacementType` |
+| `DSFeature` | `itemsType` (how the items are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
+| `DSFeature` | `itemsNumbered` (whether the numbers 1 to n stand before the titles of the items) | yes or no, no by default | none |
+| `DSFeature` | `itemsOrientation` (how every item stands; an item sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
 | `DSFeature` | `frames` · `unframed` (the parts the frame holds, and the parts it leaves out) | a list of `TEXT` · `MEDIA`. Unset, the theme's `feature` | `DSFeaturePartType` |
-| `DSFeature` | `mediaNode` · `contentNode` (art drawn as given, and a part of the page's own in the place of the points; `media` is data, as on `DSItem`) | a node | none |
-| `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSItemMediaAlignType` |
+| `DSFeature` | `mediaNode` · `contentNode` (art drawn as given, and a part of the page's own in the place of the items; `media` is data, as on `DSItem`) | a node | none |
+| `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSVerticalAlignType` |
+| `DSItem` | `endAlign` (where the end node stands against the text: at the title's first line, in the middle of the text, or at the last line of the text) | `TOP` · `CENTER` · `BOTTOM`. Unset, a line keeps its end node centred and a vertical item keeps it at the top end | `DSVerticalAlignType` |
+| A cell of `DSTable`, head or data | `verticalAlignment` (where the content of a cell sits when the row is taller than the content) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSVerticalAlignType` |
 | `DSFormatDateTime` · `DSFormatDate` | `type` (the form the date is written in: the date as it is, or how long ago in words) | `DEFAULT` · `AGO`, `DEFAULT` when unset | `DSFormatDateType` |
 | `DSItem` | `mtype`, on the picture given to `media` (the kind of picture: a bare icon, a mark, an avatar, a group of avatars, or a block of the page's own) | `ICON` · `MARK` · `AVATAR` · `AVATAR_GROUP` · `CUSTOM` | `DSItemMediaType` |
 | `DSItem` | `mtype`, on a fact of `facts` (the form the fact is given in) | `TEXT` · `BADGE` · `CUSTOM` | `DSItemFactType` |
@@ -161,7 +166,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs`, `DSFeature` and `DSSectionContainer` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -221,8 +226,8 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 | `DSCardWidget` | the shape every part shares, and the shape of each kind of part | `IDSCardWidgetPartBase`, with `IDSCardWidgetPartItems`, `IDSCardWidgetPartList` and `IDSCardWidgetPartFree` |
 | `DSCardWidget` | an item of an `ITEMS` part, and a row of a `LIST` part | `IDSCardWidgetItem` and `IDSCardWidgetRow` |
 | `DSFeature` | its props | `IDSFeatureProps` |
-| `DSFeature` | the vocabulary of its forms, of the ways it draws its points, and of the parts its frame holds | `DSFeatureType`, `DSFeatureItemsType` and `DSFeaturePartType` |
-| `DSFeature` | an action, and a point | `IDSFeatureAction` and `IDSFeatureItem` |
+| `DSFeature` | the vocabulary of its forms, of the ways it draws its items, of where its actions stand, and of the parts its frame holds | `DSFeatureType`, `DSFeatureItemsType`, `DSFeatureActionsPlacementType` and `DSFeaturePartType` |
+| `DSFeature` | an action, and an item | `IDSFeatureAction` and `IDSFeatureItem` |
 | `DSFeature` | the theme's look for it | `IDSThemeFeature`, held in `theme.feature` |
 
 `DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
@@ -254,6 +259,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |
 | `RD.SUPPORT.SURFACE.041` | the design library carries such a prop, and every stack takes it, under the same name and the same values |
 | `RD.SUPPORT.SURFACE.042` | a vocabulary is the design system's own or a shared one of the platform, and a shared one is realized once in the Support contract |
+| `RD.SUPPORT.SURFACE.249` | an alignment takes `DSHorizontalAlignType` or `DSVerticalAlignType` on any unit, and no unit defines an alignment vocabulary of its own |
 | `RD.SUPPORT.SURFACE.043` | a unit or a prop of the design library follows the order construct, Figma, stack, showcase |
 | `RD.SUPPORT.SURFACE.082` | that order binds the core units, and not a unit that a stack provides on its own |
 | `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |

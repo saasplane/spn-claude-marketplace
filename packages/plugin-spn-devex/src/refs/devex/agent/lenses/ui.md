@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "ec7f77c5"
+      "seen": "aaa8b8c1"
     }
   ],
   "decisions": [
@@ -107,11 +107,13 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **In a list the row carries the link, the chosen fill and the reaction to the pointer**, and the item line inside it carries none (`RD.SUPPORT.SURFACE.097`).
   - **Every level has its title, larger than the titles under it**: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE` at 22, 18, 16, 14, 13 and 12px, the heading element following the level. A size, type step, heading element or picture size the page wrote on an item line is a finding (`RD.SUPPORT.SURFACE.094`, `.106`, `.107`, `.112`, `.113`, `.178`).
   - **A title starts where what stands under it starts**: the part holding an item line gives it no side padding, and an item line draws none of its own (`RD.SUPPORT.SURFACE.109`, `.114`).
-  - **Every overlay that covers a page dims it with one scrim, `surface-overlay`**, drawn by `DSBackdrop`; a dialog, a sheet and a drawer take the page's surface, a popover, menu and tooltip the raised one; a sheet that is not modal and a popover draw no scrim (`RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`, `.163`).
+  - **Every overlay that covers a page dims it with one scrim, `surface-overlay`**, drawn by `DSBackdrop`; a dialog, a sheet and a drawer take the page's surface, a popover, menu and tooltip the raised one; a sheet that is not modal and a popover draw no scrim; and each of the three is one surface, the panel drawing the fill, corners, line and shadow and the card inside it none (`RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`, `.163`, `.250`).
   - **The surface answers with the design system's own blocks.** A loading or failure picture the page drew itself is a finding, and so is anything only hover reaches.
   - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` the hue, `size` the density step `XS` to `XL` with `SM` the default; `CUSTOM` is the one named way a page owns a colour (names § The three shared names).
   - **A prop that takes a vocabulary carries the book's name and the book's values** (`RD.SUPPORT.SURFACE.041`).
   - **A suffix names where a unit is placed**: `App`, `Layout`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RD.SUPPORT.SURFACE.229`).
+  - **A pitch is a `DSFeature` sized by its level alone, and a band of a website is a `DSSectionContainer`.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a band; the feature gives its items the level that follows its own and sizes its small picture by its title and lines (`RD.SUPPORT.SURFACE.233`, `.235`, `.243`, `.247`, `.253`).
+  - **An alignment takes the core's vocabulary of its axis**, `DSHorizontalAlignType` or `DSVerticalAlignType`; a vocabulary of a unit's own for one is a finding (`RD.SUPPORT.SURFACE.249`).
   - **An icon beside a title or running text takes the scale size of that text's step, on one centre line**; `size` is density and `scaleSize` is how large an icon, mark or avatar is drawn (`RD.SUPPORT.SURFACE.008`, `.100`).
   - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark; a control the page built owes all of it on its own (accessibility § The baseline).
   - **One page holds at each density, theme, device type, language and direction.** A second version of a page, or a block restyled for dark, is a finding.

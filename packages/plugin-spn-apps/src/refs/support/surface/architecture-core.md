@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "4e2323a6"
+      "seen": "177efde4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "ae74bbd8"
+      "seen": "37c3a943"
     }
   ]
 }
@@ -28,6 +28,8 @@ Read this before you ask what a block may read, or before you add a role, a step
 | Ramp | the raw palette a role points at. A block never reads a ramp step directly |
 | Scale | the token group that holds the height, the padding, the gap between blocks, the gap between the parts of a control, the radius and the icon size of each size step |
 | Scale size | `DSScaleSizeType` — a step that says how large a thing that is shown is drawn. Each unit that takes it holds its own pixels for the step |
+| Horizontal align | `DSHorizontalAlignType` — where a part stands on the horizontal axis: `START` · `CENTER` · `END`, in the reading direction |
+| Vertical align | `DSVerticalAlignType` — where a part stands on the vertical axis of its box: `TOP` · `CENTER` · `BOTTOM` |
 | Type step | one size, one weight and one line height of the type scale |
 | Icon | one of the named pictures a block may draw in place of its label, from a closed set |
 
@@ -45,12 +47,12 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group. `fg-quiet`, neutral 600 in light and neutral 300 in dark, is a title that stands a step back: the title of a group. `fg-muted` is the facts of an item and other secondary words. `fg-subtle` is for a placeholder, a disabled state, and a mark between two texts such as a dot. **Border** is the line a block draws, chosen by what it parts: `surface-divider` between rows, `surface-border` at the edge of a card, a container, a popover and the shell, and `surface-border-strong` at the edge of a control. The shell's look holds no colour of its own and points at these roles. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block, and the quiet and subtle tints and the line of the lighter variants. The brand has two roles: `primary` is the brand as a fill, and `primary-fg` the brand as text and as a line, a link, `PRIMARY` text, a selected tab and a chosen card's ring. In light the two are the seed; dark parts them. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one overlay role, `surface-overlay`, black at 40% in light and 60% in dark, and `DSBackdrop` draws it. Two scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body through a quiet and a muted tone down to a subtle or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. `fg` is the body text and every title but the title of a group with no description under it. `fg-quiet`, neutral 600 in light and oklch 0.76 in dark, between neutral 300 and 400, is a title that stands a step back: the title of a group with no description under it. `fg-muted`, neutral 500 in light and oklch 0.66 in dark, under neutral 400, is the facts of an item and other secondary words. `fg-subtle` is for a placeholder, a disabled state, and a mark between two texts such as a dot. **Border** is the line a block draws, chosen by what it parts: `surface-divider` between rows, `surface-border` at the edge of a card, a container, a popover and the shell, and `surface-border-strong` at the edge of a control. The shell's look holds no colour of its own and points at these roles. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block, and the quiet and subtle tints and the line of the lighter variants. The brand has two roles: `primary` is the brand as a fill, and `primary-fg` the brand as text and as a line, a link, `PRIMARY` text, a selected tab and a chosen card's ring. In light the two are the seed; dark parts them. Every overlay that covers a page — a dialog, a confirm dialog, a drawer or a sheet — dims it with one overlay role, `surface-overlay`, black at 40% in light and 60% in dark, and `DSBackdrop` draws it. Two scrims serve a block alone: `scrim/fade`, black at 60%, and `scrim/media`, black at 80%. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
 The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163`, `166` and `203`).
 
 - **The greys MUST take their hue and chroma from the theme's temperature, and their lightness from the design system** (`RD.SUPPORT.SURFACE.203`). `neutralTemperature` is `COOL`, `NEUTRAL` or `WARM`, written by `applyTheme` as `--neutral-hue` and `--neutral-chroma`. `NEUTRAL`, the default, is no chroma, so every grey stays as it was. `WARM` takes hue 85 and `COOL` hue 250, at a chroma of 0.005 at the dark end and a share of it toward white, which stays white. Every grey of dark takes the same two tokens. The temperature is a choice of three and never a hue or a chroma as a value.
-- **In dark the body text MUST be an off-white, neutral 200, one step down from near-white**, with the quiet, muted and subtle tones in their order under it (`RD.SUPPORT.SURFACE.203`): 13.67 to 1 on the page and 12.17 on a raised surface.
+- **In dark the body text MUST be neutral 100, and the quiet, the muted and the subtle tones MUST stand apart under it as far as light's do** (`RD.SUPPORT.SURFACE.203`). `fg` is neutral 100: 15.87 to 1 on the page and 14.03 on a raised surface. The quiet tone is oklch 0.76 and keeps over 7 to 1 (8.06 on the page, 7.13 on a raised surface); the muted tone is oklch 0.66 and keeps over 4.5 to 1 (5.56 on the page, 4.92 on a raised surface); the subtle tone stays neutral 500. The ratios hold at every temperature.
 - **In dark the brand as a fill MUST keep the brand's strength, and the brand as text or a line MUST take its light step** (`RD.SUPPORT.SURFACE.203`). `primary` in dark is the seed's hue and chroma at 54% lightness, 49% under the pointer, with white text on it (5.07 to 1 for the default seed): a `SOLID` button, the on track of a switch (60% under the pointer, the white knob 3.94 to 1 off it), a checked box, a progress or slider fill, a chosen entry. `primary-fg` is step 400, 300 under the pointer, and the focus ring stays step 400. On a fill, `--primary-fg` follows `--surface-entry-fg`: white on `PRIMARY` `SOLID`, step 400 on `DEFAULT` `SOLID` in light and on every fill in dark.
 
 - **In dark, a surface MUST be a dark grey, and never black.** The sunken surface and the side bar stand a shade under the page, and the page, a raised surface and the fills under the pointer each stand a step lighter than the one before: 20%, 22%, 26.5% and 29% lightness, and 34% for the strong fill under the pointer. Light changes only by the two new roles. So a person tells them apart by their fill.
@@ -68,7 +70,7 @@ The neutral shades keep these rules (`RD.SUPPORT.SURFACE.141`, `163`, `166` and 
 - **A fill that is already tinted MUST still answer the pointer.** It takes `surface-soft-hover`, one step past the fill under the pointer. `SUBTLE` of the default hue and the chosen entry of the side bar take it. The fill of `SUBTLE` in the default hue is the text colour mixed into transparency.
 - **A ghost or an outline control of the default hue MUST draw `surface-hover` under the pointer when it has words, and `surface-soft-hover` when it is icon only** (`RD.SUPPORT.SURFACE.145`). The strong step is one past the fill a row, a menu entry and a navigation entry draw under the pointer, so an icon at the end of a row still shows the pointer on a filled row. The arrow of an item line and a mark read the strong step. The other hues keep their own step.
 - **Small text that a person reads MUST take the muted tone at least, and the subtle tone is only for a placeholder or a disabled state** (`RD.SUPPORT.SURFACE.166`). The subtle tone does not reach 4.5 to 1 against a surface.
-- **A title that stands a step back MUST take the quiet tone, and the description of an item MUST take it at every level but `INLINE`; facts stay muted** (`RD.SUPPORT.SURFACE.143`, `166`). `DSTextToneType` names it `QUIET`.
+- **A title that stands a step back MUST take the quiet tone, and the description of an item MUST take it at every level but `INLINE`; facts stay muted** (`RD.SUPPORT.SURFACE.143`, `166`). The quiet tone stands between the body and the muted tone. The title that stands a step back is the title of a group with no description under it. `DSTextToneType` names the tone `QUIET`.
 - **The shades of the variants MUST be these** (`RD.SUPPORT.SURFACE.154`). Every tint is a wash of the hue's step 500 into transparency, at a share for each hue and a larger one under the pointer (`RD.SUPPORT.SURFACE.183`): `SUBTLE` and `SUBTLE_OUTLINE` at the least share that stands `0.04` of lightness from the page, a card and a dialog, and `QUIET` at the share that keeps its designed step from the page. `SUBTLE` of the default hue is the text colour mixed into transparency, `6` percent and `11` under the pointer. The text on a tint reads at 4.5 to 1 on it, step 900 on a tint of primary. The line of `OUTLINE` and `SUBTLE_OUTLINE` is step 300, and `surface-border-strong` for the default hue. In dark the light tint of every hue is its step 500 at 18 percent, 24 under the pointer, with the hue's step 400 for the text on it, step 300 for primary (`RD.SUPPORT.SURFACE.188`), the quiet tint keeps its own share and its text step 200, and the line is step 700, and `surface-border-strong` for the default hue. A tint inverts between modes.
 - **A chosen row of a list and the row in view of a table draw the subtle tint of primary. A pressed toggle draws `QUIET` of its hue.**
 - **Muted words on a hovered or a chosen row MUST step to the quiet tone** (`RD.SUPPORT.SURFACE.166`), because the muted tone falls to 3.76 to 1 there.
@@ -131,18 +133,29 @@ A pitch is sized by the level of the page it stands at, and the sizes must not b
 | `--level-<level>-actions-gap` | the room before the actions |
 | `--level-<level>-media-gap` | the room between the words and the media |
 | `--level-<level>-inset` | the inset of a feature that has a frame |
-| `--level-<level>-box` | the side of the square a small picture stands in |
 
-| Level | Display step | On a desktop | On a phone | Gap between the words | Before the actions | Words to media | Inset | Box of a small picture |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `PAGE` | `HEADING_XXL4` | 72px | 48px | 24px | 40px | 64px | 64px | 56px |
-| `CONTAINER` | `HEADING_XL` | 40px | 32px | 16px | 32px | 48px | 48px | 48px |
-| `WIDGET` | `HEADING_SM` | 22px | 22px | 12px | 24px | 24px | 32px | 44px |
-| `GROUP` | `HEADING_XS` | 18px | 18px | 8px | 16px | 16px | 24px | 40px |
+| Level | Display step | On a desktop | On a phone | Gap between the words | Before the actions | Words to media | Inset |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `PAGE` | `HEADING_XXL3` | 64px | 44px | 24px | 40px | 64px | 64px |
+| `CONTAINER` | `HEADING_XL` | 40px | 32px | 16px | 32px | 48px | 48px |
+| `WIDGET` | `HEADING_SM` | 22px | 22px | 12px | 24px | 24px | 32px |
+| `GROUP` | `HEADING_XS` | 18px | 18px | 8px | 16px | 16px | 24px |
 
 - **A unit MUST read the title through the type step.** `--level-<level>-title` names the type step's own size token, which carries its phone value, so the phone size follows with nothing written. A unit that sizes its title by a level token never asks what the device is.
+- **The side of a small picture MUST NOT be a level token** (`RD.SUPPORT.SURFACE.253`). It follows the title of the feature and the lines the feature has, so it is read from the scale sizes of the item line (`architecture-components.md`), and a level holds no `-box` token.
 - **A page MUST NOT write a level token.** A level is a position, and a theme that wants another rhythm changes the token once.
-- **The words of a feature's points MUST be 14px or larger, with no exception** (`RD.SUPPORT.SURFACE.239`).
+- **The words of a feature's items MUST be 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature** (`RD.SUPPORT.SURFACE.239`). A `PAGE` or a `CONTAINER` feature draws its items at `WIDGET`, a title of 16px over a description of 14px, and a `WIDGET` feature draws them at `GROUP`, 14px over 14px, so the 14px floor of a website holds for every item line from `GROUP` up. Under a `GROUP` or a `CONTENT` feature the items are at `CONTENT`, 13px over 13px, and under an `INLINE` feature at `INLINE`, 12px over 12px: the one waiver, since items there are seldom used.
+
+## Alignment
+
+Where a part stands inside the box that holds it is an alignment, and the core has one vocabulary for each axis. Any unit that lines a part up takes them, so a page learns one word for each axis: the picture and the end node of `DSItem`, the content of a cell of `DSTable`, and the text of `DSFeature` take them today.
+
+| Vocabulary | Values | Reads |
+| --- | --- | --- |
+| `DSHorizontalAlignType` | `START` · `CENTER` · `END` | in the reading direction: `START` is the left, and the right on a right-to-left page |
+| `DSVerticalAlignType` | `TOP` · `CENTER` · `BOTTOM` | on the vertical axis of the box that holds the part |
+
+- **A unit that aligns a part MUST take `DSHorizontalAlignType` or `DSVerticalAlignType`, and MUST NOT define an alignment vocabulary of its own** (`RD.SUPPORT.SURFACE.249`). The prop keeps the unit's own word, such as `mediaAlign`, `endAlign`, `verticalAlignment` or `textAlign`, and only the vocabulary is shared. The middle of either axis is `CENTER`. Which edge a panel pins to is a placement, not an alignment, so `DSPlacementHorizontalType` stays.
 
 ## Boundary
 
@@ -158,7 +171,9 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content runs to `CONTENT_XXL5` |
 | `RD.SUPPORT.SURFACE.227` | a website's words are 14px or larger, and only data and code shown inside a demo may be smaller |
 | `RD.SUPPORT.SURFACE.238` | each level from `PAGE` to `GROUP` holds one set of level tokens, and a unit reads a title through the type step so the phone size follows |
-| `RD.SUPPORT.SURFACE.239` | the words of a feature's points are 14px or larger, with no exception |
+| `RD.SUPPORT.SURFACE.239` | the words of a feature's items are 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature, and a smaller feature's items are the one waiver |
+| `RD.SUPPORT.SURFACE.249` | a unit that aligns a part takes `DSHorizontalAlignType` or `DSVerticalAlignType` and defines no alignment vocabulary of its own |
+| `RD.SUPPORT.SURFACE.253` | the side of a feature's small picture follows its title and its lines, so a level holds no box token |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
 | `RD.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |

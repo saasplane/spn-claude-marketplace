@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "c8933ab9"
+      "seen": "9a2c7a36"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
-      "seen": "10fc18ee"
+      "seen": "44257497"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
@@ -60,7 +60,7 @@ The design library holds one file for each layer of the design system that is dr
 | --- | --- |
 | The page | one top frame, named as the page. It holds the theme: light or dark, and the look of the containers |
 | A block | an instance of the library component of the same name |
-| A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement or a format is never drawn under a name or a switch of the designer's own |
+| A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement, an alignment or a format is never drawn under a name or a switch of the designer's own. An alignment is `DSHorizontalAlignType` (`START`, `CENTER`, `END`) or `DSVerticalAlignType` (`TOP`, `CENTER`, `BOTTOM`) on every unit that takes one (`RD.SUPPORT.SURFACE.249`) |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
@@ -89,6 +89,7 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the page, a band at its end as the top bar is at its start. It runs the window's width, and beside a rail the area's, and what it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content.
 - **Draw the layout as its three parts.** The top frame's fill is the body's, and below `FULL` the body's box is the width, centred, with the body showing on both sides. An attached navigation meets the window's edge: a rail the left, the window's height, and a top bar the top, its fill across the window and its items in the box. An attached content is the box itself, from the navigation, or the window's top, to the bottom, with square corners; beside a rail it is centred in the area beside the rail. A part that is not attached is a rounded container in the box, `--layout-space` from the window and from the part beside it. A raised content beside a navigation that is not raised stands above it, so its shadow falls on the navigation; where both are raised, the navigation stands above. On a phone every part attaches, and the layout draws its bar: the menu at its start, or the way back where a dock has `backTo`, then the nodes `phone` puts in the bar, and the account's avatar at its end.
 - **Draw a card at the level of a widget.** A `DSCard`, a `DSItemCard` or a card of `DSCardWidget` stands in a container's content or on the page. Its title is at `WIDGET`, a part of it at `GROUP`, and its item lines at `CONTENT`.
+- **Draw a band of a website as `DSSectionContainer`, not as a container.** A band is a full-width part of a page with a fill, the room above and below that its `pageLevel` gives (48px at `CONTAINER`, 64px at `PAGE`) and the page's width, and it frames nothing: no header, no footer, no frame (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`). Features stand in it side by side through `columns`, from one to three, and `divided`, with the `WIDGET` inset on each side of the line (`RD.SUPPORT.SURFACE.244`). The book states it before the library draws it, so a band the library lacks is handled as *When the library does not hold a block* says. A part with a title and actions stays a `DSPanelContainer`.
 - **Draw the parts of a card inside its one frame.** A part of a card pads itself, and `flush` on a part drops that padding. A card hands its size to what it holds, and a `flush` part of a card says so to the blocks in it. A `flush` part of a container around a card does not reach into it. An item line draws no padding or highlight of its own: the part that holds a title gives it no padding at its two sides, and in a `flush` part the inset of its place, and a row of a list gives the line it holds its room and its highlight. The book states these before the library draws them. `divided` is the line between each two parts.
 - **A header above the outline is a look, and the theme holds it.** It is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out. The page patterns are drawn in that form. Set it as a mode on the top frame, and on one container only where the tree sets `frames` on that container.
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.

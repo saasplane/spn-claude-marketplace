@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "ec7f77c5"
+      "seen": "aaa8b8c1"
     }
   ],
   "decisions": [
@@ -102,7 +102,8 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A part that holds many of one thing is shown by what its own data asks for.** A query taking a page, a text or a filter is a data table, even while small; a search run in the page over loaded records is a finding, and so is a page depending on a count the server does not give (`RD.SUPPORT.SURFACE.049`, `.050`, `.054`, `.070`).
   - **A label, a frame, a state and the end of a line each follow their rule of content**: no label on a value a person can tell without it; a frame only round a part with a title of its own; a state as a badge on the line of facts; the end of a line holds data or the arrow, never an action (`RD.SUPPORT.SURFACE.056`–`.059`, `.087`, `.178`).
   - **A field, a set of choices and a list each keep their layout**: an entered field has its title above and one line under; every control a person sets is a form field; readings stand in a grid; choices stand in columns; a line between each two lines of a list (`RD.SUPPORT.SURFACE.060`–`.063`, `.096`).
-  - **The data table is in the layout its data asks for**: `TABLE` to compare facts, `LIST` for a record read by its name, `GRID` for a thing of its own, `LIST` on a phone; a record's actions at the end of its row; a value changed in its cell; the filter bar in its one form, one button on a phone (`RD.SUPPORT.SURFACE.068`–`.073`, `.097`).
+  - **The data table is in the layout its data asks for**: `TABLE` to compare facts, `LIST` for a record read by its name, `GRID` for a thing of its own, `LIST` on a phone; a record's actions at the end of its row; a value changed in its cell; the filter bar in its one form, one button on a phone whose drawer fits its fields (`RD.SUPPORT.SURFACE.068`–`.073`, `.097`, `.246`).
+  - **A pitch is one `DSFeature` and a band of a website is a `DSSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a band painted by hand, is a finding (`RD.SUPPORT.SURFACE.233`, `.243`).
   - **A container holds its title and actions in its header, and what closes its work in its footer.** Over the page the closing actions stand at the end of the footer, leaving first and the main action last; on a page of its own at the start, main action first. A small entry is a dialog, a medium one a side sheet, a large form a page of one container (`RD.SUPPORT.SURFACE.074`–`.078`, `.095`).
   - **A sign-in is one compact container on a canvas**: providers as one centred row of icons, every control a form field, alternatives as equals under a separator (`RD.SUPPORT.SURFACE.205`).
   - **One container for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RD.SUPPORT.SURFACE.115`–`.117`).
