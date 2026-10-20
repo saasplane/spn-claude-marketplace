@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "a51fc7b5"
+      "seen": "6c53f3a5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -83,6 +83,13 @@ judgment gate*).
 The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
 🤖 who the agent is, 🧭 the eight stages by their names, and 👥 every lens by its role name. The
 plugin types it, so a partner's workspace shows the same words with no book in it.
+
+**The instruction to say it comes before the welcome itself.** A long session-start text reaches the
+agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole
+welcome, word for word, stands above the welcome, where that first part always holds it.
+
+**A missed welcome is never printed a second time.** A later reply that prints it again shows a short
+welcome and then a long one. Say once, in one line, that the first reply missed it, and go on.
 
 **The ground follows as one status line**, such as
 `7 repos · 1 workstream open (008) · 3 other windows open here`. The tables of repositories and

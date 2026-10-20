@@ -30,6 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { WELCOME_LEAD } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -215,7 +216,7 @@ if (IN_WORKSPACE) {
     const parsed = JSON.parse(ts);
     shape = Boolean(parsed.systemMessage) &&
       parsed.hookSpecificOutput?.hookEventName === "SessionStart" &&
-      parsed.hookSpecificOutput.additionalContext.startsWith(parsed.systemMessage) &&
+      parsed.hookSpecificOutput.additionalContext.startsWith(`${WELCOME_LEAD}\n\n${parsed.systemMessage}`) &&
       parsed.hookSpecificOutput.additionalContext.includes("Ground, read at load");
   } catch { shape = false; }
   ok = ok && shape;
@@ -475,14 +476,24 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   const offer = hook(ordinary, null);
   says("the developer's pane carries the welcome and the status line and no table",
     tables.every((t) => !offer.message.includes(t)));
-  says("the agent's context carries the same opening, then every table and the closing question",
-    offer.context.startsWith(offer.message) && tables.every((t) => offer.context.includes(t)));
-  says("the note tells the agent to open with the welcome word for word, and to hold the tables",
-    offer.context.includes("Open your first reply with the welcome above, word for word: the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after each of the three.")
-    && offer.context.includes("Show the tables only when asked"));
+  says("the agent's context opens with the lead line, then the same opening, then every table and the closing question",
+    offer.context.startsWith(`${WELCOME_LEAD}\n\n${offer.message}`) && tables.every((t) => offer.context.includes(t)));
+  says("the lead line says the welcome comes word for word and whole, before any tool call, and names every part",
+    WELCOME_LEAD.includes("word for word and whole, before any tool call")
+    && WELCOME_LEAD.includes("the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after each of the three, then the status line. Trim nothing."));
   // N116 row 8, F1: a question and a pasted handover were the prompts that cut the welcome short.
-  says("the note names the two prompts that cut the welcome, and puts the answer after it",
-    offer.context.includes("a question and a pasted handover included: the prompt is answered after the welcome, never instead of it"));
+  says("the lead line names the two prompts that cut the welcome, and puts the answer after it",
+    WELCOME_LEAD.includes("a question and a pasted handover included") && WELCOME_LEAD.includes("The prompt is answered after it, never instead of it."));
+  // 025 N020: Claude Code shows the agent the first 2 KB of a long session-start text and keeps the rest
+  // in a file. The instruction once sat after the tables, at byte 2,934, so the agent never saw it.
+  const status = statusOf(offer.message);
+  says("N020: the lead line, the welcome and the status line end inside the first 2,000 bytes",
+    Buffer.byteLength(offer.context.slice(0, offer.context.indexOf(status) + status.length), "utf8") < 2000);
+  says("N020 known-bad: no instruction to say the welcome stands below the tables",
+    !offer.context.slice(offer.context.indexOf("## The ground")).includes("word for word"));
+  says("the note points at the lead line, and holds the tables",
+    offer.context.includes("The welcome and the status line open the first reply as the line at the top says")
+    && offer.context.includes("Show the tables only when asked"));
   says("known-bad: the loose wording the proof windows shortened is gone",
     !offer.context.includes("Open your first reply with the welcome above, whatever the prompt, then the status line"));
   // N116 row 8, F5: a handover window took over a row another window had marked in progress.
@@ -516,6 +527,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
   says("day zero opens on the first-visit welcome, then the door, and no status line",
     zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nThis folder is empty`)
+    && zero.context.startsWith(`${WELCOME_LEAD}\n\n${zero.message}`)
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
 

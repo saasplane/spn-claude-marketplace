@@ -491,6 +491,18 @@ function developerName(): string | null {
  */
 export const WELCOME_SPACER = "\n&nbsp;\n";
 
+/**
+ * The line the agent reads first, above the welcome. THE INSTRUCTION STANDS BEFORE WHAT IT GOVERNS:
+ * this text runs past twelve thousand characters, and Claude Code keeps a session-start text that long
+ * in a file and shows the agent only its first 2 KB. Placed after the tables, the instruction fell
+ * outside that preview, and the agent printed a welcome it had been told nothing about.
+ */
+export const WELCOME_LEAD =
+  "Your first reply opens with the welcome below, word for word and whole, before any tool call and before " +
+  "any other text, whatever the prompt — a question and a pasted handover included: the heading, the italic " +
+  "line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after " +
+  "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
+
 export function welcome(who: string | null, firstVisit: boolean): string[] {
   const name = who ? `, ${who}` : "";
   return [
@@ -786,7 +798,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
           "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, message + note + "\n" + wayIndex() + shortRules()];
+    return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + wayIndex() + shortRules()];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -842,12 +854,9 @@ export function orient(root: string, cwd: string): [message: string, context: st
   const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
     "blocker, and `closed/` is the receipt. The number is an identity, never a " +
-    `priority. Rung ${level}: ${why}. Open your first reply with the welcome above, word for word: ` +
-    "the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer " +
-    "line after the italic line and after each of the three. That holds whatever the " +
-    "prompt, a question and a pasted handover included: the prompt is answered after the welcome, " +
-    "never instead of it, and in some editors this reply is the only place the developer sees it. " +
-    "Then the status line under it. Show the tables only when asked (*where are we?*). " +
+    `priority. Rung ${level}: ${why}. The welcome and the status line open the first reply as the ` +
+    "line at the top says: in some editors this reply is the only place the developer sees it. " +
+    "Show the tables only when asked (*where are we?*). " +
     "The closing question is asked ONLY when the developer's first message does not already " +
     "say what to do. A handover block, an arc name, or any named next step replaces it — under " +
     "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
@@ -868,7 +877,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
     "anything.\n";
-  return [message, message + "\n\n" + clean(lines) + note + "\n" + wayIndex() + shortRules()];
+  return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + wayIndex() + shortRules()];
 }
 
 if (runAlone("orientation.ts")) {

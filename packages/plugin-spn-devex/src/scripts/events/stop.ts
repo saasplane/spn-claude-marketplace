@@ -1556,8 +1556,9 @@ export function checkWelcome(firstTurn: string): Warning[] {
   return [{ check: "welcome", message:
     `This session's first reply left out ${missing.join(" · ")} of the welcome. The first reply opens with ` +
     `the welcome word for word, whatever the prompt — a question and a pasted handover included — then ` +
-    `the status line, then the answer (RD.DEVEX.WORKSPACE.045). In some editors that reply is the only ` +
-    `place the developer sees it. Say it in full at the top of your next reply.` }];
+    `the status line, then the answer (RD.DEVEX.WORKSPACE.045). Do not print it again: a second welcome ` +
+    `shows the developer a short one and then a long one. Say once, in one line, that the first reply ` +
+    `missed it, then go on.` }];
 }
 
 // ---------------------------------------------------------------------------- what is said now, and what is held

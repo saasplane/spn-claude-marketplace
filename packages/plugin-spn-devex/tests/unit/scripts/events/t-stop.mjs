@@ -1141,6 +1141,10 @@ console.log("\n=== welcome — a session's first turn opens with the welcome, wo
     ["known-bad: the 👥 line cut at its last sentence, emoji and all", missingWelcome(cut).join(","), "the 👥 line"],
     ["no first turn read (no transcript) is silent", checkWelcome("").length, 0],
     ["a cut welcome warns once, naming what is missing", checkWelcome(cut).map((w) => w.check + ":" + w.message.includes("the 👥 line")).join(), "welcome:true"],
+    // 025 N020: asked for the whole welcome again, the agent showed a short one and then a long one.
+    ["N020: the finding asks for one line and never a second welcome", checkWelcome(cut).map((w) =>
+      w.message.includes("Do not print it again") && w.message.includes("Say once, in one line, that the first reply missed it")).join(), "true"],
+    ["N020 known-bad: the finding no longer asks for the welcome in full", checkWelcome(cut).some((w) => /Say it in full/.test(w.message)), false],
     ["an unreadable transcript reads as nothing", firstTurnText("/nonexistent/transcript.jsonl"), ""],
   ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
        console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
