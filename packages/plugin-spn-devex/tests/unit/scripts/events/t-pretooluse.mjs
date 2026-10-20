@@ -370,6 +370,12 @@ console.log("\n=== pretooluse — an order asks for no screenshot unless the dev
   one("order-picture: a step asking for screenshots is refused, naming the probe",
     write("03-look.md", "# Order\n\n1. Open the page and take a screenshot of the card.\n"), "deny", { says: "browser probe", ...waived });
   one("order-picture: a `.png` in a step is refused", write("03-look.md", "Save the result to card.png.\n"), "deny", { says: "277", ...waived });
+  one("order-picture: a `.png` the step captures is refused",
+    write("03-look.md", "1. Capture the card in dark as `card-dark.png`.\n"), "deny", { says: "277", ...waived });
+  one("order-picture: an image file imported as media is allowed",
+    write("16-feature.md", "1. Import `Welcome.page-tour-light.png` and `Welcome.page-tour-dark.png` from `SC/pages/start/` as the feature's media.\n"), "silent", waived);
+  one("order-picture: a `.png` named as a file the page shows is allowed",
+    write("16-feature.md", "The hero's media is `hero.png`, already in the repository.\n"), "silent", waived);
   one("order-picture: `page.screenshot` is refused under the name Edit too", write("03-look.md", "Run page.screenshot on it.\n", "Edit"), "deny", { says: "browser probe", ...waived });
   one("order-picture: a screenshot with the developer's ask cited is allowed",
     write("03-look.md", "The developer asked to see the card in dark.\n\n1. Take a screenshot of the card.\n"), "silent", waived);

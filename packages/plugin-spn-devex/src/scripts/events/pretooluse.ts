@@ -299,8 +299,13 @@ export function checkAgentModel(payload: Payload): Verdict {
   return null;
 }
 
-/** A step that asks for a picture: shot, screenshot, a `.png`, "take a picture", `page.screenshot`. */
-const PICTURE = /\bscreen-?shots?\b|\bshots?\b|\.png\b|take a picture|page\.screenshot/i;
+/**
+ * A step that asks for a picture: shot, screenshot, "take a picture", `page.screenshot`, or a `.png` the
+ * step takes, captures, renders or saves. A `.png` named alone is a file the step uses, such as an
+ * image imported as media, and asks for no picture.
+ */
+const PICTURE =
+  /\bscreen-?shots?\b|\bshots?\b|take a picture|page\.screenshot|\b(?:take|capture|grab|snap|render|save|write)\b[^\n]{0,80}?\.png\b/i;
 /** A line that says no picture is taken, or a section that forbids one, asks for none. */
 const NO_PICTURE = /\b(never|no|not|don't|without|nothing)\b/i;
 /** The developer's ask, cited: the words, or a quoted ask with a time. */
