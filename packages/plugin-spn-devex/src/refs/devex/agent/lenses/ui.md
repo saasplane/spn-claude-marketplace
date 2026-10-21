@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "aaa8b8c1"
+      "seen": "1d8397e7"
     }
   ],
   "decisions": [
@@ -112,7 +112,8 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` the hue, `size` the density step `XS` to `XL` with `SM` the default; `CUSTOM` is the one named way a page owns a colour (names § The three shared names).
   - **A prop that takes a vocabulary carries the book's name and the book's values** (`RD.SUPPORT.SURFACE.041`).
   - **A suffix names where a unit is placed**: `App`, `Layout`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RD.SUPPORT.SURFACE.229`).
-  - **A pitch is a `DSFeature` sized by its level alone, and a band of a website is a `DSSectionContainer`.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a band; the feature gives its items the level that follows its own and sizes its small picture by its title and lines (`RD.SUPPORT.SURFACE.233`, `.235`, `.243`, `.247`, `.253`).
+  - **A pitch is a `DSFeature` sized by its level alone, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a section; the feature gives its items the level that follows its own and sizes its small picture by one box per level (`RD.SUPPORT.SURFACE.233`, `.235`, `.243`, `.247`, `.259`, `.274`).
+  - **The paint of a frame is one `surface` prop, and the theme holds no look for a unit that frames only where its page asks.** A paint written as five loose props, or a feature look put in the theme, is a finding (`RD.SUPPORT.SURFACE.261`, `.277`, `.279`).
   - **An alignment takes the core's vocabulary of its axis**, `DSHorizontalAlignType` or `DSVerticalAlignType`; a vocabulary of a unit's own for one is a finding (`RD.SUPPORT.SURFACE.249`).
   - **An icon beside a title or running text takes the scale size of that text's step, on one centre line**; `size` is density and `scaleSize` is how large an icon, mark or avatar is drawn (`RD.SUPPORT.SURFACE.008`, `.100`).
   - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark; a control the page built owes all of it on its own (accessibility § The baseline).

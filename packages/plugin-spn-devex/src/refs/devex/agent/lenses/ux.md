@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "aaa8b8c1"
+      "seen": "1d8397e7"
     }
   ],
   "decisions": [
@@ -20,7 +20,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.147",
-      "seen": "37e25f39"
+      "seen": "bc9a6b82"
     },
     {
       "repo": "spn-foundation",
@@ -94,7 +94,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area (standards § The levels · `RD.SUPPORT.APPS.146`).
   - **The layout fits the job of the app**: `RAIL` for an app a person works in, `DOCK` for a profile or settings, `TOPNAV` for a website, `CANVAS` for a sign-in, a marketing page or an error page. A layout chosen for its look is a finding (`RD.SUPPORT.SURFACE.206`).
   - **The navigation behaves the same in every layout type**: an item's actions reachable without hover; a closed group holding the current page shows the selected mark; a shut group's flyout opens on a press; the narrow dock keeps its back link (`RD.SUPPORT.APPS.163`).
-  - **A framed part reads header, content, footer, in that order**, and a container inside a container is a finding (`RD.SUPPORT.APPS.147`).
+  - **A framed part reads header, content, footer, in that order**, and a container inside a container is a finding (`RD.SUPPORT.APPS.147`). A card and a panel are told apart by level and purpose, and a card container, a feature container or a feature section container is a finding (`RD.SUPPORT.SURFACE.263`).
   - **Each task runs by the pattern of its intent** — Move, Find, Read, Enter, Choose, Act, Interrupt, Disclose, Hear back, Be refused — from the blocks that pattern names. A second way to run a known task, or a control the page built for itself, is a finding (`RD.SUPPORT.SURFACE.081`).
   - **The controls were placed by intent before a unit was chosen.** Controls of one intent stand together, beside what they relate to; alternatives are drawn as equals; a field's own action sits at the end of its label line. A title or value that names a pattern, a unit or a level is a finding (`RD.SUPPORT.SURFACE.207`).
   - **The page follows one page pattern, chosen from the data and the person**, read beside that pattern's spec (`RD.SUPPORT.SURFACE.047`, `.051`).
@@ -103,7 +103,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A label, a frame, a state and the end of a line each follow their rule of content**: no label on a value a person can tell without it; a frame only round a part with a title of its own; a state as a badge on the line of facts; the end of a line holds data or the arrow, never an action (`RD.SUPPORT.SURFACE.056`–`.059`, `.087`, `.178`).
   - **A field, a set of choices and a list each keep their layout**: an entered field has its title above and one line under; every control a person sets is a form field; readings stand in a grid; choices stand in columns; a line between each two lines of a list (`RD.SUPPORT.SURFACE.060`–`.063`, `.096`).
   - **The data table is in the layout its data asks for**: `TABLE` to compare facts, `LIST` for a record read by its name, `GRID` for a thing of its own, `LIST` on a phone; a record's actions at the end of its row; a value changed in its cell; the filter bar in its one form, one button on a phone whose drawer fits its fields (`RD.SUPPORT.SURFACE.068`–`.073`, `.097`, `.246`).
-  - **A pitch is one `DSFeature` and a band of a website is a `DSSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a band painted by hand, is a finding (`RD.SUPPORT.SURFACE.233`, `.243`).
+  - **A pitch is one `DSFeature`, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a section painted by hand, is a finding (`RD.SUPPORT.SURFACE.233`, `.243`, `.259`).
   - **A container holds its title and actions in its header, and what closes its work in its footer.** Over the page the closing actions stand at the end of the footer, leaving first and the main action last; on a page of its own at the start, main action first. A small entry is a dialog, a medium one a side sheet, a large form a page of one container (`RD.SUPPORT.SURFACE.074`–`.078`, `.095`).
   - **A sign-in is one compact container on a canvas**: providers as one centred row of icons, every control a form field, alternatives as equals under a separator (`RD.SUPPORT.SURFACE.205`).
   - **One container for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RD.SUPPORT.SURFACE.115`–`.117`).
