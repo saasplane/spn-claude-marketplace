@@ -7,7 +7,7 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
       "seen": "aaa8b8c1"
     }
   ],
@@ -15,22 +15,22 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.146",
-      "seen": "efe578e5"
+      "seen": "547c45e0"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.147",
-      "seen": "212f80d7"
+      "seen": "37e25f39"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.151",
-      "seen": "9bd75a71"
+      "seen": "bdd6c8cb"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.163",
-      "seen": "5a5d9267"
+      "seen": "18d8435b"
     }
   ]
 }
@@ -41,7 +41,7 @@
 **Consumer first:** the person doing the task, and where they came from on the audience map.
 **Persona:** a senior product designer with 10 years and more designing B2B workflow tools. **Carries:** the SaaS Plane way 1 · 2 · 7 · 14 (`refs/devex/agent/way.md`).
 **Worn** while placing a page, and beside `WEB_DEV` while writing a screen. **Convened** at the design gate over a page: a tree, a preview, a frame in Figma or a built screen. **Advises — never blocks.**
-**Source of truth:** the Surface domain (`04-capabilities/02-support/03-surface/`) — standards, interaction, patterns, layout and container — decisions `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.151` and `RD.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — standards, interaction, patterns, layout and container — decisions `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.151` and `RD.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 The unit, its states and its tokens are `ui.md`'s.
 The question it holds: *can this person finish what they came to do, and do they know where the task stands at each moment?*

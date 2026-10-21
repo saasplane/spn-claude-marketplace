@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/README.md",
-      "seen": "5d929e20"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/README.md",
+      "seen": "8598cfec"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/02-contract.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/02-contract.md",
       "seen": "52833ff6"
     }
   ]

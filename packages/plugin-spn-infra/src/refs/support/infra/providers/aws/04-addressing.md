@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/04-addressing.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/04-addressing.md",
       "seen": "1858f706"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Addressing on AWS — computed addresses, two VPCs, and what may reach what
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/04-addressing.md`, which applies the addressing formula the coordinates chapter owns. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/04-addressing.md`, which applies the addressing formula the coordinates chapter owns. Read this as the restatement; that node governs.
 
 **Design of record — nothing is provisioned on AWS yet.** The local realization exists; the cloud one is planned.
 

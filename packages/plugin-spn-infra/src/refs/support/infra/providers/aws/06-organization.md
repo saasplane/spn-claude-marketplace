@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/06-organization.md", "seen": "325d3263" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/06-organization.md", "seen": "325d3263" }
   ]
 }
 -->
 # Organization up — the account tree, the guardrails, and identity
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/06-organization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/06-organization.md`. Read this as the restatement; that node governs.
 
 **The command is `spnutils infra organization up --cloud`.** The runbook behind this names `cinfra org up`, which never shipped.
 

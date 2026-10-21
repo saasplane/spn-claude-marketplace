@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/02-support/03-surface/11-delivery-library/02-figma/02-managed.md § How the connector's work is carried out (the table of facts). The chapter is the source of truth; a change is made there first, then here.
+// RESTATES: spn-foundation docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md § How the connector's work is carried out (the table of facts). The chapter is the source of truth; a change is made there first, then here.
 //
 // Reads a `use_figma` script before the connector runs it. It refuses only what the connector does
 // not support or what throws there, and only where the text shows it: comment and string bodies are

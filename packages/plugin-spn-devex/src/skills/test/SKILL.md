@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "020faf26"
+      "seen": "36c99f62"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -20,27 +20,27 @@
       "seen": "8f12c198"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "A case title carries the id and the sentence",
-      "seen": "9c154376"
+      "seen": "7e9d1a3b"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Code coverage is reported, never enforced",
       "seen": "300e384f"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
       "seen": "5d190e92"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
       "seen": "e03d4ac4"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/02-tests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/02-tests.md",
       "section": "One entry, and one printer",
       "seen": "d697a45a"
     }
@@ -49,12 +49,12 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.FUNCTION.064",
-      "seen": "554e4ba4"
+      "seen": "2c332994"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.133",
-      "seen": "25dc665f"
+      "seen": "accf48b3"
     },
     {
       "repo": "spn-foundation",
@@ -64,12 +64,12 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.207",
-      "seen": "c4c45c16"
+      "seen": "03f3a244"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.245",
-      "seen": "edaf28ed"
+      "seen": "c1dd9f06"
     }
   ]
 }

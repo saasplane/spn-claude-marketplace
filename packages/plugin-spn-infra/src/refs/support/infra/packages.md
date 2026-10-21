@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/02-packages.md",
-      "seen": "628863da"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/02-packages.md",
+      "seen": "f43aa8c7"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "seen": "319837d8"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Estate manifests — quick reference
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/02-packages.md` and `docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/02-packages.md` and `docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md`. Read this card as the restatement; the book governs.
 
 ## Two files per node
 

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "section": "Evolution — the change classification", "seen": "1a43822e" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md", "section": "Evolution — the change classification", "seen": "1a43822e" }
   ],
   "decisions": []
 }

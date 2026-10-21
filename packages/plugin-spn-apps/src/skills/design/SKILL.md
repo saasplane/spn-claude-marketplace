@@ -10,7 +10,7 @@
       "seen": "cc127ea7"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
       "seen": "aaa8b8c1"
     }
   ]

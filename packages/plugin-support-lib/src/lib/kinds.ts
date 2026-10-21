@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/06-tests/README.md § Kind decides the tier
+// RESTATES: spn-foundation docs/04-capabilities/02-support/02-apps/06-tests/README.md § Kind decides the tier
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 
 // This table lives once, in the shared support-lib folder; spn-devex and spn-apps each import it by

@@ -2,7 +2,7 @@
 
 Frontend modules are plain packages composed by each app's router — no runtime module registry. Layering: `web-*-ts` app (route table, nav, vite build) → `module-web-<mod>-ts` (pages/components/hooks/URL helpers for ONE module). That module package sits on the shared FE kernel package — app manager, session, auth gates, shell, nav builder. The kernel sits on the web runtime + design system + **API client**. Where a workspace documents its own frontend architecture, that document governs its app composition; this layering is the rule in every case.
 
-**The component standard** is owned by the provider chapter `docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md` and restated in this plugin. It covers the wrapper as the public API, the four-step component recipe, and the density hook (never a `size` destructure default). It also covers naming, and the token tiers a component may consume. Apply the restatement; the chapter is provenance, not a file to open, because the book is not delivered to every seat. This step covers where UI code *lives* and how it plugs in, not how a component is written.
+**The component standard** is owned by the provider chapter `docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md` and restated in this plugin. It covers the wrapper as the public API, the four-step component recipe, and the density hook (never a `size` destructure default). It also covers naming, and the token tiers a component may consume. Apply the restatement; the chapter is provenance, not a file to open, because the book is not delivered to every seat. This step covers where UI code *lives* and how it plugs in, not how a component is written.
 
 > **A client service is not a server service in a browser.** No transaction, no authorization decorator, no cache-build decorator — the server gates every call and owns atomicity. Client-side services belong to the web module's **full form**, which is 🔮 planned and unrealized; today a ui package's data access is hooks over the API client.
 
@@ -28,7 +28,7 @@ App-local modules (a feature owned by one app) live under `apps/<app>/src/module
 
 ## The two contexts — read them, never re-derive them
 
-The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/03-surface/10-architecture-app/01-common/01-contexts.md`). The restatement is `refs/support/surface/architecture-app.md`, in this plugin; read `standards-core.md` for the levels of a page, `architecture-names.md` for the names, and `architecture-containers.md` for the container.
+The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md`). The restatement is `refs/support/surface/architecture-app.md`, in this plugin; read `standards-core.md` for the levels of a page, `architecture-names.md` for the names, and `architecture-containers.md` for the container.
 
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
 - **DS context** — live theme and its setter, device, `navigate`, and image transformation with placeholder/error. Read it with the DS context hook; `DSApp` supplies it.

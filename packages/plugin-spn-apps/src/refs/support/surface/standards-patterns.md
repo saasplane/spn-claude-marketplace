@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/03-standards-patterns.md",
-      "seen": "6021edc5"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
+      "seen": "0622aab8"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "bffcdb0f"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
+      "seen": "1b342f83"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Patterns — One Way to Run Each Task
 
-Source of truth: the foundation's Patterns construct (`docs/02-constructs/02-support/03-surface/03-standards-patterns.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/03-standards-patterns/`). Those chapters hold the task patterns, the page patterns, and the folder of specs that this plugin carries a copy of.
+Source of truth: the foundation's Patterns construct (`docs/02-constructs/02-support/01-surface/03-standards-patterns.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/03-standards-patterns/`). Those chapters hold the task patterns, the page patterns, and the folder of specs that this plugin carries a copy of.
 
 Patterns is the third of thirteen Surface constructs. It fills in the six parts of a pattern (the previous standard of this folder) once for each task intent a person has in an app today. It also names the page patterns: a small set of arrangements for a whole page.
 

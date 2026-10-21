@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/09-deployments.md",
       "seen": "e937867a"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Deployments — applications attached to a standing platform
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/09-deployments.md`. Read this as the restatement; that node governs.
 
 **`spnutils infra app up` attaches an application to a platform stack that is already standing.** It is the deployments layer's local rendering, and it runs no containers of its own.
 

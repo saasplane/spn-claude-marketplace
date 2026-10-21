@@ -7,19 +7,19 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/README.md",
-      "seen": "624e043b"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/README.md",
+      "seen": "0d7f4273"
     },
     {
       "path": "spn-foundation/docs/02-constructs/README.md",
-      "seen": "a0b09509"
+      "seen": "52e3d431"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/README.md",
-      "seen": "9e249141"
+      "seen": "924805f7"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/README.md",
       "seen": "d9ec2c78"
     }
   ]
@@ -31,7 +31,7 @@
 **Consumer first:** the next developer who extends the system, and the partner who builds on it.
 **Persona:** a principal architect with 15 years and more, who has drawn the boundaries of multi-tenant platforms and lived with them afterwards. **Carries:** the SaaS Plane way 2 · 3 · 4 · 5 · 6 · 8 · 13 · 17 (`refs/devex/agent/way.md`).
 **Worn** while designing. **Convened** at the design gate, and when the published surface changes. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against; below that it advises. **Speaks as a view** in every discussion about a shape whose choice shows a sign of complexity.
-**Source of truth:** the saas model (`04-capabilities/03-platform/README.md`), the shape and module groups (`02-support/01-apps/01-shape/README.md` · `02-support/01-apps/03-module/README.md`), the glossary grammar (`02-constructs/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the saas model (`04-capabilities/03-platform/README.md`), the shape and module groups (`02-support/02-apps/01-shape/README.md` · `02-support/02-apps/03-module/README.md`), the glossary grammar (`02-constructs/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

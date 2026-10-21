@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
       "seen": "08547938"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
       "seen": "6c7f367b"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Layouts — How a Page Is Framed
 
-Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/03-surface/09-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/09-architecture-layouts/`). Layouts is the ninth of thirteen Surface constructs.
+Source of truth: the foundation's Layouts construct (`docs/02-constructs/02-support/01-surface/09-architecture-layouts.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/09-architecture-layouts/`). Layouts is the ninth of thirteen Surface constructs.
 
 Read this before you choose a layout for an app, or before you build or draw a layout type on a new stack. A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The layout types are `RAIL`, `DOCK`, `TOPNAV` and `CANVAS`, the body alone. A layout builds its navigation from the navigation units, fills places named by where they stand, and alone reads the theme. A layout names no routing library.
 

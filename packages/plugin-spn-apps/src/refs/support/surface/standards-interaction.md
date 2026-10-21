@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/02-standards-interaction.md",
-      "seen": "8896986b"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/02-standards-interaction.md",
+      "seen": "729f5193"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/02-standards-interaction/",
-      "seen": "a8a14c73"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/",
+      "seen": "ecf913f8"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Interaction — How a Task Runs on Every Page
 
-Source of truth: the foundation's Interaction construct (`docs/02-constructs/02-support/03-surface/02-standards-interaction.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/02-standards-interaction/`).
+Source of truth: the foundation's Interaction construct (`docs/02-constructs/02-support/01-surface/02-standards-interaction.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/02-standards-interaction/`).
 
 Interaction is the second of thirteen Surface constructs, after the first standard of this folder.
 

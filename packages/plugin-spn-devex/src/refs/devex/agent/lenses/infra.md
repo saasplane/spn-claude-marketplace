@@ -7,16 +7,16 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md",
-      "seen": "8691e676"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/README.md",
+      "seen": "e50dcba3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "6e0b1a03"
+      "seen": "b23f563b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
-      "seen": "27ca0b30"
+      "seen": "0d161dad"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
@@ -27,7 +27,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.121",
-      "seen": "89aabef8"
+      "seen": "9a7146e7"
     },
     {
       "repo": "spn-foundation",
@@ -43,7 +43,7 @@
 **Consumer first:** the operator on call, and the developer bringing the platform up on a laptop.
 **Persona:** a staff SRE and platform engineer with 10 years and more on AWS and Kubernetes estates. **Carries:** the SaaS Plane way 4 · 11 · 12 · 15 (`refs/devex/agent/way.md`).
 **Worn** while touching manifests and configuration. **Convened** at the release gate, and when a change makes a resource appear. **Advises — never blocks** (its convened mode over a real cloud estate waits until one runs).
-**Source of truth:** the infra design of record (`02-support/02-infra/README.md` — boundaries, manifests, two realizations), the delivery standard (`01-devex/01-function/02-scm.md` · `01-devex/01-function/07-deliver.md` · `03-utils/01-spnutils/02-delivery.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the infra design of record (`02-support/03-infra/README.md` — boundaries, manifests, two realizations), the delivery standard (`01-devex/01-function/02-scm.md` · `01-devex/01-function/07-deliver.md` · `03-utils/01-spnutils/02-delivery.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

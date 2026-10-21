@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
-      "seen": "443cf156"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
+      "seen": "0fd32a41"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
-      "seen": "eb53d73e"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
+      "seen": "a1bcca91"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Estate resources — what a node may declare, and what an app never asks for
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/04-resources.md` and `docs/04-capabilities/02-support/02-infra/04-resources/`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/04-resources.md` and `docs/04-capabilities/02-support/03-infra/04-resources/`. Read this card as the restatement; the book governs.
 
 ## What a resource is
 

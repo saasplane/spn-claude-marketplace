@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
       "seen": "37e5fff7"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
       "seen": "16a24d10"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
       "section": "Generated primitives are never hand-edited",
       "seen": "87b2001b"
     }
@@ -20,7 +20,7 @@
 
 # App — What Every Surface Is Configured With
 
-Source of truth: the foundation's App construct (`docs/02-constructs/02-support/03-surface/10-architecture-app.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/10-architecture-app/`). App is the tenth of thirteen Surface constructs, and the last of the Architecture group.
+Source of truth: the foundation's App construct (`docs/02-constructs/02-support/01-surface/10-architecture-app.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/10-architecture-app/`). App is the tenth of thirteen Surface constructs, and the last of the Architecture group.
 
 Read this before you mount a surface, write a theme, or ask what a block already knows without being told. `DSApp` mounts once and hands every block below it the person's grants, their preferences, the look and the device, and the seams a block never owns itself.
 

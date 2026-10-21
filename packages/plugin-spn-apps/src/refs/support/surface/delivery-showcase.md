@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "96019bb8"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
+      "seen": "aa2f2f74"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "0696add2"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
+      "seen": "ca1e97c4"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Delivery Showcase — The Proof Every Realization Delivers
 
-Source of truth: the foundation's Delivery Showcase construct (`docs/02-constructs/02-support/03-surface/12-delivery-showcase.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/12-delivery-showcase/`). Delivery Showcase is the twelfth of thirteen Surface constructs.
+Source of truth: the foundation's Delivery Showcase construct (`docs/02-constructs/02-support/01-surface/12-delivery-showcase.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/12-delivery-showcase/`). Delivery Showcase is the twelfth of thirteen Surface constructs.
 
 Read this before you add a unit to a showcase, or before you judge whether one is complete. A stack that realizes Surface proves it with a showcase: a running catalogue that shows how every unit is used, like the web's Storybook. Every stack follows the same outline with its own tool — Storybook on the web, a showcase app on native. A showcase is for a developer or a partner who is about to use a unit. A partner is an organization that builds its own SaaS platform on SaaS Plane. It shows how a unit is used, and it is not a test of the system. **The thing to unlearn: nobody lays out a page of a showcase.** A unit declares a few facts about itself, and its page is derived from them. A stack builds the frame that derives the pages, never an outline of its own.
 

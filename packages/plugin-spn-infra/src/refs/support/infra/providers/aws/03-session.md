@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/03-session.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/03-session.md",
       "seen": "f9e2a23a"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Session — how a run authenticates on AWS
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/03-session.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/03-session.md`. Read this as the restatement; that node governs.
 
 **Every cloud act needs an identity before it can touch an account.** This entry says which identity, where it comes from, and what the tool checks before it proceeds.
 

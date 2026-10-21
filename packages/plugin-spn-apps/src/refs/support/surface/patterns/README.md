@@ -2,8 +2,8 @@
 {
   "files": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/01-common/patterns",
-      "seen": "7663a475"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/patterns",
+      "seen": "e9a2cb79"
     }
   ]
 }
@@ -11,7 +11,7 @@
 # The specs of the page patterns, as a partner has them
 
 **The book owns every file here and this folder is a copy.** They are byte-identical to
-`spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/01-common/patterns/`, and when the two disagree the book wins.
+`spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/patterns/`, and when the two disagree the book wins.
 `restates files write` writes them and `restates check` reports a copy that has fallen behind.
 
 **Each file is a skeleton spec of one page pattern, and a page starts from it.** The `design` skill

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "8c5ef818"
+      "seen": "50d1dd10"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "836d241e"
+      "seen": "0a680b28"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,19 +21,19 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "cef5546e"
+      "seen": "faf345d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "44de9ce7"
+      "seen": "b58b31a1"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "816d0b3b"
+      "seen": "f6d38a75"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "5ee2eb6d"
+      "seen": "4c7fd97f"
     }
   ],
   "decisions": [

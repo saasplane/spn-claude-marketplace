@@ -8,11 +8,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/README.md",
-      "seen": "a0b09509"
+      "seen": "52e3d431"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
-      "seen": "35978308"
+      "seen": "c11637bf"
     }
   ]
 }

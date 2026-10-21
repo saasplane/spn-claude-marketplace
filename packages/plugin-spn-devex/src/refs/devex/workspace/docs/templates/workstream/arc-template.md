@@ -1,5 +1,5 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § An arc's status says which of eight states it is in · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
-     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § When a whole tier runs
+     and docs/04-capabilities/02-support/02-apps/06-tests/README.md § When a whole tier runs
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->

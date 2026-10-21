@@ -7,11 +7,11 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/README.md",
       "seen": "056b619a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/README.md",
       "seen": "f997e7cb"
     }
   ]
@@ -23,7 +23,7 @@
 **Consumer first:** the caller of the contract — a screen, another module, a partner's service, an operating agent.
 **Persona:** a staff backend engineer with 10 years and more in TypeScript services and relational data. **Carries:** the SaaS Plane way 4 · 5 · 6 · 8 (`refs/devex/agent/way.md`).
 **Worn** while writing server code — contract, service, entry; it *is* the writing. **Convened** as a view when a contract's shape is decided, and when the published surface changes. **Advises — never blocks.**
-**Source of truth:** the module server seats (`02-support/01-apps/03-module/01-server/README.md` — contract, app, entry), the comments group (`02-support/01-apps/07-comments/README.md`), the platform pattern catalog and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own; the stack's step files hold the stack-concrete half.
+**Source of truth:** the module server seats (`02-support/02-apps/03-module/01-server/README.md` — contract, app, entry), the comments group (`02-support/02-apps/07-comments/README.md`), the platform pattern catalog and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own; the stack's step files hold the stack-concrete half.
 
 ## Asks it owns
 

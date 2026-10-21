@@ -83,7 +83,7 @@ const overview = (id, title, body = "") => page({ id, variant: "overview", title
 const construct = (id, title) => page({ id, variant: "construct", title, lenses: ["ARCHITECT"], status: "DONE", summary: "s" });
 const guide = (title, source) => page({ id: title, variant: "guide", title, lenses: ["QA"], summary: "s", source });
 
-const AGENT = "01-devex/02-agent", APPS = "02-support/01-apps";
+const AGENT = "01-devex/02-agent", APPS = "02-support/02-apps";
 const withAreas = () => repo({
   // The hub links every construct, and holds none: a construct sits under an overview of its own domain.
   [`${POCKET_DOCS}/${HUB}`]: overview("hub", "Concept",

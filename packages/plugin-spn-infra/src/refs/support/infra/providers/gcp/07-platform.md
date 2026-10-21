@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/07-platform.md", "seen": "04d828f8" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/07-platform.md", "seen": "04d828f8" }
   ]
 }
 -->
 # Platform — the contents are decided and unrendered
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/07-platform.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/07-platform.md`. Read this as the restatement; that node governs.
 
 **Nothing stands up a platform on Google Cloud** — not its workload and control containers, not its trust graph, not its zone and wildcard certificate, and none of the instruments installed beside them.
 

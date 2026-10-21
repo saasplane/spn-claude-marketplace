@@ -2,27 +2,27 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
       "section": "The rungs, and what a path may be",
       "seen": "8efff768"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
       "seen": "86359c7a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
       "seen": "ebcdc0c5"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "One packages declaration; the registry derives",
       "seen": "f5cb3b14"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/02-vendors.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/02-vendors.md",
       "section": "The blueprint is also a library, and a module's world is its own",
       "seen": "31aec928"
     }
@@ -32,7 +32,7 @@
 
 # The estate laws — the refusal card
 
-**Source of truth:** the foundation's `docs/02-constructs/02-support/02-infra/06-modules.md`, `docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md` and `docs/04-capabilities/02-support/02-infra/04-resources/02-vendors.md`. Read this card as a restatement; the book governs. Look for the checkable defect each law names, and raise it before doing anything else.
+**Source of truth:** the foundation's `docs/02-constructs/02-support/03-infra/06-modules.md`, `docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md` and `docs/04-capabilities/02-support/03-infra/04-resources/02-vendors.md`. Read this card as a restatement; the book governs. Look for the checkable defect each law names, and raise it before doing anything else.
 
 ## 1 · Machines write the environment rung only
 

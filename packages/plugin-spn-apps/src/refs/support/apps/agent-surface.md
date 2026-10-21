@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/08-agent-surface.md",
-      "seen": "c68ccf85"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/08-agent-surface.md",
+      "seen": "eff4fe73"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/",
-      "seen": "a57f722d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/",
+      "seen": "440a12f3"
     }
   ]
 }

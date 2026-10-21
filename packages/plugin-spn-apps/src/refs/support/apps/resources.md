@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/04-resources.md",
-      "seen": "ed0defa1"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/04-resources.md",
+      "seen": "ee42bfda"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/04-resources/",
-      "seen": "e916e299"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
+      "seen": "cc3c9ac0"
     }
   ]
 }

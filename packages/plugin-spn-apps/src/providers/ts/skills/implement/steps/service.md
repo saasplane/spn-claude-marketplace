@@ -2,24 +2,24 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "seen": "8e197811"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/02-repositories.md",
       "seen": "d147b9b0"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "seen": "679c29d9"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
       "seen": "1607a602"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "ed2f23ca"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
+      "seen": "5ab26963"
     }
   ]
 }

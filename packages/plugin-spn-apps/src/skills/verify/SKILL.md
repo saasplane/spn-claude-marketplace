@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "020faf26"
+      "seen": "36c99f62"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "bffcdb0f"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
+      "seen": "1b342f83"
     }
   ]
 }

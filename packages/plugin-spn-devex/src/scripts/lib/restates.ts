@@ -16,7 +16,7 @@
 //     {
 //       "docs": [
 //         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
-//         { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
+//         { "path": "docs/04-capabilities/02-support/02-apps/06-tests/README.md", "seen": "b204d81c" }
 //       ],
 //       "decisions": ["RD.SUPPORT.APPS.086"]
 //     }

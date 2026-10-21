@@ -2,16 +2,16 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md",
-      "seen": "db0b01f7"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
+      "seen": "43f0ee13"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "02e405b9"
+      "seen": "b2e50b21"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
-      "seen": "410fa6af"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
+      "seen": "7b09ad58"
     }
   ]
 }
@@ -19,7 +19,7 @@
 
 # Estate Shape — the words, the edge, the layers and the doors
 
-**Source of truth:** the foundation's `02-constructs/02-support/02-infra/01-shape.md` for what the estate is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` with `04-capabilities/02-support/02-infra/03-blueprints/01-layers.md` for the commands that act on it. Read this as the restatement; the book governs. The realization is `spnutils infra …`.
+**Source of truth:** the foundation's `02-constructs/02-support/03-infra/01-shape.md` for what the estate is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` with `04-capabilities/02-support/03-infra/03-blueprints/01-layers.md` for the commands that act on it. Read this as the restatement; the book governs. The realization is `spnutils infra …`.
 
 ## Four groups of facts, and none borrows from another
 

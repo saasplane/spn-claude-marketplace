@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/04-addressing.md",
       "seen": "f572cc70"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Addressing — the same grammar, one environment wide
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/04-addressing.md`. Read this as the restatement; that node governs.
 
 **Every name here composes from coordinates, exactly as it does in the cloud.** What changes is which coordinates are in scope and what the name resolves to. The grammar itself is [`naming.md`](../../shape/naming.md)'s, and this page states only its local rendering.
 

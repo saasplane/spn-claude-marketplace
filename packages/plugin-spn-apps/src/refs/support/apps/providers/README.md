@@ -2,19 +2,19 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/10-providers.md",
-      "seen": "fbae1e39"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/10-providers.md",
+      "seen": "49c96f2f"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/",
-      "seen": "495d9727"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/",
+      "seen": "0a7c1ccd"
     }
   ]
 }
 -->
 # Apps providers — what a stack is, and what it may never do
 
-**Source of truth:** the foundation's `02-constructs/02-support/01-apps/10-providers.md` and its capability chapters. Read this as the restatement; the book governs.
+**Source of truth:** the foundation's `02-constructs/02-support/02-apps/10-providers.md` and its capability chapters. Read this as the restatement; the book governs.
 
 **This folder is not [`ts/`](ts/README.md).** Those refs say what TypeScript actually does. This says what *any* stack is allowed to be — read it before adding a second one, and before assuming a tool can work out which stack you are in.
 

@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
       "seen": "177efde4"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "37c3a943"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
+      "seen": "2839194e"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Core — The Tokens Every Block Reads
 
-Source of truth: the foundation's Core construct (`docs/02-constructs/02-support/03-surface/05-architecture-core.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/05-architecture-core/`), which are **done**: every role, every step of the scale and every type step carries a value there. Core is the fifth of thirteen Surface constructs, and names the tokens every block is drawn with.
+Source of truth: the foundation's Core construct (`docs/02-constructs/02-support/01-surface/05-architecture-core.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/05-architecture-core/`), which are **done**: every role, every step of the scale and every type step carries a value there. Core is the fifth of thirteen Surface constructs, and names the tokens every block is drawn with.
 
 Read this before you ask what a block may read, or before you add a role, a step of the scale, a scale size or an icon.
 

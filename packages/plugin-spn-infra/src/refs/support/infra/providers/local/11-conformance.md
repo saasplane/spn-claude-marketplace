@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/11-conformance.md",
-      "seen": "f15facd1"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/11-conformance.md",
+      "seen": "d800a1d9"
     }
   ]
 }
 -->
 # Conformance — what a local pass speaks for
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/11-conformance.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/11-conformance.md`. Read this as the restatement; that node governs.
 
 **An estate change is proven at the tier that would catch it**, and the tiers are the apps ladder's own — `UNIT`, `CONTRACT` and `INTEGRATION` — with the build and a stand-up beside them ([blueprints](../../blueprints.md)). Local is not exempt from any of them, and it is the only target a stand-up has actually run against.
 

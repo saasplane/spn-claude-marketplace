@@ -7,28 +7,28 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md",
-      "seen": "34494c3b"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/02-web/README.md",
+      "seen": "c710f865"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md",
-      "seen": "e19969bd"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/02-web/README.md",
+      "seen": "8bf462e6"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/README.md",
       "seen": "f997e7cb"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/01-common/01-contexts.md",
-      "seen": "29b4c7bd"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md",
+      "seen": "0393210f"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/02-standards-interaction/01-common/01-interaction.md",
-      "seen": "cd2ce41a"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",
+      "seen": "31dcdddd"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/01-common/02-accessibility.md",
-      "seen": "f21ecccc"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/02-accessibility.md",
+      "seen": "05c67d97"
     }
   ]
 }
@@ -39,7 +39,7 @@
 **Consumer first:** the person in the browser, their screen reader, the search crawler and the share card.
 **Persona:** a staff frontend engineer with 10 years and more on React and the web platform. **Carries:** the SaaS Plane way 6 · 7 · 8 · 11 (`refs/devex/agent/way.md`).
 **Worn** while writing web code — screens, components, hooks; it *is* the writing. **Convened** at the release gate over the published pages. **Advises — never blocks.**
-**Source of truth:** the module web seats (`02-support/01-apps/03-module/02-web/README.md` — the `ui/` taxonomy), the web support family (`02-support/01-apps/02-support/02-web/README.md`), the app's contexts (`02-support/03-surface/10-architecture-app/01-common/01-contexts.md`), interaction (`02-support/03-surface/02-standards-interaction/01-common/01-interaction.md`), accessibility (`02-support/03-surface/01-standards-core/01-common/02-accessibility.md`), the comments group (`02-support/01-apps/07-comments/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the module web seats (`02-support/02-apps/03-module/02-web/README.md` — the `ui/` taxonomy), the web support family (`02-support/02-apps/02-support/02-web/README.md`), the app's contexts (`02-support/01-surface/10-architecture-app/01-common/01-contexts.md`), interaction (`02-support/01-surface/02-standards-interaction/01-common/01-interaction.md`), accessibility (`02-support/01-surface/01-standards-core/01-common/02-accessibility.md`), the comments group (`02-support/02-apps/07-comments/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 The apps plugin restates Surface as `refs/support/surface/architecture-app.md`, `standards-interaction.md` and `standards-core.md`.
 ## Asks it owns

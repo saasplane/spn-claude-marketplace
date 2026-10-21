@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/07-trust.md",
-      "seen": "0f33c40a"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/07-trust.md",
+      "seen": "7d47eb26"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/07-trust/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/07-trust/",
       "seen": "21d8e901"
     }
   ]

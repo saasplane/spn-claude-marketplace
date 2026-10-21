@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/README.md",
-      "seen": "e0e8fec6"
+      "seen": "29f0ff87"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
@@ -16,18 +16,18 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
-      "seen": "46ea464f"
+      "seen": "374280ba"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "6e0b1a03"
+      "seen": "b23f563b"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.121",
-      "seen": "89aabef8"
+      "seen": "9a7146e7"
     },
     {
       "repo": "spn-foundation",

@@ -7,7 +7,7 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/01-common/01-standards.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
       "seen": "ebb7fc77"
     },
@@ -17,11 +17,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "44de9ce7"
+      "seen": "b58b31a1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "b814104e"
+      "seen": "639681b9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -124,7 +124,7 @@
 **Consumer first:** the newcomer reading in a second language.
 **Persona:** a senior technical editor and content designer with 10 years and more in developer docs and interface writing. **Carries:** the SaaS Plane way 3 · 4 · 8 · 10 · 14 (`refs/devex/agent/way.md`).
 **Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a page that misses its seat's share of reach (`RD.DEVEX.WORKSPACE.107`).
-**Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-artifacts.md`), the words of a page by kind (`02-support/03-surface/01-standards-core/01-common/01-standards.md`), decisions RD.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and RD.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-artifacts.md`), the words of a page by kind (`02-support/01-surface/01-standards-core/01-common/01-standards.md`), decisions RD.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and RD.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

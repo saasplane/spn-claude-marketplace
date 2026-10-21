@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/09-deployments.md", "seen": "d2f2daaf" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/09-deployments.md", "seen": "d2f2daaf" }
   ]
 }
 -->
 # Deployments — running locally, not on this cloud
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/09-deployments.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/09-deployments.md`. Read this as the restatement; that node governs.
 
 **Nothing places a deployment on Google Cloud.** No digest is promoted here, no namespace holds one, and no edge serves one.
 

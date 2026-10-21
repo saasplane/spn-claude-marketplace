@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "020faf26"
+      "seen": "36c99f62"
     }
   ]
 }
@@ -60,7 +60,7 @@ spnutils infra test <run> [package]
 | `PLATFORM` | `CONTRACT` · `INTEGRATION` | the platform layer renders once, and the environment and deployments layers again per declared environment |
 | `MODULE` | `CONTRACT` · `INTEGRATION` | identity alone, but the estate stands a seat for its world |
 
-Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/` · `integration/` — and `cloud/` is reserved, unwritten until the cloud tier lands. **The folder is the tier; the extension is the engine**: `*.sh` under `contract/` runs through bash; `*.test.mjs` under `unit/` runs under `node --test`; `*.tftest.hcl` under `unit/` or `integration/` plans under `tofu test`, mock providers only, plan-only, never an account. `integration/` also takes one `*.sh`, `acceptance.sh`, for the one render no test file can stage. A case sitting in the wrong folder, or written as the wrong kind of file, is refused at write time and at run time both — the full table is the foundation's `04-capabilities/02-support/02-infra/02-packages/02-tests.md`.
+Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/` · `integration/` — and `cloud/` is reserved, unwritten until the cloud tier lands. **The folder is the tier; the extension is the engine**: `*.sh` under `contract/` runs through bash; `*.test.mjs` under `unit/` runs under `node --test`; `*.tftest.hcl` under `unit/` or `integration/` plans under `tofu test`, mock providers only, plan-only, never an account. `integration/` also takes one `*.sh`, `acceptance.sh`, for the one render no test file can stage. A case sitting in the wrong folder, or written as the wrong kind of file, is refused at write time and at run time both — the full table is the foundation's `04-capabilities/02-support/03-infra/02-packages/02-tests.md`.
 
 **A harness reports cases, never only an exit code.** `ok`, `not ok` or `skip`, per `<TIER> <BEHAVIOUR-ID> <title>` — a harness that prints no case line has proven nothing, whatever it exits. A `skip` line is recorded `PENDING`, and a tier whose only cases were skipped reads as *no cases*, never as a pass.
 

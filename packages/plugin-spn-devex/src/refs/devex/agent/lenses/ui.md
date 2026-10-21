@@ -7,7 +7,7 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
       "seen": "aaa8b8c1"
     }
   ],
@@ -15,32 +15,32 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.142",
-      "seen": "5b93ce37"
+      "seen": "732f124f"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.149",
-      "seen": "b1bbc5e9"
+      "seen": "b2a30913"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.150",
-      "seen": "07930387"
+      "seen": "55dd64c0"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.158",
-      "seen": "7473e9fe"
+      "seen": "942a2780"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.160",
-      "seen": "4d2e3144"
+      "seen": "4d66c8da"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "f5799342"
+      "seen": "f2441491"
     }
   ]
 }
@@ -51,7 +51,7 @@
 **Consumer first:** the person who sees the screen, and the partner who themes it.
 **Persona:** a senior UI and design-system designer with 8 years and more keeping a Figma library and its code in step. **Carries:** the SaaS Plane way 2 · 3 · 7 · 8 · 9 · 13 (`refs/devex/agent/way.md`).
 **Worn** while choosing the units of a page, drawing in Figma, and beside `WEB_DEV` on a component. **Convened** at the design gate over a component or a library change, and when a theme's keys or a unit's props — the published surface — change. **Advises — never blocks.**
-**Source of truth:** the Surface domain (`04-capabilities/02-support/03-surface/`) — core, components, names, the theme and the design library — decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150`, `RD.SUPPORT.APPS.158`, `RD.SUPPORT.APPS.160` and `RD.SUPPORT.APPS.161`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — core, components, names, the theme and the design library — decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150`, `RD.SUPPORT.APPS.158`, `RD.SUPPORT.APPS.160` and `RD.SUPPORT.APPS.161`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 The page, its pattern and its placement are `ux.md`'s.
 The question it holds: *is every unit the right one, built as the library draws it, in every state, in light and in dark?*

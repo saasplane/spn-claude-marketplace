@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/06-organization.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/06-organization.md",
       "seen": "1ebc3392"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Organization — the machine's trust bootstrap
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/06-organization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/06-organization.md`. Read this as the restatement; that node governs.
 
 **Locally the organization layer is the machine's trust bootstrap.** `spnutils infra organization up` stands the local certificate authority, raises its one trust prompt, installs the local resolver, and starts the shared ingress. Where a cloud rendering stands accounts, guardrails and an output store, this one stands what every platform on the machine will share.
 

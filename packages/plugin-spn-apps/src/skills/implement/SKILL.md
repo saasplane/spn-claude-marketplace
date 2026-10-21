@@ -7,18 +7,18 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "d3d654ab"
+      "seen": "c056176a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/03-standards-patterns/",
-      "seen": "bffcdb0f"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
+      "seen": "1b342f83"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "8fca20e5"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
+      "seen": "c20dbaf6"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
       "seen": "44257497"
     }
   ],
@@ -26,7 +26,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.006",
-      "seen": "b4507306"
+      "seen": "35e7b913"
     }
   ]
 }

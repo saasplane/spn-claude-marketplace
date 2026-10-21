@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/05-app.md",
-      "seen": "1ac65ee0"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
+      "seen": "d898aad9"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
-      "seen": "965981aa"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
+      "seen": "f74342a1"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # The application — what it is, how it boots, and what it ships
 
-Source of truth: the foundation's application-lifecycle construct (`docs/02-constructs/02-support/01-apps/05-app.md`) and its capability chapters (`docs/04-capabilities/02-support/01-apps/05-app/`).
+Source of truth: the foundation's application-lifecycle construct (`docs/02-constructs/02-support/02-apps/05-app.md`) and its capability chapters (`docs/04-capabilities/02-support/02-apps/05-app/`).
 
 An application is the final runtime. Contracts, modules and support packages are all means to an end; the thing a platform actually runs is an application. **An app is `config + providers + modules`.** A module never carries that shape — a module has no providers of its own and boots nothing. Reach for this file when you compose an application, decide what boots before what, or work out what an application owes on release that a module never owes.
 

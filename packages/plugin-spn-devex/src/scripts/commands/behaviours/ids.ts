@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/06-tests/README.md § A case title carries the id and the sentence
+// RESTATES: spn-foundation docs/04-capabilities/02-support/02-apps/06-tests/README.md § A case title carries the id and the sentence
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The id check: contract, component and journey cases with no behaviour id in their title or an

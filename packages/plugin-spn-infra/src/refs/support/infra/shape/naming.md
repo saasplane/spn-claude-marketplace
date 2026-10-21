@@ -2,16 +2,16 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
       "seen": "7905545a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "b6dbcd41"
+      "seen": "b2bd74bb"
     },
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
       "section": "The rungs, and what a path may be",
       "seen": "8efff768"
     }
@@ -21,7 +21,7 @@
 
 # Names, DNS and the published vocabulary — quick reference
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md`, `docs/04-capabilities/02-support/02-infra/06-modules/02-config.md` and `docs/02-constructs/02-support/02-infra/06-modules.md`. Read this card as a restatement; the book governs. Examples use SPN Demo — org `spn`, platform `dmo`, domain `spndemo.app` — the only sample platform.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/01-shape/02-coordinates.md`, `docs/04-capabilities/02-support/03-infra/06-modules/02-config.md` and `docs/02-constructs/02-support/03-infra/06-modules.md`. Read this card as a restatement; the book governs. Examples use SPN Demo — org `spn`, platform `dmo`, domain `spndemo.app` — the only sample platform.
 
 **Compose every name from coordinates; a name that cannot be composed is a defect.** Nothing is ever derived from a setup name — `{env}` = `{region}-{setup}` is a label; posture comes from `{workload}` (`PROD` · `NP`) alone. The provider's own region is a **mapping on the cloud entry, never a coordinate**.
 

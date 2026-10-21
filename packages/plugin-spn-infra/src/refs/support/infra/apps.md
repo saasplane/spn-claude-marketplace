@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
-      "seen": "7265f7c2"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
+      "seen": "edc798c3"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
       "seen": "d2d6364e"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Estate apps — a row is a grant, and exposure is declared
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/05-apps.md` and `docs/04-capabilities/02-support/02-infra/05-apps/`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/05-apps.md` and `docs/04-capabilities/02-support/03-infra/05-apps/`. Read this card as the restatement; the book governs.
 
 ## An application runs because a row grants it — MUST
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `docs/02-constructs/02-support/02-infra/10-providers.md` § The tree follows the category
+// RESTATES: `docs/02-constructs/02-support/03-infra/10-providers.md` § The tree follows the category
 // vocabulary · § The check reads the declared provider, and never names a vendor; and
 // RD.DEVEX.AGENT.066 — a gate never names an instance. Those are the source of truth; this file
 // states no rule of its own.

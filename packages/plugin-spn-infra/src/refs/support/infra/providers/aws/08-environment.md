@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md",
-      "seen": "490b2ed3"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/08-environment.md",
+      "seen": "d46c8f9a"
     }
   ]
 }
 -->
 # Environment up — network, then resources, then compute
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/08-environment.md`. Read this as the restatement; that node governs.
 
 **The command is `spnutils infra environment up <spc> <env> --cloud`.** The environment layer has **no local form** — the machine is one environment, and targeting it locally is refused by name. The runbook behind this names `cinfra env up`, which never shipped.
 

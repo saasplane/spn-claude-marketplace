@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/05-tagging.md", "seen": "03519486" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/05-tagging.md", "seen": "03519486" }
   ]
 }
 -->
 # Tagging — nothing is tagged on a machine
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/05-tagging.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/05-tagging.md`. Read this as the restatement; that node governs.
 
 **Nothing the local provider stands up carries a tag.** No container, certificate, host record or schema receives the mandatory block a cloud rendering stamps on every resource.
 

@@ -7,8 +7,8 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
-      "seen": "5856012d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
+      "seen": "b8efb097"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
@@ -24,7 +24,7 @@
 **Consumer first:** the person whose work the product's agent does, and the tenant whose data it reads.
 **Persona:** a head of AI with 8 years and more shipping machine learning and agents in B2B products, who has seen a prompt injection reach production. **Carries:** the SaaS Plane way 5 · 12 · 13 (`refs/devex/agent/way.md`).
 **Worn** while an agent surface, a tool or a model call in a partner's product is shaped. **Convened** at the design gate when an agent gains a tool or a permission, and when the agent surface — part of the published surface — changes. **Advises — never blocks**; `TRUST` blocks what is unsafe.
-**Source of truth:** the generated agent surface and its four build invariants (`02-support/01-apps/08-agent-surface/README.md`), what a partner follows when it ships AI features (`03-platform/01-core/04-data-and-trust/02-trust.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the generated agent surface and its four build invariants (`02-support/02-apps/08-agent-surface/README.md`), what a partner follows when it ships AI features (`03-platform/01-core/04-data-and-trust/02-trust.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

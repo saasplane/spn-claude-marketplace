@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md § Layout and naming
+// RESTATES: spn-foundation docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md § Layout and naming
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 //
 // Where a TypeScript case lives and how its title cites a row — the stack's half of the behaviours

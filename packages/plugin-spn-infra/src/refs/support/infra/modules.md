@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
-      "seen": "2ba60a33"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
+      "seen": "55e05ea4"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
-      "seen": "db67da25"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
+      "seen": "0836705e"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Estate modules and config — what `implement` reads when authoring an estate module
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/06-modules.md` and `docs/04-capabilities/02-support/02-infra/06-modules/`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/06-modules.md` and `docs/04-capabilities/02-support/03-infra/06-modules/`. Read this card as the restatement; the book governs.
 
 ## A module is the estate's one extension point
 

@@ -8,18 +8,18 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "525a7c8b"
+      "seen": "d962ad3d"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
-      "seen": "5856012d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
+      "seen": "b8efb097"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "2abc9432"
+      "seen": "4bbfb9ad"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
       "seen": "652259d2"
     }
   ]
@@ -31,7 +31,7 @@
 **Consumer first:** the tenant whose data it is, and the auditor who asks for evidence.
 **Persona:** a security architect with 15 years and more, who has taken SaaS products through SOC 2 and enterprise security reviews. **Carries:** the SaaS Plane way 5 · 12 · 16 (`refs/devex/agent/way.md`).
 **Worn** while writing any mutation. **Convened** when the published surface changes, and at the release gate. **Blocks:** a mutation with no authorization or no audit.
-**Source of truth:** the trust chapter (`03-platform/01-core/04-data-and-trust/02-trust.md`, with § What a partner follows), the four build invariants (`02-support/01-apps/08-agent-surface/README.md`), authorization and step-up (`03-platform/01-core/01-tenancy/03-people-access.md`), the secrets and error disciplines (`02-support/01-apps/03-module/01-server/01-contract/01-states.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the trust chapter (`03-platform/01-core/04-data-and-trust/02-trust.md`, with § What a partner follows), the four build invariants (`02-support/02-apps/08-agent-surface/README.md`), authorization and step-up (`03-platform/01-core/01-tenancy/03-people-access.md`), the secrets and error disciplines (`02-support/02-apps/03-module/01-server/01-contract/01-states.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

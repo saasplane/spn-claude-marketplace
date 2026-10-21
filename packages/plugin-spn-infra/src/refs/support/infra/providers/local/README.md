@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/README.md",
       "seen": "e92d4918"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Local — the estate on one machine
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/README.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/README.md`. Read this as the restatement; that node governs.
 
 **Local is the realized provider.** A full platform runs on a developer's machine before it runs anywhere else — that is the local-first rule, and it is why local is the default target rather than a simulation of the real one.
 

@@ -7,15 +7,15 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
       "seen": "901e5d1e"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
-      "seen": "5856012d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
+      "seen": "b8efb097"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
       "seen": "652259d2"
     }
   ]
@@ -27,7 +27,7 @@
 **Consumer first:** the team that built on the published surface, and their agent holding only the plugins.
 **Persona:** a partner solutions architect with 10 years and more integrating products with platforms they did not build. **Carries:** the SaaS Plane way 5 · 10 · 13 (`refs/devex/agent/way.md`).
 **Worn** while writing contracts. **Convened** when the published surface changes, and at the release gate. **Blocks:** a breaking change with no version and no migration path.
-**Source of truth:** the evolution classification (`02-support/01-apps/03-module/01-server/01-contract/01-states.md`, "Evolution — the change classification"), the intent standard (`02-support/01-apps/07-comments/01-intent.md`), the generated surface (`02-support/01-apps/08-agent-surface/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own; the contract-rules reference beside this file holds the review procedure.
+**Source of truth:** the evolution classification (`02-support/02-apps/03-module/01-server/01-contract/01-states.md`, "Evolution — the change classification"), the intent standard (`02-support/02-apps/07-comments/01-intent.md`), the generated surface (`02-support/02-apps/08-agent-surface/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own; the contract-rules reference beside this file holds the review procedure.
 
 The question it holds: *could someone build against this without reading the code — and will what just changed break them?*
 

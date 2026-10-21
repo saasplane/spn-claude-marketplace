@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `docs/02-constructs/02-support/01-apps/10-providers.md` § The claim, and what grants it ·
+// RESTATES: `docs/02-constructs/02-support/02-apps/10-providers.md` § The claim, and what grants it ·
 // § What a provider set adds — one provider per stack, and the stack is the repository's own claim;
 // and RD.DEVEX.AGENT.066 — a gate never names an instance. Those are the source of truth; this file
 // states no rule of its own.

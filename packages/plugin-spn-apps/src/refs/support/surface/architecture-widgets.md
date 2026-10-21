@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "ff548cd5"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
+      "seen": "21b63a35"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "8fca20e5"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
+      "seen": "c20dbaf6"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Widgets — Units Placed Beside Others
 
-Source of truth: the foundation's Widgets construct (`docs/02-constructs/02-support/03-surface/07-architecture-widgets.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/07-architecture-widgets/`). Widgets is the seventh of thirteen Surface constructs.
+Source of truth: the foundation's Widgets construct (`docs/02-constructs/02-support/01-surface/07-architecture-widgets.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/07-architecture-widgets/`). Widgets is the seventh of thirteen Surface constructs.
 
 Read this before you place a card drawn from data, or before you decide whether a new block is a widget, a component or a composition of the page. **The thing to unlearn: a widget is not just a bigger component.** A component is the smallest block; a widget is built *from* components, and it stands beside others or in a sidebar, inside a container or not. A block built from components for one task and placed nowhere in particular, such as a data table, is a composite, and it is a component (`architecture-components.md`).
 

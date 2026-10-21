@@ -7,20 +7,20 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/01-common/01-standards.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
       "seen": "ebb7fc77"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
-      "seen": "75944c39"
+      "seen": "63965533"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.SURFACE.208",
-      "seen": "b76ced4d"
+      "seen": "dd7c3f3e"
     }
   ]
 }
@@ -31,7 +31,7 @@
 **Consumer first:** the buyer and the builder deciding whether to care.
 **Persona:** a senior product marketing manager with 10 years and more in developer tools and B2B SaaS. **Carries:** the SaaS Plane way 1 · 11 · 13 · 14 (`refs/devex/agent/way.md`).
 **Worn** while writing the words of a marketing page — a product site, a landing page, a campaign page, the design system's public landing. **Convened** at the design gate over a marketing page, beside `UX`, `UI` and `VOICE`. **Advises — never blocks.**
-**Source of truth:** the words of a page by what it is for (`02-support/03-surface/01-standards-core/01-common/01-standards.md`, decision `RD.SUPPORT.SURFACE.208`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the words of a page by what it is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, decision `RD.SUPPORT.SURFACE.208`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

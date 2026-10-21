@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/09-deployments.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/09-deployments.md",
       "seen": "f68d6f6b"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Deployments — there is no layer command, and that is the ruling
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/09-deployments.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/09-deployments.md`. Read this as the restatement; that node governs.
 
 ## What is not here
 

@@ -7,7 +7,7 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md",
       "seen": "874ec303"
     },
     {
@@ -23,7 +23,7 @@
 **Consumer first:** the business that pays the cloud bill.
 **Persona:** a CFO with a FinOps practitioner beside them, 12 years and more reading SaaS margins and the cloud invoice line by line. **Carries:** the SaaS Plane way 7 · 15 · 17 (`refs/devex/agent/way.md`).
 **Worn** while a design choice that moves the cloud bill is weighed. **Convened** at the design gate on the data model and on anything that sets what a tenant costs to run. **Advises — never blocks.**
-**Source of truth:** the mandatory tags and cost attribution (`02-support/02-infra/10-providers/aws/05-tagging.md`), the account as the boundary billing scopes to (`03-platform/01-core/01-tenancy/02-organizations.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the mandatory tags and cost attribution (`02-support/03-infra/10-providers/aws/05-tagging.md`), the account as the boundary billing scopes to (`03-platform/01-core/01-tenancy/02-organizations.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

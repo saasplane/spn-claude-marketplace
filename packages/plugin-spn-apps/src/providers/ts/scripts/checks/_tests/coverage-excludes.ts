@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/06-tests/README.md § Code coverage is reported, never enforced
+// RESTATES: spn-foundation docs/04-capabilities/02-support/02-apps/06-tests/README.md § Code coverage is reported, never enforced
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 //
 // Refuses a write to a Jest or Vitest configuration that adds a coverage exclude with no comment

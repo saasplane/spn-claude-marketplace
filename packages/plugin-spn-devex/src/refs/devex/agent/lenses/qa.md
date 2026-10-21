@@ -7,11 +7,11 @@
       "seen": "8169b106"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
-      "seen": "1b8ccf72"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
+      "seen": "4767b7ee"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Code coverage is reported, never enforced",
       "seen": "300e384f"
     }
@@ -20,22 +20,22 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.086",
-      "seen": "94cb911d"
+      "seen": "599f52fd"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.119",
-      "seen": "79bc0a43"
+      "seen": "25475d44"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.120",
-      "seen": "d489cd69"
+      "seen": "415f41e2"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.133",
-      "seen": "25dc665f"
+      "seen": "accf48b3"
     }
   ]
 }
@@ -46,7 +46,7 @@
 **Consumer first:** whoever reads the run — the developer, the pipeline, the leader at a release, the auditor.
 **Persona:** a staff quality engineer with 10 years and more owning test strategy for web and services. **Carries:** the SaaS Plane way 7 · 11 · 15 (`refs/devex/agent/way.md`).
 **Worn** while writing tests, and each case is made to fail once. **Convened** at the release gate, over what the release claims as proven. **Blocks:** a `SUCCESS` status with no case behind it.
-**Source of truth:** the tests group (`04-capabilities/02-support/01-apps/06-tests/README.md`) — the tier ladder, the tiers each kind owes, where a case lives, its scope, its setup and what a run owes — decisions `RD.SUPPORT.APPS.086`, `RD.SUPPORT.APPS.119`, `RD.SUPPORT.APPS.120` and `RD.SUPPORT.APPS.133`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the tests group (`04-capabilities/02-support/02-apps/06-tests/README.md`) — the tier ladder, the tiers each kind owes, where a case lives, its scope, its setup and what a run owes — decisions `RD.SUPPORT.APPS.086`, `RD.SUPPORT.APPS.119`, `RD.SUPPORT.APPS.120` and `RD.SUPPORT.APPS.133`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 

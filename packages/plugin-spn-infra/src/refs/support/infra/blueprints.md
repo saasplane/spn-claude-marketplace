@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md",
-      "seen": "ede1c5df"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/03-blueprints.md",
+      "seen": "f209d11e"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/",
-      "seen": "1a2ca85d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
+      "seen": "a23ce8f9"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Estate blueprints — the five layers, the tree, and what proves a change
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/03-blueprints.md` and `docs/04-capabilities/02-support/02-infra/03-blueprints/`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/03-blueprints.md` and `docs/04-capabilities/02-support/03-infra/03-blueprints/`. Read this card as the restatement; the book governs.
 
 This card is provider-agnostic. The estate ships as one plugin, and a cloud is a folder inside it — a specific cloud's own account rendering, region codes and console mechanics live in that cloud's own provider ref, never here. Everything below is true of every cloud a company might bind, and of the local realization.
 

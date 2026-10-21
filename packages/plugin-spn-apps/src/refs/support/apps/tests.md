@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/06-tests.md",
-      "seen": "dddeac86"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
+      "seen": "9cafc5f8"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "77a71f1e"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
+      "seen": "23d1806c"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Proof tiers — what proves a behaviour, at the apps level
 
-Source of truth: the foundation's proof-tiers construct (`docs/02-constructs/02-support/01-apps/06-tests.md`) and its capability chapters (`docs/04-capabilities/02-support/01-apps/06-tests/`).
+Source of truth: the foundation's proof-tiers construct (`docs/02-constructs/02-support/02-apps/06-tests.md`) and its capability chapters (`docs/04-capabilities/02-support/02-apps/06-tests/`).
 
 A behaviour row states what a person or another system can do. Marking it done with nothing exercising it produces a status somebody asserted rather than one anybody verified. Reach for this file when you decide which tier a case belongs on, or how a case you write joins the row it proves.
 

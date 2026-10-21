@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/08-architecture-containers.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
       "seen": "403e2c18"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
       "seen": "44257497"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Containers — How a Part of a Page Is Framed
 
-Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/03-surface/08-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/08-architecture-containers/`). Containers is the eighth of thirteen Surface constructs.
+Source of truth: the foundation's Containers construct (`docs/02-constructs/02-support/01-surface/08-architecture-containers.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/08-architecture-containers/`). Containers is the eighth of thirteen Surface constructs.
 
 Read this before you frame a part of a page, or before you draw or build the container on a new stack.
 

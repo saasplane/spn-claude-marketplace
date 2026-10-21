@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "4c13632f"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
+      "seen": "0899a1be"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "e1d41d8d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
+      "seen": "ac0af325"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Delivery Library — Where the Look Is Drawn
 
-Source of truth: the foundation's Delivery Library construct (`docs/02-constructs/02-support/03-surface/11-delivery-library.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/11-delivery-library/`). Delivery Library is the eleventh of thirteen Surface constructs, and the first of the Delivery group — where the library is drawn and what every stack shows as proof.
+Source of truth: the foundation's Delivery Library construct (`docs/02-constructs/02-support/01-surface/11-delivery-library.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/11-delivery-library/`). Delivery Library is the eleventh of thirteen Surface constructs, and the first of the Delivery group — where the library is drawn and what every stack shows as proof.
 
 Read this before you add a token or a block to the library, or before you ask whether a look may live only in one stack's code. The units the book names are the core units, and the library draws those. A stack may provide further units of its own, as `architecture-components.md` states. The book does not name them, so the library does not draw them, and the order of a change does not bind them.
 

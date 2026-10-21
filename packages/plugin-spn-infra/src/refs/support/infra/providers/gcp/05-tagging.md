@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/05-tagging.md", "seen": "65d695c6" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/05-tagging.md", "seen": "65d695c6" }
   ]
 }
 -->
 # Tagging — the coordinates are fixed and the rendering is not
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/05-tagging.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/05-tagging.md`. Read this as the restatement; that node governs.
 
 **Nothing states which Google Cloud facility carries the coordinates**, or which policy would make them mandatory on resources here.
 

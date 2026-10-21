@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/README.md", "seen": "bfc02af2" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/README.md", "seen": "bfc02af2" }
   ]
 }
 -->
 # The estate on AWS — the folder, entry by entry
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/README.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/README.md`. Read this as the restatement; that node governs.
 
 **Read this before you tell anybody what AWS can do today.** What is reachable here is narrower than the model suggests, and the difference is not visible from the declaration. [`01-realization.md`](01-realization.md) says exactly how narrow.
 

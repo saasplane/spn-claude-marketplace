@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/13-providers.md",
-      "seen": "b8028def"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
+      "seen": "c00d7d21"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
       "seen": "43d97529"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
       "seen": "6cca5fa5"
     }
   ]
@@ -19,7 +19,7 @@
 
 # Providers — Who Realizes Surface in Code
 
-Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/03-surface/13-providers.md`), its capability chapters (`docs/04-capabilities/02-support/03-surface/13-providers/`), and the TypeScript provider's own chapter, `13-providers/ts/01-design-system.md`. Providers is the thirteenth and last of the Surface constructs.
+Source of truth: the foundation's Providers construct (`docs/02-constructs/02-support/01-surface/13-providers.md`), its capability chapters (`docs/04-capabilities/02-support/01-surface/13-providers/`), and the TypeScript provider's own chapter, `13-providers/ts/01-design-system.md`. Providers is the thirteenth and last of the Surface constructs.
 
 Read this before you ask which stack builds a block, whether Figma counts as one, or how `@saasplane/support-web-ds-ts` realizes the app's two contexts. **The thing to unlearn: the design library is not a provider.** It draws the look; a provider builds code. Figma lives beside this construct, in `delivery-library.md`'s capability, never in this one's.
 

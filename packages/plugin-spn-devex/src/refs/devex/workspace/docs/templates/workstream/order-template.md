@@ -7,7 +7,7 @@ decisions: [{{q<n>}}]                   # the cards the row rests on, by id
 facts: [{{f<n>}}]                       # the facts it rests on, by id, from the arc's facts.jsonl
 ---
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules · § The formats · § Orders name what they need by id, and a workflow runs the ready rows · § Work is sized by its kind, and fixes gather into a round
-     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § The selective loop — what runs while work is under way
+     and docs/04-capabilities/02-support/02-apps/06-tests/README.md § The selective loop — what runs while work is under way
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->

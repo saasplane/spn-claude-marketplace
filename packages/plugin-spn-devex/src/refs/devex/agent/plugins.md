@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "10cf3da6"
+      "seen": "ea93e33c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -82,7 +82,7 @@ An edit to the folder changes nothing about the cache until an install copies on
   // Documents the ref REWRITES in its own words. You read the chapter and restate it.
   "docs": [
     { "path": "spn-foundation/CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md", "seen": "b204d81c" }
   ],
 
   // Files you COPY rather than rewrite — a template, a schema, a sample.

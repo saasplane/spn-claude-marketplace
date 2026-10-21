@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/11-conformance.md", "seen": "f0aa42b4" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/11-conformance.md", "seen": "f0aa42b4" }
   ]
 }
 -->
 # Conformance — what AWS would have to prove, and nothing proves it today
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/11-conformance.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/11-conformance.md`. Read this as the restatement; that node governs.
 
 ## What is not here
 

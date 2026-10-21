@@ -1,5 +1,5 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it · § A step names every surface the change reaches, and how you would know · § Documents first, and the order they are written in · § An order is one delegated execution, and every order follows the same rules
-     and docs/04-capabilities/02-support/01-apps/06-tests/README.md § When a whole tier runs
+     and docs/04-capabilities/02-support/02-apps/06-tests/README.md § When a whole tier runs
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->

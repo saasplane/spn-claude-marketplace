@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/08-environment.md", "seen": "a43d7c4a" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/08-environment.md", "seen": "a43d7c4a" }
   ]
 }
 -->
 # Environment — refused by name
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/08-environment.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/08-environment.md`. Read this as the restatement; that node governs.
 
 **The environment layer has no local form at all, and pointing the environment noun at a machine is refused by name.** `spnutils infra environment up | down | status` takes `{spc}` and then `{env}`, and requires `--cloud`. The refusal is the answer this page gives, not a note about work still to come.
 

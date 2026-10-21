@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "9c0b15cb"
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
+      "seen": "2b19d21c"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
       "seen": "9a2c7a36"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Names — One Name for a Block, a Prop and a Value
 
-Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/03-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
+Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/01-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
 
 Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the kinds of prop and the states a design and its code share.
 

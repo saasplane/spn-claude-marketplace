@@ -2,11 +2,11 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "seen": "9a2b856f"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
       "seen": "59ba7f4d"
     }
   ]
@@ -15,7 +15,7 @@
 
 # Components — The Blocks a Surface Is Built From
 
-Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/03-surface/06-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/06-architecture-components/`). Components is the sixth of thirteen Surface constructs.
+Source of truth: the foundation's Components construct (`docs/02-constructs/02-support/01-surface/06-architecture-components.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/06-architecture-components/`). Components is the sixth of thirteen Surface constructs.
 
 Read this before you place a block on a page, before you propose a new one, or before you draw or build a component on a new stack. **The thing to unlearn: a missing control is never a reason to write one inside a page.** A control built inside a page gets none of the theme, the density, the accessibility or the translation that every listed block has. Propose it to the design system. A core unit is named and grouped here, and only then drawn and built.
 

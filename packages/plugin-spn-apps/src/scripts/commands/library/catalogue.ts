@@ -42,7 +42,7 @@ const SUPPORT = "spn-support-ts";
 const OUT = join("spn-claude-marketplace", "packages", "plugin-spn-apps", "src", "refs",
   "support", "apps", "providers", "ts", "14-libraries.md");
 /** The book entry this ref answers. The RULE is the book's; the LIST is this file's. */
-const BOOK_RULE = slashes(join(capabilitiesDir(docsOf("spn-foundation")), "02-support", "01-apps", "10-providers", "ts", "14-libraries.md"));
+const BOOK_RULE = slashes(join(capabilitiesDir(docsOf("spn-foundation")), "02-support", "02-apps", "10-providers", "ts", "14-libraries.md"));
 
 /**
  * The hash of the book entry, computed where the book is there and carried forward where it is not.

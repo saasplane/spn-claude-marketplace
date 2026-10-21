@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/01-realization.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/01-realization.md",
       "seen": "7f7be7f2"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Realization — what local is, and what it binds
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/01-realization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/01-realization.md`. Read this as the restatement; that node governs.
 
 **Local realizes the design of record on one developer machine.** It consumes the same manifests a cloud provider consumes, so it is a realization rather than a second design.
 

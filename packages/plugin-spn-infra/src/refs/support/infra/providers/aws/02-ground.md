@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/02-ground.md", "seen": "c00da836" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/02-ground.md", "seen": "c00da836" }
   ]
 }
 -->
 # Ground — the manual minimum no software can make for you
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/02-ground.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/02-ground.md`. Read this as the restatement; that node governs.
 
 **The command surface is `spnutils infra <layer> <verb> … --cloud`**, with the layer nouns `organization` · `platform` · `environment`; a platform-scoped layer names its `<spc>` straight after the verb. The runbook behind this predates that surface and names `cinfra`, which never shipped, along with a three-step split of `org` · `cc` · `env`. **Read the steps; ignore the old command names wherever you meet them.**
 
