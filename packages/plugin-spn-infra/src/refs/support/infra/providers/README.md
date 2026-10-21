@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/",
-      "seen": "75989b67"
+      "seen": "2eebf228"
     }
   ]
 }
@@ -17,6 +17,12 @@
 **Source of truth:** the foundation's `02-constructs/02-support/03-infra/10-providers.md` and its capability chapters. Read this as the restatement; the book governs.
 
 **This folder is not `providers/aws/*`.** Those say what AWS actually does. This says what a provider *is*, and what the commands above it are therefore allowed to know.
+
+| Provider | Realizes the estate | Status |
+| --- | --- | --- |
+| `local/` | on one developer machine — `spnutils infra …`, the default realization | ✅ implemented |
+| `aws/` | in AWS accounts — `spnutils infra <layer> --cloud` | 🚧 implementing — blueprints exist for six groups; the first delivery is under way |
+| `gcp/` | in Google Cloud accounts | 🔮 planned — nothing built yet |
 
 ## Why two engineers can run different infrastructure and read the same rule
 
