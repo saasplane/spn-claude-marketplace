@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "aa2f2f74"
+      "seen": "65b36088"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
@@ -308,7 +308,7 @@ A unit whose props take objects explains each object under its props table, in a
 
 ## The container's pages, and the units of App — 🔮
 
-The pages of `DSPanelContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
+The pages of `DSPanelContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that the `surface` makes, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
 App is three units, and none has a page beyond its Overview, its main page and its Playground; a case such as the theme's defaults or the device is a section or a tab of the main page. The main page of `DSApp` embeds one sample app for each job of a layout under its Usage, one tab each: an admin app in Rail, a profile in Dock, a website in Top nav and a sign-in on Canvas, with the theme's form in a sheet, and the sample app takes the theme the form applies (`RD.SUPPORT.SURFACE.207`). The pages of `DSLayout` draw the same samples, and the admin app holds one working page for each of the fourteen page patterns. The Playground of `DSApp` and of `DSContext` chooses the theme the page's `DSApp` is given.
 

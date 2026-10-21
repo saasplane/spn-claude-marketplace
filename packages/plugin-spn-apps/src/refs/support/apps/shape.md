@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
-      "seen": "56065b89"
+      "seen": "c7777149"
     }
   ]
 }
@@ -83,6 +83,8 @@ Every node you build from `contract` / `app` / `entry` follows the same three la
 | no — `APP_*` | refused: `release` is the repository's command, never a node's | exists, once built |
 
 If you invoke `release` on a node, expect a refusal — versioning is lockstep within a repository: every publishable project releases at one version, the source carries a placeholder, and the real number is stamped at publish. A node's own release line is the repository's per-package step; do not invoke it alone.
+
+**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RD.SUPPORT.APPS.214`). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
 
 ### Test tiers
 

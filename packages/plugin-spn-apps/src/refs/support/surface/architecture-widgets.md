@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "21b63a35"
+      "seen": "64053651"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "c20dbaf6"
+      "seen": "1a9ee519"
     }
   ]
 }
@@ -61,9 +61,10 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **A part with no row MUST draw its `emptyText`, in the inset of the card and in the muted tone.** With no `emptyText` it draws its head alone.
 - **A row of an `ITEMS` part MUST hold one link, and never a link inside a link.** What `endNode` holds stays outside the link, so a press on an action there does the action and does not follow the link.
 - **A row of an `ITEMS` part or of a `LIST` part MAY be `selected`.** The page says which row is chosen, and the widget draws it as a chosen row of a list, with the band and `aria-current="true"`. The widget holds no state for it.
-- **The widget MUST take `raised`, `bordered` and `rounded` for the surface of its card, and `fullHeight`, and MUST hand each to its `DSCard`.** One that the page does not give follows the card look of the theme (`architecture-app.md`).
-- **The widget MUST take `divided` from its own prop where the prop is given, else from the theme's `cardWidget`** (`RD.SUPPORT.SURFACE.128`). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
-- **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the theme's `cardWidget`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
+- **The widget MUST take `surface` and `frames` for the frame of its card, and `fullHeight`, and MUST hand each to its `DSCard`** (`RD.SUPPORT.SURFACE.261`, `RD.SUPPORT.SURFACE.262`). `surface` is an `IDSFrameSurface` and `frames` is `DSBoxPartType[]`, and they mean on the widget what they mean on the card. `frames` is `HEADER`, `CONTENT` and `FOOTER` where the page names none, so a dashboard tile may list `CONTENT` alone and stand its title flat above a framed body. A key of the surface that the page does not give follows the card look of the theme (`architecture-app.md`).
+- **A planned part.** The widget's `frames` and its `surface` in place of the four paint props, and its look at `theme.widget.card`, are design, and no stack builds them yet. The design system takes them in its own change, and the library is owed.
+- **The widget MUST take `divided` from its own prop where the prop is given, else from the theme's `widget.card`** (`RD.SUPPORT.SURFACE.128`). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
+- **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the theme's `widget.card`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
 - **The widget MUST take one `size`, and MUST pass it to its head, its lists and its rows.**
 - **The widget MUST NOT fold rows away.** A row that a page wants hidden, or shown in another way, is the page's to place, usually in a `FREE` part or in the footer.
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTable`.
@@ -79,6 +80,8 @@ This ref states what makes a unit a widget, and what `DSCardWidget` is built fro
 | --- | --- |
 | `RD.SUPPORT.SURFACE.127` | the card widget is a core widget, each group of its settings is the props of the unit that draws it, the kinds of its parts, and it folds no rows away |
 | `RD.SUPPORT.SURFACE.128` | the order the card widget takes its lines and the hover of its rows in: its own prop, else the theme's card widget look |
+| `RD.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, and the widget hands it to its card |
+| `RD.SUPPORT.SURFACE.262` | the widget takes `frames` and hands them to its card, all three parts where the page names none |
 | `RD.SUPPORT.SURFACE.181` | the small head of a card widget's part takes actions drawn as the head of a group |
 | `RD.SUPPORT.SURFACE.192` | a partner paints the card widget with a class of their own, and the class sets the card's paint tokens and nothing else |
 | `RD.SUPPORT.SURFACE.098` | a widget's name has no letter for the layer before it |

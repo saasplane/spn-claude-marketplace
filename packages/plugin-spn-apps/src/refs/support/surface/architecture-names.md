@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "2b19d21c"
+      "seen": "b0dc1a08"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "9a2c7a36"
+      "seen": "962fed44"
     }
   ]
 }
@@ -16,6 +16,8 @@
 # Names — One Name for a Block, a Prop and a Value
 
 Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/01-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
+
+> **Planned.** The names `DSFeatureGridSectionContainer`, `DSDataTablePanelContainer`, `IDSGrid`, `IDSFrameSurface`, `DSBoxPartType` and the props `surface`, `section`, `panel`, `heading` and `grid` are design, and no stack builds them yet. The design system takes them in its own change, and the library is owed.
 
 Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the kinds of prop and the states a design and its code share.
 
@@ -69,7 +71,7 @@ The design system has two sizes, and each means one thing (`RD.SUPPORT.SURFACE.1
 
 ### Names with a rule of their own
 
-A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container, the card, the feature and the row of tabs (`DSTabs`, with no default) take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTable`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
+A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. `raised` stays with the container, the card, the feature and the row of tabs (`DSTabs`, with no default): a key of `surface` on the first three, and a prop on the tabs. A container and a card take `raised`, `bordered` and `rounded` as the keys of their `surface`, and a table and a code view take `bordered` and `rounded` as props of their own. `rounded` is a key of `surface` on `DSCard` and a prop on `DSTable` and `DSCodeBlockView`; `RD.SUPPORT.SURFACE.215` still gives the tabs no default and no card look. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set. A part of a card takes `flush` too, for a part that draws no padding of its own, so that its content reaches the edge of the card. `DSTable` takes `hoverable`, yes or no, for whether a body row takes the table's row-hover fill under the pointer. A selected row, and a row that holds an open menu, keep their fill whichever way it is set. `DSTable`, and the table layout config of `DSDataTable`, take `striped`, yes or no, for whether the rows take alternating fills. Where `hoverable` or `striped` is not given, it takes the value of the theme's `table`: stripes and no hover by default. A prop that is a trait that is on or off takes an adjective, so the name is `hoverable`.
 
 A word keeps one meaning in the whole design system. So `shape` always means an outline: the one a picture is cut to, or the one a mark stands on. The word `overlay` always means drawn over the content.
 
@@ -80,7 +82,8 @@ These yes-or-no props each belong to one block or two. Each is no when it is not
 | `DSList` | `hoverable` | a row takes the list's row-hover fill under the pointer, also where it is no link. A row that is chosen keeps its fill |
 | `DSList.Item` · `DSItem` | `showArrow` | a chevron is drawn at the end of the row, to say that the row leads somewhere |
 | A data cell of `DSTable` | `marked` | the cell stands out in its row, in the medium weight and the default text colour |
-| `DSCard` | `fullHeight` | the card fills the height of the place it stands in. Otherwise it is as tall as what it holds |
+| `DSCard` | `fullHeight` | the card fills the height of a place with a set height. Otherwise it takes no height of its own: alone it is as tall as what it holds, and in a grid or a row it stands as tall as the tallest card |
+| `DSSectionContainer` | `flush` | the child runs to the edges of the section's place, with no gutter. Its words then line up with the box by `--section-box-inset` |
 | `DSCard` | `divided` | a line is drawn between each two parts of the card |
 | `DSSheet` | `modal` | the sheet takes the page over, with a scrim. Otherwise it stands beside the page, and the page stays usable. Yes by default |
 | `DSToolbar` | `bordered` | a frame is drawn around the row of controls. Yes by default |
@@ -115,17 +118,23 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL` · `FIT`, `MD` when unset | `DSOverlayExtentType` |
-| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` · `DSSectionContainer` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
 | `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
 | `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |
 | `DSItem`, on a fact whose `mtype` is `TEXT` | `color` (the hue of the words of the fact; unset, the muted tone) | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `BACKDROP`. Unset, the default of the level | `DSFeatureType` |
 | `DSFeature` | `textAlign` (how the text part lines up inside the place its type gives it: the words, the actions and a small picture, in the reading direction) | `START` · `CENTER` · `END`, `START` when unset | `DSHorizontalAlignType` |
 | `DSFeature` | `actionsPlacement` (where the actions stand against the items: after them, closing the feature, or before them, under the words) | `BEFORE_ITEMS` · `AFTER_ITEMS`, `AFTER_ITEMS` when unset | `DSFeatureActionsPlacementType` |
-| `DSFeature` | `itemsType` (how the items are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
-| `DSFeature` | `itemsNumbered` (whether the numbers 1 to n stand before the titles of the items) | yes or no, no by default | none |
-| `DSFeature` | `itemsOrientation` (how every item stands; an item sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
-| `DSFeature` | `frames` · `unframed` (the parts the frame holds, and the parts it leaves out) | a list of `TEXT` · `MEDIA`. Unset, the theme's `feature` | `DSFeaturePartType` |
+| `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `type` (how the items are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
+| `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `numbered` (whether the numbers 1 to n stand before the titles of the items) | yes or no, no by default | none |
+| `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `orientation` (how every item stands; an item sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
+| `IDSGridColumns`, in `IDSGrid` on `DSFeatureGridSectionContainer`, and as `gridColumns` on every other unit that draws a grid | `desktop` · `tablet` · `mobile` (how many columns a grid stands in at each screen class; the live device picks one and nothing measures a width; all three required) | a whole number, 1 to 4 on the grid section, the feature's items and the data unit group, 1 to 6 elsewhere | none |
+| `IDSGrid`, on `DSFeatureGridSectionContainer` · `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `borderType` (the lines of a grid: none, lines between the cells, or lines between them and around the outside) | `NONE` · `GRID` · `EDGE`, `NONE` when unset, and `GRID` for a list of items | `DSGridBorderType` |
+| `DSFeatureGridSectionContainer` · `DSDataTablePanelContainer` | `section` · `panel` (the props of the box the unit draws, a section or a panel, whole but what the unit decides: one attribute named after the box) | a named interface of the owner's props, `IDSFeatureGridSectionContainerSectionProps` · `IDSDataTablePanelContainerPanelProps` | none |
+| `DSFeatureGridSectionContainer` | `heading` (the heading over the grid: the eyebrow, title, description, facts, actions and alignment of a feature) | a named interface of `IDSFeatureProps`' props, `IDSFeatureGridSectionContainerHeadingProps` | none |
+| `DSPanelContainer` · `DSCard` · `DSFeature` · `DSCardWidget` · `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `surface` (the paint of the frame in one prop: its fill, how strong the fill is, whether it is lifted, its border and its corners) | `IDSFrameSurface`: `color` · `strength` · `raised` · `bordered` · `rounded`, each optional, a key left out taking the theme's | none |
+| `DSFeature` | `frames` (the parts of the feature the frame holds) | a list of `TEXT` · `MEDIA`. None when unset | `DSFeaturePartType` |
+| `DSPanelContainer` · `DSCard` · `DSCardWidget` | `frames` (the parts of the box the frame holds) | a list of `HEADER` · `CONTENT` · `FOOTER`. A panel's, from the theme's `container.panel` when unset; a card's and a card widget's, all three | `DSBoxPartType` |
 | `DSFeature` | `mediaNode` · `contentNode` (art drawn as given, and a part of the page's own in the place of the items; `media` is data, as on `DSItem`) | a node | none |
 | `DSItem` | `mediaAlign` (where the picture stands against the text) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSVerticalAlignType` |
 | `DSItem` | `endAlign` (where the end node stands against the text: at the title's first line, in the middle of the text, or at the last line of the text) | `TOP` · `CENTER` · `BOTTOM`. Unset, a line keeps its end node centred and a vertical item keeps it at the top end | `DSVerticalAlignType` |
@@ -166,7 +175,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs`, `DSFeature` and `DSSectionContainer` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 
@@ -204,11 +213,12 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 | --- | --- | --- |
 | Nowhere in particular: a component, a composite included | no word | `DSButton` · `DSTable` · `DSDataTable` · `DSFilterBar` · `DSFeature` |
 | Beside others, or in a sidebar, inside a container or not | `Widget` | `DSCardWidget` |
-| Around a part of a page | `Container` | `DSPanelContainer` · `DSDataTableContainer` |
+| Around a part of a page | `Container`, with the box it draws before it when it draws one | `DSPanelContainer` · `DSDataTablePanelContainer` · `DSSectionContainer` · `DSFeatureGridSectionContainer` |
 | Around a page | `Layout` | `DSLayout` |
 | Around an app | `App` | `DSApp` |
 
 - **A suffix MUST name where a unit is placed: `App`, `Layout`, `Container` or `Widget`** (`RD.SUPPORT.SURFACE.229`). A reader then tells where a block stands from its name alone, in the book, in the design library and in every stack.
+- **The word before `Container` MUST name the box the unit draws, and the unit MUST be written in place of that box** (`RD.SUPPORT.SURFACE.267`). A `…PanelContainer` stands where a panel may, and a `…SectionContainer` where a section may. There is no `DSCardContainer`, `DSFeatureContainer` or `DSFeatureSectionContainer`. `architecture-containers.md` states the rule and the props it carries.
 - **A component MUST take no such word.** A composite is placed nowhere in particular, so it is a component and takes none: a data table is `DSDataTable`, never a widget by name.
 - **No block MAY carry a letter for its layer before its name.** A letter before the name was the only mark of its kind in the design system, and a reader had to be told what it stood for.
 - **A name that belongs to a block MUST keep the block's whole name first, and its own word follows.** This holds for a config, a vocabulary, an item and a private part. The table below gives the names that belong to the core composites and the core widget.
@@ -228,7 +238,8 @@ A suffix names where a unit is placed: `App`, `Layout`, `Container` and `Widget`
 | `DSFeature` | its props | `IDSFeatureProps` |
 | `DSFeature` | the vocabulary of its forms, of the ways it draws its items, of where its actions stand, and of the parts its frame holds | `DSFeatureType`, `DSFeatureItemsType`, `DSFeatureActionsPlacementType` and `DSFeaturePartType` |
 | `DSFeature` | an action, and an item | `IDSFeatureAction` and `IDSFeatureItem` |
-| `DSFeature` | the theme's look for it | `IDSThemeFeature`, held in `theme.feature` |
+| `DSFeatureGridSectionContainer` | its props, and the interface of each group | `IDSFeatureGridSectionContainerProps`, with `IDSFeatureGridSectionContainerSectionProps` and `IDSFeatureGridSectionContainerHeadingProps` |
+| `DSDataTablePanelContainer` | its props, its metadata, and the panel it draws | `IDSDataTablePanelContainerProps`, `IDSDataTablePanelContainerMetadata` and `IDSDataTablePanelContainerPanelProps` |
 
 `DSAnchorContainer` is a component of Utility, and its name ends in `Container` today. The developer has not ruled on that name, so it stays as it is.
 
@@ -252,6 +263,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.229` | a suffix names where a unit is placed (`App`, `Layout`, `Container`, `Widget`); a component, a composite included, takes none, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.SURFACE.100` | `size` says how dense a control is and `scaleSize` how large a thing that is shown is drawn; the icon, the mark, the avatar and the avatar group take `scaleSize` |
+| `RD.SUPPORT.SURFACE.267` | the word before `Container` names the box a unit draws and is written in place of, so a `…PanelContainer` stands where a panel may and a `…SectionContainer` where a section may |
 | `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
 | `RD.SUPPORT.SURFACE.154` | the values of `variant` are named by their strength and read from the strongest to the faintest, and every variant of every hue, and of a colour the page chooses, keeps its text readable |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |

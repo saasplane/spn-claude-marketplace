@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "ac0af325"
+      "seen": "0810090f"
     }
   ]
 }
@@ -57,7 +57,7 @@ A file can use only what another file has published. SaaS Plane's own library is
 | DS 5-Layouts | Layouts |
 | DS 9-Lab | drafts, never published |
 
-Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Treatment` (the values of `variant`, `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK`, for a unit that takes its look as a mode, with `SUBTLE` the default; the file still holds the modes of before, `SOFT` among them, and is owed these), `Mark-Shape` (the values of `shape` of a mark, `CIRCLE` · `ROUNDED` · `SQUARE`), `Scale` (it also holds the size of an icon and of a mark at each scale size), `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
+Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Treatment` (the values of `variant`, `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK`, for a unit that takes its look as a mode, with `SUBTLE` the default; the file still holds the modes of before, `SOFT` among them, and is owed these), `Mark-Shape` (the values of `shape` of a mark, `CIRCLE` · `ROUNDED` · `SQUARE`), `Scale` (it also holds the size of an icon and of a mark at each scale size), `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the panel look: `frames` and the keys `raised`, `bordered` and `rounded` of its `surface` (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
 
 The organisation of a library file that the book states holds for any library, the builder's and a partner's own: a page for a group, a section for a unit with its header, set, Usage, Cases and Parts, the distances, the names of labels and cases, and the checks before a publish. Which files a library is divided into is the builder's for its design system and a partner's own for a library of its own. A partner's library uses the builder's published library and never edits it.
 
@@ -140,7 +140,7 @@ An inventory is read to one of three depths, and each is a reading of its own.
 
 | The inventory holds | For | What it settles |
 | --- | --- | --- |
-| the frame of a version: its fill, border, corners and shadow, and the variables bound to them | the set | `bordered`, `raised` and `rounded` of a card |
+| the frame of a version: its fill, border, corners and shadow, and the variables bound to them | the set | `bordered`, `raised` and `rounded` of the `surface` of a card |
 | the sizing of a layer: fill, hug or fixed, across and down | the set | `fullWidth`, `inline`, `fill`, `fullHeight` and `widthStep` |
 | the case and the decoration of a text layer: the line and its style | the set | `format` and `underline` of a text |
 
@@ -162,7 +162,7 @@ The inventory says things in Figma's words. The Surface domain says them in its 
 
 | The library says | The Surface domain says | Why |
 | --- | --- | --- |
-| `radius/base`, in the collection `Theme-Radius` | `theme.radius` | the rule for slashes does not find it, and a stack holds it as one value |
+| `radius/base`, in the collection `Theme-Radius` | `theme.app.radius` | the rule for slashes does not find it, and a stack holds it as one value |
 | `disabled`, type `VARIANT`, values `false` and `true` | the prop `disabled`, kind flag | Figma draws a boolean as a variant with two values |
 | `withStartIcon`, type `BOOLEAN` | no prop: the presence of the content prop `startIcon` | it is a switch that shows or hides a part |
 | `state`, values `rest` and `hover` | a shown state, never a prop | a shown state has a picture and no prop |

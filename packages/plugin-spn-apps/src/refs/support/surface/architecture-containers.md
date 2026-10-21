@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "403e2c18"
+      "seen": "d9d6571c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "44257497"
+      "seen": "1b0e6796"
     }
   ]
 }
@@ -23,20 +23,25 @@ Read this before you frame a part of a page, or before you draw or build the con
 
 | Term | What it means |
 | --- | --- |
-| Container | `DSPanelContainer` — an optional block that frames a part of a page as a header, content and a footer: the head, content and foot unit. `DSDataTableContainer` is built on it, for a data table |
+| Container | `DSPanelContainer` — an optional block that frames a part of a page as a header, content and a footer: the head, content and foot unit. `DSDataTablePanelContainer` is built on it, for a data table |
 | Part | `DSPanelContainer.Header` · `DSPanelContainer.Content` · `DSPanelContainer.Footer` — a named place in a container. It holds anything, and takes only `flush` |
 | Frame | `frames` — the drawn edge and fill of a container. A frame is drawn once on any part of a page |
-| Part of a box | `DSPageLevelPartType` — the closed set of the three parts of a box (`HEADER`, `CONTENT`, `FOOTER`): the parts a frame holds, the parts of a card, and the part a block stands in |
+| Part of a box | `DSBoxPartType` — the closed set of the three parts of any box (`HEADER`, `CONTENT`, `FOOTER`): a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head. The parts a frame holds, the parts of a card, and the part a block stands in |
+| Surface | `IDSFrameSurface` — the paint of a frame in one prop: its `color`, `strength`, `raised`, `bordered` and `rounded`, each optional. A key left out takes the theme's |
 | Inset | the space a part keeps between the frame and what it holds |
 | Flush | `flush` — the one word on a part that turns its inset off, because its content reaches the edge of the frame |
-| Card | `DSCard` — the block that frames one thing. It stays beside the container |
-| Band | `DSSectionContainer` — a full-width part of a page with the room of its level, the page's width and gutter, and a fill of its own. It holds features side by side with `columns` and `divided` |
+| Card | `DSCard` — the block that frames one thing, among others like it. It stays beside the container |
+| Section | `DSSectionContainer` — one part of a page, set apart from the next by its fill and its room above and below. Its room comes from its `size`, and its fill reaches the edges of its place. It holds one child |
+| Grid section | `DSFeatureGridSectionContainer` — a section whose one child is a grid of features under a heading of its own. It draws a section from its `section` prop, and is written where a section may be |
+| Grid | `IDSGrid` — how the cells of a grid stand: how many columns, and the lines between them. Any unit that draws a grid of cells takes it whole |
 
 ## The parts — 🔮
 
+> **Planned.** The grid section `DSFeatureGridSectionContainer`, `IDSGrid`, the one prop `surface` with `IDSFrameSurface` and `prepareFrameSurface`, the one frame drawer, the `frames` of a card and a card widget, `DSBoxPartType`, `DSDataTablePanelContainer` with its `panel`, and the theme by layer are design, and no stack builds them yet. The design system takes them in its own change, and the library is owed.
+
 A container is an optional block. A page uses one when a part of it has a header, content and a footer as one unit.
 
-The unit is `DSPanelContainer`, the head, content and foot unit, and its look is the theme's `panelContainer` (`RD.SUPPORT.SURFACE.231`). **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.panelContainer`; a card reads `theme.card` alone.
+The unit is `DSPanelContainer`, the head, content and foot unit, and its look is the theme's `container.panel` (`RD.SUPPORT.SURFACE.231`). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
 
 | Part | Named | How many | What it takes |
 | --- | --- | --- | --- |
@@ -44,7 +49,7 @@ The unit is `DSPanelContainer`, the head, content and foot unit, and its look is
 | Content | `DSPanelContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
 | Footer | `DSPanelContainer.Footer` | none or one | `flush`, and no other prop |
 
-The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a container and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is four props, and a fifth, `unframed`, that holds a part out of the frame.
+The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a container and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. The look of a container is its `frames`, its `surface` and `unframed`, which holds a part out of the frame.
 
 ### What a page puts in each part
 
@@ -59,7 +64,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A page MUST put the title and the actions of a container in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page.
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole container.
 - **A page uses one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two containers. `standards-patterns.md` states the rule once, for every pattern.
-- **A container MUST give the title in its header the level of its box, `CONTAINER` unless the container is the whole page, and a container that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A container takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this container is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the container gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table container takes `fullPage` too and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
+- **A container MUST give the title in its header the level of its box, `CONTAINER` unless the container is the whole page, and a container that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A container takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this container is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the container gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several containers MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one container puts its head in the header of that container. A page with several has no one container that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
@@ -78,19 +83,30 @@ Here is how the parts serve the pages most apps have.
 
 ## The look — 🔮
 
+The look of a container is the props `frames`, `surface` and `unframed`. A **frame** is the drawn edge and fill of a container. The `surface` is the paint of the frame in one prop, an `IDSFrameSurface`, and a panel, a card, a feature and a card widget take the same one.
+
 | Prop | Values | What it decides |
 | --- | --- | --- |
-| `frames` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | which parts the frame holds. A part that is not listed sits flat on the page |
-| `color` | `BASE`, `DEFAULT` or `PRIMARY` | the colour of the fill of the frame, as the shell and the content take it. `BASE` is the default, and it leaves the fill to `raised` |
-| `strength` | `SUBTLE`, `QUIET` or `SOLID` | how strong the fill of a hue is. `BASE` takes none |
-| `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
-| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds unless `divided` says otherwise. Blocks that need no line between them sit in one content part |
-| `divided` | yes or no, or a list: any of `CONTENT`, `FOOTER` | the lines inside a bordered frame. Yes, where left out, a line between every two parts; no, none, so the frame reads as one; a list, a line above each part named: `CONTENT` between two content parts (the header stays with the first), `FOOTER` above the footer. A frame with no border draws none |
-| `rounded` | yes or no | whether the corners of the frame are rounded |
+| `frames` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | which parts the frame holds. Two listed parts next to each other share one frame. A part that is not listed sits flat on the page. An empty list is no frame |
+| `surface` | `IDSFrameSurface`, its keys below | how the frame is painted. A key left out takes `theme.container.panel`'s |
 | `unframed` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | the parts that take no frame, whatever `frames` and the theme give. A part listed here sits flat on the page |
+| `divided` | yes or no, or a list: any of `CONTENT`, `FOOTER` | the lines inside a bordered frame. Yes, where left out, a line between every two parts; no, none, so the frame reads as one; a list, a line above each part named: `CONTENT` between two content parts (the header stays with the first), `FOOTER` above the footer. A frame with no border draws none |
 
-- **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each of the first six is a choice that does not depend on the others (`RD.SUPPORT.SURFACE.163`). The theme holds the app's default for each, and a container may set its own.
-- **A partner MAY paint one container with a class of their own, through the paint tokens** (`RD.SUPPORT.SURFACE.192`). `DSPanelContainer` takes `className`, which goes on its root, and `opacity`; `DSSectionContainer`, the band of a page, takes `className` on the same terms and no `opacity`, because a band is not translucent. The class sets `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` from the partner's own tokens, in light and in `[data-mode='dark']`, and each frame the container draws reads them, and the band reads `--surface-fill` for its fill. Anything else a class sets on the container or the band is unsupported, and a card inside a painted container keeps its own fill. A card takes `className` and `opacity` the same way, and no `style`.
+| Key of `surface` | Values | What it decides |
+| --- | --- | --- |
+| `color` | `DSSurfaceColorType`: `BASE`, `DEFAULT` or `PRIMARY` | the colour of the fill of the frame, as the shell and the content take it. `BASE` is the default, and it leaves the fill to `raised` |
+| `strength` | `DSSurfaceStrengthType`: `SUBTLE`, `QUIET` or `SOLID` | how strong the fill of a hue is. `BASE` takes none |
+| `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
+| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds |
+| `rounded` | yes or no | whether the corners of the frame are rounded. How much comes from the size step of the container |
+
+The values of `frames` are the three parts of a box, one closed set, `DSBoxPartType`, that every stack spells the same way. A card names its parts with it too, and so do a dialog, a sheet, a drawer, a popover and the page's head, and so does the place that tells a block which part it stands in.
+
+- **The parts of any box MUST be `DSBoxPartType`** (`RD.SUPPORT.SURFACE.266`). The set belongs to every box, and `DSPageLevelContext` keeps its name, because its first fact is the level.
+- **The paint of a frame MUST be one prop, `surface`, typed `IDSFrameSurface`, and a unit MUST NOT declare its keys one by one** (`RD.SUPPORT.SURFACE.261`). `DSPanelContainer`, `DSCard`, `DSFeature` and `DSCardWidget` take it in place of five props, each from its own look of the theme, and `frames`, `unframed`, `divided` and `opacity` stay props of their own. `DSSectionContainer` and `DSSurface` draw a fill with no frame, so they keep `color`, `strength` and `painted`.
+- **The look of a container MUST be declared by these props, and by nothing else** (`RD.SUPPORT.SURFACE.092`). Each key of the surface is a choice that does not depend on the others (`RD.SUPPORT.SURFACE.163`). The theme holds the app's default for each, and a container may set its own.
+- **A look MUST NOT take a name of its own.** A flat header above raised content is a value of `frames` and `surface`, so no list of named looks grows with each new one.
+- **A partner MAY paint one container with a class of their own, through the paint tokens** (`RD.SUPPORT.SURFACE.192`). `DSPanelContainer` takes `className`, which goes on its root, and `opacity`; `DSSectionContainer`, the section of a page, takes `className` on the same terms and no `opacity`, because a section is not translucent. The class sets `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` from the partner's own tokens, in light and in `[data-mode='dark']`, and each frame the container draws reads them, and the section reads `--surface-fill` for its fill. Anything else a class sets on the container or the section is unsupported, and a card inside a painted container keeps its own fill. A card takes `className` and `opacity` the same way, and no `style`.
 - **A part listed in `unframed` MUST take no frame, whatever `frames` and the theme give.** A page that sets `frames` takes the whole choice from the theme. A page that sets `unframed` takes one part out and leaves the rest to the theme. So a theme can still change the look of that container, and the named part stays flat in every theme.
 - **`unframed` is for a part that no theme should frame on this page.** One such part is a header that is the header of the page, which the rules of content keep out of a frame (`standards-core.md`). A page that wants a look sets `frames`, or leaves it to the theme. The book states `unframed` before the web builds it.
 
@@ -121,26 +137,73 @@ Write `flush` on a part whose content reaches the edge of the frame, such as a t
 
 A container takes no background color, no padding value, no margin, no container inside it, and no prop named `variant`. It takes no child that is not one of its parts.
 
-### The band of a page
+### The section of a page
 
-A band is a full-width part of a page with no header, no footer and no frame: the section of a marketing page, the strip behind a closing call. `DSSectionContainer` is the unit (`RD.SUPPORT.SURFACE.243`). It is a surface and the room of a level together, with the page's width and gutter, so a pitch inside it stands as it would straight on the page, and every band of a site has the same room. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, a `pageLevel` (`CONTAINER` when unset) and a `className`, and it holds features side by side with `columns`, from one to three and one on a phone, and `divided`, a line between the children, no by default (`RD.SUPPORT.SURFACE.244`). Its `columns` are its own, and not a block for a row or a grid (`RD.SUPPORT.SURFACE.084`). `divided` leaves the `WIDGET` inset, 32px, on each side of the line between two children.
+A section is one part of a page, set apart from the next by a fill of its own and its own room above and below: the hero of a website, a row of three pillars, the strip behind a closing call, a tinted greeting that opens an app's page. `DSSectionContainer` is the unit (`RD.SUPPORT.SURFACE.243`), and it draws a `<section>`. It has no header, no footer, no frame and no parts. It holds one child. What stands in it sets its own level: a pitch on a website is a `DSFeature` placed in the section, with its own `pageLevel`, and the section hands down no level. It takes a `color` (`BASE` when unset), a `strength` (`SUBTLE` when unset) and `painted`, as a surface does, a `className`, a `size` (the app's when unset), `flush`, a `mediaNode` and an `id`.
 
-- **A band MUST take its room above and below from its level, and give that level to what it holds** (`RD.SUPPORT.SURFACE.247`). `pageLevel` is `CONTAINER` when unset. The room above and below is the inset of the level: 64px at `PAGE`, the band of the head of a page, and 48px at `CONTAINER`, a section. The sides keep the page's gutter, and a feature in the band reads the band's level where it is given none. A page writes no padding, no maximum width and no gutter for a band.
-- **A partner MAY paint one band with a class of their own, through the paint token** (`RD.SUPPORT.SURFACE.192`). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the band draws that colour from edge to edge in place of its `color`. A band that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
-- **A band MUST run to the window's edges and no further.** Where the browser's scrollbar takes width from the window, the band still adds no sideways scroll.
+| Prop | Takes | What it decides |
+| --- | --- | --- |
+| `size` | `DSSizeType`. The app's size when unset | the room above and below, and the size every block inside the section takes |
+| `flush` | yes or no. No by default | whether the child runs to the edges of the section's place, with no gutter |
+| `mediaNode` | a node | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas |
+| `id` | a string | the anchor a page's own links land on. The section lands below a sticky bar, never under it |
 
-**The band stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The band frames nothing: it sets one part of a page apart from the next. A band is for the pages of a website, and an app part with a title and actions is a panel container.
+- **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RD.SUPPORT.SURFACE.243`). The sides are the layout's gutter, so a page writes no padding, no maximum width and no gutter for a section. It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
+- **A section MUST take its room above and below from its size, and hand that size to what it holds** (`RD.SUPPORT.SURFACE.247`). The size is the app's where it is unset, and every block inside the section takes it, as the blocks in a panel container take the panel's. Each value is a token, `--section-<step>-room` and `--section-<step>-gap`, with a smaller value under the layouts' phone width, and a partner overrides the tokens once for the whole site.
+
+| Size | Room above and below | Grid gap, or room on each side of a line | Typical use |
+| --- | --- | --- | --- |
+| `XS` | 32px · 24px on a phone | 16px · 16px | a strip of logos |
+| `SM` | 56px · 32px | 24px · 16px | a short call |
+| `MD`, the app's size | 96px · 56px | 32px · 24px | an ordinary section |
+| `LG` | 112px · 64px | 40px · 24px | a section that leads |
+| `XL` | 128px · 72px | 48px · 32px | the hero |
+
+- **A section MUST reach the edges of its place and no further, and MUST stand straight in a place** (`RD.SUPPORT.SURFACE.254`). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and a `flush` child run from one edge of the place to the other, and the section's words stay in the body's box. A `flush` child lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A section never stands inside a panel, a card, an overlay or the nav column.
+- **A partner MAY paint one section with a class of their own, through the paint token** (`RD.SUPPORT.SURFACE.192`). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section draws that colour from edge to edge of its place in place of its `color`. A section that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
+
+**The section stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The section frames nothing: it sets one part of a page apart from the next. A section is for the pages of a website and for a strip that opens an app's page, and an app part with a title and actions is a panel container. The theme holds no look for a section: a page alternates its sections on purpose, and the rhythm is in the stylesheet's tokens.
+
+### The grid section
+
+A grid of features under a heading is `DSFeatureGridSectionContainer` (`RD.SUPPORT.SURFACE.259`). A section holds one child, so a heading over a few cells has no place in it: the heading would become a cell of the grid, or a second section above it. The grid section gives the heading and the cells one home, and a page writes it where it writes a section. It draws a `DSSectionContainer` from `section`, and its one child is a `DSFeature` at `CONTAINER` that holds the grid where its items stand.
+
+| Prop | Takes | What it decides |
+| --- | --- | --- |
+| `section` | `IDSFeatureGridSectionContainerSectionProps`: every prop of `DSSectionContainer` but its child, `flush` and its test data | the section it draws. A key left out takes the section's own default |
+| `heading` | `IDSFeatureGridSectionContainerHeadingProps`: `eyebrow`, `title`, `description`, `facts`, `factsPlacement`, `actions` and `textAlign` of `IDSFeatureProps` | the heading over the grid, a `DSFeature` at `CONTAINER`. Left out, the grid stands alone. `title` is required, as a feature's is |
+| `grid` | `IDSGrid`. Left out, 3 columns on a desktop, 2 on a tablet and 1 on a phone, with no lines | how the cells stand: the columns at each screen class, and the lines between them |
+| `children` | the cells, each a `DSFeature` | the cells of the grid |
+| `testData` | the unit's own | handed to the section's root |
+
+- **A grid of features under a heading MUST be `DSFeatureGridSectionContainer`, and it MUST take `section`, and MAY take a `heading` and a `grid`.** `DSFeature` is not changed for it.
+- **The actions of the heading MUST stand under it, above the grid.** The unit passes `DSFeatureActionsPlacementType.BEFORE_ITEMS` and does not offer `actionsPlacement`. A feature frames nothing by default, so the heading is not framed.
+- **The grid section MUST NOT take `flush`.** With `flush` the title and the outer cells would stand at the window's edges, out of line with the bar and with the sections above and below.
+- **The grid section MUST take no `pageLevel` and hand the cells none.** The heading stands at `CONTAINER`, as a panel's does. Each cell is a `DSFeature` that names its own `pageLevel`: `WIDGET` for pillars, `GROUP` or `CONTENT` for a denser grid.
+- **The columns MUST follow the screen class, and never a measured width** (`RD.SUPPORT.SURFACE.271`). `grid` states how many columns stand at a desktop, a tablet and a phone, each from 1 to 4, and the live device picks one. A number above 4 is read as 4 and one below 1 as 1. Nothing in the section measures its place.
+- **The gap and the lines MUST follow the section's size.** With `NONE` the cells stand the section's grid gap apart. With `GRID` or `EDGE` each cell keeps that gap as its room on every side and draws its own line at its end and at its bottom, so a short last row keeps its lines at every width. `EDGE` adds a line around the outside, rounded with the theme's radius.
+- **The grid section MUST add no surface.** The section's fill is under the heading and each feature draws its own frame from its own `surface`.
+- **The columns of a grid MUST be one shape, `IDSGridColumns`, and a page MUST set them per screen class** (`RD.SUPPORT.SURFACE.260`, `RD.SUPPORT.SURFACE.271`). `IDSGridColumns` holds `desktop`, `tablet` and `mobile`, all required. `IDSGrid` extends it and adds the optional `borderType` of `DSGridBorderType`, `NONE` where left out: a grid is its columns and its lines. Every other unit that draws a grid of cells holds the shape as an attribute, `gridColumns`, and never extends it, with its own default and range stated in `architecture-components.md`.
+
+### The name of a unit and its props
+
+- **The word before `Container` MUST name the box a unit draws, and the unit MUST be written in place of that box** (`RD.SUPPORT.SURFACE.267`). A `…PanelContainer` stands where a panel may, and a `…SectionContainer` where a section may, so a reader knows where a unit may stand from its name alone. `DSDataTablePanelContainer` and `DSFeatureGridSectionContainer` are the two.
+- **There MUST be no `DSCardContainer`, no `DSFeatureContainer` and no `DSFeatureSectionContainer`** (`RD.SUPPORT.SURFACE.263`). A container exists to do a container's job: a card is a card, and a section already holds one feature.
+- **A `…PanelContainer` MUST take its box's props as `panel`, and a `…SectionContainer` as `section`** (`RD.SUPPORT.SURFACE.268`). Each is a named interface that omits what the unit decides: the panel's parts, `unframed` where the layout in view decides it, and the test data.
+- **A unit with many props MUST group them by owner, in named interfaces built from the owner's props, and its own props that belong together too.** The groups are `section`, `panel`, `heading`, `surface` and `grid`. A stack writes them with its own tools; the provider states the form.
+- **The test data MUST stay on the unit, and the unit MUST hand it to the box's root.** `panel` and `section` omit `testData`, so a test finds the unit by its own name. A listing takes the whole panel, `size`, `surface`, `frames`, `divided` and `backAnchor` among its props, `fullPage` lives in `panel`, and the listing keeps `unframed` to itself.
 
 ### The card
 
-The card, `DSCard`, stays a separate block beside the container, taking `color`, `strength`, `raised`, `bordered` and `rounded`. They mean on a card what they mean on a container. The theme holds a card look of its own. Where the app chose no card value, the theme takes the container's choice, else the default (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. These do.
+The card, `DSCard`, stays a separate block beside the container, taking `surface` and `frames`. The keys of its `surface` mean on a card what they mean on a container. The theme holds a card look of its own, and a key the card leaves out takes it, never the panel's (`architecture-app.md`). A container frames a part of a page. A card frames one thing: a record, an app, a file, a number. A card may hold a header, content and a footer of its own, so the parts do not tell the two apart. Level and purpose do: a card is one thing at `WIDGET`, among cards like it, pressed whole; a panel is a part of a page at `CONTAINER`, and the head of the page with `fullPage`.
 
 | | A container | A card |
 | --- | --- | --- |
 | It frames | a part of a page, with the title and the actions of that part | one thing |
 | How many stand together | one for a part of the page | often many alike, side by side in a grid |
-| Its parts | named places that the look reaches. `frames` and the theme decide which parts the frame holds, and a part takes `flush` | all inside the one frame, in every theme. A part pads itself, and a part takes `flush`, which drops that padding |
-| Pressed as a whole | never | it may be, with `anchor` |
+| Its parts | named places that the look reaches. `frames`, from the theme where the page names none, decide which parts the frame holds, and a part takes `flush` | the card's `frames` decide which parts its frame holds, all three where it names none, in every theme. A part pads itself, and a part takes `flush`, which drops that padding |
+| Pressed as a whole | never | it may be, with `anchor`, and a pressed card is pressed whole, its flat header with it |
+| Its level | `CONTAINER`, and `PAGE` with `fullPage` | `WIDGET` |
 | A block inside it | reacts to a `flush` part | reacts to a `flush` part of the card, in the same way. A `flush` part of a container around the card does not reach it, because a card starts a frame of its own |
 | Its size | sets the density of every block inside it | the same. A card hands its size to what it holds |
 
@@ -148,7 +211,26 @@ The card, `DSCard`, stays a separate block beside the container, taking `color`,
 - **A part of a card MUST pad itself, from the size of the card, and `flush` on a part MUST drop that padding.** A page then writes no padding of its own around what a card holds. A part whose content reaches the edge of the card, such as a list or a picture, takes `flush`. A part takes no other prop.
 - **A card MUST hand its size to what it holds, as a container does** (`RD.SUPPORT.SURFACE.114`). A block inside a card that reads the size of its place reads the size of the card. A row of a list and a title in a `flush` part are such blocks: each takes the inset of the card's size, so it starts where the card's own parts start their content. A card that states no size hands on the size it stands in.
 - **A `flush` part of a card MUST say so to what it holds, as a `flush` part of a container does.** The header, the content and the footer of a card all do this.
+- **The card MUST take `surface` and `frames` for its look, and the paint of its frame MUST come from the theme's `component.card`** (`RD.SUPPORT.SURFACE.261`). `surface` is an `IDSFrameSurface`, and its keys mean on a card what they mean on a container.
+- **A card MAY take `frames`, `DSBoxPartType[]`, and its default MUST be `HEADER`, `CONTENT` and `FOOTER`** (`RD.SUPPORT.SURFACE.262`). Two listed parts next to each other share one frame, and a part not listed sits flat, half the card's gap from the frame beside it. A header takes the same room at a size whether it stands in the frame or flat, so two cards of one size side by side line their headers up. So a dashboard tile may stand its title flat above a framed body by listing `CONTENT` alone. `DSCardWidget` takes `frames` and hands them to its card.
+- **A card and a panel MUST be told apart by level and purpose, and no unit MUST merge them** (`RD.SUPPORT.SURFACE.263`). There is no card container, and no feature container.
 - **A card MAY sit inside the content of a container.** A dashboard MAY also use cards and no container at all.
+
+### The frames of a box
+
+The components choose, and only the panel reads the theme for its frames. An app repeats a panel on every screen, so one choice in the theme keeps them alike. A card and a feature frame by their own `frames`, from a fixed default, because a website designs each section on purpose.
+
+| Unit | `frames` where left out | Its paint comes from |
+| --- | --- | --- |
+| `DSPanelContainer` | `theme.container.panel.frames` | `theme.container.panel` |
+| `DSCard` | `HEADER`, `CONTENT`, `FOOTER` | `theme.component.card` |
+| `DSCardWidget` | handed to its `DSCard` | `theme.widget.card` for what it adds, its card's look for the paint |
+| `DSFeature` | none | its own `surface` over the fixed feature default, never the theme |
+
+- **Only `DSPanelContainer` MUST take its `frames` from the theme** (`RD.SUPPORT.SURFACE.262`). A card and a feature take theirs from the table above, and the theme holds `frames` for neither.
+- **A feature MUST frame nothing unless the page asks, and it MUST take no `unframed`.** `frames` is `DSFeaturePartType[]`, empty where it is left out. There is no theme default to take a part out of.
+- **The paint of every frame MUST be an `IDSFrameSurface` that went through `prepareFrameSurface`** (`RD.SUPPORT.SURFACE.261`). The resolver keeps the theme's value for a key the unit leaves undefined, which a spread of the theme and the prop would not.
+- **One frame drawer MUST draw every frame.** It is internal, it draws an `IDSFrameSurface` as the fill, the border, the corners, the shadow and the surface the blocks inside read, and the panel, the card and the feature call it with the parts they frame.
 
 ## A frame is drawn once — 🔮
 
@@ -221,22 +303,31 @@ Where the groups are few and fixed, the page needs no swap. Each group is a cont
 
 ## Boundary
 
-This ref states what frames a part of a page, what that frame looks like, and what a block does inside it. It stops at the edge of the part. It does not state what frames the whole page — that is `architecture-layouts.md`. It does not state where the app's choice for `raised`, `bordered`, `rounded` and `frames` comes from, or how `size` reaches a block — that is `architecture-app.md`.
+This ref states what frames a part of a page, what that frame looks like, and what a block does inside it. It stops at the edge of the part. It does not state what frames the whole page — that is `architecture-layouts.md`. It does not state where the app's choice for the surface and for `frames` comes from, or how `size` reaches a block — that is `architecture-app.md`.
 
 ## Binds
 
 | Rule | What it decides |
 | --- | --- |
-| `RD.SUPPORT.APPS.147` | the parts of a container, the six props of its look, and what it refuses |
-| `RD.SUPPORT.SURFACE.231` | the framing unit is `DSPanelContainer`, `DSDataTableContainer` is built on it, and a level is a position and not a unit |
-| `RD.SUPPORT.SURFACE.243` | a band of a page is `DSSectionContainer`, the one unit that gives a part of a page its fill and its room, and it frames nothing |
-| `RD.SUPPORT.SURFACE.244` | a band holds features side by side with `columns` and `divided` |
-| `RD.SUPPORT.SURFACE.247` | a band takes its room above and below from its level, `PAGE` or `CONTAINER`, and gives that level to what it holds |
+| `RD.SUPPORT.APPS.147` | the parts of a container, the props of its look, and what it refuses |
+| `RD.SUPPORT.SURFACE.231` | the framing unit is `DSPanelContainer`, `DSDataTablePanelContainer` is built on it, and a level is a position and not a unit |
+| `RD.SUPPORT.SURFACE.243` | a section of a page is `DSSectionContainer`, the one unit that gives a part of a page its fill and its room, and it frames nothing |
+| `RD.SUPPORT.SURFACE.259` | a grid of features under a heading is `DSFeatureGridSectionContainer`, which draws a section from `section`, takes a `heading` and an optional `grid`, leaves out `flush`, hands the cells no level and follows the screen class for its columns |
+| `RD.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, the columns required and the lines `NONE` where left out, and any unit that draws a grid of cells takes it whole |
+| `RD.SUPPORT.SURFACE.247` | a section takes its room above and below from its size, and hands that size to what it holds |
+| `RD.SUPPORT.SURFACE.254` | a section reaches the edges of its place, and stands straight in a place |
+| `RD.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, an `IDSFrameSurface`, every frame is drawn by one drawer, and one resolver keeps the theme's value for a key left out |
+| `RD.SUPPORT.SURFACE.262` | only the panel takes its frames from the theme, a card takes `frames` and defaults to all three parts, and a feature frames nothing by default |
+| `RD.SUPPORT.SURFACE.263` | a card and a panel are told apart by level and purpose, and no card, feature or feature section container exists |
+| `RD.SUPPORT.SURFACE.266` | the three parts of any box are `DSBoxPartType` |
+| `RD.SUPPORT.SURFACE.267` | the word before `Container` names the box a unit draws and is written in place of |
+| `RD.SUPPORT.SURFACE.268` | a `…PanelContainer` takes its box's props as `panel`, a `…SectionContainer` as `section`, and a unit groups its props by owner |
+| `RD.SUPPORT.SURFACE.271` | the columns of a grid follow the screen class, never a measured width |
 | `RD.SUPPORT.SURFACE.163` | a container and a card take a `color` and a `strength`, `BASE` by default |
 | `RD.SUPPORT.SURFACE.092` | `unframed` names the parts that take no frame, whatever `frames` and the theme give |
 | `RD.SUPPORT.APPS.162` | inside a bordered frame, a line divides each two parts the frame holds |
 | `RD.SUPPORT.APPS.155` | the page decides what fills a part, with `flush`, and a block never changes by where it sits |
-| `RD.SUPPORT.APPS.148` | the card stays a separate block beside the container |
+| `RD.SUPPORT.APPS.148` | the card stays a separate block beside the container, and takes `surface` and `frames` |
 | `RD.SUPPORT.SURFACE.084` | the foundation defines no block for a row or a grid, and a stack may provide one |
 | `RD.SUPPORT.SURFACE.091` | a card may hold a header, content and a footer as parts, and still frames one thing |
 | `RD.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |

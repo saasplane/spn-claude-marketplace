@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "d1f7c56e"
+      "seen": "cbabe14d"
     }
   ]
 }
@@ -78,6 +78,8 @@
 | --- | --- | --- |
 | a class interface — service or provider | `I` + PascalCase | `ISPAuthProvider` |
 | React component props | `I` + component + `Props` | `IDSButtonProps` |
+| a group of a component's props | `I` + component + group + `Props`, built from the owner's props with `Omit` or `Pick` | `IDSFeatureGridSectionContainerHeadingProps` |
+| a props shape many units share, which no component owns | `I` + what it is, with no `Props` and no `Config`: neither a component nor a unit's `config` prop owns it | `IDSFrameSurface`, `IDSGridColumns`, `IDSGrid` |
 | an entity or contract shape | PascalCase, no `I` | `User` |
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
@@ -260,6 +262,8 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 | Support provider | area + `Provider` + vendor | `IngressProviderNginx` |
 | Seam interface | `I` + area + `Provider` | `IIngressProvider` |
 | Props interface | `I` + component + `Props` | `IDSButtonProps` |
+| Props group | `I` + component + group + `Props`, from the owner's props by `Omit` or `Pick` | `IDSFeatureGridSectionContainerHeadingProps` |
+| Shared props shape | `I` + what it is, no `Props`, no `Config` | `IDSFrameSurface`, `IDSGridColumns` |
 | Web module unit | ends in what it is: `Page`, `Container`, `Widget`, `Dialog`, `Form`, or a pattern's word | `RoleListContainer` |
 | Web module plain component | no suffix needed | `RoleBadge` |
 | Contract entity | PascalCase, no `I` | `User` |

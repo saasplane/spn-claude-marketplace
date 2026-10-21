@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "177efde4"
+      "seen": "493c006c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "2839194e"
+      "seen": "32c48c3a"
     }
   ]
 }
@@ -129,12 +129,11 @@ A pitch is sized by the level of the page it stands at, and the sizes must not b
 | Token | Holds |
 | --- | --- |
 | `--level-<level>-title` | the size token of the level's display step, the step the title of a feature is drawn in |
-| `--level-<level>-gap` | the gap between the words of a feature: the eyebrow, the title, the description and the facts |
+| `--level-<level>-gap` | the level's gap, such as the room above and below an item of a list; the gaps between a feature's words are no token |
 | `--level-<level>-actions-gap` | the room before the actions |
 | `--level-<level>-media-gap` | the room between the words and the media |
-| `--level-<level>-inset` | the inset of a feature that has a frame |
 
-| Level | Display step | On a desktop | On a phone | Gap between the words | Before the actions | Words to media | Inset |
+| Level | Display step | On a desktop | On a phone | Gap | Before the actions | Words to media | Inset |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `PAGE` | `HEADING_XXL3` | 64px | 44px | 24px | 40px | 64px | 64px |
 | `CONTAINER` | `HEADING_XL` | 40px | 32px | 16px | 32px | 48px | 48px |
@@ -157,6 +156,19 @@ Where a part stands inside the box that holds it is an alignment, and the core h
 
 - **A unit that aligns a part MUST take `DSHorizontalAlignType` or `DSVerticalAlignType`, and MUST NOT define an alignment vocabulary of its own** (`RD.SUPPORT.SURFACE.249`). The prop keeps the unit's own word, such as `mediaAlign`, `endAlign`, `verticalAlignment` or `textAlign`, and only the vocabulary is shared. The middle of either axis is `CENTER`. Which edge a panel pins to is a placement, not an alignment, so `DSPlacementHorizontalType` stays.
 
+## Grid, box and frame
+
+The core also carries two closed sets and two shapes beside the vocabularies above, so that every layer above reads them and none redefines them.
+
+| Vocabulary | Values | Reads |
+| --- | --- | --- |
+| `DSGridBorderType` | `NONE` · `GRID` · `EDGE` | the lines of a grid: none, lines between the cells, or lines between them and around the outside |
+| `DSBoxPartType` | `HEADER` · `CONTENT` · `FOOTER` | the parts of any box: a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head |
+
+- **How the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType`** (`RD.SUPPORT.SURFACE.260`): the columns, required, and the lines of `DSGridBorderType`, `NONE` where left out. A unit that draws a grid of cells takes it whole.
+- **The paint of a frame is `IDSFrameSurface`, typed once in the core** (`RD.SUPPORT.SURFACE.261`): its `color`, `strength`, `raised`, `bordered` and `rounded`, each optional, a key left out taking the theme's. A unit that draws a frame takes it as its `surface`.
+- **The parts of any box are `DSBoxPartType`, one closed set of the core** (`RD.SUPPORT.SURFACE.266`).
+
 ## Boundary
 
 This ref names every role, every step of the scale, every scale size, and the family of every type step. It gives none of them a value in the general vocabulary sense beyond what is listed above — the full worked value of every role in light and dark lives in the capability chapter this ref restates. It does not say which block reads which role, or which prop carries a type step — that is `architecture-components.md` and `architecture-names.md`.
@@ -173,6 +185,9 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.238` | each level from `PAGE` to `GROUP` holds one set of level tokens, and a unit reads a title through the type step so the phone size follows |
 | `RD.SUPPORT.SURFACE.239` | the words of a feature's items are 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature, and a smaller feature's items are the one waiver |
 | `RD.SUPPORT.SURFACE.249` | a unit that aligns a part takes `DSHorizontalAlignType` or `DSVerticalAlignType` and defines no alignment vocabulary of its own |
+| `RD.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType` in the core |
+| `RD.SUPPORT.SURFACE.261` | the paint of a frame is `IDSFrameSurface`, typed once in the core |
+| `RD.SUPPORT.SURFACE.266` | the parts of any box are `DSBoxPartType`, one closed set of the core |
 | `RD.SUPPORT.SURFACE.253` | the side of a feature's small picture follows its title and its lines, so a level holds no box token |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |

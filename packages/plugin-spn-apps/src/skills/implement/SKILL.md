@@ -15,11 +15,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "c20dbaf6"
+      "seen": "1a9ee519"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "44257497"
+      "seen": "1b0e6796"
     }
   ],
   "decisions": [
@@ -109,7 +109,8 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the table's config, usually read from the address. The table holds no state for it (`RD.SUPPORT.SURFACE.125`) |
 | a card with a head, drawn from data (a card that shows its own info is a `DSCard`) | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
 | subjects compared across the same settings | the page gives `DSComparison` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The composite draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
-| a band of a website: a full-width part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below is the inset of its `pageLevel`, `CONTAINER` when unset (48px, and 64px at `PAGE`), and the band gives that level to the features in it. `columns`, from one to three and one on a phone, and `divided` stand features side by side. To paint one band the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.244`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.192`) |
+| a section of a website: one part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below comes from its `size`, the app's when unset, and the section hands that size to what it holds. It holds one child and hands down no level; what stands in it sets its own. It reaches the edges of its place and stands straight in it. To paint one section the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.254`, `RD.SUPPORT.SURFACE.192`) |
+| a grid of features under a heading | the page uses `DSFeatureGridSectionContainer` where it writes a section, and gives it `section` (the section's props but its child and `flush`), `heading` (the words, facts and actions of a feature) and `grid` (`IDSGrid`: `desktop`, `tablet` and `mobile` columns, each 1 to 4, and `borderType`). Each cell is a `DSFeature` that names its own `pageLevel` (`RD.SUPPORT.SURFACE.259`, `RD.SUPPORT.SURFACE.271`) |
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
 | the paging in the footer of the container | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
