@@ -47,7 +47,8 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row");
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc whose preview What does not link fails", has(checkWorkstream(ws), "stamp", /not linked from the page's What/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
-  ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  const apart = (findings) => findings.filter((one) => one.check !== "status");
+  ok("green: the page put back passes", apart(checkWorkstream(ws)).length === 0, said(checkWorkstream(ws)));
 }
 
 console.log("\n=== RD.DEVEX.WORKSPACE.273 — a view of an arc's status that disagrees with the arc is a finding");
@@ -225,7 +226,7 @@ console.log("\n=== the life of an arc — the files of every step it has passed"
   writeFileSync(join(ws, "arcs", "N001", "state.json"), JSON.stringify(data));
   ok("red: a landed row with an order and no report fails", has(checkWorkstream(ws), "steps", /row 1 landed and its report/), said(checkWorkstream(ws)));
   put(ws, "notes/N001/orders/1.report.md", "---\nrow: \"1\"\noutcome: landed\n---\n");
-  ok("green: the report there, the check passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  ok("green: the report there, the check passes", checkWorkstream(ws).filter((one) => one.check !== "status").length === 0, said(checkWorkstream(ws)));
   mkdirSync(join(ws, "notes", "N002"), { recursive: true });
   ok("red: a notes folder with no arc data fails", has(checkWorkstream(ws), "steps", /`notes\/N002\/` has no `arcs\/N002\/state.json`/), said(checkWorkstream(ws)));
   rmSync(join(ws, "notes", "N002"), { recursive: true });
@@ -268,6 +269,30 @@ console.log("\n=== a section of a page, by its heading");
   const text = "<h2>What</h2><p>in what</p><h2>How</h2><p>in how</p>";
   ok("the part under What stops at the next h2", sectionText(text, "What") === "<p>in what</p>");
   ok("a page with no such heading gives nothing", sectionText(text, "Why") === "");
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.278 — a status the rows contradict");
+{
+  const { ws } = await dataWorkspace("state-status");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = arcData();
+  data.rows[0].state = "running";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  const red = checkWorkstream(ws);
+  ok("red: a DECIDED arc with a running row is named, with the command", has(red, "status", /N001 is DECIDED and row 1 is running.*row write N001 --status RUNNING/), said(red));
+  data.status = "PROPOSED";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("red: so is a PROPOSED one", has(checkWorkstream(ws), "status", /N001 is PROPOSED and row 1 is running/), said(checkWorkstream(ws)));
+  data.status = "RUNNING";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: at RUNNING the same rows pass the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
+  data.status = "LANDED";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("red: a LANDED arc with a row not landed is named", has(checkWorkstream(ws), "status", /N001 is LANDED and row 1 is running/), said(checkWorkstream(ws)));
+  data.rows[0].state = "landed";
+  data.rows[1].state = "landed";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: LANDED with every row landed passes the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

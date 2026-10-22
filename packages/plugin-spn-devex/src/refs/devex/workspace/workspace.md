@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "a6c40e6f"
+      "seen": "f3460d13"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -21,7 +21,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status says which of eight states it is in",
-      "seen": "5bb4305a"
+      "seen": "e83608c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -486,6 +486,8 @@ abandoned, and the next reader stops using the status.
 where the work moved to another workstream; `IN FLIGHT` is `RUNNING`; `PREPARED` is `DECIDED`. The
 pattern in all six is a word for a **stage** rather than a word for a **state** — *closing* says what
 somebody is doing, and only what is true of the arc can be read by anything but a person.
+
+**The rows move the status, and the status never contradicts them — MUST** (decision `RD.DEVEX.WORKSPACE.278`). A row written `running` or `landed` on an arc at `DECIDED`, `HELD` or `PART-LANDED` moves the arc to `RUNNING`, logs one header event and refreshes every view, as a status write does. The write never sets `LANDED`, `CARRIED` or `DROPPED`; when every row is landed it prints `every row landed: write --status LANDED once proven`. The state check refuses an arc at `PROPOSED` or `DECIDED` with a running or landed row, and an arc at `LANDED` with a row not landed, and prints the command that fixes it.
 
 **`PART-LANDED` is how a sitting resumes.** When an agent stops after changing some of what an arc asked for, that arc is `PART-LANDED`, and the next sitting reads it to find where the work was left. That gives it two moments: at the end of a turn only an arc **this sitting touched** is worth reporting, because a warning for every parked arc is one nobody reads twice; at the start of a sitting **every** `PART-LANDED` arc is listed, because that is the whole reason the status exists.
 

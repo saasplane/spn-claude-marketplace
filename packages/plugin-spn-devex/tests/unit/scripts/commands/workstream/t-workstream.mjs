@@ -1,7 +1,7 @@
 // `commands/workstream/` — the only writers of what a script owns, run as the agent types them, in a
 // throwaway workspace. Each command is shown answering in its line, writing its file, and refusing what
 // it is typed with wrongly.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -14,7 +14,7 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 const json = (path) => JSON.parse(readFileSync(path, "utf8"));
-const lines = (path) => readFileSync(path, "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line));
+const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
 
 const { root, ws, git } = await dataWorkspace("commands");
 const arcFile = join(ws, "arcs", "N001", "state.json");
@@ -43,7 +43,7 @@ console.log("\n=== row write — opens an arc, changes its header, adds and move
   ok("with its lists read at commas and its state waiting", three.state === "waiting" && three.touches.join() === "marketplace:b,foundation:c" && three.blockedBy.join() === "2");
   ok("the write names the page left behind its rows", /N001's part on the approach page is behind its rows/.test(added.out), added.out);
   const moved = cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
-  ok("a row's state moves, and the log says from where", moved.code === 0 && lines(log).at(-1).kind === "running" && lines(log).at(-1).note === "waiting → running", JSON.stringify(lines(log).at(-1)));
+  ok("a row's state moves, and the log says from where", moved.code === 0 && lines(log).at(-2).kind === "running" && lines(log).at(-2).note === "waiting → running" && lines(log).at(-1).kind === "status", JSON.stringify(lines(log).slice(-2)));
   const wrongKind = cli(root, ["workstream", "row", "write", "031/N001", "4", "--title", "x", "--kind", "chore"]);
   ok("red: a kind outside the set is refused with the set", wrongKind.code === 2 && wrongKind.out.includes("fix · change · question"), wrongKind.out);
   const wrongWait = cli(root, ["workstream", "row", "write", "031/N001", "4", "--title", "x", "--kind", "fix", "--blocked-by", "9"]);
@@ -189,7 +189,7 @@ console.log("\n=== row write — a status or a row state moved refreshes every v
   ok("the Cycles table row shows LANDED as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
   ok("the status card moves with the arcs", /<div class="sds-eyebrow">(?:(?!<\/div>).)*sds-status sds-implementing">[^<]*IMPLEMENTING/s.test(text), text);
   ok("the preview's badge shows LANDED", readFileSync(preview, "utf8").includes('sds-status sds-landed" href="../../approach.html#N001">LANDED</a>'));
-  ok("no state check finding follows", !/state check/.test(landed.out), landed.out);
+  ok("no state check finding follows but the LANDED arc's waiting rows", !/state check/.test(landed.out.replace(/^! state check .* is LANDED and row 1 is waiting.*$/m, "")), landed.out);
   const moved = cli(views.root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
   ok("a row's state moving with the views current writes none and names none", moved.code === 0 && !/approach:|preview badge/.test(moved.out), moved.out);
   const note = cli(views.root, ["workstream", "row", "write", "031/N001", "--note", "a line"]);
@@ -207,6 +207,37 @@ console.log("\n=== state show and state check");
   const legacy = workspace("commands-legacy", { ".spndevex/workstreams/open/026-old/arcs/N001-old.md": "# N001 — old\n\nStatus: **RUNNING**\n" });
   const old = cli(legacy, ["workstream", "state", "show"]);
   ok("show: a workstream not moved yet says so", old.out.trim() === "026 · keeps its arcs as Markdown — not moved to the data layout yet", old.out);
+}
+
+console.log("\n=== row write — an arc's status follows its rows (RD.DEVEX.WORKSPACE.278)");
+{
+  const followed = await dataWorkspace("commands-follows");
+  const file = join(followed.ws, "arcs", "N001", "state.json");
+  const trail = join(followed.ws, "arcs", "N001", "log.jsonl");
+  const before = lines(trail).length;
+  const first = cli(followed.root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+  ok("a row written running moves a DECIDED arc to RUNNING", first.code === 0 && json(file).status === "RUNNING", first.out);
+  ok("the write says so", first.out.includes("N001 DECIDED → RUNNING"), first.out);
+  const added = lines(trail).slice(before);
+  ok("the log gains the row's line and one status line", added.length === 2 && added[1].kind === "status" && added[1].note.startsWith("DECIDED → RUNNING"), JSON.stringify(added));
+  const again = cli(followed.root, ["workstream", "row", "write", "031/N001", "2", "--state", "running"]);
+  const afterAgain = lines(trail).slice(before + 2);
+  ok("at RUNNING the next row moves no status and logs no status event", again.code === 0 && afterAgain.length === 1 && afterAgain[0].kind === "running" && json(file).status === "RUNNING", JSON.stringify(afterAgain));
+  const mid = cli(followed.root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+  ok("one row landed of two prints no closing line", !mid.out.includes("every row landed"), mid.out);
+  const last = cli(followed.root, ["workstream", "row", "write", "031/N001", "2", "--state", "landed"]);
+  ok("the last row landed prints the line and leaves the status", last.out.includes("every row landed: write --status LANDED once proven") && json(file).status === "RUNNING", last.out);
+
+  const held = await dataWorkspace("commands-follows-held");
+  const heldFile = join(held.ws, "arcs", "N001", "state.json");
+  cli(held.root, ["workstream", "row", "write", "031/N001", "--status", "HELD", "--reason", "waits on q1"]);
+  cli(held.root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+  ok("a row landed on a HELD arc moves it to RUNNING and clears the reason", json(heldFile).status === "RUNNING" && json(heldFile).reason === null);
+
+  const waiting = await dataWorkspace("commands-follows-ready");
+  const readyFile = join(waiting.ws, "arcs", "N001", "state.json");
+  cli(waiting.root, ["workstream", "row", "write", "031/N001", "1", "--state", "ready"]);
+  ok("a row written ready leaves a DECIDED arc as it is", json(readyFile).status === "DECIDED");
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

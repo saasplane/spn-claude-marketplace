@@ -8,10 +8,12 @@
 // one to three words of at most 24 characters. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
 // `--note` alone writes a line on the arc's log, which has no other writer. A write that moves an arc's
-// status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which.
+// status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which. A row
+// written `running` or `landed` moves an arc at DECIDED, HELD or PART-LANDED to RUNNING (RD.DEVEX.WORKSPACE.278).
+// It never sets LANDED, CARRIED or DROPPED: the last row landed prints a line asking for `--status LANDED`.
 
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { STATUSES } from "../../checks/arc-status.ts";
+import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
@@ -84,6 +86,7 @@ function write(args: string[]): number {
   let data = readArc(ws, arc);
   const said: string[] = [];
   const before = arcSignatures(ws);
+  let closing = false;
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
@@ -128,16 +131,28 @@ function write(args: string[]): number {
       const was = stateOfRow(data.rows, row);
       const changed = rowFields(row, words);
       if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
+      // RD.DEVEX.WORKSPACE.278: a row that runs or lands moves a decided, held or part-landed arc to RUNNING.
+      const startedFrom = changed.includes("state") && ["running", "landed"].includes(row.state!) && ["DECIDED", "HELD", "PART-LANDED"].includes(data.status) ? data.status : null;
+      if (startedFrom) { data.status = "RUNNING"; data.reason = null; }
       if (changed.length) typed(() => writeArc(ws, data!));
       const kind = changed.includes("state") ? row.state! : changed.length ? "changed" : "note";
       logEvent(ws, arc, kind, rowId, note ?? (changed.includes("state") ? `${was} → ${row.state}` : `changed ${changed.join(", ")}`));
       said.push(changed.length ? `row ${rowId} · ${changed.join(", ")}` : `row ${rowId} · log line written`);
+      if (startedFrom) {
+        logEvent(ws, arc, "status", null, `${startedFrom} → RUNNING · row ${rowId} ${row.state}`);
+        said.push(`${arc} ${startedFrom} → RUNNING`);
+      }
+      if (changed.includes("state") && row.state === "landed" && !TERMINAL.has(data.status)) {
+        const counted = doneOf(data);
+        if (counted.total > 0 && counted.done === counted.total) closing = true;
+      }
     }
   }
   const refreshed = refreshIfMoved(ws, before);
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
+  if (closing) console.log(`every row landed: write --status LANDED once proven`);
   return 0;
 }
 

@@ -14,11 +14,11 @@ import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycl
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
 } from "../lib/workstream.ts";
-import { arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { DONE_STATES, arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -156,6 +156,22 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
   return out;
 }
 
+/**
+ * RD.DEVEX.WORKSPACE.278: an arc's status follows its rows. An arc at PROPOSED or DECIDED with a running
+ * or landed row is behind them, and an arc at LANDED with a row neither landed, carried nor deferred is ahead of them.
+ */
+export function statusFindings(arc: string, data: ArcData): string[] {
+  const leaves = leafRows(data);
+  const out: string[] = [];
+  const started = leaves.filter((row) => row.state === "running" || row.state === "landed");
+  if (["PROPOSED", "DECIDED"].includes(data.status) && started.length)
+    out.push(`${arc} is ${data.status} and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
+  const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
+  if (data.status === "LANDED" && open.length)
+    out.push(`${arc} is LANDED and row ${open[0].id} is ${open[0].state ?? "waiting"} — land the row with \`spn-devex workstream row write ${arc} ${open[0].id} --state landed\`, or move the arc back with \`--status RUNNING\``);
+  return out;
+}
+
 /** The files of every step an arc has passed: its plan once decided, and the report of each landed row with an order. */
 export function stepFindings(ws: string, arc: string, data: ArcData): string[] {
   const out: string[] = [];
@@ -218,6 +234,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...viewFindings(ws, arc, data, text).map(say(arc, "views")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
+    out.push(...statusFindings(arc, data).map(say(arc, "status")));
   }
   // The status card is read from every arc together, so it belongs to none of them.
   const card = page ? headerStatusRule(ws, text, cyclesOf(ws)) : null;

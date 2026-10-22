@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "a6c40e6f"
+      "seen": "f3460d13"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "1a893f3b"
+      "seen": "3b3e81f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -680,6 +680,8 @@ report write`. The close reads it, and so does `workstream rows show`.
 on a card names it in `blockedBy`** (`q<n>`): it is not ready while the card is open, nobody picks it
 up, and it runs again once the card is answered. A row that began and then met the question is
 `stopped`, and its log line names the card.
+
+**A row written `running` or `landed` moves its arc** (`RD.DEVEX.WORKSPACE.278`): an arc at `DECIDED`, `HELD` or `PART-LANDED` becomes `RUNNING`, with one status line in its log. The write never lands the arc; the last row landed prints `every row landed: write --status LANDED once proven`, and the status is written once the proof is in.
 
 **The running state is a claim, and its log line's age is what a second window reads.** Nothing
 expires it, so a second window never takes the row over on its own: it asks the developer, saying how
