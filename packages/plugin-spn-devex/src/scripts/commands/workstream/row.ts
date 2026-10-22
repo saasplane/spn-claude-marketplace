@@ -11,6 +11,12 @@
 // status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which. A row
 // written `running` or `landed` moves an arc at DECIDED, HELD or PART-LANDED to RUNNING (RD.DEVEX.WORKSPACE.278).
 // It never sets LANDED, CARRIED or DROPPED: the last row landed prints a line asking for `--status LANDED`.
+//
+//   spn-devex workstream row discard <arc> <row> --note "<the developer's words>"
+//
+// A row found invalid or not needed leaves the arc's data (RD.DEVEX.WORKSPACE.279). The log keeps one
+// `discarded` line with the words and the row's What; no state is written. Only a row that never reached
+// its node goes: waiting, ready or deferred, with no rows under it and no row waiting on it.
 
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
@@ -18,7 +24,7 @@ import { doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../l
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 
-export const describe = "open an arc or change its header, or add a row or change its fields and its state";
+export const describe = "open an arc or change its header, add a row or change its fields and its state, or discard a row found invalid";
 
 const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "follows", "model"] as const;
 const ROW_TEXT = ["parent", "title", "repo", "mechanism", "acceptance", "model", "proof", "order"] as const;
@@ -156,10 +162,51 @@ function write(args: string[]): number {
   return 0;
 }
 
+/** The states a row may be discarded from: none of them has reached its node. */
+const DISCARDABLE = new Set(["waiting", "ready", "deferred"]);
+
+function discard(args: string[]): number {
+  const words = readWords(args, { note: VALUE });
+  const [ref, rowId, ...more] = words.paths;
+  if (!rowId || more.length) throw new UsageFault("takes an arc and one row: `row discard <arc> <row> --note \"…\"`.");
+  const note = words.value("note");
+  if (!note?.trim()) throw new UsageFault(`discards row ${rowId} with \`--note\` carrying the developer's words, so nobody raises it again.`);
+  const { ws, arc } = arcNamed(ref, true);
+  const data = readArc(ws, arc);
+  if (!data) throw new UsageFault(`finds no ${arc}.`);
+  const row = data.rows.find((one) => one.id === rowId);
+  if (!row) throw new UsageFault(`finds no row ${rowId} in ${arc}.`);
+  const under = data.rows.filter((one) => one.parent === rowId).map((one) => one.id);
+  if (under.length) throw new UsageFault(`keeps row ${rowId}: rows ${under.join(", ")} sit under it — discard or move them first.`);
+  const waiting = data.rows.filter((one) => one.blockedBy?.includes(rowId)).map((one) => one.id);
+  if (waiting.length) throw new UsageFault(`keeps row ${rowId}: rows ${waiting.join(", ")} wait on it — rewrite their \`--blocked-by\` first.`);
+  if (!DISCARDABLE.has(row.state!))
+    throw new UsageFault(`keeps row ${rowId}: it is ${row.state}, and only a row that never reached its node is discarded — waiting, ready or deferred (RD.DEVEX.WORKSPACE.279).`);
+
+  const before = arcSignatures(ws);
+  data.rows = data.rows.filter((one) => one !== row);
+  // A parent left with no row under it keeps the state it showed, which was this row's.
+  const parent = data.rows.find((one) => one.id === row.parent);
+  if (parent && !parentIds(data.rows).has(parent.id)) parent.state = row.state;
+  typed(() => writeArc(ws, data));
+  logEvent(ws, arc, "discarded", rowId, `${note} · the row read: ${row.title}`);
+  const refreshed = refreshIfMoved(ws, before);
+  const { done, total } = doneOf(data);
+  console.log(`ok · ${arc} ${done}/${total} · ${[`row ${rowId} discarded`, ...refreshed.said].join(" · ")}`);
+  for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
+  if (total > 0 && done === total && !TERMINAL.has(data.status)) console.log(`every row landed: write --status LANDED once proven`);
+  return 0;
+}
+
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
     usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--note …] …",
     run: write,
+  },
+  discard: {
+    describe: "take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line",
+    usage: "<arc> <row> --note \"…\"",
+    run: discard,
   },
 };

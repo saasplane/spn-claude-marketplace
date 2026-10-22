@@ -23,7 +23,7 @@ const log = join(ws, "arcs", "N001", "log.jsonl");
 console.log("=== help lists the group");
 {
   const help = cli(root, ["help"]);
-  for (const words of ["workstream state show", "workstream state check", "workstream rows show", "workstream row write", "workstream arc stamp",
+  for (const words of ["workstream state show", "workstream state check", "workstream rows show", "workstream row write", "workstream row discard", "workstream arc stamp",
     "workstream report write", "workstream fact write", "workstream suggestion write", "workstream progress write",
     "workstream question raise", "workstream question show", "workstream question answer", "workstream question withdraw"])
     ok(`help lists \`${words}\``, help.out.includes(words), words);
@@ -238,6 +238,45 @@ console.log("\n=== row write — an arc's status follows its rows (RD.DEVEX.WORK
   const readyFile = join(waiting.ws, "arcs", "N001", "state.json");
   cli(waiting.root, ["workstream", "row", "write", "031/N001", "1", "--state", "ready"]);
   ok("a row written ready leaves a DECIDED arc as it is", json(readyFile).status === "DECIDED");
+}
+
+console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RD.DEVEX.WORKSPACE.279)");
+{
+  const base = { kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [] };
+  const gone = await dataWorkspace("commands-discard", { rows: [
+    { ...base, id: "1", parent: "N001", title: "write the book", state: "landed" },
+    { ...base, id: "2", parent: "N001", title: "a command nobody needs", state: "deferred" },
+    { ...base, id: "3", parent: "N001", title: "waits on four", blockedBy: ["4"], state: "waiting" },
+    { ...base, id: "4", parent: "N001", title: "four", state: "ready" },
+    { ...base, id: "5", parent: "N001", title: "half done", state: "stopped" },
+    { ...base, id: "6", parent: "N001", title: "a parent" },
+    { ...base, id: "6a", parent: "6", title: "its only row", state: "waiting" },
+  ] });
+  const file = join(gone.ws, "arcs", "N001", "state.json");
+  const trail = join(gone.ws, "arcs", "N001", "log.jsonl");
+  const discard = (...words) => cli(gone.root, ["workstream", "row", "discard", "031/N001", ...words]);
+
+  const bare = discard("2");
+  ok("red: a discard with no words is refused, and the row stays", bare.code === 2 && bare.out.includes("`--note` carrying the developer's words") && json(file).rows.some((row) => row.id === "2"), bare.out);
+  const done = discard("2", "--note", "the developer: not needed");
+  ok("a deferred row is discarded, and the line says so", done.code === 0 && /^ok · N001 1\/5 · row 2 discarded/.test(done.out), done.out);
+  ok("it is gone from the arc's data, with no state left behind", !json(file).rows.some((row) => row.id === "2"));
+  const line = lines(trail).at(-1);
+  ok("its one log line carries the words and the row's What", line.kind === "discarded" && line.row === "2" && line.note === "the developer: not needed · the row read: a command nobody needs", JSON.stringify(line));
+  const landed = discard("1", "--note", "x");
+  ok("red: a landed row is kept, naming the three states that go", landed.code === 2 && landed.out.includes("it is landed") && landed.out.includes("waiting, ready or deferred"), landed.out);
+  const stopped = discard("5", "--note", "x");
+  ok("red: a stopped row is kept", stopped.code === 2 && stopped.out.includes("it is stopped"), stopped.out);
+  const awaited = discard("4", "--note", "x");
+  ok("red: a row another row waits on is kept, naming it", awaited.code === 2 && awaited.out.includes("rows 3 wait on it"), awaited.out);
+  const parent = discard("6", "--note", "x");
+  ok("red: a row with rows under it is kept, naming them", parent.code === 2 && parent.out.includes("rows 6a sit under it"), parent.out);
+  const only = discard("6a", "--note", "not needed");
+  ok("the last row under a parent goes, and the parent keeps the state it showed", only.code === 0 && json(file).rows.find((row) => row.id === "6").state === "waiting", only.out);
+  const missing = discard("9", "--note", "x");
+  ok("red: a row the arc lacks is refused", missing.code === 2 && missing.out.includes("finds no row 9"), missing.out);
+  const check = cli(gone.root, ["workstream", "state", "check", "031"]);
+  ok("the arc's data still holds to the schema", !/\[data\]/.test(check.out), check.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

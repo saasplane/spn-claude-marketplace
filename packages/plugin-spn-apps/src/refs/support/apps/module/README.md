@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "3beab1ea"
+      "seen": "44739832"
     }
   ]
 }
@@ -68,8 +68,11 @@ You model an entity at escalating richness so a consumer fetches exactly what it
 | `{State}Info` | extends Meta | Meta plus description-class fields — card views, embedded lists |
 | `{State}` | extends Info | Info plus timestamps and resolved audit actors — admin listings, detail reads |
 | `{State}Details` | composed from fields, never extension | a detail page's whole payload: the full state plus its dependent sub-states |
+| `{Anchor}Summary` | composed from fields, never extension | one line of a listing: the anchor plus the related states the line shows |
 
-**Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
+**Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain.
+
+**A listing line that pairs entities is a `{Anchor}Summary`** (`RD.SUPPORT.APPS.217`). The anchor's read model sits under the anchor's own name and is never null. Each related state sits under its own name, `null` when there is none and an array where there can be many, at the level the line needs. It is returned by `search{Anchor}Summaries` as a `{Anchor}SummarySearchResult`, and it maps to no table: the service builds each line from the bulk readers. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
 
 ### Collection shapes — the plural is keyed, the List is ordered
 
@@ -94,7 +97,7 @@ Every entity, every module, every stack gets the same families. Spell a capabili
 | bulk get | `get{State}s` | the keyed map |
 | Meta / Info reads | `get{State}Meta` · `get{State}Metas` · `get{State}Info` · `get{State}Infos` | that level, single or keyed plural |
 | all | `getAll{State}List` · `get{State}List` · `get{State}ListBy{Scope}` | the ordered list |
-| search | `search{State}s` · `search{State}Infos` | rows plus a total |
+| search | `search{State}s` · `search{State}Infos` · `search{Anchor}Summaries` | rows plus a total |
 | details | `get{State}Details` | the composed payload |
 | key lookup | `get{State}ByCode` · `…ByToken` · `…ByHost` | the full state |
 | create · update | `create{State}` · `update{State}` | the full state |

@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "3b3e81f3"
+      "seen": "d2f354c0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -133,6 +133,7 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
 | `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), or changes its header and status, writing the arc's name file with its data; a `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer |
+| `row discard <arc> <row> --note "…"` | takes a waiting, ready or deferred row found invalid or not needed out of `state.json`; its `discarded` log line carries the developer's words and the row's *What* |
 | `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
 | `report write <workstream> <notes/N<nnn>/orders/<row>.report.md>` | folds a child's hand-back in from its front matter: state, proof, cost, commits, follow-ups. `ok · N007 18/19 · 57b added · 58 ready` |
 | `fact write <arc> --source <repository>/<path>[:<line>] --fact "…"` | one fact, its source's current commit pinned: `f12 · pinned 8b99ae92` |
@@ -675,6 +676,14 @@ report write`. The close reads it, and so does `workstream rows show`.
 | `landed` | it reached its node, with its commits and its proof | passes |
 | `carried` | the work left this workstream, and its proof names where | passes |
 | `deferred` | it waits on a named event | passes |
+
+**A row found invalid or not needed is discarded, never deferred** (`RD.DEVEX.WORKSPACE.279`). A deferred row
+comes back on its event, and wrong or unneeded work has none. `workstream row discard <arc> <row> --note
+"<the developer's words>"` removes it from `state.json`, and its one log line, of kind `discarded`, keeps
+the words and the row's *What*. Discarded is no state, so no page shows it and the close never sees it.
+Only a waiting, ready or deferred row goes. A row running, stopped, landed or carried is refused, and so
+is a row with rows under it or a row another row waits on, until those are discarded or rewritten. Then
+bring the arc's part of the page current and run `arc stamp write`.
 
 **A row with rows under it takes its state from them**, and never has one written. **A row that waits
 on a card names it in `blockedBy`** (`q<n>`): it is not ready while the card is open, nobody picks it
