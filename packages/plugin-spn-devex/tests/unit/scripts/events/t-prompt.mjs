@@ -12,7 +12,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX, WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
+import { bindingsOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
 
 const SCRIPT = resolve(PLUGIN, "src", "scripts", "events", "prompt.ts");
 const EVENT = "UserPromptSubmit";
@@ -20,15 +20,16 @@ const EVENT = "UserPromptSubmit";
 const THIS = "020-agent-workstream-improvements";
 const NEXT = "021-next-subject";
 const DONE = "008-plain-language";
-const ARC_FILE = "# the arc\n\nStatus: **RUNNING**\n";
+const arcState = (arc, subject) => JSON.stringify({ arc, subject });
 
 // One workstream in each state. `021` holds an arc numbered `N011` as `020` does, so a reload
 // handover that reads the waiting arc as its own is caught by the name it gives.
 const files = {
-  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011-artifacts-by-domain.md`]: ARC_FILE,
-  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N012-session-names.md`]: ARC_FILE,
-  [`${DEVEX}/${WORKSTREAMS}/backlog/${NEXT}/${ARCS}/N011-same-number.md`]: ARC_FILE,
-  [`${DEVEX}/${WORKSTREAMS}/closed/${DONE}/${ARCS}/N119-fresh-window.md`]: ARC_FILE,
+  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/state.json`]: arcState("N011", "artifacts-by-domain"),
+  [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N012/state.json`]: arcState("N012", "session-names"),
+  [`${DEVEX}/${WORKSTREAMS}/backlog/${NEXT}/${ARCS}/N011/state.json`]: arcState("N011", "same-number"),
+  // The old layout: an arc as a file. It names no subject, so the workstream form is given.
+  [`${DEVEX}/${WORKSTREAMS}/closed/${DONE}/${ARCS}/N119-fresh-window.md`]: "# the arc\n\nStatus: **RUNNING**\n",
   "spn-support-ts/src/a.ts": "export const a = 1;\n",
 };
 const build = (name, more = {}) => workspace(`prompt-${name}`, { ...files, ...more });
@@ -38,7 +39,7 @@ const build = (name, more = {}) => workspace(`prompt-${name}`, { ...files, ...mo
 const handover = (next) => [
   `continue:     ${next}`,
   "model:        Opus 5.5, effort high",
-  `read first:   \`/work/${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011-artifacts-by-domain.md\` (fields, and row 3)`,
+  `read first:   \`/work/${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/state.json\` (fields, and row 3)`,
   "pins:         spn-foundation db1e69f · spn-claude-marketplace 7fc99c1",
   "state:        rows 1 to 2 ✅ landed; row 3 not started",
   "live now:     no reload",
@@ -46,6 +47,8 @@ const handover = (next) => [
   "do not touch: nothing",
   "open:         none",
 ].join("\n");
+// A block that names no folder anywhere else, so only its `continue:` line can bind a workstream.
+const bare = (next) => `continue:     ${next}\nmodel:        Opus 5.5, high effort`;
 const fenced = (block) => `Pick this up.\n\n\`\`\`text\n${block}\n\`\`\`\n`;
 
 const toArc = (arc) => `workstream \`${THIS}\`, arc \`${arc}\`, row 3, in a \`spn-claude-marketplace\` window`;
@@ -106,8 +109,16 @@ console.log("\n=== prompt");
     sessionName(handover(toArc("N012")), root), { name: "020-N012 session-names", form: "arc" });
   same("[MKT.HOOKS.49] an arc named on the wrapped line of `continue:` is read",
     sessionName(handover(`workstream \`${THIS}\`,\n              arc \`N011\`, row 3`), root), { name: "020-N011 artifacts-by-domain", form: "arc" });
-  same("[MKT.HOOKS.49] a handover into a closed workstream names its arc too",
-    sessionName(handover(`workstream \`${DONE}\`, arc \`N119\`, row 1`), root), { name: "008-N119 fresh-window", form: "arc" });
+  same("[MKT.HOOKS.49] a closed workstream that holds only an old arc file gives the workstream form",
+    sessionName(handover(`workstream \`${DONE}\`, arc \`N119\`, row 1`), root), { name: DONE, form: "workstream" });
+  same("[MKT.HOOKS.49] a handover that names the workstream by its number gives the arc form",
+    sessionName(handover("020 · N011 — row 8, then row 10"), root), { name: "020-N011 artifacts-by-domain", form: "arc" });
+  same("[MKT.HOOKS.49] the number and the arc after a comma give the arc form too",
+    sessionName(handover("020, N011"), root), { name: "020-N011 artifacts-by-domain", form: "arc" });
+  same("[MKT.HOOKS.49] a number with no folder gives no name",
+    sessionName(bare("099 · N011 — row 1"), root), null);
+  same("[MKT.HOOKS.49] the reload form written with numbers: the window takes the first-named workstream",
+    sessionName(handover("open workstream 021; 020 N011 waits on it"), root), { name: NEXT, form: "workstream" });
 
   // KNOWN-BAD — a handover with no arc to start on gives the workstream form, never an arc form.
   same("[MKT.HOOKS.49] an arc with no file in the workstream's arcs/ gives the workstream form",
@@ -122,12 +133,23 @@ console.log("\n=== prompt");
     sessionName("why does the release gate refuse a dirty tree?", root), null);
   same("[MKT.HOOKS.50] a name shaped as a workstream with no folder binds none",
     sessionName("continue 099-not-here from row 2", root), null);
+  same("[MKT.HOOKS.50] a prompt with no handover that holds only a number binds nothing",
+    sessionName("what did 020 land, and is 021 next?", root), null);
   same("[MKT.HOOKS.50] two workstreams in one prompt, with no handover, bind neither",
     sessionName(`compare ${THIS} with ${NEXT}`, root), null);
   same("[MKT.HOOKS.50] a date and a version are not workstreams",
     sessionName("on 2026-10-02 the plugins went to 0.13.0, and 100-200 rows moved", root), null);
   same("[MKT.HOOKS.50] a workspace with no workstreams binds none",
     sessionName(`pick up ${THIS}`, workspace("prompt-empty")), null);
+}
+
+// ---------------------------------------------------------------- the workstreams a handover owns
+{
+  const root = build("owns");
+  same("[MKT.HOOKS.49] a handover naming `020 · N011` owns the workstream whose number it is",
+    bindingsOf(handover("020 · N011 — row 8"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
+  same("[MKT.HOOKS.49] a handover naming a number with no folder owns nothing, and the prompt binds nothing",
+    bindingsOf(bare("099 · N011"), root, "sess-owns"), []);
 }
 
 // ---------------------------------------------------------------- the decision

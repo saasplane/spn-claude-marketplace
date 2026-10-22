@@ -9,8 +9,14 @@
 //   none        the prompt binds no workstream: nothing is printed, and Claude Code's own name stays
 //   workstream  the prompt names exactly one workstream folder that exists, and nothing is recorded
 //               for the session: the folder's name, `020-agent-workstream-improvements`
-//   arc         the prompt holds a handover block whose `continue:` line names a workstream folder
-//               that exists and an arc with a file in it: `020-N011 artifacts-by-domain`
+//   arc         the prompt holds a handover block whose `continue:` line names a workstream that
+//               exists and an arc of it: the workstream's number, the arc's number and the subject
+//               from `arcs/N<nnn>/state.json`: `020-N011 artifacts-by-domain`
+//
+// A handover names its workstream by the folder or by the number: `025-partner-web, N011` and
+// `025 · N011` name the same workstream, because a number is never given to a second workstream. A
+// prompt with no handover binds a workstream only by its folder's name, because a three-digit number
+// in ordinary text is too often something else.
 //
 // IT NEVER FAILS A PROMPT. Every error ends in exit 0 with nothing on stdout, and it starts no other
 // program.
@@ -29,7 +35,7 @@ export type SessionName = { name: string; form: "workstream" | "arc" };
 // The folder under `.spndevex/` where the plugin records what it did, and the folder of names in it.
 const DEBUG = ".debug";
 const NAMES = "names";
-const ARC_FILE_END = ".md";
+const STATE_FILE = "state.json";
 
 const everyWorkstreamName = (): RegExp => new RegExp(WORKSTREAM_NAME.source, "g");
 
@@ -42,6 +48,30 @@ function workstreamFolder(root: string, name: string): string | null {
   return null;
 }
 
+/** The one folder whose name begins `NNN-`, in whichever state holds it, or null where none or several do. */
+function workstreamOfNumber(root: string, number: string): string | null {
+  const found = new Set<string>();
+  for (const state of WORKSTREAM_STATES) {
+    let entries: string[];
+    try { entries = readdirSync(workstreamsDir(root, state)); } catch { continue; }
+    for (const entry of entries) if (entry.startsWith(`${number}-`) && isDir(join(workstreamsDir(root, state), entry))) found.add(entry);
+  }
+  return found.size === 1 ? [...found][0] : null;
+}
+
+/**
+ * The workstreams a `continue:` line names, in the order it names them, each with where it stands in
+ * the line: by its folder's name, or by a standalone three-digit number. `name` is null where the
+ * folder or the number matches no folder.
+ */
+function workstreamsOfLine(line: string, root: string): Array<{ name: string | null; index: number }> {
+  const either = new RegExp(`${WORKSTREAM_NAME.source}|\\b\\d{3}\\b(?!-)`, "g");
+  return [...line.matchAll(either)].map((found) => ({
+    name: found[0].length > 3 ? (workstreamFolder(root, found[0]) ? found[0] : null) : workstreamOfNumber(root, found[0]),
+    index: found.index ?? 0,
+  }));
+}
+
 /** Every workstream folder a text names that exists, each one once, in the order the text names them. */
 function workstreamsNamed(text: string, root: string): string[] {
   const named: string[] = [];
@@ -51,16 +81,14 @@ function workstreamsNamed(text: string, root: string): string[] {
 }
 
 /**
- * The subject an arc's file name carries: `artifacts-by-domain` for `N011-artifacts-by-domain.md`.
- * Null where the workstream holds no file for that arc.
+ * The subject an arc carries: the `subject` of `arcs/N011/state.json`, such as `artifacts-by-domain`.
+ * Null where the arc has no such file or its subject is not a non-empty text.
  */
 function arcSubject(folder: string, arc: string): string | null {
-  const opening = `${arc}-`;
-  let files: string[];
-  try { files = readdirSync(join(folder, ARCS)).sort(); } catch { return null; }
-  const file = files.find((name) => name.startsWith(opening) && name.endsWith(ARC_FILE_END)
-    && name.length > opening.length + ARC_FILE_END.length);
-  return file ? file.slice(opening.length, -ARC_FILE_END.length) : null;
+  try {
+    const held = JSON.parse(readFileSync(join(folder, ARCS, arc, STATE_FILE), "utf8")) as { subject?: unknown } | null;
+    return held && typeof held.subject === "string" && held.subject ? held.subject : null;
+  } catch { return null; }
 }
 
 /**
@@ -70,13 +98,13 @@ function arcSubject(folder: string, arc: string): string | null {
  * THE FIRST WORKSTREAM THE LINE NAMES IS THE ONE THE WINDOW WORKS ON, and the arc is read only from
  * the text before a second workstream. The reload form reads `open workstream <next>; <this> N<nnn>
  * waits on it`: its arc belongs to the workstream that waits, so the window that opens `<next>` has
- * no arc to start on and takes the workstream form. An arc with no file in the workstream's `arcs/`
- * folder has no subject to show, and it gives the workstream form too.
+ * no arc to start on and takes the workstream form. An arc with no `state.json` subject in the
+ * workstream's `arcs/N<nnn>/` folder has nothing to show, and it gives the workstream form too.
  */
 function handoverName(line: string, root: string): SessionName | null {
-  const named = [...line.matchAll(everyWorkstreamName())];
-  if (!named.length) return null;
-  const workstream = named[0][0];
+  const named = workstreamsOfLine(line, root);
+  const workstream = named[0]?.name;
+  if (!workstream) return null;
   const folder = workstreamFolder(root, workstream);
   if (!folder) return null;
   const arc = line.slice(0, named.length > 1 ? named[1].index : line.length).match(ARC_NAME)?.[0];
@@ -111,8 +139,8 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 export function bindingsOf(prompt: string, root: string, session: string): Array<{ name: string; by: "prompt" | "handover" }> {
   const next = handoverLines(prompt).get("continue");
   if (next !== undefined) {
-    const owned = [...new Set([...next.matchAll(everyWorkstreamName())].map((found) => found[0]))]
-      .filter((name) => workstreamFolder(root, name));
+    const owned = [...new Set(workstreamsOfLine(next, root).map((found) => found.name))]
+      .filter((name): name is string => name !== null);
     if (owned.length) return owned.map((name) => ({ name, by: "handover" as const }));
   }
   if (Object.values(readWindow(root, session).workstreams).some((one) => one.tie === "owns")) return [];
