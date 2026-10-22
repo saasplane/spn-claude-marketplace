@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "cbabe14d"
+      "seen": "0e17fc6d"
     }
   ]
 }
@@ -228,9 +228,20 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 | --- | --- | --- |
 | Error code | `ERROR.STD.<NAME>` shared, `ERROR.<MOD>.<NAME>` module-owned | `ERROR.IAM.CHALLENGE_EXPIRED` |
 | Permission code | `MOD_FAMILY_TIER`, cumulative `VIEW` then `MANAGE` then `ADMIN` | `IAM_ACCESS_VIEW` |
-| Label key | `<scope>[.<subscope>].<snake_label>` | `common.attach_file` |
+| Label key | `<SCOPE>[.<SUBSCOPE>].<SNAKE_LABEL>`, stored UPPER | `COMMON.ATTACH_FILE` |
 
 **A permission's enum value carries the module prefix; the enum key stays short** so a gate reads cleanly. The prefix is what guarantees uniqueness when every module seeds into one catalog.
+
+**Each family of label has one key form.** The catalog stores every key in its UPPER form, and `normalizeLabelKey` only fixes case.
+
+| Family | Who writes the key | Written as | Stored as |
+| --- | --- | --- | --- |
+| A design-system label | the design system, at the call site | lower case: `translate('common.clear', 'Clear')` | `COMMON.CLEAR` |
+| A module page's label | the page, at the call site | the stored form: `translate('IAM.ROLE_ACTIVATED', 'Role activated')` | `IAM.ROLE_ACTIVATED` |
+| An error's label | nobody: the key is the error code | `ERROR.STD.<NAME>` · `ERROR.<MOD>.<NAME>` | the same |
+| An enum value's label | `translateEnumLabel`, from the enum's name and the value | `ENUM.<ENUMNAME>.<VALUE>`, from `translateEnumLabel(translate, 'RoleType', role.roleType)` | `ENUM.ROLETYPE.SYSTEM` |
+
+**An enum label's key is built, never written.** A page passes the contract enum's name exactly as declared — `'RoleType'`, never `'roleType'` or a shortened `'role'` — and `buildEnumOptions` takes the same name. **Only a contract enum's value takes an `ENUM.` key**: a code from an open set, such as a module code, an entity kind or a data source type, never does.
 
 **Scope a label by reuse, not by where it renders.** `common.*` is flat and holds generic vocabulary translated once; a module scope holds module-specific messages and may add a subscope. A `common.*` key mirrors its own English value rather than inventing a semantic name. The second argument is both the English source and the runtime fallback.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "679c29d9"
+      "seen": "cec62143"
     }
   ]
 }
@@ -120,8 +120,11 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 | `<X>Info` | extends Meta | Meta plus description-class fields |
 | `<X>` | extends Info | Info plus timestamps and resolved audit actors |
 | `<X>Details` | fields, never `extends` | the state under a named field, with its dependent sub-states beside it |
+| `<Anchor>Summary` | fields, never `extends` | a listing line: the anchor, never null, and each related state the line shows, `null` when none or an array |
 
 **Details composes because it aggregates other entities.** Extending the state would make the aggregate a subtype of one member and force every sub-state into that chain. Composition keeps each member independently nullable, independently versioned, and carried at whatever level the page needs.
+
+**A listing line that pairs entities is a Summary, which composes for the same reason.** The anchor sits under its own name at the level the line needs and is never null (`label: LabelMeta`); each related state sits under its own name, `null` when there is none (`translation: LabelTranslation | null`) or an array where there can be many. It is returned by its own search, `search<Anchor>Summaries`, routed `POST /<entity>/summary/search`, and the service builds each line from the bulk readers.
 
 **Only the full state is universal.** Skip a level an entity genuinely lacks, and never invent one to complete a set.
 
@@ -135,6 +138,7 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 | `get<X>List` | none | the caller the auth context names |
 | `get<X>ListBy<Scope>` | the scope's id | one parent |
 | `search<X>s` | a search command | filter and page |
+| `search<Anchor>Summaries` | a search command for the anchor, plus what the related states add | filter and page |
 
 **`getAll` is unbounded and that is a commitment.** It is correct only for a closed reference set the platform controls, and wrong for anything a tenant can grow. Choose search when in doubt, because a `getAll` that outgrows its assumption fails in production rather than in review.
 

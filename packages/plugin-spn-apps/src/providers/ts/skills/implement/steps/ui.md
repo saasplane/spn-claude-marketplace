@@ -58,5 +58,5 @@ Auth surfaces: business apps never implement login — the auth gate hands off t
 
 - Run `spnutils apps gen-barrel module-web-<mod>-ts` after adding/removing files.
 - If the BE contract changed: regenerate the API client from the running service **before** consuming it.
-- Write labels as `translate('<scope>.<key>', 'Fallback')` with dotted scope + snake_case leaf (`common.*` flat, mirrors its value; module keys may add one subscope). `spnutils apps gen-labels <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
+- Write a module page's label in its stored form, `translate('<SCOPE>.<KEY>', 'Fallback')`, with a dotted scope and a snake_case leaf (`COMMON.*` flat, mirrors its value; module keys may add one subscope); only the design system writes lower case. An enum value's label is `translateEnumLabel(translate, '<ContractEnumName>', value)`, which builds `ENUM.<ENUMNAME>.<VALUE>`; never write an enum key by hand. `spnutils apps gen-labels <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
 - Verify with the FE builds — `npx nx run-many -t build -p '<ui-pkg>,web-*'`.
