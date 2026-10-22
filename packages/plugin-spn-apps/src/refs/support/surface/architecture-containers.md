@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "6625f6e9"
+      "seen": "068290f1"
     }
   ]
 }
@@ -166,6 +166,21 @@ A section is one part of a page, set apart from the next by a fill of its own an
 
 **The section stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The section frames nothing: it sets one part of a page apart from the next. A section is for the pages of a website and for a strip that opens an app's page, and an app part with a title and actions is a panel container. The theme holds no look for a section: a page alternates its sections on purpose, and the rhythm is in the stylesheet's tokens.
 
+### The depth of what a section holds
+
+**A section never frames itself, and what stands in it takes its depth from what it holds and does for the visitor, not from the page's taste** (`RD.SUPPORT.SURFACE.293`). The band's fill gives the rhythm.
+
+| An item that is | Depth |
+| --- | --- |
+| a point to read, with no `anchor` | flat |
+| a door to another page, with an `anchor` | boxed and raised at `MD`, in the fill that stands off its band: `DEFAULT` on a `BASE` band, `BASE` on a `DEFAULT` band |
+| a choice that changes what is shown, with `selected` or an `anchor` that sets state | boxed and raised at `MD`, the chosen one marked |
+| a step in order, `numbered` with no `anchor` | flat, with a line between each two |
+| a statistic, `STATS` | flat |
+| a thing of its own, such as a quote or a plan | boxed; a recommended plan one level higher |
+
+A media follows its kind, named before its art exists: the product (a screen, a recording, a live view) is framed and raised, `LG` at `PAGE` and `MD` at `CONTAINER`; an illustration or a diagram is flat on its band; a photo is flush and rounded with no border and no raise; code or a terminal sits in its code frame, flat; logos are flat and muted.
+
 ### The grid section
 
 A grid of features under a heading is `DSFeatureGridSectionContainer` (`RD.SUPPORT.SURFACE.259`). A section holds one child, so a heading over a few cells has no place in it: the heading would become a cell of the grid, or a second section above it. The grid section gives the heading and the cells one home, and a page writes it where it writes a section. It draws a `DSSectionContainer` from `section`, and its one child is a `DSFeature` at `CONTAINER` that holds the grid where its items stand.
@@ -322,6 +337,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.254` | a section reaches the edges of its place, and stands straight in a place |
 | `RD.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, an `IDSFrameSurface`, every frame is drawn by one drawer, and one resolver keeps the theme's value for a key left out |
 | `RD.SUPPORT.SURFACE.282` | a raised frame takes `elevation`, a section takes `inset`, and the grid section takes `reveal`, which plays once |
+| `RD.SUPPORT.SURFACE.293` | what a section holds takes its depth from what it does for the visitor, and a section never frames itself |
 | `RD.SUPPORT.SURFACE.262` | only the panel takes its frames from the theme, a card takes `frames` and defaults to all three parts, and a feature frames nothing by default |
 | `RD.SUPPORT.SURFACE.263` | a card and a panel are told apart by level and purpose, and no card, feature or feature section container exists |
 | `RD.SUPPORT.SURFACE.266` | the three parts of any box are `DSBoxPartType` |

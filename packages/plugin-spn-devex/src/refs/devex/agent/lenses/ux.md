@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "fdb83383"
+      "seen": "a6055fcf"
     }
   ],
   "decisions": [
@@ -104,6 +104,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A field, a set of choices and a list each keep their layout**: an entered field has its title above and one line under; every control a person sets is a form field; readings stand in a grid; choices stand in columns; a line between each two lines of a list; anything set one under another is a `DSList` (`RD.SUPPORT.SURFACE.060`–`.063`, `.096`, `.288`).
   - **The data table is in the layout its data asks for**: `TABLE` to compare facts, `LIST` for a record read by its name, `GRID` for a thing of its own, `LIST` on a phone; a record's actions at the end of its row; a value changed in its cell; the filter bar in its one form, one button on a phone whose drawer fits its fields (`RD.SUPPORT.SURFACE.068`–`.073`, `.097`, `.246`).
   - **A pitch is one `DSFeature`, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a section painted by hand, is a finding (`RD.SUPPORT.SURFACE.233`, `.243`, `.259`).
+  - **Each part's depth says what a visitor can do with it.** A point to read, a step and a statistic stand flat; a door to another page and a choice that changes what is shown are boxed and raised, so they read as pressable; a thing of its own is boxed; a media is framed, flat or flush by its kind. A flat part that opens a page, or a raised one that does nothing, is a finding (`RD.SUPPORT.SURFACE.293`).
   - **A container holds its title and actions in its header, and what closes its work in its footer.** Over the page the closing actions stand at the end of the footer, leaving first and the main action last; on a page of its own at the start, main action first. A small entry is a dialog, a medium one a side sheet, a large form a page of one container (`RD.SUPPORT.SURFACE.074`–`.078`, `.095`).
   - **A sign-in is one compact container on a canvas**: providers as one centred row of icons, every control a form field, alternatives as equals under a separator (`RD.SUPPORT.SURFACE.205`).
   - **One container for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RD.SUPPORT.SURFACE.115`–`.117`).

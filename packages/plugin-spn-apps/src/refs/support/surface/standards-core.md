@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "fba5e64a"
+      "seen": "dfb0368a"
     }
   ]
 }
@@ -141,8 +141,8 @@ A page is read in one of three ways, and its words follow the way it is read. In
 
 | Level | Eyebrow | Title | Description | Item title and description | Actions |
 | --- | --- | --- | --- | --- | --- |
-| `PAGE`, a hero | 1 to 3 words | 4 to 8 words, at most 2 lines | 15 to 30 words, at most 2 lines | not set | 1 to 3 words each; one primary and one more at most |
-| `CONTAINER`, a section | 1 to 3 words | 4 to 8 words, one line | 15 to 30 words, at most 2 lines | 2 to 4 words; 10 to 20 words, at most 3 lines | 1 to 3 words; at most 2 |
+| `PAGE`, a hero | 1 to 3 words; a `TEXT` eyebrow in semibold, a state as a badge | 4 to 8 words, at most 2 lines | 15 to 30 words, at most 2 lines | not set | 1 to 3 words each; one primary and one more at most |
+| `CONTAINER`, a section | 1 to 3 words, drawn as at `PAGE` | 4 to 8 words, one line | 15 to 30 words, at most 2 lines | 2 to 4 words; 10 to 20 words, at most 3 lines | 1 to 3 words; at most 2 |
 | `WIDGET`, a card or tile | not set | 2 to 5 words | 8 to 16 words, at most 2 lines | 2 to 4 words; 6 to 12 words | one, of 1 to 3 words |
 | `GROUP`, rows in a card or list | not set | 1 to 4 words | at most 12 words, one line | 1 to 3 words; at most 10 words | not set |
 | `CONTENT`, `INLINE` | not set | 1 to 3 words | not set | not set | not set |
