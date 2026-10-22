@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "a6055fcf"
+      "seen": "17f81de7"
     }
   ]
 }
@@ -41,7 +41,7 @@ The decisions run in one order. Each level of a page owns one thing, and the lev
 
 | | Decision | What it settles |
 | --- | --- | --- |
-| 1 | the layout | the navigation, and the main area the page gets |
+| 1 | the layout | the navigation, and the content the page gets |
 | 2 | the facts, and the page pattern | what the data and the person are, which arrangement the whole page takes, and what shows each part |
 | 3 | the containers | which parts of the page are framed as a header, content and a footer |
 | 4 | the pattern for each task | how each thing the person does runs, and what they see in each task state |
@@ -57,7 +57,7 @@ The decisions run in one order. Each level of a page owns one thing, and the lev
 
 ## 1. Pick the layout
 
-A layout frames the page. It draws the navigation, and it hands the page a main area. It owns nothing inside that area.
+A layout frames the page. It draws the navigation, and it hands the page the content. It owns nothing inside it.
 
 | Layout type | The navigation | What it is for |
 | --- | --- | --- |

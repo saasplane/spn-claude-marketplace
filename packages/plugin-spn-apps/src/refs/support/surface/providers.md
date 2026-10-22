@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "c00d7d21"
+      "seen": "e5983966"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "55cf4e08"
+      "seen": "7ff91218"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
-      "seen": "8ea89220"
+      "seen": "018a4d18"
     }
   ]
 }
@@ -41,7 +41,7 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 
 ## The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest
 
-> **Planned.** The package takes these in its own change, and until then it holds the older names and shapes: `DSFeatureGridSectionContainer` and `IDSGrid`; `DSDataTablePanelContainer` in place of `DSDataTableContainer`; `DSBoxPartType` in place of `DSPageLevelPartType`; the prop `surface` with `IDSFrameSurface` and `prepareFrameSurface`, in place of five paint props; and the theme by layer. `architecture-containers.md` and `architecture-app.md` state each.
+The package carries these names and shapes from support 5.22.0: `DSFeatureGridSectionContainer` and `IDSGrid`, `DSDataTablePanelContainer`, `DSBoxPartType`, the prop `surface` with `IDSFrameSurface`, and the theme by layer. `architecture-containers.md` and `architecture-app.md` state each.
 
 `@saasplane/support-web-ds-ts` realizes the design system. `DSApp` mounts the roots and owns theme state, the choice and the whole theme; components read the contexts through hooks and never through props.
 

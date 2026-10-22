@@ -33,7 +33,7 @@
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "4c7fd97f"
+      "seen": "503debad"
     }
   ],
   "decisions": [

@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "a6055fcf"
+      "seen": "17f81de7"
     }
   ],
   "decisions": [
@@ -91,7 +91,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
 
 - **Standards and patterns** — held by the `design` skill's order of decisions, and by this lens worn.
   - **The page has one purpose and one main action.** An answer that needs *and* is two pages (standards § A page has one purpose).
-  - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area (standards § The levels · `RD.SUPPORT.APPS.146`).
+  - **Each level owns its own thing.** The layout draws the navigation and hands the page the content (standards § The levels · `RD.SUPPORT.APPS.146`).
   - **The layout fits the job of the app**: `RAIL` for an app a person works in, `DOCK` for a profile or settings, `TOPNAV` for a website, `CANVAS` for a sign-in, a marketing page or an error page. A layout chosen for its look is a finding (`RD.SUPPORT.SURFACE.206`).
   - **The navigation behaves the same in every layout type**: an item's actions reachable without hover; a closed group holding the current page shows the selected mark; a shut group's flyout opens on a press; the narrow dock keeps its back link (`RD.SUPPORT.APPS.163`).
   - **A framed part reads header, content, footer, in that order**, and a container inside a container is a finding (`RD.SUPPORT.APPS.147`). A card and a panel are told apart by level and purpose, and a card container, a feature container or a feature section container is a finding (`RD.SUPPORT.SURFACE.263`).

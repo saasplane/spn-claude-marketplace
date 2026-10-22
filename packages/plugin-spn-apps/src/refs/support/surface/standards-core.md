@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/01-standards-core.md",
-      "seen": "765b8720"
+      "seen": "b41548a2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "dfb0368a"
+      "seen": "0e546ed6"
     }
   ]
 }
@@ -40,20 +40,21 @@ A surface is built in levels, and each level owns one thing. Read a surface from
 
 ```text
 app  →  page  →  layout  →  container  →  widget or component
-        one route   main area   optional
+        one route   the content   optional
 ```
 
 | Level | What it is | What it owns |
 | --- | --- | --- |
 | App | a set of routes | which pages exist |
-| Page | one route, with one purpose | which layout it uses, and everything it puts in the main area |
-| Layout | the frame of a page | the navigation, and the main area it hands to the page. Nothing inside the main area |
-| Container, optional | a framed part of a page, as a header, content and a footer | its frame, and the order of its parts |
-| Widget | a block built for one purpose, from components | its own working |
+| Page | one route, with one purpose | which layout it uses, and everything it puts in the content |
+| Layout | the frame of a page | the navigation, and the content it hands to the page. Nothing inside the content |
+| Container, optional | a part of a page: a panel framed as a header, content and a footer, or a section set apart by its fill | its frame or its fill, and the order of its parts |
+| Widget | a unit placed beside others or in a sidebar, built from components | its own working and its size |
 | Component | the smallest block | one control, or one way to show something |
 
-- Let a level own what the table gives it, and never decide what another level owns. The container is optional — a page may put a widget or a component straight into the main area, or fill the whole area with one block.
+- Let a level own what the table gives it, and never decide what another level owns. The container is optional — a page may put a widget or a component straight into the content, or fill the whole content with one block.
 - A token is not a level: a token is a value a block is drawn with, and it is not a block.
+- The chain says who owns what. A second word, the page level, says where a block stands on a page: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` or `INLINE`. A box tells its level to what it holds, and a block takes its type sizes, heading tag, gaps and buttons from it. A page level is a position and never a unit; `architecture-names.md` holds its values.
 
 ## A page has one purpose — 🔮
 
@@ -107,7 +108,7 @@ Never write a second version of a page for a density, a theme, a device type or 
 
 ## An application and a site — 🔮
 
-An application and a site are built from the same blocks, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. It needs three additions the standard names and states no rule for yet: larger type steps, a full-width section, and site widgets (such as the opening block and a footer in columns). They add to the design system and read the same tokens, so one theme tints a partner's site and their app together.
+An application and a site are built from the same units, and one theme gives both their look. A site is a surface a person reads more than they work on, such as a marketing site. A page of a site is a run of sections: each is a `DSSectionContainer`, set apart by its fill and its room, and holds one `DSFeature` or a grid of features, `DSFeatureGridSectionContainer`. A feature's page level sets its display size, 64, 40, 22 or 18 px from `PAGE` to `GROUP`. Three rules hold on every page of a site: its words keep a length budget by level, each part takes its depth from what it holds, and anything set one under another is a `DSList`. None of this changes a unit an application uses, and a unit a site uses reads the same tokens as every other, so one theme tints a partner's site and their app together.
 
 ## The words of a page, by what it is for — 🔮
 

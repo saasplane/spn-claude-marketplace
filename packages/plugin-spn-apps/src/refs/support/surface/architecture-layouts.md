@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "5dcb878f"
+      "seen": "a146f5c0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
@@ -23,11 +23,11 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 | Term | What it means |
 | --- | --- |
-| Layout | the block that frames a page: the navigation, and the main area it hands to the page |
+| Layout | the block that frames a page: the navigation and the content it hands to the page |
 | Layout type | `DSLayoutType` — `RAIL` · `DOCK` · `TOPNAV` · `CANVAS` |
 | Body | the part of a layout that is the whole window: the fill behind everything, and the box every other part stands in, by its width |
 | Navigation | the part of a layout that moves a person around the app: the entries, `startNode`, `actionsNode` and `endNode`, with its own fill, line and shadow |
-| Content | the part of a layout that is the main area the page's children stand in, with its own fill, line and shadow |
+| Content | the part of a layout the page's children stand in, with its own fill, line and shadow |
 | Attached | `attached` — a part meets the window's edge; not attached, it floats, the layout's space in, as a rounded container |
 | Sticky | `sticky` — the top bar stays in the window while the page scrolls |
 | Bordered · Raised | `bordered` · `raised` — a part draws a line at its edges · a part draws a shadow |
