@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "1c1961ff"
+      "seen": "0991269b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
@@ -95,6 +95,7 @@ The layout look, `IDSThemeLayout`, has three parts and no more: `body`, `navigat
 | `entry` | the kind of the entries of the navigation | `DSNavEntryType`: `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` | the navigation |
 | `bordered` | the lines: at the edge of the part, and around a panel of navigation that opens from it | yes or no | the navigation · the content |
 | `raised` | the depth: a shadow under the part, and under such a panel | yes or no | the navigation · the content |
+| `elevation` | how far a raised part, and a panel that opens from it, stands off the page. Read only where `raised` is yes; `MD` where left out, the shadow a raised bar and its panels always cast (`RD.SUPPORT.SURFACE.289`) | `DSSizeType`: `XS` to `XL` | the navigation · the content |
 | `attached` | the part meets the window's edge. No, it floats as a rounded container, the layout's space in | yes or no | the navigation · the content |
 | `sticky` | the top bar stays in the window while the page scrolls. A rail always stays | yes or no | the navigation |
 
@@ -230,6 +231,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RD.SUPPORT.SURFACE.277` | the theme holds no feature look, and a framed feature takes each key of its `surface` left out from the design system's fixed feature default |
 | `RD.SUPPORT.SURFACE.279` | a unit's look stands in the theme only where the unit frames by default and repeats across an app: the panel container, the card, the card widget and the table |
 | `RD.SUPPORT.SURFACE.265` | the theme's form has one accordion row per layer, each look a titled group inside it |
+| `RD.SUPPORT.SURFACE.289` | `IDSSurfaceLook` carries `elevation`, `MD` where left out and read only where `raised` is true; a bar hands its elevation to the panels it opens, and the theme form offers it while Raised is on |
 | `RD.SUPPORT.SURFACE.261` | the looks that paint a frame extend the surface the core types once, and one resolver keeps the theme's value for a key left out |
 | `RD.SUPPORT.SURFACE.262` | only the panel takes its frames from the theme, and the theme holds no feature look and no feature's frames |
 | `RD.SUPPORT.SURFACE.257` | the bar's width and the size of the navigation's entries are the layout's config, not the theme's |

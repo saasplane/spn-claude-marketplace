@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "4583764b"
+      "seen": "0c09c3d8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
@@ -190,6 +190,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.261` | the paint of a frame is `IDSFrameSurface`, typed once in the core |
 | `RD.SUPPORT.SURFACE.282` | `IDSFrameSurface` carries `elevation`, and `DSMotionType` is the core's set of reveal motions |
 | `RD.SUPPORT.SURFACE.266` | the parts of any box are `DSBoxPartType`, one closed set of the core |
+| `RD.SUPPORT.SURFACE.289` | `IDSSurfaceLook` carries `elevation`, `MD` where left out, read only where `raised` is true |
 | `RD.SUPPORT.SURFACE.253` | the side of a feature's small picture follows its title and its lines, so a level holds no box token |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RD.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
