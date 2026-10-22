@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "7231cf80"
+      "seen": "fba5e64a"
     }
   ]
 }
@@ -137,10 +137,24 @@ A page is read in one of three ways, and its words follow the way it is read. In
 - A headline states the outcome, and the line under it gives the proof. A headline that describes the system is a finding.
 - The words **MUST** be a buyer's and a builder's. A word of the system's own — a layer, a task intent, a unit, a seat, a pattern's name — **MUST NOT** stand on the page unless the same sentence explains it.
 - A number **MUST** stand in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear.
+- **The words MUST fit the length of their level** (`RD.SUPPORT.SURFACE.286`, `RD.SUPPORT.SURFACE.287`), measured at 1440. The `MARKETING` lens writes to this table.
+
+| Level | Eyebrow | Title | Description | Item title and description | Actions |
+| --- | --- | --- | --- | --- | --- |
+| `PAGE`, a hero | 1 to 3 words | 4 to 8 words, at most 2 lines | 15 to 30 words, at most 2 lines | not set | 1 to 3 words each; one primary and one more at most |
+| `CONTAINER`, a section | 1 to 3 words | 4 to 8 words, one line | 15 to 30 words, at most 2 lines | 2 to 4 words; 10 to 20 words, at most 3 lines | 1 to 3 words; at most 2 |
+| `WIDGET`, a card or tile | not set | 2 to 5 words | 8 to 16 words, at most 2 lines | 2 to 4 words; 6 to 12 words | one, of 1 to 3 words |
+| `GROUP`, rows in a card or list | not set | 1 to 4 words | at most 12 words, one line | 1 to 3 words; at most 10 words | not set |
+| `CONTENT`, `INLINE` | not set | 1 to 3 words | not set | not set | not set |
+
+A feature adds facts at its level: 0 to 4 at `PAGE`, 0 to 3 at `CONTAINER` and `WIDGET`, 0 to 2 below, of 1 to 3 words each at the top. Its items follow their form: a `GRID` title of 2 to 4 words, a `LIST` title of 1 to 3 words as the step's name, `STATS` a value of 6 characters at most and a label of 2 to 5 words that says what it counts. The buttons and the count of items are in `architecture-components.md`.
+
+- **Siblings MUST match.** The items of one group share one grammatical form, and no description runs more than about a third longer than its shortest sibling's.
+- **One idea MUST stand in each element.** A title carries one claim, the description its reason, the items the evidence and the action the next step. A second clause in a title belongs in the description.
 
 ## Motion — ✅
 
-One set of tokens moves every surface. A place has its own clamped duration (`clamp(min, base x --motion-speed, max)`) for the hover, the icon's emphasis, the tooltip, the menu, the collapse, the toast, the dialog, the sheet and the rail. Three eases are shared: `enter` (ease-out) for what arrives, `exit` (ease-in) for what leaves, `move` (ease-in-out) for what changes size or place. `--motion-speed` is the multiplier a theme sets as `motionSpeed` (`DEFAULT` x 1, `FAST` x 0.75, `SLOW` x 1.25), and `--motion-amount` is how far things move.
+One set of tokens moves every surface. A place has its own clamped duration (`clamp(min, base x --motion-speed, max)`) for the hover, the icon's emphasis, the tooltip, the menu, the collapse, the toast, the dialog, the sheet and the rail, and for the reveal of a unit that moves into place as it first scrolls into view. Three eases are shared: `enter` (ease-out) for what arrives, `exit` (ease-in) for what leaves, `move` (ease-in-out) for what changes size or place. `--motion-speed` is the multiplier a theme sets as `motionSpeed` (`DEFAULT` x 1, `FAST` x 0.75, `SLOW` x 1.25), and `--motion-amount` is how far things move.
 
 | Kind | Enters | Leaves |
 | --- | --- | --- |
@@ -151,10 +165,12 @@ One set of tokens moves every surface. A place has its own clamped duration (`cl
 | Toast | slides in from its corner | fades where it stands, in the time it entered |
 | Accordion, collapsible | grows to its content's height | shrinks, in the time it entered |
 | Rail | grows to its open width, labels fade in after | labels fade, then it shrinks, in the time it entered |
+| A revealed unit | the first time it scrolls into view: words first, then media, then items (a grid row by row, a list top down, stats left to right), each fading, rising, sliding or zooming in, 60 ms apart | none; it plays once and stays |
 
 - Every unit that moves MUST take its duration and ease from the tokens, and each kind MUST enter and leave by its role.
 - An icon MUST move only because what holds it is hovered, pressed or open (`architecture-components.md` states the motions).
 - Under `prefers-reduced-motion` nothing MUST move and every fade MUST take the hover duration, set in one place. A size change in place keeps its place's min duration with no overshoot.
+- A reveal MUST play once, in the order words, media, items, and MUST leave the words shown without a script (`RD.SUPPORT.SURFACE.282`). One observer drives every reveal; rise, slide and zoom move by `--motion-amount`, so reduced motion stops them. The theme holds no reveal.
 - The loader is not motion; it owns its turning.
 
 ## What every surface owes a person — ✅
@@ -212,6 +228,9 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.062` | the choices of one set stand in columns |
 | `RD.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
 | `RD.SUPPORT.SURFACE.208` | the words of a page follow what it is for, a doc, an app's screen or a marketing page, decided before a word is written |
+| `RD.SUPPORT.SURFACE.282` | a reveal plays once, words first, and leaves the words shown without a script |
+| `RD.SUPPORT.SURFACE.286` | the words of a marketing page fit a length budget by level |
+| `RD.SUPPORT.SURFACE.287` | a feature's words, buttons and items follow its level and its form |
 
 ## Proof
 

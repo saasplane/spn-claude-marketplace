@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "83bf21d1"
+      "seen": "9315e967"
     }
   ],
   "decisions": [
@@ -104,7 +104,9 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RD.SUPPORT.SURFACE.139`, `.140`, `.155`, `.156`, `.161`, `.200`).
   - **A frame is drawn once.** Two borders round one table is the finding; a `bordered` block in a `flush` part, and a table, list, code block, accordion or empty state drawing its own border in a `flush` part, are findings (`RD.SUPPORT.APPS.149`).
   - **A line of a list and the header of a record have one shape**, as `DSItem` holds it: a picture given as data, then the title, the description and the line of facts; a fact as plain words, `TEXT`, `BADGE` or the page's own block; a badge always shows its word and its colour says a state, never a kind; an enum shown by its name; a mark says what and an avatar says who (`RD.SUPPORT.SURFACE.064`–`.067`, `.085`, `.086`, `.096`).
-  - **In a list the row carries the link, the chosen fill and the reaction to the pointer**, and the item line inside it carries none (`RD.SUPPORT.SURFACE.097`).
+  - **In a list the row carries the link, the chosen fill and the reaction to the pointer**, and the item line inside it carries none (`RD.SUPPORT.SURFACE.097`). A list's `title` starts where its rows' words start, and anything set one under another is a `DSList`, never a hand-written vertical flex (`.283`, `.288`).
+  - **Lift, inset and movement are props, not hand-written paint.** A raised frame takes `elevation` (`XS` to `XL`, `SM` today's shadow), a section takes `inset`, a feature or grid section takes `reveal` that plays once, and a boxed item keeps its room inside its frame; a shadow, an inner edge or a scroll animation written on a page is a finding (`.282`, `.284`).
+  - **A link that leaves the site ends on `ARROW_UP_RIGHT` with `NUDGE_UP_END`**; one that goes onward on the site ends on `ARROW_RIGHT` with `NUDGE_END` (`.285`, `.287`).
   - **Every level has its title, larger than the titles under it**: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE` at 22, 18, 16, 14, 13 and 12px, the heading element following the level. A size, type step, heading element or picture size the page wrote on an item line is a finding (`RD.SUPPORT.SURFACE.094`, `.106`, `.107`, `.112`, `.113`, `.178`).
   - **A title starts where what stands under it starts**: the part holding an item line gives it no side padding, and an item line draws none of its own (`RD.SUPPORT.SURFACE.109`, `.114`).
   - **Every overlay that covers a page dims it with one scrim, `surface-overlay`**, drawn by `DSBackdrop`; a dialog, a sheet and a drawer take the page's surface, a popover, menu and tooltip the raised one; a sheet that is not modal and a popover draw no scrim; and each of the three is one surface, the panel drawing the fill, corners, line and shadow and the card inside it none (`RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`, `.163`, `.250`).

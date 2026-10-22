@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "83bf21d1"
+      "seen": "9315e967"
     }
   ]
 }
@@ -176,7 +176,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 - **Read the tree by level of that pattern in `standards-patterns.md`.** It names the page level, the containers, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
 - **The spec names the layout and the page level a tree starts from** (`RD.DEVEX.WORKSPACE.260`). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the containers, or the header of the one container that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
 - **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement. Every title, description and value the tree writes is in the product's own words, and never the name of a pattern, a unit or a level.
-- **The words follow what the page is for** (`RD.SUPPORT.SURFACE.208`). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once: on an app's screen a label is short, an action starts with a verb that says what happens, an error says how to fix it, and nothing persuades; on a marketing page the personas come first, each section answers one reader question, and every number is real. The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
+- **The words follow what the page is for** (`RD.SUPPORT.SURFACE.208`). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once (anything set one under another is a `DSList`, `RD.SUPPORT.SURFACE.288`): on an app's screen a label is short, an action starts with a verb that says what happens, an error says how to fix it, and nothing persuades; on a marketing page the personas come first, each section answers one reader question, and every number is real, in the length its level allows (`RD.SUPPORT.SURFACE.286`). The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.
 
 ## 3. Decide the containers
@@ -208,7 +208,7 @@ A container is optional. Use one where a part of the page has a header, content 
 - **In a `flush` part, a block that draws a border of its own draws none.** Those blocks are a table, a list, a code block, an accordion and an empty state. Every other block reaches the edge.
 - **Write `divided` on a bordered container only where it needs other lines than the default.** Unset, the frame draws a line between every two parts; `false` draws none; a list draws a line above each part it names, as `CONTENT` sets a second content, another task, apart. A sign-in's *Create an account* is such a content.
 - **Never put a container inside a container.** A card, an accordion or a set of tabs goes inside the content.
-- **Leave the look to the theme.** The look is `frames`, the one prop `surface` (an `IDSFrameSurface`, with the keys `color`, `strength`, `raised`, `bordered` and `rounded`, each optional) and `unframed`, which holds a part out of the frame. Set one on a container only where that container differs from the app; a `surface` key left out takes the theme's.
+- **Leave the look to the theme.** The look is `frames`, the one prop `surface` (an `IDSFrameSurface`, with the keys `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional) and `unframed`, which holds a part out of the frame. Set one on a container only where that container differs from the app; a `surface` key left out takes the theme's.
 - **Write `unframed` for a part that no theme should frame on this page** (`RD.SUPPORT.SURFACE.092`). It is a list: any of `HEADER`, `CONTENT`, `FOOTER`. A part listed there sits flat on the page, whatever `frames` and the theme give, and the rest of the look stays the theme's. One such part is a header that is the header of the page. The book states `unframed` before the web builds it, so say so where the tree writes it.
 - **Write no color, no padding and no margin on a container.** The gap between two blocks comes from the scale.
 - **The book defines no block for a row or a grid of blocks in a part** (`RD.SUPPORT.SURFACE.084`). The page writes it, with its gap from the scale, or uses a unit for it where its stack provides one.

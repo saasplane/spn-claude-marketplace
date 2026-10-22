@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "ebb7fc77"
+      "seen": "250febfd"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -82,6 +82,8 @@
   - **Each section answers one question a reader asks**: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
   - **A headline states the outcome, and the line under it gives the proof.** *Ship your admin this week* states an outcome; *Every block a web app is built from* describes the system and is a finding as a headline.
   - **The words are a buyer's and a builder's.** A system word — a layer, a task intent, a unit, a seat, a pattern's name — does not stand on the page unless the same sentence explains it.
+  - **The words fit the length of their level.** A hero title runs 4 to 8 words in at most two lines and its description 15 to 30; a section title 4 to 8 words in one line; a card title 2 to 5 words; a row 1 to 4. Items in one group share a grammatical form, and one idea stands in each element (`RD.SUPPORT.SURFACE.286`, `.287`).
+  - **A feature's buttons follow its level**: the primary is the only filled button in view, a label starts with a verb and names where it goes, and an arrow stands only on a link that goes somewhere.
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number is read from the real system**, and a made-up number never appears.
 - **The purpose part** — a claim on the site is a claim the book's purpose part already makes.

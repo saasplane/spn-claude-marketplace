@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "493c006c"
+      "seen": "4583764b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "32c48c3a"
+      "seen": "cdaa5e81"
     }
   ]
 }
@@ -166,8 +166,9 @@ The core also carries two closed sets and two shapes beside the vocabularies abo
 | `DSBoxPartType` | `HEADER` · `CONTENT` · `FOOTER` | the parts of any box: a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head |
 
 - **How the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType`** (`RD.SUPPORT.SURFACE.260`): the columns, required, and the lines of `DSGridBorderType`, `NONE` where left out. A unit that draws a grid of cells takes it whole.
-- **The paint of a frame is `IDSFrameSurface`, typed once in the core** (`RD.SUPPORT.SURFACE.261`): its `color`, `strength`, `raised`, `bordered` and `rounded`, each optional, a key left out taking the theme's. A unit that draws a frame takes it as its `surface`.
+- **The paint of a frame is `IDSFrameSurface`, typed once in the core** (`RD.SUPPORT.SURFACE.261`): its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional, a key left out taking the theme's. `elevation` is a `DSSizeType` from `XS` to `XL`, how far a raised frame stands off the page, read only where `raised` is true, and `SM` is today's shadow. A unit that draws a frame takes it as its `surface`.
 - **The parts of any box are `DSBoxPartType`, one closed set of the core** (`RD.SUPPORT.SURFACE.266`).
+- **How a unit moves into place the first time it scrolls into view is `DSMotionType`, a set of the core** (`RD.SUPPORT.SURFACE.282`): `NONE`, `FADE`, `RISE`, `SLIDE` and `ZOOM`, beside `DSMotionSpeedType` and `DSIconMotionType`.
 
 ## Boundary
 
@@ -187,6 +188,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RD.SUPPORT.SURFACE.249` | a unit that aligns a part takes `DSHorizontalAlignType` or `DSVerticalAlignType` and defines no alignment vocabulary of its own |
 | `RD.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, beside `DSGridBorderType` in the core |
 | `RD.SUPPORT.SURFACE.261` | the paint of a frame is `IDSFrameSurface`, typed once in the core |
+| `RD.SUPPORT.SURFACE.282` | `IDSFrameSurface` carries `elevation`, and `DSMotionType` is the core's set of reveal motions |
 | `RD.SUPPORT.SURFACE.266` | the parts of any box are `DSBoxPartType`, one closed set of the core |
 | `RD.SUPPORT.SURFACE.253` | the side of a feature's small picture follows its title and its lines, so a level holds no box token |
 | `RD.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |

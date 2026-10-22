@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "1b0e6796"
+      "seen": "6625f6e9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
@@ -62,7 +62,7 @@ The design library holds one file for each layer of the design system that is dr
 | A block | an instance of the library component of the same name |
 | A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement, an alignment or a format is never drawn under a name or a switch of the designer's own. An alignment is `DSHorizontalAlignType` (`START`, `CENTER`, `END`) or `DSVerticalAlignType` (`TOP`, `CENTER`, `BOTTOM`) on every unit that takes one (`RD.SUPPORT.SURFACE.249`) |
 | `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
-| The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `bordered` and `rounded` of its `surface` |
+| The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `elevation`, `bordered` and `rounded` of its `surface` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
 | A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `headerNode`, in a dock or a top nav, is the header directly under the bar, what it holds standing in the body's box, and the content's box starts under it; `footerNode` is the place at the page's end |
@@ -96,7 +96,7 @@ The design library holds one file for each layer of the design system that is dr
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
 - **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts; at `INLINE`, with facts and no description, the facts follow the title on its own line after a dot (`RD.SUPPORT.SURFACE.223`). A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` or `INLINE`, and it alone decides the type of the text, the size of a badge among the facts and the box of the picture, so no text style is set by hand. The item line has no size. A row of tabs takes `pageLevel` too, and the level decides its look: the pill at `PAGE`, the line at `CONTAINER` and `WIDGET`, the switch at `GROUP`, `CONTENT` and `INLINE` (`RD.SUPPORT.SURFACE.224`). The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. The picture is the kind the tree gives `media`, and what stands at the end of the line is what the tree gives `endNode`. `showArrow` is the chevron at the end of a line that leads to a page and has no action there.
-- **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor` and `showArrow` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. A chosen row of a list is a fill of the soft step of the primary role across the row, with no check. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
+- **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor`, `showArrow` and `endIconMotion` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. A chosen row of a list is a fill of the soft step of the primary role across the row, with no check. A list may carry a `title`, which starts where the rows' words start; anything stacked is a `DSList`. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
 
 ## How a block is drawn
 
