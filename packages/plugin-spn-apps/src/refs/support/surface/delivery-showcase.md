@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "65b36088"
+      "seen": "7d993c7c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
-      "seen": "ca1e97c4"
+      "seen": "e42f57eb"
     }
   ]
 }
@@ -21,7 +21,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The rule — 🔮
 
-1. A showcase is a list of seven sections in one order: Welcome, Standards, App, Layout, Container, Widget and Components. Welcome holds the sample apps as a folder. Standards is the ground every group stands on, and App, Layout, Container, Widget and Components are the Surface standard's groups, from the whole app inwards, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
+1. A showcase is a list of seven sections in one order: Home, Core, App, Layout, Container, Widget and Components. Home holds the sample apps as a folder. Home's pages and the sample apps stand full page, with no sidebar, and every unit page keeps the sidebar. Core is the ground every group stands on, and App, Layout, Container, Widget and Components are the Surface standard's groups, from the whole app inwards, each a section of its own and none nested inside another. A group of units sits in a section, belongs to one layer of the design system, and opens with its Overview.
 2. A unit has a main page and a Playground, and other pages where its showcase layout calls for them.
 3. A main page opens the same way on every unit, and then holds sections in one order.
 4. A unit declares its tags: its group, its category, its showcase layout and what it has. Its page is derived from them, so no page is laid out by hand.
@@ -54,12 +54,12 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 
 ## The layers, the groups and the units — 🔮
 
-The showcase is seven sections, each a root of the sidebar, in this order, none nested inside another. Five of them are the Surface standard's groups, the layers its architecture builds a surface from: App, Layout, Container, Widget and Components, so a reader who knows the standard finds each by its own name. The first layer, the core, is Standards, and it comes straight after Welcome, because every group stands on it; the groups follow from the outside in, the order a screen is built in. The levels of a page that are not groups, Page, Group, Content and Inline, hold no unit, so they are no section: the Standards page Page levels tells every level.
+The showcase is seven sections, each a root of the sidebar, in this order, none nested inside another. Five of them are the Surface standard's groups, the layers its architecture builds a surface from: App, Layout, Container, Widget and Components, so a reader who knows the standard finds each by its own name. The first layer, the core, is Core, and it comes straight after Home, because every group stands on it; the groups follow from the outside in, the order a screen is built in. The levels of a page that are not groups, Page, Group, Content and Inline, hold no unit, so they are no section: the Core page Page levels tells every level.
 
 | Section | What it holds |
 | --- | --- |
-| Welcome | three pages written as a small website, Overview, Showcase and Getting started, then the folder Sample apps. It opens on the Overview. Showcase opens on *How a screen is built*: one live picture of the groups, one inside the next on the ground of the standards, each labelled, linked to its section and named with its file of the library, then one line for each, Standards first. Sample apps holds the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device |
-| Standards | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
+| Home | three pages written as a small website, Overview, Get started and the folder Sample apps. It opens on the Overview, which opens on *How a screen is built*: one live picture of the groups, one inside the next on the ground of the standards, each labelled, linked to its section and named with its file of the library, then one line for each, Core first. Sample apps holds the sample apps, one page each, built only from the units of the design system. A page is one row and the app: its name, a switcher for the device it is shown on, and *Open full screen*, then the app live in that device |
+| Core | an Overview, then Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. Page levels tells every level a unit stands at, Page to Inline, with its look, its size and a live example |
 | App | its Overview, then `DSApp`, `DSContext` and `DSAppContext` |
 | Layout | its Overview, then `DSLayout` and its layouts |
 | Container | its Overview, which names the level its units stand at and links Page levels, then the containers |
@@ -70,7 +70,7 @@ The group of a unit is its path in the sidebar, so the title of a unit is its gr
 
 | Layer | Its groups, in order |
 | --- | --- |
-| Core | Standards |
+| Core | Core |
 | Components | `Components/Typography` · `Media` · `Actions` · `Data entry/Fields` · `Data entry/Pickers` · `Data entry/Compound fields` · `Composites` · `Data display` · `Navigation` · `Structure` · `Feedback` · `Overlays` · `Popovers` · `Utility` |
 | Widgets | `Widget` |
 | Containers | `Container` |
@@ -81,7 +81,7 @@ The theme is not a page. A floating theme bar on every page is the one place it 
 
 The tool's chrome keeps only what a reader of the public site uses (`RD.SUPPORT.SURFACE.212`): the search, the sidebar, the device as one group of icon toggles (the sample apps' devices, each named, the chosen one pressed, kept between pages) and the code toggle, one icon toggle in the same look, in the toolbar, a link to the page, and on a component page the controls and the accessibility checks. The sidebar opens with every section and folder expanded down to the units, each unit closed until the reader opens it, and keeps a reader's own choices. A tool or menu that serves the people who build a component goes, by the tool's configuration where it has a setting and by its stylesheet only where it has none. The public site is a static build: every page comes from code at build time, and nothing in a browser creates, changes or saves a story, an argument or a source file.
 
-Welcome, with its sample apps, and Standards hold pages, and every other group holds units. Standards holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
+Home, with its sample apps, and Core hold pages, and every other group holds units. Core holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
 
 The table of units below lists the core units, the ones the constructs name, and every stack's showcase holds them all.
 
@@ -89,7 +89,7 @@ The table of units below lists the core units, the ones the constructs name, and
 - **A unit of the stack's own MUST declare that it is, and the showcase MUST show that on its card in the group's Overview and in the opening of its main page.** It stands in the group whose job it does, after the units the constructs name. It has no drawing in the library, so its Figma group holds a dash, as a missing value does. The table below does not list it, because the book does not name it.
 - **A unit that is shown with no such mark MUST be one the constructs name.** An unmarked unit that no construct lists is evidence of a second standard, not of this one.
 
-The Standards pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, shows the same tokens with the same values, and has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Motion shows the motion tokens of the standards. Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
+The Core pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, shows the same tokens with the same values, and has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Motion shows the motion tokens of the standards. Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
 
 A group's Overview names the group, says in one sentence what its units are for, and holds one card for each unit: its name, its category, one sentence, a small live example with real words, and the pages the unit has.
 
@@ -343,10 +343,10 @@ App is three units, and none has a page beyond its Overview, its main page and i
 - A size named in words is written out: X Small, Small, Medium, Large, X Large. A tab keeps the short name, `XS` to `XL`.
 - The showcase opens at the default size the apps use, `SM`. An example gives a size only where size is what it shows.
 - An action's example shows the primary colour.
-- A thing inline with text takes the text's size step. Standards holds the page *Inline alignment*: every control at each size on one centre line, and a line of text with an icon, a badge, a link and a button on the text's baseline.
+- A thing inline with text takes the text's size step. Core holds the page *Inline alignment*: every control at each size on one centre line, and a line of text with an icon, a badge, a link and a button on the text's baseline.
 - One control, *Show code*, on the showcase's own bar, sets the code of every card. It is on at first on a wide page and off at first on a narrow one. On a narrow page each card also has its own control, which wins for its card. On a wide page a card has no control of its own.
 - Every page reads well on a phone, a tablet and a desktop. On a narrow page a split stacks, nothing has a fixed width, a wide table scrolls inside its own box, and a grid of variants folds to fewer columns. The page never scrolls sideways.
-- A documentation page, which is a page written in prose such as a page of Standards or of Welcome, has no outline panel. Its content is as wide as the width of the shell, a measure of the layout, and on a narrower window it fits the window.
+- A documentation page, which is a page written in prose such as a page of Core or of Home, has no outline panel. Its content is as wide as the width of the shell, a measure of the layout, and on a narrower window it fits the window.
 - A unit inside a documentation page keeps its own sizes. The styling a tool gives its documentation never reaches a unit.
 
 ## What a stack chooses — 🔮

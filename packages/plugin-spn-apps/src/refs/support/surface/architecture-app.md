@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "3119678c"
+      "seen": "1c1961ff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
@@ -89,7 +89,7 @@ The layout look, `IDSThemeLayout`, has three parts and no more: `body`, `navigat
 | --- | --- | --- | --- |
 | `color` | the colour of the fill | `DSSurfaceColorType`: `BASE` (the surface of the page) · `DEFAULT` (the neutral hue) · `PRIMARY` (the brand hue) | the body · the navigation · the content |
 | `strength` | how strong the fill of a hue is. `BASE` takes none | `DSSurfaceStrengthType`: `SUBTLE` · `QUIET` · `SOLID` | the body · the navigation · the content |
-| `width` | how wide the body's box grows | `DSLayoutWidthType`: `FULL` (the whole window) · `XWIDE` (at most 1536 px) · `WIDE` (1280) · `MEDIUM` (1024) · `NARROW` (768), each centred | the body |
+| `width` | how wide the body's box grows | `DSLayoutWidthType`: `FULL` (the whole window) · `XWIDE` (at most 1400 px) · `WIDE` (1280) · `MEDIUM` (1024) · `NARROW` (768), each centred | the body |
 | `maxWidth` | the widest the box grows, in pixels, over the width's own step | a number | the body |
 | `opacity` | whether the fill is opaque, or frosted where content passes behind it | `DSSurfaceOpacityType`: `OPAQUE` · `TRANSLUCENT` | the navigation |
 | `entry` | the kind of the entries of the navigation | `DSNavEntryType`: `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN` | the navigation |

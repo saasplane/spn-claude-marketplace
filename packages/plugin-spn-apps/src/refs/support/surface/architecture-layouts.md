@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "4a84bf4a"
+      "seen": "5dcb878f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "a4143327"
+      "seen": "76c367a0"
     }
   ]
 }
@@ -81,7 +81,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | `NARROW` | 768 px | a page to read: an article, a sign-in, a single form |
 | `MEDIUM` | 1024 px | settings and profile pages, a form with a side column |
 | `WIDE` | 1280 px | the default page of an app |
-| `XWIDE` | 1536 px | dense dashboards and wide tables on a large monitor |
+| `XWIDE` | 1400 px | a public site's page and dense dashboards; the widest step that leaves a margin on a 1440 laptop |
 | `FULL` | the screen | a canvas, a map, a board that uses every pixel |
 
 - **A page that wants a column narrower than the box sets that width on its own block.** What stands inside the content is the page's.
