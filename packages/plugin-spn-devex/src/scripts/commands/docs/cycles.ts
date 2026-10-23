@@ -28,10 +28,10 @@
 
 import { writeFileSync } from "node:fs";
 import { basename, dirname, join, posix, relative, resolve } from "node:path";
-import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
+import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { approachOf, arcIdsOf, blockAt, readArc, stampsOn, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { approachOf, arcIdsOf, blockAt, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -530,11 +530,10 @@ export function headerStatusOf(text: string): HeaderStatus | null {
 /**
  * The word the arcs give a workstream page's header (05-artifacts.md § How ends in Cycles):
  * `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once one is, and `DONE` for a
- * workstream in `closed/`.
+ * workstream in `closed/`. It is `workstreamWord`, which the progress block's *Overall* takes too.
  */
 export function headerStatusFor(folder: string, cycles: Cycle[] = cyclesOf(folder)): HeaderStatus {
-  if (isClosed(folder)) return "DONE";
-  return cycles.some((cycle) => pastDecided(cycle.status)) ? "IMPLEMENTING" : "PLANNING";
+  return workstreamWord(folder, cycles.map((cycle) => cycle.status));
 }
 
 /**

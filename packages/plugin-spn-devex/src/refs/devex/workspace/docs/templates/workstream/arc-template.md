@@ -29,7 +29,10 @@ spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fac
 # a row, once the plan is written: its kind, where, at what altitude, how, and its acceptance
 spn-devex workstream row write N{{nnn}} {{row}} --title "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
 
-# the status, at your word: DECIDED, RUNNING, HELD, PART-LANDED, LANDED, CARRIED or DROPPED, with a reason for the last three and HELD
+# the go, the one write that moves the arc out of PROPOSED, with your words beside it; every row not yet landed turns from design to change
+spn-devex workstream row write N{{nnn}} --status DECIDED --note "<the developer's words>"
+
+# the status after the go, at your word: RUNNING, HELD, PART-LANDED, LANDED, CARRIED or DROPPED, with a reason for the last three and HELD
 spn-devex workstream row write N{{nnn}} --status {{STATUS}} --reason "{{the card it waits on · where it went · why}}"
 
 # a line on the log, which has no other writer: a decision, a correction, your words

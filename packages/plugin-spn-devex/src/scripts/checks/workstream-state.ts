@@ -16,7 +16,7 @@ import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-s
 import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
-  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, statusMoves, landedLines, logLinesOf,
 } from "../lib/workstream.ts";
 import { DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
@@ -158,17 +158,23 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
 
 /**
  * RD.DEVEX.WORKSPACE.278: an arc's design rows run under PROPOSED, and only the developer's go moves it. A build
- * row running or landed on a PROPOSED arc started before the go, and a DECIDED arc with one is behind its rows;
- * a design row running or landed is neither. An arc at LANDED with a row neither landed, carried nor deferred is
- * ahead of its rows.
+ * row running on a PROPOSED arc started before the go, and a DECIDED arc with one is behind its rows; so is one
+ * landed since the arc last moved to PROPOSED or opened there, read from `lines`, the arc's log. A build row landed
+ * before that landed under an earlier go, and is history: the check exists to stop build work before a go, and that
+ * row was not. One whose landing the log does not show is named, as is every one where the log shows no move to
+ * PROPOSED. A design row running or landed is never named. An arc at LANDED with a row neither landed, carried nor
+ * deferred is ahead of its rows.
  */
-export function statusFindings(arc: string, data: ArcData): string[] {
+export function statusFindings(arc: string, data: ArcData, lines: readonly unknown[] = []): string[] {
   const leaves = leafRows(data);
   const out: string[] = [];
-  const started = leaves.filter((row) => isBuildRow(row) && (row.state === "running" || row.state === "landed"));
+  const since = statusMoves(lines).toProposed;
+  const landedAt = landedLines(data, lines);
+  const afterGo = (id: string): boolean => since === null || !landedAt.has(id) || landedAt.get(id)! > since;
+  const started = leaves.filter((row) => isBuildRow(row) && (row.state === "running" || (row.state === "landed" && afterGo(row.id))));
   if (data.status === "PROPOSED" && started.length)
     out.push(`${arc} is PROPOSED and build row ${started[0].id} is ${started[0].state} — a build row starts only after the developer's go, ` +
-      `which is theirs to give: \`spn-devex workstream row write ${arc} --status DECIDED --note "<their words>"\``);
+      `which is theirs to give: \`spn-devex workstream row write ${arc} --status DECIDED --note "<the developer's words>"\``);
   if (data.status === "DECIDED" && started.length)
     out.push(`${arc} is DECIDED and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
@@ -239,7 +245,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...viewFindings(ws, arc, data, text).map(say(arc, "views")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
-    out.push(...statusFindings(arc, data).map(say(arc, "status")));
+    out.push(...statusFindings(arc, data, logLinesOf(ws, arc)).map(say(arc, "status")));
   }
   // The status card is read from every arc together, so it belongs to none of them.
   const card = page ? headerStatusRule(ws, text, cyclesOf(ws)) : null;

@@ -159,7 +159,7 @@ console.log("\n=== 003 — a preview's header shows the arc's status");
   ok("a closed workstream's preview stays as it closed", readFileSync(join(root, ".spndevex/workstreams/closed/020-done/notes/N001/preview.html"), "utf8") === old);
 }
 
-console.log("\n=== 004 — every row of an arc at PROPOSED is a design row");
+console.log("\n=== 004 — every row of an arc at PROPOSED, and every row landed before an arc's go, is a design row");
 {
   const m004 = MIGRATIONS.find((one) => one.id === "004");
   ok("the plugin ships 004 fourth, with a version, one sentence and a script",
@@ -179,20 +179,51 @@ console.log("\n=== 004 — every row of an arc at PROPOSED is a design row");
   mkdirSync(closed, { recursive: true });
   const closedText = `${JSON.stringify({ ...arcData(), status: "PROPOSED" }, null, 2)}\n`;
   writeFileSync(join(closed, "state.json"), closedText);
+  // An arc past its go: rows 1 and 2 landed before it (2 was added landed), row 3 after it.
+  const running = { ...arcData([
+    { id: "1", parent: "N003", title: "the preview", kind: "change", state: "landed" },
+    { id: "2", parent: "N003", title: "the record read", kind: "change", state: "landed" },
+    { id: "3", parent: "N003", title: "the book", kind: "change", state: "landed" },
+    { id: "4", parent: "N003", title: "the plugin", kind: "change", state: "waiting" },
+  ]), arc: "N003", subject: "third", status: "RUNNING" };
+  mkdirSync(join(ws, "arcs", "N003"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N003", "state.json"), `${JSON.stringify(running, null, 2)}\n`);
+  const line = (kind, note, row = null) => JSON.stringify({ at: "2026-10-23T19:00+05:30", kind, row, note });
+  writeFileSync(join(ws, "arcs", "N003", "log.jsonl"), `${[line("opened", "opened as PROPOSED"), line("landed", "waiting → landed", "1"), line("added", "the record read", "2"),
+    line("status", "the developer: good to go"), line("added", "the book", "3"), line("landed", "running → landed", "3"), line("status", "DECIDED → RUNNING · row 3 running")].join("\n")}\n`);
+  // An arc opened at DECIDED: row 1 built then; reopened, row 2 landed while it read PROPOSED, and its go came after.
+  const reopened = { ...arcData([
+    { id: "1", parent: "N004", title: "built at first", kind: "change", state: "landed" },
+    { id: "2", parent: "N004", title: "the next batch's preview", kind: "change", state: "landed" },
+  ]), arc: "N004", subject: "fourth", status: "RUNNING" };
+  mkdirSync(join(ws, "arcs", "N004"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N004", "state.json"), `${JSON.stringify(reopened, null, 2)}\n`);
+  writeFileSync(join(ws, "arcs", "N004", "log.jsonl"), `${[line("opened", "opened as DECIDED"), line("landed", "running → landed", "1"), line("status", "DECIDED → LANDED"),
+    line("status", "LANDED → PROPOSED · the next batch"), line("landed", "running → landed", "2"), line("status", "PROPOSED → DECIDED · the developer: go")].join("\n")}\n`);
   const decidedBefore = readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8");
   const found = m004.check(root);
-  ok("red: 004 names each PROPOSED arc in open and backlog with rows not design, by its count",
-    found.length === 2 && found.includes("open/031-probe/arcs/N002: 2 row(s) at PROPOSED not design → design") && found.includes("backlog/032-later/arcs/N001: 2 row(s) at PROPOSED not design → design"), found.join(" | "));
+  ok("red: 004 names each PROPOSED arc in open and backlog with rows not design, and each arc with rows landed before its go, by their count",
+    found.length === 4 && found.includes("open/031-probe/arcs/N002: 2 row(s) at PROPOSED not design → design") && found.includes("backlog/032-later/arcs/N001: 2 row(s) at PROPOSED not design → design")
+      && found.includes("open/031-probe/arcs/N003: 2 row(s) landed before the go not design → design")
+      && found.includes("open/031-probe/arcs/N004: 1 row(s) landed before the go not design → design"), found.join(" | "));
   const lines = m004.script(root);
   const rows = JSON.parse(readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8")).rows;
   ok("its script gives every row of those arcs the kind design, and nothing else changes",
-    lines.length === 2 && rows.every((row) => row.kind === "design") && rows.map((row) => row.state).join() === "landed,running,waiting" && rows.map((row) => row.title).join() === "read the code,draw the preview,a design row already", lines.join(" | "));
-  ok("an arc past PROPOSED and a closed workstream stay as they are",
+    lines.length === 4 && rows.every((row) => row.kind === "design") && rows.map((row) => row.state).join() === "landed,running,waiting" && rows.map((row) => row.title).join() === "read the code,draw the preview,a design row already", lines.join(" | "));
+  const third = JSON.parse(readFileSync(join(ws, "arcs", "N003", "state.json"), "utf8"));
+  ok("a row landed before the arc's first move out of PROPOSED takes design, one added landed included; one landed after it and one not landed keep their kind",
+    third.rows.map((row) => row.kind).join() === "design,design,change,change" && third.status === "RUNNING", JSON.stringify(third.rows));
+  const fourth = JSON.parse(readFileSync(join(ws, "arcs", "N004", "state.json"), "utf8"));
+  ok("only a row landed while the arc read PROPOSED takes design: one built while an arc opened at DECIDED ran keeps its kind",
+    fourth.rows.map((row) => row.kind).join() === "change,design", JSON.stringify(fourth.rows));
+  ok("an arc whose log shows no move out of PROPOSED, and a closed workstream, stay as they are",
     readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8") === decidedBefore && readFileSync(join(closed, "state.json"), "utf8") === closedText);
   const second = readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8");
+  const thirdText = readFileSync(join(ws, "arcs", "N003", "state.json"), "utf8");
   const again = m004.script(root);
   ok("green: 004 then finds nothing, and a second run writes nothing",
-    m004.check(root).length === 0 && again.length === 0 && readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8") === second, again.join(" | "));
+    m004.check(root).length === 0 && again.length === 0 && readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8") === second
+      && readFileSync(join(ws, "arcs", "N003", "state.json"), "utf8") === thirdText, again.join(" | "));
 }
 
 console.log("\n=== a broken ledger → reported, never written over");

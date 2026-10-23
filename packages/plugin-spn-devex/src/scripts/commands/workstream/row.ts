@@ -13,8 +13,12 @@
 // An arc's design rows run under PROPOSED, and only the developer's go moves it (RD.DEVEX.WORKSPACE.278). A row
 // added while its arc is PROPOSED takes the kind `design` from the command, whatever `--kind` says, and needs no
 // `--kind`; on any other arc `--kind design` is refused, and a row's kind is never moved to or from `design`. The go
-// is its own write, and it carries the developer's words: `--status DECIDED --note "<their words>"`. A move out of
-// PROPOSED without `--note` is refused, and no write moves a PROPOSED arc to RUNNING. A build row starts only after
+// is its own write, and it carries the developer's words: `--status DECIDED --note "<the developer's words>"`, logged
+// beside the move as `PROPOSED → DECIDED · <their words>`; every status line leads with its move. A move out of
+// PROPOSED without `--note` is refused, and no write moves a PROPOSED arc to RUNNING. The go turns the plan into build
+// work: every row not yet landed turns from `design` to `change`, and the write says how many; it also lists each
+// line of the arc's preview whose text says "proposed", outside the masthead's status badge, and checks none of them
+// (RD.DEVEX.WORKSPACE.273). A build row starts only after
 // the go: one written `running` or `landed` on a PROPOSED arc is refused, and on an arc at DECIDED, HELD or
 // PART-LANDED it moves the arc to RUNNING. It never sets LANDED, CARRIED or DROPPED: the last row landed prints a
 // line asking for `--status LANDED`, except on a PROPOSED arc, whose next step is the go.
@@ -28,10 +32,13 @@
 // `discarded` line with the words and the row's What; no state is written. Only a row that never reached
 // its node goes: waiting, ready or deferred, with no rows under it and no row waiting on it.
 
+import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
-import { arcIdsOf, doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
+import {
+  NOTES, PREVIEW_FILE, arcIdsOf, doneOf, logEvent, newArc, previewOf, proposedLines, readArc, stateOfRow, turnPlanToBuild, writeArc,
+} from "../../lib/workstream.ts";
 import { ALTITUDES, DESIGN_KIND, ROW_ID, ROW_KINDS, ROW_STATES, isBuildRow, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 
@@ -104,7 +111,7 @@ function goGuard(arc: string, was: string, words: Words): void {
   if (status === "RUNNING")
     throw new UsageFault(`keeps ${arc} at PROPOSED: no write moves a \`PROPOSED\` arc to \`RUNNING\`. The go is \`--status DECIDED --note "<the developer's words>"\`, and a build row written running after it moves the arc on (RD.DEVEX.WORKSPACE.278).`);
   if (!hasWords(words.value("note")))
-    throw new UsageFault(`keeps ${arc} at PROPOSED: an arc leaves \`PROPOSED\` only with the developer's words in the same write — \`--status ${status} --note "<their words>"\` (RD.DEVEX.WORKSPACE.278).`);
+    throw new UsageFault(`keeps ${arc} at PROPOSED: an arc leaves \`PROPOSED\` only with the developer's words in the same write — \`--status ${status} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.278).`);
 }
 
 /**
@@ -144,6 +151,7 @@ function write(args: string[]): number {
   const said: string[] = [];
   const before = arcSignatures(ws);
   let closing = false;
+  let goes = false;
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
@@ -162,10 +170,17 @@ function write(args: string[]): number {
       const was = data.status;
       const changed = header(data, words);
       if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
+      // The go turns the plan into build work: every design row not yet landed takes the kind `change`.
+      const turned = was === "PROPOSED" && data.status === "DECIDED" ? turnPlanToBuild(data) : [];
+      if (turned.length) changed.push("kinds");
       if (changed.length) typed(() => writeArc(ws, data!));
+      // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
+      const move = `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`;
       logEvent(ws, arc, changed.includes("status") ? "status" : changed.length ? "header" : "note", null,
-        note ?? (changed.includes("status") ? `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}` : `changed ${changed.join(", ")}`));
+        changed.includes("status") ? (note ? `${move} · ${note}` : move) : note ?? `changed ${changed.join(", ")}`);
       said.push(changed.length ? `${arc} · ${changed.join(", ")}` : `${arc} · log line written`);
+      if (turned.length) said.push(`${turned.length} row(s) not landed turned from design to change: ${turned.join(", ")}`);
+      if (was === "PROPOSED" && data.status === "DECIDED") goes = true;
     }
   } else {
     if (!data) throw new UsageFault(`finds no ${arc} — open it first: \`row write ${ref} --title "…" --subject …\`.`);
@@ -198,7 +213,7 @@ function write(args: string[]): number {
       const starts = changed.includes("state") && ["running", "landed"].includes(row.state!) && isBuildRow(row);
       // A build row starts only after the go.
       if (starts && data.status === "PROPOSED")
-        throw new UsageFault(`keeps row ${rowId} ${was}: ${arc} is PROPOSED, and a build row starts only after the developer's go — \`row write ${arc} --status DECIDED --note "<their words>"\` (RD.DEVEX.WORKSPACE.278).`);
+        throw new UsageFault(`keeps row ${rowId} ${was}: ${arc} is PROPOSED, and a build row starts only after the developer's go — \`row write ${arc} --status DECIDED --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.278).`);
       // After the go, a build row that runs or lands moves a decided, held or part-landed arc to RUNNING.
       const startedFrom = starts && ["DECIDED", "HELD", "PART-LANDED"].includes(data.status) ? data.status : null;
       if (startedFrom) { data.status = "RUNNING"; data.reason = null; }
@@ -221,7 +236,23 @@ function write(args: string[]): number {
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   if (closing) console.log(`every row landed: write --status LANDED once proven`);
+  if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
   return 0;
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.273: the go's write lists each line of the arc's preview whose text still says "proposed",
+ * outside the masthead's status badge, so the agent brings it current, with the preview's `Open`, in the same turn.
+ * It lists them and checks nothing.
+ */
+function previewProposals(ws: string, arc: string): string[] {
+  let text: string;
+  try { text = readFileSync(previewOf(ws, arc), "utf8"); } catch { return []; }
+  const found = proposedLines(text);
+  if (!found.length) return [];
+  const shown = (words: string): string => (words.length > 110 ? `${words.slice(0, 107)}…` : words);
+  return [`the preview still says proposed in ${found.length} line(s) — bring each current now the go is given, with its Open:`,
+    ...found.map((one) => `  ${NOTES}/${arc}/${PREVIEW_FILE}:${one.line}  ${shown(one.text)}`)];
 }
 
 /** The states a row may be discarded from: none of them has reached its node. */

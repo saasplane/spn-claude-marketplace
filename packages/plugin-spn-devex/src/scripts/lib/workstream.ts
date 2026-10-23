@@ -14,7 +14,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, isBuildRow, parentIds,
+  ARC_ID, BUILD_KIND, DESIGN_KIND, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, isBuildRow, parentIds,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
 } from "./workstream-schema.ts";
 
@@ -430,6 +430,78 @@ export const designOf = (data: ArcData): { done: number; total: number } => done
 export const hasBuilt = (data: ArcData): boolean => leafRows(data).some((row) => isBuildRow(row) && row.state === "landed");
 
 /**
+ * RD.DEVEX.WORKSPACE.278: the go turns the plan into build work. Every row of the arc not yet landed whose kind is
+ * `design` takes the kind it would otherwise take, `change`; a row landed before the go stays design. Changes the
+ * rows in place and returns the ids it turned.
+ */
+export function turnPlanToBuild(data: ArcData): string[] {
+  const turned: string[] = [];
+  for (const row of data.rows)
+    if (row.kind === DESIGN_KIND && stateOfRow(data.rows, row) !== "landed") { row.kind = BUILD_KIND; turned.push(row.id); }
+  return turned;
+}
+
+// ---------------------------------------------------------------------------- an arc's moves, from its log
+
+/** A status line's move, read from the head of its note: `FROM → TO`, as `row write` writes it. Null where the note names none. */
+export function moveOf(note: unknown): { from: string; to: string } | null {
+  const found = typeof note === "string" ? /^([A-Z][A-Z-]*) → ([A-Z][A-Z-]*)(?![A-Z-])/.exec(note) : null;
+  return found ? { from: found[1], to: found[2] } : null;
+}
+
+/**
+ * Where an arc's status moved, by the place of each line in its log, which is only ever appended to and so orders
+ * every event. `toProposed` is the last line at which the arc moved to `PROPOSED` or opened there; `outOfProposed`
+ * the first line at which it left `PROPOSED`, and `firstProposed` the line that began the `PROPOSED` it then left,
+ * so a row landed between the two landed before the arc's first go. A status line whose note names no move (an
+ * older line, written with the words alone) is read as a move from the status the log last showed; an `opened`
+ * line that names no status opened the arc at `PROPOSED`, as `newArc` does. Null where the log holds no such line.
+ */
+export function statusMoves(lines: readonly unknown[]): { toProposed: number | null; outOfProposed: number | null; firstProposed: number | null } {
+  let toProposed: number | null = null;
+  let outOfProposed: number | null = null;
+  let firstProposed: number | null = null;
+  let shown: string | null = null;
+  lines.forEach((raw, at) => {
+    const line = raw as LogLine | undefined;
+    if (!line || typeof line !== "object") return;
+    if (line.kind === "opened") {
+      shown = /^opened as ([A-Z][A-Z-]*)/.exec(String(line.note ?? ""))?.[1] ?? "PROPOSED";
+      if (shown === "PROPOSED") toProposed = at;
+      return;
+    }
+    if (line.kind !== "status") return;
+    const move = moveOf(line.note);
+    const from = move?.from ?? shown;
+    if (from === "PROPOSED" && outOfProposed === null) { outOfProposed = at; firstProposed = toProposed; }
+    shown = move?.to ?? null;
+    if (shown === "PROPOSED") toProposed = at;
+  });
+  return { toProposed, outOfProposed, firstProposed };
+}
+
+/**
+ * The place in an arc's log where each row landed: its last `landed` line, else, for a row landed now with no such
+ * line, the line that added it, since a row can be added landed. A row with neither is not in the map.
+ */
+export function landedLines(data: ArcData, lines: readonly unknown[]): Map<string, number> {
+  const out = new Map<string, number>();
+  const added = new Map<string, number>();
+  lines.forEach((raw, at) => {
+    const line = raw as LogLine | undefined;
+    if (!line || typeof line !== "object" || typeof line.row !== "string") return;
+    if (line.kind === "landed") out.set(line.row, at);
+    if (line.kind === "added" && !added.has(line.row)) added.set(line.row, at);
+  });
+  for (const row of data.rows)
+    if (!out.has(row.id) && row.state === "landed" && added.has(row.id)) out.set(row.id, added.get(row.id)!);
+  return out;
+}
+
+/** An arc's log, line by line, as `statusMoves` and `landedLines` read it. */
+export const logLinesOf = (ws: string, arc: string): unknown[] => readJsonl(logFileOf(ws, arc));
+
+/**
  * Whether a blocker has resolved: a row of the same arc or another arc that is done, an arc that is
  * terminal, or a card that is no longer open.
  */
@@ -564,6 +636,16 @@ export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]
     || left.arc.localeCompare(right.arc));
 }
 
+/**
+ * A workstream's own word, which its page's header shows and *Overall* takes (05-artifacts.md § How ends in
+ * Cycles): `DONE` for a workstream in `closed/`, `IMPLEMENTING` once one of its arcs is past `DECIDED`, else
+ * `PLANNING`. Read from the arcs' statuses alone, so the header and *Overall* cannot disagree.
+ */
+export function workstreamWord(ws: string, statuses: readonly (string | null)[]): "PLANNING" | "IMPLEMENTING" | "DONE" {
+  if (basename(dirname(resolve(ws))) === "closed") return "DONE";
+  return statuses.some((status) => pastDecided(status)) ? "IMPLEMENTING" : "PLANNING";
+}
+
 /** How far along an arc is, in five steps of one hue by rows done (0-19, 20-39, 40-59, 60-79, 80-99 per cent), and `done` at 100. */
 export function progressStep(done: number, total: number): string {
   const percent = share(done, total);
@@ -603,16 +685,17 @@ function arcChip(data: ArcData): string {
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
  * is on the right, a highlighted section of two lines like a chip: Overall with build rows done, and a full-width bar;
- * the workstream's status is its left edge's colour and its tooltip, and it reads `PLANNING` until a build row of
- * some arc has landed (RD.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each
- * arc is a chip from then on.
+ * the workstream's status is its left edge's colour and its tooltip, and it is the workstream's own word, the one
+ * the page's header shows (`workstreamWord`), so the two never disagree; its bar counts build rows only
+ * (RD.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each arc is a chip from
+ * then on.
  */
 function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string[] {
   if (!arcs.length) return [];
   const counts = arcs.map(builtOf);
   const done = counts.reduce((sum, one) => sum + one.done, 0);
   const total = counts.reduce((sum, one) => sum + one.total, 0);
-  const word = basename(dirname(resolve(ws))) === "closed" ? "DONE" : arcs.some(hasBuilt) ? "IMPLEMENTING" : "PLANNING";
+  const word = workstreamWord(ws, arcs.map((data) => data.status));
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
@@ -704,6 +787,30 @@ export function previewWithStatus(text: string, arc: string, status: string): st
   facts.splice(typeAt + 1, 0, previewArc(arc));
   const line = `${LINE_OPEN}${facts.join(SEPARATOR)}${previewState(arc, status)}</span>`;
   return text.slice(0, lineAt) + line + text.slice(lineEnd);
+}
+
+/**
+ * Each line of a preview whose text says "proposed", in any case, with its number and its text: what the go's write
+ * lists so the agent brings it current (RD.DEVEX.WORKSPACE.273). The text is the line with its tags taken out, so a
+ * class such as `sds-proposed` is no text; a comment, the page's `spn:doc` block among them, is none either, and the
+ * masthead's status badge is left out. Nothing checks these lines: which of them is still a proposal is the agent's
+ * to read.
+ */
+export function proposedLines(text: string): Array<{ line: number; text: string }> {
+  const uncommented = text.replace(/<!--[\s\S]*?-->/g, (comment) => comment.replace(/[^\n]/g, ""));
+  const out: Array<{ line: number; text: string }> = [];
+  uncommented.split("\n").forEach((raw, at) => {
+    let line = raw;
+    const state = line.indexOf(STATE_OPEN);
+    if (state >= 0) {
+      const end = spanEnd(line, state);
+      line = line.slice(0, state) + (end < 0 ? "" : line.slice(end));
+    }
+    const words = line.replace(/<[^>]*>/g, " ").replace(/&[a-z]+;|&#\d+;/gi, " ").replace(/\s+/g, " ").trim();
+    // The template's own section heading, Proposed, names a part of every preview and is never a line to bring current.
+    if (/\bproposed\b/i.test(words) && words !== "Proposed") out.push({ line: at + 1, text: words });
+  });
+  return out;
 }
 
 /**

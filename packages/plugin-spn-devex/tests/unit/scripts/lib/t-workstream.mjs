@@ -125,7 +125,7 @@ console.log("\n=== the generated blocks — progress and open");
   ok("progress: a chip is two lines — the number without the N and the name with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
     /<a class="sds-chip sds-decided sds-step-3" href="#N001" aria-label="N001 probe, DECIDED, 1 of 2 build rows done"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><strong>the probe arc<\/strong><span>1 of 2 build rows done<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>DECIDED/.test(inside), inside);
   ok("progress: the summary is a highlighted section of two lines — Overall with build rows done, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
-    /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 build rows done, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 build rows done<\/span><\/span>\s*<\/div>/.test(inside), inside);
+    /<div class="sds-footbar-summary sds-planning sds-step-3" tabindex="0" aria-label="Workstream PLANNING, 1 of 2 build rows done, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-planning">PLANNING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 build rows done<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
     // RD.DEVEX.WORKSPACE.278: a chip and Overall count build rows only; design work shows in the planning look.
     const design = (id, state) => ({ id, parent: "N001", title: `design ${id}`, kind: "design", state });
@@ -143,12 +143,58 @@ console.log("\n=== the generated blocks — progress and open");
     const partBuilt = lib.progressInside("/nowhere", [arc("N002", "RUNNING", [design("1", "landed"), design("2", "landed"), build("3", "landed"), build("4", "running")])]);
     ok("progress: a part-built arc counts its build rows alone",
       /class="sds-chip sds-running sds-step-3"/.test(chipOf(partBuilt, "N002")) && chipOf(partBuilt, "N002").includes('<span class="sds-arc-count">1/2</span>') && chipOf(partBuilt, "N002").includes('style="width:50%"'), partBuilt);
-    const planning = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "RUNNING", [design("1", "landed"), build("2", "running")])]);
-    ok("progress: Overall reads PLANNING, counting build rows, until a build row of some arc has landed",
-      summaryOf(planning).includes('class="sds-footbar-summary sds-planning ') && summaryOf(planning).includes('<span class="sds-arc-count">0/1</span>'), summaryOf(planning));
-    const implementing = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "DECIDED", [design("1", "landed"), build("2", "landed"), build("3", "waiting")])]);
-    ok("progress: Overall reads IMPLEMENTING once a build row has landed, whatever the arcs' statuses",
-      summaryOf(implementing).includes('class="sds-footbar-summary sds-implementing ') && summaryOf(implementing).includes('<span class="sds-arc-count">1/2</span>'), summaryOf(implementing));
+    // RD.DEVEX.WORKSPACE.278: Overall takes the workstream's own word, the one the page's header shows; its bar counts build rows.
+    const running = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "RUNNING", [design("1", "landed"), build("2", "running")])]);
+    ok("progress: Overall reads IMPLEMENTING once an arc runs, as the header does, though no build row has landed, its bar counting build rows",
+      summaryOf(running).includes('class="sds-footbar-summary sds-implementing ') && summaryOf(running).includes('<span class="sds-arc-count">0/1</span>'), summaryOf(running));
+    const decided = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "DECIDED", [design("1", "landed"), build("2", "landed"), build("3", "waiting")])]);
+    ok("progress: Overall reads PLANNING while no arc is past DECIDED, as the header does, whatever has landed",
+      summaryOf(decided).includes('class="sds-footbar-summary sds-planning ') && summaryOf(decided).includes('<span class="sds-arc-count">1/2</span>'), summaryOf(decided));
+    const closed = lib.progressInside("/work/.spndevex/workstreams/closed/031-probe", [arc("N001", "LANDED", [design("1", "landed")])]);
+    ok("progress: a closed workstream's Overall reads DONE", summaryOf(closed).includes('class="sds-footbar-summary sds-done '), summaryOf(closed));
+    ok("the workstream's word is one function, the header's and Overall's alike",
+      lib.workstreamWord("/nowhere", ["PROPOSED", "DECIDED"]) === "PLANNING" && lib.workstreamWord("/nowhere", ["DECIDED", "HELD"]) === "IMPLEMENTING" && lib.workstreamWord("/x/closed/031-probe", ["PROPOSED"]) === "DONE");
+  }
+  {
+    // RD.DEVEX.WORKSPACE.278: the go turns the plan into build work, and an arc's moves are read from its log.
+    const rows = [
+      { id: "1", parent: "N001", title: "read", kind: "design", state: "landed" },
+      { id: "2", parent: "N001", title: "plan", kind: "design", state: "waiting" },
+      { id: "3", parent: "N001", title: "a parent", kind: "design" },
+      { id: "3a", parent: "3", title: "under it", kind: "design", state: "running" },
+      { id: "4", parent: "N001", title: "a build row already", kind: "fix", state: "waiting" },
+    ];
+    const turned = { ...arcData(rows.map((row) => ({ ...row }))), status: "PROPOSED" };
+    const ids = lib.turnPlanToBuild(turned);
+    ok("the go turns every design row not landed into change, and a landed one stays design",
+      ids.join() === "2,3,3a" && turned.rows.map((row) => row.kind).join() === "design,change,change,change,fix", `${ids} ${turned.rows.map((row) => row.kind)}`);
+    ok("a status line's move is read from its note's head", JSON.stringify(lib.moveOf("PROPOSED → DECIDED · the developer: go")) === '{"from":"PROPOSED","to":"DECIDED"}'
+      && lib.moveOf("PART-LANDED → LANDED") !== null && lib.moveOf("the developer: go") === null);
+    const line = (kind, note, row = null) => ({ at: "2026-10-23T19:00+05:30", kind, row, note });
+    const reopened = [line("opened", "opened as PROPOSED"), line("status", "the developer: go"), line("landed", "waiting → landed", "1"),
+      line("status", "RUNNING → LANDED"), line("status", "LANDED → PROPOSED · new scope"), line("added", "new", "5"), line("landed", "waiting → landed", "6")];
+    const moves = lib.statusMoves(reopened);
+    ok("the last move to PROPOSED and the first move out of it are read from the log, an older line with words alone read from the status before it",
+      moves.toProposed === 4 && moves.outOfProposed === 1 && moves.firstProposed === 0, JSON.stringify(moves));
+    ok("an arc opened with words alone opened at PROPOSED", lib.statusMoves([line("opened", "the developer: open it")]).toProposed === 0);
+    ok("a log with no move out of PROPOSED says so", lib.statusMoves([line("opened", "opened as PROPOSED"), line("note", "x")]).outOfProposed === null);
+    const landedAt = lib.landedLines({ rows: [{ id: "1", state: "landed" }, { id: "5", state: "landed" }, { id: "7", state: "landed" }] }, reopened);
+    ok("a row lands at its landed line, or at the line that added it already landed, and is absent where the log shows neither",
+      landedAt.get("1") === 2 && landedAt.get("5") === 5 && !landedAt.has("7"), JSON.stringify([...landedAt]));
+  }
+  {
+    // RD.DEVEX.WORKSPACE.273: the go's write lists each line of the preview that still says proposed, and checks none.
+    const preview = [
+      '<!-- spn:doc {"summary": "what is proposed here"} -->',
+      '<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-proposed" href="../../approach.html#N001">PROPOSED</a></span></span></div></header>',
+      '<section id="s3"><div class="sds-section-head"><h2>Proposed</h2></div>',
+      '<p>The status table does not change.</p>',
+      '<p>The bar is <span class="sds-proposed">drawn</span> as it would be once proposed.</p>',
+      "</section>",
+    ].join("\n");
+    const found = lib.proposedLines(preview);
+    ok("each line whose text says proposed, in any case, by its number; never the masthead's badge, the template's Proposed heading, a comment or a class",
+      found.map((one) => one.line).join() === "5" && found[0].text.endsWith("once proposed."), JSON.stringify(found));
   }
   ok("progress: the shade steps are 0-19, 20-39, 40-59, 60-79, 80-99 and done at 100",
     [[0, 10, "1"], [1, 10, "1"], [2, 10, "2"], [4, 10, "3"], [6, 10, "4"], [8, 10, "5"], [99, 100, "5"], [10, 10, "done"], [0, 0, "1"]].every(([d, t, want]) => lib.progressStep(d, t) === want));

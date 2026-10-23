@@ -318,5 +318,36 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — design rows run under PROPOSED; a 
     has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is landed.*--status RUNNING/) && !has(checkWorkstream(ws), "status", /row [12] /), said(checkWorkstream(ws)));
 }
 
+console.log("\n=== RD.DEVEX.WORKSPACE.278 — a reopened arc's earlier build rows are history to the check");
+{
+  const { ws } = await dataWorkspace("state-reopened");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const trail = join(ws, "arcs", "N001", "log.jsonl");
+  const line = (kind, note, row = null) => JSON.stringify({ at: "2026-10-23T19:00+05:30", kind, row, note });
+  const data = arcData();
+  data.status = "PROPOSED";
+  data.rows = data.rows.map((row) => ({ ...row, state: "landed" }));
+  data.rows.push({ id: "3", parent: "N001", title: "the next batch's design", kind: "design", state: "waiting" });
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  const before = [line("opened", "opened as PROPOSED"), line("status", "PROPOSED → DECIDED · the developer: go"), line("landed", "waiting → landed", "1"),
+    line("landed", "running → landed", "2"), line("status", "RUNNING → LANDED"), line("status", "LANDED → PROPOSED · new scope: row 3")];
+  writeFileSync(trail, `${before.join("\n")}\n`);
+  const quiet = checkWorkstream(ws).filter((one) => one.check === "status" || one.check === "schema");
+  ok("green: a reopened arc whose build rows landed under its earlier go has no status finding", quiet.length === 0, said(quiet));
+  writeFileSync(trail, `${before.slice(0, 5).join("\n")}\n`);
+  ok("red: with no move to PROPOSED after them in the log, the same landed build rows are named",
+    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 1 is landed/), said(checkWorkstream(ws)));
+  writeFileSync(trail, `${[...before, line("landed", "waiting → landed", "2")].join("\n")}\n`);
+  ok("red: a build row landed after the reopening is named",
+    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 2 is landed/), said(checkWorkstream(ws)));
+  writeFileSync(trail, `${[...before, line("status", "PROPOSED → DECIDED · the developer: go on row 3")].join("\n")}\n`);
+  data.status = "DECIDED";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: at its next go, its earlier build rows are still history", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
+  data.rows[2] = { ...data.rows[2], kind: "change", state: "running" };
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("red: a build row running on the DECIDED arc is named", has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is running/), said(checkWorkstream(ws)));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);
 process.exit(failed ? 1 : 0);

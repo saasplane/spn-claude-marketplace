@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "ab10dc2e"
+      "seen": "b45a9351"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -21,7 +21,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status says which of eight states it is in",
-      "seen": "f55662a5"
+      "seen": "a9225dec"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -487,7 +487,7 @@ where the work moved to another workstream; `IN FLIGHT` is `RUNNING`; `PREPARED`
 pattern in all six is a word for a **stage** rather than a word for a **state** — *closing* says what
 somebody is doing, and only what is true of the arc can be read by anything but a person.
 
-**An arc's design rows run under `PROPOSED`, and only the developer's go moves it — MUST** (decision `RD.DEVEX.WORKSPACE.278`). An arc's first rows are its design: the reads, the sizing, the preview. The command gives every row added while the arc is `PROPOSED` the kind `design`, and those rows run and land while the arc reads `PROPOSED`. **The go is its own write, and it carries the developer's words**: `row write <ws>/<arc> --status DECIDED --note "<their words>"` is the only write that moves an arc from `PROPOSED` to `DECIDED`, and no write moves a `PROPOSED` arc to `RUNNING`. An arc nobody wants is still `DROPPED`, with its reason. **A build row starts only after the go**: written `running` or `landed` on an arc at `DECIDED`, `HELD` or `PART-LANDED`, it moves the arc to `RUNNING`, logs one header event and refreshes every view, as a status write does. The write never sets `LANDED`, `CARRIED` or `DROPPED`; when every row is landed it prints `every row landed: write --status LANDED once proven`. The state check refuses a build row running or landed on a `PROPOSED` arc, a `DECIDED` arc with one, and an arc at `LANDED` with a row not landed, and prints the command that fixes it. Rows added after the go are new scope, such as a standing arc's next batch: they are design rows until the developer says go on them.
+**An arc's design rows run under `PROPOSED`, and only the developer's go moves it — MUST** (decision `RD.DEVEX.WORKSPACE.278`). An arc's first rows are its design: the reads, the sizing, the preview. The command gives every row added while the arc is `PROPOSED` the kind `design`, and those rows run and land while the arc reads `PROPOSED`. **The go is its own write, and it carries the developer's words**: `row write <ws>/<arc> --status DECIDED --note "<the developer's words>"` is the only write that moves an arc from `PROPOSED` to `DECIDED`, the log keeps the words beside the move (`PROPOSED → DECIDED · <their words>`), and no write moves a `PROPOSED` arc to `RUNNING`. **The go turns the plan into build work**: the go's write gives every row not yet landed the kind `change` and says how many, and a row landed before the go stays `design`. An arc nobody wants is still `DROPPED`, with its reason. **A build row starts only after the go**: written `running` or `landed` on an arc at `DECIDED`, `HELD` or `PART-LANDED`, it moves the arc to `RUNNING`, logs one header event and refreshes every view, as a status write does. The write never sets `LANDED`, `CARRIED` or `DROPPED`; when every row is landed it prints `every row landed: write --status LANDED once proven`. The state check refuses a build row running on a `PROPOSED` or `DECIDED` arc, one landed on it since the arc last moved to `PROPOSED` or opened there, and an arc at `LANDED` with a row not landed, and prints the command that fixes it. Rows added after the go are new scope, such as a standing arc's next batch: they are design rows until the developer says go on them. **A reopened arc's earlier build rows are history to the check**: it reads the arc's log for when the arc last moved to `PROPOSED`, and names only a build row landed after it.
 
 **`PART-LANDED` is how a sitting resumes.** When an agent stops after changing some of what an arc asked for, that arc is `PART-LANDED`, and the next sitting reads it to find where the work was left. That gives it two moments: at the end of a turn only an arc **this sitting touched** is worth reporting, because a warning for every parked arc is one nobody reads twice; at the start of a sitting **every** `PART-LANDED` arc is listed, because that is the whole reason the status exists.
 

@@ -23,6 +23,8 @@ export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "carried", "d
 export const ROW_KINDS = ["fix", "change", "question", "design"] as const;
 /** The kind of a row added while its arc is `PROPOSED`. */
 export const DESIGN_KIND = "design";
+/** The kind the go gives a design row not yet landed: the kind a row would otherwise take (RD.DEVEX.WORKSPACE.278). */
+export const BUILD_KIND = "change";
 /** Whether a row is build work: any kind but `design`. The bar counts these, and the status rule reads them. */
 export const isBuildRow = (row: Pick<ArcRow, "kind">): boolean => row.kind !== DESIGN_KIND;
 /** A step row's altitude (§ A step row says where, at what altitude, and how). */

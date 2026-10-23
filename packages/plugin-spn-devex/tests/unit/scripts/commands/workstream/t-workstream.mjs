@@ -270,11 +270,27 @@ console.log("\n=== row write — design rows run under PROPOSED, the go carries 
     noWords.code === 2 && noWords.out.includes("leaves `PROPOSED` only with the developer's words") && json(second).status === "PROPOSED", noWords.out);
   const running = write("031/N002", "--status", "RUNNING", "--note", "the developer: go");
   ok("red: no write moves a PROPOSED arc to RUNNING, words or not", running.code === 2 && running.out.includes("no write moves a `PROPOSED` arc to `RUNNING`") && json(second).status === "PROPOSED", running.out);
+  write("031/N002", "3", "--title", "build what the preview drew");
+  put(design.ws, "notes/N002/preview.html", [
+    '<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-proposed" href="../../approach.html#N002">PROPOSED</a></span></span></div></header>',
+    '<section id="s3"><h2>Proposed</h2>', "<p>The bar, as proposed.</p>", "<p>Nothing else.</p>", "</section>"].join("\n"));
   const go = write("031/N002", "--status", "DECIDED", "--note", "the developer: go on N002");
   const status = lines(secondLog).filter((line) => line.kind === "status").at(-1);
+  ok("the go with the developer's words moves it to DECIDED, its status line leading with the move and the words beside it",
+    go.code === 0 && status?.note === "PROPOSED → DECIDED · the developer: go on N002" && json(second).status === "DECIDED", `${go.out}${JSON.stringify(status)}`);
+  const kinds = Object.fromEntries(json(second).rows.map((row) => [row.id, row.kind]));
+  ok("the go turns every design row not landed into change, says how many, and a landed one stays design",
+    kinds["1"] === "design" && kinds["2"] === "design" && kinds["1b"] === "change" && kinds["3"] === "change"
+      && go.out.includes("2 row(s) not landed turned from design to change: 1b, 3"), `${JSON.stringify(kinds)} ${go.out}`);
+  ok("the go lists each line of the preview that still says proposed, by its number, and not the masthead's badge or the Proposed heading",
+    go.out.includes("the preview still says proposed in 1 line(s)") && go.out.includes("notes/N002/preview.html:3  The bar, as proposed.")
+      && !go.out.includes("preview.html:1 ") && !go.out.includes("preview.html:2 "), go.out);
   const designRun = write("031/N002", "2", "--state", "running");
-  ok("the go with the developer's words moves it to DECIDED, the words on its status line, and a design row then moves nothing",
-    go.code === 0 && status?.note === "the developer: go on N002" && designRun.code === 0 && json(second).status === "DECIDED", `${go.out}${designRun.out}`);
+  ok("a design row then moves nothing", designRun.code === 0 && json(second).status === "DECIDED", designRun.out);
+  const turnedRun = write("031/N002", "3", "--state", "running");
+  ok("a row the go turned is a build row, and running it moves the arc to RUNNING", turnedRun.code === 0 && json(second).status === "RUNNING", turnedRun.out);
+  const held = write("031/N002", "--status", "HELD", "--reason", "waits on q1");
+  ok("a status line with no words still leads with its move", held.code === 0 && lines(secondLog).at(-1).note === "RUNNING → HELD · waits on q1", JSON.stringify(lines(secondLog).at(-1)));
 
   const early = await dataWorkspace("commands-design-early", { rows: [
     { id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "waiting" },
