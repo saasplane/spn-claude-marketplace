@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The formats · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The formats · § An arc's status says which of eight states it is in · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The one schema for every file a script owns in a workstream. `workstream state check` runs it, and
@@ -15,8 +15,16 @@ export const ROW_STATES = ["waiting", "ready", "running", "stopped", "landed", "
 export type RowState = (typeof ROW_STATES)[number];
 /** The row states that say what became of a row. */
 export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "carried", "deferred"]);
-/** What kind of work a row is: a small correction, a new prop, token, rule or construct, or a wait on a card. */
-export const ROW_KINDS = ["fix", "change", "question"] as const;
+/**
+ * What kind of work a row is: a small correction, a new prop, token, rule or construct, a wait on a card, or
+ * an arc's design — the reads, the sizing, the preview. The command gives `design` to every row added while its
+ * arc is `PROPOSED`, and the agent never chooses it; every other row is a build row (RD.DEVEX.WORKSPACE.278).
+ */
+export const ROW_KINDS = ["fix", "change", "question", "design"] as const;
+/** The kind of a row added while its arc is `PROPOSED`. */
+export const DESIGN_KIND = "design";
+/** Whether a row is build work: any kind but `design`. The bar counts these, and the status rule reads them. */
+export const isBuildRow = (row: Pick<ArcRow, "kind">): boolean => row.kind !== DESIGN_KIND;
 /** A step row's altitude (§ A step row says where, at what altitude, and how). */
 export const ALTITUDES = ["DOCS", "CODE", "GENERATED", "RELEASE", "PROOF"] as const;
 /** The statuses that carry a reason. */

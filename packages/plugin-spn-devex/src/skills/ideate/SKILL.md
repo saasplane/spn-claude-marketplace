@@ -167,7 +167,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 ## What you put to the developer, and what is yours
 
-- **A decision that sets a shape, a name, a member, a check or the direction of a dependency goes to the developer before it is built** (`RD.DEVEX.WORKSPACE.239`). Put it with what was weighed and the views that spoke. Decide it alone only where you can name the rule that settles it, because other work is built on a decision of this kind and a correction undoes that work too.
+- **A decision that sets a shape, a name, a member, a check or the direction of a dependency goes to the developer before it is built** (`RD.DEVEX.WORKSPACE.239`). Put it with what was weighed and the views that spoke, because other work is built on a decision of this kind and a correction undoes that work too. Decide it alone where a rule settles it, or where the purpose the book states for the construct settles it and no option shifts a boundary, adds cost or is a matter of taste; name the rule or the purpose and log it. Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change in the arc in hand.
 - **The arcs inside a workstream are yours to manage, and a new workstream is always the developer's decision** (`RD.DEVEX.WORKSPACE.243`). Open, split, order, pause or close an arc and say so in one line; the developer may guide you at any moment. Suggest a workstream with the trigger you saw, and ask.
 - **Needs you opens a reply in two cases only** (`RD.DEVEX.WORKSPACE.189`): the reply raises a card, shown there in full once, or the work is done or blocked and you now wait. A progress reply carries none, because a heading that opens every reply is one the developer stops reading.
 

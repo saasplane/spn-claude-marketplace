@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The commands · § The formats · § The life of an arc, and every file it touches
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status says which of eight states it is in · § An arc opens when its work can be reviewed on its own, and a workstream ideates one at a time
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream row write <arc> [<row>] [--field value …] [--position <n>] [--note "…"]
@@ -8,9 +8,19 @@
 // one to three words of at most 24 characters. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
 // `--note` alone writes a line on the arc's log, which has no other writer. A write that moves an arc's
-// status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which. A row
-// written `running` or `landed` moves an arc at DECIDED, HELD or PART-LANDED to RUNNING (RD.DEVEX.WORKSPACE.278).
-// It never sets LANDED, CARRIED or DROPPED: the last row landed prints a line asking for `--status LANDED`.
+// status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which.
+//
+// An arc's design rows run under PROPOSED, and only the developer's go moves it (RD.DEVEX.WORKSPACE.278). A row
+// added while its arc is PROPOSED takes the kind `design` from the command, whatever `--kind` says, and needs no
+// `--kind`; on any other arc `--kind design` is refused, and a row's kind is never moved to or from `design`. The go
+// is its own write, and it carries the developer's words: `--status DECIDED --note "<their words>"`. A move out of
+// PROPOSED without `--note` is refused, and no write moves a PROPOSED arc to RUNNING. A build row starts only after
+// the go: one written `running` or `landed` on a PROPOSED arc is refused, and on an arc at DECIDED, HELD or
+// PART-LANDED it moves the arc to RUNNING. It never sets LANDED, CARRIED or DROPPED: the last row landed prints a
+// line asking for `--status LANDED`, except on a PROPOSED arc, whose next step is the go.
+//
+// A workstream ideates one arc at a time (RD.DEVEX.WORKSPACE.280). While one arc reads PROPOSED, opening another
+// is refused unless `--note` carries the developer's words, and the refusal names the arc being ideated.
 //
 //   spn-devex workstream row discard <arc> <row> --note "<the developer's words>"
 //
@@ -18,10 +28,11 @@
 // `discarded` line with the words and the row's What; no state is written. Only a row that never reached
 // its node goes: waiting, ready or deferred, with no rows under it and no row waiting on it.
 
+import { basename } from "node:path";
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
-import { doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
-import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
+import { arcIdsOf, doneOf, logEvent, newArc, readArc, stateOfRow, writeArc } from "../../lib/workstream.ts";
+import { ALTITUDES, DESIGN_KIND, ROW_ID, ROW_KINDS, ROW_STATES, isBuildRow, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 
 export const describe = "open an arc or change its header, add a row or change its fields and its state, or discard a row found invalid";
@@ -80,6 +91,46 @@ function rowFields(row: ArcRow, words: Words): string[] {
   return changed;
 }
 
+/** Whether a `--note` carries words: the developer's, where a write needs them. */
+const hasWords = (note: string | null): note is string => !!note?.trim();
+
+/**
+ * RD.DEVEX.WORKSPACE.278: an arc leaves PROPOSED only with the developer's words in the same write, and never to
+ * RUNNING. Throws where `--status` would move an arc at `was` against that.
+ */
+function goGuard(arc: string, was: string, words: Words): void {
+  const status = words.value("status");
+  if (was !== "PROPOSED" || !status || status === "PROPOSED") return;
+  if (status === "RUNNING")
+    throw new UsageFault(`keeps ${arc} at PROPOSED: no write moves a \`PROPOSED\` arc to \`RUNNING\`. The go is \`--status DECIDED --note "<the developer's words>"\`, and a build row written running after it moves the arc on (RD.DEVEX.WORKSPACE.278).`);
+  if (!hasWords(words.value("note")))
+    throw new UsageFault(`keeps ${arc} at PROPOSED: an arc leaves \`PROPOSED\` only with the developer's words in the same write — \`--status ${status} --note "<their words>"\` (RD.DEVEX.WORKSPACE.278).`);
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.280: a workstream ideates one arc at a time. Throws where another arc reads PROPOSED and the
+ * opening write carries no words of the developer's, naming the arc being ideated.
+ */
+function openingGuard(ws: string, arc: string, note: string | null): void {
+  if (hasWords(note)) return;
+  const ideated = arcIdsOf(ws).filter((other) => other !== arc && readArc(ws, other)?.status === "PROPOSED");
+  if (!ideated.length) return;
+  const named = ideated.join(", ");
+  throw new UsageFault(`refuses to open ${arc}: ${basename(ws)} is ideating ${named} — a new arc opens when ${named} has its go, ` +
+    `or with the developer's words: \`--note "<their words>"\` (RD.DEVEX.WORKSPACE.280).`);
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.278: the kind of a row added to an arc at `status` — `design` while the arc is PROPOSED,
+ * whatever was typed, and else the kind typed, which is never `design`.
+ */
+function kindAdded(arc: string, rowId: string, status: string, typedKind: string | null): string | null {
+  if (status === "PROPOSED") return DESIGN_KIND;
+  if (typedKind === DESIGN_KIND)
+    throw new UsageFault(`gives \`design\` only to a row added while its arc is \`PROPOSED\`, and ${arc} is ${status}: row ${rowId} is a build row — \`--kind\` ${ROW_KINDS.filter((one) => one !== DESIGN_KIND).join(" · ")} (RD.DEVEX.WORKSPACE.278).`);
+  return typedKind;
+}
+
 function write(args: string[]): number {
   const words = readWords(args, OPTIONS);
   const [ref, rowId, ...more] = words.paths;
@@ -97,9 +148,11 @@ function write(args: string[]): number {
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
     if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")} — name the row after the arc.`);
+    goGuard(arc, data?.status ?? "PROPOSED", words);
     if (!data) {
       const title = words.value("title");
       if (!title || !subject) throw new UsageFault(`opens ${arc} with \`--title\` and \`--subject\`.`);
+      openingGuard(ws, arc, note);
       data = newArc(arc, subject, title);
       header(data, words);
       typed(() => writeArc(ws, data!));
@@ -122,10 +175,11 @@ function write(args: string[]): number {
     let row = data.rows.find((one) => one.id === rowId);
     if (!row) {
       const title = words.value("title");
-      const kind = words.value("kind");
+      const kind = kindAdded(arc, rowId, data.status, words.value("kind"));
       if (!title || !kind) throw new UsageFault(`adds row ${rowId} with \`--title\` and \`--kind\`.`);
       row = { id: rowId, parent: arc, title, kind, state: "waiting" };
       rowFields(row, words);
+      row.kind = kind;
       data.rows.push(row);
       // A row that now has rows under it takes its state from them.
       const parents = parentIds(data.rows);
@@ -135,10 +189,18 @@ function write(args: string[]): number {
       said.push(`row ${rowId} added`);
     } else {
       const was = stateOfRow(data.rows, row);
+      const wasKind = row.kind;
       const changed = rowFields(row, words);
       if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
-      // RD.DEVEX.WORKSPACE.278: a row that runs or lands moves a decided, held or part-landed arc to RUNNING.
-      const startedFrom = changed.includes("state") && ["running", "landed"].includes(row.state!) && ["DECIDED", "HELD", "PART-LANDED"].includes(data.status) ? data.status : null;
+      // RD.DEVEX.WORKSPACE.278: the command gives `design`, so no hand moves a row to it or from it.
+      if (changed.includes("kind") && (wasKind === DESIGN_KIND || row.kind === DESIGN_KIND))
+        throw new UsageFault(`keeps row ${rowId} a ${wasKind} row: a row's kind is never moved to or from \`design\` by hand — the command gives it to every row added while its arc is \`PROPOSED\` (RD.DEVEX.WORKSPACE.278).`);
+      const starts = changed.includes("state") && ["running", "landed"].includes(row.state!) && isBuildRow(row);
+      // A build row starts only after the go.
+      if (starts && data.status === "PROPOSED")
+        throw new UsageFault(`keeps row ${rowId} ${was}: ${arc} is PROPOSED, and a build row starts only after the developer's go — \`row write ${arc} --status DECIDED --note "<their words>"\` (RD.DEVEX.WORKSPACE.278).`);
+      // After the go, a build row that runs or lands moves a decided, held or part-landed arc to RUNNING.
+      const startedFrom = starts && ["DECIDED", "HELD", "PART-LANDED"].includes(data.status) ? data.status : null;
       if (startedFrom) { data.status = "RUNNING"; data.reason = null; }
       if (changed.length) typed(() => writeArc(ws, data!));
       const kind = changed.includes("state") ? row.state! : changed.length ? "changed" : "note";
@@ -148,7 +210,7 @@ function write(args: string[]): number {
         logEvent(ws, arc, "status", null, `${startedFrom} → RUNNING · row ${rowId} ${row.state}`);
         said.push(`${arc} ${startedFrom} → RUNNING`);
       }
-      if (changed.includes("state") && row.state === "landed" && !TERMINAL.has(data.status)) {
+      if (changed.includes("state") && row.state === "landed" && !TERMINAL.has(data.status) && data.status !== "PROPOSED") {
         const counted = doneOf(data);
         if (counted.total > 0 && counted.done === counted.total) closing = true;
       }

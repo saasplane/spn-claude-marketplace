@@ -282,7 +282,8 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — a status the rows contradict");
   ok("red: a DECIDED arc with a running row is named, with the command", has(red, "status", /N001 is DECIDED and row 1 is running.*row write N001 --status RUNNING/), said(red));
   data.status = "PROPOSED";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("red: so is a PROPOSED one", has(checkWorkstream(ws), "status", /N001 is PROPOSED and row 1 is running/), said(checkWorkstream(ws)));
+  ok("red: a build row running on a PROPOSED arc is named, with the go as its fix and never --status RUNNING",
+    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 1 is running .*--status DECIDED --note/) && !has(checkWorkstream(ws), "status", /--status RUNNING/), said(checkWorkstream(ws)));
   data.status = "RUNNING";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("green: at RUNNING the same rows pass the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
@@ -293,6 +294,28 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — a status the rows contradict");
   data.rows[1].state = "landed";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("green: LANDED with every row landed passes the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.278 — design rows run under PROPOSED; a build row waits for the go");
+{
+  const { ws } = await dataWorkspace("state-design");
+  const file = join(ws, "arcs", "N001", "state.json");
+  const data = arcData();
+  data.status = "PROPOSED";
+  data.rows = data.rows.map((row) => ({ ...row, kind: "design" }));
+  data.rows[0].state = "landed";
+  data.rows[1].state = "running";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  const quiet = checkWorkstream(ws).filter((one) => one.check === "status" || one.check === "schema");
+  ok("green: a PROPOSED arc with design rows landed and running holds to the schema and has no status finding", quiet.length === 0, said(quiet));
+  data.status = "DECIDED";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: a DECIDED arc whose only started rows are design has no status or schema finding",
+    !checkWorkstream(ws).some((one) => one.check === "status" || one.check === "schema"), said(checkWorkstream(ws)));
+  data.rows.push({ id: "3", parent: "N001", title: "build it", kind: "change", state: "landed" });
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("red: a DECIDED arc with a build row landed beside its design rows is named, with --status RUNNING",
+    has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is landed.*--status RUNNING/) && !has(checkWorkstream(ws), "status", /row [12] /), said(checkWorkstream(ws)));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

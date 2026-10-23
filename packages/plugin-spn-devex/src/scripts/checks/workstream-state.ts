@@ -18,7 +18,7 @@ import {
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
 } from "../lib/workstream.ts";
-import { DONE_STATES, arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -157,15 +157,20 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
 }
 
 /**
- * RD.DEVEX.WORKSPACE.278: an arc's status follows its rows. An arc at PROPOSED or DECIDED with a running
- * or landed row is behind them, and an arc at LANDED with a row neither landed, carried nor deferred is ahead of them.
+ * RD.DEVEX.WORKSPACE.278: an arc's design rows run under PROPOSED, and only the developer's go moves it. A build
+ * row running or landed on a PROPOSED arc started before the go, and a DECIDED arc with one is behind its rows;
+ * a design row running or landed is neither. An arc at LANDED with a row neither landed, carried nor deferred is
+ * ahead of its rows.
  */
 export function statusFindings(arc: string, data: ArcData): string[] {
   const leaves = leafRows(data);
   const out: string[] = [];
-  const started = leaves.filter((row) => row.state === "running" || row.state === "landed");
-  if (["PROPOSED", "DECIDED"].includes(data.status) && started.length)
-    out.push(`${arc} is ${data.status} and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
+  const started = leaves.filter((row) => isBuildRow(row) && (row.state === "running" || row.state === "landed"));
+  if (data.status === "PROPOSED" && started.length)
+    out.push(`${arc} is PROPOSED and build row ${started[0].id} is ${started[0].state} — a build row starts only after the developer's go, ` +
+      `which is theirs to give: \`spn-devex workstream row write ${arc} --status DECIDED --note "<their words>"\``);
+  if (data.status === "DECIDED" && started.length)
+    out.push(`${arc} is DECIDED and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
   if (data.status === "LANDED" && open.length)
     out.push(`${arc} is LANDED and row ${open[0].id} is ${open[0].state ?? "waiting"} — land the row with \`spn-devex workstream row write ${arc} ${open[0].id} --state landed\`, or move the arc back with \`--status RUNNING\``);

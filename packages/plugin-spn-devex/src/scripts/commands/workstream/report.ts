@@ -12,7 +12,7 @@ import { basename, join, resolve } from "node:path";
 import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { frontMatter } from "../../lib/front-matter.ts";
 import { doneOf, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
-import { OUTCOMES, ROW_ID, type ArcRow, type Cost } from "../../lib/workstream-schema.ts";
+import { DESIGN_KIND, OUTCOMES, ROW_ID, type ArcRow, type Cost } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { projectFolder, report as tokensReport } from "../workspace/tokens.ts";
 
@@ -71,7 +71,8 @@ function write(args: string[]): number {
   for (const followUp of Array.isArray(matter.followUps) ? matter.followUps.map(String) : []) {
     const [id, ...title] = followUp.trim().split(/\s+/);
     if (!ROW_ID.test(id) || !title.length || data.rows.some((one) => one.id === id)) continue;
-    const next: ArcRow = { id, parent: row.parent, title: title.join(" "), kind: "fix", state: "waiting" };
+    // A row added while its arc is PROPOSED is design, from the command (RD.DEVEX.WORKSPACE.278).
+    const next: ArcRow = { id, parent: row.parent, title: title.join(" "), kind: data.status === "PROPOSED" ? DESIGN_KIND : "fix", state: "waiting" };
     for (const field of ["repo", "altitude", "model"] as const) if (row[field]) next[field] = row[field];
     data.rows.push(next);
     added.push(id);

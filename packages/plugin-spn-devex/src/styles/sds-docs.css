@@ -3245,6 +3245,12 @@
   .sds-chip.sds-step-done,.sds-footbar-summary.sds-step-done {
     --sds-arc: var(--sds-step-done);
   }
+  .sds-chip.sds-step-design {
+    --sds-arc: var(--sds-gap);
+  }
+  .sds-chip.sds-step-design .sds-chip-bar {
+    background: var(--sds-gap-soft);
+  }
   @media (max-width:40rem) {
     .sds-footbar {
       grid-template-columns: minmax(0,1fr) 6.4rem;

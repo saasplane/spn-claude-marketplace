@@ -14,7 +14,7 @@ import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
+  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, isBuildRow, parentIds,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
 } from "./workstream-schema.ts";
 
@@ -414,11 +414,20 @@ export function leafRows(data: ArcData): ArcRow[] {
   return data.rows.filter((row) => !parents.has(row.id));
 }
 
-/** Rows done of rows, counting only the rows that are work. */
-export function doneOf(data: ArcData): { done: number; total: number } {
-  const leaves = leafRows(data);
+/** Rows done of rows, counting only the rows that are work, of the kinds `which` keeps; every kind by default. */
+export function doneOf(data: ArcData, which: (row: ArcRow) => boolean = () => true): { done: number; total: number } {
+  const leaves = leafRows(data).filter(which);
   return { done: leaves.filter((row) => DONE_STATES.has(row.state ?? "")).length, total: leaves.length };
 }
+
+/** Build rows done of build rows, which a chip and *Overall* count (RD.DEVEX.WORKSPACE.278). */
+export const builtOf = (data: ArcData): { done: number; total: number } => doneOf(data, isBuildRow);
+
+/** Design rows done of design rows: the work an arc being ideated shows in the planning look. */
+export const designOf = (data: ArcData): { done: number; total: number } => doneOf(data, (row) => !isBuildRow(row));
+
+/** Whether a build row of the arc has landed: until one has, the arc shows its design work and builds nothing. */
+export const hasBuilt = (data: ArcData): boolean => leafRows(data).some((row) => isBuildRow(row) && row.state === "landed");
 
 /**
  * Whether a blocker has resolved: a row of the same arc or another arc that is done, an arc that is
@@ -562,39 +571,57 @@ export function progressStep(done: number, total: number): string {
 }
 
 /**
- * One arc's chip in the sticky card, two lines: its number without the N and its short name, with done/total on
- * the right, and a thin bar. Its border colour says its status, and the status is in its tooltip and accessible name. The bar's shade is the chip's second class, `sds-step-1` to `sds-step-5` by rows done and `sds-step-done`
- * at the end, so it says how far along the arc is. The chip links the arc's Cycles row.
+ * One arc's chip in the sticky card, two lines: its number without the N and its short name, with its count on
+ * the right, and a thin bar. Its border colour says its status, and the status is in its tooltip and accessible name.
+ * A chip counts its arc's build rows (RD.DEVEX.WORKSPACE.278): the bar's shade is the chip's third class, `sds-step-1`
+ * to `sds-step-5` by build rows done and `sds-step-done` at the end, so it says how far the build is along. Until a
+ * build row has landed, the chip shows its design work instead, `design done/total` in the planning look,
+ * `sds-step-design`, and never as done; an arc that closed with no build row says its status, with no bar to fill.
+ * The chip links the arc's Cycles row.
  */
-function arcChip(data: ArcData, done: number, total: number): string {
+function arcChip(data: ArcData): string {
   const word = data.status.toLowerCase();
   const number = String(Number(data.arc.replace(/^N/, "")));
   const name = escapeHtml(data.subject.replace(/-/g, " "));
   const reason = data.reason ? `, ${escapeHtml(data.reason)}` : "";
-  const label = `${data.arc} ${name}, ${data.status}, ${done} of ${total} rows done${reason}`;
-  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><strong>${escapeHtml(data.title)}</strong><span>${done} of ${total} rows done</span>${data.reason ? `<span>${escapeHtml(data.reason)}</span>` : ""}</span>`;
-  return `      <a class="sds-chip sds-${word} sds-step-${progressStep(done, total)}" href="#${data.arc}" aria-label="${label}">`
-    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${done}/${total}</span></span>`
-    + `<span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>${tip}</a>`;
+  const built = builtOf(data);
+  const design = designOf(data);
+  const building = hasBuilt(data);
+  const closedUnbuilt = !building && TERMINAL.has(data.status);
+  const step = building ? progressStep(built.done, built.total) : "design";
+  const count = building ? `${built.done}/${built.total}` : closedUnbuilt ? word : `design ${design.done}/${design.total}`;
+  const width = building ? share(built.done, built.total) : closedUnbuilt ? 0 : share(design.done, design.total);
+  const said = `${built.done} of ${built.total} build rows done${building ? "" : `, ${design.done} of ${design.total} design rows done`}`;
+  const label = `${data.arc} ${name}, ${data.status}, ${said}${reason}`;
+  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><strong>${escapeHtml(data.title)}</strong><span>${built.done} of ${built.total} build rows done</span>${building ? "" : `<span>${design.done} of ${design.total} design rows done</span>`}${data.reason ? `<span>${escapeHtml(data.reason)}</span>` : ""}</span>`;
+  return `      <a class="sds-chip sds-${word} sds-step-${step}" href="#${data.arc}" aria-label="${label}">`
+    + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}</span></span>`
+    + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
 }
 
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right, a highlighted section of two lines like a chip: Overall with rows done, and a full-width bar; the workstream's status is its left edge's colour and its tooltip. It is written as soon as the workstream has its first arc, and each arc is a chip from then on.
+ * is on the right, a highlighted section of two lines like a chip: Overall with build rows done, and a full-width bar;
+ * the workstream's status is its left edge's colour and its tooltip, and it reads `PLANNING` until a build row of
+ * some arc has landed (RD.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each
+ * arc is a chip from then on.
  */
-function statusBar(ws: string, counts: readonly { data: ArcData; done: number; total: number }[], done: number, total: number, closed: number): string[] {
-  if (!counts.length) return [];
-  const word = basename(dirname(resolve(ws))) === "closed" ? "DONE" : counts.some((one) => pastDecided(one.data.status)) ? "IMPLEMENTING" : "PLANNING";
+function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string[] {
+  if (!arcs.length) return [];
+  const counts = arcs.map(builtOf);
+  const done = counts.reduce((sum, one) => sum + one.done, 0);
+  const total = counts.reduce((sum, one) => sum + one.total, 0);
+  const word = basename(dirname(resolve(ws))) === "closed" ? "DONE" : arcs.some(hasBuilt) ? "IMPLEMENTING" : "PLANNING";
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
-    ...counts.map((one) => arcChip(one.data, one.done, one.total)),
+    ...arcs.map(arcChip),
     `    </div>`,
-    `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} rows done, ${closed} of ${counts.length} arcs closed">`,
+    `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} build rows done, ${closed} of ${arcs.length} arcs closed">`,
     `      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">${done}/${total}</span></span>`,
     `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
-    `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${counts.length} arcs closed</span><span>${done} of ${total} rows done</span></span>`,
+    `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${arcs.length} arcs closed</span><span>${done} of ${total} build rows done</span></span>`,
     `    </div>`,
     `  </nav>`,
   ];
@@ -602,11 +629,8 @@ function statusBar(ws: string, counts: readonly { data: ArcData; done: number; t
 
 /** The inside of the progress block: the sticky card alone, its chips in the order the arcs run. Progress shows nowhere else on the page. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
-  const counts = executionOrder(ws, arcs).map((data) => ({ data, ...doneOf(data) }));
-  const done = counts.reduce((sum, one) => sum + one.done, 0);
-  const total = counts.reduce((sum, one) => sum + one.total, 0);
   const closed = arcs.filter((data) => TERMINAL.has(data.status)).length;
-  const lines = statusBar(ws, counts, done, total, closed);
+  const lines = statusBar(ws, executionOrder(ws, arcs), closed);
   return lines.length ? `${lines.join("\n")}\n` : "";
 }
 

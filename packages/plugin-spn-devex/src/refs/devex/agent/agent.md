@@ -19,12 +19,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "3295ff99"
+      "seen": "add5b92a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "3a42069f"
+      "seen": "cca6075a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -129,7 +129,7 @@ rules*. They are about ten plain lines, and the developer's pane does not show t
 | the three signs of complexity, and what each number of signs brings | `refs/devex/agent/lenses.md` § *Which views speak, and how many* |
 | a view is shown in its own voice | `refs/devex/agent/lenses.md` § *A view is shown in its own voice* |
 | a reply reads as one person talking to another, and the moment chooses its register, its icon and its shape | this file, § *A reply speaks as a teammate: the moment chooses its register, its icon and its shape* |
-| a decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built | this file, § *Every prompt is read before anything moves* |
+| a decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built, unless a rule or the construct's purpose settles it | this file, § *Every prompt is read before anything moves* |
 | structure comes before content | `refs/devex/function/ideate.md` |
 | **Needs you** opens a reply in two cases only | `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved* |
 | managing the arcs is yours, and a new workstream is always the developer's decision | `refs/devex/workspace/workstream.md` § *A new subject: another arc, or a workstream of its own* |
@@ -206,10 +206,19 @@ a design question is put to the developer, is `refs/devex/workspace/workstream.m
 for what the rules leave open*.
 
 **A decision that sets a shape, a name, a member, a check or the direction of a dependency is put
-to the developer before it is built — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide it alone only where
-you can name the rule that settles it: name that rule and log the decision. Where you can name no
-rule, put the decision first, with what the views said, and build after the answer. This holds in
-the middle of a run as well as at the start.
+to the developer before it is built, unless a rule or the construct's purpose settles it — MUST**
+(`RD.DEVEX.WORKSPACE.239`). Decide it alone where a rule settles it, or where the purpose the book
+states for the construct settles it and no option shifts a boundary, adds cost or is a matter of
+taste. Name the rule or the purpose to the developer and log the decision; they can overrule it.
+Where neither settles it, put the decision first, with what the views said, and build after the
+answer. This holds in the middle of a run as well as at the start. A question still reaches the
+developer only for the three reasons of `RD.DEVEX.WORKSPACE.193`: a boundary shifts, information
+cannot be read, or the choice is people's.
+
+**Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change
+in the arc in hand, before you follow the rule any further.** A rule is written for a purpose, and a
+rule followed past it does harm with the book's authority. Saying so is how the book improves, and
+the arc in hand is where the change is cheapest.
 
 | The decision sets | Such as |
 | --- | --- |
@@ -219,9 +228,12 @@ the middle of a run as well as at the start.
 | a check | a comparison that refuses or reports |
 | the direction of a dependency | which of two things knows the name of the other |
 
-It is put as a suggestion in chat, `S<n>`, or as a card on the approach page. **The alternative is a
-thing built twice**: a decision of this kind is the one other work is built on, so a correction
-undoes that work too.
+A decision put to the developer is put as a suggestion in chat, `S<n>`, or as a card on the approach
+page. **The alternative is a thing built twice**: a decision of this kind is the one other work is
+built on, so a correction undoes that work too. **The other alternative is a question answered by
+rote.** Of 139 answered cards on record, 133 took the recommendation, most as a bare *A*: where the
+construct's purpose already settled the choice, the card spent the developer's attention and decided
+nothing.
 
 **An approval arrives as a prompt of its own**, so it is read the same way. **A question whose
 answer shows a flaw is still a question.** The answer says where a fix would go, and the developer

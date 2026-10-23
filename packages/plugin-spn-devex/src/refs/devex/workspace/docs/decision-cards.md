@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "98d1ec2f"
+      "seen": "3d60adcb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "bed56138"
+      "seen": "717910ea"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -68,9 +68,12 @@ change, propose the constructs the ask needs and their patterns, correct on thei
 What they make possible later is one line, *later, not now*, never a construct or an option of its own.
 
 **One kind of decision is taken out of that: a decision that sets a shape, a name, a member, a check
-or the direction of a dependency — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide it alone only where you
-can name the rule that settles it. Otherwise put it to the developer before it is built, with what
-the views said, as a suggestion or as a card.
+or the direction of a dependency — MUST** (`RD.DEVEX.WORKSPACE.239`). Decide it alone where a rule
+settles it, or where the purpose the book states for the construct settles it and no option shifts a
+boundary, adds cost or is a matter of taste; name the rule or the purpose, log the decision, and the
+developer can overrule it. Otherwise put it to the developer before it is built, with what the views
+said, as a suggestion or as a card. Where a rule gives a result its own purpose would not, say the
+rule is wrong and propose its change in the arc in hand.
 
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`, `RD.DEVEX.WORKSPACE.252`). While no arc row
 owns the subject, put a suggestion, `S<n>`, in chat, and record it the moment it is raised with

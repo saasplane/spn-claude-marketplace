@@ -1,7 +1,7 @@
 // `commands/workstream/` — the only writers of what a script owns, run as the agent types them, in a
 // throwaway workspace. Each command is shown answering in its line, writing its file, and refusing what
 // it is typed with wrongly.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -134,7 +134,7 @@ console.log("\n=== progress write, and arc stamp write");
   ok("it reads the rows done and the arcs", /<span>0 of 2 arcs closed<\/span>/.test(readFileSync(join(ws, "approach.html"), "utf8")));
   const wrong = cli(root, ["workstream", "arc", "stamp", "031/N001"]);
   ok("red: `arc stamp` with no `write` is refused in the chapter's words", wrong.code === 2 && wrong.out.includes("is typed `arc stamp write <arc>`."), wrong.out);
-  cli(root, ["workstream", "row", "write", "031/N009", "--title", "an arc the page does not list", "--subject", "unlisted"]);
+  cli(root, ["workstream", "row", "write", "031/N009", "--title", "an arc the page does not list", "--subject", "unlisted", "--note", "the developer: open it beside N002"]);
   const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N009"]);
   ok("red: an arc with no Cycles row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
@@ -238,6 +238,65 @@ console.log("\n=== row write — an arc's status follows its rows (RD.DEVEX.WORK
   const readyFile = join(waiting.ws, "arcs", "N001", "state.json");
   cli(waiting.root, ["workstream", "row", "write", "031/N001", "1", "--state", "ready"]);
   ok("a row written ready leaves a DECIDED arc as it is", json(readyFile).status === "DECIDED");
+}
+
+console.log("\n=== row write — design rows run under PROPOSED, the go carries the developer's words (RD.DEVEX.WORKSPACE.278)");
+{
+  const design = await dataWorkspace("commands-design");
+  const write = (...words) => cli(design.root, ["workstream", "row", "write", ...words]);
+  const second = join(design.ws, "arcs", "N002", "state.json");
+  const secondLog = join(design.ws, "arcs", "N002", "log.jsonl");
+  write("031/N002", "--title", "the second arc", "--subject", "second");
+  const given = write("031/N002", "1", "--title", "read the code", "--kind", "change");
+  ok("a row added to a PROPOSED arc takes the kind design, whatever --kind says", given.code === 0 && json(second).rows[0].kind === "design", given.out);
+  const bare = write("031/N002", "2", "--title", "draw the preview");
+  ok("a row added to a PROPOSED arc needs no --kind, and is design", bare.code === 0 && json(second).rows.find((row) => row.id === "2")?.kind === "design", bare.out);
+  write("031/N002", "1", "--state", "landed");
+  const lastDesign = write("031/N002", "2", "--state", "landed");
+  ok("design rows land under PROPOSED, the arc stays PROPOSED, and no line asks to land it",
+    lastDesign.code === 0 && json(second).status === "PROPOSED" && !lastDesign.out.includes("every row landed"), lastDesign.out);
+  put(design.ws, "notes/N002/orders/1.report.md", ["---", 'row: "1"', "outcome: landed", 'followUps: ["1b read the tests too"]', "---", ""].join("\n"));
+  const folded = cli(design.root, ["workstream", "report", "write", "031", "notes/N002/orders/1.report.md"]);
+  ok("a follow-up a report adds to a PROPOSED arc is design, from the command", folded.code === 0 && json(second).rows.find((row) => row.id === "1b")?.kind === "design", folded.out);
+  const designElsewhere = write("031/N001", "3", "--title", "x", "--kind", "design");
+  ok("red: --kind design on an arc past PROPOSED is refused, and nothing is written",
+    designElsewhere.code === 2 && designElsewhere.out.includes("only to a row added while its arc is `PROPOSED`") && !json(join(design.ws, "arcs", "N001", "state.json")).rows.some((row) => row.id === "3"), designElsewhere.out);
+  const toDesign = write("031/N001", "1", "--kind", "design");
+  ok("red: a build row's kind is never moved to design by hand", toDesign.code === 2 && toDesign.out.includes("never moved to or from `design`"), toDesign.out);
+  const fromDesign = write("031/N002", "1", "--kind", "fix");
+  ok("red: a design row's kind is never moved from design by hand", fromDesign.code === 2 && fromDesign.out.includes("never moved to or from `design`") && json(second).rows[0].kind === "design", fromDesign.out);
+  const noWords = write("031/N002", "--status", "DECIDED");
+  ok("red: the go without the developer's words is refused, and the arc stays PROPOSED",
+    noWords.code === 2 && noWords.out.includes("leaves `PROPOSED` only with the developer's words") && json(second).status === "PROPOSED", noWords.out);
+  const running = write("031/N002", "--status", "RUNNING", "--note", "the developer: go");
+  ok("red: no write moves a PROPOSED arc to RUNNING, words or not", running.code === 2 && running.out.includes("no write moves a `PROPOSED` arc to `RUNNING`") && json(second).status === "PROPOSED", running.out);
+  const go = write("031/N002", "--status", "DECIDED", "--note", "the developer: go on N002");
+  const status = lines(secondLog).filter((line) => line.kind === "status").at(-1);
+  const designRun = write("031/N002", "2", "--state", "running");
+  ok("the go with the developer's words moves it to DECIDED, the words on its status line, and a design row then moves nothing",
+    go.code === 0 && status?.note === "the developer: go on N002" && designRun.code === 0 && json(second).status === "DECIDED", `${go.out}${designRun.out}`);
+
+  const early = await dataWorkspace("commands-design-early", { rows: [
+    { id: "1", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [], state: "waiting" },
+  ] });
+  const earlyFile = join(early.ws, "arcs", "N001", "state.json");
+  writeFileSync(earlyFile, JSON.stringify({ ...json(earlyFile), status: "PROPOSED" }, null, 2));
+  const built = cli(early.root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+  ok("red: a build row written running on a PROPOSED arc is refused, and its state stays",
+    built.code === 2 && built.out.includes("a build row starts only after the developer's go") && json(earlyFile).rows[0].state === "waiting", built.out);
+}
+
+console.log("\n=== row write — a workstream ideates one arc at a time (RD.DEVEX.WORKSPACE.280)");
+{
+  const one = await dataWorkspace("commands-one-at-a-time");
+  const write = (...words) => cli(one.root, ["workstream", "row", "write", ...words]);
+  write("031/N002", "--title", "the second arc", "--subject", "second");
+  const third = write("031/N003", "--title", "the third arc", "--subject", "third");
+  const opened = write("031/N003", "--title", "the third arc", "--subject", "third", "--note", "the developer: open N003 while N002 is shaped");
+  const openedLine = lines(join(one.ws, "arcs", "N003", "log.jsonl"))[0];
+  ok("red: a second arc is refused while one is ideated, naming it; with the developer's words it opens, and the words are its first line",
+    third.code === 2 && third.out.includes("031-probe is ideating N002 — a new arc opens when N002 has its go, or with the developer's words: `--note \"<their words>\"`")
+      && opened.code === 0 && openedLine?.kind === "opened" && openedLine.note === "the developer: open N003 while N002 is shaped", `${third.out}${opened.out}`);
 }
 
 console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RD.DEVEX.WORKSPACE.279)");
