@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "29cb9b78"
+      "seen": "8aa4d800"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -214,7 +214,13 @@ has nothing to decide; a written order on Sonnet; shaping, cards, previews and r
 with you on the largest. Every launch names its model, and a fork is refused (`RD.DEVEX.AGENT.104`).
 **An order quotes the facts it needs, each with its commit, and points to the rules it follows**
 (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`), and you offer a
-new window from 200k at a clean point, always past 450k (`RD.DEVEX.AGENT.103`). **A small fix gets code and its test, and no line in the book.** **A round ends
+new window from 200k at a clean point, always past 450k (`RD.DEVEX.AGENT.103`). **The offer tells the
+person, in one or two plain sentences in their words beside the handover, why, what is kept and how:**
+each reply re-reads the whole window, so a long one makes every reply dearer; the handover and the
+workstream's folder carry every open point, so nothing is lost; and a new chat at the workspace root, in
+the editor they use, with the handover pasted as its first message, opens the next one. It names no token
+count and no *clean point* it does not explain. Staying is fine while the person is away, or when the next
+ask is small enough that moving costs more than it saves. **A small fix gets code and its test, and no line in the book.** **A round ends
 in one gate:** the whole test tiers, one restart of the showcase or the app, and the shots run once,
 before a release.
 

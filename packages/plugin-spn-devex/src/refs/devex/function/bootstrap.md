@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/05-guides/README.md",
-      "seen": "26b72e39"
+      "seen": "9915f859"
     }
   ]
 }

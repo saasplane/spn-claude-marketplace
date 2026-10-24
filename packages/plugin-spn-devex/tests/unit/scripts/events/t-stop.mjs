@@ -1533,6 +1533,15 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   check("a state finding at 210k: no offer", !asks(found) && /\[state\]/.test(found), found);
   const always = await hear({ status: "RUNNING", running: true, kilo: 460 });
   check("a child running at 460k: the always-message", asks(always) && /past 450k/.test(always) && /Write every open point first/.test(always) && /whatever is running/.test(always), always);
+  // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK: a partner holds no book, so the note asks the
+  // turn to say why a new window helps, that nothing is lost, and how to open one, in the person's words.
+  const forThePerson = (out) => /one or two plain sentences/.test(out) && /never this note's/.test(out)
+    && /each reply re-reads the whole window/.test(out)
+    && /nothing is lost/.test(out) && /the handover and the workstream's folder carry every open point/.test(out)
+    && /a new chat at the workspace root, in the editor they use, with the handover pasted as its first message/.test(out)
+    && /no token count/.test(out) && /"clean point"/.test(out);
+  check("clean: the note asks the turn to tell the person why, that nothing is lost, and how to open one", forThePerson(clean), clean);
+  check("past 450k: the always-message asks for the same three things", forThePerson(always), always);
   check("does not ask again until the window grows 50k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
   check("asks again once the window has grown 50k", asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
   const waiting = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 220 });

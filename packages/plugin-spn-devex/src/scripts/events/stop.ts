@@ -1407,10 +1407,17 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     if (checkWorkstreamState(root, mine).length) return [];
   }
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
+  // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
+  // a partner holds no book, so the reply says why, what is kept and how, in the person's words.
+  const person = "Beside the handover, tell the person in one or two plain sentences, in their words and never this note's: " +
+    "why a new window helps now (each reply re-reads the whole window, so a long one makes every reply cost more), " +
+    "that nothing is lost (the handover and the workstream's folder carry every open point), " +
+    "and how to open one (a new chat at the workspace root, in the editor they use, with the handover pasted as its first message). " +
+    "Say no token count and no \"clean point\" unless you explain it. ";
   const small = "If the developer's ask is small (a question, a one-line change), say that each ask costs the window's whole size, and offer the new window then.";
   const message = always
-    ? `This window is at ${size / 1000}k, past ${ALWAYS_POINT / 1000}k. ${written}Then say that the work moves to a new window, with its handover, whatever is running. ${small}`
-    : `This window is at ${size / 1000}k, past ${CLEAN_POINT / 1000}k, and the point is clean: no order running, \`workstream state check\` whole. ${written}Then end your reply with the offer of a new window and its handover. ${small}`;
+    ? `This window is at ${size / 1000}k, past ${ALWAYS_POINT / 1000}k. ${written}Then say that the work moves to a new window, with its handover, whatever is running. ${person}${small}`
+    : `This window is at ${size / 1000}k, past ${CLEAN_POINT / 1000}k, and the point is clean: no order running, \`workstream state check\` whole. ${written}Then end your reply with the offer of a new window and its handover. ${person}${small}`;
   return [{ check: "window", message }];
 }
 
