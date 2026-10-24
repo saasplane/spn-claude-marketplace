@@ -1135,6 +1135,7 @@ console.log("\n=== welcome — a session's first turn opens with the welcome, wo
   for (const [what, got, expected] of [
     ["the whole welcome, then the answer", missingWelcome(whole + "\n\n7 repos · 1 workstream open\n\nThe answer.").length, 0],
     ["the first-visit heading counts", missingWelcome(firstVisit).length, 0],
+    ["a builder's welcome, the partner sentence inside its 👥 line, counts", missingWelcome(welcome("Dhruv", false, true).join("\n")).length, 0],
     ["the same words without the markdown emphasis count", missingWelcome(plainText).length, 0],
     ["known-bad: a pasted handover answered with no welcome", missingWelcome("I'll start by reading the arc file.").join(","), "the heading,the italic line,the 🤖 line,the 🧭 line,the 👥 line"],
     ["known-bad: a question answered under the heading alone", missingWelcome(headingOnly).length, 4],

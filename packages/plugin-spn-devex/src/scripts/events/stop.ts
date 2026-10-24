@@ -1541,10 +1541,13 @@ export function firstTurnText(transcript: string): string {
 export function missingWelcome(text: string): string[] {
   const said = plain(text);
   const [, , tagline, , agent, , stages, , roles] = welcome(null, false).map(plain);
+  // A builder's 👥 line carries the partner sentence, so either variant is the whole line.
+  const builderRoles = plain(welcome(null, false, true)[8]);
   const missing: string[] = [];
   if (!/Welcome back to SaaS Plane!|Glad you're here!/.test(said)) missing.push("the heading");
-  for (const [name, line] of [["the italic line", tagline], ["the 🤖 line", agent], ["the 🧭 line", stages], ["the 👥 line", roles]] as const)
+  for (const [name, line] of [["the italic line", tagline], ["the 🤖 line", agent], ["the 🧭 line", stages]] as const)
     if (!said.includes(line)) missing.push(name);
+  if (!said.includes(roles) && !said.includes(builderRoles)) missing.push("the 👥 line");
   return missing;
 }
 

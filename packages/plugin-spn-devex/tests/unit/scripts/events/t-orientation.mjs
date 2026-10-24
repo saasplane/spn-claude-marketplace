@@ -320,10 +320,12 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "\n&nbsp;\n",
     "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
     "\n&nbsp;\n",
-    "🧭 I work with you through the whole software lifecycle: **Start** (Bootstrap a repo, Source Control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
     "\n&nbsp;\n",
-    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Design** (UX Designer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
+    "👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). Tell me whose view you need, and I'll bring it.",
   ].join("\n");
+  const PARTNER_SENTENCE = "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. ";
+  const BUILDER_BODY = BODY.replace("Tell me whose view", PARTNER_SENTENCE + "Tell me whose view");
   /** The approved welcome under `heading`, then exactly one status line, and nothing else. */
   const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`)
     && message.slice(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`.length).split("\n").filter(Boolean).length === 1;
@@ -336,11 +338,14 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
       JSON.stringify(name ? { oauthAccount: { displayName: `${name} Tester` } } : {}), "utf8");
     return dir;
   };
-  const hook = (root, name, script = `${HOOKS}/src/scripts/events/orientation.ts`) => {
+  const hook = (root, name, script = `${HOOKS}/src/scripts/events/orientation.ts`, workspaceKey = null) => {
+    const env = { ...process.env, HOME: home(name), SPN_TELEMETRY: "off" };
+    delete env.SPN_DEVEX_AGENT_WORKSPACE;
+    if (workspaceKey !== null) env.SPN_DEVEX_AGENT_WORKSPACE = workspaceKey;
     try {
       const out = execFileSync("node", [script, "--stdin"], {
         input: JSON.stringify({ cwd: root, session_id: "t-orientation" }), encoding: "utf8", cwd: root,
-        env: { ...process.env, HOME: home(name), SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+        env, maxBuffer: 16 * 1024 * 1024 });
       const parsed = JSON.parse(out);
       return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
     } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
@@ -359,6 +364,18 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   const firstNamed = hook(first, "Dhruv");
   says("a first visit greets by name with the first-visit heading, then the approved welcome",
     isWelcome(firstNamed.message, "# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!"));
+  // THE TWO VARIANTS follow SPN_DEVEX_AGENT_WORKSPACE: set and naming this workspace is a builder's;
+  // unset, or naming another place, is a partner's.
+  const HEADING = "# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!";
+  const elsewhere = mkdtempSync(join(tmpdir(), "t-orientation-elsewhere-"));
+  says("N023-85: the workspace the key names hears the partner sentence",
+    hook(first, "Dhruv", undefined, first).message.startsWith(`${HEADING}\n\n${BUILDER_BODY}\n\n&nbsp;\n\n`)
+    && hook(first, "Dhruv", undefined, first).message.includes(PARTNER_SENTENCE));
+  says("N023-85: with the key unset, the partner variant omits it",
+    isWelcome(hook(first, "Dhruv").message, HEADING) && !hook(first, "Dhruv").message.includes("every partner who builds"));
+  says("N023-85: with the key naming a different folder, the partner variant omits it",
+    isWelcome(hook(first, "Dhruv", undefined, elsewhere).message, HEADING)
+    && !hook(first, "Dhruv", undefined, elsewhere).message.includes("every partner who builds"));
   says("with no name, only the name's clause drops",
     isWelcome(hook(first, null).message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
 

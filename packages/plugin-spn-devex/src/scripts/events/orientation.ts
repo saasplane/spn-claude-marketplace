@@ -488,6 +488,11 @@ function developerName(): string | null {
  * panel draws a blank line between paragraphs as almost no gap, so the four lines read as one block.
  * The array keeps its shape — a part at every even index — because the stop hook reads the parts by
  * position.
+ *
+ * The roles line has two variants. Every workspace hears the team's roles grouped by function. Only a
+ * builder's workspace — the one `SPN_DEVEX_AGENT_WORKSPACE` names — also hears the partner view, by what
+ * it guards: that view speaks for the people who build on what the builders publish, and it is no seat
+ * on a partner's team (RD.DEVEX.WORKSPACE.283).
  */
 export const WELCOME_SPACER = "\n&nbsp;\n";
 
@@ -503,7 +508,14 @@ export const WELCOME_LEAD =
   "line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after " +
   "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
 
-export function welcome(who: string | null, firstVisit: boolean): string[] {
+/** Whether `SPN_DEVEX_AGENT_WORKSPACE` is set and names this workspace, both resolved to their real paths. */
+export function isBuilderWorkspace(root: string): boolean {
+  const named = process.env.SPN_DEVEX_AGENT_WORKSPACE;
+  if (!named) return false;
+  try { return realpathSync(named) === realpathSync(root); } catch { return false; }
+}
+
+export function welcome(who: string | null, firstVisit: boolean, builder = false): string[] {
   const name = who ? `, ${who}` : "";
   return [
     firstVisit
@@ -514,9 +526,9 @@ export function welcome(who: string | null, firstVisit: boolean): string[] {
     WELCOME_SPACER,
     "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
     WELCOME_SPACER,
-    "🧭 I work with you through the whole software lifecycle: **Start** (Bootstrap a repo, Source Control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
     WELCOME_SPACER,
-    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Design** (UX Designer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
+    `👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). ${builder ? "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. " : ""}Tell me whose view you need, and I'll bring it.`,
   ];
 }
 
@@ -764,7 +776,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
   // plugin runs in a partner's workspace, where the foundation book is not a member and absence is
   // how access control works — so a banner sourced from that book would render empty for the reader
   // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
-  const greeting = welcome(who, streams.length === 0);
+  const greeting = welcome(who, streams.length === 0, isBuilderWorkspace(root));
   const clean = (lines: string[]) => lines.map((line) => line.replace(/[ \t]+$/, "")).join("\n");
 
   if (!governed.length) {
