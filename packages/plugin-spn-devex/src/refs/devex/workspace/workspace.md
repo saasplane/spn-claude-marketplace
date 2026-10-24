@@ -21,12 +21,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status says which of eight states it is in",
-      "seen": "a9225dec"
+      "seen": "2ca1f4ef"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc reopens by the moment, and a closed workstream reopens nothing",
-      "seen": "4a4a839a"
+      "seen": "55df7200"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -53,7 +53,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.261",
-      "seen": "f1560c2a"
+      "seen": "b91a6929"
     },
     {
       "repo": "spn-foundation",
@@ -468,11 +468,11 @@ outside the set is a state nothing can act on, and an arc with no status is one 
 | `PROPOSED` | Written and argued, but nobody has said go yet | **no** — not agreed | no | — |
 | `DECIDED` | Agreed and waiting its turn; no step has started | **no** — waiting, by definition | no | — |
 | `RUNNING` | Being executed now — steps are landing in this sitting | **yes** | no | — |
-| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | **no** | no | the blocker, in the same line |
+| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | **no** | no | the blocker, in its reason |
 | `PART-LANDED` | Some steps landed, the rest are owed, and nobody is on it | **yes** | no | — |
 | `LANDED` | Every step landed. Nothing is owed | no | yes | — |
 | `CARRIED` | The remaining work left this workstream | no | yes | where it went |
-| `DROPPED` | Abandoned on purpose | no | yes | the reason, in the same line |
+| `DROPPED` | Abandoned on purpose | no | yes | its reason |
 
 **The runnable column is stated because a check that has to infer it gets it wrong.** *Runnable*
 asks whether there is work here somebody could pick up now, and four of the eight answer no for four
@@ -496,12 +496,14 @@ business. It does not describe a **workstream**, whose state is the folder it si
 describe the **approach document**, which carries the document status vocabulary instead. Three
 altitudes, three vocabularies, and no word shared between them.
 
-**Write it as `Status: **WORD …**` on its own line under the title — one spelling.** A reader that
-has to know two spellings knows neither, and the check that reads this word was blind to every arc
-written in one week because a second spelling had appeared.
+**The status is written by `row write --status`, into the arc's `state.json`.** The plugin's schema
+holds the eight, so `row write` refuses a word outside them and `workstream state check` names a
+`state.json` that holds one.
 
-**`HELD` names its blocker in the same line and `DROPPED` names its reason.** A status that records
-a stop without recording what it waits for moves the question somewhere nobody can find it.
+**`HELD` names its blocker in its reason and `DROPPED` names its reason.** A status that records
+a stop without recording what it waits for moves the question somewhere nobody can find it. So the
+Stop hook reads the reason of each `HELD` arc of this window's workstreams, and names one whose
+reason names no card still open in `questions.jsonl` and no arc still to land.
 
 **A terminal status means the arc is finished, so its unlanded rows are history rather than work.**
 
@@ -516,7 +518,7 @@ a stop without recording what it waits for moves the question somewhere nobody c
 | A change that stops the building | back to `PROPOSED`; its rows stop until the developer decides |
 | The workstream is closed | nothing reopens; new scope is a new workstream |
 
-**A `LANDED` arc with a row that is not landed, carried or deferred has gained scope after it landed.** The Stop hook reports it for an arc this sitting wrote, and the finding says *reopen it as `PROPOSED`*.
+**A `LANDED` arc with a row that is not landed, carried or deferred has gained scope after it landed.** `workstream state check` names it, and the Stop hook runs that check for this window's workstreams. The finding says *reopen it as `PROPOSED`* where the row is new scope, and to land the row where it is a small decision inside what was agreed.
 
 
 ## Producer and partner — two shapes of workspace

@@ -10,6 +10,7 @@ import { join, relative, resolve } from "node:path";
 import { ARCS, artifactDocsDir, artifactIndex, capabilitiesDir, decisionsRegister, docsOf, domainConstructsDir, domainDirOf, constructsDir,
   guidePagesDir, hubPage, registersDir, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, STYLES_ADDRESS, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { cyclesOf, tableOf } from "../../../../src/scripts/commands/docs/cycles.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -72,18 +73,21 @@ const CHAPTER = join(capabilitiesDir(PROBE_DOCS), "01-devex", "04-workspace", "0
 const REGISTER = join(registersDir(PROBE_DOCS), "probe.md");
 
 // An approach page lives in the workstream that argues it, beside its arcs, so the probe page is
-// compared with arcs on disk: N1 and N2, carrying the statuses the clean page's Cycles table reads.
-const arcFile = (id, name, status, rows = "") =>
-  `# ${id} — ${name}\n\nStatus: **${status} — 2026-09-29.** ${name}, in one sentence.\n\n## Steps\n\n` +
-  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n${rows}`;
-const stream = (root, name, state = "open") => {
+// compared with arcs on disk, kept as data: N1 and N2, carrying the statuses the clean page's Cycles
+// table reads.
+const putArc = (folder, id, name, status, reason = null) => {
+  mkdirSync(join(folder, ARCS, id), { recursive: true });
+  writeFileSync(join(folder, ARCS, id, "state.json"), `${JSON.stringify({ schemaVersion: 1, arc: id, subject: "the-arc", title: name,
+    goal: "it lands", decides: `${name}, in one sentence.`, status, reason, preview: "preview.html", rows: [] }, null, 2)}\n`);
+};
+const stream = (root, name, state = "open", statuses = ["RUNNING", "DECIDED"]) => {
   const folder = join(workstreamsDir(root, state), name);
-  mkdirSync(join(folder, ARCS), { recursive: true });
-  writeFileSync(join(folder, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "RUNNING"));
-  writeFileSync(join(folder, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
+  putArc(folder, "N1", "the chapter", statuses[0]);
+  putArc(folder, "N2", "the check", statuses[1], statuses[1] === "DROPPED" ? "2026-09-29" : null);
   return folder;
 };
-const APPROACH = join(stream(WORKSPACE, "041-probe"), "probe-approach.html");
+const PROBE_STREAM = stream(WORKSPACE, "041-probe");
+const APPROACH = join(PROBE_STREAM, "probe-approach.html");
 
 // The two lines a stored page carries: the shared stylesheet's, and the shared script's.
 const STYLES = linesFor("1.0.0");
@@ -113,15 +117,12 @@ ${STYLES.stylesheet}
 </section>
 `;
 
-// The same page with the two-column Cycles table an open workstream carries: the Arc cell holds the
-// title, the line and the link pills, and the Status cell the word.
+// The same page with the two-column Cycles table an open workstream carries, written from a folder's
+// arcs: the Arc cell holds the title, the line and the facts, and the Status cell the badge.
 // A status as an open page draws it: its badge (05-artifacts.md § How ends in Cycles).
 const BADGE = (word) => `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span>`;
-const TWO_ROW = (id, name, file, line, status) =>
-  `<tr><td><p><strong>${id} &mdash; ${name}</strong></p><p>${line}</p><span class="sds-small">Arc: <a href="arcs/${file}">${file}</a></span></td><td>${BADGE(status)}</td></tr>`;
-const CLEAN = CLEAN_FOUR.replace(/<thead>[\s\S]*<\/tbody>/,
-  `<thead><tr><th>Arc</th><th>Status</th></tr></thead>\n  <tbody>${TWO_ROW("N1", "the chapter", "N1-the-chapter.md", "the chapter, in one sentence.", "RUNNING")}\n` +
-  `  ${TWO_ROW("N2", "the check", "N2-the-check.md", "the check, in one sentence.", "DECIDED")}</tbody>`);
+const cleanFor = (folder) => CLEAN_FOUR.replace(/  <div class="sds-scroll"><table>[\s\S]*<\/table><\/div>\n/, `${tableOf(cyclesOf(folder))}\n`);
+const CLEAN = cleanFor(PROBE_STREAM);
 
 // The same page with the Cycles table a closed workstream keeps: three columns, no file link.
 const NO_PREVIEWS = CLEAN_FOUR
@@ -429,7 +430,7 @@ one("a subsection after Cycles",
   "reports", "after Cycles");
 
 one("Cycles whose table has the wrong columns",
-  write(APPROACH, CLEAN.replace("<th>Status</th>", "<th>Scope</th>")),
+  write(APPROACH, CLEAN.replace(">Status</th>", ">Scope</th>")),
   "reports", "Arc · Status");
 
 one("a Terms section — an approach page has none",
@@ -464,7 +465,7 @@ try {
     "reports", "N2 reads RUNNING and the arc reads DECIDED");
 
   one("an arc with no row in Cycles",
-    write(page, CLEAN.replace(/\n  <tr><td><p><strong>N2[^\n]*/, "</tbody></table></div>")),
+    write(page, CLEAN.replace(/\n\s*<tr id="N2"[^\n]*/, "")),
     "reports", "has no row for N2");
 
   one("a Cycles row naming no arc",
@@ -476,16 +477,13 @@ try {
     "silent");
 
   one("the same rows in another order — a person chooses the order the arcs run in",
-    write(page, CLEAN.replace(/(<tbody>)(<tr>[^\n]*)\n  (<tr>[\s\S]*?<\/tr>)(<\/tbody>)/, "$1$3\n  $2$4")),
+    write(page, CLEAN.replace(/(<tbody>\n)(\s*<tr id="N1"[^\n]*\n)(\s*<tr id="N2"[^\n]*\n)/, "$1$3$2")),
     "silent");
 
-  one("a row whose Arc cell links no file",
-    write(page, CLEAN.replace(`<span class="sds-small">Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span>`, "")),
-    "reports", "N2's links are not the arc file");
-
-  one("a row whose Arc cell links another arc's file",
-    write(page, CLEAN.replace(`href="arcs/N2-the-check.md"`, `href="arcs/N1-the-chapter.md"`)),
-    "reports", "N2's links are not the arc file");
+  one("a row whose Arc cell links a preview the arc's notes do not hold",
+    write(page, CLEAN.replace(`<span class="sds-small"></span></td><td>${BADGE("DECIDED")}`,
+      `<span class="sds-small">Preview: <a href="notes/N2/preview.html">preview.html</a></span></td><td>${BADGE("DECIDED")}`)),
+    "reports", "N2's links are not the arc's preview and samples");
 
   one("a row named differently from its arc's heading",
     write(page, CLEAN.replace("N2 &mdash; the check</strong>", "N2 &mdash; the gate</strong>")),
@@ -494,11 +492,6 @@ try {
   one("a line under the title typed by hand",
     write(page, CLEAN.replace("the check, in one sentence.", "a check reads the new shape")),
     "reports", "N2's line is not the arc's own line");
-
-  one("a preview pill the arc's Previews table does not list",
-    write(page, CLEAN.replace(`<span class="sds-small">Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span></td>`,
-      `<span class="sds-small">Preview: <a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; Arc: <a href="arcs/N2-the-check.md">N2-the-check.md</a></span></td>`)),
-    "reports", "N2's links are not the arc file");
 
   one("four columns in an open workstream — told to run the command",
     write(page, CLEAN_FOUR), "reports", "run `spn-devex docs cycles write <workstream>`");
@@ -513,40 +506,31 @@ try {
   const closedPage = join(stream(TMP, "046-done", "closed"), "done-approach.html");
   one("three columns in a closed workstream — never judged for the column",
     write(closedPage, NO_PREVIEWS), "silent");
-  one("three columns in a closed workstream — a status the arc does not carry is still reported",
-    write(closedPage, NO_PREVIEWS.replace("<td>DECIDED</td>", "<td>RUNNING</td>")),
-    "reports", "N2 reads RUNNING and the arc reads DECIDED");
+  one("a closed workstream's page stays as it closed: a status its arc does not carry is not compared",
+    write(closedPage, NO_PREVIEWS.replace("<td>DECIDED</td>", "<td>RUNNING</td>")), "silent");
   one("four columns in a closed workstream, matching its arcs",
     write(closedPage, CLEAN_FOUR), "silent");
   one("two columns in a closed workstream, matching its arcs",
     write(closedPage, CLEAN), "silent");
 
-  // AN ARC NUMBERED IN THREE DIGITS, WITH A PREVIEWS TABLE: a preview, a sample with a dated state,
-  // and a link written from `arcs/`, which the page states from the workstream folder.
+  // AN ARC NUMBERED IN THREE DIGITS, WITH A PREVIEW AND A SAMPLE, linked from the page's workstream folder.
   const previewed = join(workstreamsDir(TMP, "open"), "047-previewed");
-  mkdirSync(join(previewed, ARCS), { recursive: true });
-  writeFileSync(join(previewed, ARCS, "N001-the-chapter.md"), arcFile("N001", "the chapter", "RUNNING").replace("## Steps",
-    "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
-    "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
-    "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n\n## Steps"));
-  writeFileSync(join(previewed, ARCS, "N002-the-check.md"), arcFile("N002", "the check", "DECIDED").replace("## Steps", "## Previews\n\nNone.\n\n## Steps"));
-  const PILLS = `Preview: <a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> (proposed) &middot; ` +
-    `Sample: <a href="notes/N001/samples/close-message.md">close-message.md</a> (decided) &middot; `;
-  const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
-    .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
-    .replace(`<span class="sds-small">Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></span></td>`, `<span class="sds-small">${PILLS}Arc: <a href="arcs/N001-the-chapter.md">N001-the-chapter.md</a></span></td>`);
+  putArc(previewed, "N001", "the chapter", "RUNNING");
+  putArc(previewed, "N002", "the check", "DECIDED");
+  mkdirSync(join(previewed, "notes", "N001", "samples"), { recursive: true });
+  writeFileSync(join(previewed, "notes", "N001", "preview.html"), "<h1>the layout</h1>\n");
+  writeFileSync(join(previewed, "notes", "N001", "samples", "close-message.md"), "the close\n");
+  const PILLS = `Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/close-message.md">close-message.md</a>`;
+  const PREVIEWED = cleanFor(previewed);
   const previewedPage = join(previewed, "approach.html");
-  one("three-digit arcs, and link pills matching the arc's Previews table",
+  one("three-digit arcs, and facts matching the arc's preview and sample",
     write(previewedPage, PREVIEWED), "silent");
-  one("link pills left out while the arc lists two files",
+  one("facts left out while the arc's notes hold two files",
     write(previewedPage, PREVIEWED.replace(PILLS, "")),
-    "reports", "N001's links are not the arc file");
-  one("a pill whose state is not the arc's",
-    write(previewedPage, PREVIEWED.replace("layout-preview.html</a> (proposed)", "layout-preview.html</a> (decided)")),
-    "reports", "N001's links are not the arc file");
-  one("a pill whose link is written from arcs/ rather than from the page",
-    write(previewedPage, PREVIEWED.replace(`href="notes/N001/previews/`, `href="../notes/N001/previews/`)),
-    "reports", "N001's links are not the arc file");
+    "reports", "N001's links are not the arc's preview and samples");
+  one("a fact whose link is written from arcs/ rather than from the page",
+    write(previewedPage, PREVIEWED.replace(`href="notes/N001/preview.html"`, `href="../notes/N001/preview.html"`)),
+    "reports", "N001's links are not the arc's preview and samples");
 
   // 008 is exempt by name: its page keeps the shape it was written in.
   const exempt = stream(TMP, "008-plain-probe");
@@ -555,101 +539,14 @@ try {
       CLEAN.replace(HOW_TAIL, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
     "silent");
 
-  console.log("\n=== doc-check — an arc's step rows (SOFT)");
+  console.log("\n=== doc-check — an arc is data, and a Markdown arc file is no document it reads");
 
-  const arcs = join(home, ARCS);
-  const ordered = "| 1 | spn-foundation | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n" +
-    "| 3 | spn-support-ts | CODE | a | by hand | b | |\n| 4 | — | PROOF | a | command | b | |\n";
-  one("rows in chain order, a `—` proof row last",
-    write(join(arcs, "N3-ordered.md"), arcFile("N3", "ordered", "DECIDED", ordered)), "silent");
-
-  one("DOCS after CODE inside one repository",
-    write(join(arcs, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
-      "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n")),
-    "reports", "row 2 is DOCS after CODE in spn-support-ts");
-
-  one("the foundation after another repository",
-    write(join(arcs, "N5-late-book.md"), arcFile("N5", "late book", "DECIDED",
-      "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n| 2 | spn-foundation | DOCS | a | by hand | b | |\n")),
-    "reports", "the foundation comes first");
-
-  one("a repository that comes back after another",
-    write(join(arcs, "N6-back.md"), arcFile("N6", "back", "DECIDED",
-      "| 1 | spn-foundation | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n| 3 | spn-foundation | CODE | a | by hand | b | |\n")),
-    "reports", "returns to spn-foundation");
-
-  one("a row with no altitude from the set",
-    write(join(arcs, "N7-bare.md"), arcFile("N7", "bare", "DECIDED", "| 1 | spn-foundation | DOCS → CODE | a | by hand | b | |\n")),
-    "reports", "carry no Repo, or no Altitude");
-
-  one("a step table with no Repo column",
-    write(join(arcs, "N8-old.md"), "# N8 — old\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
-    "reports", "carries no Repo column");
-
-  one("an older 008 arc with no Repo column — exempt by name",
-    write(join(exempt, ARCS, "N50-older.md"), "# N50 — older\n\nStatus: **LANDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | ✅ |\n"),
-    "silent");
-
-  one("a new 008 arc past the exemption still reports",
-    write(join(exempt, ARCS, "N121-newer.md"), "# N121 — newer\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
-    "reports", "carries no Repo column");
-
-  // An Edit carries only its replacement, and the table is judged whole: the edit is applied to the
-  // arc on disk first.
-  const onDisk = join(arcs, "N9-edited.md");
-  writeFileSync(onDisk, arcFile("N9", "edited", "DECIDED", ordered));
-  one("an Edit that moves a row out of order — judged on the arc it leaves",
-    { tool_name: "Edit", tool_input: { file_path: onDisk,
-      old_string: "| 3 | spn-support-ts | CODE |", new_string: "| 3 | spn-foundation | CODE |" } },
-    "reports", "returns to spn-foundation");
-  one("an Edit that keeps the order", { tool_name: "Edit", tool_input: { file_path: onDisk,
-    old_string: "| 4 | — | PROOF |", new_string: "| 4 | — | PROOF | " } }, "silent");
-
-  console.log("\n=== doc-check — a step row's cell count, read when the arc is written");
-
-  // KNOWN-BAD: a doubled pipe before State, so the row has 8 cells under a 7-cell header.
-  one("[MKT.HOOKS.38] a step row with a doubled pipe is named with its count and the header's",
-    write(join(arcs, "N10-doubled.md"), arcFile("N10", "doubled", "DECIDED",
-      "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | CODE | a | by hand | b || ✅ landed 2026-10-01 |\n")),
-    "reports", "row 2 has 8 cells under a 7-cell header");
-  one("[MKT.HOOKS.38] a step row that is short of its header is named too",
-    write(join(arcs, "N11-short.md"), arcFile("N11", "short", "DECIDED", "| 1 | spn-support-ts | DOCS | a | by hand | b |\n")),
-    "reports", "row 1 has 6 cells under a 7-cell header");
-  // UNTOUCHED: an Acceptance cell that holds a pipe written with a backslash, inside a code span.
-  one("[MKT.HOOKS.38] a cell holding an escaped pipe is read as one cell",
-    write(join(arcs, "N12-escaped.md"), arcFile("N12", "escaped", "DECIDED",
-      "| 1 | spn-support-ts | DOCS | a | by hand | `grep -c \"a\\|b\" file` → 0 | ✅ landed 2026-10-01 |\n")),
-    "silent");
-  const countedOnDisk = join(arcs, "N13-counted.md");
-  writeFileSync(countedOnDisk, arcFile("N13", "counted", "DECIDED", ordered));
-  one("[MKT.HOOKS.38] an Edit that adds a pipe to a row is judged on the arc it leaves",
-    { tool_name: "Edit", tool_input: { file_path: countedOnDisk, old_string: "| 3 | spn-support-ts | CODE | a |", new_string: "| 3 | spn-support-ts | CODE | a | or b |" } },
-    "reports", "row 3 has 8 cells under a 7-cell header");
-  one("[MKT.HOOKS.38] an older 008 arc with a miscounted row is exempt by name",
-    write(join(exempt, ARCS, "N51-older.md"), arcFile("N51", "older", "LANDED", "| 1 | spn-support-ts | DOCS | a | by hand | b || ✅ |\n")),
-    "silent");
-
-  console.log("\n=== doc-check — a row of an arc's Previews table names its file as a link");
-
-  const previewsArc = (id, section) => arcFile(id, "previewed", "DECIDED", "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n")
-    .replace("## Steps", `${section}\n\n## Steps`);
-  const PREVIEWS_HEAD = "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n";
-  // KNOWN-BAD: the File cell names its file in backticks and links nothing.
-  one("[MKT.SCRIPTS.80] a Previews row whose File cell is not a link is named",
-    write(join(arcs, "N999-unlinked.md"), previewsArc("N999", PREVIEWS_HEAD + "| `notes/N999/previews/a-preview.html` | preview | the layout | proposed |")),
-    "reports", "Previews row `notes/N999/previews/a-preview.html` names its file without a link");
-  one("[MKT.SCRIPTS.80] and the note shows the link form",
-    write(join(arcs, "N999-unlinked.md"), previewsArc("N999", PREVIEWS_HEAD + "| `a-preview.html` | preview | the layout | proposed |")),
-    "reports", "[`a-preview.html`](../notes/N999/previews/a-preview.html)");
-  // UNTOUCHED.
-  one("[MKT.SCRIPTS.80] a row written as a markdown link is left alone",
-    write(join(arcs, "N999-linked.md"), previewsArc("N999", PREVIEWS_HEAD + "| [`a-preview.html`](../notes/N999/previews/a-preview.html) | preview | the layout | decided 2026-10-01 |")),
-    "silent");
-  one("[MKT.SCRIPTS.80] a section that reads None. is left alone",
-    write(join(arcs, "N999-none.md"), previewsArc("N999", "## Previews\n\nNone.")), "silent");
-  one("[MKT.SCRIPTS.80] an 008 arc is exempt by name",
-    write(join(exempt, ARCS, "N52-older.md"), previewsArc("N52", PREVIEWS_HEAD + "| `a-preview.html` | preview | the layout | proposed |")),
-    "silent");
+  // THE RETIRED FORM COUNTS FOR NOTHING. The arc's rows are written by `workstream row write`, which
+  // names a row out of chain order itself; a Markdown arc written by hand is read by no check here.
+  one("a Markdown arc file under arcs/ with rows out of chain order draws nothing",
+    write(join(home, ARCS, "N4-late-docs.md"), "# N4 — late docs\n\nStatus: **DECIDED.**\n\n## Steps\n\n" +
+      "| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n" +
+      "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"), "silent");
 
   console.log("\n=== doc-check — the header's status against the arcs, when the whole page is written");
 
@@ -668,11 +565,8 @@ try {
   one("[MKT.HOOKS.40] a page whose header labels no status is left alone", write(statusPage, CLEAN), "silent");
 
   // A workstream whose arcs are all at PROPOSED or DECIDED: the arcs give PLANNING.
-  const planning = join(workstreamsDir(TMP, "open"), "048-planning");
-  mkdirSync(join(planning, ARCS), { recursive: true });
-  writeFileSync(join(planning, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "PROPOSED"));
-  writeFileSync(join(planning, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
-  const PLANNED = CLEAN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("PROPOSED")}</td>`);
+  const planning = stream(TMP, "048-planning", "open", ["PROPOSED", "DECIDED"]);
+  const PLANNED = cleanFor(planning);
   one("[MKT.HOOKS.40] a page reading PLANNING while no arc is past DECIDED is left alone",
     write(join(planning, "approach.html"), withStatus(PLANNED, "PLANNING")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page reading IMPLEMENTING while no arc is past DECIDED",
@@ -688,30 +582,26 @@ try {
 
   // THE STAMP BEFORE THE MOVE. The close gate asks for a page that says it is finished before the
   // folder moves, so a page in `open/` may read DONE once every arc carries a terminal status.
-  const landing = join(workstreamsDir(TMP, "open"), "049-landing");
-  mkdirSync(join(landing, ARCS), { recursive: true });
-  writeFileSync(join(landing, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "LANDED"));
-  writeFileSync(join(landing, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DROPPED"));
-  const LANDED_PAGE = CLEAN.replace(`<td>${BADGE("RUNNING")}</td>`, `<td>${BADGE("LANDED")}</td>`).replace(`<td>${BADGE("DECIDED")}</td>`, `<td>${BADGE("DROPPED")}<br><span class="sds-small">2026-09-29</span></td>`);
+  const landing = stream(TMP, "049-landing", "open", ["LANDED", "DROPPED"]);
+  const LANDED_PAGE = cleanFor(landing);
   one("[MKT.HOOKS.40] a page in open/ stamped DONE once every arc is terminal is left alone",
     write(join(landing, "approach.html"), withStatus(LANDED_PAGE, "DONE", "&#x2705;")), "silent");
   one("[MKT.HOOKS.40] known-bad: a page in open/ stamped DONE while an arc still runs",
     write(statusPage, withStatus(CLEAN, "DONE", "&#x2705;")), "reports", "the header's status reads DONE and the arcs give IMPLEMENTING");
 
-  // THE SWEEP READS ARCS TOO, and counts each one it scanned — a bad path reads `0 scanned`.
+  // THE SWEEP READS THE PAGE, and counts each document it scanned — a bad path reads `0 scanned`. A
+  // Markdown arc file beside it is no document of the sweep's.
   n += 1;
   const sweptHome = stream(TMP, "044-sweep");
-  writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
-    TWO_ROW("N4", "late docs", "N4-late-docs.md", "late docs, in one sentence.", "DECIDED") + "</tbody>"));
-  writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
-    "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
+  writeFileSync(join(sweptHome, "sweep-approach.html"), cleanFor(sweptHome));
+  writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), "# N4 — late docs\n\nStatus: **DECIDED.**\n");
   let out = "", code = 0;
   try { out = execFileSync("node", [`${HOOKS}/src/scripts/checks/doc-check.ts`, sweptHome], { encoding: "utf8", cwd: CWD }); }
   catch (e) { out = String(e.stdout ?? ""); code = e.status; }
   const scanned = /(\d+) documents scanned/.exec(out)?.[1];
-  const swept = scanned === "4" && out.includes("N4-late-docs.md") && out.includes("[SOFT]") && code === 0;
+  const swept = scanned === "1" && !out.includes("N4-late-docs.md") && code === 0;
   if (!swept) failed += 1;
-  console.log(`  ${swept ? "PASS" : "FAIL"}  the sweep scans the page and every arc, and a SOFT keeps exit 0\n        scanned ${scanned} · exit ${code}${swept ? "" : `\n${out.slice(0, 600)}`}`);
+  console.log(`  ${swept ? "PASS" : "FAIL"}  the sweep scans the page and no Markdown arc file\n        scanned ${scanned} · exit ${code}${swept ? "" : `\n${out.slice(0, 600)}`}`);
 
   console.log("\n=== doc-check — a page that holds its own copy of the styles");
 

@@ -122,19 +122,14 @@ console.log("\n=== the workstreams");
 const WORKSTREAM = join(tree.workstreamsDir(ROOT, "open"), "041-probe");
 same("a workstream folder sits under its state", tree.workstreamsDir(ROOT, "backlog"), join(ROOT, ".spndevex", WORKSTREAMS, "backlog"));
 same("a path inside a workstream names it",
-  tree.workstreamDirOf(join(WORKSTREAM, tree.ARCS, "N1-probe.md")), { folder: WORKSTREAM, name: "041-probe" });
+  tree.workstreamDirOf(join(WORKSTREAM, tree.ARCS, "N001", "state.json")), { folder: WORKSTREAM, name: "041-probe" });
 same("and the container's older name still reads",
   tree.workstreamDirOf(join(tree.legacyWorkstreamsDir(ROOT, "closed"), "002-old", "page.html"))?.name, "002-old");
 same("a path outside one names none", tree.workstreamDirOf(SEAT_FILE), null);
-same("an arc file is an .md directly under arcs/",
-  [join(WORKSTREAM, tree.ARCS, "N1-probe.md"), join(WORKSTREAM, tree.ARCS, "deep", "N1.md"), join(WORKSTREAM, "notes.md")].map(tree.isArcFile),
-  [true, false, false]);
 same("an approach page is a workstream's approach.html, or a page with the approach suffix",
   [join(WORKSTREAM, tree.APPROACH_PAGE), join(WORKSTREAM, `probe${tree.APPROACH_SUFFIX}`), join(WORKSTREAM, "approach.md"),
    join(WORKSTREAM, "preapproach.html")].map(tree.isApproachPage),
   [true, true, false, false]);
-same("the arc pattern reads a command that names one",
-  tree.arcPathPattern(false).test(`cat ${join(WORKSTREAM, tree.ARCS, "N1-probe.md")} | head`), true);
 
 console.log("\n=== the check — no script spells the layout");
 const line = (source) => layoutLiterals(source, NAMES).map((hit) => hit.name);

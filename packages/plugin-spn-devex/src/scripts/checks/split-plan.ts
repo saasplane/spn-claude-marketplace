@@ -10,22 +10,21 @@
 // is the folder it sits in. Only the move into `closed/` is a close. Moving `backlog/` into `open/` is
 // how work starts, so neither gate fires on it.
 //
-// THE SPLIT PLAN is not a section somebody writes. It is the step rows of the workstream's arcs — the
-// `## Steps` table of every file under `arcs/`, read by its REPO column, which is the scope, and its
-// STATE column (RD.DEVEX.WORKSPACE.038). A step id is a number with an optional letter and optional
-// dotted parts: `3`, `4b`, `3e.1`. An approach page written before that rule carried the plan as
-// `How` tables with a SCOPE column, and those tables are still read, so a workstream argued in the
-// older shape closes under the shape it was written in.
+// THE SPLIT PLAN is not a section somebody writes. It is the rows of the workstream's arcs, kept as
+// data in `arcs/N<nnn>/state.json`: each row with no row under it, read by its `repo`, which is the
+// scope, and its `state` (RD.DEVEX.WORKSPACE.038). An approach page written before that rule carried
+// the plan as `How` tables with a SCOPE column, and those tables are still read, so a workstream
+// argued in the older shape closes under the shape it was written in.
 //
 //   documents-first :  a WARNING. You are writing an approach page into a member repo while the
 //                      open workstream that argues it still has rows that have not landed.
 //   close           :  a REFUSAL. Every row must be ACCOUNTED FOR, which is not the same as finished:
-//                      landed, carried and deferred all pass; a row nobody decided, a row marked
-//                      `◐ stopped`, a row still `in progress <time>` and a row `⏸ held on Q<n>` refuse.
+//                      landed, carried and deferred all pass; a row nobody decided, a row `stopped`
+//                      and a row still `running` refuse.
 //                      There is no override, and none is needed — recording the deferral is the way through.
 //
 //   sweep :  node split-plan.ts [path …]     (every open workstream's rows: the tally, then each row
-//                                             nobody accounted for and each row with a wrong cell count)
+//                                             nobody accounted for)
 //
 // PORTED FROM `hooks/scripts/split-plan.py`, AND THE PORT IS ALSO THE FIX. The hook audit measured it
 // at 77.7% of every millisecond a hook has ever cost — 79.2 s across 7,895 fires — and 76.0 s of that
@@ -40,7 +39,7 @@
 // their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
 import { readdirSync, statSync } from "node:fs";
-import { TERMINAL, statusIn, statusOfData } from "./arc-status.ts";
+import { TERMINAL, statusOfData } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -48,6 +47,7 @@ import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
+import { logLinesOf, readQuestions } from "../lib/workstream.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -175,10 +175,9 @@ export const stepId = (cell: string): string => cell.replace(/[*_`]/g, "").trim(
 /**
  * Every split-plan row in one document.
  *
- * A split-plan table is one carrying BOTH a scope header and a `state` header. On an approach page
- * the scope header is `scope`; in an arc's step table it is `repo`, and the caller names which one it
- * reads, so a page's own `Repo` table is never taken for a plan. A step table's first column is the
- * step id, so its label is `step <id> — <What>`: a label that read `3` named nothing a reader could find.
+ * A split-plan table is one carrying BOTH a scope header and a `state` header, the scope header named
+ * by the caller, so a page's own `Repo` table is never taken for a plan. A table whose first column is
+ * a step id labels its row `step <id> — <What>`: a label that read `3` named nothing a reader could find.
  */
 export function rowsOf(text: string, markdown: boolean, scopeHeader = "scope"): Row[] {
   const out: Row[] = [];
@@ -199,89 +198,14 @@ export function rowsOf(text: string, markdown: boolean, scopeHeader = "scope"): 
   return out;
 }
 
-// ---------------------------------------------------------------------------- the arcs' step rows
+// ---------------------------------------------------------------------------- the arcs' rows
 
-/**
- * The `## Steps` section of an arc, from its heading to the next `## ` heading, or `null` where the
- * arc has none. Only this section is read, so a table in the log or the specification that happens
- * to carry a Repo and a State column is never taken for a step.
- */
-export function stepsSection(text: string): string | null {
-  const lines = text.split("\n");
-  const start = lines.findIndex((line) => /^##\s+Steps\b/i.test(line));
-  if (start < 0) return null;
-  const rest = lines.slice(start + 1);
-  const stop = rest.findIndex((line) => /^##\s/.test(line));
-  return (stop < 0 ? rest : rest.slice(0, stop)).join("\n");
-}
-
-export type Step = { id: string; what: string; state: string | null; cells: string[] };
-
-/**
- * Every row of an arc's step table, with its What and State cells found BY HEADER.
- *
- * The step row is `# · Repo · Altitude · What · Mechanism · Acceptance · State`, so the second cell
- * is the repository and not the step. A reader that printed `cells[1]` named a repository where it
- * meant to name the work. An older arc's table carries `# · What · …` with no State column: `what`
- * is still found by its header, and `state` is `null` so the caller knows no State cell exists.
- */
-export function stepsOf(text: string): Step[] | null {
-  const section = stepsSection(text);
-  if (section === null) return null;
-  const out: Step[] = [];
-  for (const table of mdTables(section)) {
-    const head = table[0].map(headerName);
-    const whatAt = head.indexOf("what") > 0 ? head.indexOf("what") : 1;
-    const stateAt = head.indexOf("state");
-    for (const cells of table.slice(1)) {
-      const id = stepId(cells[0] ?? "");
-      if (!STEP_ID.test(id)) continue;
-      out.push({ id, what: cells[whatAt] ?? "", state: stateAt >= 0 ? cells[stateAt] ?? "" : null, cells });
-    }
-  }
-  return out;
-}
-
-/**
- * The step rows of an arc whose cell count differs from their header's, each with both counts. Such
- * a row is read one cell to the left or skipped, so its State is not the cell a person wrote.
- */
-export function miscountedSteps(text: string): Array<{ id: string; cells: number; header: number }> {
-  const section = stepsSection(text);
-  if (section === null) return [];
-  const out: Array<{ id: string; cells: number; header: number }> = [];
-  for (const table of mdTables(section))
-    for (const cells of table.slice(1)) {
-      const id = stepId(cells[0] ?? "");
-      if (STEP_ID.test(id) && cells.length !== table[0].length) out.push({ id, cells: cells.length, header: table[0].length });
-    }
-  return out;
-}
-
-/** An arc's short name for a label: `N116` from `N116-r2-the-devex-release.md`. */
-export function arcName(file: string): string {
-  const name = basename(file).replace(/\.md$/, "");
-  return /^N\d+[a-z]?/i.exec(name)?.[0] ?? name;
-}
-
-/** Every arc file of one workstream folder. */
-export function arcFiles(folder: string): string[] {
-  const dir = join(folder, "arcs");
-  if (!isDir(dir)) return [];
-  return listdir(dir).filter((name) => name.endsWith(".md")).sort().map((name) => join(dir, name));
-}
-
-/** The split-plan rows of one arc: its step rows, read by Repo and State, labelled with the arc. */
-export function arcRowsOf(text: string, arc: string): Row[] {
-  const section = stepsSection(text);
-  if (section === null) return [];
-  return rowsOf(section, true, "repo").map((row) => ({ ...row, label: `${arc} ${row.label}` }));
-}
-
-// A data row's state as a step cell writes it, so `stateOf` reads both kinds of arc one way.
+// A data row's state as a page's State cell writes it, so `stateOf` reads a row and a page's plan one way.
+// A row waiting or ready is one nobody decided: the close accepts only landed, carried and deferred.
 const DATA_STATE: Record<string, string> = {
-  landed: "landed", carried: "carried", deferred: "deferred", stopped: "◐ stopped", running: "in progress", waiting: "pending", ready: "pending",
+  landed: "landed", carried: "carried", deferred: "deferred", stopped: "◐ stopped", running: "in progress", waiting: "", ready: "",
 };
+const CARD_BLOCKER = /^q\d+$/i;
 
 /** The arcs a workstream keeps as data: each `arcs/N<nnn>/` folder, by its id. */
 export function dataArcsOf(folder: string): string[] {
@@ -291,35 +215,41 @@ export function dataArcsOf(folder: string): string[] {
 
 /**
  * The split-plan rows of the arcs a workstream keeps as data (01-workstream.md § The formats): each
- * row with no row under it, by its repository and its state. A carried row's proof says where it went.
+ * row with no row under it, labelled `N001 row 2 — <What>`, by its repository and its state. A carried
+ * row's proof says where it went. A running row carries the time its log line moved it there, as
+ * `in progress <time>` (RD.DEVEX.WORKSPACE.184), and a row waiting on a card reads `held on Q<n>`
+ * (RD.DEVEX.WORKSPACE.188).
  */
 export function dataRowsOf(folder: string): Row[] {
   const out: Row[] = [];
   for (const arc of dataArcsOf(folder)) {
-    let data: { rows?: Array<{ id: string; parent?: string; repo?: string | null; state?: string | null; proof?: string | null }> } | null = null;
+    type DataRow = { id: string; parent?: string; title?: string; repo?: string | null; state?: string | null; proof?: string | null; blockedBy?: string[] };
+    let data: { rows?: DataRow[] } | null = null;
     try { data = JSON.parse(read(join(folder, "arcs", arc, "state.json"))); } catch { continue; }
     if (!data || !Array.isArray(data.rows)) continue;
+    const lines = logLinesOf(folder, arc) as Array<{ at?: string; kind?: string; row?: string | null } | undefined>;
+    const runningSince = (id: string): string => [...lines].reverse().find((line) => line?.kind === "running" && line.row === id)?.at ?? "";
     const parents = new Set(data.rows.map((row) => row.parent));
     for (const row of data.rows) {
       if (parents.has(row.id)) continue;
-      const word = DATA_STATE[row.state ?? ""] ?? "";
-      out.push({ label: `${arc} ${row.id}`, scope: row.repo ?? "—", state: row.state === "carried" && row.proof ? `${word} — ${row.proof}` : word });
+      const card = (row.blockedBy ?? []).find((blocker) => CARD_BLOCKER.test(blocker));
+      const word = row.state === "running" ? `in progress ${runningSince(row.id)}`.trim()
+        : (row.state === "waiting" || row.state === "ready") && card ? `held on ${card.toUpperCase()}`
+        : row.state === "carried" && row.proof ? `carried — ${row.proof}`
+        : DATA_STATE[row.state ?? ""] ?? "";
+      out.push({ label: `${arc} row ${row.id} — ${row.title ?? ""}`.trim(), scope: row.repo ?? "—", state: word });
     }
   }
   return out;
 }
 
 /**
- * A workstream's whole split plan: the step rows of every arc in its folders, whether the arc is a
- * Markdown file or kept as data, and the scope tables of any page written in the older shape. Each
- * folder is read once, however many ways it was found.
+ * A workstream's whole split plan: the rows of every arc in its folders, kept as data, and the scope
+ * tables of any page written in the older shape. Each folder is read once, however many ways it was found.
  */
 export function workstreamPlan(folders: string[], pages: string[]): Row[] {
   const rows = pages.flatMap(planOf);
-  for (const folder of [...new Set(folders.map((f) => resolve(f)))]) {
-    for (const file of arcFiles(folder)) rows.push(...arcRowsOf(read(file), arcName(file)));
-    rows.push(...dataRowsOf(folder));
-  }
+  for (const folder of [...new Set(folders.map((f) => resolve(f)))]) rows.push(...dataRowsOf(folder));
   return rows;
 }
 
@@ -412,7 +342,7 @@ export function stateOf(row: Row): string {
 // `carried → N15 step 8` read as accounted for the whole time step 8 sat blocked on an open card,
 // and the page reported `pending 0` above it.
 
-/** An arc of this same workstream — `N15`, `N3 step 2`, `arcs/N15-….md step 8`. Never a handover. */
+/** An arc of this same workstream — `N15`, `N3 row 2`, `N015/8`. Never a handover. */
 const OWN_ARC = /(?:^|\/)(?:arcs\/)?N\d+[a-z]?\b/i;
 /** A workstream a carry can name — `003-cloud-day-0`, `010`, `017 Phase 3`. */
 const SUCCESSOR = /\b(\d{3})(?:-[a-z0-9-]+)?\b/;
@@ -422,8 +352,8 @@ export function carryTarget(row: Row): { kind: "own-arc" | "workstream" | "unnam
   // A carry may write its date before the arrow, as in `↷ carried 2026-10-01 → N006 row 1`.
   const after = row.state.replace(LEAD, "").replace(/^carried\s*(?:\d{4}-\d{2}-\d{2}\s*)?(?:→|->|to\b)?\s*/i, "").trim();
   if (!after) return { kind: "unnamed", name: "" };
-  // THE OWN-ARC TEST RUNS FIRST. `carried → arcs/N15-what-the-final-shape-left-owed.md step 8` holds
-  // digits that `SUCCESSOR` would read as a workstream number if it were asked first.
+  // THE OWN-ARC TEST RUNS FIRST. `carried → N015 row 8` holds digits that `SUCCESSOR` would read as a
+  // workstream number if it were asked first.
   const arc = after.match(OWN_ARC);
   if (arc) return { kind: "own-arc", name: arc[0].replace(/^.*\//, "") };
   const ws = after.match(SUCCESSOR);
@@ -468,16 +398,9 @@ export function carryFault(root: string, row: Row): string | null {
   return null;
 }
 
-// The words an arc's Status line may open with. `LANDED` is the only one that means finished; the
-// rest all mean work is left, and an arc with no Status line at all is three of `008`'s own.
-const ARC_STATES = new Set(["LANDED", "PART-LANDED", "TAKEN", "RUNNING", "OPEN", "DECIDED", "REVISED", "STOPPED"]);
-
 /**
- * An arc's own status word, or `null` where the arc has no file or names no status.
- *
- * ARC STATUSES ARE A VOCABULARY, and only one of them means finished: `LANDED`. `PART-LANDED`,
- * `TAKEN`, `RUNNING`, `OPEN`, `DECIDED` and `REVISED` all mean work is left, and three arcs in `008`
- * carry no status line at all. So this reads the word and never guesses at the ones it does not know.
+ * An arc's own status, read from its `state.json`, or `null` where the arc has no data. Only `LANDED`
+ * resolves a row waiting on it; every other status means work is left.
  */
 export function arcStatus(root: string, subject: string, arc: string): string | null {
   for (const container of CONTAINERS) {
@@ -488,22 +411,8 @@ export function arcStatus(root: string, subject: string, arc: string): string | 
         if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
         const arcs = join(dir, entry, "arcs");
         if (!isDir(arcs)) continue;
-        // AN ARC KEPT AS DATA holds its status in its own `state.json`, which the schema keeps in the set.
         const kept = statusOfData(arcs, arc.toUpperCase());
         if (kept) return kept;
-        // `N8` LIVES IN `N7-N8-flip-and-close.md`. An arc is not always the first name in its file,
-        // so a prefix match alone finds nothing and reads as *no such arc*.
-        const file = listdir(arcs).find((f) =>
-          f.toLowerCase().startsWith(`${arc.toLowerCase()}-`) || f.toLowerCase().includes(`-${arc.toLowerCase()}-`));
-        if (!file) continue;
-        const line = read(join(arcs, file)).split("\n").find((l) => /^status:/i.test(l.trim()));
-        if (!line) return null;
-        const word = line.replace(/^\s*status:\s*/i, "").replace(/[*_`]/g, "").trim().split(/[\s—–]/)[0]?.toUpperCase() ?? "";
-        // AN UNRECOGNISED WORD IS `null`, NEVER A GUESS. `N7-N8-flip-and-close.md` holds two arcs and
-        // opens `Status: **N7 LANDED … N8, the close, runs after N13.**`, so its first word is `N7`
-        // and the line answers for neither arc on its own. Unknown resolves as unfinished, which
-        // refuses; reading `N7` as a status would have passed `N8` on a word that is not a state.
-        return ARC_STATES.has(word) ? word : null;
       }
     }
   }
@@ -578,21 +487,12 @@ function stateFolders(root: string, state: WorkstreamState): string[] {
  * anything.
  */
 export function openWorkstreams(root: string): Map<string, string[]> {
-  const devex = join(root, DEVEX);
   const found = new Map<string, string[]>();
   for (const openDir of stateFolders(root, "open"))
     for (const subject of listdir(openDir)) {
       const folder = join(openDir, subject);
       if (isDir(folder) && !found.has(subject)) found.set(subject, pagesIn(folder));
     }
-  for (const name of listdir(join(devex, "arcs"))) {
-    if (!name.startsWith("arc-") || !name.endsWith(".md")) continue;
-    const subject = name.slice("arc-".length, -".md".length);
-    if (!found.has(subject)) found.set(subject, []);
-    const page = join(devex, "notes", `${subject}-approach.html`);
-    const pages = found.get(subject)!;
-    if (isFile(page) && !pages.includes(page)) pages.push(page);
-  }
   return found;
 }
 
@@ -640,8 +540,6 @@ function home(root: string, subject: string): string {
     const folder = relative(root, join(base, subject));
     if (isDir(join(root, folder))) return `${folder}/`;
   }
-  const legacy = join(DEVEX, ARCS, `arc-${subject}.md`);
-  if (isFile(join(root, legacy))) return legacy;
   return `${relative(root, join(workstreamsDir(root, "open"), subject))}/`;
 }
 
@@ -741,14 +639,14 @@ export function closing(destination: string): boolean {
 // 05-artifacts.md § The approach document → Open — an answered question is not an `Open` entry with
 // an answer written beside it: it folds into the section that then states it, and leaves.
 //
-// THE PAGE ALONE CANNOT TELL whether a card is answered from the log, so this reads the arc beside it.
-// An arc logs an answer by naming the number — `Q3 to Q7 answered`, `Q13 answered C`.
+// THE PAGE ALONE CANNOT TELL whether a card is answered, so this reads the workstream's records beside
+// it: every question is one record in `questions.jsonl`, and `question answer` and `withdraw` settle it
+// (RD.DEVEX.WORKSPACE.253).
 //
 // AND THE PAGE CAN SAY SO ITSELF, which is finding F5. A card whose own `sds-recommended` block carries
 // a `Decision:` with an answer in it has been answered ON THE PAGE, and the arc may never mention it.
-// `answered_numbers()` read only the arcs, so four cards sat in `Open` answered for a day and the
-// developer found them by opening the published page. The check trusted the log and not the record,
-// and the page IS the record.
+// A check that read only the log let four cards sit in `Open` answered for a day, and the developer
+// found them by opening the published page.
 //
 // Reported as a WARNING rather than a refusal. The page is mid-edit for exactly as long as it takes
 // to fold a card, and refusing a write during that would refuse the fix itself.
@@ -769,32 +667,10 @@ export function closing(destination: string): boolean {
 const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
 const CARD_OPEN = /<h4[^>]*\bid="(q\d+)"[^>]*>/gi;
 const DECISION = /<b>\s*Decision:?\s*<\/b>([\s\S]{0,600})/i;
-// `answered` may sit either side of the number, because a log writes both ways.
-const ANSWERED = /\b(Q\d+)\b[^.\n]{0,80}?\banswered\b|\banswered\b[^.\n]{0,80}?\b(Q\d+)\b/gi;
-// `Q3 to Q7 answered` names a run rather than one card.
-const ANSWERED_RUN = /\bQ(\d+)\s*(?:to|through|–|—|-)\s*Q(\d+)\b[^.\n]{0,60}?\banswered\b/gi;
-// A card number inside a code span or a fenced block is an EXAMPLE, not a record. An arc that
-// explains the convention — "a log saying `Q7 answered` names one card" — was read as a log entry
-// answering Q7, and the gate then demanded a card be folded that nobody had answered. Three false
-// alarms in one session, and a gate that cries wolf is one people learn to work around.
-const CODE_SPAN = /```[\s\S]*?```|`[^`\n]*`/g;
-
-/** Every `Q<n>` an arc in this workstream records as answered. Examples are stripped first. */
+/** Every `Q<n>` this workstream's records hold as settled: answered or withdrawn in `questions.jsonl`. */
 export function answeredNumbers(folder: string): Set<string> {
-  const out = new Set<string>();
-  const arcs = join(folder, "arcs");
-  if (!isDir(arcs)) return out;
-  for (const name of listdir(arcs)) {
-    if (!name.endsWith(".md")) continue;
-    const text = read(join(arcs, name)).replace(CODE_SPAN, " ");
-    for (const match of text.matchAll(ANSWERED)) out.add((match[1] || match[2]).toUpperCase());
-    for (const match of text.matchAll(ANSWERED_RUN)) {
-      const first = Number(match[1]), last = Number(match[2]);
-      if (last - first > 0 && last - first < 40)
-        for (let n = first; n <= last; n += 1) out.add(`Q${n}`);
-    }
-  }
-  return out;
+  return new Set(readQuestions(folder).filter((one) => one.state === "answered" || one.state === "withdrawn")
+    .map((one) => String(one.id).toUpperCase()));
 }
 
 /**
@@ -914,9 +790,8 @@ export function misshapenCards(page: string): Array<{ number: string; shape: str
 }
 
 /**
- * Cards still in `Open` that are already answered — by an arc's log, or by the card's own decision.
- * The second source is finding F5: the page is the record, and a check that reads only the log
- * misses every card answered where the reader actually looks.
+ * Cards still in `Open` that are already answered — by their record in `questions.jsonl`, or by the
+ * card's own decision, which is finding F5: a check that reads only one source misses the other.
  */
 export function staleCards(folder: string, pages: string[]): Array<[string, string, string]> {
   const answered = answeredNumbers(folder);
@@ -924,7 +799,7 @@ export function staleCards(folder: string, pages: string[]): Array<[string, stri
   for (const page of pages)
     for (const card of cardsOf(page)) {
       if (card.decided) out.push([basename(page), card.number, "the card carries its own decision"]);
-      else if (answered.has(card.number)) out.push([basename(page), card.number, "an arc records it as answered"]);
+      else if (answered.has(card.number)) out.push([basename(page), card.number, "its record in questions.jsonl is settled"]);
     }
   return out;
 }
@@ -934,9 +809,10 @@ export function staleCards(folder: string, pages: string[]): Array<[string, stri
  * carry nothing with it — deleted rather than folded. The page then reads as settled while the
  * reasoning that settled it lives only in a closed window.
  *
- * Deliberately weak. It asks only that the number appears somewhere outside `Open`, because no check
- * can judge whether a fold carries enough. A gate that fires on real deletions and stays quiet on
- * thin folds is worth more than one nobody trusts.
+ * Deliberately weak. It asks only that the card's `q<n>` anchor stands somewhere outside `Open`, because
+ * no check can judge whether a fold carries enough. The anchor, never a Q number in the words, is what
+ * the book's fold check reads (05-artifacts.md § The fold check reads the anchor). A gate that fires on
+ * real deletions and stays quiet on thin folds is worth more than one nobody trusts.
  */
 export function unfoldedCards(folder: string, pages: string[]): Array<[string, string]> {
   const answered = answeredNumbers(folder);
@@ -945,9 +821,9 @@ export function unfoldedCards(folder: string, pages: string[]): Array<[string, s
   for (const page of pages) {
     const text = read(page);
     const stillOpen = new Set(cardsOf(page).map((c) => c.number));
-    const mentioned = new Set([...text.matchAll(/\bQ\d+\b/g)].map((m) => m[0].toUpperCase()));
+    const anchored = new Set([...text.matchAll(/\bid="(q\d+)"/gi)].map((m) => m[1].toUpperCase()));
     for (const number of [...answered].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))))
-      if (!stillOpen.has(number) && !mentioned.has(number)) out.push([basename(page), number]);
+      if (!stillOpen.has(number) && !anchored.has(number)) out.push([basename(page), number]);
   }
   return out;
 }
@@ -995,7 +871,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
       if (gone.length && !silent(payload, root, `unfolded|${subject}`, goneLine)) {
         return { note: named(subject,
           `An answered card left \`Open\` and took its answer with it — ${goneLine}. ` +
-          `The arc records it as answered, and the page now says nothing about it at all. A fold ` +
+          `Its record is settled, and the page now says nothing about it at all. A fold ` +
           `moves the card into the section that states what it settled; what replaces it is what ` +
           `execution reads, because the window holding the answer is gone ` +
           `(05-artifacts.md, The approach document).`) };
@@ -1147,8 +1023,6 @@ export function gateClose(payload: Payload): Verdict {
     const root = workspaceRoot(destination) ?? workspaceRoot(cwd);
     if (!root) continue;
     let subject = source ? basename(source.replace(/\/+$/, "")) : "";
-    if (subject.startsWith("arc-") && subject.endsWith(".md"))
-      subject = subject.slice("arc-".length, -".md".length);       // the shape `workstreams/` replaces
     if (!subject || STRUCTURE.has(subject)) {
       const after = relative(join(root, DEVEX), destination).split(sep);
       subject = after.find((part) => !STRUCTURE.has(part)) ?? "";
@@ -1184,15 +1058,15 @@ export function gateClose(payload: Payload): Verdict {
         deny:
           `Denied: \`${subject}\` has no split plan, so this gate checked NOTHING — that is not ` +
           `the same as everything being accounted for, and it must not read the same.\n` +
-          `The split plan is the step rows of the workstream's arcs: each arc's \`## Steps\` table, ` +
-          `with a **Repo** column and a **State** column (02-workstream/01-workstream.md § A step ` +
-          `row says where, at what altitude, and how). The gate reads those two and nothing else.\n\n` +
-          `Give each arc its step table, then give each row one of three states:\n` +
+          `The split plan is the rows of the workstream's arcs, kept as data: each row's \`repo\` ` +
+          `and its \`state\` (02-workstream/01-workstream.md § A step row says where, at what ` +
+          `altitude, and how). The gate reads those two and nothing else.\n\n` +
+          `Give each arc its rows with \`spn-devex workstream row write <arc> <row>\`, then give each row one of three states:\n` +
           `  landed <commit>   what reached its node, and the commit that landed it\n` +
           `  carried           the successor workstream that takes it on\n` +
           `  deferred          the event that brings it back\n\n` +
-          `If this scope genuinely planned nothing, say so in a one-row step table rather than by ` +
-          `leaving the table out — an absent plan and a finished one are indistinguishable to any ` +
+          `If this scope genuinely planned nothing, say so in a one-row arc rather than by ` +
+          `leaving the rows out — an absent plan and a finished one are indistinguishable to any ` +
           `reader, not just to this hook.`,
       };
 
@@ -1260,15 +1134,11 @@ export function gateClose(payload: Payload): Verdict {
     // A TERMINAL STATUS IS THE WHOLE TEST. `LANDED` says nothing is owed, `CARRIED` says the work
     // left and names where, `DROPPED` says it was abandoned and why. Any other word means somebody
     // has to decide which of those three it is, and a receipt written before that decision records
-    // a state nobody checked. An arc with NO status is left alone here, the same way `arc-status`
-    // leaves it: a batch-shaped arc whose state has to be read is not pushed into a stamped word.
+    // a state nobody checked. Each arc's status is read from its `state.json`, where the schema
+    // keeps it to the eight.
     const unfinished: string[] = [];
     const arcDirs = [...new Set([...folders, ...pages.map(dirname)].map((f) => join(f, "arcs")))];
     for (const dir of arcDirs.filter(isDir)) {
-      for (const f of listdir(dir).filter((x) => x.endsWith(".md"))) {
-        const st = statusIn(read(join(dir, f)));
-        if (st && !TERMINAL.has(st)) unfinished.push(`  - ${f.replace(/\.md$/, "")} — ${st}`);
-      }
       for (const arc of listdir(dir).filter((x) => /^N\d+[a-z]?$/.test(x))) {
         const st = statusOfData(dir, arc);
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${arc} — ${st}`);
@@ -1284,8 +1154,8 @@ export function gateClose(payload: Payload): Verdict {
           `terminal. The three that are: \`LANDED\` (nothing is owed), \`CARRIED\` (the work left, ` +
           `and the status names where) and \`DROPPED\` (abandoned on purpose, with the reason).\n\n` +
           `${listed}${more}\n\n` +
-          `For each one, decide which of the three it is and say so in its \`Status:\` line, or for an arc kept as ` +
-          `data with \`spn-devex workstream row write <arc> --status …\`. An arc ` +
+          `For each one, decide which of the three it is and write it with ` +
+          `\`spn-devex workstream row write <arc> --status …\`. An arc ` +
           `left at \`PART-LANDED\` inside a closed workstream is a receipt that disagrees with ` +
           `itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
       };
@@ -1411,12 +1281,6 @@ export function reportLines(root: string, label: string, rows: Row[], suffix = "
   return out;
 }
 
-/** One line for each step row of an arc whose cell count differs from its header's. */
-export function miscountLines(arc: string, text: string): string[] {
-  return miscountedSteps(text).map((row) =>
-    `    cell count  ${arc} step ${row.id} — ${row.cells} cells under a ${row.header}-cell header`);
-}
-
 function sweep(roots: string[]): number {
   for (const start of roots) {
     const root = workspaceRoot(start) ?? resolve(start);
@@ -1426,13 +1290,10 @@ function sweep(roots: string[]): number {
       const folders = subjectFolders(root, subject, null);
       const rows = workstreamPlan(folders, pages);
       if (!rows.length) {
-        console.log(`  ${subject}: no arc carries a step table with Repo and State — no split plan yet`);
+        console.log(`  ${subject}: no arc carries a row — no split plan yet`);
         continue;
       }
-      const lines = reportLines(root, subject, rows, ` · ${pages.length} page(s)`);
-      for (const folder of folders)
-        for (const file of arcFiles(folder)) lines.push(...miscountLines(arcName(file), read(file)));
-      for (const line of lines) console.log(`  ${line}`);
+      for (const line of reportLines(root, subject, rows, ` · ${pages.length} page(s)`)) console.log(`  ${line}`);
     }
   }
   return 0;

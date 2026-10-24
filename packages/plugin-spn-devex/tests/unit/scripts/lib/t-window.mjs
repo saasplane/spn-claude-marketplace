@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
+import { CARD as RAISED_CARD } from "../../../helpers/workstream-fixture.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { bindNamed, readWindow, recordWrites, reposWritten, visitedWorkstreams, windowWorkstreams } from "../../../../src/scripts/lib/window.ts";
@@ -21,12 +22,19 @@ const open = (name) => `.spndevex/${WORKSTREAMS}/open/${name}`;
 const STYLES = linesFor("1.0.0").stylesheet;
 const card = (q) => `<div class="sds-open"><h4 id="q${q}">Q${q} &middot; a question</h4><div class="sds-scroll"><table><thead><tr><th></th><th>What</th></tr></thead><tbody><tr><td><strong>A</strong></td><td>x</td></tr></tbody></table></div><div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div></div>`;
 const page = (...cards) => `<!doctype html>\n${STYLES}\n<div class="sds-eyebrow">Workstream</div>\n<section id="s4"><div class="sds-section-head"><h2>Open</h2></div>\n${cards.map(card).join("\n")}\n</section>\n`;
-const arc = (...answered) => `# N1 — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n\n## Log\n\n- **2026-09-19 — go.**\n${answered.map((q) => `- **2026-10-06 — Q${q} answered A**\n`).join("")}`;
+const { title: _title, ...WHOLE_CARD } = RAISED_CARD;
+// The workstream's question records, each card answered: the page still asking them is the note's finding.
+const answered = (...cards) => cards.map((q) => JSON.stringify({ id: `q${q}`, arc: "N001", title: "a question", state: "answered",
+  raised: "2026-10-06T09:00+05:30", shownIn: [], card: WHOLE_CARD, answer: { key: "A", words: "the developer chose A", at: "2026-10-06T10:00+05:30" } })).join("\n") + "\n";
 
-/** Two open workstreams. Each has a page that still asks Q7 and an arc that records it as answered. */
+// An arc kept as data, for the cases about the arcs a window writes.
+const DATA_ARC = { schemaVersion: 1, arc: "N001", subject: "a-subject", title: "a subject", goal: "it lands", status: "RUNNING", reason: null,
+  preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "a thing", kind: "change", state: "waiting" }] };
+
+/** Two open workstreams. Each has a page that still asks Q7, and a record in `questions.jsonl` that holds it answered. */
 const two = (name) => workspace(name, {
-  [`${open(A)}/approach.html`]: page(7), [`${open(A)}/arcs/N1-a-subject.md`]: arc(7),
-  [`${open(B)}/approach.html`]: page(7), [`${open(B)}/arcs/N1-b-subject.md`]: arc(7),
+  [`${open(A)}/approach.html`]: page(7), [`${open(A)}/questions.jsonl`]: answered(7),
+  [`${open(B)}/approach.html`]: page(7), [`${open(B)}/questions.jsonl`]: answered(7),
 });
 
 function hook(event, payload, cwd) {
@@ -51,7 +59,7 @@ console.log("\n=== window — what binds a window, and what does not");
 {
   const root = two("w-binds");
   // A LOG LINE THAT NAMES ANOTHER WORKSTREAM'S PAGE BINDS NOTHING: only the path of the write counts.
-  pre(root, "mention", { file_path: join(root, open(A), "arcs", "N1-a-subject.md"), new_string: `see ${B}/approach.html and .spndevex/workstreams/open/${B}/arcs/N1-b-subject.md`, old_string: "x" });
+  pre(root, "mention", { file_path: join(root, open(A), "notes", "N001", "plan.md"), new_string: `see ${B}/approach.html and .spndevex/workstreams/open/${B}/notes/N001/plan.md`, old_string: "x" });
   check("a write whose text names another workstream's folder does not bind it",
     JSON.stringify(Object.keys(readWindow(root, "mention").workstreams)) === JSON.stringify([A]), JSON.stringify(readWindow(root, "mention").workstreams));
   // A READ BINDS NOTHING.
@@ -78,35 +86,75 @@ console.log("\n=== window — owning and visiting a workstream");
 {
   const root = two("w-ties");
   bindNamed(root, "owner", A, "prompt");
-  pre(root, "owner", { file_path: join(root, open(B), "arcs", "N1-b-subject.md"), old_string: "x", new_string: "y" });
+  pre(root, "owner", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" });
   const held = readWindow(root, "owner").workstreams;
   check("a window that owns one workstream and writes inside another only visits it", held[A]?.tie === "owns" && held[B]?.tie === "visits", JSON.stringify(held));
   check("a visit is not an owned workstream and not read as one", windowWorkstreams(root, "owner").join() === A && [...visitedWorkstreams(root, "owner")].join() === B);
   pre(root, "owner", { file_path: join(root, open(B), "approach.html"), content: "x" });
   check("a second write there does not turn the visit into ownership", readWindow(root, "owner").workstreams[B].tie === "visits");
   bindNamed(root, "owner-b", A, "prompt");
-  pre(root, "owner-b", { file_path: join(root, open(B), "arcs", "N1-b-subject.md"), old_string: "x", new_string: "y" }, { agent_id: "kid" });
+  pre(root, "owner-b", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" }, { agent_id: "kid" });
   const told = pre(root, "owner-b", LOOK);
   check("the answered-card note names nothing of the workstream it visits, and speaks of the one it owns", !/002-b-subject/.test(told) && /001-a-subject/.test(told), told);
   // THE FIRST WORKSTREAM A WINDOW WRITES INSIDE, WHEN NOTHING NAMED ONE, IS ITS OWN.
-  pre(root, "first", { file_path: join(root, open(A), "arcs", "N1-a-subject.md"), old_string: "x", new_string: "y" });
-  pre(root, "first", { file_path: join(root, open(B), "arcs", "N1-b-subject.md"), old_string: "x", new_string: "y" });
+  pre(root, "first", { file_path: join(root, open(A), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" });
+  pre(root, "first", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" });
   const first = readWindow(root, "first").workstreams;
   check("when nothing names one, the first workstream written inside is owned and the next is visited", first[A].tie === "owns" && first[B].tie === "visits", JSON.stringify(first));
   // At Stop: held by neither cards nor needs-you of the visited workstream.
   const out = stop(root, "owner");
   check("at Stop, a window is not held by the cards of a workstream it visits", !/002-b-subject/.test(out), out.slice(0, 300));
-  // The notes rule still holds for an arc the window itself changed there, and the message says visited.
-  const arcFile = join(root, open(B), "arcs", "N1-b-subject.md");
-  const notes = join(root, open(B), "notes", "N1");
-  mkdirSync(notes, { recursive: true });
-  writeFileSync(join(notes, "plan.md"), "# plan\n");
+}
+{
+  // The notes rule still holds for an arc the window itself changed in a workstream it visits, and the
+  // message says visited. B keeps its arc as data, and the answer is a line its log gains.
+  const root = workspace("w-visit-notes", {
+    [`${open(A)}/approach.html`]: page(),
+    [`${open(B)}/approach.html`]: page(),
+    [`${open(B)}/arcs/N001/state.json`]: `${JSON.stringify(DATA_ARC)}\n`,
+    [`${open(B)}/notes/N001/plan.md`]: "# plan\n",
+  });
+  bindNamed(root, "owner", A, "prompt");
+  pre(root, "owner", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" });
   stop(root, "owner");                                           // a baseline, with the notes as they stand
-  writeFileSync(arcFile, readFileSync(arcFile, "utf8") + "- **2026-10-06 — Q9 B.** a decision recorded, the developer said so\n");
-  recordWrites(root, "owner", root, [arcFile]);
+  writeFileSync(join(root, open(B), "arcs", "N001", "log.jsonl"),
+    `${JSON.stringify({ at: "2026-10-06T10:00+05:30", kind: "answered", row: null, note: "q9 B · the developer said so" })}\n`);
+  recordWrites(root, "owner", root, [join(root, open(B), "arcs", "N001", "log.jsonl")]);
   const noted = stop(root, "owner");
   check("the notes rule speaks for an arc the window changed in a workstream it visits, and names the tie",
     /\[notes\] `002-b-subject` \(visited\)/.test(noted), noted.slice(0, 400));
+}
+
+console.log("\n=== window — the arc a write records: a path inside its data or notes folder, or a `workstream` command");
+{
+  const root = workspace("w-arc-writes", {
+    [`${open(A)}/arcs/N001/state.json`]: `${JSON.stringify(DATA_ARC)}\n`,
+    [`${open(B)}/arcs/N002/state.json`]: `${JSON.stringify({ ...DATA_ARC, arc: "N002" })}\n`,
+    [`${open(B)}/questions.jsonl`]: `${JSON.stringify({ id: "q3", arc: "N002", title: "a question", state: "open" })}\n`,
+  });
+  const wrote = (session) => Object.keys(readWindow(root, session).wrote).sort();
+  const arcOf = (name, arc) => `${open(name)}/arcs/${arc}`;
+  pre(root, "by-path", { file_path: join(root, open(A), "notes", "N001", "plan.md"), content: "x" });
+  check("a write inside an arc's notes records the arc by its data folder", wrote("by-path").join() === arcOf(A, "N001"), wrote("by-path").join());
+  pre(root, "by-data", { file_path: join(root, open(A), "arcs", "N001", "state.json"), content: "x" });
+  check("a write inside an arc's data folder records it the same way", wrote("by-data").join() === arcOf(A, "N001"), wrote("by-data").join());
+  pre(root, "loose", { file_path: join(root, open(A), "approach.html"), content: "x" });
+  check("a write to the page records no arc, and still binds the workstream", wrote("loose").length === 0 && windowWorkstreams(root, "loose").join() === A);
+  pre(root, "row-write", { command: "spn-devex workstream row write 002/N002 1 --state landed --note \"the developer: go\"" });
+  check("known-bad: `row write` records the arc it names, and binds its workstream",
+    wrote("row-write").join() === arcOf(B, "N002") && windowWorkstreams(root, "row-write").join() === B, `${wrote("row-write")} · ${windowWorkstreams(root, "row-write")}`);
+  pre(root, "built-cli", { command: "node packages/plugin-spn-devex/src/dist/cli.mjs workstream arc stamp write 001/N001" });
+  check("the plugin's built command line counts as the command, and `arc stamp write` records its arc", wrote("built-cli").join() === arcOf(A, "N001"), wrote("built-cli").join());
+  pre(root, "answer", { command: "spn-devex workstream question answer q3 --key A --words \"the first\"" });
+  check("`question answer` records the arc its card's record names, found in the one workstream that holds it", wrote("answer").join() === arcOf(B, "N002"), wrote("answer").join());
+  pre(root, "report", { command: `spn-devex workstream report write 002 notes/N002/orders/04.report.md` });
+  check("`report write` records the arc whose notes hold the report", wrote("report").join() === arcOf(B, "N002"), wrote("report").join());
+  hook("pretooluse", { cwd: join(root, open(A)), session_id: "around", tool_name: "Bash", tool_input: { command: "spn-devex workstream fact write N001 --source spn-x/a.ts --fact \"a fact\"" } }, join(root, open(A)));
+  check("a bare arc is read in the workstream the command stands in", wrote("around").join() === arcOf(A, "N001"), wrote("around").join());
+  pre(root, "reads", { command: "spn-devex workstream state check && spn-devex workstream rows show 002 --ready" });
+  check("a command that only reads records nothing and binds nothing", wrote("reads").length === 0 && windowWorkstreams(root, "reads").length === 0);
+  pre(root, "nowhere", { command: "spn-devex workstream row write N009 --note \"x\"" });
+  check("an arc no workstream holds records nothing", wrote("nowhere").length === 0);
 }
 
 console.log("\n=== window — a hook speaks only of this window's workstreams");
@@ -125,13 +173,13 @@ console.log("\n=== window — a hook speaks only of this window's workstreams");
   // SPEAKS ONCE.
   check("the same finding is not said again to the same window", pre(root, "win-b", LOOK) === "");
   writeFileSync(join(root, open(B), "approach.html"), page(7, 8));
-  writeFileSync(join(root, open(B), "arcs", "N1-b-subject.md"), arc(7, 8));
+  writeFileSync(join(root, open(B), "questions.jsonl"), answered(7, 8));
   check("it is said again when the finding changes", /Q8/.test(pre(root, "win-b", LOOK)));
   // A CHILD.
   bindNamed(root, "parent", A, "prompt");
   const child = pre(root, "parent", LOOK, { agent_id: "child-1" });
   check("a call a child makes gets no card or page note", child === "", child);
-  pre(root, "kid-window", { file_path: join(root, open(B), "arcs", "N1-b-subject.md"), old_string: "x", new_string: "y" }, { agent_id: "child-2" });
+  pre(root, "kid-window", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" }, { agent_id: "child-2" });
   check("but a child's write binds the window it carries the session id of", windowWorkstreams(root, "kid-window").join() === B);
   // A WORKSTREAM THAT LEAVES open/.
   mkdirSync(join(root, ".spndevex", WORKSTREAMS, "closed"), { recursive: true });

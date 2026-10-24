@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "717910ea"
+      "seen": "035e57cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -211,12 +211,17 @@ moved* holds that shape.
 **The cards named there are those of the workstream you are working on — MUST**
 (`RD.DEVEX.WORKSPACE.197`). A card on another workstream's page belongs to the window that works
 there. A workstream you open while you help shape an idea is yours from then on. A workstream is
-yours when this window wrote a file inside its folder, or its first prompt or a handover named it
-(`RD.DEVEX.WORKSPACE.236`); a window that works on none asks no card.
+yours when this window wrote a file inside its folder or ran a `workstream` command that writes an arc
+there, or its first prompt or a handover named it (`RD.DEVEX.WORKSPACE.236`); a window that works on
+none asks no card.
 
 **An answer lands in the arc's notes in the same turn — MUST** (`RD.DEVEX.WORKSPACE.193`): in the
 card, answered and folded; in the arc, as a log line and a change to every row it affects; and in the
-arc's notes — its spec, its plan, and any sample they name.
+arc's notes — its spec, which is its `preview.html`, its `plan.md`, and any sample they name. At the
+end of the turn the Stop hook reads the lines this window's write added to the arc's `log.jsonl`, and
+names an arc that logged an answer (the `answered` line `question answer` writes) or a review point
+while its preview, plan and samples did not move. A `PROPOSED` arc never carries a review point to a
+later row of itself, and the hook names a log line that does.
 
 ## Deferred
 

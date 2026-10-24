@@ -2,13 +2,12 @@
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status says which of eight states it is in
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// A workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run, in two
-// columns. Arc holds the title, the description and the facts as links separated by middots (the arc file, and the
-// previews and samples the arc's own `## Previews` table carries); Status holds the word, and for
-// HELD, CARRIED and DROPPED the reason below it. An arc kept as data (`arcs/N<nnn>/state.json`) gives
-// the preview by its fixed name and its samples, a badge for its status, and its number as the row's
-// id, so `approach.html#N013` opens it (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the
-// row; a rewrite keeps the stamp, which only `workstream arc stamp write` writes. `write` also writes
+// A workstream's Cycles table, read from its arcs' data (`arcs/N<nnn>/state.json`): one row per arc, in
+// the order the arcs run, in two columns. Arc holds the title, the description and the facts as links
+// separated by middots: the preview by its fixed name, each sample, and for HELD, CARRIED and DROPPED
+// the reason. Status holds the badge. The arc's number is the row's id, so `approach.html#N013` opens it
+// (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the row; a rewrite keeps the stamp, which
+// only `workstream arc stamp write` writes. `write` also writes
 // each arc's name file, `arcs/N<nnn>/<subject>.md` (RD.DEVEX.WORKSPACE.264), and the status in the
 // header of each arc's preview, read from the arc (RD.DEVEX.WORKSPACE.266).
 //
@@ -38,47 +37,34 @@ import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-
 
 export const describe = "a workstream's Cycles table, read from its arcs: one row per arc, with its file, its status and its previews";
 
-/** One row of an arc's `## Previews` table: a preview page or a sample, and where its review stands. */
+/** An arc's preview or one of its samples, as its Cycles row links it. */
 export type Preview = {
   name: string;            // the file's name
-  href: string | null;     // its path from the workstream folder; null where the row links nothing
-  kind: string;            // `preview` or `sample`, as the row states it
-  state: string;           // `proposed` or `decided`, the arc's own words — the State cell before any date
+  href: string;            // its path from the workstream folder
+  kind: string;            // `preview` or `sample`
 };
 
-/** One row of Cycles, and the file it was read from. */
+/** One row of Cycles, and the `state.json` it was read from. */
 export type Cycle = {
-  id: string | null;       // `N001`, `N12`, `N1a` — from the file name; null for an arc file that carries none
-  name: string;            // the heading, without the number
-  does: string;            // one line: what the arc changes
-  status: string | null;   // one of STATUSES, or null where the arc states none the set knows
+  id: string;              // `N001`, `N12`, `N1a`
+  name: string;            // the arc's title
+  does: string;            // one line: what the arc decides
+  status: string | null;   // one of STATUSES, or null where the data holds none the set knows
   detail: string;          // the blocker, destination or reason a HELD, CARRIED or DROPPED arc carries
   file: string;
-  previews: Preview[];     // the rows of the arc's `## Previews` table; empty where it reads `None.`
-  kept?: boolean;          // an arc kept as data, read from `arcs/N<nnn>/state.json` (01-workstream.md § The formats)
+  previews: Preview[];     // the preview by its fixed name, then each sample
 };
 
 /** The columns of the Cycles table, in order: the arc with its description and facts, then its status. */
 export const CYCLES_COLUMNS = ["Arc", "Status"];
-/** The four columns the table had before it went to two, which a closed workstream may keep. */
-export const FOUR_COLUMNS = ["Arc", "What it does", "Status", "Previews"];
-/** The three columns an older closed workstream keeps. */
-export const THREE_COLUMNS = FOUR_COLUMNS.slice(0, 3);
 /** A header as `tableColumns` reads it: lower case, joined by a middle dot. */
 export const headerOf = (columns: string[]): string => columns.join(" · ").toLowerCase();
 
 const MUST_CARRY = new Set(["HELD", "CARRIED", "DROPPED"]);
 // Longest word first, so `PART-LANDED` is never read as `LANDED`.
 const BY_LENGTH = [...STATUSES].sort((a, b) => b.length - a.length);
-const ARC_ID = /^(N\d+[a-z]?)(?=-|\.md$)/i;
-const STATUS_LINE = /^\s*\*{0,2}Status:?\*{0,2}\s*/i;
-const PREVIEWS_HEADING = /^##\s+Previews\b/i;
-const TABLE_RULE = /^\|?\s*:?-{3,}/;
-const LINK_TARGET = /\]\(\s*<?([^)\s>]+)>?[^)]*\)/;
-const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
-const DATE = /\d{4}-\d{2}-\d{2}/;
 
-/** Markdown as a person reads it: links to their text, code and emphasis marks gone, spaces collapsed. */
+/** A cell's text as a person reads it: links to their text, code and emphasis marks gone, spaces collapsed. */
 function plain(text: string): string {
   return text
     .replace(/<!--[\s\S]*?-->/g, " ")
@@ -94,124 +80,12 @@ export function statusWord(text: string): string | null {
   return BY_LENGTH.find((word) => new RegExp(`^${word}(?![A-Z-])`).test(head)) ?? null;
 }
 
-/**
- * The arc number a file name carries, with the digits the name writes, or null.
- * `N001-book-change.md` is `N001`, and `N7-N8-flip-and-close.md` is `N7`.
- */
-export function arcId(file: string): string | null {
-  const found = ARC_ID.exec(basename(file));
-  return found ? found[1].charAt(0).toUpperCase() + found[1].slice(1) : null;
-}
-
-/**
- * The rows of an arc's `## Previews` table. Each column is found by its heading: File, Kind, State.
- * A link in the File cell is written from the arc file, which sits in `arcs/`, so it is resolved to a
- * path from the workstream folder, where the approach page sits. A section reading `None.`, and an arc
- * with no such section, have no rows.
- */
-export function previewsOf(text: string): Preview[] {
-  const lines = text.split("\n");
-  const at = lines.findIndex((line) => PREVIEWS_HEADING.test(line));
-  if (at < 0) return [];
-  const rows: string[][] = [];
-  for (const line of lines.slice(at + 1)) {
-    if (/^#{1,2}\s/.test(line)) break;
-    const row = line.trim();
-    if (!row.startsWith("|") || TABLE_RULE.test(row)) continue;
-    rows.push(row.replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((cell) => cell.trim()));
-  }
-  if (rows.length < 2) return [];
-  const header = rows[0].map((cell) => plain(cell).toLowerCase());
-  const fileAt = header.indexOf("file");
-  const kindAt = header.indexOf("kind");
-  const stateAt = header.indexOf("state");
-  if (fileAt < 0) return [];
-  return rows.slice(1).filter((cells) => cells[fileAt]).map((cells) => {
-    const target = LINK_TARGET.exec(cells[fileAt])?.[1].replace(/#.*$/, "") ?? null;
-    const href = !target ? null
-      : HAS_SCHEME.test(target) || target.startsWith("/") ? target
-      : posix.normalize(posix.join(ARCS, target));
-    const name = target ? posix.basename(target) : cells[fileAt].replace(/`/g, "").trim();
-    const stated = plain(cells[stateAt] ?? "");
-    const dated = DATE.exec(stated);
-    const state = (dated ? stated.slice(0, dated.index) : stated).replace(/[\s—–·,:;(-]+$/, "");
-    return { name, href, kind: plain(cells[kindAt] ?? ""), state };
-  });
-}
-
-/**
- * The File cell an unlinked Previews row should carry: the file's name as a link written from the
- * arc file, which sits in `arcs/`. A name that already holds a path is linked at that path, and a
- * bare name under the arc's own `previews/` folder.
- */
-export function previewLinkForm(file: string, name: string): string {
-  const target = name.includes("/")
-    ? `../${name.replace(/^(?:\.{1,2}\/)+/, "")}`
-    : `../notes/${arcId(file) ?? "N<nnn>"}/previews/${name}`;
-  return `[\`${posix.basename(name)}\`](${target})`;
-}
-
-/** The first sentence of a text. */
-function firstSentence(text: string): string {
-  return text.split(/(?<=[.!?])\s+(?=[A-Z"“(])/)[0]?.trim() ?? "";
-}
-
-/**
- * One arc file, read into its Cycles row. Arc: the number in the file name and the name in the
- * heading. What it does: the first sentence after the bold status, which the arc template reserves
- * for what the arc changes, or else the `Decides` field. Status: the word, then what a HELD, CARRIED
- * or DROPPED arc must also carry.
- */
-export function cycleOf(file: string, text: string): Cycle {
-  const lines = text.split("\n");
-  const heading = lines.find((line) => /^#\s/.test(line)) ?? "";
-  const id = arcId(file);
-  const name = plain(heading.replace(/^#\s+/, ""))
-    .replace(/^(?:Arc\s*)?(?:N?\d+[a-z]?)?\s*[—–:-]\s*/i, "")
-    .trim() || basename(file, ".md");
-
-  // The status line is a paragraph: a long one wraps, and the sentence after the status may sit on
-  // the next line. It ends at the first blank line or the next field line.
-  const at = lines.findIndex((line) => STATUS_LINE.test(line));
-  const paragraph: string[] = [];
-  for (let i = at; at >= 0 && i < lines.length; i += 1) {
-    if (i > at && (!lines[i].trim() || /^\s*(?:Repos?:|\||#|>|<!--)/.test(lines[i]))) break;
-    paragraph.push(lines[i]);
-  }
-  const afterLabel = paragraph.join(" ").replace(STATUS_LINE, "");
-  // The bold span is the status itself; what follows it on the same line says what the arc changes.
-  const bold = /^\*\*([^*]*)\*\*(.*)$/.exec(afterLabel.trim());
-  const statusText = bold ? bold[1] : afterLabel;
-  const status = statusWord(statusText);
-  const rest = bold ? bold[2] : "";
-
-  let detail = "";
-  if (status && MUST_CARRY.has(status))
-    detail = plain(statusText).slice(status.length).replace(/^[\s—–:·,-]+/, "").replace(/[.\s]+$/, "");
-
-  // What precedes the sentence is bookkeeping the status already carries: a date, or when it opened.
-  let does = firstSentence(plain(rest)
-    .replace(/^[\s,.;:·—–-]+/, "")
-    .replace(/^\d{4}-\d{2}-\d{2}\.?\s*/, "")
-    .replace(/^Opened\b[^.]*\.\s*/i, ""));
-  if (!does) {
-    const decides = lines.find((line) => /^\|\s*\*{0,2}Decides\*{0,2}\s*\|/.test(line));
-    if (decides) does = firstSentence(plain(decides.split("|")[2] ?? ""));
-  }
-  return { id, name, does, status, detail, file, previews: previewsOf(text) };
-}
-
-/** The order arcs run in: by number, then by the letter after it; an arc with no number last. */
+/** The order arcs run in: by number, then by the letter after it. */
 function runOrder(a: Cycle, b: Cycle): number {
-  if (a.id && !b.id) return -1;
-  if (!a.id && b.id) return 1;
-  if (a.id && b.id) {
-    const [, an, al] = /^N(\d+)([a-z]?)$/i.exec(a.id)!;
-    const [, bn, bl] = /^N(\d+)([a-z]?)$/i.exec(b.id)!;
-    if (Number(an) !== Number(bn)) return Number(an) - Number(bn);
-    if (al !== bl) return al < bl ? -1 : 1;
-  }
-  return basename(a.file) < basename(b.file) ? -1 : basename(a.file) > basename(b.file) ? 1 : 0;
+  const [, an, al] = /^N(\d+)([a-z]?)$/i.exec(a.id) ?? [, "0", ""];
+  const [, bn, bl] = /^N(\d+)([a-z]?)$/i.exec(b.id) ?? [, "0", ""];
+  if (Number(an) !== Number(bn)) return Number(an) - Number(bn);
+  return al < bl ? -1 : al > bl ? 1 : 0;
 }
 
 /**
@@ -229,32 +103,21 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });
   const notes = posix.dirname(previewHref);
   const previews: Preview[] = [];
-  if (isFile(join(folder, previewHref))) previews.push({ name: PREVIEW_FILE, href: previewHref, kind: "preview", state: "" });
+  if (isFile(join(folder, previewHref))) previews.push({ name: PREVIEW_FILE, href: previewHref, kind: "preview" });
   for (const sample of listdir(join(folder, notes, "samples")))
-    previews.push({ name: sample, href: `${notes}/samples/${sample}`, kind: "sample", state: "" });
+    previews.push({ name: sample, href: `${notes}/samples/${sample}`, kind: "sample" });
   return { id: arc, name: typeof data.title === "string" ? data.title : arc, does: typeof data.decides === "string" ? data.decides : "",
-           status, detail: typeof data.reason === "string" ? data.reason : "", file, previews, kept: true };
+           status, detail: typeof data.reason === "string" ? data.reason : "", file, previews };
 }
 
-/**
- * Every arc of a workstream folder, as Cycles rows in run order: each Markdown arc file, and each
- * arc kept as data. A folder with no `arcs/` has none.
- */
+/** Every arc of a workstream folder kept as data, as Cycles rows in run order. A folder with no `arcs/` has none. */
 export function cyclesOf(folder: string): Cycle[] {
-  const arcs = join(folder, "arcs");
-  if (!isDir(arcs)) return [];
-  const files = listdir(arcs)
-    .filter((entry) => entry.endsWith(".md") && isFile(join(arcs, entry)))
-    .map((entry) => cycleOf(join(arcs, entry), read(join(arcs, entry))));
-  const kept = listdir(arcs)
-    .filter((entry) => /^N\d+[a-z]?$/.test(entry) && isFile(join(arcs, entry, "state.json")))
-    .map((entry) => cycleOfData(folder, entry)).filter((cycle): cycle is Cycle => cycle !== null);
-  return [...files, ...kept].sort(runOrder);
+  return arcIdsOf(folder).map((arc) => cycleOfData(folder, arc)).filter((cycle): cycle is Cycle => cycle !== null).sort(runOrder);
 }
 
 /** The Arc cell as a person reads it: `N12 — the name`. */
 export function arcLabel(cycle: Cycle): string {
-  return cycle.id ? `${cycle.id} — ${cycle.name}` : cycle.name;
+  return `${cycle.id} — ${cycle.name}`;
 }
 
 /** The Status cell: the word, then what a HELD, CARRIED or DROPPED arc must also carry. */
@@ -267,32 +130,16 @@ const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;
   .replace(/—/g, "&mdash;").replace(/·/g, "&middot;");
 const attribute = (text: string) => escape(text).replace(/"/g, "&quot;");
 
-/** The arc's file as the approach page links it: its path from the workstream folder. */
-export function arcHref(cycle: Cycle): string {
-  return `${ARCS}/${basename(cycle.file)}`;
-}
-
 /**
- * The facts of an arc, one line of `Key: value` facts separated by middots: each preview and sample,
- * keyed by its kind, its name a link and its state in brackets; then the arc file last. A person reads
- * the previews; the arc file is the agent's, and a preview links it again for whoever wants it.
+ * The facts of an arc, one line of `Key: value` facts separated by middots: its preview first and each
+ * sample, keyed by its kind, its name a link; then a HELD, CARRIED or DROPPED reason. The arc's data is
+ * not linked: it rides on the row as `data-arc`.
  */
 export function factsCell(cycle: Cycle): string {
   const link = (href: string, text: string) => `<a href="${attribute(href)}">${escape(text)}</a>`;
-  const keyOf = (kind: string) => (kind ? kind[0].toUpperCase() + kind.slice(1) : "File");
-  const facts: string[] = [];
-  // AN ARC KEPT AS DATA names its preview first and each sample, no state beside them, and no link to
-  // its data, which rides on the row as `data-arc`; a HELD, CARRIED or DROPPED reason is a fact.
-  if (cycle.kept) {
-    for (const preview of cycle.previews) facts.push(`${keyOf(preview.kind)}: ${preview.href ? link(preview.href, preview.name) : escape(preview.name)}`);
-    if (cycle.detail && cycle.status && MUST_CARRY.has(cycle.status)) facts.push(escape(cycle.detail));
-    return facts.join(" &middot; ");
-  }
-  for (const preview of cycle.previews) {
-    const value = preview.href ? link(preview.href, preview.name) : escape(preview.name);
-    facts.push(`${keyOf(preview.kind)}: ${value}${preview.state ? ` (${escape(preview.state)})` : ""}`);
-  }
-  facts.push(`Arc: ${link(arcHref(cycle), basename(cycle.file))}`);
+  const keyOf = (kind: string) => kind[0].toUpperCase() + kind.slice(1);
+  const facts = cycle.previews.map((preview) => `${keyOf(preview.kind)}: ${link(preview.href, preview.name)}`);
+  if (cycle.detail && cycle.status && MUST_CARRY.has(cycle.status)) facts.push(escape(cycle.detail));
   return facts.join(" &middot; ");
 }
 
@@ -309,28 +156,12 @@ export function arcCell(cycle: Cycle): string {
 }
 
 /**
- * The Status cell's HTML: the status as its badge. An arc kept as data stops there, because its HELD, CARRIED or
- * DROPPED reason is one of its facts and is shown once, in the Arc cell; an arc kept as Markdown has no such fact,
- * so its reason stands below the badge in small text.
+ * The Status cell's HTML: the status as its badge. A HELD, CARRIED or DROPPED reason is one of the arc's
+ * facts, and is shown once, in the Arc cell.
  */
 export function statusCell(cycle: Cycle): string {
   if (!cycle.status) return escape(statusLabel(cycle));
-  const badge = `<span class="sds-badge sds-status sds-${cycle.status.toLowerCase()}">${escape(cycle.status)}</span>`;
-  return cycle.detail && !cycle.kept ? `${badge}<br><span class="sds-small">${escape(cycle.detail)}</span>` : badge;
-}
-
-/**
- * The Previews cell of the four-column table: one entry per row of the arc's Previews table, each the
- * file as a link from the page, its kind and its state. An arc with no rows reads as a dash.
- */
-export function previewsCell(cycle: Cycle): string {
-  if (!cycle.previews.length) return "&mdash;";
-  return cycle.previews.map((preview) => {
-    const file = preview.href
-      ? `<a href="${attribute(preview.href)}">${escape(preview.name)}</a>`
-      : escape(preview.name);
-    return [file, escape(preview.kind), escape(preview.state)].filter(Boolean).join(" &middot; ");
-  }).join("<br>");
+  return `<span class="sds-badge sds-status sds-${cycle.status.toLowerCase()}">${escape(cycle.status)}</span>`;
 }
 
 /** The two cells of one Cycles row, as HTML, in the order of `CYCLES_COLUMNS`. */
@@ -344,7 +175,6 @@ export function rowCells(cycle: Cycle): string[] {
  * which only `workstream arc stamp write` writes, so a rewrite of the table keeps it.
  */
 export function rowTag(cycle: Cycle, stamps: Map<string, { stamp: string | null }> = new Map()): string {
-  if (!cycle.kept || !cycle.id) return "<tr>";
   const stamp = stamps.get(cycle.id)?.stamp;
   return `<tr id="${cycle.id}" data-arc="${ARCS}/${cycle.id}/state.json"${stamp ? ` data-arc-stamp="${attribute(stamp)}"` : ""}>`;
 }
@@ -382,7 +212,7 @@ function anchorsOf(html: string): Array<{ href: string; text: string }> {
 /** A cell with its links taken out, as a person reads the rest. */
 const withoutAnchors = (html: string): string => flat(html.replace(/<a\b[\s\S]*?<\/a>/gi, " "));
 
-/** The key one Cycles row and one arc share: the arc number, or the name where there is none. */
+/** The key one Cycles row and one arc share: the arc number, or a row's name where it names none. */
 function cycleKey(label: string): string {
   const id = /\bN\d+[a-z]?\b/i.exec(label);
   if (id) return id[0].charAt(0).toUpperCase() + id[0].slice(1);
@@ -422,68 +252,44 @@ function tableRows(table: string): Map<string, string[]> {
 
 /** The arcs of a workstream, each under the key a Cycles row names it by. */
 function arcsByKey(cycles: Cycle[]): Map<string, Cycle> {
-  return new Map(cycles.map((cycle) => [cycle.id ?? cycleKey(cycle.name), cycle]));
+  return new Map(cycles.map((cycle) => [cycle.id, cycle]));
 }
 
 /**
  * What a page's Cycles table says that its arcs do not: the arcs with no row, the rows naming no arc,
  * and one line for each row that differs from its arc. Rows are matched by arc and never by position,
- * so a page may list the arcs in the order a person chooses. With `withPreviews` false only the rows
- * and their statuses are compared, which is what a closed workstream's three-column table is held to.
+ * so a page may list the arcs in the order a person chooses. A closed workstream's page stays as it
+ * closed, and is not compared.
  */
-export function tableDifferences(table: string, cycles: Cycle[], withPreviews = true, requireBadge = true): { missing: string[]; unknown: string[]; stale: string[] } {
+export function tableDifferences(table: string, cycles: Cycle[]): { missing: string[]; unknown: string[]; stale: string[] } {
   const onPage = tableRows(table);
   const inArcs = arcsByKey(cycles);
   const stale: string[] = [];
-  // Cells are read by the header's name, never by position: a table may hold two, three or four columns.
+  // Cells are read by the header's name, never by position.
   const headers = [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase());
-  const at = (name: string): number => headers.indexOf(name);
-  const statusAt = at("status") >= 0 ? at("status") : 2;
-  const doesAt = at("what it does");
-  const previewsAt = at("previews");
-  const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
+  const statusAt = headers.indexOf("status") >= 0 ? headers.indexOf("status") : 1;
   for (const [key, cells] of onPage) {
     const cycle = inArcs.get(key);
     if (!cycle) continue;
     const status = flat(cells[statusAt] ?? "");
     if (cycle.status && statusWord(status) !== cycle.status)
       stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${cycle.status}`);
-    if (!withPreviews) continue;
-    if (doesAt < 0) {
-      // Two columns: the Arc cell holds the title, the description and the facts, and the Status cell its reason.
-      const expected = arcCell(cycle);
-      if (cycle.kept && !new RegExp(`<tr\\b[^>]*\\bdata-arc="${ARCS}/${cycle.id}/state\\.json"`).test(table))
-        stale.push(`${key}'s row does not carry \`data-arc="${ARCS}/${cycle.id}/state.json"\``);
-      else if (cycle.kept && requireBadge && !carriesAddress(table, cycle.id!))
-        stale.push(`${key}'s row carries no \`id="${cycle.id}"\`, so \`approach.html#${cycle.id}\` opens nothing`);
-      if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
-        stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
-      if (lineOf(cells[0]) !== lineOf(expected))
-        stale.push(`${key}'s line is not the arc's own line`);
-      // The facts are compared whole, links and the kind and state written after each, as plain text.
-      const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
-      if (facts(cells[0]) !== facts(expected))
-        stale.push(`${key}'s links are not the arc file and the previews and samples the arc's Previews table lists`);
-      // An open page draws every status as its badge; a closed workstream's page stays as it closed, its word read as it is.
-      if (cycle.status && (requireBadge || cycle.kept) && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
-        stale.push(`${key}'s Status is not its badge, \`sds-badge sds-status sds-${cycle.status.toLowerCase()}\``);
-      if (cycle.status && cycle.detail && !cycle.kept && status !== flat(statusCell(cycle)))
-        stale.push(`${key}'s Status does not carry the arc's reason`);
-      continue;
-    }
-    if (withoutAnchors(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
-      stale.push(`${key} is named "${withoutAnchors(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
-    const href = arcHref(cycle);
-    if (!anchorsOf(cells[0]).some((anchor) => anchor.href === href && anchor.text === href))
-      stale.push(`${key} does not link its arc file as ${href}`);
-    if (flat(cells[doesAt]) !== cycle.does.replace(/\s+/g, " ").trim())
-      stale.push(`${key}'s What it does is not the arc's own line`);
-    if (previewsAt >= 0 || headers.length >= 4) {
-      const cell = cells[previewsAt >= 0 ? previewsAt : 3] ?? "";
-      const previews = previewsCell(cycle);
-      if (flat(cell) !== flat(previews) || linked(cell) !== linked(previews))
-        stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
-    }
+    // The Arc cell holds the title, the description and the facts.
+    const expected = arcCell(cycle);
+    if (!new RegExp(`<tr\\b[^>]*\\bdata-arc="${ARCS}/${cycle.id}/state\\.json"`).test(table))
+      stale.push(`${key}'s row does not carry \`data-arc="${ARCS}/${cycle.id}/state.json"\``);
+    else if (!carriesAddress(table, cycle.id))
+      stale.push(`${key}'s row carries no \`id="${cycle.id}"\`, so \`approach.html#${cycle.id}\` opens nothing`);
+    if (titleOf(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
+      stale.push(`${key} is named "${titleOf(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
+    if (lineOf(cells[0]) !== lineOf(expected))
+      stale.push(`${key}'s line is not the arc's own line`);
+    // The facts are compared whole, links and their text, as plain text.
+    const facts = (html: string) => `${anchorsOf(html).map((anchor) => `${anchor.href} ${anchor.text}`).join("\n")}\n${flat(factsOf(html))}`;
+    if (facts(cells[0]) !== facts(expected))
+      stale.push(`${key}'s links are not the arc's preview and samples`);
+    if (cycle.status && !(cells[statusAt] ?? "").includes(`sds-status sds-${cycle.status.toLowerCase()}`))
+      stale.push(`${key}'s Status is not its badge, \`sds-badge sds-status sds-${cycle.status.toLowerCase()}\``);
   }
   return {
     missing: [...inArcs.keys()].filter((key) => !onPage.has(key)),
@@ -714,7 +520,7 @@ export function tableStatuses(text: string): Map<string, { word: string | null; 
   if (!at) return new Map();
   const table = text.slice(at.from, at.to);
   const headers = [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase());
-  const statusAt = headers.indexOf("status") >= 0 ? headers.indexOf("status") : 2;
+  const statusAt = headers.indexOf("status") >= 0 ? headers.indexOf("status") : 1;
   return new Map([...tableRows(table)].map(([key, cells]) => [key, { word: statusWord(flat(cells[statusAt] ?? "")), cell: cells[statusAt] ?? "" }]));
 }
 
@@ -786,14 +592,9 @@ function run(args: string[], write: boolean): number {
     console.log(tableOf(cycles));
   }
   // An arc whose status the set does not know is printed and named, never guessed at: the row still
-  // appears, and the arc is the file to fix.
+  // appears, and the arc is the data to mend.
   for (const cycle of cycles.filter((one) => !one.status))
-    console.error(`! ${basename(cycle.file)} states no status the set knows (${STATUSES.join(" · ")})`);
-  // A Previews row that links nothing shows on the page as plain text, so the arc is the file to fix.
-  for (const cycle of cycles)
-    for (const preview of cycle.previews.filter((one) => !one.href))
-      console.error(`! ${basename(cycle.file)} names the preview \`${preview.name}\` without a link — write its File cell as ` +
-        previewLinkForm(cycle.file, preview.name));
+    console.error(`! ${cycle.id} holds no status the set knows (${STATUSES.join(" · ")})`);
   return code;
 }
 

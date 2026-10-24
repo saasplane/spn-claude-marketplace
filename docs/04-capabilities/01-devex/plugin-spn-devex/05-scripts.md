@@ -12,7 +12,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| An arc's status word | `packages/plugin-spn-devex/src/scripts/checks/arc-status.ts` | refuses an arc written with a status word nothing can act on |
+| An arc's status word | `packages/plugin-spn-devex/src/scripts/checks/arc-status.ts` | states the eight statuses once, which the workstream schema holds every `state.json` to |
 | What the code says about itself | `packages/plugin-spn-devex/src/scripts/checks/comment-check.ts` | refuses a history word, a `//` where JSDoc is owed, a comment repeating its line, a guess |
 | The questions a fragment cannot answer | `packages/plugin-spn-devex/src/scripts/checks/corpus.ts` | asks the corpus questions nobody would otherwise ask until they typed a command |
 | Confirmed execution | `packages/plugin-spn-devex/src/scripts/checks/confirmed.ts` | warns on an edit with no recorded go, and never on a read |

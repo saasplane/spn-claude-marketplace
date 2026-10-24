@@ -52,7 +52,8 @@ import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARCS, SESSIONS, WORKSTREAM_STATES, isApproachPage, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { arcIdsOf } from "../lib/workstream.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { windowStartLines } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
@@ -267,14 +268,12 @@ type Workstream = { folder: string; number: string; subject: string; state: stri
                     page: string; arcs: number; when: number; legacy: string };
 
 /**
- * Every workstream and the state it sits in — the shape, and the two it replaces.
+ * Every workstream and the state it sits in, with the count of its arcs kept as data.
  *
  * One window restructures `.spndevex/` and another may open before it lands, so
- * `sessions/{state}/{subject}/` and a bare `arcs/arc-{subject}.md` are read the same way and marked
- * as legacy.
+ * `sessions/{state}/{subject}/`, the container's older name, is read the same way and marked as legacy.
  */
 export function workstreams(root: string): Workstream[] {
-  const devex = join(root, DEVEX);
   const found = new Map<string, Workstream>();
   for (const state of STATES)
     for (const [base, legacy] of [[workstreamsDir(root, state), ""],
@@ -295,20 +294,11 @@ export function workstreams(root: string): Workstream[] {
             const own = listdir(path).filter(isApproachPage).sort()[0];
             return own ? join(path, own) : "";
           })(),
-          arcs: listdir(join(path, "arcs")).filter((f) => f.endsWith(".md")).length,
+          arcs: arcIdsOf(path).length,
           when: newest(files) || newest([path]),
           legacy,
         });
       }
-  for (const name of listdir(join(devex, "arcs"))) {
-    if (!name.startsWith("arc-") || !name.endsWith(".md")) continue;
-    const subject = name.slice("arc-".length, -".md".length);
-    if (found.has(subject)) continue;
-    const arc = join(devex, "arcs", name);
-    const page = join(devex, "notes", `${subject}-approach.html`);
-    found.set(subject, { folder: subject, number: "", subject, state: "open",
-      page: isFile(page) ? page : "", arcs: 1, when: newest([arc, page]), legacy: "arcs/" });
-  }
   return [...found.values()].sort((a, b) => {
     const left = a.number || "zzz", right = b.number || "zzz";
     if (left !== right) return left < right ? -1 : 1;

@@ -99,16 +99,18 @@ one("the one spelling the Python did handle, so the port is held to it",
   `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/001-a-subject`,
   "speaks", { says: "1 row landed" });
 
-// THE SPLIT PLAN IS THE ARCS' STEP ROWS. A workstream written after that rule carries its plan in
-// each arc's `## Steps` table and may have no page at all, so the count comes from the arcs.
-const stepArc = (rows) => `# N2 — the arc\n\nStatus: **LANDED**\n\n## Steps\n\n` +
-  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
-  rows.map(([id, repo, state]) => `| ${id} | ${repo} | DOCS | a change | by hand | audit | ${state} |`).join("\n") + "\n\n## Log\n\n- **2026-09-29 — go.**\n";
+// THE SPLIT PLAN IS THE ARCS' ROWS. A workstream carries its plan in each arc's `state.json` and may
+// have no page at all, so the count comes from the arcs' rows.
+const ARC_DIR = `.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N002`;
+const stepArc = (rows) => `${JSON.stringify({ schemaVersion: 1, arc: "N002", subject: "the-arc", title: "the arc", goal: "it lands",
+  status: "LANDED", reason: null, preview: "preview.html", rows: rows.map(([id, repo, state, fields = {}]) =>
+    ({ id, parent: "N002", title: "a change", kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
+const logLine = (kind, row, note, at = "2026-09-29T14:32+05:30") => `${JSON.stringify({ at, kind, row, note })}\n`;
 
-one("a close with no page counts the arcs' landed steps, dotted ones included",
+one("a close with no page counts the arcs' landed rows, and a row with rows under it is not one",
   workspace("m1-cl-arcs", {
-    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
-      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["3e.1", "spn-support-ts", "LANDED — `def5678`"], ["4", "spn-platform-ts", "⊘ deferred until asked"]]),
+    [`${ARC_DIR}/state.json`]: stepArc([["1", "spn-foundation", "landed", { proof: "abc1234" }], ["3", "spn-support-ts", "landed", { proof: "def5678" }],
+      ["3.1", "spn-support-ts", "landed", { proof: "def5678", parent: "3" }], ["4", "spn-platform-ts", "deferred", { proof: "until asked" }]]),
   }),
   `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "2 rows landed, and 1 deferred with its trigger", parity: false, why: "the Python reads only a page" });
@@ -116,17 +118,17 @@ one("a close with no page counts the arcs' landed steps, dotted ones included",
 one("a page's scope rows and the arcs' step rows are one plan",
   workspace("m1-cl-both", {
     [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: page([["a", "spn-foundation", "&#x2705; landed"]]),
-    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]: stepArc([["1", "spn-support-ts", "✅ landed"]]),
+    [`${ARC_DIR}/state.json`]: stepArc([["1", "spn-support-ts", "landed", { proof: "abc1234" }]]),
   }),
   `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "2 rows landed", parity: false, why: "the Python reads only a page" });
 
-// RD.DEVEX.WORKSPACE.184 — `in progress <time>` IS NOT LANDED. The gate refuses it before the move,
-// so a row found here was moved past the gate, and the line must not count it or cheer.
+// RD.DEVEX.WORKSPACE.184 — A RUNNING ROW IS NOT LANDED. The gate refuses it before the move, so a
+// row found here was moved past the gate, and the line must not count it or cheer.
 {
   const root = workspace("m7-cl-in-progress", {
-    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
-      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["2", "spn-support-ts", "in progress 2026-09-29 14:32 +05:30"]]),
+    [`${ARC_DIR}/state.json`]: stepArc([["1", "spn-foundation", "landed", { proof: "abc1234" }], ["2", "spn-support-ts", "running"]]),
+    [`${ARC_DIR}/log.jsonl`]: logLine("running", "2", "row 2 runs"),
   });
   const said = run("node", [`${HOOKS}/src/scripts/events/closed.ts`],
     { tool_name: "Bash", cwd: root, tool_input: { command: `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/` } }, root);
@@ -137,12 +139,11 @@ one("a page's scope rows and the arcs' step rows are one plan",
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ts: ${said.slice(0, 250)}`}`); }
 }
 
-// RD.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` IS NOT LANDED EITHER. The gate refuses it before the move
-// (the refusal is proved in `t-split-plan.mjs`), so a held row found here was moved past the gate.
-for (const [label, mark] of [["the book's form", "⏸ held on Q352"], ["the mark without its glyph", "held on Q352"]]) {
-  const root = workspace(`m11-cl-held-${mark.startsWith("held") ? "bare" : "glyph"}`, {
-    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
-      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["2", "spn-support-ts", mark]]),
+// RD.DEVEX.WORKSPACE.188 — A ROW WAITING ON A CARD IS NOT LANDED EITHER. The gate refuses it before
+// the move (the refusal is proved in `t-split-plan.mjs`), so a held row found here was moved past the gate.
+for (const [label, state] of [["waiting", "waiting"], ["ready", "ready"]]) {
+  const root = workspace(`m11-cl-held-${state}`, {
+    [`${ARC_DIR}/state.json`]: stepArc([["1", "spn-foundation", "landed", { proof: "abc1234" }], ["2", "spn-support-ts", state, { blockedBy: ["Q352"] }]]),
   });
   const said = run("node", [`${HOOKS}/src/scripts/events/closed.ts`],
     { tool_name: "Bash", cwd: root, tool_input: { command: `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/` } }, root);

@@ -290,6 +290,9 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — a status the rows contradict");
   data.status = "LANDED";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("red: a LANDED arc with a row not landed is named", has(checkWorkstream(ws), "status", /N001 is LANDED and row 1 is running/), said(checkWorkstream(ws)));
+  ok("[RD.DEVEX.WORKSPACE.261] its finding says a row of new scope reopens the arc at PROPOSED, and a small decision lands",
+    has(checkWorkstream(ws), "status", /new scope reopens it: `spn-devex workstream row write N001 --status PROPOSED`.*RD\.DEVEX\.WORKSPACE\.261.*--state landed/),
+    said(checkWorkstream(ws)));
   data.rows[0].state = "landed";
   data.rows[1].state = "landed";
   writeFileSync(file, JSON.stringify(data, null, 2));
@@ -347,6 +350,30 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — a reopened arc's earlier build row
   data.rows[2] = { ...data.rows[2], kind: "change", state: "running" };
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("red: a build row running on the DECIDED arc is named", has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is running/), said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and an altitude, in chain order");
+{
+  const { stepRowFindings } = await import("../../../../src/scripts/checks/workstream-state.ts");
+  const arcOf = (rows) => ({ ...arcData([]), rows: rows.map(([id, repo, altitude, kind = "change"]) =>
+    ({ id, parent: "N001", title: `row ${id}`, kind, repo, altitude, state: "waiting" })) });
+  const rows = (...list) => stepRowFindings(arcOf(list));
+  ok("rows in chain order, a `—` proof row last, find nothing",
+    rows(["1", "spn-foundation", "DOCS"], ["2", "spn-support-ts", "DOCS"], ["3", "spn-support-ts", "CODE"], ["4", "—", "PROOF"]).length === 0);
+  ok("known-bad: DOCS after CODE inside one repository is named",
+    rows(["1", "spn-support-ts", "CODE"], ["2", "spn-support-ts", "DOCS"]).some((line) => /row 2 is DOCS after CODE in spn-support-ts/.test(line)));
+  ok("known-bad: the foundation after another repository is named",
+    rows(["1", "spn-support-ts", "DOCS"], ["2", "spn-foundation", "DOCS"]).some((line) => /the foundation comes first/.test(line)));
+  ok("known-bad: a repository that comes back after another is named",
+    rows(["1", "spn-foundation", "DOCS"], ["2", "spn-support-ts", "DOCS"], ["3", "spn-foundation", "CODE"]).some((line) => /returns to spn-foundation/.test(line)));
+  ok("known-bad: a build row with no repository or no altitude is named, with the set",
+    rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no altitude from DOCS · CODE/.test(line)));
+  ok("a design row is the arc's reads and sizing, and is not read", rows(["1", null, null, "design"]).length === 0);
+  const { root, ws } = await dataWorkspace("state-chain");
+  const wrote = cli(root, ["workstream", "row", "write", "031/N001", "3", "--title", "the book again", "--kind", "change", "--repo", "spn-foundation", "--altitude", "DOCS"]);
+  ok("known-bad: `row write` prints the finding in a note line after the write, and still writes",
+    wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x — the foundation comes first/.test(wrote.out)
+      && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);

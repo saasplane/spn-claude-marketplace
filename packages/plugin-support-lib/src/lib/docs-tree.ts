@@ -345,16 +345,3 @@ export function workstreamDirOf(path: string): { folder: string; name: string } 
   const found = new RegExp(`^(.*\\/${workstreamPrefixSource(true)}([^/]+))\\/`).exec(slashes(path));
   return found ? { folder: found[1], name: found[2] } : null;
 }
-
-/** An arc file: any `.md` directly under a workstream's `arcs/`, in either container. */
-export function isArcFile(path: string): boolean {
-  return new RegExp(`\\/${escape(DEVEX)}\\/(?:${WORKSTREAMS}|${SESSIONS})\\/[^/]+\\/[^/]+\\/${ARCS}\\/[^/]+\\.md$`).test(slashes(path));
-}
-
-/**
- * `/workstreams/<state>/<subject>/arcs/<file>.md` anywhere in a text — a path, or a command naming
- * one. `anchored` requires it to end the text.
- */
-export function arcPathPattern(anchored: boolean): RegExp {
-  return new RegExp(`\\/${WORKSTREAMS}\\/[^/]+\\/[^/]+\\/${ARCS}\\/[^/]+\\.md${anchored ? "$" : ""}`);
-}

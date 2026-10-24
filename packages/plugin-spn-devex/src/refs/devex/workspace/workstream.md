@@ -17,12 +17,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "a1dff755"
+      "seen": "29cb9b78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
-      "seen": "96b6bdb0"
+      "seen": "fb55963d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "1cd65054"
+      "seen": "6905c22c"
     }
   ]
 }
@@ -116,10 +116,15 @@ It carries `schemaVersion`; one schema in the plugin validates it, and every wri
 header is `arc`, `subject`, `title`, `goal`, `status` and its `reason` (for `HELD`, `CARRIED` and `DROPPED`),
 `decides`, `repos`, `cycle`, `follows`, `model` and `preview`. A row is `id`, `parent`, `title` (the
 step's *What*), `kind` (`fix` · `change` · `question` · `design`), `repo`, `altitude`, `mechanism`, `acceptance`,
-`model`, `blockedBy`, `touches` (`repository:place`), `decisions`, `facts`, `state`, and what its report
+`model`, `blockedBy`, `touches` (`repository:place`), `decisions`, `facts`, `state` (`waiting` until the
+step starts, `running` while it runs, with the log line that moved it there saying when, then what it
+reached), and what its report
 folded in: `proof`, `cost`, `commits`, `order`. **The command gives `design` to every row added while its
 arc is `PROPOSED`, and you never choose it**; the go turns each one not yet landed into `change`; every
 other row is a build row, which the progress bar counts and the status rule reads (`RD.DEVEX.WORKSPACE.278`).
+Build rows run in chain order, by repository with the foundation first, then by altitude. After each
+write `row write` names, in a `note:` line, a build row with no `repo` or no `altitude` and a row out of
+chain order; it reports and never refuses (`RD.DEVEX.WORKSPACE.183`).
 
 ### The commands
 
@@ -244,8 +249,9 @@ same files, or to a new one. New scope on a `LANDED` arc of an open workstream s
 developer's word. A small decision inside what was agreed leaves `DECIDED` or `RUNNING` where it is and
 is logged on its card and the arc. A change that stops the building sends the arc back to `PROPOSED`, and
 its rows stop until the developer decides. A closed workstream reopens nothing: new scope is a new
-workstream. A `LANDED` arc that holds a row not landed, carried or deferred is reported at Stop with the
-words *reopen it as `PROPOSED`*.
+workstream. A `LANDED` arc that holds a row not landed, carried or deferred is named by `workstream
+state check`, which the Stop hook runs for the window's workstreams, with the words *reopen it as
+`PROPOSED`* where the row is new scope.
 
 **Say which arc and which row took the ask — MUST.** One sentence is enough: *"Added to N117 as row
 4, which already edits that chapter."* Without it the developer cannot tell whether the ask was
@@ -378,10 +384,11 @@ them this way:
 **An answer lands in the arc's notes in the same turn — MUST.** An answer to a card, or any point the
 developer makes in review, lands in three places before the turn ends: the card, answered and
 folded; the arc, as a log line and a change to every row it affects; and the arc's notes — its spec,
-its plan, and any preview or sample they name. An answer logged while the spec stays as it was leaves the next
-reader planning from the old spec, with nothing on disk to say it moved. The Stop hook checks it:
-a turn that logs an answer for an arc whose `notes/N<nnn>/` holds a spec, a plan, previews or samples, when none
-of them changed, is refused with the file named.
+which is its `preview.html`, its `plan.md`, and any sample they name. An answer logged while the spec
+stays as it was leaves the next reader planning from the old spec, with nothing on disk to say it
+moved. The Stop hook checks it: it reads the lines this window's write added to the arc's `log.jsonl`,
+and a turn that logs an answer (the `answered` line `question answer` writes) or a review point for an
+arc whose preview, plan and samples did not move is refused with the files named.
 
 **An answered card folds into the section that then states it, and leaves no revision marker.** Its
 answer goes into `Why` where it settles a reason, `What` where it settles a shape, and `How` where it
@@ -390,7 +397,8 @@ executes it. Its number is not reused, so the gap in the run is the record that 
 
 **A proposed arc never carries a review point to a later step of itself.** Nothing has been built on
 the spec yet, so the point changes the spec now. Carrying it forward leaves a spec that disagrees
-with what was agreed, and the step that picks it up later has to find the point first.
+with what was agreed, and the step that picks it up later has to find the point first. The Stop hook
+names a line added to a `PROPOSED` arc's log that carries a point to a later row.
 
 **A go is asked for only when the arc's plan holds the execution checklist built from its spec.** A
 go given on a plan that has no checklist approves work nobody has listed.
@@ -416,7 +424,8 @@ The milestone line between batches is a progress reply.
 | **Needs you** | in the reply that raises a card: that card in full, in markdown, once. In the reply that ends the work or stops it: each open card in one line, its number, its question, and where it is. It comes before anything else. A progress reply has no such part, and neither has a reply with no card open |
 | **Progress** | one line per step that moved, then the diff that step made, trimmed to the lines that show the change, with one plain sentence on what the change does |
 
-**Work still runs while a row of this window's arcs is marked in progress.** That mark is how a
+**Work still runs while a row of this window's arcs is marked in progress**, its state `running` in
+the arc's `state.json`. That mark is how a
 progress reply is told from a reply that waits, and the check at the end of a turn reads it. With a
 row in progress, a reply owes nothing for a card the developer has already read. With no row in
 progress, you are waiting, and the reply names each open card in one line. So clear the mark when a
@@ -507,12 +516,16 @@ on no workstream is held for none.
 `.spndevex/.debug/windows/`, named by Claude Code's session id and removed after fourteen days. It
 lists the workstream folders the window has worked on, the time it last wrote each arc, and the last
 finding of each note it was told. No person reads it, and it never says which state a workstream is
-in: the folder tree says that.
+in: the folder tree says that. A window writes an arc when a write goes inside the arc's
+`arcs/N<nnn>/` or `notes/N<nnn>/`, or when it runs a `workstream` command that writes the arc's data:
+`row write` or `row discard` on the arc, `fact write`, `arc stamp write`, `question raise` on it,
+`question show`, `answer` or `withdraw` on one of its cards, and `report write` with a report under its
+notes.
 
 | What the window did | Tie |
 | --- | --- |
 | Sent a first prompt that names exactly one workstream folder, or a handover whose `continue:` line names workstreams | **owns** each one named; a handover that names two gives two |
-| Wrote a file inside a workstream folder, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
+| Wrote a file inside a workstream folder, or ran a `workstream` command that writes an arc's data there, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
 | Wrote a file inside a workstream folder when it already owns another | **visits** it; a visit never becomes ownership by itself |
 | Read a file, wrote text that only names another workstream, or sent a prompt naming two workstreams with no handover | nothing |
 
@@ -1308,17 +1321,17 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a page keeps its shape and its voice, and its `How` ends in a Cycles table that matches the arcs | `doc-check.ts`, on every write |
 | the outline folds | `doc-check.ts` |
 | an answered card does not sit in `Open` | `split-plan.ts`, on every write |
-| an arc the page does not cite | `stop.ts`, when a turn ends |
 | every row accounted for, and the page stamped, before a close — a row still waiting, ready, running or stopped refuses | `split-plan.ts --gate close` |
 | a file a script owns, a `progress` or `open` block, and an arc's stamp written only by its command | `workstream-owner.ts`, on every write |
 | a card on a page that is its record rendered, and never typed | `questions.ts`, on every write to a page |
-| each open and backlog workstream whole: its data, one preview per arc, each arc's stamp current, every card equal to its record, the files of every step it has passed | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
+| each open and backlog workstream whole: its data, one preview per arc, each arc's row in Cycles and its stamp current, an approach page to stand on, a `LANDED` arc with every row landed, every card equal to its record, the files of every step it has passed | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
 | a build row started before the go, and an arc moved out of `PROPOSED` without the developer's words or into `RUNNING` | `workstream row write` refuses it; `workstream state check` names a build row running or landed on a `PROPOSED` or `DECIDED` arc |
 | a second arc opened while one is still being ideated, with no words of the developer's | `workstream row write`, which names the arc being ideated |
-| a row in progress named with its age, never called runnable | `stop.ts`, when a turn ends |
-| a row held on an open card never called runnable | `stop.ts`, when a turn ends |
+| a running row of an arc the window wrote named with the age of its log line, never called runnable | `stop.ts`, when a turn ends |
+| a row waiting on a card open in `questions.jsonl` never called runnable | `stop.ts`, when a turn ends |
+| a `HELD` arc whose reason names no card still open and no arc still to land | `stop.ts`, when a turn ends |
 | a card raised in full once, under **Needs you** at the top of its reply, and named in one line in a reply that ends the work or stops it | `stop.ts`, when a turn ends |
-| an answer logged for an arc lands in that arc's notes in the same turn, and a proposed arc carries no review point to a later step of itself | `stop.ts`, when a turn ends |
+| an answer logged in an arc's `log.jsonl` lands in that arc's preview, plan or samples in the same turn, and a proposed arc carries no review point to a later row of itself | `stop.ts`, when a turn ends |
 | a page published without being asked is met by a reminder, never a refusal | `pretooluse.ts`, on a publish |
 | a page that links its stylesheet from outside is refused on a publish, and the refusal names `docs sds bundle` | `pretooluse.ts`, on a publish |
 | a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left, once while the step rows have not moved, and names each open card | `stop.ts`, when a turn ends |

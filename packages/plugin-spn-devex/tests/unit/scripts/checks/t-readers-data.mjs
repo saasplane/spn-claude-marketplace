@@ -29,8 +29,17 @@ console.log("=== arc-status and split-plan read state.json");
   ok("an arc with no data has none", statusOfData(arcs, "N009") === null);
   ok("the close gate's lookup reads it too", split.arcStatus(root, "031-probe", "N001") === "DECIDED");
   const rows = split.dataRowsOf(ws);
-  ok("each row is a split-plan row, by its repository", rows.map((row) => `${row.label}|${row.scope}|${split.stateOf(row)}`).join() ===
-    "N001 1|spn-x|pending,N001 2|spn-x|pending", JSON.stringify(rows));
+  ok("each row is a split-plan row, by its repository, and a waiting row is one nobody decided", rows.map((row) => `${row.label}|${row.scope}|${split.stateOf(row)}`).join() ===
+    "N001 row 1 — write the book|spn-x|empty,N001 row 2 — build it|spn-x|empty", JSON.stringify(rows));
+  const held = arcData();
+  held.rows[1].blockedBy = ["q4"];
+  held.rows[0].state = "running";
+  writeFileSync(join(arcs, "N001", "state.json"), JSON.stringify(held));
+  writeFileSync(join(arcs, "N001", "log.jsonl"), `${JSON.stringify({ at: "2026-10-24T14:32+05:30", kind: "running", row: "1", note: "waiting → running" })}\n`);
+  const read = split.dataRowsOf(ws).map((row) => `${split.stateOf(row)}:${row.state}`);
+  ok("a running row carries its log line's time, and a row waiting on a card is held on it",
+    read.join() === "in-progress:in progress 2026-10-24T14:32+05:30,held:held on Q4", read.join());
+  writeFileSync(join(arcs, "N001", "log.jsonl"), "");
   const data = arcData();
   data.rows[0].state = "landed";
   data.rows[1].state = "carried";

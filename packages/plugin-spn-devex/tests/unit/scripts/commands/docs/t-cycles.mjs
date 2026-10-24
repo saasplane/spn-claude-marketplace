@@ -1,10 +1,10 @@
-// `docs cycles` — a workstream's Cycles table, printed from its arcs (05-artifacts.md § `How` ends in
-// Cycles, and the arcs are the state). Each case builds a workstream in a temporary folder, because
+// `docs cycles` — a workstream's Cycles table, printed from its arcs' data (05-artifacts.md § `How` ends
+// in Cycles, and the arcs are the state). Each case builds a workstream in a temporary folder, because
 // what the command reads is arcs, and the arcs of a real workstream move every day.
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { arcCell, arcId, arcLabel, cycleOf, cyclesOf, previewsCell, previewsOf, statusLabel, statusWord, tableOf, workstreamFolder }
+import { arcCell, arcLabel, cyclesOf, statusLabel, statusWord, tableOf, workstreamFolder }
   from "../../../../../src/scripts/commands/docs/cycles.ts";
 import * as cyclesModule from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
@@ -38,126 +38,78 @@ async function capture(argv, env = {}) {
 
 const TMP = realpathSync(mkdtempSync(join(tmpdir(), "docs-cycles-")));
 const folder = join(TMP, ".spndevex", WORKSTREAMS, "backlog", "042-probe");
-const arcs = join(folder, "arcs");
-mkdirSync(arcs, { recursive: true });
-const put = (name, text) => writeFileSync(join(arcs, name), text);
 
-// The arc template's first line: the bold status, when it opened, then one sentence on what it changes.
-put("N2-the-check.md", "# N2 — the check\n\nStatus: **DECIDED — waits on N1.** Opened 2026-09-29.   <!-- a comment the template keeps --> A check reads the new shape. It runs after N1.\n");
-put("N1-the-chapter.md", "# `N1` — the chapter\n\nStatus: **RUNNING — 2026-09-29.** The chapter says where the model sits.\n");
-put("N10-the-release.md", "# N10 — the release\n\nStatus: **HELD — waits on Q7.** Opened\n2026-09-29. The plugins ship once.\n");
-put("N1a-a-brief.md", "# Arc 1a — a brief\n\nStatus: **CARRIED → `N98` steps 1-2** — 2026-09-27.\n\n| Field | This arc |\n| --- | --- |\n| **Decides** | **The brief moves on.** Nothing else. |\n");
-put("N3-part.md", "# N3 — part of it\n\nStatus: **PART-LANDED — 2026-09-29.** Half the rows landed.\n");
-// An arc's Previews section: a table of previews and samples, or the one line `None.`.
-const PREVIEWS = "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
-  "| [`layout-preview.html`](../notes/N010/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
-  "| [`close_message.md`](../notes/N010/samples/close_message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n" +
-  "| [`first-preview.html`](../notes/N010/previews/first-preview.html) | preview | the first layout | decided — 2026-09-30, with the second |\n\n" +
-  "## What done means\n\n| File | Kind | State |\n| --- | --- | --- |\n| not-a-preview.md | sample | decided |\n";
-put("arc-legacy.md", "# Arc — a legacy arc with no number\n\nStatus: **OPEN** · Prepared: 2026-08-31\n");
+/**
+ * An arc kept as data in a workstream folder: its `state.json`, and the preview and samples its notes hold.
+ * `fields` are the arc's header: its title, what it decides, its status and its reason.
+ */
+function putArc(home, id, fields, { preview = false, samples = [] } = {}) {
+  const data = { schemaVersion: 1, arc: id, subject: "the-arc", title: "an arc", goal: "it lands", status: "DECIDED", reason: null,
+    preview: "preview.html", rows: [], ...fields };
+  mkdirSync(join(home, "arcs", id), { recursive: true });
+  writeFileSync(join(home, "arcs", id, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  if (preview || samples.length) mkdirSync(join(home, "notes", id, "samples"), { recursive: true });
+  if (preview) writeFileSync(join(home, "notes", id, "preview.html"), "<h1>the preview</h1>\n");
+  for (const sample of samples) writeFileSync(join(home, "notes", id, "samples", sample), "a sample\n");
+}
+
+putArc(folder, "N2", { title: "the check", decides: "A check reads the new shape.", status: "DECIDED" });
+putArc(folder, "N1", { title: "the chapter", decides: "The chapter says where the model sits.", status: "RUNNING" });
+putArc(folder, "N10", { title: "the release", decides: "The plugins ship once.", status: "HELD", reason: "waits on Q7" }, { preview: true, samples: ["close_message.md"] });
+putArc(folder, "N1a", { title: "a brief", decides: "The brief moves on.", status: "CARRIED", reason: "→ N98 rows 1-2" });
+putArc(folder, "N3", { title: "part of it", decides: "Half the rows landed.", status: "PART-LANDED" });
+putArc(folder, "N7", { title: "a status nobody knows", decides: "", status: "OPEN" });
+// THE RETIRED FORM COUNTS FOR NOTHING: an arc written as a Markdown file under `arcs/` is no row.
+writeFileSync(join(folder, "arcs", "N9-the-old-form.md"), "# N9 — the old form\n\nStatus: **RUNNING**\n");
 
 try {
-  console.log("=== docs cycles — reading one arc");
+  console.log("=== docs cycles — reading the status word");
   {
     ok("the status word is read from the set", statusWord("HELD · no cloud account") === "HELD");
     ok("PART-LANDED is never read as LANDED", statusWord("PART-LANDED — today") === "PART-LANDED");
     ok("a word outside the set reads as none", statusWord("OPEN") === null);
-    ok("the arc number comes from the file name", arcId("N7-N8-flip-and-close.md") === "N7" && arcId("N1a-x.md") === "N1a");
-    ok("a file with no number has none", arcId("arc-legacy.md") === null);
-    ok("a three-digit number is read whole, and a one- or two-digit one still is",
-      arcId("N001-book-change.md") === "N001" && arcId("N120-the-release.md") === "N120" && arcId("N15-x.md") === "N15" && arcId("N1.md") === "N1",
-      [arcId("N001-book-change.md"), arcId("N120-the-release.md"), arcId("N15-x.md"), arcId("N1.md")].join(","));
-    const numbered = cycleOf(join(arcs, "N001-book-change.md"), "# N001 — the book change\n\nStatus: **PROPOSED — 2026-10-01.** This arc writes the rule.\n");
-    ok("a three-digit arc's label keeps its digits, and its heading's number is not repeated in the name",
-      arcLabel(numbered) === "N001 — the book change" && numbered.name === "the book change", arcLabel(numbered));
-
-    const two = cycleOf(join(arcs, "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED — waits on N1.** Opened 2026-09-29.   <!-- c --> A check reads the new shape. It runs after N1.\n");
-    ok("the name is the heading without its number", two.name === "the check", two.name);
-    ok("what it does is the first sentence after the status, past when it opened", two.does === "A check reads the new shape.", two.does);
-    ok("a DECIDED arc's status cell is its word alone", statusLabel(two) === "DECIDED", statusLabel(two));
   }
 
-  console.log("\n=== docs cycles — every arc of a workstream, in run order");
+  console.log("\n=== docs cycles — every arc of a workstream, from its data, in run order");
   {
     const cycles = cyclesOf(folder);
-    const order = cycles.map((c) => c.id ?? c.name).join(",");
-    ok("one row per arc file, numbers in order, a letter after its number, no number last",
-      order === "N1,N1a,N2,N3,N10,a legacy arc with no number", order);
-    const byId = Object.fromEntries(cycles.map((c) => [c.id ?? "legacy", c]));
-    ok("a backticked heading reads plain", arcLabel(byId.N1) === "N1 — the chapter", arcLabel(byId.N1));
-    ok("a status paragraph that wraps still yields its sentence", byId.N10.does === "The plugins ship once.", byId.N10.does);
-    ok("HELD carries its blocker", statusLabel(byId.N10) === "HELD · waits on Q7", statusLabel(byId.N10));
-    ok("CARRIED carries where it went", statusLabel(byId.N1a) === "CARRIED · → N98 steps 1-2", statusLabel(byId.N1a));
-    ok("with no sentence after the status, Decides says what it does", byId.N1a.does === "The brief moves on.", byId.N1a.does);
-    ok("an arc whose status the set does not know is still a row, marked", statusLabel(byId.legacy) === "(no status)");
+    const order = cycles.map((c) => c.id).join(",");
+    ok("one row per arc kept as data, numbers in order, a letter after its number", order === "N1,N1a,N2,N3,N7,N10", order);
+    ok("the retired form counts for nothing: a Markdown arc file is no row", !cycles.some((c) => /N9/.test(c.id)), order);
+    const byId = Object.fromEntries(cycles.map((c) => [c.id, c]));
+    ok("the label is the number and the title", arcLabel(byId.N1) === "N1 — the chapter", arcLabel(byId.N1));
+    ok("the line is what the arc decides", byId.N10.does === "The plugins ship once.", byId.N10.does);
+    ok("HELD carries its reason", statusLabel(byId.N10) === "HELD · waits on Q7", statusLabel(byId.N10));
+    ok("CARRIED carries where it went", statusLabel(byId.N1a) === "CARRIED · → N98 rows 1-2", statusLabel(byId.N1a));
+    ok("an arc whose status the set does not know is still a row, marked", statusLabel(byId.N7) === "(no status)");
     ok("a folder with no arcs/ has no Cycles", cyclesOf(TMP).length === 0);
-  }
-
-  console.log("\n=== docs cycles — an arc's Previews table");
-  {
-    const listed = previewsOf(PREVIEWS);
-    ok("one entry per row of the Previews table, and no row of a later section's table", listed.length === 3, JSON.stringify(listed));
-    ok("a link written from arcs/ is stated from the workstream folder",
-      listed[0].href === "notes/N010/previews/layout-preview.html", listed[0].href);
-    ok("the file name keeps every character of the link's target", listed[1].name === "close_message.md", listed[1].name);
-    ok("the kind is the row's own", listed.map((preview) => preview.kind).join(",") === "preview,sample,preview");
-    ok("the state is the words before any date",
-      listed.map((preview) => preview.state).join(",") === "proposed,decided,decided", listed.map((preview) => preview.state).join(","));
-    ok("a section reading None. has no entries", previewsOf("# N2\n\n## Previews\n\nNone.\n\n## Steps\n").length === 0);
-    ok("an arc with no Previews section has no entries", previewsOf("# N2\n\n## Steps\n\n| File | Kind | State |\n| --- | --- | --- |\n| a.md | sample | decided |\n").length === 0);
-    const unlinked = previewsOf("## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n| `plan.md` | sample | the plan | proposed |\n");
-    ok("a File cell with no link is named and links nothing", unlinked[0].name === "plan.md" && unlinked[0].href === null, JSON.stringify(unlinked));
-
-    const none = cycleOf(join(arcs, "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED**\n\n## Previews\n\nNone.\n");
-    ok("the Previews cell of an arc with none is a dash", previewsCell(none) === "&mdash;", previewsCell(none));
-    const held = cycleOf(join(arcs, "N010-the-release.md"), `# N010 — the release\n\nStatus: **RUNNING**\n\n${PREVIEWS}`);
-    ok("the Previews cell lists each file as a link, its kind and its state, one per line",
-      previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
-        `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; decided<br>` +
-        `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
     const link = (href, text) => `<a href="${href}">${text}</a>`;
-    ok("the Arc cell is three levels: the title in bold, the line below it, then Key: value facts, each preview and sample keyed by its kind and the arc file last",
-      arcCell(held) === `<p><strong>N010 &mdash; the release</strong></p><span class="sds-small">` +
-        ["Preview: " + link("notes/N010/previews/layout-preview.html", "layout-preview.html") + " (proposed)",
-          "Sample: " + link("notes/N010/samples/close_message.md", "close_message.md") + " (decided)",
-          "Preview: " + link("notes/N010/previews/first-preview.html", "first-preview.html") + " (decided)",
-          "Arc: " + link("arcs/N010-the-release.md", "N010-the-release.md")].join(" &middot; ") + "</span>", arcCell(held));
+    ok("the Arc cell is three levels: the title in bold, the line, then the preview, each sample and the reason as facts",
+      arcCell(byId.N10) === `<p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p><span class="sds-small">` +
+        ["Preview: " + link("notes/N10/preview.html", "preview.html"), "Sample: " + link("notes/N10/samples/close_message.md", "close_message.md"),
+          "waits on Q7"].join(" &middot; ") + "</span>", arcCell(byId.N10));
   }
 
   console.log("\n=== docs cycles — the table the approach template carries");
   {
-    const table = tableOf(cyclesOf(folder));
+    const cycles = cyclesOf(folder);
+    const table = tableOf(cycles);
     ok("the header is Arc · Status, two columns",
       table.includes('<thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>') && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
-    ok("a row is two cells: the Arc cell, and the Status cell with a HELD arc's reason below its word",
-      table.includes(`<tr><td><p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p>` +
-        `<span class="sds-small">Arc: <a href="arcs/N10-the-release.md">N10-the-release.md</a></span></td>` +
-        `<td><span class="sds-badge sds-status sds-held">HELD</span><br><span class="sds-small">waits on Q7</span></td></tr>`), table);
-    ok("a RUNNING arc's Status cell is its badge alone", table.includes('<td><span class="sds-badge sds-status sds-running">RUNNING</span></td></tr>'), table);
-    ok("an arc with no number still links its file",
-      table.includes(`<p><strong>a legacy arc with no number</strong></p><p>Prepared: 2026-08-31</p><span class="sds-small">Arc: <a href="arcs/arc-legacy.md">arc-legacy.md</a></span>`), table);
+    ok("a row carries the arc's address and its data, and a HELD arc's Status cell is its badge alone",
+      table.includes('<tr id="N10" data-arc="arcs/N10/state.json">') && table.includes(`<td><span class="sds-badge sds-status sds-held">HELD</span></td></tr>`), table);
+    ok("a RUNNING arc's Status cell is its badge", table.includes('<td><span class="sds-badge sds-status sds-running">RUNNING</span></td></tr>'), table);
 
-    // The older tables are still read by header name and compared: four columns on any page, three on a closed one.
     const { tableDifferences } = cyclesModule;
-    const cycles = cyclesOf(folder);
-    const four = `<table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead><tbody>` +
-      `<tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table>`;
-    const fourRead = tableDifferences(four, cycles);
-    ok("an old four-column table is read: its row is matched and its stale status is named",
-      fourRead.stale.length === 1 && /N1 reads PROPOSED and the arc reads RUNNING/.test(fourRead.stale[0]) && !fourRead.unknown.length, JSON.stringify(fourRead));
-    const three = `<table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead><tbody>` +
-      `<tr><td><strong>N1 &mdash; the chapter</strong></td><td>x</td><td>RUNNING</td></tr></tbody></table>`;
-    const threeRead = tableDifferences(three, cycles, false);
-    ok("a closed workstream's three-column table is read and compared by its Status header",
-      threeRead.stale.length === 0 && threeRead.missing.includes("N2") && !threeRead.unknown.length, JSON.stringify(threeRead));
-    const two = tableOf(cycles);
-    ok("a two-column table written from the arcs has no difference", JSON.stringify(tableDifferences(two, cycles)) === JSON.stringify({ missing: [], unknown: [], stale: [] }), JSON.stringify(tableDifferences(two, cycles)));
-    const plainWord = two.replace('<span class="sds-badge sds-status sds-running">RUNNING</span>', "RUNNING");
-    ok("an arc kept as Markdown whose Status is its plain word is named stale: every status is its badge",
-      plainWord !== two && tableDifferences(plainWord, cycles).stale.some((line) => /Status is not its badge/.test(line)), JSON.stringify(tableDifferences(plainWord, cycles)));
-    const reasonless = two.replace('<br><span class="sds-small">waits on Q7</span>', "");
-    ok("a HELD arc's reason missing from the Status cell is named",
-      tableDifferences(reasonless, cycles).stale.some((line) => /N10's Status does not carry the arc's reason/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));
+    ok("a two-column table written from the arcs has no difference", JSON.stringify(tableDifferences(table, cycles)) === JSON.stringify({ missing: [], unknown: [], stale: [] }), JSON.stringify(tableDifferences(table, cycles)));
+    const plainWord = table.replace('<span class="sds-badge sds-status sds-running">RUNNING</span>', "RUNNING");
+    ok("a Status written as its plain word is named stale: every status is its badge",
+      plainWord !== table && tableDifferences(plainWord, cycles).stale.some((line) => /Status is not its badge/.test(line)), JSON.stringify(tableDifferences(plainWord, cycles)));
+    const reasonless = table.replace(" &middot; waits on Q7", "");
+    ok("a HELD arc's reason missing from its facts is named",
+      tableDifferences(reasonless, cycles).stale.some((line) => /N10's links are not the arc's preview and samples/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));
+    const extra = table.replace("</tbody>", `<tr><td><p><strong>N9 &mdash; the old form</strong></p></td><td>RUNNING</td></tr>\n    </tbody>`);
+    ok("a row for the Markdown arc names no arc the data holds", tableDifferences(extra, cycles).unknown.join() === "N9", JSON.stringify(tableDifferences(extra, cycles)));
   }
 
   console.log("\n=== docs cycles — naming the workstream");
@@ -176,13 +128,13 @@ try {
   {
     const printed = await capture(["docs", "cycles", "show", "042"], { SPN_WORKSPACE: TMP });
     ok("prints the table and exits 0", printed.code === 0 && printed.out.includes("<th>Arc</th>"), `code ${printed.code}`);
-    ok("names the arc whose status the set does not know, on stderr", printed.err.includes("arc-legacy.md"), printed.err);
+    ok("names the arc whose status the set does not know, on stderr", printed.err.includes("! N7 holds no status the set knows"), printed.err);
 
     const json = await capture(["docs", "cycles", "show", folder, "--json"]);
     let rows = [];
     try { rows = JSON.parse(json.out); } catch { /* reported below */ }
     ok("--json prints one object per arc", json.code === 0 && rows.length === 6 && rows[0].arc === "N1 — the chapter", json.out.slice(0, 200));
-    ok("--json names each arc's file and lists its previews", rows[0]?.file === "N1-the-chapter.md" && Array.isArray(rows[0]?.previews), json.out.slice(0, 200));
+    ok("--json names each arc's data file and lists its previews", rows[0]?.file === "state.json" && Array.isArray(rows[0]?.previews), json.out.slice(0, 200));
 
     const SHOW_USAGE = "usage: spn-devex docs cycles show <workstream> [--json]";
     const WRITE_USAGE = "usage: spn-devex docs cycles write <workstream>";
@@ -217,29 +169,11 @@ try {
     ok("a workstream with no arcs exits 1", none.code === 1 && none.err.includes("has no arcs"), none.err);
   }
 
-  console.log("\n=== docs cycles — a Previews row that links nothing is printed as a `!` line");
-  {
-    const home = join(TMP, ".spndevex", WORKSTREAMS, "open", "044-unlinked");
-    mkdirSync(join(home, "arcs"), { recursive: true });
-    const head = "# N999 — the layout\n\nStatus: **RUNNING — 2026-10-01.** It lays the page out.\n\n## Previews\n\n| File | Kind | State |\n| --- | --- | --- |\n";
-    // KNOWN-BAD: the File cell names its file in backticks and links nothing.
-    writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| `notes/N999/previews/a-preview.html` | preview | proposed 2026-10-01 |\n");
-    const bad = await capture(["docs", "cycles", "show", home]);
-    ok("[MKT.SCRIPTS.80] the unlinked row is named on stderr, with the link form",
-      bad.code === 0 && bad.err.includes("! N999-the-layout.md") && bad.err.includes("[`a-preview.html`](../notes/N999/previews/a-preview.html)"), bad.err);
-    // UNTOUCHED: the same row written as a markdown link.
-    writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| [`a-preview.html`](../notes/N999/previews/a-preview.html) | preview | proposed 2026-10-01 |\n");
-    const good = await capture(["docs", "cycles", "show", home]);
-    ok("[MKT.SCRIPTS.80] a row written as a link prints no `!` line", good.code === 0 && good.err === "", good.err);
-    ok("[MKT.SCRIPTS.80] the link form of a bare file name is written from arcs/",
-      cyclesModule.previewLinkForm(join(home, "arcs", "N999-the-layout.md"), "a-preview.html") === "[`a-preview.html`](../notes/N999/previews/a-preview.html)");
-  }
-
   console.log("\n=== docs cycles — the header's status follows the arcs");
   {
     const header = (word, glyph) => `<div class="sds-eyebrow"><span class="sds-line1">Workstream</span><span class="sds-state"><span class="sds-label">Status:</span> ` +
       `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${glyph} ${word}</span></span></div>`;
-    const arcAt = (status) => ({ id: "N1", name: "x", does: "", status, detail: "", file: "N1-x.md", previews: [] });
+    const arcAt = (status) => ({ id: "N1", name: "x", does: "", status, detail: "", file: "arcs/N1/state.json", previews: [] });
     const open = join(TMP, ".spndevex", WORKSTREAMS, "open", "045-status");
     const closed = join(TMP, ".spndevex", WORKSTREAMS, "closed", "046-status");
     ok("the word a header shows is read from its labelled status field",
@@ -297,9 +231,8 @@ ${linesFor("1.0.0").script}
       `  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>`;
     const build = (state, name, page) => {
       const home = join(TMP, ".spndevex", WORKSTREAMS, state, name);
-      mkdirSync(join(home, "arcs"), { recursive: true });
-      writeFileSync(join(home, "arcs", "N1-the-chapter.md"), "# N1 — the chapter\n\nStatus: **RUNNING — 2026-10-01.** The chapter says where the model sits.\n");
-      writeFileSync(join(home, "arcs", "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED — 2026-10-01.** A check reads the new shape.\n");
+      putArc(home, "N1", { title: "the chapter", decides: "The chapter says where the model sits.", status: "RUNNING" });
+      putArc(home, "N2", { title: "the check", decides: "A check reads the new shape.", status: "DECIDED" });
       if (page !== null) writeFileSync(join(home, "approach.html"), page);
       return home;
     };
@@ -330,7 +263,7 @@ ${linesFor("1.0.0").script}
       again.code === 0 && readFileSync(page, "utf8") === after && statSync(page).mtimeMs === writtenAt && /current/.test(again.out), again.out);
 
     // UNTOUCHED: a page that is already current, with its rows in the order a person chose.
-    const current = after.replace(/(<tbody>\n)(\s*<tr>[^\n]*\n)(\s*<tr>[^\n]*\n)/, "$1$3$2");
+    const current = after.replace(/(<tbody>\n)(\s*<tr\b[^\n]*\n)(\s*<tr\b[^\n]*\n)/, "$1$3$2");
     ok("the fixture really holds the same rows in another order", current !== after && cyclesRule(page, current).length === 0);
     writeFileSync(page, current);
     const currentAt = stamp(page);
@@ -402,8 +335,7 @@ ${linesFor("1.0.0").script}
 `;
     const place = (state, name) => {
       const home = join(TMP, ".spndevex", WORKSTREAMS, state, name);
-      mkdirSync(join(home, "arcs"), { recursive: true });
-      writeFileSync(join(home, "arcs", "N1-the-chapter.md"), "# N1 — the chapter\n\nStatus: **RUNNING — 2026-10-01.** The chapter says where the model sits.\n");
+      putArc(home, "N1", { title: "the chapter", decides: "The chapter says where the model sits.", status: "RUNNING" });
       writeFileSync(join(home, "approach.html"), OWN_PAGE);
       return home;
     };
@@ -413,10 +345,10 @@ ${linesFor("1.0.0").script}
       refused.code === 1 && refused.err.includes(`approach.html: ${OWN_COPY}`) && refused.err.split(OWN_COPY).length - 1 === 1, `${refused.code} ${refused.err}`);
     ok("[MKT.SCRIPTS.108] and it writes nothing: the page keeps every byte", readFileSync(join(own, "approach.html"), "utf8") === OWN_PAGE);
     ok("[MKT.SCRIPTS.108] it names no part of the page, because it read no class of it",
-      !/status badge|Cycles table to write|wrote/.test(refused.err + refused.out), refused.err + refused.out);
+      !/status badge|Cycles table to write|wrote the (?:header|Cycles|heading)/.test(refused.err + refused.out), refused.err + refused.out);
     const printed = await capture(["docs", "cycles", "show", own]);
     ok("[MKT.SCRIPTS.108] with no option the table is still printed from the arcs, in the shared names",
-      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`Arc: <a href="arcs/N1-the-chapter.md">N1-the-chapter.md</a>`), printed.out);
+      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<tr id="N1" data-arc="arcs/N1/state.json">`), printed.out);
     // A page under `closed/` is never read, so it is neither refused nor written.
     const shut = place("closed", "058-own-copy-closed");
     const kept = await capture(["docs", "cycles", "write", shut]);

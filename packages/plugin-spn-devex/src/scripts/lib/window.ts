@@ -2,14 +2,17 @@
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // Which workstreams a window works on (RD.DEVEX.WORKSPACE.236), and the one reader every hook uses.
-// A window is bound by the PATH a write goes to, by its first prompt, or by a handover; never by text
-// inside a write, and never by a read. The note is `.spndevex/.debug/windows/<session>.json`, removed
-// after fourteen days. The reader returns the empty set, never "everything", for a window with no
+// A window is bound by the PATH a write goes to, the arc a `workstream` command writes, its first prompt,
+// or a handover; never by text inside a write, and never by a read. The note is
+// `.spndevex/.debug/windows/<session>.json`, removed after fourteen days. The reader returns the empty set, never "everything", for a window with no
 // binding, and a workstream that has left `open/` drops out of its answer.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { ARCS, DEVEX, legacyWorkstreamsDir, workstreamDirOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { isDir } from "./payload.ts";
+import { LOG_FILE, NOTES, findWorkstream, readQuestions, workstreamAround, workstreamsOf } from "./workstream.ts";
+import { ARC_ID } from "./workstream-schema.ts";
 
 /** How a workstream came to be this window's. */
 export type BoundBy = "write" | "prompt" | "handover";
@@ -102,26 +105,84 @@ export function workstreamOfPath(root: string, path: string, cwd: string = root)
   return inside && !inside.startsWith("..") ? { name: found.name, folder: found.folder } : null;
 }
 
-/** Whether a path is an arc's file or sits in the arc's notes folder, and which arc file that is. */
+/**
+ * The arc a path writes, as the arc's data folder `<workstream>/arcs/N<nnn>`, or null: a path inside
+ * the arc's `arcs/N<nnn>/` or its `notes/N<nnn>/`, the folder itself included.
+ */
 function arcOfPath(folder: string, path: string): string | null {
   const within = relative(folder, path).split("/");
-  if (within[0] === ARCS && within.length === 2 && within[1].endsWith(".md")) return path;
-  if (within[0] === "notes" && within.length >= 3) {
-    const number = within[1];
+  return (within[0] === ARCS || within[0] === NOTES) && within.length >= 2 && ARC_ID.test(within[1])
+    ? join(folder, ARCS, within[1]) : null;
+}
+
+// The `workstream` commands that write an arc's data, as the words after `workstream`, and what names
+// the arc: the arc itself, one of its cards, or a report under its notes.
+const ARC_WRITES: ReadonlyArray<{ words: string[]; names: "arc" | "card" | "report" }> = [
+  { words: ["row", "write"], names: "arc" }, { words: ["row", "discard"], names: "arc" },
+  { words: ["fact", "write"], names: "arc" }, { words: ["arc", "stamp", "write"], names: "arc" },
+  { words: ["question", "raise"], names: "arc" }, { words: ["question", "show"], names: "card" },
+  { words: ["question", "answer"], names: "card" }, { words: ["question", "withdraw"], names: "card" },
+  { words: ["report", "write"], names: "report" },
+];
+
+/** The workstream a name gives (`030`, `030-page-patterns`, a folder), or the one the command stands in. */
+function workstreamNamed(root: string, cwd: string, name: string | null): string | null {
+  if (name) return findWorkstream(name, root, cwd);
+  return workstreamAround(cwd);
+}
+
+/**
+ * The arc data a `workstream` command in a shell command writes, as one path inside each arc's folder
+ * (`<workstream>/arcs/N<nnn>/log.jsonl`, which every such write appends to), so the window that runs it
+ * is bound and its arc recorded as a write inside the folder is (01-workstream.md § The workstream is a
+ * scope of work, not a window). The arc is named as the command takes it: `030/N004`, or `N004` in the
+ * workstream the command stands in or the one open or backlog workstream that holds it; a card as
+ * `030/q12` or `q12`, whose record names its arc; a report by its path under `notes/N<nnn>/`. A command
+ * that names nothing this can find writes nothing here.
+ */
+export function commandWrites(root: string, cwd: string, command: string): string[] {
+  const out: string[] = [];
+  for (const segment of command.split(/&&|\|\||[;|\n]/)) {
+    const words = segment.trim().split(/\s+/).map((word) => word.replace(/^['"]|['"]$/g, ""));
+    const at = words.indexOf("workstream");
+    if (at < 0) continue;
+    const write = ARC_WRITES.find((one) => one.words.every((word, step) => words[at + 1 + step] === word));
+    if (!write) continue;
+    const named = words.slice(at + 1 + write.words.length).filter((word) => word && !word.startsWith("-"));
     try {
-      const file = readdirSync(join(folder, ARCS)).find((name) => name.startsWith(`${number}-`) && name.endsWith(".md"));
-      return file ? join(folder, ARCS, file) : null;
-    } catch { return null; }
+      if (write.names === "report") {
+        const report = named.at(-1);
+        const ws = named.length > 1 ? workstreamNamed(root, cwd, named[0]) : null;
+        const path = report ? resolve(ws ?? cwd, report) : null;
+        const arc = path ? /\/notes\/(N\d+[a-z]?)\//.exec(path.split(sep).join("/"))?.[1] : null;
+        const home = path ? workstreamOfPath(root, path, cwd)?.folder ?? null : null;
+        if (arc && home) out.push(join(home, ARCS, arc, LOG_FILE));
+        continue;
+      }
+      const ref = named[0];
+      if (!ref) continue;
+      const slash = ref.lastIndexOf("/");
+      const id = slash > 0 ? ref.slice(slash + 1) : ref;
+      const given = slash > 0 ? workstreamNamed(root, cwd, ref.slice(0, slash)) : workstreamAround(cwd);
+      const holds = (ws: string): string | null => write.names === "arc"
+        ? (ARC_ID.test(id) ? id : null)
+        : readQuestions(ws).find((one) => one.id === id.toLowerCase())?.arc ?? null;
+      const holders = given ? [given] : workstreamsOf(root).filter((ws) => write.names === "arc" ? isDir(join(ws, ARCS, id)) : holds(ws) !== null);
+      if (holders.length !== 1) continue;
+      const arc = holds(holders[0]);
+      if (arc) out.push(join(holders[0], ARCS, arc, LOG_FILE));
+    } catch { /* a command this cannot read writes nothing here */ }
   }
-  return null;
+  return out;
 }
 
 /**
  * Record what a window's writes did to its binding: each path inside a workstream folder binds that
- * workstream, and a path that is an arc, or inside an arc's notes, records the time it was written.
+ * workstream, and a path inside an arc's data or notes folder records the time the arc was written.
  * Nothing is written to disk where nothing changed in the binding and no arc was written.
  *
- * @param paths  every path the tool call writes, as the call gave it
+ * @param paths  every path the tool call writes, as the call gave it, and the arc data its `workstream`
+ *               commands write (`commandWrites`)
  */
 export function recordWrites(root: string, session: string | undefined, cwd: string, paths: string[]): void {
   if (!windowFile(root, session)) return;
@@ -220,7 +281,7 @@ export function windowSet(root: string, session: string | undefined): Set<string
   return new Set(windowWorkstreams(root, session));
 }
 
-/** The arcs (absolute paths) this window wrote after `since`, and that are still files. */
+/** The arcs this window wrote after `since`, each as its absolute data folder `<workstream>/arcs/N<nnn>`. */
 export function arcsWrittenSince(root: string, session: string | undefined, since: number): Set<string> {
   const out = new Set<string>();
   for (const [arc, at] of Object.entries(readWindow(root, session).wrote))

@@ -94,24 +94,32 @@ const card = (n, decision) => `  <div class="sds-open">
 const ownCard = (n, decision) => card(n, decision).replace(/class="sds-(open|scroll)"/g, 'class="$1"')
   .replace(/class="sds-key"/g, 'class="k"').replace('class="sds-recommended"', 'class="rec"');
 
-// THE STATUS IS A PARAMETER because a sequencing row resolves through it: only a terminal word means
-// the arc is finished, and `RUNNING` is one of the words that means work is left.
+// AN ARC KEPT AS DATA (01-workstream.md § The formats): its status, and the rows it holds, each
+// `[id, repo, what, state, fields]` in the data's own words — `landed`, `waiting`, `running`, `deferred`,
+// `carried` with what it names in its proof, and a card a waiting row is held on as its blocker.
 //
-// THE DEFAULT IS `LANDED` NOW, AND IT WAS `RUNNING` (N66 step 7). The close gate refuses a
-// workstream holding an arc that is not terminal, so an unfinished arc in the DEFAULT fixture made
-// every close case meet that refusal — including the ones testing a row fault and the ones that must
-// be silent. A fixture should carry only the fault its case is about; an unfinished arc is now a
-// fault, so it is set where a case wants one rather than everywhere.
-const arc = (log = "", status = "LANDED") =>
-  `# Arc — a subject\n\nStatus: **${status}**\n\n## Log\n\n- **2026-09-18 — go.** Finish it.\n${log}`;
+// THE STATUS IS A PARAMETER because a sequencing row resolves through it, and its default is `LANDED`:
+// the close gate refuses a workstream holding an arc that is not terminal, so a fixture carries an
+// unfinished arc only where its case is about one.
+const dataArc = (id, status = "LANDED", rows = []) => `${JSON.stringify({ schemaVersion: 1, arc: id, subject: "the-arc",
+  title: "the arc", goal: "it lands", status, reason: ["HELD", "CARRIED", "DROPPED"].includes(status) ? "a reason" : null,
+  preview: "preview.html", rows: rows.map(([rowId, repo, title, state, fields = {}]) =>
+    ({ id: rowId, parent: id, title, kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
+// A line of an arc's `log.jsonl`.
+const logLine = (kind, note, row = null, at = "2026-09-29T14:32+05:30") => `${JSON.stringify({ at, kind, row, note })}\n`;
+// The workstream's question records, each answered in the developer's words.
+const answeredRecords = (ids) => ids.map((id) => JSON.stringify({ id, arc: "N1", title: "a question", state: "answered",
+  raised: "2026-09-18T10:00+05:30", shownIn: [], answer: { key: "C", words: "the capabilities seat", at: "2026-09-18T11:00+05:30" } })).join("\n") + "\n";
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED", arcFile = "N1-something.md", form = page } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", answered = [], log = "", state = "open", arcStatus = "LANDED", arcId = "N1", form = page } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/${state}/001-a-subject`;
   return workspace(name, {
     [`${folder}/a-subject-approach.html`]: form({ eyebrow, rows, cards }),
-    [`${folder}/arcs/${arcFile}`]: arc(log, arcStatus),
+    [`${folder}/arcs/${arcId}/state.json`]: dataArc(arcId, arcStatus),
+    ...(log ? { [`${folder}/arcs/${arcId}/log.jsonl`]: log } : {}),
+    ...(answered.length ? { [`${folder}/questions.jsonl`]: answeredRecords(answered) } : {}),
     // A SIBLING SCOPE, SO A CARRY HAS SOMEWHERE REAL TO POINT. `carried` means the work leaves this
     // workstream, and the gate reads the folder to see whether the named scope can receive it — so a
     // tree holding one workstream can only ever test a carry that fails.
@@ -120,40 +128,22 @@ function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "op
   });
 }
 
-// THE SPLIT PLAN IS THE ARCS' STEP ROWS (RD.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan
-// is the arcs' step rows). An arc's `## Steps` table carries Repo · Altitude · What · Mechanism ·
-// Acceptance · State, and the Repo column is the scope. Each row here is `[id, repo, what, state]`.
-const stepArc = (rows, { status = "LANDED", log = "" } = {}) => `# N2 — the arc
-
-Status: **${status}**
-
-| Field | This arc |
-| --- | --- |
-| **Decides** | what the steps do |
-
-## Steps
-
-| # | Repo | Altitude | What | Mechanism | Acceptance | State |
-| --- | --- | --- | --- | --- | --- | --- |
-${rows.map(([id, repo, what, state]) => `| ${id} | ${repo} | DOCS | ${what} | by hand | audit → 0 RULE | ${state} |`).join("\n")}
-
-## Log
-
-- **2026-09-29 — go.**
-${log}`;
-
-/** A workstream whose only split plan is its arc's step table; a page is added only where asked. */
-function buildArcs(name, rows, { page: withPage = false, log = "" } = {}) {
+// THE SPLIT PLAN IS THE ARCS' ROWS (RD.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan is the
+// arcs' step rows): each row's repo is the scope, and its state is read.
+/** A workstream whose only split plan is its arc N2's rows; a page is added only where asked. */
+function buildArcs(name, rows, { page: withPage = false, log = "", extra = {} } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
   return workspace(name, {
-    [`${folder}/arcs/N2-the-arc.md`]: stepArc(rows, { log }),
+    [`${folder}/arcs/N2/state.json`]: dataArc("N2", "LANDED", rows),
+    ...(log ? { [`${folder}/arcs/N2/log.jsonl`]: log } : {}),
     ...(withPage ? { [`${folder}/a-subject-approach.html`]: `${STYLES}\n<div class="sds-eyebrow">Workstream 001 &middot; closed</div>\n<h1>A subject</h1>\n` } : {}),
     [`.spndevex/${WORKSTREAMS}/backlog/002-a-successor/a-successor-approach.html`]: "<h1>002</h1>\n",
     "probe-repo/README.md": "# probe-repo\n",
+    ...Object.fromEntries(Object.entries(extra).map(([file, body]) => [`${folder}/${file}`, body])),
   });
 }
 
-const ARC_LANDED = [["1", "spn-foundation", "the chapter", "✅ landed — `abc1234`"], ["3e.1", "probe-repo", "the check", "LANDED — `def5678`"]];
+const ARC_LANDED = [["1", "spn-foundation", "the chapter", "landed"], ["3e.1", "probe-repo", "the check", "landed"]];
 
 // ---------------------------------------------------------------- running the two gates
 
@@ -207,22 +197,18 @@ one("a row started and put down refuses too", "close",
 
 // RD.DEVEX.WORKSPACE.184 — `in progress <time>` is somebody's claim on a row, never a landing. It read
 // as `pending` before the mark existed, and `pending` closes with a note.
-one("a row still marked in progress refuses the close, and its age is named", "close",
-  buildArcs("m7-sp-in-progress", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "in progress 2026-09-29 14:32 +05:30"]], { page: true }),
+one("a row still running refuses the close, and the age of its log line is named", "close",
+  buildArcs("m7-sp-in-progress", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "running"]],
+    { page: true, log: logLine("running", "waiting → running", "4") }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "still marked in progress", parity: false, why: "the Python predates the mark" });
 
 // RD.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` waits on a card's answer. It is not accounted for, so the
 // close refuses it as it refuses a stopped row, and names the card it waits on.
-one("a row held on a card refuses the close, and the card is named", "close",
-  buildArcs("m11-sp-held", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "⏸ held on Q352"]], { page: true }),
+one("a row waiting on a card refuses the close, and the card is named", "close",
+  buildArcs("m11-sp-held", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "waiting", { blockedBy: ["q352"] }]], { page: true }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "waits on Q352", parity: false, why: "the Python predates the mark" });
-
-one("the mark without its glyph refuses the same", "close",
-  buildArcs("m11-sp-held-bare", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "held on Q352"]], { page: true }),
-  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
-  "deny", { says: "held on a card", parity: false, why: "the Python predates the mark" });
 
 {
   const { stateOf, heldOn, inProgressSince, markAge, markedAgo } = await import("../../../../src/scripts/checks/split-plan.ts");
@@ -261,7 +247,7 @@ one("no split plan at all is refused, not passed", "close",
   workspace("sp-noplan", {
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]:
       `${STYLES}<div class="sds-eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table><thead><tr><th>What</th></tr></thead><tbody><tr><td>a thing</td></tr></tbody></table></section>`,
-    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`]: arc(),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1/state.json`]: dataArc("N1"),
   }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "checked NOTHING" });
@@ -276,46 +262,46 @@ one("backlog moving into open is not a close", "close",
   move(`.spndevex/${WORKSTREAMS}/backlog/001-a-subject`, `.spndevex/${WORKSTREAMS}/open/`),
   "silent");
 
-console.log("\n=== split-plan — the close gate reads the arcs' step rows");
+console.log("\n=== split-plan — the close gate reads the arcs' rows, kept as data");
 
-one("an arc step nobody decided refuses the close, named by arc and step", "close",
-  buildArcs("m1-sp-arc-undecided", [...ARC_LANDED, ["4b", "spn-platform-ts", "the third thing", ""]]),
+one("a row nobody decided, waiting, refuses the close, named by arc, row and What", "close",
+  buildArcs("m1-sp-arc-undecided", [...ARC_LANDED, ["4b", "spn-platform-ts", "the third thing", "waiting"]]),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
-  "deny", { says: "N2 step 4b — the third thing", parity: false, why: "the Python reads only a page's scope tables" });
+  "deny", { says: "N2 row 4b — the third thing", parity: false, why: "the Python reads only a page's scope tables" });
 
-// A DOTTED STEP IS A STEP. `3e.1` is how an arc splits a lettered step, and a reader taking only
-// `\d+[a-z]?` skipped it, so an undecided dotted row closed as green.
-one("a dotted step nobody decided refuses too", "close",
-  buildArcs("m1-sp-arc-dotted", [["1", "spn-foundation", "the chapter", "✅ landed"], ["3e.1", "probe-repo", "the split half", ""]]),
+// A DOTTED ROW IS A ROW. `3e.1` is how an arc splits a lettered row.
+one("a dotted row nobody decided refuses too", "close",
+  buildArcs("m1-sp-arc-dotted", [["1", "spn-foundation", "the chapter", "landed"], ["3e.1", "probe-repo", "the split half", "ready"]]),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
-  "deny", { says: "N2 step 3e.1", parity: false, why: "the Python reads only a page's scope tables" });
+  "deny", { says: "N2 row 3e.1", parity: false, why: "the Python reads only a page's scope tables" });
 
-one("every arc step landed, carried or deferred closes, with no page at all", "close",
-  buildArcs("m1-sp-arc-accounted", [...ARC_LANDED, ["4", "spn-platform-ts", "c", "⊘ deferred until a partner asks"], ["5", "spn-infra", "d", "↷ carried to 002-a-successor"]]),
-  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
-  "silent", { parity: false, why: "the Python finds no page and refuses" });
-
-// ONLY THE `## Steps` SECTION IS READ. A table in the log that happens to carry Repo and State is a
-// record, and reading it made an empty cell there refuse a close nothing was owed on.
-one("a Repo and State table outside the Steps section is not the plan", "close",
-  buildArcs("m1-sp-arc-logtable", ARC_LANDED, { log: "\n| Repo | State |\n| --- | --- |\n| spn-infra | |\n" }),
+one("every arc row landed, carried or deferred closes, with no page at all", "close",
+  buildArcs("m1-sp-arc-accounted", [...ARC_LANDED, ["4", "spn-platform-ts", "c", "deferred"], ["5", "spn-infra", "d", "carried", { proof: "to 002-a-successor" }]]),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent", { parity: false, why: "the Python finds no page and refuses" });
 
-one("an arc with no step table and no page plan is refused, not passed", "close",
-  workspace("m1-sp-arc-noplan", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N2-the-arc.md`]: arc() }),
+// THE RETIRED FORM COUNTS FOR NOTHING. An arc written as a Markdown file under `arcs/` is no arc any
+// reader keeps, so its undecided step refuses no close.
+one("a Markdown arc file's step table is no plan", "close",
+  buildArcs("m1-sp-arc-markdown", ARC_LANDED, { extra: { "arcs/N9-old.md":
+    "# N9 — old\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n| 1 | spn-infra | DOCS | a thing | by hand | green | |\n" } }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
-  "deny", { says: "step rows of the workstream's arcs" });
+  "silent", { parity: false, why: "the Python reads Markdown arcs" });
+
+one("an arc with no rows and no page plan is refused, not passed", "close",
+  workspace("m1-sp-arc-noplan", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N2/state.json`]: dataArc("N2") }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "the rows of the workstream's arcs" });
 
 one("a page stamped closed with its plan in the arcs closes", "close",
   buildArcs("m1-sp-arc-page", ARC_LANDED, { page: true }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent", { parity: false, why: "the Python reads only the page, which carries no scope table" });
 
-one("writing a seat page while an arc step naming that repo is not landed", "documents-first",
-  buildArcs("m1-sp-arc-seat", [["1", "spn-foundation", "the chapter", "✅ landed"], ["2", "probe-repo", "the check", ""]]),
+one("writing a seat page while an arc row naming that repo is not landed", "documents-first",
+  buildArcs("m1-sp-arc-seat", [["1", "spn-foundation", "the chapter", "landed"], ["2", "probe-repo", "the check", "waiting"]]),
   { file_path: join(docsOf("probe-repo"), "a-thing-approach.html"), content: "<html></html>" },
-  "note", { says: "N2 step 2 — the check", parity: false, why: "the Python reads only a page's scope tables" });
+  "note", { says: "N2 row 2 — the check", parity: false, why: "the Python reads only a page's scope tables" });
 
 one("and the same write once every row naming it has landed", "documents-first",
   buildArcs("m1-sp-arc-seat-landed", ARC_LANDED),
@@ -326,22 +312,23 @@ console.log("\n=== split-plan — the documents-first gate, and finding F5");
 
 one("F5: a card in Open carrying its own decision", "documents-first",
   build("sp-f5", { cards: card(88, "<strong>C.</strong> The capabilities seat, beside the data model.") }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: "the card carries its own decision", parity: false, why: "this is the defect F5 names — the Python reads only the arcs" });
 
 one("F5: an unanswered card is left alone", "documents-first",
   build("sp-f5-open", { cards: card(88, "&mdash;") }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "silent");
 
-one("a card an arc records as answered is still caught", "documents-first",
-  build("sp-arclog", { cards: card(88, "&mdash;"), log: "\n- **2026-09-18 — Q88 answered C.** The capabilities seat.\n" }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "an arc records it as answered" });
+one("a card its record holds answered is still caught", "documents-first",
+  build("sp-arclog", { cards: card(88, "&mdash;"), answered: ["q88"] }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
+  "note", { says: "its record in questions.jsonl is settled" });
 
-one("a number in a code span is an example, not a record", "documents-first",
-  build("sp-example", { cards: card(88, "&mdash;"), log: "\n- a log saying `Q88 answered` names one card\n" }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+// THE RETIRED FORM COUNTS FOR NOTHING: a log line naming a card answered is no record of it.
+one("a log line saying Q88 answered is no record, so the card stays open", "documents-first",
+  build("sp-example", { cards: card(88, "&mdash;"), log: logLine("note", "Q88 answered C") }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "silent");
 
 // N8 row 2k (Q389 A): THE READER REFUSES A CARD IN THE WRONG SHAPE. It found a card only by its `h4`,
@@ -354,27 +341,27 @@ const decidedShape = (n) => `  <div class="sds-card" id="q${n}">
 `;
 one("2k: a div.sds-card with an h3 in Open is refused, naming the card and the book's shape", "documents-first",
   build("sp-2k-card", { cards: decidedShape(88) }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: "not in the open-card shape — Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
 one("2k: an h4 card wrapped in a div.sds-card is refused too", "documents-first",
   build("sp-2k-h4-card", { cards: card(88, "&mdash;").replace('<div class="sds-open">', '<div class="sds-card">') }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (an `h4` inside a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
 one("2k: the refusal states the book's shape and cites RD.DEVEX.WORKSPACE.147", "documents-first",
   build("sp-2k-rule", { cards: decidedShape(88) }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: 'An open card is a `<div class="sds-open">` wrapping `<h4 id="q<n>">` (RD.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
 
 one("2k: a div.sds-open + h4 open card passes", "documents-first",
   build("sp-2k-open", { cards: card(88, "&mdash;") + card(89, "&mdash;") }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "silent");
 
 one("2k: an answered h4 card is still refused as today", "documents-first",
   build("sp-2k-answered", { cards: card(88, "<strong>B.</strong> The other way.") }),
-  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (the card carries its own decision)", parity: false, why: "this is the defect F5 names — the Python reads only the arcs" });
 
 one("writing a seat page while the workstream's rows still pend", "documents-first",
@@ -478,8 +465,7 @@ one("a carry to a scope that does not exist is refused", "close",
   "deny", { says: "exists in no state" });
 
 // SEQUENCING, NOT HANDOVER. The row names an arc of this same workstream, so nobody else is going to
-// do it — and `N1-something.md` carries no status line, which resolves as unfinished rather than as
-// a guess.
+// do it, and only `LANDED` in that arc's data resolves it.
 one("a row waiting on an arc of its own workstream is refused", "close",
   build("sp-sequencing", { arcStatus: "RUNNING", rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N1 step 2"]] }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
@@ -493,15 +479,15 @@ one("and it closes once that arc has landed", "close",
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
 
-// THE SAME TWO, WITH THE ARC NAMED IN THREE DIGITS: the row says `N001` and the file is
-// `N001-something.md`, so the gate finds the arc and reads its status.
+// THE SAME TWO, WITH THE ARC NAMED IN THREE DIGITS: the row says `N001`, and the gate reads
+// `arcs/N001/state.json`.
 one("a row waiting on a three-digit arc of its own workstream is refused", "close",
-  build("sp-sequencing-3", { arcFile: "N001-something.md", arcStatus: "RUNNING", rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N001 step 2"]] }),
+  build("sp-sequencing-3", { arcId: "N001", arcStatus: "RUNNING", rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N001 step 2"]] }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "waits on N001 (RUNNING)" });
 
 one("and it closes once that three-digit arc has landed", "close",
-  build("sp-sequencing-3-landed", { arcFile: "N001-something.md", arcStatus: "LANDED",
+  build("sp-sequencing-3-landed", { arcId: "N001", arcStatus: "LANDED",
     rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N001 step 2"]] }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
@@ -552,21 +538,9 @@ function carry(name, state, want) {
 
 carry("a bare arc number is this workstream's own sequencing", "⤵ carried → N15", "own-arc");
 carry("and so is one naming a step", "⤵ carried → N15 step 8", "own-arc");
-// THE ARC TEST RUNS FIRST FOR THIS CASE. An arc path holds digits a workstream matcher reads as a
-// number, so asking `which workstream` first turned every `arcs/N15-….md` into a handover.
-carry("an arc named by its file path is still sequencing", "⤵ carried → arcs/N15-what-the-final-shape-left-owed.md step 8", "own-arc");
 // AN ARC NUMBERED IN THREE DIGITS IS STILL AN ARC. `N001` carries the three digits a workstream
 // number has, so it is the case where reading the workstream first would name the wrong scope.
 carry("a three-digit arc number is this workstream's own sequencing", "⤵ carried → N001 step 2", "own-arc");
-carry("and so is a three-digit arc named by its file path", "⤵ carried → arcs/N001-book-change.md step 8", "own-arc");
-{
-  n += 1;
-  const names = ["N001-book-change.md", "N15-what-the-final-shape-left-owed.md", "N1-something.md", "N1a-a-brief.md"].map(splitPlan.arcName).join(",");
-  const target = splitPlan.carryTarget(carried("⤵ carried → arcs/N001-book-change.md step 8")).name;
-  const ok = names === "N001,N15,N1,N1a" && target === "N001";
-  if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  an arc's short name keeps the digits its file name writes\n        names ${names} · carry target ${target}`);
-}
 carry("a numbered scope is a handover", "⤵ carried → 003-cloud-day-0", "workstream");
 carry("and so is one naming a phase inside it", "⤵ carried → 010 Phase 3 owns the split", "workstream");
 carry("a cell naming nothing names no successor", "⤵ carried", "unnamed");
@@ -575,9 +549,9 @@ carry("a cell naming nothing names no successor", "⤵ carried", "unnamed");
 // workstream in each state: the real workspace's `closed/` is emptied as workstreams are archived and
 // its `backlog/` is refolded, so a case naming a real workstream fails the day that folder moves.
 const STATES_ROOT = workspace("m1-sp-states", {
-  [`.spndevex/${WORKSTREAMS}/open/008-plain-language/arcs/N1-a.md`]: "# N1\n",
-  [`.spndevex/${WORKSTREAMS}/closed/010-register-retrofit/arcs/N1-a.md`]: "# N1\n",
-  [`.spndevex/${WORKSTREAMS}/backlog/003-cloud-day-0/arcs/N1-a.md`]: "# N1\n",
+  [`.spndevex/${WORKSTREAMS}/open/008-plain-language/approach.html`]: "<h1>008</h1>\n",
+  [`.spndevex/${WORKSTREAMS}/closed/010-register-retrofit/approach.html`]: "<h1>010</h1>\n",
+  [`.spndevex/${WORKSTREAMS}/backlog/003-cloud-day-0/approach.html`]: "<h1>003</h1>\n",
 });
 
 function fault(name, state, shouldRefuse) {
@@ -612,69 +586,36 @@ where("a closed one reads closed", "010", "closed");
 where("a parked one reads backlog", "003", "backlog");
 where("a number nobody used reads nothing", "042", null);
 
-console.log("\n=== split-plan — reading an arc's step table");
+console.log("\n=== split-plan — a step id, and a page's own Repo table");
 {
   const check = (name, ok) => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}`); };
   for (const id of ["1", "4b", "3e.1", "10a.2b"]) check(`\`${id}\` is a step id`, splitPlan.STEP_ID.test(id));
   for (const id of ["#", "Field", "**Decides**", "3.", "a1"]) check(`\`${id}\` is not a step id`, !splitPlan.STEP_ID.test(splitPlan.stepId(id)));
 
-  const text = stepArc([["1", "spn-foundation", "the chapter", "✅ landed"], ["**3e.1**", "probe-repo", "the split half", ""]]);
-  const rows = splitPlan.arcRowsOf(text, "N2");
-  check("the Repo column is the scope", rows.length === 2 && rows[1].scope === "probe-repo");
-  check("a row's label is the arc, the step and its What — never the Repo cell",
-    rows[1].label === "N2 step 3e.1 — the split half");
-  check("the field table above the steps is not read", !rows.some((row) => /Decides/.test(row.label)));
-
-  const steps = splitPlan.stepsOf(text);
-  check("stepsOf finds What and State by header", steps?.[1].what === "the split half" && steps?.[1].state === "");
-  const older = "# N1\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n";
-  const old = splitPlan.stepsOf(older);
-  check("an older table with no State column reads What and a null state", old?.[0].what === "a thing" && old?.[0].state === null);
-  check("an arc with no Steps section has no steps, which is not an empty table", splitPlan.stepsOf("# N1\n\n## Log\n") === null);
-
-  // A PAGE'S OWN `Repo` TABLE IS NOT A PLAN. Only an arc's step table reads Repo as the scope.
+  // A PAGE'S OWN `Repo` TABLE IS NOT A PLAN: a page's plan is read by its Scope column.
   const pageTable = "<table><thead><tr><th>Repo</th><th>State</th></tr></thead><tbody><tr><td>spn-x</td><td></td></tr></tbody></table>";
   check("a page table with Repo and State is not read as a split plan", splitPlan.rowsOf(pageTable, false).length === 0);
 }
 
-console.log("\n=== split-plan — a row is split as the two other readers split it, and its cells are counted");
+console.log("\n=== split-plan — the report run by hand, over the arcs' rows");
 {
   const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
-  const HEAD = "# N9 — x\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n";
-  // An Acceptance cell that holds a pipe written with a backslash, inside a code span.
-  const ESCAPED = HEAD + "| 1 | spn-x | CODE | the check | by hand | `grep -c \"a\\|b\" file` → 0 | ✅ landed 2026-10-01 — `abc1234` |\n";
-  const escaped = splitPlan.arcRowsOf(ESCAPED, "N9");
-  check("[MKT.HOOKS.38] a cell holding an escaped pipe is read as one cell, so the State cell is the row's own",
-    escaped.length === 1 && splitPlan.stateOf(escaped[0]) === "landed", JSON.stringify(escaped));
-  check("[MKT.HOOKS.38] and stepsOf reads the same State cell", splitPlan.stepsOf(ESCAPED)?.[0].state.startsWith("✅ landed") === true);
-  check("[MKT.HOOKS.38] a row holding an escaped pipe has the header's cell count", splitPlan.miscountedSteps(ESCAPED).length === 0,
-    JSON.stringify(splitPlan.miscountedSteps(ESCAPED)));
-
-  // KNOWN-BAD: a doubled pipe before State, 8 cells under a 7-cell header.
-  const DOUBLED = HEAD + "| 1 | spn-x | CODE | the good row | by hand | green | ✅ landed 2026-10-01 — `abc1234` |\n" +
-    "| 2 | spn-x | CODE | the bad row | by hand | green || ✅ landed 2026-10-01 — `abc1234` |\n";
-  const miscounted = splitPlan.miscountedSteps(DOUBLED);
-  check("[MKT.HOOKS.38] known-bad: a row with a doubled pipe is named with its count and the header's",
-    miscounted.length === 1 && miscounted[0].id === "2" && miscounted[0].cells === 8 && miscounted[0].header === 7, JSON.stringify(miscounted));
-  check("[MKT.HOOKS.38] an arc with no Steps section has no row to count", splitPlan.miscountedSteps("# N1\n\n## Log\n").length === 0);
-
-  // THE REPORT RUN BY HAND prints the same row, and the rows that never say what became of them.
+  const rows = [["1", "spn-x", "the good row", "landed"], ["2", "spn-x", "the bad row", "waiting"], ["3", "spn-x", "the held row", "waiting", { blockedBy: ["q7"] }]];
   const root = workspace("n006-sp-report", {
-    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N9-x.md`]: DOUBLED + "| 3 | spn-x | CODE | the vague row | by hand | green | ✅ the arc is written |\n",
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N9/state.json`]: dataArc("N9", "RUNNING", rows),
     "probe-repo/README.md": "# probe-repo\n",
   });
   let out = "";
   try { out = execFileSync("node", [`${HOOKS}/src/scripts/checks/split-plan.ts`, root], { encoding: "utf8", cwd: root }); } catch (e) { out = String(e.stdout ?? ""); }
-  check("[MKT.HOOKS.38] the report run by hand prints the miscounted row", /cell count\s+N9 step 2 — 8 cells under a 7-cell header/.test(out), out);
-  check("[MKT.HOOKS.36] and lists a row that reads pending", /pending\s+spn-x — N9 step 3 — the vague row/.test(out), out);
-  check("[MKT.HOOKS.36] under the tally the Stop hook reads", /001-a-subject: 3 rows · landed 1 · .*pending 1 · undecided 1/.test(out), out);
-
-  const rows = splitPlan.arcRowsOf(DOUBLED, "N9");
-  const lines = splitPlan.reportLines(root, "N9-x.md", rows);
+  check("[MKT.HOOKS.36] the report run by hand lists a row nobody decided, and a row held on a card",
+    /undecided\s+spn-x — N9 row 2 — the bad row/.test(out) && /held\s+spn-x — N9 row 3 — the held row/.test(out), out);
+  check("[MKT.HOOKS.36] under the tally the Stop hook reads", /001-a-subject: 3 rows · landed 1 · .*held 1 · .*undecided 1/.test(out), out);
+  const plan = splitPlan.dataRowsOf(join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject`));
+  const lines = splitPlan.reportLines(root, "N9", plan);
   check("[MKT.HOOKS.36] the tally is a function that returns lines: the count first, then each row nobody accounted for",
-    lines.length === 2 && lines[0].startsWith("N9-x.md: 2 rows · landed 1") && /undecided\s+spn-x — N9 step 2 — the bad row/.test(lines[1]), JSON.stringify(lines));
+    lines.length === 3 && lines[0].startsWith("N9: 3 rows · landed 1"), JSON.stringify(lines));
   check("[MKT.HOOKS.36] an arc with every row accounted for is one line, the tally",
-    splitPlan.reportLines(root, "N9-x.md", splitPlan.arcRowsOf(ESCAPED, "N9")).length === 1);
+    splitPlan.reportLines(root, "N9", plan.slice(0, 1)).length === 1);
 }
 
 console.log("\n=== split-plan — a tick with no date and no landed word reads as pending");
@@ -740,7 +681,7 @@ console.log("\n=== split-plan — the header's status field, and the cards of a 
 
 console.log("\n=== split-plan — a page that holds its own copy of the styles");
 {
-  const ARC = `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`;
+  const ARC = `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`;
   const CLOSE = move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`);
   const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
 
@@ -789,6 +730,35 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   const shut = build("sp-own-copy-closed", { form: ownPage, state: "closed" });
   check("[MKT.SCRIPTS.108] a page under closed/ is never named",
     splitPlan.ownCopyLines(shut, [join(shut, `.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`)]).length === 0);
+}
+
+// AN ANSWERED CARD IS FOUND BY ITS ANCHOR, never by a Q number in the text (05-artifacts.md § The fold
+// check reads the anchor). Until the records moved to `questions.jsonl` the reader of answers found
+// none, so this half of the rule never ran; the first page it read folded every answer under `id="q1"`
+// and still drew the note, because it looked for `Q1` in the words.
+{
+  const folder = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
+  const folded = (body) => {
+    const root = workspace(`sp-unfolded-${n}`, {
+      [`${folder}/questions.jsonl`]: answeredRecords(["q7"]),
+      [`${folder}/approach.html`]: `<section id="s2"><h2>What</h2>${body}</section><section id="s4"><h2>Open</h2></section>\n`,
+    });
+    return splitPlan.unfoldedCards(join(root, folder), [join(root, folder, "approach.html")]).map(([, number]) => number);
+  };
+  const unfolded = (name, body, want) => {
+    const got = folded(body).join(" ");
+    n += 1;
+    const ok = got === want;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect "${want}" · got "${got}"`);
+  };
+  console.log("\n=== split-plan — an answered card is found by its anchor");
+  unfolded("an answer folded under its q<n> anchor in What draws no note",
+    `<p id="q7">The library covers pages built from sections.</p>`, "");
+  unfolded("an answered card that left nothing behind is named",
+    `<p>The library covers pages built from sections.</p>`, "Q7");
+  unfolded("a Q number in the words is no fold: the card's anchor is",
+    `<p>As Q7 settled, the library covers pages built from sections.</p>`, "Q7");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

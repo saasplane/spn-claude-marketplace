@@ -25,6 +25,9 @@
 // PART-LANDED it moves the arc to RUNNING. It never sets LANDED, CARRIED or DROPPED: the last row landed prints a
 // line asking for `--status LANDED`, except on a PROPOSED arc, whose next step is the go.
 //
+// After each write it names, in a `note:` line, a build row of the arc with no repo or no altitude and a row out
+// of chain order (RD.DEVEX.WORKSPACE.183). It refuses nothing for them: the chain between two stacks is judgement.
+//
 // A workstream ideates one arc at a time (RD.DEVEX.WORKSPACE.280). While one arc reads PROPOSED, opening another
 // is refused unless `--note` carries the developer's words, and the refusal names the arc being ideated.
 //
@@ -43,6 +46,7 @@ import {
 } from "../../lib/workstream.ts";
 import { ALTITUDES, DESIGN_KIND, ROW_ID, ROW_KINDS, ROW_STATES, isBuildRow, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
+import { stepRowFindings } from "../../checks/workstream-state.ts";
 
 export const describe = "open an arc or change its header, add a row or change its fields and its state, or discard a row found invalid";
 
@@ -247,6 +251,7 @@ function write(args: string[]): number {
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
+  for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   if (closing) console.log(`every row landed: write --status LANDED once proven`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
   return 0;

@@ -18,7 +18,7 @@ import {
   markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewHrefOf, previewOf,questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, statusMoves, landedLines, logLinesOf,
 } from "../lib/workstream.ts";
-import { DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ALTITUDES, DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -180,7 +180,50 @@ export function statusFindings(arc: string, data: ArcData, lines: readonly unkno
     out.push(`${arc} is DECIDED and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
   if (data.status === "LANDED" && open.length)
-    out.push(`${arc} is LANDED and row ${open[0].id} is ${open[0].state ?? "waiting"} — land the row with \`spn-devex workstream row write ${arc} ${open[0].id} --state landed\`, or move the arc back with \`--status RUNNING\``);
+    out.push(`${arc} is LANDED and row ${open[0].id} is ${open[0].state ?? "waiting"} — a landed arc owes nothing, so a row that is new scope reopens it: ` +
+      `\`spn-devex workstream row write ${arc} --status PROPOSED\`, with the new information in the preview, and \`DECIDED\` waits for the developer's word ` +
+      `(RD.DEVEX.WORKSPACE.261); a row that is a small decision inside what was agreed lands with \`spn-devex workstream row write ${arc} ${open[0].id} --state landed\``);
+  return out;
+}
+
+// The altitudes in the order they run, and a repository cell that names no repository (01-workstream.md § A step row).
+const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
+const NO_REPO = new Set(["—", "–", "-"]);
+
+/**
+ * RD.DEVEX.WORKSPACE.183: an arc's build rows, each with a repository and an altitude, in chain order by repository,
+ * the foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each, read in the order the arc keeps
+ * them. A row whose repository is `—` changes none and takes no place in the chain. A design row is the arc's reads
+ * and sizing, and is not read. `row write` prints what this finds and never refuses on it: the chain between two
+ * stack repositories is judgement.
+ */
+export function stepRowFindings(data: ArcData): string[] {
+  const rows = leafRows(data).filter(isBuildRow);
+  const bare: string[] = [];
+  const disorder: string[] = [];
+  const seen = new Set<string>();
+  let repo: string | null = null;
+  let lastAltitude = -1;
+  for (const row of rows) {
+    const rowRepo = typeof row.repo === "string" ? row.repo.trim() : "";
+    const altitude = ALTITUDE_ORDER.indexOf(typeof row.altitude === "string" ? row.altitude : "");
+    if (!rowRepo || altitude < 0) { bare.push(row.id); continue; }
+    if (NO_REPO.has(rowRepo)) continue;
+    if (rowRepo !== repo) {
+      if (seen.has(rowRepo)) disorder.push(`row ${row.id} returns to ${rowRepo} after ${repo}`);
+      else if (/\bspn-foundation\b/.test(rowRepo) && seen.size) disorder.push(`row ${row.id} is spn-foundation after ${[...seen][0]} — the foundation comes first`);
+      seen.add(rowRepo);
+      repo = rowRepo;
+      lastAltitude = -1;
+    }
+    if (altitude < lastAltitude) disorder.push(`row ${row.id} is ${ALTITUDE_ORDER[altitude]} after ${ALTITUDE_ORDER[lastAltitude]} in ${rowRepo}`);
+    lastAltitude = Math.max(lastAltitude, altitude);
+  }
+  const where = "(01-workstream.md § A step row says where, at what altitude, and how; RD.DEVEX.WORKSPACE.183)";
+  const out: string[] = [];
+  if (bare.length) out.push(`${data.arc} row(s) ${bare.join(", ")} carry no repo, or no altitude from ${ALTITUDE_ORDER.join(" · ")} ${where}`);
+  if (disorder.length) out.push(`${data.arc} rows out of chain order: ${disorder.join(" · ")} — rows run by repository, the foundation ` +
+    `first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each ${where}`);
   return out;
 }
 

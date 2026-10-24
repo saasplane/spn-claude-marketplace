@@ -29,13 +29,12 @@
 import { readFileSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { emit, readPayload, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
-import { alreadyTold, fromWorkspace, recordWrites } from "../lib/window.ts";
+import { alreadyTold, commandWrites, fromWorkspace, recordWrites } from "../lib/window.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
 import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.ts";
-import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-status.ts";
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
@@ -106,10 +105,6 @@ const CHECKS: Check[] = [
     applies: (path, command) => commitTiersApplies(path, command) },
   // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
   // it and a pass over the text being written.
-  // Its fast path is one regular expression over the path, so every write outside an `arcs/` folder
-  // pays that and stops.
-  { name: { group: "arc-status", action: "arc-status" }, run: checkArcStatus, needs: ["command", "file_path"],
-    applies: (path, command) => arcStatusApplies(path, command) },
   { name: { group: "comment-check", action: "comment-check" }, run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },
   // LAST, BECAUSE IT IS THE ONLY ONE THAT READS A DOCS TREE. Its fast path is a substring of the
   // path, so an edit outside any `src/` pays that and stops; an edit inside one reads a single face.
@@ -257,6 +252,8 @@ export function bindingPaths(payload: Payload): string[] {
   const paths = writes ? writtenPaths(payload) : [];
   if (writes && supplied.command) {
     try { paths.push(...madeFolders(supplied.command), ...landings(supplied.command, cwd)); } catch { /* the binding is best effort */ }
+    // A `workstream` command writes an arc's data through the library, never through a path the call names.
+    try { const root = workspaceRoot(cwd); if (root) paths.push(...commandWrites(root, cwd, supplied.command)); } catch { /* best effort */ }
   }
   const notebook = (supplied as { notebook_path?: string }).notebook_path;
   if (notebook && writes) paths.push(notebook);

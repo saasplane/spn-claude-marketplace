@@ -22,7 +22,7 @@ put(ws, "notes/N001/samples/badge-dark.png", "png");
 console.log("=== an arc kept as data, read into its row");
 {
   const [cycle] = cycles.cyclesOf(ws);
-  ok("the arc is read from its data", cycle?.kept === true && cycle.id === "N001" && cycle.name === "the probe arc" && cycle.status === "DECIDED", JSON.stringify(cycle));
+  ok("the arc is read from its data", cycle?.file.endsWith("arcs/N001/state.json") && cycle.id === "N001" && cycle.name === "the probe arc" && cycle.status === "DECIDED", JSON.stringify(cycle));
   ok("its line is what it decides", cycle.does === "what it decides");
   ok("its preview by its fixed name comes first, then each sample", cycle.previews.map((one) => `${one.kind}:${one.href}`).join() ===
     "preview:notes/N001/preview.html,sample:notes/N001/samples/badge-dark.png", JSON.stringify(cycle.previews));

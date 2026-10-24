@@ -156,7 +156,9 @@ function onceForAFile(shown) {
       `${linesFor("1.0.0").stylesheet}<div class="sds-eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table>
         <thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
         <tbody><tr><td>a</td><td>spn-foundation</td><td></td></tr></tbody></table></section>`,
-    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N1-x.md")]: "# Arc\n\n## Log\n\n- **2026-09-18 — go.**\n",
+    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N001", "state.json")]: `${JSON.stringify({ schemaVersion: 1, arc: "N001",
+      subject: "x", title: "x", status: "LANDED", reason: null, preview: "preview.html",
+      rows: [{ id: "1", parent: "N001", title: "a", kind: "change", repo: "spn-foundation", state: "landed" }] })}\n`,
   });
   one("split-plan's close refusal survives the chain",
     { tool_name: "Bash", cwd: root, tool_input: { command: `mv ${DEVEX_WORKSTREAMS}/open/001-a-subject ${DEVEX_WORKSTREAMS}/closed/` } },

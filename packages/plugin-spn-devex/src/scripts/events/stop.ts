@@ -8,22 +8,27 @@
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
 // the turn is already written and a refusal would only lose it.
 //
-//   runnable   a turn that ends while an arc THIS SESSION worked on still has rows to do, and nothing
-//              blocks them; a row `⏸ held on Q<n>` is not runnable while that card is open
+//   runnable   a turn that ends while an arc THIS SESSION wrote still has rows ready to run, and no card
+//              is open; a row waiting on an open card is not ready
 //   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
 //              full there, once, and every card still open from an earlier reply named in one line
-//   notes      an answer logged in an arc lands in that arc's notes (spec, plan, previews, samples) the same turn
-//   carried    a proposed arc never carries a review point to a later step of itself
-//   hold       an arc whose status reads HELD must name a card that exists and is unanswered
+//   notes      an answer logged in an arc lands in that arc's notes (preview, plan, samples) the same turn
+//   carried    a proposed arc never carries a review point to a later row of itself
+//   hold       an arc whose status reads HELD names, in its reason, a card still open or an arc still to land
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
-//              once while the step rows stand, and names each open card in one line
+//              once while the rows stand, and names each open card in one line
 //   page-stale an arc this window wrote left its workstream's page behind the arcs
-//   state      `workstream state check` fails for a workstream of this window kept as data
+//   state      `workstream state check` fails for a workstream of this window: among its findings an arc
+//              the page does not carry, a workstream with no page, and a LANDED arc with a row not landed
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
 //   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
-//   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
+//
+// AN ARC IS READ FROM ITS DATA: its header and rows from `arcs/N<nnn>/state.json`, its events from
+// `log.jsonl`, and the cards from the workstream's `questions.jsonl`, through `lib/workstream.ts`. An
+// arc is named by its data folder, `<workstream>/arcs/N<nnn>`, which is also how the window's note
+// records an arc the window wrote.
 //
 // A CHECK SPEAKS ONCE IN A TURN, AND ONLY ABOUT THIS SESSION'S OWN WORK (RD.DEVEX.WORKSPACE.198). The
 // reply that follows a finding is the answer to it, so a check that spoke at this session's last Stop
@@ -53,11 +58,12 @@ import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { arcIdsOf, readArc, workstreamsOf } from "../lib/workstream.ts";
+import { NOTES, PREVIEW_FILE, arcDataDir, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
+         workstreamsOf } from "../lib/workstream.ts";
+import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
-import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, holdsOwnCopy, isInProgress, markedAgo,
-         miscountLines, openWorkstreams, ownCopyLines, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
+import { cardsOf, holdsOwnCopy, markAge, openWorkstreams, ownCopyLines, stateOf, workstreamPlan } from "../checks/split-plan.ts";
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
 import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
@@ -179,34 +185,6 @@ export function withoutFences(reply: string): string {
 export function quotesTemplate(fence: Fence): boolean {
   return fence.info === "diff" || fence.body.includes("{{");
 }
-// A GLYPH IS UNAMBIGUOUS AND A WORD IS NOT, so the two are read differently.
-//
-// `landed`, `carried` and `deferred` are ordinary English. Read against a whole row joined into one
-// string, a step counted its own DESCRIPTION as its marker: thirteen rows in `008-plain-language`
-// say one of those words in their prose, and `N90` step 3 — *spot-check the claimed-LANDED steps
-// rather than trusting them* — reported as done because it is a step ABOUT landed steps. That is the
-// direction that hides work, so the count it feeds is an undercount and nothing in the tables can
-// fix it.
-//
-// So a word counts only where a marker is WRITTEN — as a cell's whole content, or at its start so a
-// date or a commit may follow — and a glyph counts anywhere in the row, which is where the corpus
-// puts it (`| 4 | ✅ **done 2026-09-23** — …`).
-//
-// THE TICK IS READ AS THE CLOSE GATE READS IT. A tick lands a row only where a date or a landed word
-// follows it, so `✅ the arc is written` is not a done-mark here either. `tickLands` is the one test
-// both readers use.
-const DONE_GLYPHS = ["↷", "⊘"];
-const DONE_WORDS = ["landed", "carried", "deferred"];
-
-/** Whether a step row carries a done-mark, as opposed to merely naming one. */
-function isDone(cells: string[]): boolean {
-  if (cells.some((c) => tickLands(c) || DONE_GLYPHS.some((g) => c.includes(g)))) return true;
-  return cells.some((c) => {
-    const bare = c.replace(/[*_`~]/g, "").trim().toLowerCase();
-    return DONE_WORDS.some((w) => bare === w || bare.startsWith(`${w} `));
-  });
-}
-
 function read(p: string): string {
   try { return readFileSync(p, "utf8"); } catch { return ""; }
 }
@@ -217,10 +195,9 @@ function openWorkstreamFolders(root: string): string[] {
   catch { return []; }
 }
 
-function arcsOf(ws: string): string[] {
-  const dir = join(ws, "arcs");
-  try { return readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => join(dir, f)); }
-  catch { return []; }
+/** Every arc of a workstream kept as data, each named by its data folder `<workstream>/arcs/N<nnn>`. */
+function arcFoldersOf(ws: string): string[] {
+  return arcIdsOf(ws).map((arc) => arcDataDir(ws, arc));
 }
 
 function pagesOf(ws: string): string[] {
@@ -228,125 +205,98 @@ function pagesOf(ws: string): string[] {
   catch { return []; }
 }
 
-/**
- * An arc's status word, from the first `Status:` line, in either spelling the corpus uses.
- *
- * **IT READ ONE SPELLING AND THE CORPUS HAS TWO.** The pattern was `Status: **WORD`, and every arc
- * written from `N30` onward opens `**Status: WORD` — the bold around the label rather than after it.
- * Measured 2026-09-23 over workstream `008`: 37 arcs read, **10 unread, and the 10 are `N30` to
- * `N39`** — every arc of the current week. So the checks that read a status were blind to exactly
- * the arcs somebody was working on, which is the worst possible subset to be blind to.
- *
- * A hyphen is part of the word: `PART-LANDED` is a status, not `PART`.
- */
-function statusOf(arc: string): string {
-  const m = read(arc).match(/^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m);
-  return m ? m[1] : "";
-}
+/** The workstream folder an arc's data folder sits in. */
+const homeOf = (arc: string): string => dirname(dirname(arc));
+/** An arc's number, from its data folder. */
+const idOf = (arc: string): string => basename(arc);
+/** An arc's data, from its `state.json`, or null where it has none. */
+const dataOf = (arc: string): ArcData | null => readArc(homeOf(arc), idOf(arc));
+/** An arc's status, or "" where it has no data. */
+const statusOf = (arc: string): string => dataOf(arc)?.status ?? "";
+/** The cards still open in a workstream's `questions.jsonl`. */
+const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((one) => one.state === "open");
+/** The way a command names an arc: the workstream's number and the arc, `030/N004`. */
+const arcRef = (arc: string): string => `${basename(homeOf(arc)).slice(0, 3)}/${idOf(arc)}`;
 
-/** Statuses that mean the arc is finished, so unfinished rows in it are history rather than work. */
-// TERMINAL IS IMPORTED NOW, BECAUSE A SECOND COPY OF A CLOSED SET DRIFTS. This file
-// kept its own — `LANDED · DONE · CLOSED · CARRIED · DEFERRED` — against the register's
-// `LANDED · CARRIED · DROPPED`. Three of those five are not arc statuses at all, and `DROPPED` was
-// missing, so an arc abandoned on purpose reported as runnable work for as long as anybody touched
-// it. `arc-status.ts` already exported the set; this file simply did not ask for it.
-//
-// A STATUS THAT MEANS *DO NOT START THIS* IS NOT RUNNABLE, and four of the eight say so for four
-// different reasons: nobody agreed it, its turn has not come, it is blocked, or it is finished.
-// Inferring runnable from *has unfinished steps* is true of `RUNNING` and `PART-LANDED` and false of
-// the rest — which is how an arc opened at `DECIDED` was reported, within a minute of being written,
-// as work somebody had abandoned.
+// A STATUS THAT MEANS *DO NOT START THIS* IS NOT RUNNABLE: nobody agreed it, its turn has not come, or
+// it is blocked. The finished ones are `TERMINAL`, which `arc-status.ts` states once.
 const NOT_RUNNABLE = new Set(["PROPOSED", "DECIDED", "HELD"]);
 
 const DEBUG = ".debug";
 
-/** The cards open on the approach page of the workstream an arc sits in (`<workstream>/arcs/<arc>`). */
-function openCardsOf(arc: string): Set<string> {
-  return new Set(pagesOf(dirname(dirname(arc))).flatMap(openCards));
-}
-
-/** Every card the approach page of an arc's workstream carries, open or answered. */
-function pageCardsOf(arc: string): Set<string> {
-  return new Set(pagesOf(dirname(dirname(arc))).flatMap((page) => cardsOf(page).map((card) => card.number)));
-}
-
 /**
- * The rows of an arc's own step table that are not yet done, or `null` where it has no `## Steps`.
- * A row marked `in progress <time>` is left out: somebody is on it, so it is not runnable work
- * (RD.DEVEX.WORKSPACE.184). `inProgressSteps` names those rows instead.
- *
- * A row marked `⏸ held on Q<n>` is left out while card `Q<n>` is open, because the card's answer can
- * change it (RD.DEVEX.WORKSPACE.188). Once the card is answered the row is runnable again, and its
- * line says so: `step 7 was held on Q352, which is answered — …`. A row held on a card the page does
- * not carry at all is runnable too, and its line names that instead: `step 7 is held on Q9, which is
- * not on the approach page — …`.
- *
- * @param open    the card numbers open on the workstream's page; read from the page when not given
- * @param onPage  every card number the page carries, open or answered; read from the page when not given
+ * A short hash of an arc's rows: each row's id, *What* and state, in the order the arc keeps them. A
+ * sitting working ON the arc changes it; a header write, a log line or a status alone does not.
  */
-export function unfinishedSteps(arc: string, open: Set<string> = openCardsOf(arc),
-                                onPage: Set<string> = pageCardsOf(arc)): string[] | null {
-  const steps = stepsOf(read(arc));
-  if (steps === null) return null;
-  // THE STATE CELL IS READ WHERE THE TABLE HAS ONE. The step row carries What, Mechanism and
-  // Acceptance beside State, and any of them may open with `carried` or hold a `✅` in a quotation,
-  // so a table with a State column is judged by that cell alone. An older table has none, and there
-  // every cell is read as before.
-  return steps
-    .filter((step) => !isDone(step.state === null ? step.cells : [step.state]))
-    .filter((step) => step.state === null || !isInProgress(step.state))
-    .filter((step) => { const card = heldCard(step); return card === null || !open.has(card); })
-    .map((step) => {
-      const card = heldCard(step);
-      if (card === null) return `step ${step.id} — ${step.what.slice(0, 70)}`;
-      return onPage.has(card)
-        ? `step ${step.id} was held on ${card}, which is answered — ${step.what.slice(0, 70)}`
-        : `step ${step.id} is held on ${card}, which is not on the approach page — ${step.what.slice(0, 70)}`;
-    });
-}
-
-/** The card a step's State cell holds it on, or `null`. A table with no State column holds nothing. */
-function heldCard(step: { state: string | null }): string | null {
-  return step.state === null ? null : heldOn(step.state);
+export function rowsMark(data: ArcData | null): string {
+  const rows = (data?.rows ?? []).map((row) => [row.id, row.title, row.state ?? null]);
+  return createHash("sha256").update(JSON.stringify(rows)).digest("hex").slice(0, 12);
 }
 
 /**
- * The rows whose State cell reads `in progress <time>`, each with how old its mark is. A row whose
- * order is out with an agent is left out: the agent is on it, and its report is what ends the wait.
+ * The rows of an arc ready to run, as the runnable check names them: `row 2 — build it`. They are the
+ * rows `workstream rows show --ready` lists (`readyRows`): work rows waiting or ready whose every
+ * blocker has resolved, so a row waiting on a card that is open is not one, and is one again once the
+ * card is answered (RD.DEVEX.WORKSPACE.188). A running row is not ready; `runningRows` names it.
+ *
+ * @param questions  the workstream's question records; read from its `questions.jsonl` when not given
+ */
+export function readyRowsOf(arc: string, questions?: readonly Question[]): string[] {
+  const data = dataOf(arc);
+  if (!data) return [];
+  return readyRows(homeOf(arc), data, questions ?? readQuestions(homeOf(arc)))
+    .map((row) => `row ${row.id} — ${row.title.slice(0, 70)}`);
+}
+
+/** When a row last moved to `running`, from the arc's log, or null where the log does not say. */
+function runningSince(lines: readonly unknown[], row: string): Date | null {
+  for (let at = lines.length - 1; at >= 0; at -= 1) {
+    const line = lines[at] as LogLine | undefined;
+    if (!line || typeof line !== "object" || line.row !== row || line.kind !== "running") continue;
+    const since = new Date(String(line.at));
+    return Number.isNaN(since.getTime()) ? null : since;
+  }
+  return null;
+}
+
+/**
+ * The rows of an arc that are `running`, each with how long ago its log line moved it there
+ * (RD.DEVEX.WORKSPACE.184). A row whose order is out with an agent is left out: the agent is on it,
+ * and its report is what ends the wait.
  *
  * @param out  the rows of this arc whose order is out; read from the arc's orders folder when not given
  */
-export function inProgressSteps(arc: string, now = Date.now(), out: Set<string> = ordersOut(arc)): string[] {
-  return (stepsOf(read(arc)) ?? [])
-    .filter((step) => step.state !== null && isInProgress(step.state))
-    .filter((step) => !out.has(step.id.toLowerCase()))
-    .map((step) => `step ${step.id} — ${step.what.slice(0, 70)} (${markedAgo(step.state ?? "", now)})`);
+export function runningRows(arc: string, now = Date.now(), out: Set<string> = ordersOut(arc)): string[] {
+  const data = dataOf(arc);
+  if (!data) return [];
+  const lines = logLinesOf(homeOf(arc), idOf(arc));
+  return leafRows(data)
+    .filter((row) => row.state === "running" && !out.has(row.id.toLowerCase()))
+    .map((row) => `row ${row.id} — ${row.title.slice(0, 70)} (running for ${markAge(runningSince(lines, row.id), now)})`);
 }
 
 /**
- * Whether work still runs in this window: a row of an arc in one of its workstreams is marked
- * `in progress` (RD.DEVEX.WORKSPACE.189). The Stop event says nothing about whether the agent now
- * waits, so the mark is how a progress reply is told from a reply that waits.
+ * Whether work still runs in this window: a row of an arc in one of its workstreams is `running`
+ * (RD.DEVEX.WORKSPACE.189). The Stop event says nothing about whether the agent now waits, so the
+ * state is how a progress reply is told from a reply that waits.
  *
- * A row whose order is out with an agent counts here, though `inProgressSteps` leaves it out: that
- * agent is the work that runs. An arc whose status is terminal does not count, because a mark left
- * in a finished arc is history, and it would hide the open cards for as long as the arc stays open.
+ * A row whose order is out with an agent counts here, though `runningRows` leaves it out: that agent
+ * is the work that runs. An arc whose status is terminal does not count, because a row left running in
+ * a finished arc is history, and it would hide the open cards for as long as the arc stays open.
  *
  * @param mine  the workstreams this window works on; a row in any other is another window's work
  */
 export function workRuns(root: string, mine: Set<string>): boolean {
-  const marked = openArcs(root, mine)
-    .filter((arc) => !TERMINAL.has(statusOf(arc)))
-    .some((arc) => (stepsOf(read(arc)) ?? []).some((step) => step.state !== null && isInProgress(step.state)));
-  // AN ARC KEPT AS DATA says a row runs with its `state`, `running`, in `arcs/N<nnn>/state.json`.
-  return marked || workstreamsOf(root, ["open"]).filter((ws) => mine.has(basename(ws))).some((ws) =>
-    arcIdsOf(ws).some((arc) => {
-      const data = readArc(ws, arc);
-      return !!data && !TERMINAL.has(data.status) && data.rows.some((row) => row.state === "running");
-    }));
+  return openArcs(root, mine).some((arc) => {
+    const data = dataOf(arc);
+    return !!data && !TERMINAL.has(data.status) && leafRows(data).some((row) => row.state === "running");
+  });
 }
 
-const REPORT_SUFFIX = "-report.md";
+// A REPORT SITS BESIDE ITS ORDER, `57.md` and `57.report.md` (01-workstream.md § The folder); `57-report.md`
+// is the name older orders of an open workstream still carry. A ledger is the child's running log, not an order.
+const REPORT_SUFFIXES = [".report.md", "-report.md"];
+const LEDGER_SUFFIX = ".ledger.md";
 // The rows an order is for, as its first heading names them: `# Order 04a — N006 row 4: …`, or for an
 // order that carries several, `rows 0, 1 and 2` or `rows 0 to 2`.
 const ORDER_ROWS = /\brows?\s+(\d+[a-z]?(?:\.\d+[a-z]?)*(?:(?:\s*,\s*|\s+and\s+|\s+to\s+)\d+[a-z]?(?:\.\d+[a-z]?)*)*)/i;
@@ -365,23 +315,22 @@ function rowsNamed(heading: string): string[] {
 }
 
 /**
- * The rows of an arc whose order is out, by step id. An order is out where a file under the arc's
+ * The rows of an arc whose order is out, by row id. An order is out where a file under the arc's
  * `notes/N<nnn>/orders/` is for that row and no report sits beside it: `03-reports.md` with no
- * `03-reports-report.md`. The rows are the ones the order's first heading names (`row 3`, or
- * `rows 0, 1 and 2`, or `rows 0 to 2` for an order that carries several). Where the
- * heading names none, it is the number that opens the file name, so `04a-…` and `04b-…` are both for
- * row 4. A row with several orders is out until every report is back.
+ * `03-reports.report.md`. The rows are the ones the order's first heading names (`row 3`, or
+ * `rows 0, 1 and 2`, or `rows 0 to 2` for an order that carries several). Where the heading names
+ * none, it is the number that opens the file name, so `04a-…` and `04b-…` are both for row 4. A row
+ * with several orders is out until every report is back.
  */
 export function ordersOut(arc: string): Set<string> {
   const out = new Set<string>();
-  const id = basename(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
-  if (!id) return out;
-  const folder = join(dirname(dirname(arc)), "notes", id, "orders");
+  const folder = join(notesDirOf(homeOf(arc), idOf(arc)), "orders");
   let names: string[];
   try { names = readdirSync(folder).filter((name) => name.endsWith(".md")); } catch { return out; }
   for (const name of names) {
-    if (name.endsWith(REPORT_SUFFIX)) continue;
-    if (names.includes(`${name.slice(0, -".md".length)}${REPORT_SUFFIX}`)) continue;
+    if (REPORT_SUFFIXES.some((suffix) => name.endsWith(suffix)) || name.endsWith(LEDGER_SUFFIX)) continue;
+    const stem = name.slice(0, -".md".length);
+    if (REPORT_SUFFIXES.some((suffix) => names.includes(`${stem}${suffix}`))) continue;
     const heading = read(join(folder, name)).split("\n").find((line) => /^#\s/.test(line)) ?? "";
     const rows = rowsNamed(heading);
     const numbered = /^(\d+)/.exec(name)?.[1].replace(/^0+(?=\d)/, "");
@@ -391,41 +340,8 @@ export function ordersOut(arc: string): Set<string> {
 }
 
 /**
- * A card that is open and unanswered.
- *
- * **F16 — THIS HELD A SECOND, WRONG COPY OF THE TEST, AND IT MADE BOTH CHECKS BLIND.** It asked
- * whether `<b>Decision` appears at all. The card template ships `<b>Decision:</b> &mdash;`, which is
- * a card still waiting — so every card written the way the template asks read as ANSWERED here.
- * `runnable` therefore never saw a card as open and nagged through sittings where one was, and
- * `hold` would have reported every HELD arc as naming no open card.
- *
- * `split-plan.ts` fixed exactly this as F5 and its `cardsOf` carries the correct test: the marker's
- * presence is not the answer, what follows it is. There is one implementation now, because two were
- * how this drifted.
- */
-function openCards(page: string): string[] {
-  return cardsOf(page).filter((card) => !card.decided).map((card) => card.number);
-}
-
-/**
- * Just the step table's rows, so a log entry, a status line or a handover block cannot look like
- * work. This is the whole discriminator: the sitting writing ABOUT an arc moves everything else.
- */
-function stepRows(text: string): string {
-  return text.split("\n").filter((line) => {
-    const first = /^\|\s*([^|]*)\|/.exec(line);
-    return first !== null && STEP_ID.test(first[1].replace(/[*_`]/g, "").trim());
-  }).join("\n");
-}
-
-/** A short hash of an arc's step rows — what a sitting working ON the arc changes. */
-export function stepHash(text: string): string {
-  return createHash("sha256").update(stepRows(text)).digest("hex").slice(0, 12);
-}
-
-/**
- * What one SESSION saw at its last `Stop`: when, each arc's step-row hash, how far into its
- * transcript it had read, and which checks it reported.
+ * What one SESSION saw at its last `Stop`: when, each arc's rows mark (`rowsMark`), and which checks
+ * it reported. Both maps are keyed by the arc's data folder.
  *
  * **THE BASELINE IS PER SESSION, BECAUSE THE WORKSPACE IS SHARED.** One file per workspace compared
  * this window's turn against whichever window stopped last, so an arc another session was executing
@@ -433,7 +349,7 @@ export function stepHash(text: string): string {
  * that window had touched, after every reply, and forced eight "Blocked" turns.
  *
  * **IT CANNOT USE `git`.** The workstream folder lives at the workspace root, which is not a
- * repository, so `git show HEAD:./arc.md` fails there for every arc.
+ * repository, so `git show HEAD:./arcs/N001/state.json` fails there for every arc.
  */
 export type Baseline = { at: number; steps: Record<string, string>; fired?: string[];
                          cards?: string[]; arcs?: Record<string, ArcMark>;
@@ -443,11 +359,11 @@ export type Baseline = { at: number; steps: Record<string, string>; fired?: stri
                          handover?: string };
 
 /**
- * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
- * its log entries, a signature of its notes (the spec, the plan, the previews and the samples under
- * `notes/N<nnn>/`), and its status word.
+ * What one arc looked like at a Stop, for the `notes` and `carried` checks: how many lines its
+ * `log.jsonl` held, which is only ever appended to, a signature of its notes (the preview, the plan and
+ * the samples under `notes/N<nnn>/`), and its status.
  */
-export type ArcMark = { log: string[]; notes: string; status: string };
+export type ArcMark = { log: number; notes: string; status: string };
 
 const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80) || "_";
 const sessionsDir = (root: string): string => join(root, DEVEX, DEBUG, "stop", "sessions");
@@ -459,11 +375,10 @@ export function readBaseline(root: string, session: string): Baseline | null {
   catch { return null; }
 }
 
-/** Every open arc's step-row hash, as this Stop sees it. */
+/** Every open arc's rows mark, as this Stop sees it. */
 function currentSteps(root: string): Record<string, string> {
   const seen: Record<string, string> = {};
-  for (const ws of openWorkstreamFolders(root))
-    for (const arc of arcsOf(ws)) seen[arc] = stepHash(read(arc));
+  for (const arc of snapshotArcs(root)) seen[arc] = rowsMark(dataOf(arc));
   return seen;
 }
 
@@ -485,36 +400,19 @@ function scoped(folders: string[], mine: Set<string>): string[] {
 
 // ---------------------------------------------------------------------------- notes and carried
 
-/** The top-level entries of an arc's `## Log`, each a line beginning `- `. */
-export function logEntries(text: string): string[] {
-  const at = text.search(/^##[ \t]+Log\b/m);
-  if (at < 0) return [];
-  const body = text.slice(at).split("\n").slice(1);
-  const out: string[] = [];
-  for (const line of body) {
-    if (/^##[ \t]/.test(line)) break;
-    if (/^- /.test(line)) out.push(line.trim());
-  }
-  return out;
-}
-
-const entryHash = (line: string): string => createHash("sha256").update(line).digest("hex").slice(0, 10);
-
-// The two folders of an arc's notes the developer reviews: `previews/` holds the preview pages, and
-// `samples/` holds real files of the kind the work produces.
-const REVIEWED_FOLDERS = ["previews", "samples"];
+// The folder of an arc's notes the developer reviews beside its preview and its plan: real files of the
+// kind the work produces.
+const SAMPLES = "samples";
 
 /**
- * The files an arc's notes hold that an answer must land in: `notes/N<nnn>/spec.md`, `plan.md`, and
- * everything under `previews/` and `samples/`. Orders and scratch are not the spec, so they are left
- * out. The arc number is read as the file name writes it, with one, two or three digits.
+ * The files an arc's notes hold that an answer must land in: `notes/N<nnn>/preview.html`, which is the
+ * arc's spec, `plan.md`, and everything under `samples/`. Orders and scripts are not the spec, so they
+ * are left out.
  */
 export function notesFiles(arc: string): string[] {
-  const id = basename(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
-  if (!id) return [];
-  const folder = join(dirname(dirname(arc)), "notes", id);
+  const folder = notesDirOf(homeOf(arc), idOf(arc));
   const out: string[] = [];
-  for (const name of ["spec.md", "plan.md"]) {
+  for (const name of [PREVIEW_FILE, "plan.md"]) {
     try { if (statSync(join(folder, name)).isFile()) out.push(join(folder, name)); } catch { /* absent */ }
   }
   const walk = (dir: string): void => {
@@ -525,7 +423,7 @@ export function notesFiles(arc: string): string[] {
       try { if (statSync(full).isDirectory()) walk(full); else out.push(full); } catch { /* next */ }
     }
   };
-  for (const reviewed of REVIEWED_FOLDERS) walk(join(folder, reviewed));
+  walk(join(folder, SAMPLES));
   return out;
 }
 
@@ -539,28 +437,33 @@ function notesSignature(files: string[]): string {
 /** Every open arc's mark at this Stop. */
 export function arcMarks(root: string): Record<string, ArcMark> {
   const out: Record<string, ArcMark> = {};
-  for (const arc of snapshotArcs(root)) {
-    const text = read(arc);
-    out[arc] = { log: logEntries(text).map(entryHash), notes: notesSignature(notesFiles(arc)), status: statusOf(arc) };
-  }
+  for (const arc of snapshotArcs(root))
+    out[arc] = { log: logLinesOf(homeOf(arc), idOf(arc)).length, notes: notesSignature(notesFiles(arc)), status: statusOf(arc) };
   return out;
 }
 
-// AN ENTRY THAT RECORDS AN ANSWER OR A REVIEW POINT: a card answered (`Q396 B`, `Q401 revised`), an
-// `update`, or the developer quoted. A `go.`, a landing or the agent's own decision is not one.
-const RECORDS_AN_ANSWER = /\bQ\d+\s+(?:[A-D]\b|revised\b|answered\b)|\bupdates?\b|\breview points?\b|\(the developer\b/i;
+// A LINE THAT RECORDS AN ANSWER OR A REVIEW POINT: the `answered` line `question answer` writes, or a
+// note that names a card answered (`Q396 B`, `Q401 revised`), a review point, or quotes the developer
+// (`(the developer: …)`). A status line is a go or a move, which carries the developer's words by
+// design, and an `opened` line opens the arc: neither is an answer, and neither is a landing.
+const RECORDS_AN_ANSWER = /\bQ\d+\s+(?:[A-D]\b|revised\b|answered\b)|\breview points?\b|\(the developer:/i;
+const NOT_AN_ANSWER: ReadonlySet<string> = new Set(["status", "opened", "landed", "stamped"]);
 const CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
 
+/** Whether a log line records an answer or a review point. */
+const recordsAnAnswer = (line: LogLine): boolean =>
+  line.kind === "answered" || (!NOT_AN_ANSWER.has(line.kind) && RECORDS_AN_ANSWER.test(String(line.note ?? "")));
+
 /**
- * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the arcs whose log gained entries
- * since this session's last Stop.
+ * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the lines an arc's `log.jsonl` gained
+ * since this session's last Stop, in the arcs this window wrote.
  *
- * `notes`: an entry that records an answer or a review point, in an arc whose `notes/N<nnn>/` holds a
- * spec, a plan, previews or samples, when none of those files changed. The answer lands in the card, the arc
- * and the notes in the same turn; a spec left as it was is what the next reader plans from.
+ * `notes`: a line that records an answer or a review point, in an arc whose `notes/N<nnn>/` holds a
+ * preview, a plan or samples, when none of those files changed. The answer lands in the card, the arc
+ * and the notes in the same turn; a preview left as it was is what the next reader plans from.
  *
- * `carried`: an entry saying a point is carried to a later step, in an arc that was PROPOSED. Nothing
- * is built on its spec yet, so the point changes the spec now.
+ * `carried`: a line saying a point is carried to a later row, in an arc that was PROPOSED. Nothing is
+ * built on its spec yet, so the point changes the spec now.
  *
  * @param before   each arc's mark at this session's last Stop; nothing is judged without one
  * @param touched  the arcs this window wrote since then, from the window's note (`lib/window.ts`)
@@ -575,42 +478,38 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
   const tie = (arc: string) => (mine.has(workstreamOf(arc)) ? "owns" : "visits") as "owns" | "visits";
   for (const arc of openArcs(root, new Set([...mine, ...visits]))) {
     const was = before[arc];
-    if (!was) continue;
+    if (!was || typeof was.log !== "number") continue;
     if (!touched.has(arc)) continue;
-    const text = read(arc);
-    const seen = new Set(was.log);
-    const added = logEntries(text).filter((line) => !seen.has(entryHash(line)));
+    const added = logLinesOf(homeOf(arc), idOf(arc)).slice(was.log)
+      .filter((line): line is LogLine => !!line && typeof line === "object");
     if (!added.length) continue;
     const files = notesFiles(arc);
-    if (files.length && added.some((line) => RECORDS_AN_ANSWER.test(line)) && notesSignature(files) === was.notes) {
-      // A spec and a plan are named by file; a reviewed folder is named once, whatever it holds.
-      const fromNotes = (file: string): string => file.slice(file.indexOf("/notes/") + 1);
-      const folderOf = (file: string): string | undefined => REVIEWED_FOLDERS.find((reviewed) => file.includes(`/${reviewed}/`));
-      const shown = files.filter((file) => !folderOf(file)).map(fromNotes);
-      for (const reviewed of REVIEWED_FOLDERS) {
-        const inside = files.find((file) => folderOf(file) === reviewed);
-        if (inside) shown.push(fromNotes(inside).slice(0, fromNotes(inside).indexOf(`/${reviewed}/`)) + `/${reviewed}/`);
-      }
+    if (files.length && added.some(recordsAnAnswer) && notesSignature(files) === was.notes) {
+      // The preview and the plan are named by file; the samples folder once, whatever it holds.
+      const fromNotes = (file: string): string => file.slice(file.indexOf(`/${NOTES}/`) + 1);
+      const shown = files.filter((file) => !file.includes(`/${SAMPLES}/`)).map(fromNotes);
+      const sample = files.find((file) => file.includes(`/${SAMPLES}/`));
+      if (sample) shown.push(`${fromNotes(sample).slice(0, fromNotes(sample).indexOf(`/${SAMPLES}/`))}/${SAMPLES}/`);
       out.push({ check: "notes", message: named(workstreamOf(arc),
         `\`${fromWorkspace(root, arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
         `An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every ` +
-        `row it changes) and in the arc's notes: the spec, the plan and any preview or sample they name — MUST ` +
-        `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in the ` +
-        `log line.`, tie(arc)) });
+        `row it changes) and in the arc's notes: its preview, its plan and any sample they name — MUST ` +
+        `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in a ` +
+        `log line: \`spn-devex workstream row write ${arcRef(arc)} --note "…"\`.`, tie(arc)) });
     }
     const status = statusOf(arc);
-    if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(line)))
+    if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(String(line.note ?? ""))))
       out.push({ check: "carried", message: named(workstreamOf(arc),
-        `\`${fromWorkspace(root, arc)}\` is PROPOSED and its log carries a review point to a later step of itself. A proposed ` +
+        `\`${fromWorkspace(root, arc)}\` is PROPOSED and its log carries a review point to a later row of itself. A proposed ` +
         `arc never does: nothing is built on its spec yet, so the point changes the spec now (RD.DEVEX.WORKSPACE.193). ` +
-        `Write it into the spec and the plan this turn.`, tie(arc)) });
+        `Write it into the preview and the plan this turn.`, tie(arc)) });
   }
   return out;
 }
 
-/** Every arc file of the open workstreams this window works on. */
+/** Every arc of the open workstreams this window works on, by its data folder. */
 function openArcs(root: string, mine: Set<string>): string[] {
-  return scoped(openWorkstreamFolders(root), mine).flatMap(arcsOf);
+  return scoped(openWorkstreamFolders(root), mine).flatMap(arcFoldersOf);
 }
 
 /**
@@ -619,19 +518,19 @@ function openArcs(root: string, mine: Set<string>): string[] {
  * later already has its marks. It is the one read of every open arc in this file.
  */
 function snapshotArcs(root: string): string[] {
-  return openWorkstreamFolders(root).flatMap(arcsOf);
+  return openWorkstreamFolders(root).flatMap(arcFoldersOf);
 }
 
-/** The workstream an arc file sits in, by its folder name. */
-const workstreamOf = (arc: string): string => basename(dirname(dirname(arc)));
+/** The workstream an arc's data folder sits in, by the workstream folder's name. */
+const workstreamOf = (arc: string): string => basename(homeOf(arc));
 
 /**
- * Arcs this session worked on that still have runnable steps, with no card open to block them.
+ * Arcs this session wrote that still have rows ready to run, with no card open to block them.
  *
  * @param since    when THIS SESSION last stopped; 0 is its first Stop, and the check stays quiet
- * @param stepsAt  each arc's step-row hash at that Stop
+ * @param stepsAt  each arc's rows mark at that Stop
  * @param touched  the arcs this window's own tool calls wrote since then, from the window's note;
- *                 `null` where that is not known, and then a file time newer than `since` stands in
+ *                 `null` where that is not known, and then a `state.json` time newer than `since` stands in
  * @param mine     the workstreams this window works on; the others are read by nobody here
  */
 export function checkRunnable(root: string, since: number, stepsAt: Record<string, string>,
@@ -639,53 +538,51 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
   const out: Warning[] = [];
 
   for (const ws of scoped(openWorkstreamFolders(root), mine)) {
-    const cards = pagesOf(ws).flatMap(openCards);
-    for (const arc of arcsOf(ws)) {
+    const questions = readQuestions(ws);
+    const cards = questions.filter((one) => one.state === "open");
+    for (const arc of arcFoldersOf(ws)) {
+      const data = dataOf(arc);
+      if (!data) continue;
       // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM, AND IT IS THIS SESSION'S FACT. A status
-      // word is a claim any window can have written: `RUNNING` fired on `N114` in a headless window
-      // that had never opened it, after every reply. What this session wrote is in its transcript,
-      // and an arc it wrote whose step rows moved since its own last Stop is the arc it is executing.
-      const status = statusOf(arc);
-      if (TERMINAL.has(status)) continue;          // its unfinished rows are history, not work
-      // `HELD` names its blocker in its own line, and that blocker is frequently an ARC rather than a
+      // word is a claim any window can have written. What this session wrote is in its window's note,
+      // and an arc it wrote whose rows moved since its own last Stop is the arc it is executing.
+      if (TERMINAL.has(data.status)) continue;     // its unfinished rows are history, not work
+      // `HELD` names its blocker in its reason, and that blocker is frequently an ARC rather than a
       // card, which the `cards.length` guard below cannot see. `PROPOSED` and `DECIDED` have not
       // started. None of the three is runnable, whoever touched it.
-      if (NOT_RUNNABLE.has(status)) continue;
+      if (NOT_RUNNABLE.has(data.status)) continue;
       // NO BASELINE MEANS NO INFERENCE. A session's first Stop has nothing of its own to compare
       // against, and a headless window has only a first Stop, so it stays quiet.
       if (!since) continue;
       let wrote = false;
       if (touched) wrote = touched.has(arc);
-      else { try { wrote = statSync(arc).mtimeMs > since; } catch { wrote = false; } }
+      else { try { wrote = statSync(stateFileOf(ws, idOf(arc))).mtimeMs > since; } catch { wrote = false; } }
       if (!wrote) continue;
-      // EDITING AN ARC IS NOT EXECUTING IT. A status line, a log entry and a handover block are the
-      // sitting writing ABOUT the arc; a step table changing is the sitting working ON it. An arc
-      // absent from the baseline was written after it, and that is not evidence of work either.
-      const now = stepHash(read(arc));
-      if ((stepsAt[arc] ?? now) === now) continue;           // the record moved, the work did not
-      const steps = unfinishedSteps(arc, new Set(cards));
-      // A ROW IN PROGRESS IS NAMED WITH ITS AGE, NEVER CALLED RUNNABLE. The mark says somebody is on
-      // it; whether that is this sitting or a window that has gone, only the developer can say.
-      const claimed = inProgressSteps(arc);
+      // WRITING ABOUT AN ARC IS NOT EXECUTING IT. A header, a status or a log line is the sitting
+      // writing ABOUT the arc; its rows changing is the sitting working ON it. An arc absent from the
+      // baseline was opened after it, and that is not evidence of work either.
+      const now = rowsMark(data);
+      if ((stepsAt[arc] ?? now) === now) continue;            // the record moved, the work did not
+      // A RUNNING ROW IS NAMED WITH ITS AGE, NEVER CALLED RUNNABLE. Its state says somebody is on it;
+      // whether that is this sitting or a window that has gone, only the developer can say.
+      const claimed = runningRows(arc);
       if (claimed.length && !cards.length)
         out.push({
           check: "runnable",
-          message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} marked in progress: ` +
-            `${claimed.join(" · ")}. If this sitting is on it, finish it and mark it landed with its commit, or mark ` +
-            `it \`◐ stopped\` with what was done. If another window marked it, leave it and ask the developer, ` +
-            `saying how old the mark is (02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`),
+          message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} running: ` +
+            `${claimed.join(" · ")}. If this sitting is on it, finish it and land it with its commit ` +
+            `(\`spn-devex workstream row write ${arcRef(arc)} <row> --state landed\`), or write it \`--state stopped\` with what was ` +
+            `done. If another window is on it, leave it and ask the developer, saying how long it has run ` +
+            `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`),
         });
-      if (steps === null) {
-        out.push({ check: "runnable", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.`) });
-        continue;
-      }
+      const steps = readyRowsOf(arc, questions);
       if (!steps.length) continue;
       if (cards.length) continue;   // a card blocks: the hold reply covers that case
       out.push({
         check: "runnable",
-        message: named(basename(ws), `stopped with runnable work — this session changed the step rows of \`${fromWorkspace(root, arc)}\`, and ${steps.length} step` +
-          `${steps.length > 1 ? "s are" : " is"} not landed, and no card is open. The next one is ${steps[0]}. ` +
-          `Reporting is not stopping: a milestone line goes between steps, in the same turn as the next step ` +
+        message: named(basename(ws), `stopped with runnable work — this session changed the rows of \`${fromWorkspace(root, arc)}\`, and ${steps.length} row` +
+          `${steps.length > 1 ? "s are" : " is"} ready to run, and no card is open. The next one is ${steps[0]}. ` +
+          `Reporting is not stopping: a milestone line goes between rows, in the same turn as the next row ` +
           `(02-workstream/01-workstream.md § Say what you opened, and know when to wait for the answer).`),
       });
     }
@@ -693,16 +590,29 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
   return out;
 }
 
+/**
+ * Every arc of this window's workstreams that reads HELD while its reason names no blocker that still
+ * holds: no card open in the workstream's `questions.jsonl` and no arc of it still to land
+ * (02-workstream/01-workstream.md § An arc's status says which of eight states it is in). A card is
+ * named `q<n>` or `Q<n>`, and an arc `N<nnn>`.
+ */
 export function checkHold(root: string, mine: Set<string>): Warning[] {
   const out: Warning[] = [];
   for (const ws of scoped(openWorkstreamFolders(root), mine)) {
-    const cards = new Set(pagesOf(ws).flatMap(openCards));
-    for (const arc of arcsOf(ws)) {
-      if (statusOf(arc) !== "HELD") continue;
-      const asked = [...read(arc).matchAll(/`?(Q\d+)`?/g)].map((m) => m[1].toUpperCase());
-      const live = asked.filter((n) => cards.has(n));
-      if (!live.length)
-        out.push({ check: "hold", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads HELD and names no card that is open and unanswered. A HELD arc waits on a card; if its cards are answered, re-plan it and lift the hold.`) });
+    const open = new Set(openQuestionsOf(ws).map((one) => one.id.toLowerCase()));
+    for (const arc of arcFoldersOf(ws)) {
+      const data = dataOf(arc);
+      if (data?.status !== "HELD") continue;
+      const reason = typeof data.reason === "string" ? data.reason : "";
+      const cards = [...reason.matchAll(/\bq(\d+)\b/gi)].map((found) => `q${found[1]}`);
+      const arcs = [...reason.matchAll(/\bN\d+[a-z]?\b/g)].map((found) => found[0]).filter((other) => other !== data.arc);
+      const holds = cards.some((card) => open.has(card)) ||
+        arcs.some((other) => { const blocker = readArc(ws, other); return !!blocker && !TERMINAL.has(blocker.status); });
+      if (!holds)
+        out.push({ check: "hold", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads HELD and its reason ` +
+          `${reason ? `("${reason.slice(0, 80)}") ` : ""}names no card still open and no arc still to land. A HELD arc waits on a ` +
+          `named blocker, in its reason: a card in \`questions.jsonl\`, or an arc that must land first. If its blocker is gone, ` +
+          `re-plan it and lift the hold: \`spn-devex workstream row write ${arcRef(arc)} --status …\`.`) });
     }
   }
   return out;
@@ -822,11 +732,9 @@ export function carriesCard(reply: string): boolean {
 }
 
 /**
- * Every `Q<n>` open and unanswered across every open workstream's page.
- *
- * `openCards` above takes ONE page and is about that page's own cards; this asks the workspace-wide
- * question a handover has to answer, and it subtracts what an arc records as settled — a card the
- * page still shows but an arc has answered is not work anybody is waiting on.
+ * Every `Q<n>` open and unanswered on the pages of this window's workstreams: the question a handover
+ * has to answer. It subtracts what a workstream records as settled — a card the page still shows but
+ * a record has answered is not work anybody is waiting on.
  */
 function cardsWaiting(root: string, mine: Set<string>): string[] {
   return [...new Set([...cardsByWorkstream(root, mine).values()].flat())].sort();
@@ -836,8 +744,8 @@ function cardsWaiting(root: string, mine: Set<string>): string[] {
 export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, string[]> {
   const out = new Map<string, string[]>();
   for (const [subject, pages] of argued(root, mine)) {
-    const folder = dirname(pages[0]);
-    const answered = answeredNumbers(folder);
+    // A card its record has answered or withdrawn in `questions.jsonl` is settled, whatever a page still shows.
+    const answered = new Set(readQuestions(dirname(pages[0])).filter((one) => one.state !== "open").map((one) => one.id.toUpperCase()));
     const cards: string[] = [];
     for (const page of pages)
       for (const card of cardsOf(page))
@@ -880,13 +788,13 @@ export function givesHandover(reply: string): boolean {
 }
 
 /**
- * One hash of the step rows of every arc in this window's workstreams. The hook keeps it when a whole
+ * One hash of the rows of every arc in this window's workstreams. The hook keeps it when a whole
  * handover block is written. While it has not moved, the work stands where the block says, and no
  * second block is owed. Only this window's arcs are read, so another window's work never brings the
  * question back.
  */
 export function stepsMark(root: string, mine: Set<string>): string {
-  const rows = openArcs(root, mine).sort().map((arc) => `${arc}\n${stepHash(read(arc))}`);
+  const rows = openArcs(root, mine).sort().map((arc) => `${arc}\n${rowsMark(dataOf(arc))}`);
   return createHash("sha256").update(rows.join("\n")).digest("hex").slice(0, 12);
 }
 
@@ -968,18 +876,11 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
 }
 
 
-// ---------------------------------------------------------------------------- the arc-to-page checks
+// ---------------------------------------------------------------------------- the arc-to-page check
 //
-// PORTED FROM `hooks/scripts/stop.py`, WHICH WAS SILENT ON THIS WORKSPACE. Every one of its four
-// checks listed an open workstream's arcs as `name.startswith('arc-')`. The naming moved to
-// `N1-{subject}.md` and the filter was never followed, so on 2026-09-19 workstream `008` held
-// FOURTEEN arcs, none of them named `arc-`, and the whole file reported nothing.
-//
-// Drop the filter and the same code has three real findings on that workstream, and an arc carrying
-// two `Q` cards while the page's `Open` reads *none* — which is precisely the shape `cardsInArcs`
-// was written for. Finding F11 in this arc.
-//
-// So these read every `.md` under `arcs/`, which is what `arcsOf` above already did.
+// A ROW WAITING ON THE DEVELOPER WHILE THE PAGE'S `Open` CARRIES NO CARD. The rest of what a page owes
+// its arcs is `workstream state check`'s, which the `state` check below runs: an arc with no row in
+// Cycles, a workstream with arcs and no page, and a card with no record or a record with no card.
 
 /**
  * Whether a page names a card number anywhere — an open card, a settled row, or a deferred one.
@@ -1011,47 +912,6 @@ function argued(root: string, mine: Set<string>): Array<[string, string[]]> {
 }
 
 /**
- * Every arc in an open workstream that no row of its page names.
- *
- * AN ARC IS NOT WRITTEN UNTIL THE PAGE CARRIES IT. The arc is the plan and the page is what you
- * read, so an arc no row names is work that looks finished from the only surface anybody opens.
- *
- * The page must name the arc FILE. Rows name pieces of work, never the arc they belong to, so
- * matching a row's words against a filename was guesswork — it fired on a page that carried every
- * arc under a heading. A citation is explicit, greppable, and useful to a reader who wants the
- * argument behind a plan.
- */
-export function unnamedArcs(root: string, mine: Set<string>): Array<[string, string, string]> {
-  const out: Array<[string, string, string]> = [];
-  for (const [subject, pages] of argued(root, mine)) {
-    const pageText = pages.map(read).join(" ");
-    for (const arc of arcsOf(dirname(pages[0]))) {
-      const name = basename(arc);
-      if (!pageText.includes(name)) out.push([subject, name, basename(pages[0])]);
-    }
-  }
-  return out;
-}
-
-/**
- * Every open workstream that holds arcs and has no page at all.
- *
- * THE CHECK'S OWN WORST CASE, AND IT WAVED IT THROUGH. `unnamedArcs` begins by skipping a workstream
- * with no pages, so the strongest form of the failure it exists to catch — an arc nobody can read,
- * because there is no page to read — was the one shape it never reported. `008-plain-language` sat in
- * exactly that state while the check ran green beside it.
- */
-export function pagelessWorkstreams(root: string, mine: Set<string>): string[] {
-  const out: string[] = [];
-  for (const [subject, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
-    if (pages.length || !mine.has(subject)) continue;
-    for (const folder of scoped(openWorkstreamFolders(root), mine))
-      if (basename(folder) === subject && arcsOf(folder).length) { out.push(subject); break; }
-  }
-  return out;
-}
-
-/**
  * Every open workstream whose plan records a stop while its page says nothing is open.
  *
  * THE THIRD SHAPE, AND THE WORST OF THE THREE. The other two put a question in the wrong file, where
@@ -1065,36 +925,6 @@ export function stopsWithEmptyOpen(root: string, mine: Set<string>): Array<[stri
     const text = pages.map(read).join(" ");
     const waiting = workstreamPlan([dirname(pages[0])], pages).filter((row) => stateOf(row) === "stopped");
     if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
-  }
-  return out;
-}
-
-/**
- * Every open workstream whose ARCS carry `Q<n>` cards while its page shows none.
- *
- * THIS IS THE SHAPE THAT ACTUALLY HAPPENED, twice in one sitting on `011`. The agent wrote five cards
- * into an arc while the page's `Open` said nothing, and the developer caught it both times.
- * `stopsWithEmptyOpen` reads a row's STATE, which catches a related shape and would not have caught
- * this one: those rows read `pending`, and the question was never a row at all.
- *
- * A CARD THE PAGE ALREADY NAMES IS NOT THIS SHAPE. An arc is where a card's argument belongs — the
- * options, what each costs, and why one won — once the page carries the answer somewhere a reader
- * finds it. Finding F12: this fired on `008`'s `Q11`, argued in `N1b` and answered on the page in
- * its *Settled already* table, which is the arrangement the convention asks for. The question is
- * whether the PAGE names the number at all, not whether it still has a card open.
- */
-export function cardsInArcs(root: string, mine: Set<string>): Array<[string, string, string]> {
-  const out: Array<[string, string, string]> = [];
-  for (const [subject, pages] of argued(root, mine)) {
-    if (!cardPatternReadable(pages)) continue;
-    const pageText = pages.map(read).join(" ");
-    if (hasOpenCard(pageText)) continue;
-    for (const arc of arcsOf(dirname(pages[0]))) {
-      const unrecorded = [...read(arc).matchAll(/^#{2,4}\s+`?(Q\d+[A-Z]?)`?\s*[·\u00b7]/gm)]
-        .map((found) => found[1])
-        .filter((card) => !namesCard(pageText, card));
-      if (unrecorded.length) { out.push([subject, basename(arc), unrecorded[0]]); break; }
-    }
   }
   return out;
 }
@@ -1303,42 +1133,16 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
   return out;
 }
 
-/** The four arc-to-page checks, as warnings. */
+/** The arc-to-page check, as warnings. */
 export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
-  const out: Warning[] = [];
-  const pageless = pagelessWorkstreams(root, mine);
-  if (pageless.length)
-    out.push({ check: "pageless", message:
-      `An open workstream with arcs and no page — ${pageless.join(" · ")}. The arc is the plan and ` +
-      `the page is what anybody reads, so a workstream with no page is work nobody can pick up. ` +
-      `Give it an approach page in the fixed shape (05-artifacts.md, The approach document).` });
-
-  const inArcs = cardsInArcs(root, mine);
-  if (inArcs.length)
-    out.push({ check: "cards-in-arcs", message:
-      `A card written into an arc while the page shows none — ` +
-      inArcs.slice(0, 4).map(([subject, arc, card]) => `${card} in ${arc} (${subject})`).join(" · ") +
-      `. An arc plans work and never holds a question. Move it to the page's \`Open\` as a \`Q<n>\` ` +
-      `card, in the card pattern (refs/devex/workspace/docs/decision-cards.md).` });
-
   const stopped = stopsWithEmptyOpen(root, mine);
-  if (stopped.length)
-    out.push({ check: "stopped-no-card", message:
-      `A row waiting on the developer while \`Open\` carries no card — ` +
-      stopped.slice(0, 4).map(([subject, row]) => `row ${row} in ${subject}`).join(" · ") +
-      `. A stop is an open item like any other, and a question the plan knows about while the page ` +
-      `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
-      `(refs/devex/workspace/docs/decision-cards.md).` });
-
-  const missing = unnamedArcs(root, mine);
-  if (missing.length)
-    out.push({ check: "unnamed-arc", message:
-      `An arc the page does not name — ` +
-      missing.slice(0, 4).map(([subject, arc]) => `${arc} in ${subject}`).join(" · ") +
-      `. An arc is the plan and the page is what anybody reads, so an arc nothing names is work that ` +
-      `looks finished from the only surface they open. Give it its row in the page's Cycles table, ` +
-      `citing the arc file (05-artifacts.md, The approach document).` });
-  return out;
+  if (!stopped.length) return [];
+  return [{ check: "stopped-no-card", message:
+    `A row waiting on the developer while \`Open\` carries no card — ` +
+    stopped.slice(0, 4).map(([subject, row]) => `row ${row} in ${subject}`).join(" · ") +
+    `. A stop is an open item like any other, and a question the plan knows about while the page ` +
+    `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
+    `(refs/devex/workspace/docs/decision-cards.md).` }];
 }
 
 // ---------------------------------------------------------------------------- the page and the arcs
@@ -1438,47 +1242,6 @@ export function checkOwnCopy(root: string, mine: Set<string>, told: string[] = [
     `Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, ` +
     `the header's status and the parts that \`docs cycles write\` writes are not checked. Each page is ` +
     `named once in a session.` }];
-}
-
-/**
- * The close gate's report for an arc that reached `LANDED` this turn. The close refuses a row nobody
- * decided, and it says so only when every arc of the workstream is read at once. The turn an arc
- * lands is when its rows are easiest to account for, so its rows are read here as the gate reads them.
- *
- * @param before   each arc's mark at this session's last Stop, which holds the status it read then
- * @param touched  the arcs this session wrote since that Stop; `null` reads nothing
- */
-export function checkArcLanded(root: string, before: Record<string, ArcMark> | undefined, touched: Set<string> | null): Warning[] {
-  if (!before || !touched) return [];
-  const reports: string[] = [];
-  const reopen: string[] = [];
-  for (const arc of [...touched].sort()) {
-    const was = before[arc];
-    if (!was || statusOf(arc) !== "LANDED") continue;
-    const text = read(arc);
-    const rows = arcRowsOf(text, arcName(arc));
-    const miscounted = miscountLines(arcName(arc), text);
-    const owed = rows.some((row) => !accounted(row) || (stateOf(row) === "carried" && carryFault(root, row) !== null));
-    if (!owed && !miscounted.length) continue;
-    const report = `\`${workstreamOf(arc)}\` · \`${fromWorkspace(root, arc)}\`:\n` +
-      [...reportLines(root, basename(arc), rows), ...miscounted].join("\n");
-    // An arc that read LANDED at the last Stop and now holds a row nobody accounted for gained scope
-    // after it landed, and a landed arc owes nothing (01-workstream.md § An arc reopens by the moment).
-    (was.status === "LANDED" ? reopen : reports).push(report);
-  }
-  const out: Warning[] = [];
-  if (reports.length) out.push({ check: "arc-landed", message:
-    `An arc reached \`LANDED\` this turn with a row nobody accounted for. The close gate's report for it:\n${reports.join("\n")}\n` +
-    `Give each row one of three states now, while the arc is in front of you: \`✅ landed\` with its date and ` +
-    `commit, \`↷ carried\` with the workstream that takes it on, or \`⊘ deferred\` with the event that brings ` +
-    `it back. A tick with no date and no landed word reads as pending ` +
-    `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).` });
-  if (reopen.length) out.push({ check: "arc-landed", message:
-    `A \`LANDED\` arc holds a row that is not landed, carried or deferred, so it gained scope after it landed. ` +
-    `Reopen it as \`PROPOSED\`, with the new information in the preview and the new rows, and \`DECIDED\` waits for the ` +
-    `developer's word. If the row is a small decision inside what was agreed, give it its landed state instead:\n` +
-    `${reopen.join("\n")}\n(02-workstream/01-workstream.md § An arc reopens by the moment, RD.DEVEX.WORKSPACE.261).` });
-  return out;
 }
 
 // ---------------------------------------------------------------------------- welcome
@@ -1723,7 +1486,6 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "state" }, () => checkWorkstreamState(root, mine)),
     ...span({ group: "stop", action: "migration" }, () => checkMigrations(root)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
-    ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),
     ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given)),

@@ -109,8 +109,7 @@ compare("day zero resumed: a new-platform workstream is already open",
   fixture("day-zero-resumed", {
     "README.md": "nothing here yet\n",
     ".spndevex/README.md": "the workspace state, and no repo cloned yet\n",
-    [`.spndevex/${WORKSTREAMS}/open/001-new-platform/arcs/N1-estate-coordinates.md`]:
-      "| 1 | The organization's code, its name, and the mail domain | `acme` | … |\n",
+    [`.spndevex/${WORKSTREAMS}/open/001-new-platform/arcs/N001/state.json`]: "{}\n",
   }),
   ["You started a platform here and we did not finish", "001-new-platform",
    "Shall we carry on?", "Read its arc BEFORE you say anything"],
@@ -139,22 +138,23 @@ const one = compare("exactly one workstream open: the standing offer appears",
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/widget-pricing-approach.html`]: "<html></html>",
-    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1-a.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   }),
   ["Or ask me to continue 042 widget-pricing", "1 open · 1 backlog · 1 closed", "file://", "041-finished"]);
 
-// ARC FILES NAMED WITH THREE DIGITS ARE COUNTED AS ARCS, beside one named with one digit. The notes
-// folder `notes/N001/` holds no arc, whatever sits in it.
-compare("arc files named N001 and N002 are counted, and files under notes/N001/ are not",
+// ARCS NUMBERED WITH THREE DIGITS ARE COUNTED, beside one numbered with one digit, each by its data. The
+// notes folder `notes/N001/` holds no arc, whatever sits in it, and a Markdown arc file is no arc.
+compare("arcs kept as data N001, N002 and N3 are counted, and neither notes/N001/ nor a Markdown arc file is",
   fixture("three-digit-arcs", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N001-book-change.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N002-support-release.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N3-an-older-name.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N001/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N002/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N3/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N9-the-old-form.md`]: "# arc\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/plan.md`]: "# plan\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/samples/close-message.md`]: "Closing.\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/approach.html`]: "<html></html>",
@@ -165,20 +165,21 @@ compare("two open: no offer is made, because naming one would be choosing for yo
   fixture("two-open", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1/state.json`]: "{}\n",
   }),
   ["2 open"], ["Or ask me to continue"]);
 
-compare("the legacy shapes still read: sessions/ and a bare arc",
+// THE CONTAINER'S OLDER NAME STILL READS, and a bare Markdown arc under `.spndevex/arcs/`, the shape
+// before workstreams, is no workstream.
+compare("the container's older name still reads: sessions/, and a bare arc file is no workstream",
   fixture("legacy", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    ".spndevex/sessions/open/old-subject/arcs/N1-a.md": "# arc\n",
+    ".spndevex/sessions/open/old-subject/arcs/N1/state.json": "{}\n",
     ".spndevex/arcs/arc-older-subject.md": "# arc\n",
-    ".spndevex/notes/older-subject-approach.html": "<html></html>",
   }),
-  ["still in sessions/", "still in arcs/"]);
+  ["still in sessions/"], ["older-subject", "still in arcs/"]);
 
 compare("a repo with no claim at all reports one, rather than guessing",
   fixture("no-claim", {
@@ -383,7 +384,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": wired,
-    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   });
   says("any workstream, even a closed one, makes it a returning visit",
     isWelcome(hook(returning, "Dhruv").message, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!"));
@@ -411,10 +412,10 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-py/sprepo.json": repo("APPS", { stack: "PY" }),
     "spn-app-py/CONCEPT.md": "# concept\n",
     "spn-app-py/.claude/settings.json": wired,
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1-a.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1-a.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1/state.json`]: "{}\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   });
   const plain = hook(busy, "Dhruv");
   // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected, and asserted apart.
@@ -430,7 +431,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": wired,
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
   });
   says("an ordinary session adds no clause at all",
     statusOf(hook(ordinary, null).message) === "1 repo · 1 workstream open (042)");
@@ -573,7 +574,7 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
   const ordinary = hook(fixture("short-rules", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
   }));
   const HEADING = "## The short rules";
   const at = ordinary.context.indexOf(HEADING);
