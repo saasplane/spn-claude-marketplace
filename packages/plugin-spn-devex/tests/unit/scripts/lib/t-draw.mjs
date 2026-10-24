@@ -1292,5 +1292,122 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RD.DEV
     createHash("sha256").update(draw(LOOSE).svg).digest("hex"), "5dad41d636d8f5b8ece28d801e51e4df6adcede2b6863539b049a57d74494a24");
 }
 
+console.log("=== SKELETON — a section's fill and room, a feature's frames, and every field read (RD.DEVEX.WORKSPACE.285 to .288)");
+{
+  /** Every rect of one class, as [x, y, width, height, corner]. */
+  const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const wordsAt = (g, words) => [...g.matchAll(/<text class="[^"]+" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]), words: m[3] })).find((t) => t.words === words);
+  const same = (one_, other) => JSON.stringify(one_) === JSON.stringify(other);
+  const NOTE = [{ items: [{ note: "Every team rebuilds the same plumbing" }] }];
+  const section = (look, rows = NOTE) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", rows, ...look } }] }] } });
+  const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
+  const extent = (g) => boxes(g, "sds-skel-guide")[0];
+  const DOORS = [{ items: [{ item: { media: "default", title: "Secure", description: "Zero trust by construction" }, fill: true }, { item: { media: "default", title: "Scalable" }, fill: true }] }];
+  const HEAD = [{ items: [{ head: { title: "Plans for every team" } }] }];
+  const BESIDE = [{ items: [{ frame: { rows: HEAD } }, { slot: "mediaNode · the product", fill: true }] }];
+
+  // 1 · `DSFeatureGridSectionContainer` is a unit, a container by its name
+  const cell = { fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { pageLevel: "WIDGET", title: "Audit log" } }] }] } };
+  const grid = draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows: [...HEAD, { items: [cell, { ...cell }] }] } }] }] } });
+  one("`DSFeatureGridSectionContainer` is a unit a spec may name: a container, drawn as a section is, its name at the corner of its outline",
+    [grid.findings, grid.svg.includes(">DSFeatureGridSectionContainer<"), boxes(grid.svg, "sds-skel-control").filter((b) => b[4] === 8)[0], extent(grid.svg)],
+    ([found, named, box, outer]) => found.length === 0 && named && box[0] === outer[0] && box[2] === outer[2]);
+
+  // 2 · a section's fill is a band across its box, and every strength draws the same band
+  const banded = section({ color: "DEFAULT" });
+  one("a section's `color` other than `BASE` is a band: a raised frame's background across the whole box, square, and no finding",
+    [banded.findings, boxes(banded.svg, "sds-skel-surface"), extent(banded.svg), boxes(section({}).svg, "sds-skel-surface"), boxes(section({ color: "BASE" }).svg, "sds-skel-surface")],
+    ([found, band, outer, plain, base]) => found.length === 0 && band.length === 1 && same(band[0].slice(0, 4), outer.slice(0, 4)) && band[0][4] === 0 && plain.length === 0 && base.length === 0);
+  one("how strong the fill is belongs to the library's look: `SUBTLE`, `QUIET` and `SOLID` draw the same band, and a fill draws one",
+    ["SUBTLE", "QUIET", "SOLID"].map((strength) => section({ color: "PRIMARY", strength }).svg),
+    (g) => g[0] === g[1] && g[1] === g[2] && g[0] !== section({}).svg);
+
+  // 3 · `inset` is a solid line along the top and the bottom edge of the box, and none at its sides
+  const inset = section({ inset: true }), [ix, iy, iw, ih] = extent(inset.svg);
+  one("a section's `inset` is a solid line along its top and its bottom edge, and none at its sides",
+    [inset.findings, [...inset.svg.matchAll(/<path class="sds-skel-border" d="([^"]+)"/g)].map((m) => m[1]), section({}).svg.includes("sds-skel-border")],
+    ([found, lines, plain]) => found.length === 0 && lines.length === 1 && lines[0] === `M${ix} ${iy} L${ix + iw} ${iy} M${ix} ${iy + ih} L${ix + iw} ${iy + ih}` && !plain);
+
+  // 4 · a `size` stands the section's room above and below its content: its room on a phone
+  one("a section's `size` stands its room above and below its content: 24, 32, 56, 64 and 72 for XS to XL, each side",
+    ["XS", "SM", "MD", "LG", "XL"].map((size, i) => extent(section({ size }).svg)[3] - 20 - [28, 32, 36, 40, 44][i]),
+    (g) => g.join() === "48,64,112,128,144");
+  one("the content stands its room under the section's name: at `SM`, 16 further down than a section with no `size`",
+    wordsAt(section({ size: "SM" }).svg, "Every team rebuilds the same plumbing").y - wordsAt(section({}).svg, "Every team rebuilds the same plumbing").y, 16);
+
+  // 5 · a section's fields are a section's, and take the values the design system has
+  one("`color`, `strength` or `inset` on a frame that is not a `DSSectionContainer` is a finding",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSPanelContainer", label: "Orders", inset: true, rows: NOTE } }] }] } }).findings,
+    says("`inset` is a field of a `DSSectionContainer`, and this frame is `DSPanelContainer`"));
+  one("a `color` or a `strength` the design system does not have is a finding",
+    [section({ color: "BLUE" }).findings, section({ strength: "LOUD" }).findings],
+    ([colour, strength]) => says("a section's `color` is `BLUE`, and it takes BASE · DEFAULT · PRIMARY")(colour) && says("a section's `strength` is `LOUD`, and it takes SUBTLE · QUIET · SOLID")(strength));
+
+  // 6 · `items.surface` puts each item line of a feature in a frame of its own
+  const doors = feature({ items: { surface: {} } }, DOORS);
+  const doorBoxes = boxes(doors.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  one("`items.surface` puts each item line in a thin rounded outline of its own, as tall as its row, its words a boundary's padding in",
+    [doors.findings, doorBoxes, wordsAt(doors.svg, "Secure"), wordsAt(doors.svg, "Scalable")],
+    ([found, two, secure, scalable]) => found.length === 0 && two.length === 2 && two[0][3] === two[1][3] && two[0][1] === two[1][1]
+      && secure.x > two[0][0] + 16 && scalable.x > two[1][0] + 16 && secure.y > two[0][1] + 16 && scalable.y < two[1][1] + two[1][3]);
+  one("a boxed line takes a boundary's padding on every side: the row is 32 taller than the same lines unboxed",
+    extent(doors.svg)[3] - extent(feature({}, DOORS).svg)[3], 32);
+  const raisedDoors = feature({ items: { surface: { raised: true, elevation: "MD" } } }, DOORS);
+  one("a raised frame has a raised frame's background behind its outline, and a bordered one a solid line in place of the thin one",
+    [boxes(raisedDoors.svg, "sds-skel-surface").filter((b) => b[4] === 8), boxes(raisedDoors.svg, "sds-skel-control").filter((b) => b[4] === 8),
+      boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "sds-skel-border"), boxes(feature({ items: { surface: { bordered: true } } }, DOORS).svg, "sds-skel-control").filter((b) => b[4] === 8)],
+    ([fills, outlines, solid, thin]) => fills.length === 2 && same(fills, outlines) && solid.length === 2 && thin.length === 0);
+  one("a frame with `rounded` false has square corners", boxes(feature({ items: { surface: { rounded: false } } }, DOORS).svg, "sds-skel-control").filter((b) => b[4] === 0).length, 2);
+  one("a colour other than `BASE` gives the frame a background too", boxes(feature({ items: { surface: { color: "DEFAULT" } } }, DOORS).svg, "sds-skel-surface").filter((b) => b[4] === 8).length, 2);
+  one("how far a raised frame stands off belongs to the library's look: `elevation` `MD` and `LG` draw the same raised frame",
+    [feature({ items: { surface: { raised: true, elevation: "LG" } } }, DOORS).svg === raisedDoors.svg, boxes(raisedDoors.svg, "sds-skel-surface").filter((b) => b[4] === 8).length],
+    ([alike, raised]) => alike && raised === 2);
+
+  // 7 · `frames` and `surface`: the feature's own frame, round the whole of it, its media, or its words
+  const whole = feature({ frames: ["TEXT"], surface: {} }, HEAD);
+  one("`frames` `TEXT` on a feature with no media frames the whole feature, in place of its dotted boundary, its name kept",
+    [whole.findings, boxes(whole.svg, "sds-skel-guide"), boxes(whole.svg, "sds-skel-control").filter((b) => b[4] === 8), extent(feature({}, HEAD).svg), whole.svg.includes(">DSFeature<")],
+    ([found, guides, frame, plain, named]) => found.length === 0 && guides.length === 0 && frame.length === 1 && same(frame[0].slice(0, 4), plain.slice(0, 4)) && named);
+  const media = feature({ frames: ["MEDIA"], surface: { raised: true, elevation: "LG" } }, [...HEAD, { items: [{ slot: "mediaNode · the product", fill: true, height: 3 }] }]);
+  const plainMedia = feature({}, [...HEAD, { items: [{ slot: "mediaNode · the product", fill: true, height: 3 }] }]);
+  one("`frames` `MEDIA` frames the slot that is the feature's media, flush, and the feature keeps its dotted boundary",
+    [media.findings, boxes(media.svg, "sds-skel-control").filter((b) => b[4] === 8), boxes(media.svg, "sds-skel-surface").filter((b) => b[4] === 8), boxes(plainMedia.svg, "sds-skel-guide")[1], extent(media.svg)],
+    ([found, outline, fill, slot, outer]) => found.length === 0 && outline.length === 1 && same(outline, fill) && same(outline[0].slice(0, 4), slot.slice(0, 4)) && outer !== undefined);
+  one("`frames` `TEXT` and `MEDIA` together frame the whole feature, and leave the slot its own mark",
+    [boxes(feature({ frames: ["TEXT", "MEDIA"] }, BESIDE).svg, "sds-skel-control").filter((b) => b[4] === 8), extent(feature({}, BESIDE).svg)],
+    ([frame, outer]) => frame.length === 1 && same(frame[0].slice(0, 4), outer.slice(0, 4)));
+  const words = feature({ frames: ["TEXT"] }, BESIDE), wordsPlain = feature({}, BESIDE);
+  one("`frames` `TEXT` alone beside media frames the words, and the slot keeps its dotted mark",
+    [words.findings, boxes(words.svg, "sds-skel-control").filter((b) => b[4] === 8), boxes(wordsPlain.svg, "sds-skel-guide")[1], boxes(words.svg, "sds-skel-guide").length, boxes(wordsPlain.svg, "sds-skel-guide").length],
+    ([found, frame, column, guides, plainGuides]) => found.length === 0 && frame.length === 1 && same(frame[0].slice(0, 4), column.slice(0, 4)) && guides === plainGuides);
+
+  // 8 · the frames' findings
+  one("a feature's `surface` with no part named in `frames` is a finding: it paints nothing", feature({ surface: { raised: true } }, HEAD).findings, says("paints only the parts its `frames` names"));
+  one("an `elevation` on a frame that is not raised is a finding", feature({ items: { surface: { elevation: "MD" } } }, DOORS).findings, says("gives an `elevation` and is not `raised`"));
+  one("a part the feature does not have in `frames` is a finding", feature({ frames: ["BODY"] }, HEAD).findings, says("a `DSFeature`'s `frames` names its parts, TEXT · MEDIA"));
+  one("an `elevation` the design system does not have is a finding", feature({ items: { surface: { raised: true, elevation: "XXL" } } }, DOORS).findings, says("the `elevation` of a feature's `items.surface` is `XXL`"));
+  one("`surface` or `items` on a unit that is not a `DSFeature` is a finding",
+    [draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSCard", label: "Team", surface: { raised: true }, rows: NOTE } }] }] } }).findings, section({ items: { surface: {} } }).findings],
+    ([card, sectioned]) => says("`surface` is a field of a `DSFeature`, and this frame is `DSCard`")(card) && says("`items` is a field of a `DSFeature`, and this frame is `DSSectionContainer`")(sectioned));
+
+  // 9 · a field that a skeleton does not have is a finding, never silence
+  one("`numbered` on a feature is no field a skeleton has, and is named in a finding", feature({ numbered: true }, HEAD).findings, says("`numbered` is no field of a frame"));
+  one("`selected` on an item is no field a skeleton has, and is named in a finding", feature({}, [{ items: [{ item: { title: "Shape" }, selected: true, fill: true }] }]).findings, says("`selected` is no field of an item"));
+  one("a key of a feature's `items` the skeleton does not draw is named, `items.numbered` among them", feature({ items: { numbered: true } }, DOORS).findings, says("`numbered` is no field of a feature's `items`"));
+  one("a field of a row, a head, an item line, a view and the spec is read too",
+    draw({ kind: "skeleton", subtitle: "x", views: [{ viewport: "DESKTOP", zoom: 2, frame: { rows: [{ height: 2, items: [{ head: { title: "A", align: "CENTER" } }, { item: { title: "B", badge: "x" }, fill: true }] }] } }] }).findings,
+    (g) => ["`subtitle` is no field of a skeleton spec", "`zoom` is no field of a view", "`height` is no field of a row", "`align` is no field of a head", "`badge` is no field of an item line"].every((s) => says(s)(g)));
+  one("`tone` keeps the finding that names what replaced it, and a field beside it that no skeleton has is named on its own",
+    draw({ kind: "skeleton", frame: { tone: "warn", shade: "dark", rows: NOTE } }).findings,
+    (g) => g.length === 2 && says("no longer reads `tone`")(g) && says("`shade` is no field of a frame")(g) && !says("`tone` is no field")(g));
+
+  // 10 · a section and a feature written with none of the new fields draw byte for byte as before (the hash of the drawer before this row)
+  const PLAIN = { kind: "skeleton", title: "A section and a feature, as before", views: [{ viewport: "DESKTOP", frame: { size: "XS", rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows: [
+    { items: [{ head: { eyebrow: "Orders", title: "Watch every order move", description: "Each order shows where it stands." } }] },
+    { items: [{ item: { media: "default", title: "Live status", description: "Paid, packed or shipped" }, fill: true }, { slot: "mediaNode · the product", fill: true }] }] } }] }] } }] }] } }] };
+  one("a section and a feature written with none of the new fields draw byte for byte as before",
+    createHash("sha256").update(draw(PLAIN).svg).digest("hex"), "45e92a0ba59ce1114ff1ad250657ca422a65eb0ff970dcfd29563b23231bbafd");
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

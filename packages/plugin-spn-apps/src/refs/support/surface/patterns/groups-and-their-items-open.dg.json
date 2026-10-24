@@ -194,76 +194,78 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "standin": "table",
-            "fill": true,
-            "flush": true,
-            "columns": [
-             "Name",
-             "Type",
-             "State",
-             ""
-            ],
-            "cells": [
-             [
-              "Budget",
-              "Number",
-              {
-               "control": "badge",
-               "text": "Required"
-              },
-              {
-               "icon": "more"
-              }
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              "State",
+              ""
              ],
-             [
-              "Due date",
-              "Date",
-              "",
-              {
-               "icon": "more"
-              }
-             ],
-             [
-              "Stage",
-              "Choice",
-              {
-               "control": "badge",
-               "text": "Required"
-              },
-              {
-               "icon": "more"
-              }
-             ],
-             [
-              "Notes",
-              "Text",
-              {
-               "control": "badge",
-               "text": "Inactive"
-              },
-              {
-               "icon": "more"
-              }
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               "",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "control": "badge",
+                "text": "Inactive"
+               },
+               {
+                "icon": "more"
+               }
+              ]
              ]
-            ]
-           }
-          ]
-         }
-        ],
-        "label": "Project",
-        "note": "Fields of this record type",
-        "actions": [
-         {
-          "control": "button",
-          "text": "Add field",
-          "main": true
-         }
-        ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ]
+        }
        }
       ]
      }
@@ -284,103 +286,105 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Budget",
-             "meta": [
-              "Number",
-              {
-               "control": "badge",
-               "text": "Required"
-              }
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Due date",
-             "meta": [
-              "Date"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Stage",
-             "meta": [
-              "Choice",
-              {
-               "control": "badge",
-               "text": "Required"
-              }
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Notes",
-             "meta": [
-              "Text",
-              {
-               "control": "badge",
-               "text": "Inactive"
-              }
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         }
-        ],
-        "label": "Project",
-        "note": "Fields of this record type",
-        "actions": [
-         {
-          "control": "button",
-          "text": "Add field",
-          "main": true
-         }
-        ],
-        "divided": true
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Budget",
+              "meta": [
+               "Number",
+               {
+                "control": "badge",
+                "text": "Required"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Due date",
+              "meta": [
+               "Date"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Stage",
+              "meta": [
+               "Choice",
+               {
+                "control": "badge",
+                "text": "Required"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Notes",
+              "meta": [
+               "Text",
+               {
+                "control": "badge",
+                "text": "Inactive"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ],
+         "divided": true
+        }
        }
       ]
      }

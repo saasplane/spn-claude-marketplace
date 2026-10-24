@@ -182,76 +182,78 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "item": {
-             "title": "OTP verification",
-             "meta": [
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Password reset",
-             "meta": [
-              {
-               "control": "badge",
-               "text": "Published v3"
-              },
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "New device",
-             "meta": [
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         }
-        ],
-        "label": "Authentication",
-        "note": "Actions of this group",
-        "divided": true
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "note": "Actions of this group",
+         "divided": true
+        }
        }
       ]
      }
@@ -272,76 +274,78 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "item": {
-             "title": "OTP verification",
-             "meta": [
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Password reset",
-             "meta": [
-              {
-               "control": "badge",
-               "text": "Published v3"
-              },
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "New device",
-             "meta": [
-              "Email",
-              "SMS",
-              "Push"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         }
-        ],
-        "label": "Authentication",
-        "note": "Actions of this group",
-        "divided": true
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "OTP verification",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Password reset",
+              "meta": [
+               {
+                "control": "badge",
+                "text": "Published v3"
+               },
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "New device",
+              "meta": [
+               "Email",
+               "SMS",
+               "Push"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Authentication",
+         "note": "Actions of this group",
+         "divided": true
+        }
        }
       ]
      }

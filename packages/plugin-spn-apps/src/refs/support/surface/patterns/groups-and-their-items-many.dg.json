@@ -241,62 +241,64 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "standin": "table",
-            "fill": true,
-            "flush": true,
-            "columns": [
-             "Name",
-             "Type",
-             ""
-            ],
-            "cells": [
-             [
-              "Budget",
-              "Number",
-              {
-               "icon": "more"
-              }
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              ""
              ],
-             [
-              "Due date",
-              "Date",
-              {
-               "icon": "more"
-              }
-             ],
-             [
-              "Stage",
-              "Choice",
-              {
-               "icon": "more"
-              }
-             ],
-             [
-              "Notes",
-              "Text",
-              {
-               "icon": "more"
-              }
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "icon": "more"
+               }
+              ]
              ]
-            ]
-           }
-          ]
-         }
-        ],
-        "label": "Project",
-        "note": "Fields of this record type",
-        "actions": [
-         {
-          "control": "button",
-          "text": "Add field",
-          "main": true
-         }
-        ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ]
+        }
        }
       ]
      }
@@ -317,91 +319,93 @@
      {
       "items": [
        {
-        "unit": "DSPanelContainer",
-        "rows": [
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Budget",
-             "meta": [
-              "Number"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Due date",
-             "meta": [
-              "Date"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Stage",
-             "meta": [
-              "Choice"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         },
-         {
-          "items": [
-           {
-            "item": {
-             "title": "Notes",
-             "meta": [
-              "Text"
-             ],
-             "end": [
-              {
-               "icon": "more"
-              }
-             ]
-            },
-            "fill": true
-           }
-          ]
-         }
-        ],
-        "label": "Project",
-        "note": "Fields of this record type",
-        "actions": [
-         {
-          "control": "button",
-          "text": "Add field",
-          "main": true
-         }
-        ],
-        "divided": true
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Budget",
+              "meta": [
+               "Number"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Due date",
+              "meta": [
+               "Date"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Stage",
+              "meta": [
+               "Choice"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Notes",
+              "meta": [
+               "Text"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ],
+         "divided": true
+        }
        }
       ]
      }

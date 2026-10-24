@@ -149,7 +149,8 @@ export type SkeletonRow = { label?: string; framed?: boolean; chosen?: boolean; 
  *  names the parts that share a frame. Parts next to each other that are named share one frame; a part not
  *  named is flat. The frame is `raised` (one surface behind its parts), `bordered` (one solid outline and a solid
  *  line between its parts), or both, and `rounded` or square. `size` is a size step, `XS` to `XL`, that every
- *  control inside reads its height from; the default is `SM`. */
+ *  control inside reads its height from; the default is `SM`. A `DSFeature` is no such container: its `frames`
+ *  names the parts of its own frame, `TEXT` and `MEDIA`. */
 export type SkeletonFrame = {
   label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat" | "card" | "container"; tag?: string; height?: number; fill?: boolean;
   /** The design system's unit this frame is. Its name gives its level: a container, a widget, a card, or a component. */
@@ -172,6 +173,14 @@ export type SkeletonFrame = {
   marked?: boolean;
   /** With a `look` of `card`: a mark before its title, one of the drawer's shapes, for the kind of thing the card is about. */
   media?: string;
+  /** On a `DSSectionContainer`, in its own names: `color`, the section's fill, `BASE` where it is left out; `strength`, how strong
+   *  a `DEFAULT` or a `PRIMARY` fill is; and `inset`, an inner shadow along its top and bottom edges. Its `size` also stands its
+   *  room above and below. */
+  color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; inset?: boolean;
+  /** On a `DSFeature`, in its own names: `items.surface` puts each of its item lines in a frame of its own. With `frames`, which on
+   *  a `DSFeature` names its parts `TEXT` and `MEDIA`, `surface` is what the feature's own frame draws. */
+  items?: { surface?: SkeletonFrame["surface"] };
+  surface?: { color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; raised?: boolean; elevation?: "XS" | "SM" | "MD" | "LG" | "XL"; bordered?: boolean; rounded?: boolean };
 };
 /** A section of the content of a container or a card: its title, the actions at the end of that title, its rows, and
  *  the unit of the design system it is, whose name stands at its corner. A section with a title and no unit is a group,
@@ -1714,10 +1723,12 @@ const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next"
 
 /**
  * THE UNITS A SPEC MAY NAME: every unit the design system's barrel exports (`spn-support-ts`
- * `packages/support-web-ds-ts/src/index.ts` @ `368b3262`), leaving out its contexts and its observers, which
- * are no unit a page is drawn from. A `unit` that is not here is a finding, since a sketch names the real unit.
+ * `packages/support-web-ds-ts/src/index.ts` @ `368b3262`, and `DSFeatureGridSectionContainer` @ `v5.31.0`), leaving out its
+ * contexts and its observers, which are no unit a page is drawn from. A `unit` that is not here is a finding, since a sketch
+ * names the real unit.
  */
 const SKEL_UNITS = new Set([
+  "DSFeatureGridSectionContainer",
   "DSAccordion", "DSAccordionGroup", "DSActorView", "DSAddressForm", "DSAddressView", "DSAlert", "DSAnchor", "DSAnchorContainer",
   "DSApp", "DSAspectRatio", "DSAttachment", "DSAttachmentMulti", "DSAuthz", "DSAutocomplete", "DSAutocompleteMulti", "DSAvatar",
   "DSAvatarGroup", "DSBackdrop", "DSBadge", "DSBreadcrumb", "DSButton", "DSButtonGroup", "DSCalendar", "DSCard", "DSCardWidget",
@@ -1756,6 +1767,51 @@ const skelCornerName = (frame: SkeletonFrame, surface = false): string | undefin
 };
 /** Whether a frame is a named boundary, which the nesting count counts. */
 const skelNamed = (frame: SkeletonFrame): boolean => !!frame.tag || frame.unit !== undefined;
+
+/** A SECTION OF A PAGE AND A FEATURE'S FRAMES, IN THE DESIGN SYSTEM'S OWN NAMES (RD.DEVEX.WORKSPACE.285, .286, .288).
+ *  A `DSSectionContainer` takes its fill as `color` and `strength`, its `inset`, and its room from its `size`; a `DSFeature` takes
+ *  `items.surface`, and `frames` with `surface`. Each is drawn with a mark a frame's look already has, and never as a colour. */
+const SKEL_SECTION = "DSSectionContainer", SKEL_FEATURE = "DSFeature";
+const SKEL_SURFACE_COLORS = ["BASE", "DEFAULT", "PRIMARY"], SKEL_SURFACE_STRENGTHS = ["SUBTLE", "QUIET", "SOLID"];
+const SKEL_FEATURE_PARTS = ["TEXT", "MEDIA"];
+/** A section's room above and below its content, by its size: the section's room on a phone, which is also about its room on
+ *  a desktop at the scale a desktop view draws the window. A section with no `size` keeps a boundary's padding. */
+const SKEL_SECTION_ROOM: Record<string, number> = { XS: 24, SM: 32, MD: 56, LG: 64, XL: 72 };
+const skelSectionRoom = (frame: SkeletonFrame): number | undefined =>
+  frame.unit === SKEL_SECTION && frame.look === "container" && frame.size !== undefined ? SKEL_SECTION_ROOM[frame.size] : undefined;
+/** Whether a frame is a container drawn by its parts, its `frames` naming the parts that share a frame. A `DSFeature`'s
+ *  `frames` names the parts of its own frame instead. */
+const skelHasParts = (frame: SkeletonFrame): boolean => frame.frames !== undefined && frame.unit !== SKEL_FEATURE;
+type SkelSurface = NonNullable<SkeletonFrame["surface"]>;
+/** What a feature's own frame draws: its `surface`, or the feature's defaults where it gives none. */
+const skelSurfaceOf = (frame: SkeletonFrame): SkelSurface =>
+  frame.surface !== null && typeof frame.surface === "object" && !Array.isArray(frame.surface) ? frame.surface : {};
+/** The item lines and the slots that stand in a frame of their own: each item line of a feature with `items.surface`, and
+ *  each slot that is the media of a feature whose `frames` names `MEDIA`. Filled from the spec once, before it is drawn. */
+const skelItemFrames = new WeakMap<object, SkelSurface>();
+/** A boxed item line takes a boundary's padding on every side. */
+const skelItemBox = (it: SkeletonItem): number => (skelItemFrames.has(it) ? SKEL_PAD * 2 : 0);
+/** Whether a frame holds a slot, in its rows or in a region of them that is no unit of its own: a feature's media. */
+const skelHoldsSlot = (frame: SkeletonFrame): boolean => (frame.rows ?? []).some((row) => skelRowHoldsSlot(row));
+const skelItemHoldsSlot = (it: SkeletonItem): boolean =>
+  skelKind(it) === "slot" || (skelKind(it) === "frame" && it.frame!.unit === undefined && skelHoldsSlot(it.frame!));
+const skelRowHoldsSlot = (row: SkeletonRow): boolean => (row?.items ?? []).some((it) => !!it && typeof it === "object" && skelItemHoldsSlot(it));
+/** Which parts of a `DSFeature` its own frame is drawn round. `TEXT` with `MEDIA`, or `TEXT` where the feature has no media,
+ *  is the whole feature; `MEDIA` alone is each slot; `TEXT` alone beside media is the words and the items. */
+function skelFeatureFrames(frame: SkeletonFrame): { whole: boolean; text: boolean; media: boolean } {
+  const parts = frame.unit === SKEL_FEATURE && Array.isArray(frame.frames) ? frame.frames : [];
+  const text = parts.includes("TEXT"), media = parts.includes("MEDIA"), hasMedia = parts.length > 0 && skelHoldsSlot(frame);
+  const whole = text && (media || !hasMedia);
+  return { whole, text: text && !whole, media: media && !whole && hasMedia };
+}
+/** A FRAME IS DRAWN WITH THE MARKS A FRAME'S LOOK ALREADY HAS: a thin outline, as a card's, solid where it is `bordered`; behind
+ *  it the background of a raised frame where it is `raised` or its colour is not `BASE`; and a rounded corner unless `rounded`
+ *  is false. How strong a fill is, and how far a raised frame stands off, are the library's look and draw no mark of their own. */
+function skelSurfaceMarks(surface: SkelSurface, x: number, y: number, w: number, h: number): string[] {
+  const rx = surface.rounded === false ? 0 : SKEL_ROUND;
+  const filled = surface.raised === true || (surface.color !== undefined && surface.color !== "BASE");
+  return [...(filled ? [skelRect("sds-skel-surface", x, y, w, h, rx)] : []), skelRect(surface.bordered === true ? "sds-skel-border" : "sds-skel-control", x, y, w, h, rx)];
+}
 
 /** THE LAYOUT'S WORDS, and the fields of the three looks (`IDSLayoutBodyLook`, `IDSLayoutNavigationLook`,
  *  `IDSLayoutContentLook`); a sketch's navigation adds the words of its entries and the open one. */
@@ -1961,7 +2017,7 @@ function skelFixedWidth(it: SkeletonItem, h: number): number {
     case "place": return it.fill ? 0 : Math.max(it.text !== undefined ? skelTextW(it.text) : 0, skelTagW(it.tag!), SKEL_PAD * 2);
     case "slot": return it.fill ? 0 : Math.max(skelTagW(it.slot!), SKEL_PAD * 2);
     case "standin": return it.standin === "table" ? (it.fill ? 0 : skelTableW(it, h)) : it.fill ? 0 : SKEL_LINES_W;
-    case "item": return it.fill ? 0 : skelItemW(it, h);
+    case "item": return it.fill ? 0 : skelItemW(it, h) + skelItemBox(it);
     case "head": return 0; // a head takes the rest of its row, and wraps to it
     case "icon": return h + (it.text !== undefined ? SKEL_LABEL_GAP + skelWordW(it.text) : 0);
     case "control": {
@@ -2001,7 +2057,7 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
   if (kind === "frame") return skelFrameHeight(it.frame!, slot);
   let h = slot;
   if (kind === "place" && it.text !== undefined) h = slot + SKEL_TAG_H;
-  if (kind === "item") h = skelItemH(it, slot);
+  if (kind === "item") h = skelItemH(it, slot) + skelItemBox(it);
   if (kind === "head") h = skelHeadH(it);
   if (kind === "standin") {
     const count = Math.max(1, it.lines ?? 3);
@@ -2025,10 +2081,11 @@ function skelFrameHeight(frame: SkeletonFrame, inherited: number): number {
   const ctl = skelSizeH(frame, inherited);
   const rows = skelRows(frame);
   // A CONTAINER'S PARTS STAND WITH NO GAP AND NO PADDING OF THE CONTAINER'S OWN: each part keeps its own.
-  if (frame.frames !== undefined)
+  if (skelHasParts(frame))
     return Math.max(skelHead(frame) + skelParts(frame).reduce((t, p) => t + skelFrameHeight(p, ctl), 0), (frame.height ?? 0) * ctl);
   const body = rows.reduce((t, r) => t + skelRowHeight(r, ctl), 0) + SKEL_GAP * Math.max(0, rows.length - 1);
-  return Math.max(skelHead(frame) + body + SKEL_PAD, (frame.height ?? 0) * ctl);
+  // A SECTION WITH A `size` STANDS ITS ROOM UNDER ITS CONTENT, as above it.
+  return Math.max(skelHead(frame) + body + (skelSectionRoom(frame) ?? SKEL_PAD), (frame.height ?? 0) * ctl);
 }
 /** The rows a frame lays out: its own, and under them the footer's where it is a container drawn for a surface. */
 function skelSectionRows(section: SkeletonSection): SkeletonRow[] {
@@ -2111,8 +2168,10 @@ function skelHead(frame: SkeletonFrame): number {
   const tag = skelCornerName(frame) ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   // A CONTAINER HOLDS ITS HEADER: its unit's name at the corner of its outline, its header band under the name, and its
   // content under the line that closes the band. With no header, the content stands under the name.
+  // A SECTION WITH A `size` STANDS ITS ROOM ABOVE ITS CONTENT, under its name, in place of a boundary's padding.
+  const room = skelSectionRoom(frame) ?? SKEL_PAD;
   if (frame.look === "container")
-    return skelContainerHead(frame) ? skelContainerEdge(frame) + SKEL_PAD : (frame.unit !== undefined ? SKEL_TAG_H : 0) + SKEL_PAD;
+    return skelContainerHead(frame) ? skelContainerEdge(frame) + room : (frame.unit !== undefined ? SKEL_TAG_H : 0) + room;
   if (!frame.label) return Math.max(tag, SKEL_PAD);
   // A card whose title line holds an action stands a gap taller, so the action keeps clear of the first part under it.
   if (frame.look === "card") return tag + (frame.note ? SKEL_CARD_HEAD_TWO : SKEL_CARD_HEAD_ONE) + (frame.actions?.length ? SKEL_LABEL_GAP * 2 : 0);
@@ -2141,7 +2200,7 @@ function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
     if (kind === "spacer") return 0;
     if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl);
     if (kind === "standin" && it.standin === "table") return skelTableW(it, ctl);
-    if (kind === "item") return skelItemW(it, ctl);
+    if (kind === "item") return skelItemW(it, ctl) + skelItemBox(it);
     if (kind === "head") return skelHeadMinW(it, ctl);
     if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
     if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
@@ -2170,7 +2229,7 @@ function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   // A CONTAINER'S OR A CARD'S HEADER HOLDS ITS ACTIONS AT THE END, so its title and its actions must both fit across.
   const headActions = (frame.look === "container" || frame.look === "card") && frame.actions?.length
     ? SKEL_GAP + frame.actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * (frame.actions.length - 1) : 0;
-  if (frame.frames !== undefined) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
+  if (skelHasParts(frame)) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
   const rows = Math.max(0, ...skelRows(frame).map((r) => skelRowMinWidth(r, ctl)));
   return Math.max(SKEL_PAD * 2 + head + headActions, skelInset(frame) * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
@@ -2293,7 +2352,9 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   if (kind === "plain") { out.push(it.part ? skelStepText(it.text!, SKEL_STEP_PART, ix, baseline) : `  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
   if (kind === "note") { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
   if (kind === "slot") {
-    out.push(...skelMarks(undefined, ix, iy, iw, ih));
+    // A SLOT THAT IS A FEATURE'S MEDIA, WITH `frames` NAMING `MEDIA`, STANDS IN THE FEATURE'S FRAME, flush.
+    const framed = skelItemFrames.get(it);
+    out.push(...(framed ? skelSurfaceMarks(framed, ix, iy, iw, ih) : skelMarks(undefined, ix, iy, iw, ih)));
     out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.slot!)}</text>`);
     return;
   }
@@ -2307,17 +2368,23 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // THE LINE OF AN ITEM: its media at the start, its title with its description under it, and what stands at its end.
     const item = it.item!;
     if (typeof item.title !== "string" || !item.title) findings.push("an item line carries its `title`, and this one carries none");
-    let wx = ix;
+    // AN ITEM LINE IN A FRAME OF ITS OWN, as a feature's `items.surface` puts it: the frame round the line's place, as tall as
+    // its row, and the line inside it at a boundary's padding, at the top.
+    const boxed = skelItemFrames.get(it);
+    if (boxed) out.push(...skelSurfaceMarks(boxed, ix, iy, iw, ih));
+    const lineH = boxed ? skelItemH(it, h) : ih, lineX = boxed ? ix + SKEL_PAD : ix, lineW = boxed ? iw - SKEL_PAD * 2 : iw;
+    const lineMid = boxed ? iy + SKEL_PAD + lineH / 2 : mid;
+    let wx = lineX;
     if (item.media !== undefined) {
       if (!SKEL_ICONS.includes(item.media)) findings.push(`an item's \`media\` is \`${item.media}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
       const across = skelItemMediaD(it, h);
-      out.push(...skelIcon(item.media, ix + across / 2, mid, h, true, undefined, across));
-      wx = ix + across + SKEL_LABEL_GAP;
+      out.push(...skelIcon(item.media, lineX + across / 2, lineMid, h, true, undefined, across));
+      wx = lineX + across + SKEL_LABEL_GAP;
     }
     // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is of medium weight, the facts small and quiet.
-    const facts = skelItemFacts(it), top = mid - ih / 2;
+    const facts = skelItemFacts(it), top = lineMid - lineH / 2;
     const inline = skelItemInline(it);
-    const titleY = facts.length && !inline ? top + (ih - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : mid + 4;
+    const titleY = facts.length && !inline ? top + (lineH - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : lineMid + 4;
     out.push(skelStepText(item.title ?? "", skelItemStep(it), wx, titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
     const ownDescription = skelItemOwnDescription(it), below = skelItemDescriptionH(it);
@@ -2331,11 +2398,11 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       fx += SKEL_FACT_DOT_W;
     }
     skelDrawFacts(facts, fx, factsMid, h, "a fact on the line under an item's title is a word or a badge", findings, out);
-    let ex = ix + iw - skelItemEndW(it, h);
+    let ex = lineX + lineW - skelItemEndW(it, h);
     for (const part of item.end ?? []) {
       const partKind = skelKind(part), pw = skelFixedWidth(part, h);
       if (!SKEL_CELL_KINDS.includes(partKind)) findings.push("the end of an item line holds words, a note, an icon or a control");
-      else skelDrawLeaf(part, partKind!, ex, mid - h / 2, pw, h, h, h, findings, out);
+      else skelDrawLeaf(part, partKind!, ex, lineMid - h / 2, pw, h, h, h, findings, out);
       ex += pw + SKEL_LABEL_GAP;
     }
     return;
@@ -2605,7 +2672,7 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   if (frame.size !== undefined && SKEL_CONTROL_H[frame.size] === undefined)
     findings.push(`a \`size\` is \`${frame.size}\`, and a skeleton takes ${Object.keys(SKEL_CONTROL_H).join(" · ")}`);
   const ctl = skelSizeH(frame, inherited);
-  const isContainer = frame.frames !== undefined;
+  const isContainer = skelHasParts(frame);
   const rows = skelRows(frame);
   // AN ITEM THAT STANDS ON THE PAGE ITSELF IS THE PAGE'S HEADER: it names the record the page is about, so its
   // title is as large and as heavy as a container's, and not the title of one thing among many.
@@ -2642,6 +2709,11 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const surface = frame.look === "container" && !root;
   if (frame.look === "container" && frame.marked)
     findings.push("`marked` is for a row with no border; a container's header stands inside its outline, so a container takes no `marked`");
+  // A SECTION'S FILL IS A BAND ACROSS ITS BOX, the background a raised frame has (RD.DEVEX.WORKSPACE.285). How strong the fill
+  // is belongs to the library's look, so every strength draws the same band.
+  const section = frame.unit === SKEL_SECTION;
+  const band = section && SKEL_SURFACE_COLORS.includes(frame.color as string) && frame.color !== "BASE" ? skelRect("sds-skel-surface", x, y, w, h, 0) : undefined;
+  if (band && !(root && !bare)) out.push(band);
   if (surface) {
     const headH = skelContainerHead(frame);
     // BY DEFAULT A CONTAINER FRAMES ITS CONTENT AND ITS FOOTER, NOT ITS HEADER: the container's extent is a dotted
@@ -2662,8 +2734,12 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     }
   }
   // A ROOT FRAME THAT STANDS IN A LAYOUT'S CONTENT IS BARE: the content's line is its edge.
-  if (root && !bare) out.push(skelRect("sds-box", x, y, w, h));
-  else if (!bare && !isContainer && !surface) out.push(...skelMarks(frame.look, x, y, w, h));
+  // A FEATURE WHOSE `frames` HOLD THE WHOLE OF IT IS DRAWN IN ITS OWN FRAME, in place of its dotted boundary (RD.DEVEX.WORKSPACE.286).
+  const featureFrames = skelFeatureFrames(frame);
+  if (root && !bare) out.push(skelRect("sds-box", x, y, w, h), ...(band ? [band] : []));
+  else if (!bare && !isContainer && !surface) out.push(...(featureFrames.whole ? skelSurfaceMarks(skelSurfaceOf(frame), x, y, w, h) : skelMarks(frame.look, x, y, w, h)));
+  // A SECTION'S `inset` IS A SOLID LINE ALONG THE TOP AND THE BOTTOM EDGE OF ITS BOX, and none at its sides.
+  if (section && frame.inset === true) out.push(skelPath("sds-skel-border", [[[x, y], [x + w, y]], [[x, y + h], [x + w, y + h]]]));
   const corner = skelCornerName(frame, frame.look === "container");
   const tagH = corner ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   if (corner) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(corner)}</text>`);
@@ -2728,6 +2804,19 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   const itemsX = x + inset + (labelCol ? labelCol + SKEL_GAP : 0);
   let rowY = y + skelHead(frame);
   const dividers = skelDividers(frame), partStarts = skelPartStarts(frame);
+  // A FEATURE'S `frames` NAMING `TEXT` ALONE BESIDE ITS MEDIA FRAMES THE WORDS AND THE ITEMS: each run of rows that holds no slot,
+  // here, and in a row that holds one, each part of it that is not the media, below.
+  const textFrame = featureFrames.text ? skelSurfaceOf(frame) : undefined;
+  if (textFrame) {
+    const runMarks = (from: number, to: number) => skelSurfaceMarks(textFrame, itemsX - SKEL_LABEL_GAP, from - SKEL_LABEL_GAP, rowContentW + SKEL_LABEL_GAP * 2, to - from + SKEL_LABEL_GAP * 2);
+    let top = rowY, runTop: number | undefined, runEnd = 0;
+    rows.forEach((row, i) => {
+      if (!skelRowHoldsSlot(row)) { runTop ??= top; runEnd = top + heights[i]; }
+      else if (runTop !== undefined) { out.push(...runMarks(runTop, runEnd)); runTop = undefined; }
+      top += heights[i] + SKEL_GAP;
+    });
+    if (runTop !== undefined) out.push(...runMarks(runTop, runEnd));
+  }
   // A ROW WITH NO BORDER, such as the way back or the header of a record, takes the same dotted line with `marked`,
   // as wide as the containers beside it, so their edges are seen to agree.
   rows.forEach((row, rowIndex) => {
@@ -2780,6 +2869,14 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     // EVERY BOX IN A ROW STANDS AS TALL AS THE ROW, so a named place beside a plain one lines up at
     // both edges, as the regions of a layout do.
     const boxH = (row.framed ? rh - SKEL_GAP * 2 : rh) - leadH;
+    if (textFrame && skelRowHoldsSlot(row)) {
+      let tx = innerX;
+      row.items.forEach((it, i) => {
+        const kind = skelKind(it);
+        if (kind !== null && kind !== "spacer" && !skelItemHoldsSlot(it)) out.push(...skelSurfaceMarks(textFrame, tx, innerY, widths[i], boxH));
+        tx += widths[i] + skelGapAfter(row, i);
+      });
+    }
     const centres: number[] = [];
     let ix = innerX;
     row.items.forEach((it, i) => {
@@ -2793,8 +2890,9 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       if (kind === "frame") skelDrawFrame(it.frame!, ix, innerY, iw, findings, out, boxH, named + (skelNamed(frame) ? 1 : 0) + (row.within !== undefined ? 1 : 0), ctl);
       else if (kind !== null && kind !== "spacer") {
         // A PLACE AND A STAND-IN STRETCH, A CONTROL DOES NOT: a named region fills its row, and a
-        // control keeps the height of its component, centred on the row's one centre line.
-        const stretches = kind === "slot" || kind === "place" || (it.height !== undefined && kind === "standin");
+        // control keeps the height of its component, centred on the row's one centre line. An item line in a frame of its
+        // own stands as tall as its row, as the boxes of a feature's items do.
+        const stretches = kind === "slot" || kind === "place" || (it.height !== undefined && kind === "standin") || (kind === "item" && skelItemFrames.has(it));
         const own = stretches ? boxH : skelItemHeight(it, ctl);
         const top = kind === "standin" || stretches ? innerY : innerY + (boxH - Math.min(own, boxH)) / 2;
         const drawnH = kind === "standin" ? Math.min(own, boxH) : own;
@@ -2860,7 +2958,7 @@ function skelWhichUnit(frame: SkeletonFrame | undefined, findings: string[], pag
     if (line.words && line.note && line.action && line.only)
       said("a row is built by hand as words, a note and an action: one line about one thing is a `DSItem`; write it as an `item`");
   }
-  for (const child of children) skelWhichUnit(child, findings, false, frame.frames !== undefined);
+  for (const child of children) skelWhichUnit(child, findings, false, skelHasParts(frame));
 }
 
 /**
@@ -2882,7 +2980,127 @@ function skelUnits(frame: SkeletonFrame | undefined, findings: string[], inFrame
   }
   for (const section of frame.sections ?? []) if (section?.unit !== undefined) known(section.unit);
   const rows = [...(frame.sections ?? []).flatMap((section) => section?.rows ?? []), ...(frame.rows ?? []), ...(frame.footer ?? [])];
-  for (const row of rows) for (const it of row?.items ?? []) if (it?.frame) skelUnits(it.frame, findings, frame.frames !== undefined);
+  for (const row of rows) for (const it of row?.items ?? []) if (it?.frame) skelUnits(it.frame, findings, skelHasParts(frame));
+}
+
+/**
+ * A SECTION'S FILL AND A FEATURE'S FRAMES, read once before anything is drawn (RD.DEVEX.WORKSPACE.285, .286, .288).
+ * `color`, `strength` and `inset` belong to a `DSSectionContainer`, and `items`, `surface` and the parts `TEXT` and `MEDIA` in
+ * `frames` to a `DSFeature`; each value is one the design system has. Each item line of a feature with `items.surface`, and each
+ * slot that is the media of a feature whose `frames` frames it, is kept with the frame it stands in. A region of a feature that
+ * is no unit of its own is the feature's, and another unit inside it is not.
+ */
+function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?: SkelSurface, media?: SkelSurface): void {
+  if (!frame || typeof frame !== "object") return;
+  const said = (message: string) => { if (!findings.includes(message)) findings.push(message); };
+  const unit = typeof frame.unit === "string" ? frame.unit : undefined;
+  const which = unit !== undefined ? `\`${unit}\`` : "a frame with no `unit`";
+  for (const key of ["color", "strength", "inset"] as const)
+    if (frame[key] !== undefined && unit !== SKEL_SECTION) said(`\`${key}\` is a field of a \`DSSectionContainer\`, and this frame is ${which}`);
+  for (const key of ["items", "surface"] as const)
+    if (frame[key] !== undefined && unit !== SKEL_FEATURE) said(`\`${key}\` is a field of a \`DSFeature\`, and this frame is ${which}`);
+  const enumOf = (value: unknown, values: string[], what: string) => {
+    if (value !== undefined && !values.includes(value as string)) said(`${what} is \`${String(value)}\`, and it takes ${values.join(" · ")}`);
+  };
+  if (unit === SKEL_SECTION) {
+    enumOf(frame.color, SKEL_SURFACE_COLORS, "a section's `color`");
+    enumOf(frame.strength, SKEL_SURFACE_STRENGTHS, "a section's `strength`");
+  }
+  // WHAT A FRAME DRAWS IS `IDSFrameSurface`: each value one the design system has, and an `elevation` only on a raised frame.
+  const surfaceOf = (given: unknown, what: string): SkelSurface | undefined => {
+    if (given === null || typeof given !== "object" || Array.isArray(given)) { said(`${what} holds the keys of \`IDSFrameSurface\`, and it is \`${JSON.stringify(given)}\``); return undefined; }
+    const surface = given as SkelSurface;
+    enumOf(surface.color, SKEL_SURFACE_COLORS, `the \`color\` of ${what}`);
+    enumOf(surface.strength, SKEL_SURFACE_STRENGTHS, `the \`strength\` of ${what}`);
+    enumOf(surface.elevation, Object.keys(SKEL_CONTROL_H), `the \`elevation\` of ${what}`);
+    if (surface.elevation !== undefined && surface.raised !== true)
+      said(`${what} gives an \`elevation\` and is not \`raised\`: how far a frame stands off is read only where it is raised`);
+    return surface;
+  };
+  let itemsHere = items, mediaHere = media;
+  if (unit === SKEL_FEATURE) {
+    const given = frame.items;
+    itemsHere = given !== null && typeof given === "object" && given.surface !== undefined ? surfaceOf(given.surface, "a feature's `items.surface`") : undefined;
+    const parts = frame.frames;
+    if (parts !== undefined && (!Array.isArray(parts) || parts.some((part) => !SKEL_FEATURE_PARTS.includes(part))))
+      said(`a \`DSFeature\`'s \`frames\` names its parts, ${SKEL_FEATURE_PARTS.join(" · ")}, and this one is \`${JSON.stringify(parts)}\``);
+    const own = frame.surface !== undefined ? surfaceOf(frame.surface, "a feature's `surface`") : undefined;
+    if (frame.surface !== undefined && !(Array.isArray(parts) && parts.some((part) => SKEL_FEATURE_PARTS.includes(part))))
+      said("a `DSFeature`'s `surface` paints only the parts its `frames` names, and this one names none");
+    mediaHere = skelFeatureFrames(frame).media ? own ?? {} : undefined;
+  } else if (unit !== undefined) { itemsHere = undefined; mediaHere = undefined; }
+  const rows = [...(frame.sections ?? []).flatMap((section) => section?.rows ?? []), ...(frame.rows ?? []), ...(frame.footer ?? [])];
+  for (const row of rows) for (const it of row?.items ?? []) {
+    if (!it || typeof it !== "object") continue;
+    const kind = skelKind(it);
+    if (kind === "item" && itemsHere) skelItemFrames.set(it, itemsHere);
+    if (kind === "slot" && mediaHere) skelItemFrames.set(it, mediaHere);
+    if (kind === "frame") skelLooks(it.frame, findings, itemsHere, mediaHere);
+  }
+}
+
+/** THE FIELDS A SKELETON HAS, by what holds them (RD.DEVEX.WORKSPACE.287). A field none of them has draws nothing, so it is a
+ *  finding that names it. The fields the drawer writes on its own copy are listed too, since a spec that writes one asks for
+ *  what the drawer does anyway; `tone`, `em`, `off` and `warn` on an item or a frame keep the findings that name what replaced them. */
+const SKEL_FIELDS: Record<string, string[]> = {
+  spec: ["kind", "title", "caption", "frame", "views", "layout"],
+  view: ["viewport", "page", "frame"],
+  page: ["item", "actions", "back"],
+  frame: ["label", "note", "width", "rows", "look", "tag", "height", "fill", "unit", "headed", "frames", "raised", "bordered", "rounded", "size",
+    "part", "actions", "footer", "sections", "divided", "marked", "media", "color", "strength", "inset", "items", "surface"],
+  section: ["label", "actions", "rows", "divided", "unit", "part", "sections"],
+  row: ["label", "framed", "chosen", "marked", "items", "within", "lead"],
+  item: ["text", "note", "fill", "frame", "tag", "slot", "control", "main", "on", "flush", "edgeTop", "inPart", "atPage", "mark", "tabs", "chosen",
+    "icon", "standin", "lines", "headings", "columns", "cells", "label", "info", "description", "error", "read", "item", "head", "spacer", "height", "part", "page"],
+  line: ["media", "title", "description", "meta", "end", "inline"],
+  head: ["pageLevel", "eyebrow", "title", "description", "facts", "textAlign"],
+  items: ["surface"],
+  surface: ["color", "strength", "raised", "elevation", "bordered", "rounded"],
+};
+const SKEL_OLD_FIELDS = ["tone", "em", "off", "warn"];
+function skelFieldFindings(spec: Spec, findings: string[]): void {
+  const said = (message: string) => { if (!findings.includes(message)) findings.push(message); };
+  const known = (value: unknown, holder: string, where: string, old = false): value is Record<string, unknown> => {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+    for (const key of Object.keys(value)) if (!SKEL_FIELDS[holder].includes(key) && !(old && SKEL_OLD_FIELDS.includes(key)))
+      said(`\`${key}\` is no field of ${where}, and a skeleton draws nothing for it`);
+    return true;
+  };
+  const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
+  const line = (value: unknown) => {
+    if (!known(value, "line", "an item line")) return;
+    for (const fact of list(value.meta)) if (typeof fact !== "string") item(fact);
+    for (const part of list(value.end)) item(part);
+  };
+  const item = (value: unknown): void => {
+    if (!known(value, "item", "an item", true)) return;
+    frame(value.frame);
+    line(value.item);
+    if (known(value.head, "head", "a head")) for (const fact of list(value.head.facts)) if (typeof fact !== "string") item(fact);
+    for (const cells of list(value.cells)) for (const cell of list(cells)) if (typeof cell !== "string") item(cell);
+  };
+  const row = (value: unknown) => { if (known(value, "row", "a row")) for (const it of list(value.items)) item(it); };
+  const section = (value: unknown): void => {
+    if (!known(value, "section", "a section")) return;
+    for (const action of list(value.actions)) item(action);
+    for (const r of list(value.rows)) row(r);
+    for (const group of list(value.sections)) section(group);
+  };
+  const frame = (value: unknown): void => {
+    if (!known(value, "frame", "a frame", true)) return;
+    known(value.surface, "surface", "a `surface`");
+    if (known(value.items, "items", "a feature's `items`")) known(value.items.surface, "surface", "a `surface`");
+    for (const action of list(value.actions)) item(action);
+    for (const part of list(value.sections)) section(part);
+    for (const r of [...list(value.rows), ...list(value.footer)]) row(r);
+  };
+  known(spec, "spec", "a skeleton spec");
+  frame(spec.frame);
+  for (const view of list(spec.views)) {
+    if (!known(view, "view", "a view")) continue;
+    frame(view.frame);
+    if (known(view.page, "page", "a view's `page`")) { line(view.page.item); for (const action of list(view.page.actions)) item(action); }
+  }
 }
 
 /**
@@ -3117,10 +3335,13 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   const findings: string[] = [];
   const out: string[] = [];
   const spec: Spec = structuredClone(given);
+  skelFieldFindings(spec, findings);
   skelWhichUnit(spec.frame, findings);
   if (Array.isArray(spec.views)) for (const view of spec.views) skelWhichUnit(view?.frame, findings, true);
   skelUnits(spec.frame, findings);
   if (Array.isArray(spec.views)) for (const view of spec.views) skelUnits(view?.frame, findings);
+  skelLooks(spec.frame, findings);
+  if (Array.isArray(spec.views)) for (const view of spec.views) skelLooks(view?.frame, findings);
   let layout: SkeletonLayout | undefined;
   if (spec.layout !== undefined) {
     if (spec.views === undefined) findings.push("`layout` is the layout the views stand in, so a spec with a `layout` holds `views`; give the frame a `viewport`");
