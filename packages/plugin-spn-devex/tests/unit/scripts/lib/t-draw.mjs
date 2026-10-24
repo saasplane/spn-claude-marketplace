@@ -1462,11 +1462,11 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
     [lined.findings, across(lined.svg), down(lined.svg), wordsAt(lined.svg, "Start in four steps"), across(gsec({}, CELLS).svg).length, down(gsec({}, CELLS).svg).length],
     ([found, lines, downs, heading, plainAcross, plainDown]) => found.length === 0 && lines.length === 1 && lines[0][1] > heading.y + 12 && downs.length === 2
       && downs[0][0] === downs[1][0] && plainAcross === 0 && plainDown === 0);
-  one("`items.type` `STATS`, a `borderType` the design system lacks, `divided` on a `DSFeature`, and `grid` on another frame are findings",
-    [feature({ items: { type: "STATS" } }, GRID).findings, feature({ items: { borderType: "DOTTED" } }, GRID).findings, feature({ divided: true }, LIST).findings,
+  one("an `items.type` the design system lacks, a `borderType` it lacks, `divided` on a `DSFeature`, and `grid` on another frame are findings",
+    [feature({ items: { type: "MASONRY" } }, GRID).findings, feature({ items: { borderType: "DOTTED" } }, GRID).findings, feature({ divided: true }, LIST).findings,
       draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", grid: { borderType: "GRID" }, rows: [HEAD()] } }] }] } }).findings,
       gsec({ grid: { borderType: "GRID", columns: 3 } }, CELLS).findings],
-    ([stats, dotted, divided, elsewhere, columns]) => says("`items.type` is `STATS`, and a skeleton draws GRID · LIST")(stats)
+    ([masonry, dotted, divided, elsewhere, columns]) => says("`items.type` is `MASONRY`, and a skeleton draws GRID · LIST · STATS")(masonry)
       && says("a feature's `items.borderType` is `DOTTED`, and it takes NONE · GRID · EDGE")(dotted)
       && says("a `DSFeature`'s lines are its `items.type` `LIST` or its `items.borderType`")(divided)
       && says("`grid` is a field of a `DSFeatureGridSectionContainer`, and this frame is `DSSectionContainer`")(elsewhere)
@@ -1684,6 +1684,112 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
         { fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ item: { media: "default", title: "Salesforce", description: "Accounts, both ways.", meta: ["CRM", "OAuth"] }, fill: true }] }] } }] }] } }] }] } }] };
   one("items, heads and a grid section written with none of these fields draw byte for byte as before",
     createHash("sha256").update(draw(PARTS_BEFORE).svg).digest("hex"), "13af0699d5bb3cd2c98af0c36360558e6dd69867283fea8b2a761d059d930cf3");
+}
+
+console.log("=== SKELETON — statistics, an accordion's entries and the tabs' own type (RD.DEVEX.WORKSPACE.300 to .302)");
+{
+  /** Every rect of one class, as [x, y, width, height, corner]. */
+  const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const texts = (g) => [...g.matchAll(/<text class="([^"]+)" x="([\d.]+)" y="([\d.]+)"(?: style="([^"]*)")?>([^<]*)</g)].map((m) => ({ cls: m[1], x: Number(m[2]), y: Number(m[3]), style: m[4] ?? "", words: m[5] }));
+  const wordsAt = (g, words) => texts(g).find((t) => t.words === words);
+  /** The plain strokes, glyphs and lines alike, each as its list of [x, y] points. */
+  const strokes = (g, cls = "sds-skel-glyph") => [...g.matchAll(new RegExp(`<path class="${cls}" d="([^"]+)"`, "g"))].map((m) => [...m[1].matchAll(/[MLHV]\s*([\d.]+)(?:\s+([\d.]+))?/g)].map((p) => [Number(p[1]), p[2] === undefined ? undefined : Number(p[2])]));
+  const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
+  const HEAD = (extra = {}) => ({ items: [{ head: { title: "Built for teams like yours", ...extra } }] });
+  const STAT = (title, description, extra = {}) => ({ item: { title, description, ...extra }, fill: true });
+  const STATS_ROW = { items: [STAT("12k", "orders a day, live"), STAT("99.9%", "uptime last quarter"), STAT("4.9", "rating from 300 teams")] };
+
+  // 1 · `items.type` `STATS`: each item line a statistic, its value large over its label, one level below the feature's own
+  const stats = feature({ items: { type: "STATS" } }, [HEAD(), STATS_ROW]);
+  const [value, label] = [wordsAt(stats.svg, "12k"), wordsAt(stats.svg, "orders a day, live")];
+  one("`items.type` `STATS` draws each item line as a statistic: its title the value, heavy at a card title's 15px under a `CONTAINER` feature, and its description the label under it, quiet at 13px, with no finding",
+    [stats.findings, value, label], ([found, number, words]) => found.length === 0 && number.cls === "sds-title" && number.style === "font-size:15px"
+      && words.cls === "sds-note" && words.style === "font-size:13px" && words.y > number.y && words.y - number.y < 20);
+  const sizes = (pageLevel) => { const g = feature({ items: { type: "STATS" } }, [HEAD({ pageLevel }), STATS_ROW]).svg; return [wordsAt(g, "12k").style, wordsAt(g, "orders a day, live").style]; };
+  one("a statistic stands one level below its feature's head: 20 over 14 under `PAGE`, and 13 over 12 under `WIDGET`",
+    [sizes("PAGE"), sizes("WIDGET")], ([page, widget]) => page.join() === "font-size:20px,font-size:14px" && widget.join() === "font-size:13px,font-size:12px");
+  const plainLines = feature({}, [HEAD(), STATS_ROW]);
+  one("a statistic draws no media, no facts line and no number, and stands no line apart from the next, as `STATS` take none where `borderType` is left out",
+    [stats.findings, strokes(stats.svg, "sds-skel-control").length, texts(stats.svg).filter((t) => t.words.includes("·")).length, wordsAt(plainLines.svg, "12k").style],
+    ([found, lines, dots, asItem]) => found.length === 0 && lines === 0 && dots === 0 && asItem.includes("font-size:12px"));
+  const centred = feature({ items: { type: "STATS" } }, [HEAD({ textAlign: "CENTER" }), STATS_ROW]);
+  const middle = (t, size) => t.x + Math.ceil(t.words.length * 7.6 * size / 13) / 2;
+  one("a centred head centres each statistic's value and its label in its place, on one centre line",
+    [wordsAt(centred.svg, "12k"), wordsAt(centred.svg, "orders a day, live"), wordsAt(stats.svg, "12k")],
+    ([number, words, started]) => number.x > started.x && Math.abs(middle(number, 15) - (words.x + Math.ceil(words.words.length * 6.4 * 13 / 11) / 2)) <= 1);
+  const lined = feature({ items: { type: "STATS", borderType: "GRID" } }, [HEAD(), STATS_ROW]);
+  one("`borderType` `GRID` stands a line in the gap after each statistic of a row but its last, as a `GRID` of items does, with no finding",
+    [lined.findings, strokes(lined.svg, "sds-skel-control").filter((s) => s[1] && s[1][1] === undefined && s[0][1] !== undefined)], ([found, downs]) => found.length === 0 && downs.length === 2);
+  const boxed = feature({ items: { type: "STATS", surface: { bordered: true } } }, [HEAD(), STATS_ROW]);
+  one("`items.surface` puts each statistic in a frame of its own, as the design system sets it in a `DSCard`, its value at a boundary's padding",
+    [boxed.findings, boxes(boxed.svg, "sds-skel-border").filter((b) => b[4] === 8), wordsAt(boxed.svg, "12k")],
+    ([found, frames, number]) => found.length === 0 && frames.length === 3 && number.x === frames[0][0] + 16);
+  one("media, facts or `selected` on a statistic, and `items.numbered` with `STATS`, are findings",
+    [feature({ items: { type: "STATS" } }, [HEAD(), { items: [STAT("12k", "orders", { media: "default", meta: ["Live"] })] }]).findings,
+      feature({ items: { type: "STATS", numbered: true } }, [HEAD(), STATS_ROW])],
+    ([parts, numbered]) => says("a statistic of `items.type` `STATS` draws its `title`, the value, and its `description`, the label under it, and nothing else; `media`, `meta` are not drawn")(parts)
+      && says("the design system writes no number before a statistic of `STATS`")(numbered.findings) && !wordsAt(numbered.svg, "1."));
+
+  // 2 · `DSAccordionGroup` with its entries: each header with its indicator, the open entry's words under it
+  const OPTIONS = [{ header: "Do I need my own cloud account?", expanded: true, content: "Yes. The estate is created in your account, from one declaration." },
+    { header: "Can I use only the standards?", content: "Yes, the standards stand alone." }, { header: "Is there a free plan?" }];
+  const group = (look, options = OPTIONS, viewport) => {
+    const frame = { rows: [{ items: [{ fill: true, frame: { unit: "DSAccordionGroup", options, ...look } }] }] };
+    return draw(viewport ? { kind: "skeleton", views: [{ viewport, frame }] } : { kind: "skeleton", frame });
+  };
+  const plain = group({}), bordered = group({ bordered: true });
+  one("a `DSAccordionGroup` with `options` draws each entry's header, and under the open one its words, with no finding; a shut entry's words are not drawn",
+    [plain.findings, ...OPTIONS.map((o) => wordsAt(plain.svg, o.header)), wordsAt(plain.svg, OPTIONS[0].content), wordsAt(plain.svg, OPTIONS[1].content), wordsAt(plain.svg, "DSAccordionGroup")],
+    ([found, first, second, third, open, shut, name]) => found.length === 0 && first && second && third && open && !shut && name
+      && first.style === "font-size:12px;font-weight:500" && open.cls === "sds-code" && open.y > first.y && open.y < second.y && second.y < third.y);
+  const chevrons = strokes(plain.svg).map((s) => s.map(([x, y]) => [x, y]));
+  one("each header leads with the design system's chevron: down while the entry is shut, turned up while it is open",
+    chevrons, (g) => g.length === 3 && g[0][1][1] < g[0][0][1] && g[1][1][1] > g[1][0][1] && g[2][1][1] > g[2][0][1]
+      && wordsAt(plain.svg, OPTIONS[0].header).x > g[0][2][0]);
+  const outlines = boxes(bordered.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  one("`bordered` puts each entry in a thin rounded outline of its own, with a line across under the open entry's header and its words a boundary's padding in",
+    [bordered.findings, outlines, strokes(bordered.svg, "sds-skel-control"), wordsAt(bordered.svg, OPTIONS[0].content), boxes(plain.svg, "sds-skel-control").filter((b) => b[4] === 8).length],
+    ([found, frames, lines, open, plainFrames]) => found.length === 0 && frames.length === 3 && frames[0][3] > frames[1][3] && lines.length === 1
+      && lines[0][0][1] === frames[0][1] + 32 && open.x === frames[0][0] + 16 && plainFrames === 0);
+  const narrow = group({ bordered: true }, OPTIONS, "MOBILE");
+  one("an open entry's words wrap at a word to the entry's width, and the entry grows by a line for each, with no finding",
+    [narrow.findings, texts(narrow.svg).filter((t) => t.cls === "sds-code"), boxes(narrow.svg, "sds-skel-control").filter((b) => b[4] === 8)[0]],
+    ([found, lines, frame]) => found.length === 0 && lines.length === 2 && lines[1].y - lines[0].y === 18 && lines.every((t) => t.x + t.words.length * 7 <= frame[0] + frame[2] - 16));
+  one("`options` on another unit, `rows` beside `options`, an entry with no `header`, an `expanded` or a `bordered` that is not true or false, and a key an entry does not have are findings",
+    [draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", options: OPTIONS, rows: [HEAD()] } }] }] } }).findings,
+      draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSAccordionGroup", options: OPTIONS, rows: [{ items: [{ text: "Billing" }] }] } }] }] } }).findings,
+      group({}, [{ content: "No header" }]).findings, group({}, [{ header: "Billing", expanded: "yes" }]).findings, group({ bordered: "thin" }).findings,
+      group({}, [{ header: "Billing", key: "billing" }]).findings],
+    ([elsewhere, rows, headless, expanded, borderedWord, key]) => says("`options` is a field of a `DSAccordionGroup`, its entries, and this frame is `DSFeature`")(elsewhere)
+      && says("a `DSAccordionGroup` draws its entries from `options`, and its `rows` are not drawn")(rows)
+      && says("an entry of a `DSAccordionGroup` carries the words of its `header`")(headless) && expanded.includes("an entry's `expanded` is `\"yes\"`, and it takes true or false")
+      && borderedWord.includes("a `DSAccordionGroup`'s `bordered` is `\"thin\"`, and it takes true or false") && says("`key` is no field of an entry of a `DSAccordionGroup`'s `options`")(key));
+
+  // 3 · `DSTabs` `type`: `PILL` draws the pills inside a feature, `LINE` the line at the page level
+  const TABS = (extra = {}) => ({ items: [{ control: "tabs", tabs: ["Workspace", "Workstreams", "Docs"], chosen: 0, ...extra }] });
+  const pills = feature({}, [HEAD(), TABS({ type: "PILL" }), { items: [{ slot: "the open tab's picture", fill: true, height: 4 }] }]), lineTabs = feature({}, [HEAD(), TABS()]);
+  const rounded = (g) => boxes(g, "sds-skel-(?:surface|control)").filter((b) => b[4] >= 10);
+  one("a row of tabs with `type` `PILL` inside a feature is drawn as pills: a rounded track and the chosen tab in a pill, no line under it, and no finding; with no `type` it keeps the line",
+    [pills.findings, rounded(pills.svg).length, strokes(pills.svg, "sds-skel-border").length, rounded(lineTabs.svg).length, strokes(lineTabs.svg, "sds-skel-border").length],
+    ([found, pillShapes, underline, lineShapes, lineUnderline]) => found.length === 0 && pillShapes === 3 && underline === 0 && lineShapes === 0 && lineUnderline === 1);
+  const atPage = (extra) => draw({ kind: "skeleton", frame: { rows: [TABS(extra), { items: [{ standin: "rows", fill: true }] }] } });
+  one("`type` `LINE` draws the line at the page level, and `PILL` there draws byte for byte as the pills the level picks",
+    [atPage({ type: "LINE" }), atPage({ type: "PILL" }).svg === atPage({}).svg], ([line, same]) => line.findings.length === 0 && rounded(line.svg).length === 0 && strokes(line.svg, "sds-skel-border").length === 1 && same);
+  one("a `type` the skeleton does not draw, and `type` on an item that is no row of tabs, are findings",
+    [feature({}, [HEAD(), TABS({ type: "SWITCH" })]).findings, feature({}, [HEAD(), { items: [{ control: "button", text: "Start", type: "PILL" }] }]).findings],
+    ([switched, button]) => says("a row of tabs' `type` is `SWITCH`, and a skeleton draws LINE · PILL")(switched)
+      && says("`type` is the look of a row of tabs, in `DSTabsType`'s words, and this item is no row of tabs")(button));
+
+  // 4 · a spec written with none of these fields draws byte for byte as before (the hash of the drawer before this row)
+  const LOOKS_BEFORE = { kind: "skeleton", title: "Numbers, an accordion and tabs, as before", views: [{ viewport: "DESKTOP", frame: { size: "XS", rows: [
+    { items: [{ control: "tabs", tabs: ["Overview", "Members"], chosen: 0 }] },
+    { items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows: [
+      { items: [{ head: { title: "Built for teams like yours", textAlign: "CENTER" } }] },
+      { items: [{ head: { pageLevel: "WIDGET", title: "12k", description: "orders a day", textAlign: "CENTER" }, fill: true }, { head: { pageLevel: "WIDGET", title: "4.9", description: "rating", textAlign: "CENTER" }, fill: true }] },
+      { items: [{ control: "tabs", tabs: ["Workspace", "Docs"], chosen: 1 }] },
+      { items: [{ fill: true, frame: { unit: "DSAccordionGroup", rows: [{ items: [{ text: "Do I need my own cloud account?" }, { spacer: true }, { icon: "select" }] }, { items: [{ note: "Yes, in your account." }] }] } }] }] } }] }] } }] }] } }] };
+  one("numbers faked as heads, an accordion written as rows and tabs with no `type` draw byte for byte as before",
+    createHash("sha256").update(draw(LOOKS_BEFORE).svg).digest("hex"), "5b5a9173fd518a9865d63b1fe4f42c0c396662365e85628ae55004b4415a57c7");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

@@ -105,6 +105,9 @@ export type SkeletonItem = {
   mark?: boolean;
   /** The words of a row of tabs, and the place of the chosen one, counted from 0. */
   tabs?: string[]; chosen?: number;
+  /** On a row of tabs, `DSTabsType`: `PILL` draws the pills and `LINE` the line wherever the row stands. Left out, the level picks:
+   *  pills at the page level, the line inside a container, a card, a widget or a feature. */
+  type?: "LINE" | "PILL";
   /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. At the end of an
    *  item line, `ARROW_RIGHT` and `ARROW_UP_RIGHT` are its end arrows, in `DSIconType`'s names, drawn bare. */
   icon?: "close" | "add" | "menu" | "search" | "more" | "previous" | "next" | "select" | "checkbox" | "bell" | "person" | "default" | "ARROW_RIGHT" | "ARROW_UP_RIGHT";
@@ -190,8 +193,9 @@ export type SkeletonFrame = {
   color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; inset?: boolean;
   /** On a `DSFeature`, in its own names: `items.surface` puts each of its item lines in a frame of its own. With `frames`, which on
    *  a `DSFeature` names its parts `TEXT` and `MEDIA`, `surface` is what the feature's own frame draws. `items.type` and
-   *  `items.borderType` draw the lines between its items, and `items.numbered` a number before each item's title. */
-  items?: { surface?: SkeletonFrame["surface"]; type?: "GRID" | "LIST"; borderType?: "NONE" | "GRID" | "EDGE"; numbered?: boolean };
+   *  `items.borderType` draw the lines between its items, and `items.numbered` a number before each item's title. `items.type`
+   *  `STATS` draws each item line as a statistic: its title the value, large, and its description the label under it. */
+  items?: { surface?: SkeletonFrame["surface"]; type?: "GRID" | "LIST" | "STATS"; borderType?: "NONE" | "GRID" | "EDGE"; numbered?: boolean };
   surface?: { color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; raised?: boolean; elevation?: "XS" | "SM" | "MD" | "LG" | "XL"; bordered?: boolean; rounded?: boolean };
   /** On a `DSFeature`: where the two sides of its split stand against each other, each at its own height. Left out, every part
    *  stretches to its row. */
@@ -201,7 +205,12 @@ export type SkeletonFrame = {
    *  screen class, which a view reads for its own. */
   section?: { color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; inset?: boolean; size?: "XS" | "SM" | "MD" | "LG" | "XL" };
   grid?: { borderType?: "NONE" | "GRID" | "EDGE"; desktop?: number; tablet?: number; mobile?: number };
+  /** On a `DSAccordionGroup`, in `IDSAccordionGroupOption`'s names: its entries, each a `header`, the `content` an open entry shows
+   *  under it, and `expanded`, whether it is open. With `bordered` each entry stands in an outline of its own. */
+  options?: SkeletonAccordionOption[];
 };
+/** One entry of a `DSAccordionGroup`: the words of its header, the words its open body shows, and whether it is open. */
+export type SkeletonAccordionOption = { header: string; content?: string; expanded?: boolean };
 /** A section of the content of a container or a card: its title, the actions at the end of that title, its rows, and
  *  the unit of the design system it is, whose name stands at its corner. A section with a title and no unit is a group,
  *  the level `GROUP` of the design system: a dotted boundary round it, *Group* at its corner.
@@ -1729,6 +1738,8 @@ const SKEL_CARD_HEAD_ONE = 40, SKEL_CARD_HEAD_TWO = 58;
  *  and it stays so where it also tells that thing's state: a spec says `mark` and `on` together for it. */
 const SKEL_MARK_DROP = 12;
 const SKEL_CONTROLS = ["button", "field", "select", "checkbox", "switch", "tabs", "badge", "pager"];
+/** The looks of a row of tabs a skeleton draws, in `DSTabsType`'s words (RD.DEVEX.WORKSPACE.302). */
+const SKEL_TABS_TYPES = ["LINE", "PILL"];
 /** A badge stands this much lower than a control, and a switch's track this much, each on the row's centre line. */
 const SKEL_BADGE_DROP = 8, SKEL_SWITCH_DROP = 12;
 /** An icon before the word of a badge or a tab: a plain shape with no square around it. */
@@ -1819,7 +1830,7 @@ const skelSectionRoom = (frame: SkeletonFrame): number | undefined => {
 /** THE LINES BETWEEN A FEATURE'S ITEMS, AND BETWEEN A GRID SECTION'S CELLS, IN `DSGridBorderType`'S WORDS (RD.DEVEX.WORKSPACE.289).
  *  `border` is `GRID` or `EDGE`; `across` draws a line between the parts of one row too, as a `GRID` of items and a grid of cells
  *  do, where a `LIST` has one item to a row; `cells` reads rows of `DSFeature` cells, where a feature reads rows of item lines. */
-const SKEL_ITEMS_TYPES = ["GRID", "LIST"], SKEL_BORDER_TYPES = ["NONE", "GRID", "EDGE"], SKEL_V_ALIGNS = ["TOP", "CENTER", "BOTTOM"];
+const SKEL_ITEMS_TYPES = ["GRID", "LIST", "STATS"], SKEL_BORDER_TYPES = ["NONE", "GRID", "EDGE"], SKEL_V_ALIGNS = ["TOP", "CENTER", "BOTTOM"];
 const SKEL_GRID_CLASSES = ["desktop", "tablet", "mobile"];
 type SkelLines = { border: string; across: boolean; cells: boolean };
 /** Filled from the spec once, before it is drawn, each by the rows array it reads, which a view's copy of its frame keeps: the lines
@@ -1829,6 +1840,14 @@ const skelLined = new WeakMap<object, SkelLines>();
 const skelNumbers = new WeakMap<object, number>();
 const skelCentred = new WeakSet<object>();
 const skelAligned = new WeakMap<object, string>();
+/** A FEATURE'S STATISTICS, `items.type` `STATS` (RD.DEVEX.WORKSPACE.300): each item line of such a feature, kept with the sizes of its
+ *  value and its label and whether the feature's head centres them. Filled from the spec once, before it is drawn. The design system
+ *  draws a statistic one level below the feature's own: its value at the title step of that level and its label at its description
+ *  step, which the drawer's head steps give as 20 · 15 · 13px and 14 · 13 · 12px under `PAGE`, `CONTAINER` and `WIDGET`. */
+type SkelStat = { value: number; label: number; centre: boolean };
+const skelStats = new WeakMap<object, SkelStat>();
+const SKEL_STAT_VALUE: Record<string, number> = { PAGE: 20, CONTAINER: 15, WIDGET: 13 };
+const SKEL_STAT_LABEL: Record<string, number> = { PAGE: 14, CONTAINER: 13, WIDGET: 12 };
 /** Whether a row is one of the items its frame's lines part: item lines, or `DSFeature` cells, with spacers where a row is short. */
 const skelLinedRow = (row: SkeletonRow, lines: SkelLines): boolean => {
   const real = (row?.items ?? []).filter((it) => !!it && typeof it === "object" && skelKind(it) !== "spacer");
@@ -1867,6 +1886,69 @@ function skelSurfaceMarks(surface: SkelSurface, x: number, y: number, w: number,
   const filled = surface.raised === true || (surface.color !== undefined && surface.color !== "BASE");
   return [...(filled ? [skelRect("sds-skel-surface", x, y, w, h, rx)] : []), skelRect(surface.bordered === true ? "sds-skel-border" : "sds-skel-control", x, y, w, h, rx)];
 }
+
+/** A `DSAccordionGroup` WITH ITS ENTRIES, in `IDSAccordionGroupOption`'s names (RD.DEVEX.WORKSPACE.301): a group that names its `options`
+ *  draws them, one under another, each its header line with the indicator at its start and, where it is `expanded`, its `content` under
+ *  it. A group written with `rows` and no `options` draws its rows as before. */
+const SKEL_ACCORDION = "DSAccordionGroup";
+const skelAccordionOf = (frame: SkeletonFrame): SkeletonAccordionOption[] | undefined =>
+  frame.unit === SKEL_ACCORDION && Array.isArray(frame.options)
+    ? frame.options.filter((option) => option !== null && typeof option === "object" && !Array.isArray(option)) : undefined;
+/** THE WIDTH EACH OPEN ENTRY'S WORDS WERE WRAPPED AT, as a head's are: they wrap at a word to the entry's width, which a row learns only when
+ *  it is drawn, so a spec that holds an accordion is drawn twice (`drawSkeleton`), and an entry drawn at two widths keeps the narrower. */
+const skelAccordionWidths = new WeakMap<object, number>();
+/** The words an open entry shows under its header, or none where it is closed or has no words. */
+const skelAccordionWords = (option: SkeletonAccordionOption): string | undefined =>
+  option.expanded === true && typeof option.content === "string" && option.content.trim() ? option.content : undefined;
+const skelAccordionLines = (option: SkeletonAccordionOption, width: number): string[] => {
+  const words = skelAccordionWords(option);
+  return words === undefined ? [] : skelHeadWrap(words, width, (line) => skelWordW(line));
+};
+/** AN ENTRY IS ITS HEADER LINE, as tall as a control of its size, and under it an open entry's words, a line apart from it, or inside its
+ *  own outline a boundary's padding round them where the group is `bordered`. */
+const skelAccordionEntryH = (frame: SkeletonFrame, option: SkeletonAccordionOption, ctl: number): number => {
+  const lines = skelAccordionLines(option, skelAccordionWidths.get(option) ?? Infinity).length;
+  return ctl + (lines ? (frame.bordered === true ? SKEL_PAD * 2 : SKEL_LABEL_GAP) + lines * SKEL_ITEM_LINE : 0);
+};
+/** The entries stand one under another, the gap between parts apart. */
+const skelAccordionH = (frame: SkeletonFrame, entries: SkeletonAccordionOption[], ctl: number): number =>
+  entries.reduce((t, option) => t + skelAccordionEntryH(frame, option, ctl), 0) + SKEL_GAP * Math.max(0, entries.length - 1);
+/** The room an entry needs across: its indicator, the gap and its header's words, or the widest word of its open words, and the padding
+ *  of its outline where the group is `bordered`. */
+const skelAccordionMinW = (frame: SkeletonFrame, entries: SkeletonAccordionOption[]): number => Math.max(0, ...entries.map((option) => {
+  const words = skelAccordionWords(option) ?? "";
+  return (frame.bordered === true ? SKEL_PAD * 2 : 0) + Math.max(SKEL_INLINE_ICON + SKEL_LABEL_GAP + skelStepW(String(option.header ?? ""), SKEL_STEP_ITEM),
+    ...words.split(/\s+/).filter(Boolean).map((word) => skelWordW(word)));
+}));
+/** THE ENTRIES OF A GROUP, drawn from `(x, y)` across `w`. The indicator is the design system's chevron, at the start of the header line,
+ *  pointing down while the entry is shut and turned up while it is open; the header's words stand at an item title's step. */
+function skelDrawAccordion(frame: SkeletonFrame, entries: SkeletonAccordionOption[], x: number, y: number, w: number, ctl: number, out: string[]): void {
+  const bordered = frame.bordered === true, pad = bordered ? SKEL_PAD : 0;
+  let top = y;
+  for (const option of entries) {
+    const wrapAt = w - pad * 2, known = skelAccordionWidths.get(option);
+    skelAccordionWidths.set(option, known === undefined ? wrapAt : Math.min(known, wrapAt));
+    const lines = skelAccordionLines(option, wrapAt), entryH = skelAccordionEntryH(frame, option, ctl);
+    if (bordered) out.push(skelRect("sds-skel-control", x, top, w, entryH, SKEL_ROUND));
+    const cx = x + pad + SKEL_INLINE_ICON / 2, cy = top + ctl / 2, unit = SKEL_INLINE_ICON / 24;
+    const at = (vx: number, vy: number): [number, number] => [cx - SKEL_INLINE_ICON / 2 + vx * unit, cy - SKEL_INLINE_ICON / 2 + vy * unit];
+    out.push(...(option.expanded === true ? [skelPath("sds-skel-glyph", [[at(6, 15), at(12, 9), at(18, 15)]])] : skelGlyph("select", cx, cy, SKEL_INLINE_ICON)));
+    out.push(skelStepText(String(option.header ?? ""), SKEL_STEP_ITEM, x + pad + SKEL_INLINE_ICON + SKEL_LABEL_GAP, cy + 4));
+    if (lines.length) {
+      // A BORDERED ENTRY THAT IS OPEN DIVIDES ITS HEADER FROM ITS BODY BY A LINE ACROSS ITS OUTLINE.
+      if (bordered) out.push(`  <path class="sds-skel-control" d="M${r2(x)} ${r2(top + ctl)} H${r2(x + w)}"/>`);
+      let lineTop = top + ctl + (bordered ? SKEL_PAD : SKEL_LABEL_GAP);
+      for (const line of lines) {
+        out.push(`  <text class="sds-code" x="${r2(x + pad)}" y="${Math.round(lineTop + 13)}">${esc(line)}</text>`);
+        lineTop += SKEL_ITEM_LINE;
+      }
+    }
+    top += entryH + SKEL_GAP;
+  }
+}
+/** Whether a spec holds a group's entries anywhere, and so must be measured before it is drawn. */
+const skelHasOptions = (value: unknown): boolean => Array.isArray(value) ? value.some(skelHasOptions)
+  : value !== null && typeof value === "object" && ("options" in value || Object.values(value).some(skelHasOptions));
 
 /** THE LAYOUT'S WORDS, and the fields of the three looks (`IDSLayoutBodyLook`, `IDSLayoutNavigationLook`,
  *  `IDSLayoutContentLook`); a sketch's navigation adds the words of its entries and the open one. */
@@ -1985,7 +2067,7 @@ const skelItemTitleW = (it: SkeletonItem) => skelItemNumberW(it) + skelStepW(it.
 const skelItemWordsW = (it: SkeletonItem, h: number) => skelItemInline(it) ? skelItemTitleW(it) + SKEL_FACT_DOT_W + skelItemFactsW(it, h)
   : Math.max(skelItemTitleW(it), skelItemFactsW(it, h), Math.ceil((skelItemOwnDescription(it) ?? "").length * SKEL_W_NOTE));
 /** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
-const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length || skelItemInline(it) ? h
+const skelItemH = (it: SkeletonItem, h: number) => skelStats.has(it) ? skelStatH(it) : !skelItemFacts(it).length || skelItemInline(it) ? h
   : skelItemDescriptionH(it) + (skelItemHasBadge(it) ? Math.max(h, SKEL_ITEM_LINE + SKEL_PACK_GAP + SKEL_FACT_BADGE + SKEL_LABEL_GAP) : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP));
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
  *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
@@ -2001,8 +2083,20 @@ const skelItemMediaOf = (media: unknown): { bare: boolean; shape: string } =>
 const skelItemIconW = (it: SkeletonItem) => Math.round(skelItemStep(it) * 4 / 3);
 const skelItemMediaW = (it: SkeletonItem, h: number): number =>
   it.item?.media === undefined ? 0 : (skelItemMediaOf(it.item.media).bare ? skelItemIconW(it) : skelItemMediaD(it, h)) + SKEL_LABEL_GAP;
-const skelItemW = (it: SkeletonItem, h: number): number =>
-  skelItemMediaW(it, h) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+const skelItemW = (it: SkeletonItem, h: number): number => skelStats.has(it) ? skelStatW(it)
+  : skelItemMediaW(it, h) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+/** A STATISTIC IS ITS VALUE OVER ITS LABEL, one block as tall as its two lines, as the design system stacks them with no room between
+ *  (RD.DEVEX.WORKSPACE.300). It is as wide as the wider of the two. */
+const skelStatOf = (it: SkeletonItem): SkelStat => skelStats.get(it)!;
+const skelStatLabel = (it: SkeletonItem): string | undefined => (typeof it.item?.description === "string" && it.item.description ? it.item.description : undefined);
+const skelStatH = (it: SkeletonItem): number => {
+  const stat = skelStatOf(it);
+  return skelHeadLine(stat.value) + (skelStatLabel(it) !== undefined ? skelHeadLine(stat.label) : 0);
+};
+const skelStatW = (it: SkeletonItem): number => {
+  const stat = skelStatOf(it), label = skelStatLabel(it);
+  return Math.max(skelStepW(String(it.item?.title ?? ""), stat.value), label !== undefined ? skelHeadDescriptionW(label, stat.label) : 0);
+};
 
 /** A FEATURE'S HEAD IS DRAWN AT ITS LEVEL, IN `DSFeature`'S OWN NAMES (RD.DEVEX.WORKSPACE.284): its title at its level's step,
  *  heavy; its description a step larger than an item's words, quiet; the eyebrow in small capitals, packed above the title;
@@ -2172,6 +2266,9 @@ function skelRowHeight(row: SkeletonRow, ctl: number): number {
 function skelFrameHeight(frame: SkeletonFrame, inherited: number): number {
   const ctl = skelSizeH(frame, inherited);
   const rows = skelRows(frame);
+  // A GROUP'S ENTRIES STAND UNDER ITS NAME, with a boundary's padding under the last (RD.DEVEX.WORKSPACE.301).
+  const entries = skelAccordionOf(frame);
+  if (entries) return Math.max(skelHead(frame) + skelAccordionH(frame, entries, ctl) + SKEL_PAD, (frame.height ?? 0) * ctl);
   // A CONTAINER'S PARTS STAND WITH NO GAP AND NO PADDING OF THE CONTAINER'S OWN: each part keeps its own.
   if (skelHasParts(frame))
     return Math.max(skelHead(frame) + skelParts(frame).reduce((t, p) => t + skelFrameHeight(p, ctl), 0), (frame.height ?? 0) * ctl);
@@ -2322,6 +2419,8 @@ function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   const headActions = (frame.look === "container" || frame.look === "card") && frame.actions?.length
     ? SKEL_GAP + frame.actions.reduce((t, a) => t + skelFixedWidth(a, ctl), 0) + SKEL_LABEL_GAP * (frame.actions.length - 1) : 0;
   if (skelHasParts(frame)) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
+  const entries = skelAccordionOf(frame);
+  if (entries) return SKEL_PAD * 2 + Math.max(head, skelAccordionMinW(frame, entries));
   const rows = Math.max(0, ...skelRows(frame).map((r) => skelRowMinWidth(r, ctl)));
   return Math.max(SKEL_PAD * 2 + head + headActions, skelInset(frame) * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
@@ -2467,6 +2566,24 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // its row, and the line inside it at a boundary's padding, at the top.
     const boxed = skelItemFrames.get(it);
     if (boxed) out.push(...skelSurfaceMarks(boxed, ix, iy, iw, ih));
+    // A STATISTIC (RD.DEVEX.WORKSPACE.300): its title is the value, large and heavy, and its description the label under it, quiet, each
+    // at its step one level below the feature's own. It draws nothing else, as the design system draws a statistic from these two.
+    if (skelStats.has(it)) {
+      const stat = skelStatOf(it), label = skelStatLabel(it);
+      const drawn = (["media", "meta", "end", "inline", "factsPlacement", "selected"] as const).filter((key) => item[key] !== undefined);
+      if (drawn.length)
+        skelSay(findings, `a statistic of \`items.type\` \`STATS\` draws its \`title\`, the value, and its \`description\`, the label under it, and nothing else; ${drawn.map((key) => `\`${key}\``).join(", ")} ${drawn.length > 1 ? "are" : "is"} not drawn`);
+      const lineX = boxed ? ix + SKEL_PAD : ix, lineW = boxed ? iw - SKEL_PAD * 2 : iw;
+      const top = boxed ? iy + SKEL_PAD : iy + (ih - skelStatH(it)) / 2;
+      const valueW = skelStepW(String(item.title ?? ""), stat.value), labelW = label !== undefined ? skelHeadDescriptionW(label, stat.label) : 0;
+      // `textAlign` `CENTER` ON THE FEATURE'S HEAD CENTRES THE VALUE AND THE LABEL IN THEIR PLACE, each by its own measure.
+      const startOf = (w: number) => (stat.centre ? lineX + (lineW - w) / 2 : lineX);
+      const baseOf = (lineTop: number, size: number) => Math.round(lineTop + (skelHeadLine(size) + size * 0.7) / 2);
+      out.push(skelStepText(String(item.title ?? ""), stat.value, startOf(valueW), baseOf(top, stat.value)));
+      if (label !== undefined)
+        out.push(`  <text class="sds-note" x="${r2(startOf(labelW))}" y="${baseOf(top + skelHeadLine(stat.value), stat.label)}" style="font-size:${stat.label}px">${esc(label)}</text>`);
+      return;
+    }
     // THE CHOSEN LINE OF A FEATURE'S BOXED ITEMS KEEPS ITS FRAME AND DRAWS A HEAVIER LINE INSIDE ITS EDGE (RD.DEVEX.WORKSPACE.298), as
     // `DSItemCard` marks a selected tile, so it keeps its size. The design system reads `selected` only where the items are boxed.
     if (item.selected !== undefined && typeof item.selected !== "boolean") skelSay(findings, `an item line's \`selected\` is \`${JSON.stringify(item.selected)}\`, and it takes true or false`);
@@ -2631,12 +2748,17 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       if (!Number.isInteger(chosen) || chosen < 0 || chosen >= words.length)
         findings.push(`\`chosen\` is \`${chosen}\`, and this row has ${words.length} tabs, counted from 0`);
       if (words.some((word) => word.includes("\n"))) findings.push("a control stands on one line, and a tab's word runs over more");
+      // A ROW OF TABS THAT NAMES ITS `type` IS DRAWN IN IT WHEREVER IT STANDS (RD.DEVEX.WORKSPACE.302), as `DSTabs` draws the type a page
+      // names: `PILL` the pills, as the second form of a choice to see sets them over its panel inside a feature, and `LINE` the line.
+      if (it.type !== undefined && !SKEL_TABS_TYPES.includes(it.type))
+        skelSay(findings, `a row of tabs' \`type\` is \`${String(it.type)}\`, and a skeleton draws ${SKEL_TABS_TYPES.join(" · ")}; the level's look is drawn in its place`);
+      const pill = it.type === "PILL" || (it.type !== "LINE" && !!it.atPage);
       const foot = iy + h - 1;
       // THE PILL'S TRACK STARTS WHERE THE ROW STARTS, so its edge lines up with the page head and the parts under it;
       // its words stand in from that edge by the pill's padding and the track's.
       const pillPad = SKEL_LABEL_GAP, trackPad = 3;
-      const inset = it.atPage ? pillPad + trackPad : 0;
-      if (it.atPage) {
+      const inset = pill ? pillPad + trackPad : 0;
+      if (pill) {
         // THE PILL: a muted rounded track with an outline holds the words, and the chosen one stands in a filled pill.
         const pillH = h - trackPad * 2;
         out.push(skelRect("sds-skel-surface", ix, iy, iw + inset * 2, h, h / 2));
@@ -2652,7 +2774,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
         const tw = skelTabW(it, word);
         if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
         out.push(`  <text class="${index === chosen ? "sds-label" : "sds-code"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
-        if (index === chosen && !it.atPage) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
+        if (index === chosen && !pill) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
         tx += tw + SKEL_GAP;
       });
       return;
@@ -2842,8 +2964,10 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   // TABS IN THE ROOT FRAME'S ROWS STAND AT THE PAGE LEVEL, as the page head's actions do (they are the root frame's own row).
   if (root) for (const row of rows) for (const it of row.items ?? []) if (it.control === "tabs") it.atPage = true;
   const parts = skelParts(frame);
+  const entries = skelAccordionOf(frame);
   if (isContainer) skelContainerFindings(frame, parts, findings);
-  else if (frame.raised !== undefined || frame.bordered !== undefined || frame.rounded !== undefined)
+  // A `DSAccordionGroup` THAT DRAWS ITS ENTRIES TAKES `bordered` AS ITS OWN, an outline round each entry (RD.DEVEX.WORKSPACE.301).
+  else if (frame.raised !== undefined || (frame.bordered !== undefined && entries === undefined) || frame.rounded !== undefined)
     findings.push("`raised`, `bordered` and `rounded` belong to a frame with `frames`; a frame that stands alone takes `look`");
   const labelCol = skelLabelCol(frame);
   const inset = skelInset(frame);
@@ -2924,6 +3048,8 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
       cx += aw + SKEL_LABEL_GAP;
     }
   }
+  // A GROUP'S ENTRIES STAND INSIDE ITS BOUNDARY, under its name, at a boundary's padding (RD.DEVEX.WORKSPACE.301).
+  if (entries) { skelDrawAccordion(frame, entries, x + SKEL_PAD, y + skelHead(frame), w - SKEL_PAD * 2, ctl, out); return; }
 
   // A PART THAT TAKES THE HEIGHT LEFT: where the frame stands taller than its rows need, the rows whose
   // one item is a `fill` frame, slot or part share what is over.
@@ -3183,7 +3309,7 @@ function skelUnits(frame: SkeletonFrame | undefined, findings: string[], inFrame
 
 /** What a feature hands the regions inside it that are no unit: the lines of its items, whether they are numbered and counted so
  *  far, and whether they are a `LIST`. */
-type SkelFeatureLook = { lines?: SkelLines; numbered: boolean; list: boolean; count: { n: number } };
+type SkelFeatureLook = { lines?: SkelLines; numbered: boolean; list: boolean; count: { n: number }; stats?: SkelStat };
 /** Whether a row stands centred with a centred head: it holds actions, words, icons or item lines, and no item line of a `LIST`. */
 const skelCentrable = (row: SkeletonRow, list: boolean): boolean => {
   const kinds = (row?.items ?? []).map((it) => (it && typeof it === "object" ? skelKind(it) : null));
@@ -3250,7 +3376,13 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
     if (shape.numbered !== undefined && typeof shape.numbered !== "boolean") said(`a feature's \`items.numbered\` is \`${JSON.stringify(shape.numbered)}\`, and it takes true or false`);
     const list = shape.type === "LIST";
     const border = itemsHere ? "NONE" : SKEL_BORDER_TYPES.includes(shape.borderType as string) ? (shape.borderType as string) : list ? "GRID" : "NONE";
-    featureHere = { lines: border !== "NONE" ? { border, across: !list, cells: false } : undefined, numbered: shape.numbered === true, list, count: { n: 0 } };
+    // A FEATURE'S `STATS` (RD.DEVEX.WORKSPACE.300) stand side by side as a `GRID` does, with no line where `borderType` is left out, and
+    // take the sizes one level below the feature's own, which its head's `pageLevel` gives. The design system numbers no statistic.
+    const head = ownRows.flatMap((row) => row?.items ?? []).find((it) => !!it && typeof it === "object" && skelKind(it) === "head");
+    const level = head !== undefined ? skelHeadLevel(skelHeadOf(head)) : "CONTAINER";
+    const stats = shape.type === "STATS" ? { value: SKEL_STAT_VALUE[level], label: SKEL_STAT_LABEL[level], centre: head !== undefined && skelHeadOf(head).textAlign === "CENTER" } : undefined;
+    if (stats && shape.numbered === true) said("`items.numbered` numbers the item lines of a `GRID` or a `LIST`, and the design system writes no number before a statistic of `STATS`");
+    featureHere = { lines: border !== "NONE" ? { border, across: !list, cells: false } : undefined, numbered: shape.numbered === true && !stats, list, count: { n: 0 }, stats };
     if (frame.divided !== undefined)
       said("`divided` draws the lines of a container's or a card's list, and a `DSFeature`'s lines are its `items.type` `LIST` or its `items.borderType`");
     // THE SPLIT OF A FEATURE WITH `verticalAlign` (RD.DEVEX.WORKSPACE.292): each of its rows that holds its media beside its words. A
@@ -3288,6 +3420,22 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
           said(`the \`${device}\` view stands a grid section's cells in \`grid.${key}\`, ${columns} columns, and a row of them holds ${row.items.length}; a short row is filled with spacers`);
     }
   }
+  // A `DSAccordionGroup`'S ENTRIES ARE ITS `options` (RD.DEVEX.WORKSPACE.301): each with the words of its `header`, its `content` in words,
+  // and `expanded` true or false; the group's `bordered` true or false. A group that draws its entries draws no `rows`.
+  if (frame.options !== undefined) {
+    if (unit !== SKEL_ACCORDION) said(`\`options\` is a field of a \`DSAccordionGroup\`, its entries, and this frame is ${which}`);
+    else if (!Array.isArray(frame.options)) said(`a \`DSAccordionGroup\`'s \`options\` is the list of its entries, and it is \`${JSON.stringify(frame.options)}\``);
+    else {
+      if (ownRows.length) said("a `DSAccordionGroup` draws its entries from `options`, and its `rows` are not drawn");
+      for (const option of frame.options) {
+        if (!isObject(option) || typeof option.header !== "string" || !option.header.trim()) { said("an entry of a `DSAccordionGroup` carries the words of its `header`"); continue; }
+        if (option.expanded !== undefined && typeof option.expanded !== "boolean") said(`an entry's \`expanded\` is \`${JSON.stringify(option.expanded)}\`, and it takes true or false`);
+        if (option.content !== undefined && typeof option.content !== "string") said(`an entry's \`content\` is the words its open body shows, and it is \`${JSON.stringify(option.content)}\``);
+      }
+    }
+  }
+  if (unit === SKEL_ACCORDION && Array.isArray(frame.options) && frame.bordered !== undefined && typeof frame.bordered !== "boolean")
+    said(`a \`DSAccordionGroup\`'s \`bordered\` is \`${JSON.stringify(frame.bordered)}\`, and it takes true or false`);
   // A REGION OF A FEATURE THAT IS NO UNIT HOLDS THE FEATURE'S ITEMS TOO, and takes their lines.
   if (featureHere?.lines !== undefined && (unit === SKEL_FEATURE || unit === undefined) && Array.isArray(frame.rows)) skelLined.set(frame.rows, featureHere.lines);
   // A CENTRED HEAD CENTRES THE ROWS THAT STAND WITH IT (RD.DEVEX.WORKSPACE.291): in a feature, in a region of one, and in a grid section's heading.
@@ -3303,6 +3451,7 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
     if (kind === "slot" && mediaHere) skelItemFrames.set(it, mediaHere);
     // EACH ITEM LINE OF A NUMBERED FEATURE TAKES THE NEXT NUMBER, in the order its rows are read (RD.DEVEX.WORKSPACE.290).
     if (kind === "item" && featureHere?.numbered) skelNumbers.set(it, ++featureHere.count.n);
+    if (kind === "item" && featureHere?.stats) skelStats.set(it, featureHere.stats);
     if (kind === "frame") skelLooks(it.frame, findings, itemsHere, mediaHere, featureHere, device);
   }
 }
@@ -3315,11 +3464,13 @@ const SKEL_FIELDS: Record<string, string[]> = {
   view: ["viewport", "page", "frame"],
   page: ["item", "actions", "back"],
   frame: ["label", "note", "width", "rows", "look", "tag", "height", "fill", "unit", "headed", "frames", "raised", "bordered", "rounded", "size",
-    "part", "actions", "footer", "sections", "divided", "marked", "media", "color", "strength", "inset", "items", "surface", "verticalAlign", "section", "grid"],
+    "part", "actions", "footer", "sections", "divided", "marked", "media", "color", "strength", "inset", "items", "surface", "verticalAlign", "section", "grid",
+    "options"],
   section: ["label", "actions", "rows", "divided", "unit", "part", "sections"],
   row: ["label", "framed", "chosen", "marked", "items", "within", "lead"],
   item: ["text", "note", "fill", "frame", "tag", "slot", "control", "main", "on", "flush", "edgeTop", "inPart", "atPage", "mark", "tabs", "chosen",
-    "icon", "standin", "lines", "headings", "columns", "cells", "label", "info", "description", "error", "read", "item", "head", "spacer", "height", "part", "page"],
+    "icon", "standin", "lines", "headings", "columns", "cells", "label", "info", "description", "error", "read", "item", "head", "spacer", "height", "part", "page",
+    "type"],
   line: ["media", "title", "description", "meta", "end", "inline", "factsPlacement", "selected"],
   head: ["pageLevel", "eyebrow", "title", "description", "facts", "textAlign", "media"],
   media: ["mtype", "node", "icon", "title"],
@@ -3327,6 +3478,7 @@ const SKEL_FIELDS: Record<string, string[]> = {
   surface: ["color", "strength", "raised", "elevation", "bordered", "rounded"],
   gridSection: ["color", "strength", "inset", "size"],
   grid: ["borderType", "desktop", "tablet", "mobile"],
+  option: ["header", "content", "expanded"],
 };
 const SKEL_OLD_FIELDS = ["tone", "em", "off", "warn"];
 function skelFieldFindings(spec: Spec, findings: string[]): void {
@@ -3346,6 +3498,7 @@ function skelFieldFindings(spec: Spec, findings: string[]): void {
   };
   const item = (value: unknown): void => {
     if (!known(value, "item", "an item", true)) return;
+    if (value.type !== undefined && value.control !== "tabs") said("`type` is the look of a row of tabs, in `DSTabsType`'s words, and this item is no row of tabs");
     frame(value.frame);
     line(value.item);
     if (known(value.head, "head", "a head")) {
@@ -3368,6 +3521,7 @@ function skelFieldFindings(spec: Spec, findings: string[]): void {
     if (known(value.items, "items", "a feature's `items`")) known(value.items.surface, "surface", "a `surface`");
     known(value.section, "gridSection", "a grid section's `section`");
     known(value.grid, "grid", "a grid section's `grid`");
+    for (const option of list(value.options)) known(option, "option", "an entry of a `DSAccordionGroup`'s `options`");
     for (const action of list(value.actions)) item(action);
     for (const part of list(value.sections)) section(part);
     for (const r of [...list(value.rows), ...list(value.footer)]) row(r);
@@ -3634,7 +3788,7 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   const paint = (said: string[], into: string[]) => views ? skelDrawViews(spec.views!, layout, said, into) : skelDrawFrame(spec.frame!, 24, 24, undefined, said, into);
   // A HEAD WRAPS TO THE WIDTH ITS ROW GIVES IT, so a spec that holds one is first drawn to learn each head's width, and
   // that drawing and what it found are put aside. A spec with no head is drawn once.
-  if (skelHasHead(spec)) paint([...findings], []);
+  if (skelHasHead(spec) || skelHasOptions(spec)) paint([...findings], []);
   paint(findings, out);
   if (views && !out.length) return { svg: "", findings };
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };
