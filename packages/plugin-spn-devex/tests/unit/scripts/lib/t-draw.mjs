@@ -1393,7 +1393,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
   // 9 · a field that a skeleton does not have is a finding, never silence
   one("`numbered` on a feature is no field a skeleton has, and is named in a finding", feature({ numbered: true }, HEAD).findings, says("`numbered` is no field of a frame"));
   one("`selected` on an item is no field a skeleton has, and is named in a finding", feature({}, [{ items: [{ item: { title: "Shape" }, selected: true, fill: true }] }]).findings, says("`selected` is no field of an item"));
-  one("a key of a feature's `items` the skeleton does not draw is named, `items.numbered` among them", feature({ items: { numbered: true } }, DOORS).findings, says("`numbered` is no field of a feature's `items`"));
+  one("a key of a feature's `items` the skeleton does not draw is named, `items.orientation` among them", feature({ items: { orientation: "VERTICAL" } }, DOORS).findings, says("`orientation` is no field of a feature's `items`"));
   one("a field of a row, a head, an item line, a view and the spec is read too",
     draw({ kind: "skeleton", subtitle: "x", views: [{ viewport: "DESKTOP", zoom: 2, frame: { rows: [{ height: 2, items: [{ head: { title: "A", align: "CENTER" } }, { item: { title: "B", badge: "x" }, fill: true }] }] } }] }).findings,
     (g) => ["`subtitle` is no field of a skeleton spec", "`zoom` is no field of a view", "`height` is no field of a row", "`align` is no field of a head", "`badge` is no field of an item line"].every((s) => says(s)(g)));
@@ -1407,6 +1407,158 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
     { items: [{ item: { media: "default", title: "Live status", description: "Paid, packed or shipped" }, fill: true }, { slot: "mediaNode · the product", fill: true }] }] } }] }] } }] }] } }] };
   one("a section and a feature written with none of the new fields draw byte for byte as before",
     createHash("sha256").update(draw(PLAIN).svg).digest("hex"), "45e92a0ba59ce1114ff1ad250657ca422a65eb0ff970dcfd29563b23231bbafd");
+}
+
+console.log("=== SKELETON — lines, numbers and alignment, and a grid section's fill (RD.DEVEX.WORKSPACE.289 to .293)");
+{
+  /** Every rect of one class, as [x, y, width, height, corner]. */
+  const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const wordsAt = (g, words) => [...g.matchAll(/<text class="[^"]+" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]), words: m[3] })).find((t) => t.words === words);
+  /** The thin lines across, as [x1, y, x2], and the thin lines down, as [x, y1, y2]. */
+  const across = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M([\d.]+) ([\d.]+) H([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const down = (g) => [...g.matchAll(/<path class="sds-skel-control" d="M([\d.]+) ([\d.]+) V([\d.]+)"/g)].map((m) => m.slice(1).map(Number));
+  const ITEM = (title, extra = {}) => ({ item: { title, description: "One line under it" }, ...extra });
+  const FILLED = (title) => ITEM(title, { fill: true });
+  const HEAD = (textAlign) => ({ items: [{ head: { title: "Start in four steps", ...(textAlign ? { textAlign } : {}) } }] });
+  const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
+  const LIST = [{ items: [FILLED("Connect your store")] }, { items: [FILLED("Choose your plan")] }, { items: [FILLED("Go live")] }];
+  const GRID = [{ items: [FILLED("Live status"), FILLED("One place to act")] }, { items: [FILLED("Every channel"), FILLED("Audit built in")] }];
+
+  // 1 · the lines between a feature's items, in `DSGridBorderType`'s words
+  const list = feature({ items: { type: "LIST" } }, LIST), unlined = feature({}, LIST);
+  const connect = wordsAt(list.svg, "Connect your store"), choose =wordsAt(list.svg, "Choose your plan"), live = wordsAt(list.svg, "Go live");
+  one("`items.type` `LIST` draws a line under every item but its last, across the column, where `borderType` is left out, and no finding",
+    [list.findings, across(list.svg), down(list.svg), across(unlined.svg)],
+    ([found, lines, verticals, none_]) => found.length === 0 && lines.length === 2 && verticals.length === 0 && none_.length === 0
+      && lines[0][1] > connect.y && lines[0][1] < choose.y && lines[1][1] > choose.y && lines[1][1] < live.y && lines[0][2] - lines[0][0] > 900);
+  const noneList = feature({ items: { type: "LIST", borderType: "NONE" } }, LIST), gridItems = feature({ items: { type: "GRID" } }, GRID);
+  one("a `LIST` with `borderType` `NONE` draws no line, and a `GRID` draws none where `borderType` is left out, with no finding",
+    [noneList.findings, gridItems.findings, across(noneList.svg), across(gridItems.svg), down(gridItems.svg)],
+    ([found, gridFound, ...lines]) => found.length === 0 && gridFound.length === 0 && lines.every((drawn) => drawn.length === 0));
+  const grid = feature({ items: { borderType: "GRID" } }, GRID);
+  const [rowLine] = across(grid.svg), verticals = down(grid.svg);
+  one("`borderType` `GRID` on a `GRID` of items draws a line under the first row and one in the gap between the two items of each row, and the lines meet",
+    [grid.findings, across(grid.svg), verticals, wordsAt(grid.svg, "Live status"), wordsAt(grid.svg, "One place to act")],
+    ([found, lines, downs, first, second]) => found.length === 0 && lines.length === 1 && downs.length === 2 && downs[0][0] === downs[1][0]
+      && downs[0][0] > first.x && downs[0][0] < second.x && downs[0][2] === rowLine[1] && downs[1][1] === rowLine[1]
+      && rowLine[0] < downs[0][0] && rowLine[2] > downs[0][0]);
+  const edge = feature({ items: { borderType: "EDGE" } }, GRID);
+  one("`EDGE` adds a thin rounded outline round the items, and the lines reach it",
+    [boxes(edge.svg, "sds-skel-control").filter((b) => b[4] === 8), across(edge.svg), down(edge.svg)],
+    ([outline, lines, downs]) => outline.length === 1 && lines.length === 1 && lines[0][0] === outline[0][0] && lines[0][2] === outline[0][0] + outline[0][2]
+      && downs[0][1] === outline[0][1] && downs[1][2] === outline[0][1] + outline[0][3]);
+  const boxedList = feature({ items: { type: "LIST", surface: {} } }, LIST), boxedGrid = feature({ items: { borderType: "GRID", surface: {} } }, GRID);
+  one("items boxed by `items.surface` take no line, as the design system reads none there, with no finding",
+    [boxedList.findings, boxedGrid.findings, across(boxedList.svg), across(boxedGrid.svg), down(boxedGrid.svg)],
+    ([found, gridFound, ...lines]) => found.length === 0 && gridFound.length === 0 && lines.every((drawn) => drawn.length === 0));
+  const split = feature({ items: { type: "LIST" } }, [HEAD(), { items: [{ frame: { rows: LIST } }, { slot: "mediaNode · the setup screen", fill: true }] }]);
+  one("the items in a region of the feature that is no unit take its lines too",
+    [split.findings, across(split.svg).length], ([found, count]) => found.length === 0 && count === 2);
+  const CELL = (title) => ({ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { pageLevel: "WIDGET", title } }] }] } });
+  const gsec = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows, ...look } }] }] } });
+  const CELLS = [HEAD(), { items: [CELL("Documents"), CELL("Audit log")] }, { items: [CELL("Notifications"), { spacer: true }] }];
+  const lined = gsec({ grid: { borderType: "GRID" } }, CELLS);
+  one("a grid section's `grid.borderType` `GRID` draws the lines between its cells: under the first row of cells, and in the gap after a cell, a short row's too; none under the heading",
+    [lined.findings, across(lined.svg), down(lined.svg), wordsAt(lined.svg, "Start in four steps"), across(gsec({}, CELLS).svg).length, down(gsec({}, CELLS).svg).length],
+    ([found, lines, downs, heading, plainAcross, plainDown]) => found.length === 0 && lines.length === 1 && lines[0][1] > heading.y + 12 && downs.length === 2
+      && downs[0][0] === downs[1][0] && plainAcross === 0 && plainDown === 0);
+  one("`items.type` `STATS`, a `borderType` the design system lacks, `divided` on a `DSFeature`, and `grid` on another frame are findings",
+    [feature({ items: { type: "STATS" } }, GRID).findings, feature({ items: { borderType: "DOTTED" } }, GRID).findings, feature({ divided: true }, LIST).findings,
+      draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", grid: { borderType: "GRID" }, rows: [HEAD()] } }] }] } }).findings,
+      gsec({ grid: { borderType: "GRID", desktop: 3 } }, CELLS).findings],
+    ([stats, dotted, divided, elsewhere, columns]) => says("`items.type` is `STATS`, and a skeleton draws GRID · LIST")(stats)
+      && says("a feature's `items.borderType` is `DOTTED`, and it takes NONE · GRID · EDGE")(dotted)
+      && says("a `DSFeature`'s lines are its `items.type` `LIST` or its `items.borderType`")(divided)
+      && says("`grid` is a field of a `DSFeatureGridSectionContainer`, and this frame is `DSSectionContainer`")(elsewhere)
+      && says("`desktop` is no field of a grid section's `grid`")(columns));
+
+  // 2 · `items.numbered`: a number before each item's title, in the order the rows are read
+  const numbered = feature({ items: { type: "LIST", numbered: true } }, [HEAD(), { items: [{ frame: { rows: LIST.slice(0, 2) } }, { slot: "mediaNode · the setup screen", fill: true }] }, LIST[2]]);
+  const plain = feature({ items: { type: "LIST" } }, [HEAD(), { items: [{ frame: { rows: LIST.slice(0, 2) } }, { slot: "mediaNode · the setup screen", fill: true }] }, LIST[2]]);
+  one("`items.numbered` puts 1., 2. and 3. before the titles, on the title's line, counted through a region in the order the rows are read",
+    [numbered.findings, ["1.", "2.", "3."].map((n) => wordsAt(numbered.svg, n)), ["Connect your store", "Choose your plan", "Go live"].map((t) => wordsAt(numbered.svg, t))],
+    ([found, numbers, titles]) => found.length === 0 && numbers.every((n, i) => n && n.y === titles[i].y && n.x < titles[i].x));
+  one("the number takes the room before the title, and the description stays under the start of the line",
+    [wordsAt(numbered.svg, "Go live"), wordsAt(plain.svg, "Go live"), wordsAt(numbered.svg, "3."), numbered.svg.match(/<text class="sds-note" x="([\d.]+)" y="[\d.]+">One line under it</)[1], plain.svg.match(/<text class="sds-note" x="([\d.]+)" y="[\d.]+">One line under it</)[1]],
+    ([titled, untitled, number, under, plainUnder]) => titled.x > untitled.x && number.x === untitled.x && under === plainUnder);
+  one("the number is quiet, at the title's size and weight", numbered.svg.includes('<text class="sds-note" x="') && /style="font-size:12px;font-weight:500">1\.</.test(numbered.svg), true);
+  one("`items.numbered` that is not true or false is a finding", feature({ items: { numbered: "yes" } }, LIST).findings, says("`items.numbered` is `"));
+
+  // 3 · a feature's `textAlign` lines up the rows that stand with its head
+  const BUTTONS = { items: [{ control: "button", text: "Start building", main: true }, { control: "button", text: "Read the docs" }] };
+  const buttons = (g) => boxes(g, "sds-skel-control(?: sds-skel-main)?").filter((b) => b[4] === 3);
+  const centred = feature({}, [HEAD("CENTER"), BUTTONS]), started = feature({}, [HEAD(), BUTTONS]);
+  const outer = (g) => boxes(g, "sds-skel-guide")[0];
+  one("a head's `textAlign` `CENTER` centres the row of actions under it: the room left over is shared on its two sides",
+    [centred.findings, buttons(centred.svg), outer(centred.svg), buttons(started.svg)],
+    ([found, [first, second], box, [startFirst]]) => found.length === 0 && Math.abs((first[0] - box[0]) - (box[0] + box[2] - (second[0] + second[2]))) <= 1 && first[0] > startFirst[0]);
+  const spacered = feature({}, [HEAD("CENTER"), { items: [{ spacer: true }, ...BUTTONS.items, { spacer: true }] }]);
+  one("the centred row stands where the spacers on each side faked it", [buttons(centred.svg), buttons(spacered.svg)], ([one_, other]) => JSON.stringify(one_) === JSON.stringify(other));
+  const ACROSS = [HEAD("CENTER"), BUTTONS, { items: [{ frame: { rows: [{ items: [ITEM("The decision")] }, { items: [{ control: "button", text: "See a record" }] }] } }, { slot: "mediaNode · draws the items", fill: true }] }];
+  const headAcross = feature({}, ACROSS), headStart = feature({}, [HEAD(), ...ACROSS.slice(1)]);
+  one("a row in a region that holds no head stays at the start, as the items and their action under a head across do",
+    [wordsAt(headAcross.svg, "See a record"), wordsAt(headStart.svg, "See a record"), wordsAt(headAcross.svg, "Start building"), wordsAt(headStart.svg, "Start building")],
+    ([record, recordStart, lead, leadStart]) => record.x === recordStart.x && lead.x > leadStart.x);
+  const words = (look) => wordsAt(feature(look, [HEAD("CENTER"), { items: [ITEM("Live status"), ITEM("Every channel")] }]).svg, "Live status").x;
+  one("item lines of a `GRID` that do not fill the row stand centred, and a `LIST`'s stay at the start",
+    [words({}), words({ items: { type: "LIST" } }), wordsAt(feature({}, [HEAD(), { items: [ITEM("Live status"), ITEM("Every channel")] }]).svg, "Live status").x],
+    ([grid_, list_, start]) => grid_ > start && list_ === start);
+  const heading = gsec({}, [HEAD("CENTER"), BUTTONS, { items: [CELL("Documents"), CELL("Audit log")] }]);
+  one("a grid section's centred heading centres its actions, and its cells keep the row",
+    [heading.findings, buttons(heading.svg), boxes(heading.svg, "sds-skel-guide")[0]],
+    ([found, [first, second], box]) => found.length === 0 && Math.abs((first[0] - box[0]) - (box[0] + box[2] - (second[0] + second[2]))) <= 1);
+
+  // 4 · `verticalAlign` stands the two sides of a split against each other, each at its own height
+  const WORDS = { frame: { rows: [HEAD(), { items: [FILLED("Connect your store")] }, { items: [FILLED("Choose your plan")] }, BUTTONS] } };
+  const aligned = (verticalAlign) => feature(verticalAlign ? { verticalAlign } : {}, [{ items: [WORDS, { slot: "mediaNode · short code", fill: true, height: 2 }] }]);
+  const slotOf = (g) => boxes(g, "sds-skel-guide").find((b) => b[3] === 64) ?? boxes(g, "sds-skel-guide")[2];
+  const wordsBox = (g) => boxes(g, "sds-skel-guide")[1];
+  const [topped, middled, footed, stretched] = ["TOP", "CENTER", "BOTTOM", undefined].map(aligned);
+  one("`verticalAlign` `TOP`, `CENTER` and `BOTTOM` stand the short side at the top, the middle and the foot of the taller one, at its own height; with none it stretches as before",
+    [...[topped, middled, footed].map((g) => [g.findings, slotOf(g.svg), wordsBox(g.svg)]), [boxes(stretched.svg, "sds-skel-guide")[2], wordsBox(stretched.svg)]],
+    ([[f1, top, words1], [f2, middle, words2], [f3, foot, words3], [slot, words4]]) => [f1, f2, f3].every((f) => f.length === 0) && [top, middle, foot].every((s) => s && s[3] === 64)
+      && top[1] === words1[1] && Math.abs(middle[1] + 32 - (words2[1] + words2[3] / 2)) < 1 && foot[1] + 64 === words3[1] + words3[3]
+      && slot[3] > 64 && slot[3] === words4[3] && slot[1] === words4[1]);
+  const tall = feature({ verticalAlign: "CENTER" }, [{ items: [{ frame: { rows: [HEAD()] } }, { slot: "mediaNode · the product", fill: true, height: 8 }] }]);
+  one("the words beside a taller picture keep their own height, at the middle of it",
+    [boxes(tall.svg, "sds-skel-guide")[1], boxes(tall.svg, "sds-skel-guide")[2]],
+    ([region, slot]) => region[3] < slot[3] && Math.abs(region[1] + region[3] / 2 - (slot[1] + slot[3] / 2)) < 1);
+  const folded = feature({ verticalAlign: "TOP" }, [HEAD(), ...LIST]);
+  one("a view where the split folds, as a phone's, reads no `verticalAlign` and says nothing, as the design system reads it nowhere but in a split",
+    [folded.findings, folded.svg === feature({}, [HEAD(), ...LIST]).svg], ([found, alike]) => found.length === 0 && alike);
+  one("a `verticalAlign` the design system lacks, and `verticalAlign` on another unit, are findings",
+    [feature({ verticalAlign: "MIDDLE" }, [{ items: [WORDS, { slot: "x", fill: true }] }]).findings,
+      draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", verticalAlign: "TOP", rows: [HEAD()] } }] }] } }).findings],
+    ([middle, elsewhere]) => says("a feature's `verticalAlign` is `MIDDLE`, and it takes TOP · CENTER · BOTTOM")(middle)
+      && says("`verticalAlign` is a field of a `DSFeature`, and this frame is `DSSectionContainer`")(elsewhere));
+
+  // 5 · a grid section's `section` is drawn as a section's own fields
+  const sectionOf = (look) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [HEAD()], ...look } }] }] } });
+  const sectioned = gsec({ section: { color: "DEFAULT", inset: true, size: "SM" } }, [HEAD()]), section_ = sectionOf({ color: "DEFAULT", inset: true, size: "SM" });
+  const extent = (g) => boxes(g, "sds-skel-guide")[0];
+  one("a grid section's `section` draws a section's band, its inset and its room, as a `DSSectionContainer` with the same fields does",
+    [sectioned.findings, boxes(sectioned.svg, "sds-skel-surface"), extent(sectioned.svg), extent(section_.svg), /<path class="sds-skel-border" d="M[\d.]+ [\d.]+ L/.test(sectioned.svg), extent(gsec({}, [HEAD()]).svg)],
+    ([found, band, box, sectionBox, inset, plainBox]) => found.length === 0 && band.length === 1 && JSON.stringify(band[0].slice(0, 4)) === JSON.stringify(box.slice(0, 4))
+      && box[3] === sectionBox[3] && inset && box[3] > plainBox[3]);
+  one("a grid section's `section.size` is the size of every block inside, as a section's is",
+    buttons(gsec({ section: { size: "LG" } }, [HEAD(), BUTTONS]).svg).map((b) => b[3]), (g) => g.length === 2 && g.every((h) => h === 40));
+  one("`section` on another frame, a value the design system lacks, and a key a skeleton does not draw are findings",
+    [feature({ section: { color: "DEFAULT" } }, LIST).findings, gsec({ section: { color: "BLUE" } }, [HEAD()]).findings, gsec({ section: { flush: true } }, [HEAD()]).findings],
+    ([elsewhere, blue, flush]) => says("`section` is a field of a `DSFeatureGridSectionContainer`, and this frame is `DSFeature`")(elsewhere)
+      && says("a grid section's `section.color` is `BLUE`")(blue) && says("`flush` is no field of a grid section's `section`")(flush));
+
+  // 6 · a spec written with none of these fields draws byte for byte as before (the hash of the drawer before this row)
+  const ROW = (title) => ({ item: { media: "default", title, description: "One line under it" }, fill: true });
+  const GCELL = (title) => ({ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { pageLevel: "WIDGET", title, description: "Two records become one." } }] }] } });
+  const AS_BEFORE = { kind: "skeleton", title: "Lines, numbers and alignment, as before", views: [{ viewport: "DESKTOP", frame: { size: "XS", rows: [
+    { items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows: [
+      { items: [{ head: { title: "Start in four steps", description: "From sign-in to your first order.", textAlign: "CENTER" } }] },
+      { items: [{ spacer: true }, { control: "button", text: "Start building", main: true }, { control: "button", text: "Read the docs" }, { spacer: true }] },
+      { items: [{ frame: { rows: [{ items: [ROW("Connect your store")] }, { items: [ROW("Choose your plan")] }] } }, { slot: "mediaNode · the setup screen", fill: true }] },
+      { items: [ROW("Invite the team"), ROW("Go live")] }] } }] }] } }] },
+    { items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows: [{ items: [{ head: { title: "Built for messy data" } }] }, { items: [GCELL("Entity resolution"), GCELL("Your schema")] }] } }] }] } }] };
+  one("a feature, a split, its item rows and a grid section written with none of these fields draw byte for byte as before",
+    createHash("sha256").update(draw(AS_BEFORE).svg).digest("hex"), "c59e5a3e39549f0f1f202dbf5fcc598c4d65cefa57a0db1d6742d290af2db362");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
