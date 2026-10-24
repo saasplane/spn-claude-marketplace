@@ -1502,16 +1502,11 @@ console.log("\n=== page.js — a set crossed beyond the rule");
     same("sort is a known exception: a set that crosses it with its size is no finding, and the answer counts the set", [sort.findings.crossedBeyondTheRule.items.length, sort.passedByException], [0, 1]);
     const named = async (unit, versionNames) => (await runFile("scan-sets.js", { pageId: "2:1" }, file([page("2:1", "Layouts", [componentSet("X:set", unit, [0, 0, 300, 600], versionNames.map((name, at) => version(`X:${at}`, name, 20, at * 60))), buttonHeader()])]))).scan;
     const narrowNames = ["size=SM, narrow=false", "size=SM, narrow=true", "size=MD, narrow=false", "size=MD, narrow=true"];
-    const ownUnit = await named("DSLayout", narrowNames);
-    same("a property the book names for a unit passes for that unit, and the answer counts the set", [ownUnit.findings.crossedBeyondTheRule.items.length, ownUnit.passedByException], [0, 1]);
-    const otherUnit = await named("DSThing", narrowNames);
-    same("the same property on another unit is still named, and the set is not counted as passed by exception", [otherUnit.findings.crossedBeyondTheRule.items.map((item) => item.property), otherUnit.passedByException], [["narrow"], 0]);
-    // The book names the filter bar `DSFilterBar`. The library carries it as `DSWFilterBar`, and arc 025 N006 renames
-    // the component there. Until then the scan's table holds both names, so the second name below is the library's own.
-    const bookName = await named("DSFilterBar", narrowNames);
-    const libraryName = await named("DSWFilterBar", narrowNames);
-    same("the filter bar keeps narrow crossed under the book's name and under the name the library carries",
-      [bookName.findings.crossedBeyondTheRule.items.length, bookName.passedByException, libraryName.findings.crossedBeyondTheRule.items.length, libraryName.passedByException], [0, 1, 0, 1]);
+    // The book names no unit that keeps a property crossed, so a property crossed on any unit is named.
+    for (const unit of ["DSLayout", "DSFilterBar", "DSThing"]) {
+      const crossed = await named(unit, narrowNames);
+      same(`no unit keeps a property crossed: narrow on ${unit} is named and the set is not counted as passed by exception`, [crossed.findings.crossedBeyondTheRule.items.map((item) => item.property), crossed.passedByException], [["narrow"], 0]);
+    }
     const flavour = await partOf(["size=SM, flavour=a", "size=SM, flavour=b", "size=SM, flavour=c", "size=MD, flavour=a", "size=MD, flavour=b", "size=MD, flavour=c"]);
     same("control: a made-up property crossed with the size is named", flavour.findings.crossedBeyondTheRule.items.map((item) => item.property), ["flavour"]);
   });

@@ -3,19 +3,19 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "0810090f"
+      "seen": "033295d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "962fed44"
+      "seen": "bdc3b084"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "068290f1"
+      "seen": "3106ebcb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "76c367a0"
+      "seen": "164e4a35"
     }
   ]
 }
@@ -49,7 +49,7 @@ The design library holds one file for each layer of the design system that is dr
 | Core | the variables, the text styles, the scale and the icons | `DS 1-core` | `3RZVOKGItY4Kos2ZVfmI3V` |
 | Components | one page for each group of components | `DS 2-Components` | `saEPRBFUOa7QEj84NpCJkr` |
 | Widgets | one page for each widget | `DS 3-Widgets` | `QfApgt8QTngjhGe0Hqf3Xq` |
-| Containers | the container, with its parts and its look | `DS 4-Containers` | `XQPPdU83nFQjT5LQ3JmHgg` |
+| Containers | the panel, with its parts and its look | `DS 4-Containers` | `XQPPdU83nFQjT5LQ3JmHgg` |
 | Layouts | the layout, in each of its types | `DS 5-Layouts` | `ENmqF4WjVnecAVnpuy0nHF` |
 
 **Never draw from Lab.** It holds drafts, and it is never published.
@@ -61,11 +61,12 @@ The design library holds one file for each layer of the design system that is dr
 | The page | one top frame, named as the page. It holds the theme: light or dark, and the look of the panels |
 | A block | an instance of the library component of the same name |
 | A prop with a closed set of values | the property of the same name, set to the same value. The values are the vocabulary's, as `architecture-names.md` states them: a clock, a placement, an alignment or a format is never drawn under a name or a switch of the designer's own. An alignment is `DSHorizontalAlignType` (`START`, `CENTER`, `END`) or `DSVerticalAlignType` (`TOP`, `CENTER`, `BOTTOM`) on every unit that takes one (`RD.SUPPORT.SURFACE.249`) |
-| `color` | a variable mode, set on the instance itself and read by its name from the `Hue` collection |
+| `color` | a variable mode, set on the instance itself and read by its name from the `Color` collection; light or dark is a mode of the `Mode` collection |
 | The look of a container or a card | a mode of the theme's collections, for `frames` and for the keys `raised`, `elevation`, `bordered` and `rounded` of its `surface` |
 | `unframed` on a container | the parts it lists are drawn with no frame, whatever the mode of `frames` on the top frame gives. The rest of the container keeps the look of the theme |
 | The layout | one instance of `DSLayout` in its type, filling the top frame. The `width` of the body, and the `attached` of the navigation and of the content, are set on it as properties of the same names |
 | A part of a layout | the body, the navigation or the content of that instance. The navigation holds `startNode`, the entries of `nav`, `actionsNode` and `endNode`; the content holds the page. `headerNode`, in a dock or a top nav, is the header directly under the bar, what it holds standing in the body's box, and the content's box starts under it; `footerNode` is the place at the page's end |
+| The level of a frame | a variable mode of the `Level` collection, set once on the frame, whose six modes are the values of `DSPageLevelType`. It costs no version of any unit |
 | The page level | the head of the page, first in the content: `DSPageLevel` at `PAGE` as its `HEADER`, or the header of a `DSPanelContainer` with `fullPage`. A `DSItem` holds the title and the description, the actions follow it as one group at the end, and `backAnchor` is the way back at the start of the title's line |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
 | `flush` on a part of a container | the frame setting, a variable mode set on that part |
@@ -105,7 +106,7 @@ The design library holds one file for each layer of the design system that is dr
 - **A sheet that is not modal is drawn beside the page, with no `DSBackdrop`.** That is `modal` set to no on `DSSheet`.
 - **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
 - **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
-- **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason (the table "A property a named unit keeps crossed" in `refs/support/surface/delivery-library.md`).** Every other property of the web unit is a case on the unit's sheet, found by the section of the unit's page in the showcase that shows it (Cases, and a section of the unit's own); a hue is a mode on the instance; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
+- **A set crosses its size, its states and the shared `variant`, and may cross a prop that takes a vocabulary of forms of the block itself (`type` of `DSTimePicker`, `attached` of `DSToggleGroup`, `sort` of a table's header cell) and a property that the book names for its unit with a reason.** Every other property of the web unit is placed in the unit's column, *The library draws*, in the components chapter, read from the stack's source and never from the property's name: a prop drawn once is a case on the unit's sheet, a hue, light or dark and the page level are modes, and text and swaps are properties. No unit keeps a crossed property today, until the book names one; a look that no property can produce is a version drawn once. `skills/design/steps/change-library.md` carries the walk.
 
 ## When the library does not hold a block
 

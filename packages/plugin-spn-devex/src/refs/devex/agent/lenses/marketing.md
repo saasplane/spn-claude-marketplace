@@ -13,7 +13,7 @@
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
-      "seen": "63965533"
+      "seen": "5265644c"
     }
   ],
   "decisions": [

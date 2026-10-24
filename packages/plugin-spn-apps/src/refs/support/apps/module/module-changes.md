@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
-      "seen": "87566ae9"
+      "seen": "cfa4c345"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "e725d27c"
+      "seen": "59747715"
     }
   ]
 }
@@ -67,6 +67,12 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 ## The generation chain
 
 The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client.
+
+**The published specification keeps the ladder — MUST** (`RD.SUPPORT.APPS.219`). A client generated from a specification that writes every level flat cannot tell that `RoleInfo` is `RoleMeta` and more. So the specification composes each level from the one below it: the level is the reference to its base and its own fields beside it, joined by `allOf`, and a client reads `RoleInfo = RoleMeta & {…}` with the same fields it had before, so no caller changes.
+
+- **Each level is open where it is declared, and closed where it is used.** A level is also the base of the next, so every component leaves its fields open, and every place that uses a level, a response, a container such as `RoleMetas` or `RoleList`, or a branch of a union, closes it beside the reference with `unevaluatedProperties: false`. A component read alone accepts a stray field, by design, since no payload is a bare component.
+- **A level that re-declares a field of its base stays flat**, because composed it would state the field twice and the two could disagree.
+- **A variant of a polymorphic family composes on its base in the same way**, except a base that holds no field besides `mtype`, whose variants stay flat.
 
 ## Boundary rule
 

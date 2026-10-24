@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "cffdea08"
+      "seen": "7a8cd98f"
     }
   ]
 }
@@ -27,7 +27,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 | `DS 1-core` | the variables, the text styles, the scale and the icons | `3RZVOKGItY4Kos2ZVfmI3V` |
 | `DS 2-Components` | one page for each group of components | `saEPRBFUOa7QEj84NpCJkr` |
 | `DS 3-Widgets` | one page for each widget | `QfApgt8QTngjhGe0Hqf3Xq` |
-| `DS 4-Containers` | the container, with its parts and its look | `XQPPdU83nFQjT5LQ3JmHgg` |
+| `DS 4-Containers` | the panel, with its parts and its look | `XQPPdU83nFQjT5LQ3JmHgg` |
 | `DS 5-Layouts` | the layout, in each of its types | `ENmqF4WjVnecAVnpuy0nHF` |
 
 - **Check your order against the live file before the first change, and say what you corrected.** The order names the nodes you may touch, and the web's file and line for each thing you make. Where the order and the web differ, take the web and say so.

@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "e5983966"
+      "seen": "46a753d8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "7ff91218"
+      "seen": "6d6faef9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
-      "seen": "018a4d18"
+      "seen": "462133dd"
     }
   ]
 }
@@ -37,6 +37,7 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 - A provider **MUST** build the showcase that `delivery-showcase.md` lists, in its own stack's tool.
 - A provider **MUST** say what it does not realize yet. A gap stated in words is a plan; a gap left unstated is a surprise for whoever reaches for it next.
 - A provider **MUST NOT** give a core unit a second name, and **MUST NOT** restate a rule. The name of a core unit and a rule belong to the book, once; a provider that invents either has made a second standard nobody else reads.
+- A unit's name and props are the standard's; what a stack builds the unit from is the stack's own and private. A stack **MAY** replace a primitive under a unit, and no page that uses the unit changes.
 - A provider **MAY** hold units of its own that help build apps, beside the core units (`RD.SUPPORT.SURFACE.081`). It names them and states them in its own docs, and each one keeps the rules of the book, as `architecture-components.md` states. Its showcase shows them marked as its own. They are no part of what every provider owes.
 
 ## The ts provider — ✅ for the two contexts and tokens, 🔮 for the rest

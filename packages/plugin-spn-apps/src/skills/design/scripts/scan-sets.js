@@ -80,37 +80,11 @@ const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
   "attached", "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
   "pageLevel", "percent", "placement", "scaleSize", "shape", "sort", "type", "valueType",
 ];
-// Properties that the book names for one unit, with a reason (the table "A property a named unit keeps crossed" in the delivery
-// library chapter). Unlike the list above, a pair here is admitted to the rule, for its own unit only: the same property on any
-// other unit is still named. `passedByException` counts a set that passes only because of this list too.
-//
-// The book names the three units of DS 3-Widgets `DSFilterBarField`, `DSFilterBar` and `.DSDataTableEmpty`, and the four
-// units of DS 4-Containers `.DSPanelContainerFrames` and `DSPanelContainer.Header`, `.Content` and `.Footer`
-// (RD.SUPPORT.SURFACE.229: a suffix names where a unit is placed). The library file carries the first three as
-// `DSWFilterField`, `DSWFilterBar` and `.DSWDataTableEmpty`, and the last four as `.DSContainerFrames` and
-// `DSContainer.Header`, `.Content` and `.Footer`, until arc 025 N018 row 2 renames them, so the table holds both forms of
-// each name, and the scan reads the library with either. The library names leave this table with that rename.
-const PROPERTIES_A_UNIT_KEEPS_CROSSED = {
-  DSFilterBarField: ["kind"],
-  DSFilterBar: ["narrow"],
-  ".DSDataTableEmpty": ["filtered"],
-  DSWFilterField: ["kind"],
-  DSWFilterBar: ["narrow"],
-  ".DSWDataTableEmpty": ["filtered"],
-  ".DSPanelContainerFrames": ["frames"],
-  "DSPanelContainer.Header": ["flush"],
-  "DSPanelContainer.Content": ["flush"],
-  "DSPanelContainer.Footer": ["flush"],
-  ".DSContainerFrames": ["frames"],
-  "DSContainer.Header": ["flush"],
-  "DSContainer.Content": ["flush"],
-  "DSContainer.Footer": ["flush"],
-  "DSCard.Header": ["flush"],
-  "DSCard.Content": ["flush"],
-  "DSCard.Footer": ["flush"],
-  DSLayoutNavNode: ["open", "inGroup", "inMenu"],
-  DSLayout: ["open", "narrow", "flush", "side"],
-};
+// Properties that the book names for one unit, with a reason (the part "A property a named unit keeps crossed" in the delivery
+// library chapter, `04-drawing.md`). The book holds none today, so the table is empty. A pair added here is admitted to the rule
+// for its own unit only: the same property on any other unit is still named. `passedByException` counts a set that passes only
+// because of this list too.
+const PROPERTIES_A_UNIT_KEEPS_CROSSED = {};
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const SCAN_FACTS = { passedByException: 0 };
 const LABEL_PREFIX = "label · ";

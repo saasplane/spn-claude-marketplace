@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/02-packages.md",
-      "seen": "f43aa8c7"
+      "seen": "ddd4c0df"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
-      "seen": "319837d8"
+      "seen": "bf1ecb9c"
     }
   ]
 }
@@ -25,8 +25,8 @@ Every estate node is a package. **Find its root by `spinfrapkg.json`; read its t
 // spinfrapkg.json — infra's own package file, at the node root
 { "name": "@spn/infra-platform-dmo",
   "version": "0.11.0",
-  "description": "The SPN Demo platform node — its environments, resource spaces, modules and apps.",
-  "author": "SPN Demo",
+  "description": "The SaaS Plane Demo platform node — its environments, resource spaces, modules and apps.",
+  "author": "SaaS Plane Demo",
   "license": "UNLICENSED" }
 ```
 
@@ -107,7 +107,7 @@ A module row:
 - **`@`-prefixed = published; semver required.** Anything else is a **path** (a sibling in the estate repo, while iterating) — `version` is ignored and written `null`. There is no `file:` prefix, no environment-variable override, and no hand-copied package.
 - References verify by type on fetch: the org's `blueprint` against `SUPPORT`, a `modules[].source` against `MODULE`. A fetched type contradicting its role key refuses before anything renders.
 - **A path ref resolves only where the sibling checkout exists** — every machine in the standard workspace layout, and deliberately not CI. The day a pipeline needs the pin is the day it gets published. An apply fetches the published version and applies *that*, never a checkout.
-- Scoped refs resolve **the org's registry pair → the machine store (`~/.spnutils/registry`), the resolve-side cache → refused by name**. The store answers a resolve, and `infra release --local` stages into it — a staged artifact is not a published one, and a version already present is refused in the store too.
+- Scoped refs resolve **the org's registry pair → the machine store (`~/.spnutils/registry`), the resolve-side cache → refused by name**. The store answers a resolve, and `infra release --local` stages into it — a staged artifact is not a published one, and a version already present is refused in the store too. A release dry run lists every refusal, and a publish on the commit of a green dry run shows its verdict again; `--run-gates` runs the tests anyway.
 
 ## The artifact
 

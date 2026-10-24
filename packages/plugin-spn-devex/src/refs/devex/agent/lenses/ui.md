@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "17f81de7"
+      "seen": "984df23f"
     }
   ],
   "decisions": [
@@ -35,12 +35,12 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.160",
-      "seen": "4d66c8da"
+      "seen": "827eaa2f"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "f2441491"
+      "seen": "a1c53b80"
     }
   ]
 }
@@ -100,22 +100,33 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 - **Core, components and names** — held by the stack's checks, `spnutils apps surface gaps`, and this lens worn.
   - **The look comes from the theme, and never from the page.** A colour, a padding, a margin, a radius or a gap set by hand is the finding; in a design, a colour bound to no variable, or a copy of a block that is no longer an instance (`RD.SUPPORT.APPS.150`).
-  - **The page's fill and padding are the layout's.** The fill is `page/fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`, `.200`).
+  - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`,   - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
+`.200`).
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RD.SUPPORT.SURFACE.139`, `.140`, `.155`, `.156`, `.161`, `.200`).
   - **A frame is drawn once.** Two borders round one table is the finding; a `bordered` block in a `flush` part, and a table, list, code block, accordion or empty state drawing its own border in a `flush` part, are findings (`RD.SUPPORT.APPS.149`).
+  - **A line is chosen by what it parts**: `surface-divider` between rows, `surface-border` at the edge of a card, panel, popover or the shell, `surface-border-strong` at the edge of a control. A partner paints one card, card widget or panel with a class that sets the three paint tokens and nothing else, and a block reads only the tokens set on its own root (`RD.SUPPORT.SURFACE.163`, `.192`).
+  - **A token has one name, the book's, in small letters with dashes**; a slash spelling is a finding (`RD.SUPPORT.SURFACE.298`).
   - **A line of a list and the header of a record have one shape**, as `DSItem` holds it: a picture given as data, then the title, the description and the line of facts; a fact as plain words, `TEXT`, `BADGE` or the page's own block; a badge always shows its word and its colour says a state, never a kind; an enum shown by its name; a mark says what and an avatar says who (`RD.SUPPORT.SURFACE.064`–`.067`, `.085`, `.086`, `.096`).
+  - **An item line draws its picture, its text and its end node and nothing around them**: no padding, border or fill under the pointer; the place gives the room and the highlight. A title that stands a step back and an item's description take the quiet tone, the description at `INLINE` and the facts muted; an icon takes `tone` as a text does and `tone` wins over `color`, and a bare icon on an item line with no colour or tone draws muted (`RD.SUPPORT.SURFACE.175`, `.143`, `.166`, `.303`, `.304`).
+  - **The item line sets its words alike in either orientation and only the picture moves**: the eyebrow 2px over the title, the facts 4px under what stands above them, and a title alone at `PAGE` to `GROUP` keeps the room of a control, 36px; a vertical item stands its picture a level-sized gap above the words and takes one picture box per level (`RD.SUPPORT.SURFACE.094`, `.135`, `.216`, `.272`).
   - **In a list the row carries the link, the chosen fill and the reaction to the pointer**, and the item line inside it carries none (`RD.SUPPORT.SURFACE.097`). A list's `title` starts where its rows' words start, one title step above its size and semibold, and anything set one under another is a `DSList`, never a hand-written vertical flex (`.283`, `.288`, `.292`). A `DSLink` in a sentence keeps its underline, a neutral one alone in a list row brightens with none, and a list of links holds a `DSLink` in each row (`.294`).
   - **Lift, inset and movement are props, not hand-written paint.** A raised frame takes `elevation` (`XS` to `XL`, `SM` today's shadow), and a raised surface look, a bar and the panels it opens, takes it too (`MD` where left out, `.289`), a section takes `inset`, a feature or grid section takes `reveal` that plays once, and a boxed item keeps its room inside its frame; a shadow, an inner edge or a scroll animation written on a page is a finding (`.282`, `.284`).
   - **A feature's eyebrow, items and depth follow the book.** A `TEXT` eyebrow at `PAGE` and `CONTAINER` is semibold in the primary tone where no colour is set, and a state is a `BADGE` eyebrow; the items of a `LIST` take the text's width up to `62ch`; a section never frames itself, and its parts take flat, boxed or raised depth, and a media a depth by its kind, as the book's table says. A hand-set weight, width or shadow that repeats these is a finding (`.290`, `.291`, `.293`).
+  - **A feature takes its form from the book and folds by its type on a phone.** `ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` stand the words across and the items beside the media; `verticalAlign` places the shorter column of a split and `textAlign` lines up the words alone; a feature reads no device, and a page never picks a smaller step for a phone. The items of a `GRID` and of `STATS` keep a width of one 20rem column each; boxed items are cards, pressable only where an item has an `anchor` (`RD.SUPPORT.SURFACE.237`, `.248`, `.269`).
+  - **A grid takes its columns per screen class, one shape**, `IDSGridColumns` (`desktop`, `tablet`, `mobile`), 3, 2 and 1 where left out, for `DSList`, a `GRID` layout and a stack's own grid of readings (`RD.SUPPORT.SURFACE.260`, `.271`).
   - **A link that leaves the site ends on `ARROW_UP_RIGHT` with `NUDGE_UP_END`**; one that goes onward on the site ends on `ARROW_RIGHT` with `NUDGE_END` (`.285`, `.287`).
   - **Every level has its title, larger than the titles under it**: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE` at 22, 18, 16, 14, 13 and 12px, the heading element following the level. A size, type step, heading element or picture size the page wrote on an item line is a finding (`RD.SUPPORT.SURFACE.094`, `.106`, `.107`, `.112`, `.113`, `.178`).
   - **A title starts where what stands under it starts**: the part holding an item line gives it no side padding, and an item line draws none of its own (`RD.SUPPORT.SURFACE.109`, `.114`).
   - **Every overlay that covers a page dims it with one scrim, `surface-overlay`**, drawn by `DSBackdrop`; a dialog, a sheet and a drawer take the page's surface, a popover, menu and tooltip the raised one; a sheet that is not modal and a popover draw no scrim; and each of the three is one surface, the panel drawing the fill, corners, line and shadow and the card inside it none (`RD.SUPPORT.APPS.158`, `RD.SUPPORT.SURFACE.093`, `.163`, `.250`).
+  - **A record is chosen by an autocomplete and never by a select.** What is chosen decides, not the length of the list: an enum is known whole and takes a select; a record is a row on the server, stored by its id, and `DSAutocomplete` turns the id back through `search` and `resolveByIds`. A short bounded list is preloaded with `minChar` `0`, a long one opens empty (`RD.SUPPORT.SURFACE.307`).
+  - **A page from another address, or a document the page wrote, is a `DSEmbed`.** `title` is required, a `srcDoc` runs sandboxed with nothing allowed, and the unit draws no fill, border, shadow or corner: it stands in the frame of the card or media that holds it (`RD.SUPPORT.SURFACE.305`).
+  - **`DSTabs` lift only where `raised` asks and read no card or container look**; a set of tabs without its bar takes `grouped={false}` (`RD.SUPPORT.SURFACE.215`, `.218`, `.220`).
+  - **A panel a group draws has no padding and clips to its corner**; a field carries no space around it and whoever places the fields spaces them; wherever a person chooses the mode it is offered System, Light, Dark, System first (`RD.SUPPORT.SURFACE.159`, `.195`, `.211`).
   - **The surface answers with the design system's own blocks.** A loading or failure picture the page drew itself is a finding, and so is anything only hover reaches.
   - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` the hue, `size` the density step `XS` to `XL` with `SM` the default; `CUSTOM` is the one named way a page owns a colour (names § The three shared names).
   - **A prop that takes a vocabulary carries the book's name and the book's values** (`RD.SUPPORT.SURFACE.041`).
   - **A suffix names where a unit is placed**: `App`, `Layout`, `Container`, `Widget`; a component, a composite included, takes none, and a block's own name comes first (`RD.SUPPORT.SURFACE.229`).
-  - **A pitch is a `DSFeature` sized by its level alone, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a section; the feature gives its items the level that follows its own and sizes its small picture by one box per level (`RD.SUPPORT.SURFACE.233`, `.235`, `.243`, `.247`, `.259`, `.274`).
+  - **A pitch is a `DSFeature` sized by its level alone, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`, chosen when the data is a set of features that are each a thing of their own.** A type step, gap or class a page wrote for a pitch is a finding, and so is a padding, maximum width or gutter written for a section; the feature gives its items the level that follows its own and sizes its small picture by one box per level (`RD.SUPPORT.SURFACE.233`, `.235`, `.243`, `.247`, `.259`, `.274`).
   - **The paint of a frame is one `surface` prop, and the theme holds no look for a unit that frames only where its page asks.** A paint written as five loose props, or a feature look put in the theme, is a finding (`RD.SUPPORT.SURFACE.261`, `.277`, `.279`).
   - **An alignment takes the core's vocabulary of its axis**, `DSHorizontalAlignType` or `DSVerticalAlignType`; a vocabulary of a unit's own for one is a finding (`RD.SUPPORT.SURFACE.249`).
   - **An icon beside a title or running text takes the scale size of that text's step, on one centre line**; `size` is density and `scaleSize` is how large an icon, mark or avatar is drawn (`RD.SUPPORT.SURFACE.008`, `.100`).

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "b0dc1a08"
+      "seen": "af312396"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "962fed44"
+      "seen": "bdc3b084"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Names construct (`docs/02-constructs/02-support/01-surface/04-architecture-names.md`) and its capability chapters (`docs/04-capabilities/02-support/01-surface/04-architecture-names/`). Names is the fourth of thirteen Surface constructs, and the first of the Architecture group — what a surface is built from, layer by layer.
 
-> **Planned.** The names `DSFeatureGridSectionContainer`, `DSDataTablePanelContainer`, `IDSGrid`, `IDSFrameSurface`, `DSBoxPartType` and the props `surface`, `section`, `panel`, `heading` and `grid` are design, and no stack builds them yet. The design system takes them in its own change, and the library is owed.
+> **Built.** `@saasplane/support-web-ds-ts` carries the names `DSFeatureGridSectionContainer`, `DSDataTablePanelContainer`, `IDSGrid`, `IDSFrameSurface`, `DSBoxPartType` and the props `surface`, `section`, `panel`, `heading` and `grid` from support 5.22.0, and the library is owed.
 
 Read this before you name a new block, a new prop or a new layer of the design system, or before you change a block of the design system. It runs from the rule that keeps a name from drifting, to the three shared prop names, to the two sizes, to the six layers and the suffix that says where a unit is placed, to the kinds of prop and the states a design and its code share.
 
@@ -37,6 +37,8 @@ Read this before you name a new block, a new prop or a new layer of the design s
 
 One name is used in the book, in the design library and in every stack. The book names every block, prop, closed value and token. The design library draws each one under that name, and a stack builds it under that name. No file maps a design name to a code name. A stack may add the form its language asks for, and never a second name.
 
+- **A token has one name, the book's, written in small letters with dashes** (`RD.SUPPORT.SURFACE.298`). The library names its variable with it as it is, and each stack spells it by one fixed rule of its language: the web as a custom property, `--surface-raised`, and a native stack as its language writes a name, such as `surfaceRaised`. A slash, which only a design tool can hold, is never part of a token's name.
+
 ## The three shared names — ✅
 
 | Name | Means | Values | Vocabulary |
@@ -45,7 +47,7 @@ One name is used in the book, in the design library and in every stack. The book
 | `color` | the hue | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
 | `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
 
-**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the text tones are, and read from the strongest to the faintest** (`RD.SUPPORT.SURFACE.154`): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
+**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. `color` has no order, because a hue is no scale. **The values of `variant` are named by their strength, as the tones are, and read from the strongest to the faintest** (`RD.SUPPORT.SURFACE.154`): `SOLID` the hue's full colour, `QUIET` a medium tint, `SUBTLE` a light tint with no edge, `SUBTLE_OUTLINE` the light tint with a line, `OUTLINE` a line and no fill, `GHOST` no fill until the pointer, `LINK` text alone. Every variant of every hue keeps its text at 4.5 to 1, at rest and under the pointer; the line of an outline is a decoration, not held to 3 to 1. `architecture-core.md` gives the shades.
 
 **`CUSTOM` is a value of `color` that means the caller owns the colour.** A block's inner text and icon take the colour around them, and a page passes a chosen colour as `customColor` on the blocks that take it. It is the one named way a page sets a colour outside the theme. `DSButton` and `DSSeparator` take no `customColor`. A colour the page chooses gives every variant: the design system works the fill, the text and the line of each out from the one colour, in light and in dark, and pulls the text until it reads at 4.5 to 1 on its fill.
 
@@ -110,7 +112,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSText` | `typography` | `HEADING_XXL5` to `HEADING_XXS` · `TITLE_XXL5` to `TITLE_XXS` · `CONTENT_XXL5` to `CONTENT_XXS` | `DSTypographyType` |
 | `DSLink` · `DSText` | `underline` | `SOLID` · `DOTTED` · `DASHED` | `DSTextUnderlineType` |
 | `DSText` | `format` | `UPPERCASE` · `LOWERCASE` · `CAPITALIZE` | `DSTextFormatType` |
-| `DSLink` · `DSText` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSTextToneType` |
+| `DSLink` · `DSText` · `DSIcon` | `tone` | `DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE` | `DSToneType` |
 | `DSImage`, `DSImagePicker`'s `image` | `shape` | `NONE` · `FILM` · `WIDE` · `SQUARE` · `CIRCLE` | `DSImageShapeType` |
 | `DSMark` · `DSAvatar` | `shape` (the outline of the background the icon, the symbol or the picture stands on; one type for both units) | `CIRCLE` · `ROUNDED` · `SQUARE`, `CIRCLE` when unset | `DSMarkShapeType` |
 | `DSImage`, `DSImagePicker`'s `image` | `widthStep` | `NONE`, and `WIDTH_80` to `WIDTH_1280` | `DSImageWidthStepType` |
@@ -122,14 +124,15 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
 | `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |
 | `DSItem`, on a fact whose `mtype` is `TEXT` | `color` (the hue of the words of the fact; unset, the muted tone) | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
-| `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `BACKDROP`. Unset, the default of the level | `DSFeatureType` |
+| `DSFeature` | `verticalAlign` (where the two columns of a split stand against each other when one is taller: the shorter one at the top, in the middle or at the foot of the row) | `TOP` · `CENTER` · `BOTTOM`, `CENTER` when unset | `DSVerticalAlignType` |
+| `DSFeature` | `type` (where the media stands against the words) | `SPLIT_END` · `SPLIT_START` · `MEDIA_TOP` · `MEDIA_BOTTOM` · `BACKDROP` · `ITEMS_SPLIT_END` · `ITEMS_SPLIT_START`. Unset, the default of the level | `DSFeatureType` |
 | `DSFeature` | `textAlign` (how the text part lines up inside the place its type gives it: the words, the actions and a small picture, in the reading direction) | `START` · `CENTER` · `END`, `START` when unset | `DSHorizontalAlignType` |
 | `DSFeature` | `actionsPlacement` (where the actions stand against the items: after them, closing the feature, or before them, under the words) | `BEFORE_ITEMS` · `AFTER_ITEMS`, `AFTER_ITEMS` when unset | `DSFeatureActionsPlacementType` |
 | `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `type` (how the items are drawn) | `GRID` · `LIST` · `STATS`, `GRID` when unset | `DSFeatureItemsType` |
 | `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `numbered` (whether the numbers 1 to n stand before the titles of the items) | yes or no, no by default | none |
 | `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `orientation` (how every item stands; an item sets none of its own) | `HORIZONTAL` · `VERTICAL`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | `DSOrientationType` |
-| `IDSGridColumns`, in `IDSGrid` on `DSFeatureGridSectionContainer`, and as `gridColumns` on every other unit that draws a grid | `desktop` · `tablet` · `mobile` (how many columns a grid stands in at each screen class; the live device picks one and nothing measures a width; all three required) | a whole number, 1 to 4 on the grid section, the feature's items and the data unit group, 1 to 6 elsewhere | none |
-| `IDSGrid`, on `DSFeatureGridSectionContainer` · `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `borderType` (the lines of a grid: none, lines between the cells, or lines between them and around the outside) | `NONE` · `GRID` · `EDGE`, `NONE` when unset, and `GRID` for a list of items | `DSGridBorderType` |
+| `IDSGridColumns`, in `IDSGrid` on `DSFeatureGridSectionContainer` and `DSList`, and as `gridColumns` on every other unit that draws a grid | `desktop` · `tablet` · `mobile` (how many columns a grid stands in at each screen class; the live device picks one and nothing measures a width; all three required) | a whole number, 1 to 4 on the grid section, the feature's items and the data unit group, 1 to 6 elsewhere | none |
+| `IDSGrid`, on `DSFeatureGridSectionContainer` and `DSList` · `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `borderType` (the lines of a grid: none, lines between the cells, or lines between them and around the outside) | `NONE` · `GRID` · `EDGE`, `NONE` when unset, and `GRID` for a list of items | `DSGridBorderType` |
 | `DSFeatureGridSectionContainer` · `DSDataTablePanelContainer` | `section` · `panel` (the props of the box the unit draws, a section or a panel, whole but what the unit decides: one attribute named after the box) | a named interface of the owner's props, `IDSFeatureGridSectionContainerSectionProps` · `IDSDataTablePanelContainerPanelProps` | none |
 | `DSFeatureGridSectionContainer` | `heading` (the heading over the grid: the eyebrow, title, description, facts, actions and alignment of a feature) | a named interface of `IDSFeatureProps`' props, `IDSFeatureGridSectionContainerHeadingProps` | none |
 | `DSPanelContainer` · `DSCard` · `DSFeature` · `DSCardWidget` · `IDSFeatureItemsProps`, on `DSFeature`'s `items` | `surface` (the paint of the frame in one prop: its fill, how strong the fill is, whether it is lifted, its border and its corners) | `IDSFrameSurface`: `color` · `strength` · `raised` · `bordered` · `rounded`, each optional, a key left out taking the theme's | none |
@@ -267,6 +270,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.SURFACE.113` | the item line and the tabs take `pageLevel`, with the one vocabulary `DSPageLevelType`, and the item line has no size |
 | `RD.SUPPORT.SURFACE.154` | the values of `variant` are named by their strength and read from the strongest to the faintest, and every variant of every hue, and of a colour the page chooses, keeps its text readable |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
+| `RD.SUPPORT.SURFACE.298` | a token has one name, the book's, in small letters with dashes, and each stack spells it by one fixed rule of its language |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
 | `RD.SUPPORT.SURFACE.040` | a prop whose values are a vocabulary is stated in the book with its values |
 | `RD.SUPPORT.SURFACE.041` | the design library carries such a prop, and every stack takes it, under the same name and the same values |

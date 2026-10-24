@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b2e50b21"
+      "seen": "09c27219"
     }
   ],
   "decisions": [
@@ -137,7 +137,9 @@ is broken rather than fussy.
 
 The `gen-*` chain is never hand-edited: validators are what the API enforces, symbols and labels are
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
-routed by each package's own scope.
+routed by each package's own scope. A dry run runs every tier and lists every failure, and a publish on the
+commit of a green dry run shows that run's verdict again unless `--run-gates` is given. `infra release`
+answers the same way.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
@@ -239,6 +241,7 @@ recomputing it; nothing else there should be.
 | `registry/` | the machine store: every estate package released with `--local` |
 | `cache/` | copies that can be fetched again, such as the engine's providers |
 | `browser/chrome/` | the automation browser profile: the machine's own, and deliberately not the developer's Chrome |
+| `run/` | one record and one log for each server `apps dev` or `start` started on this machine, removed when the server is gone |
 | `surface/` | the design comparison: the library's inventories and snapshot, and for each package its snapshot, its gaps and its accepted differences, as the delivery library states |
 
 **The tool's home folder is the tool's own — MUST** (`RD.DEVEX.UTILS.075`). A developer and an agent are

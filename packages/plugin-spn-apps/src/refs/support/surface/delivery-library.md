@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "0899a1be"
+      "seen": "217e263a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "0810090f"
+      "seen": "033295d3"
     }
   ]
 }
@@ -26,8 +26,9 @@ Read this before you add a token or a block to the library, or before you ask wh
 | Term | What it means |
 | --- | --- |
 | Design library | the Figma files that draw each named block and token |
-| Snapshot | one file that states a design system in the Surface domain's own words, written from the library and from each stack |
-| Gap | one difference between the library's snapshot and a stack's snapshot, of one closed kind |
+| Snapshot | one file that states a design system in the Surface domain's own words, written from the book, from the library and from each stack |
+| Plugin | the Figma plugin the tool writes out with the CONSTRUCT snapshot inside, which builds the library's sets from that file alone |
+| Gap | one difference between a snapshot and the one before it, the library's against the book's or a stack's against the library's, of one closed kind |
 | Inventory | one file for one library file, that holds what the agent read of it through the connector, to the depth the comparison needs, and that the tool takes in |
 | Accepted difference | a gap that has been looked at and accepted, recorded with its reason and taken in by the tool, so that the list of gaps leaves it out and counts it |
 | A unit's section | the Figma section that holds one unit and everything the unit owns, named as the unit. It is a different thing from a block of the design system, which a unit's set draws |
@@ -57,17 +58,17 @@ A file can use only what another file has published. SaaS Plane's own library is
 | DS 5-Layouts | Layouts |
 | DS 9-Lab | drafts, never published |
 
-Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Treatment` (the values of `variant`, `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK`, for a unit that takes its look as a mode, with `SUBTLE` the default; the file still holds the modes of before, `SOFT` among them, and is owed these), `Mark-Shape` (the values of `shape` of a mark, `CIRCLE` · `ROUNDED` · `SQUARE`), `Scale` (it also holds the size of an icon and of a mark at each scale size), `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the panel look: `frames` and the keys `raised`, `bordered` and `rounded` of its `surface` (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
+Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Mode` (`LIGHT`, `DARK`), `Color` (the values of `color`), `Level` (the six values of `DSPageLevelType`, `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`: the level tokens from `PAGE` to `GROUP`, and the item line's rows, its picture's boxes and 12px at `CONTENT` and `INLINE`), `Treatment` (the values of `variant`, `SOLID` · `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` · `OUTLINE` · `GHOST` · `LINK`, for a unit that takes its look as a mode, with `SUBTLE` the default; the file still holds the modes of before, `SOFT` among them, and is owed these), `Mark-Shape` (the values of `shape` of a mark and of an avatar, `CIRCLE` · `ROUNDED` · `SQUARE`), `Tone` (`DEFAULT` · `QUIET` · `MUTED` · `SUBTLE` · `INVERSE`, the values of `tone` of a text and a link), `Surface` (`BASE` · `DEFAULT` · `PRIMARY`, the values of the `color` of a surface), `Strength` (`SUBTLE` · `QUIET` · `SOLID`, the `strength` of a surface), `Scale` (it also holds the size of an icon and of a mark at each scale size), `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the panel look: `frames` and the keys `raised`, `bordered` and `rounded` of its `surface` (`Theme-Raised` also holds `page-fill`), and `Frame` (the frame setting of `flush`). Each collection's name is the one the book gives it, in the table of the CONSTRUCT snapshot's `collection`; the files of the old Design System folder keep the names `Hue` and `Roles`, and the modes Light and Dark, until the folder is retired. A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
 
 The organisation of a library file that the book states holds for any library, the builder's and a partner's own: a page for a group, a section for a unit with its header, set, Usage, Cases and Parts, the distances, the names of labels and cases, and the checks before a publish. Which files a library is divided into is the builder's for its design system and a partner's own for a library of its own. A partner's library uses the builder's published library and never edits it.
 
 ## Color is a mode, and the rest are properties
 
-In the design library, `color` is a variable mode. `variant`, `size`, `scaleSize` and the state are properties. The scale sizes are variables of the library's core, and the mark, the avatar and the avatar group carry `scaleSize` with every step from `XXS` to `XXL5`. Which other properties of a unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
+In the design library, `color` is a variable mode. `variant`, `size`, `scaleSize` and the state are properties. The scale sizes are variables of the library's core, and the mark, the avatar and the avatar group carry `scaleSize` with every step from `XXS` to `XXL5`. Which other properties of a unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Color` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
 
 ## What stays in words
 
-The library holds the pictures, the properties and the variables. It draws every state and every tab of Cases that a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
+The library holds the pictures, the properties and the variables. It draws every state and every case a unit's column names, and a line in a description never stands in for a drawing. A showcase is proven against the library and may show more. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is drawn as its column says, its feedback composed from the units it holds. A description in the library carries one line and a link to the chapter that states the behavior.
 
 ## A value held worked out
 
@@ -75,22 +76,24 @@ The primary ramp comes from one seed by a formula, and the radius of each size s
 
 ## The snapshot
 
-A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the library, and the same file is written from each stack's code, so the two are compared key by key. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface library` takes in the inventory of each library file and writes the library's snapshot from the five, and `spnutils apps surface snapshot <package>` writes a stack's from its code. The two snapshots are made with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository.
+A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the book, from the library and from each stack's code, in one form. The one written from the book is the CONSTRUCT snapshot: the tool reads it from each unit's column, *The library draws*, and from the token pages. It is the plugin's only input and the third side of every comparison: the library is compared with it, and a stack with the library. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface construct` writes the CONSTRUCT snapshot from the book, `spnutils apps surface library` takes in the inventory of each library file and writes the library's snapshot from the five, and `spnutils apps surface snapshot <package>` writes a stack's from its code. The three snapshots are made with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository.
 
 A snapshot has four parts and three levels:
 
 | Key | Level | What it holds |
 | --- | --- | --- |
-| `snapshotVersion` and `source` | all | the kind of source (`DESIGN_LIBRARY`, `WEB` or `NATIVE`), the time it was read, what it was read from, and the deepest level written |
-| `vocabularies` and `units` | 1, the inventory | the closed lists a prop takes, and each unit with its name, layer, group, props, shown states and parts |
+| `snapshotVersion` and `source` | all | the kind of source (`CONSTRUCT`, `DESIGN_LIBRARY`, `WEB` or `NATIVE`), the time it was read, what it was read from, and the deepest level written |
+| `vocabularies` and `units` | 1, the inventory | the closed lists a prop takes, and each unit with its name, layer, group, props, shown states and parts; in the CONSTRUCT snapshot also how each prop is drawn (`mtype`: `CROSSED`, `ONCE`, `MODE`, `TEXT`, `SWAP` or `NO`), the `collection` of a `MODE` entry, the unit's `crosses`, its `levelForms`, its `cases` and its `usage` |
 | `tokens` | 2 | the ramps, the roles for light and for dark, the scale, the type steps and the theme |
 | `measures` | 3 | for each unit and each size: the height, paddings, gap, radii, border and text size, each as a value and, where the side can say it, the token it is bound to |
+
+A `MODE` entry names its `collection`, by the one name "Color is a mode, and the rest are properties" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column: the cases are what it draws once, its modes, its texts and its swaps, and the usage names the instances the plugin places, with their props.
 
 Level 1 finds most gaps. Level 2 finds a value that differs. Level 3 is read only for the units that levels 1 and 2 flag, because it is the largest. The category, the showcase layout and what a unit has are tags of the showcase only: they are never in a snapshot and never a gap.
 
 ## The gaps
 
-The comparison asks one question: does the stack support everything the library asks for? A gap is a unit, a property or a value that the library holds and the stack does not. What the stack holds beyond the library is not a gap; it is kept in the record and shown as one count, because a stack always holds more than the library draws. Only SaaS Plane's own design library is compared this way. Its kind is one of six, and the list is closed:
+The comparison asks two questions, each of one side and the side before it: does the library draw everything the book asks for, and does the stack support everything the library asks for? A gap is a unit, a property or a value that the library holds and the stack does not. What the stack holds beyond the library is not a gap; it is kept in the record and shown as one count, because a stack always holds more than the library draws. Only SaaS Plane's own design library is compared this way. Its kind is one of six, and the list is closed:
 
 | Kind | What it means |
 | --- | --- |
@@ -101,7 +104,7 @@ The comparison asks one question: does the stack support everything the library 
 | `TOKEN_ABSENT` | a token that the library holds and the stack does not |
 | `NAME_UNMAPPED` | a name the naming map does not know, so no comparison was possible |
 
-One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A view of one line for each gap is written from the record and is never edited.
+One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` for a gap of the library against the book and `STACK` for a gap of a stack against the library, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out, and `accepted`, the count of gaps an accepted difference left out. A view of one line for each gap is written from the record and is never edited.
 
 The view stays short by five rules. A `UNIT_ABSENT` line replaces every line under that unit. Many `VALUE_ABSENT` gaps on one prop become one line with a list. What could not be compared is a count in the footer and never a line. Level 3 is written only for the units that levels 1 and 2 flagged. **A person and a model read the gaps, and never the library.**
 
@@ -268,7 +271,7 @@ The folder is `~/.spnutils/surface/`. It holds what the tool takes in and what t
 
 ## Changing the library
 
-The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. So the library never draws what the book does not name, and a stack never builds a core unit that the library does not draw. **This order binds the core units, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RD.SUPPORT.SURFACE.082`). The book does not name a stack's own unit, so the library does not draw it as a published component. A stack's own unit that every stack should build joins the book first, and the library draws it then. **The library MUST NOT draw a task pattern, a page pattern, a skeleton or a sample page** (`RD.SUPPORT.SURFACE.099`). A pattern is a way to use the units and not a unit, so a drawing of one would be a second place where a page is decided, and it would fall behind the book. The book states each pattern with its skeleton, and a page is built from the units the library draws. The agent changes the library through the Figma connector and in no other way.
+The library is the baseline, and a stack is brought to it; this turned on 2026-10-10, when all five library files were published. A set of the library is built by the plugin from the CONSTRUCT snapshot, and no model draws a set (`RD.SUPPORT.SURFACE.295`). A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third, and an improvement is taken in the same order. So the library never draws what the book does not name, and a stack never builds a core unit that the library does not draw. **This order binds the core units, which are the ones the book names. It does not bind a unit that a stack provides on its own** (`RD.SUPPORT.SURFACE.082`). The book does not name a stack's own unit, so the library does not draw it as a published component. A stack's own unit that every stack should build joins the book first, and the library draws it then. **The library MUST NOT draw a task pattern, a page pattern, a skeleton or a sample page** (`RD.SUPPORT.SURFACE.099`). A pattern is a way to use the units and not a unit, so a drawing of one would be a second place where a page is decided, and it would fall behind the book. The book states each pattern with its skeleton, and a page is built from the units the library draws. The agent changes the library through the Figma connector and in no other way.
 
 | Step | What happens |
 | --- | --- |
@@ -287,13 +290,13 @@ The library is the baseline, and a stack is brought to it; this turned on 2026-1
 A developer does not work in the design library by hand.
 
 - **A developer's hands in the design library are two things: saving a named version of a file before your first change in it, and publishing a file.** The connector cannot save a named version, so you ask the developer for it and wait. Nothing else in the library is asked of a developer. Never ask a developer to draw, rebind, remove or confirm anything in Figma, and never ask a developer to add or change a file in the tool's folder.
-- **You change the library through the Figma connector, and in no other way.** Follow the rules of "How an agent changes a library file through the connector" and of "How the connector's work is carried out". Name the developer's next step and show the result.
+- **You change the library through the Figma connector, except a set, which the plugin builds from the CONSTRUCT snapshot.** Follow the rules of "How an agent changes a library file through the connector" and of "How the connector's work is carried out". Name the developer's next step and show the result.
 - **When something looks wrong, the developer sends a picture.** You correct the work and show the result again. The developer does not repair the file.
 
 ### Three kinds of work
 
 - **A unit changes: a prop, a value or a look.** The connector changes it, under the rules below, so that the library holds the same change for every version of the unit.
-- **A case the showcase shows is a unit with its prop values set.** Place it as instances of the unit, and never draw it as a new look. A case drawn as a new look would be a second look for the same unit.
+- **A case is a unit with its prop values set, read from its column.** Place it as instances of the unit, and never draw it as a new look. A case drawn as a new look would be a second look for the same unit.
 - **A use case, a page or a pattern built from units is not synchronised with a stack.** Compose it on request from the published library, in a file that is not a library file. It is never put into one of the library files.
 
 ### A builder manages the library, and a partner uses it
@@ -431,11 +434,12 @@ A library file is read by people and by scripts. A person reads the grid of a se
 A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. A page of a file that holds units is one group of the showcase, so a person who knows the showcase finds the same groups in the file, in the same order.
 
 - **A page's name MUST be its group's name in the showcase, without the `Component - ` that starts the name of a group of components, and the pages MUST stand in the showcase's order.** The group `Component - Actions` is the page Actions. The group `Data Entry - Fields` is the page Data entry · Fields, and its two sisters are Data entry · Pickers and Data entry · Composites. A file does not order its pages by its own rule.
-- **The Core file's pages MUST be the showcase's Core entries that show tokens: Colour, Type, Scale, Icons and States.** The file holds no component, so its section holds a group of tokens with its specimens and not a unit. The showcase's Core entries Primitives, Patterns and Inline alignment show components, so they have no page in this file and stay in the showcase. "A section of the Core file" states what such a section holds. The Scale page holds Control sizes and The layout's measures as the showcase does, and States is drawn from tokens only, one row for each state. The pages of the Widgets, Containers and Layouts files are Widgets, Containers and Layouts.
-- **A page that is no group of the showcase MUST NOT be kept.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
+- **A published file MUST have a cover as its page 0, which Figma shows as the file's thumbnail, and the plugin MUST draw it from the CONSTRUCT snapshot.** The cover names the file, its layer and the book's commit the file was built from. It holds no unit, and it is the one page of a file that is no group of the showcase.
+- **The Core file's pages, after its cover, MUST be the showcase's Core entries that show tokens: Colour, Type, Scale, Icons and States.** The file holds no component, so its section holds a group of tokens with its specimens and not a unit. The showcase's Core entries Primitives, Patterns and Inline alignment show components, so they have no page in this file and stay in the showcase. "A section of the Core file" states what such a section holds. The Scale page holds Control sizes and The layout's measures as the showcase does, and States is drawn from tokens only, one row for each state. The pages of the Widgets, Containers and Layouts files are Widgets, Containers and Layouts.
+- **A page that is no group of the showcase MUST NOT be kept, but for the cover.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
 - **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a usage that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
 - **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
-- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose page in the showcase has no Cases section and no section of its own owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
+- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose column draws nothing once and no mode, text or swap owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
 
 | Piece | What it is |
 | --- | --- |
@@ -554,49 +558,50 @@ How the library keeps to the last rule is stated as far as the book can state it
 
 ### What a library file owes of a unit
 
-A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. The Usage band is the part of the library that the showcase's own Usage is proven against: both draw the one use of the unit that an app would really have. A usage is drawn from the showcase's source for its props, labels and values, and checked against a picture of the running showcase. Where a reading of the source and the picture differ, the picture is right. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
+A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. A unit's set, its cases and its usage are read from its column, *The library draws*, in the components chapter: the usage is the unit's primary use, named by the units it stands with, and the plugin composes it from instances; the cases are what the column draws once, its modes, its texts and its swaps. Nothing of a unit's section is taken from the showcase, which may show more (`RD.SUPPORT.SURFACE.026`). A property that a unit has, and that nothing on its page draws, leaves nothing to prove a stack against. So the page draws what a person sees of each unit.
 
-- **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
+- **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the book lists, in a group table or in one line under its own heading, and its column names its usage. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
 - **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. "Which property is a variant and which is a case" places each of them. A version of the set draws a property only where the property is the size, a state, the shared `variant` or a look drawn once, and a case named `<property>=<value>` on the version where the property draws it in every other kind. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
 - **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in MUST be drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
 - **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header MUST name it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
 - **A property that lets a unit reach a state is drawn by that state.** `collapsible` lets a panel be shut, and the shut panel is a state, so it is drawn. `sticky` holds a header in place while a page scrolls, and a case draws one scroll place, as "A unit with no look of its own" states for a still picture of behaviour. A property is named in the `behaviour:` clause only when no state it leads to looks different.
 - **Example, `DSSelect`.** `open` is drawn, because the popup is there to see. `disabled` is drawn, and so is a start icon. Whether the popup closes when a choice is made is behaviour, and the header names it.
-- **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue, light or dark, a border, a radius and a shadow are such properties. A variable carries each of their values, so a version for each value would draw the same unit again and again. Size is the one property of this kind that stays a version, as the rule on size states.
+- **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue, light or dark, a border, a radius and a shadow are such properties. A variable carries each of their values, so a version for each value would draw the same unit again and again. Size and the scale size are the properties of this kind that stay versions, as the rule on size states, and the page level is a mode, as "Which property is a variant and which is a case" states.
 - **A unit that the library draws as cases alone, having no look of its own, MUST say why in the label of its sheet.** A person who reads the sheet then learns that the unit has no set because the unit has no look, and not because a set is missing.
-- **The duty MUST run one way: a showcase may show more than the library, and a library MUST NOT lack a primary case.** A library that lacks a primary case of a unit is at fault, and the showcase is not.
+- **The duty MUST run one way: a showcase may show more than the library, and a library MUST NOT lack a case its column names.** A library that lacks one is at fault, and the showcase is not.
 
 ### Which property is a variant and which is a case
 
-A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the page of the unit in the showcase, where a developer already looks for each of them (RD.SUPPORT.SURFACE.038). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (RD.SUPPORT.SURFACE.039).
+A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the unit's column, *The library draws*, which the book keeps by the rules below (RD.SUPPORT.SURFACE.038). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (RD.SUPPORT.SURFACE.039).
 
-- **The library MUST follow the sections of the unit's page in the showcase.** Each property is drawn where the showcase shows it, and the table below says what the library holds for each section.
-- **A set MUST cross its size, its states and the shared `variant`, and it MAY cross two more kinds of property, which are stated below. It MUST NOT cross any other property.** A designer who picks a unit picks a size, a state and a look. The showcase's Sizes tabs show every variant at each size, so the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
+- **The library MUST follow the unit's column.** Each property is drawn as the column says: crossed, once, as a mode, as a text or a swap, or not at all, and the table below says what each part of the column is in Figma. A stack is proven against the library, and its showcase may show more.
+- **A set MUST cross its size, its states and the shared `variant`, and it MAY cross two more kinds of property, which are stated below. It MUST NOT cross any other property.** A designer who picks a unit picks a size, a state and a look, and every pair of them is a picture that someone will place. So the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
 - **`disabled` MUST stay a property of its own and MUST NOT be a value of `state`.** A caller sets `disabled`, and a person or the system puts the unit in a state.
-- **Each tab of Cases, and of a section of the unit's own, MUST be one case on the unit's sheet of cases.** The Cases section holds each icon or place of the unit and every choice that a caller makes with a prop. A section of the unit's own, such as the looks and the pinned parts of `DSTable`, is read the same way.
-- **Colors MUST be a mode, shown by one case.** The case sets the mode on the instance, and the instance shows every variant, as the showcase's Colors tabs do.
+- **Each prop the column draws once, each mode, each text and each swap MUST be one case on the unit's sheet of cases.** A case is one picture a person can find.
+- **Colors MUST be a mode, shown by one case.** The case sets the mode on the instance, and the instance shows every variant.
+- **A vocabulary whose every value names one set of tokens MUST be a mode, and the page level is one: the collection Level, whose modes are the six values of `DSPageLevelType`** (`RD.SUPPORT.SURFACE.296`). A designer sets a frame's level once, and every unit inside takes that level's sizes, its items one level down, so a level costs no version. A form that a level changes MUST stay a crossed vocabulary, and a set MUST draw only the pairs the book allows: the type of a feature, the size of a button, the level a feature gives its items and the corner of a mark.
 - **A set MAY cross a prop that takes a vocabulary whose values are forms of the block itself.** `type` of `DSTimePicker`, `attached` of `DSToggleGroup` and `sort` of a table's header cell are such props, and the library carries each under the same name and the same values as the web.
 - **A set MAY cross a property that a named unit keeps crossed, and the book names that property for the unit, with its reason.** The reason is always that the values combine into forms a person must see together. The property is crossed for its own unit only; on any other unit it is a case. "A property a named unit keeps crossed" lists them.
 - **A look that no property can produce MUST be a version drawn once, crossed with nothing, and its case MUST be an instance of that version.** `type` of `DSSkeleton` has six values and each is a look that no other property can draw, so the set holds six versions and a version for each pair with the size would draw the same look again.
 - **A pair of values that the web cannot be in MUST be left out, and a pair MUST keep a version only where it draws something that neither value draws alone.** A disabled row of a list is not under the pointer, so `DSList.Item` has no hover version for it. A checked radio that is disabled shows a mark in the disabled look, so `DSRadio` keeps that pair.
 - **Usage MUST stay the usage, and Props MUST draw nothing.**
-- **An agent MUST place each property by the section of the showcase that shows it, and MUST answer from the web's source and the running showcase, never from the property's name.** A first list that sorted the properties of 93 sets by name alone left 32 names that only a reading of the source could place.
+- **An agent MUST place each property in the unit's column by the rules of this part, read from the stack's source, never from the property's name**, and the column then decides the set. A first list that sorted the properties of 93 sets by name alone left 32 names that only a reading of the source could place.
 
-| Section of the unit's page | What the library holds | Example |
+| Part of the column | In Figma | Versions it adds |
 | --- | --- | --- |
-| Usage | the usage, in the band of Usage | the usage of `DSBadge`, in its band |
-| Sizes | `size` of the set, one version for each size, crossed with the states and the shared `variant` | `size` of `DSButton`, XS to XL, crossed with its five variants |
-| States | the states of the set, crossed with `size`, with each pair left out or kept as the rule above says | `state` of `DSDataUnit`, filled and empty, at each size |
-| Colors | a mode on the instance, shown by one case | `Hue=WARNING` of `DSBadge`, which shows all five variants |
-| Cases | one case on the sheet for each tab | `fullWidth=true` of `DSButton`, and `fullScreen=true` of `DSDialog`, the instance of a version drawn once |
-| A section of the unit's own | one case on the sheet for each tab | `horizontalScroll=true, stickyLeftColumns=2` of `DSTable`, in its pinned parts |
-| Props | nothing | the props table of `DSButton` |
+| crossed | versions of the set | a product |
+| once | one version each | one per value |
+| colour | a mode of Color | none |
+| light and dark | a mode of Mode | none |
+| page level | a mode of Level | none |
+| text, swap | a text or swap property | none |
+| usage | the Usage band, composed from instances | none |
 
-The section places a property, and a short list of questions then decides only how its case is carried. A question is asked of a property that is drawn as a case, in this order, and the first yes decides.
+The column places a property, and a short list of questions then decides only how its case is carried. A question is asked of a property that is drawn as a case, in this order, and the first yes decides.
 
 | Question | The case is carried by | Example |
 | --- | --- | --- |
-| Is its value a token, such as a hue, light or dark, a border, a radius or a shadow? | a mode on the instance | `Hue=WARNING` of `DSBadge`, and `mode=DARK` of `DSCodeBlockView` |
+| Is its value a token, such as a hue, light or dark, a border, a radius or a shadow? | a mode on the instance | `Color=WARNING` of `DSBadge`, and `Mode=DARK` of `DSCodeBlockView` |
 | Does it show or hide one part? | a yes-or-no property | `withClose=true` of `DSBadge` |
 | Is it words, a number that is shown, a picture or a nested node? | a text property, or a swap of the node | `title=AL` of `DSAvatar`, and `startIcon=BELL` of `DSBadge` |
 | Is it a free number? | the property on the instance, set to one value | `maxHeight=160` of `DSCodeBlockView` |
@@ -605,23 +610,7 @@ A property that changes nothing a person can see in any state is drawn by no cas
 
 #### A property a named unit keeps crossed
 
-| Library file | Unit | Property | Reason |
-| --- | --- | --- | --- |
-| DS 3-Widgets | `DSFilterBarField` | `kind` | each kind of field is a different control, and a person must see the field of every kind next to the others |
-| DS 3-Widgets | `DSFilterBar` | `narrow` | a narrow bar folds its fields away and a wide bar shows them inline, so the two forms must be seen together |
-| DS 3-Widgets | `.DSDataTableEmpty` | `filtered` | a table empty because no record exists and a table empty because the filter left none say different things |
-| DS 2-Components | `DSCard.Header` · `DSCard.Content` · `DSCard.Footer` | `flush` | a part with its padding and a part without it are two forms of the part, and what it holds reaches the edge of the card only in one of them |
-| DS 4-Containers | `.DSPanelContainerFrames` | `frames` | the parts a frame holds decide where its edges and fills fall, and every combination of parts is a form of the frame |
-| DS 4-Containers | `DSPanelContainer.Header` | `flush` | a part with its inset and a part without it are two forms of the part |
-| DS 4-Containers | `DSPanelContainer.Content` | `flush` | the same reason as for the header |
-| DS 4-Containers | `DSPanelContainer.Footer` | `flush` | the same reason as for the header |
-| DS 5-Layouts | `DSLayoutNavNode` | `open` | an open group shows its children and a shut group does not |
-| DS 5-Layouts | `DSLayoutNavNode` | `inGroup` | an item inside a group sits indented under it, and an item outside a group does not |
-| DS 5-Layouts | `DSLayoutNavNode` | `inMenu` | an item drawn in a menu is a row of the menu and not of the rail |
-| DS 5-Layouts | `DSLayout` | `open` | the rail is open or shut, and the page beside it is placed differently in each |
-| DS 5-Layouts | `DSLayout` | `narrow` | a narrow screen moves the navigation into a sheet and a dock, so the whole page changes its form |
-| DS 5-Layouts | `DSLayout` | `flush` | the main area with its inset and without it are two forms of the page |
-| DS 5-Layouts | `DSLayout` | `side` | the side the navigation sits on moves the main area to the other side |
+No unit keeps such a property today. A part's `flush` and a frame's `frames` are modes, and the forms a person picks first are crossed by the rule on a vocabulary of forms, so neither is an exception. A property that a unit needs crossed for another reason joins this part first, as a row of a table that names the unit, the property and the reason.
 
 ### A unit with no look of its own
 
@@ -692,7 +681,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.082` | this order binds the core units, and not a unit that a stack provides on its own |
 | `RD.SUPPORT.SURFACE.099` | the library draws the core units, the icons and the places of the layout only, and nothing of a pattern |
-| `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
+| `RD.SUPPORT.SURFACE.026` | the library draws every case a unit's column names, a block with a behaviour and little or no look as its column says, and a showcase is proven against the library and may show more |
 | `RD.SUPPORT.SURFACE.027` | the Figma connector is the one way the agent changes the library, and a developer publishes |
 | `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are saving a named version and publishing a file, the builder manages the library and a partner is given it published, and the agent says what it will change before a connector write |
 | `RD.SUPPORT.SURFACE.029` | the connector's work in a library file is carried out by an inventory read once, a script for each page, one picture for each set and a probe written once, and a person saves a named version before the connector's first change |
@@ -702,6 +691,8 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, usage, cases and parts in a fixed order and at fixed distances |
 | `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |
 | `RD.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
+| `RD.SUPPORT.SURFACE.295` | the plugin builds the library's sets from the CONSTRUCT snapshot alone, and the tool writes the snapshot from the book and writes the plugin out |
+| `RD.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RD.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
 
 ## Proof

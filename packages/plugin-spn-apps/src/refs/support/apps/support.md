@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/",
-      "seen": "dbc949ee"
+      "seen": "2317d1bd"
     }
   ]
 }
@@ -133,9 +133,9 @@ Apply this same taxonomy whether you are filing a support package's own tree or 
 | `utils/` | pure helper functions only | every unit that has any |
 | `widgets/` | embeddable composite units, self-contained enough to mount anywhere their props allow | units shipping embeddable composites |
 | `containers/` | blocks that frame a part of a page as a header, content and a footer | units that ship containers (the design system; a module, for each framed part of its pages) |
-| `layouts/` | blocks that frame a page, with its navigation and its main area | units that ship layouts (the design system) |
+| `layouts/` | blocks that frame a page, with its navigation and its content | units that ship layouts (the design system) |
 
-A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the main area of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `refs/support/surface/architecture-containers.md` and `architecture-layouts.md` refs state the blocks themselves.
+A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the content of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `refs/support/surface/architecture-containers.md` and `architecture-layouts.md` refs state the blocks themselves.
 
 ### A page and its containers
 

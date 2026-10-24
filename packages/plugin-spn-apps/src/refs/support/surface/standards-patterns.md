@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "0622aab8"
+      "seen": "55122c67"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "1b342f83"
+      "seen": "f89b6498"
     }
   ]
 }
@@ -199,14 +199,14 @@ A part of a page takes the unit it is for (`RD.SUPPORT.SURFACE.217`, narrowed by
 
 | Unit | Use it for |
 | --- | --- |
-| `DSPanelContainer` | a part of the page with a header (title, description, actions), whose look follows the theme's container framing |
+| `DSPanelContainer` | a part of the page with a header (title, description, actions), whose look follows the theme's panel framing |
 | `DSCardWidget` | a card with a head: a title with its mark or icon, and actions in the head, often with titled parts under it |
 | `DSCard` | a card that shows its own info: a number with its caption, or a single thing with its words and an action under them; several side by side stay `DSCard`s, even when they come from data |
-| Content part | one section of a container's content, a `DSPanelContainer.Content`: one or more in a container, a line between every two, each with its own title and actions, no dotted boundary |
-| Group | a titled cluster inside a container, a card or a content part, with a dotted boundary; a level, not a unit |
+| Content part | one section of a panel's content, a `DSPanelContainer.Content`: one or more in a panel, a line between every two, each with its own title and actions, no dotted boundary |
+| Group | a titled cluster inside a panel, a card or a content part, with a dotted boundary; a level, not a unit |
 | `DSItem` | one line about one thing: its media, its title, a line under the title, and what stands at its end |
 
-A container whose content is only cards lets them stand flush; any other content sits in the container's one rounded box, which holds every content part and the footer, a line across it between every two parts and above the footer (`RD.DEVEX.WORKSPACE.272`). A container may separate its sections by lines (parts), by groups, or both: parts by lines, groups inside a part. A side column holds a container where its parts share one header, and widgets or cards on their own where each stands alone. A frame names its unit and leaves its look to it.
+A panel whose content is only cards lets them stand flush; any other content sits in the panel's one rounded box, which holds every content part and the footer, a line across it between every two parts and above the footer (`RD.DEVEX.WORKSPACE.272`). A panel may separate its sections by lines (parts), by groups, or both: parts by lines, groups inside a part. A side column holds a panel where its parts share one header, and widgets or cards on their own where each stands alone. A frame names its unit and leaves its look to it.
 
 ## Each page pattern, by level — 🔮
 
@@ -215,7 +215,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### Find in a list
 
 - **When.** The data grows as people work, and a person comes often, to find one record. A record that has things of its own opens as a page. A record of a few facts and nothing else opens as a look beside the list.
-- **Page level.** The header of the container, with `fullPage`: the title, a line under it and the main action.
+- **Page level.** The header of the panel, with `fullPage`: the title, a line under it and the main action.
 - **Container.** One `DSPanelContainer`. Its content is two parts: the filter bar, and the records. Its footer holds the paging: the page gives `DSDataTable` a place in the footer, and the table draws its paging there.
 - **Widget.** `DSFilterBar` and `DSDataTable`, in the layout that step 2 chose.
 - **Component.** `DSDrawer`, for the look of a small record beside its list.
@@ -225,7 +225,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### A record and its setup
 
 - **When.** The data is one record and a few things set up for it. A person comes rarely, to see where things stand.
-- **Layout.** The page level, then the containers. An action that can do harm stands apart from the others, at the end.
+- **Layout.** The page level, then the panels. An action that can do harm stands apart from the others, at the end.
 - **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the record, its picture, its name, and under the name its facts.
 - **Container.** One `DSPanelContainer` for each thing set up: its header, with its title and its actions, then its content.
 - **Widget.** None.
@@ -259,7 +259,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### Compare across kinds
 
 - **When.** The data is one fixed set of settings for a fixed set of kinds. A person comes rarely, to check or change a default. The page has no search and no paging, because the settings are few and fixed.
-- **Page level.** The header of the container, with `fullPage`: the title of the page, and a line under it.
+- **Page level.** The header of the panel, with `fullPage`: the title of the page, and a line under it.
 - **Container.** One `DSPanelContainer`, holding the table.
 - **Widget.** None.
 - **Component.** `DSTable`: a setting in each row and a kind in each column, with an Edit under each kind. `DSDialog` with `DSForm` for the change. On a phone, `DSTabs` and `DSDataUnit`.
@@ -270,9 +270,9 @@ The levels are the layout, the page level, the containers, the widgets and cards
 
 - **When.** The data is many things to tick, and a person ticks several. Where the data says which group each thing belongs to, the page has one part for each group. Where it does not, the things are one list with a search.
 - **A heading MUST NOT be made up for choices whose data names no group** (`RD.SUPPORT.SURFACE.055`). A made-up heading puts a choice where a person does not look for it.
-- **Layout.** The content, or the content of the entry the choices stand in: one container, or the parts of the entry's content.
-- **Page level.** The header of the container, with `fullPage`, where the choices are a page; the entry's own header where they stand in an entry.
-- **Container.** One `DSPanelContainer`: a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a container of its own.
+- **Layout.** The content, or the content of the entry the choices stand in: one panel, or the parts of the entry's content.
+- **Page level.** The header of the panel, with `fullPage`, where the choices are a page; the entry's own header where they stand in an entry.
+- **Container.** One `DSPanelContainer`: a part of its content for each group under the title of the group, or one part for the whole list, and its actions in its footer. The choices of every group are saved once, so a group is a part of the content and never a panel of its own.
 - **Widget.** None.
 - **Component.** `DSForm`, with `DSSwitch` or `DSCheckbox`, and `DSList`. The choices stand in columns.
 - **On a tablet and a phone.** On a phone the choices stand one under another.
@@ -281,10 +281,10 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### An editor with its preview
 
 - **When.** The data is content a person writes and what that content becomes. The person must see the result while writing.
-- **An editor with its preview MUST be one container, and each thing a person writes MUST stand beside its own result** (`RD.SUPPORT.SURFACE.115`). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
+- **An editor with its preview MUST be one panel, and each thing a person writes MUST stand beside its own result** (`RD.SUPPORT.SURFACE.115`). The page is an entry that is a page. Its content has a part for the details that have no preview, and then one part for each thing a person writes, under the title of that thing.
 - **Where the content has several forms, a row of tabs MUST choose the form.** The tabs stand at the top of the content, and every part under them belongs to the chosen form. Where the record is saved whole, one save holds every form.
-- **Layout.** One container.
-- **Page level.** The header of the container, with `fullPage`: the way back, before the title.
+- **Layout.** One panel.
+- **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
 - **Container.** One `DSPanelContainer`: the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer.
 - **Widget.** None.
 - **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it. `DSSticky` for the footer that stays in view.
@@ -295,7 +295,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 
 - **When.** The data is a small or a medium form, and the page it belongs to stays beneath or beside it. Step 4 says which is small and which is medium.
 - **Layout.** The content of the page the entry belongs to. It stays in view beneath a dialog, or beside a sheet.
-- **Page level.** The page level of the page the entry belongs to. The entry takes none of its own: its title stands in the header of its container.
+- **Page level.** The page level of the page the entry belongs to. The entry takes none of its own: its title stands in the header of its panel.
 - **Container.** One `DSPanelContainer` inside the overlay. Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
 - **Widget.** None.
 - **Component.** `DSDialog` for a small form. `DSSheet` for a medium one. `DSDrawer` for a look at one record. `DSForm` for the fields.
@@ -305,7 +305,7 @@ The levels are the layout, the page level, the containers, the widgets and cards
 ### Inherit or override
 
 - **When.** The data is a value that follows a default until someone sets their own. The person must see which of the two it is, and be able to go back.
-- **Layout.** The page level, then one container for each part.
+- **Layout.** The page level, then one panel for each part.
 - **Page level.** `DSPageLevel` at `PAGE`: the title of what the values belong to, with the way back before it.
 - **Container.** One `DSPanelContainer` for each part. The line under its title says whether the part follows the default or holds its own values. Its header or its footer holds the one action that changes that.
 - **Widget.** None.
@@ -332,7 +332,7 @@ Whether the set of groups is closed decides the arrangement, before any count do
 
 | The groups | The arrangement |
 | --- | --- |
-| a closed set, few, and all the items fit on about two screens | one page, a container for each group, all open |
+| a closed set, few, and all the items fit on about two screens | one page, a panel for each group, all open |
 | a closed set, few, each one long | a tab for each group |
 | can be added to, by a module, a partner or a person; or many | the groups as a list at the left, the items of the chosen group at the right |
 | any, where the items of a group grow without limit | the same, with a data table at the right, which is then Find in a list |
@@ -343,7 +343,7 @@ Whether the set of groups is closed decides the arrangement, before any count do
 - **Many groups a person searches MUST be the `LIST` layout of `DSDataTable`, and never its `TABLE` layout** (`RD.SUPPORT.SURFACE.069`). The part is narrow, and a person picks one group by its name.
 - **Ask whether a group is a thing a person manages.** Where the product fixes the groups, a group is a heading. Where people make them, a group has its own actions.
 - **Page level.** `DSPageLevel` at `PAGE`: the title of the page, and a line under it.
-- **Container.** `DSPanelContainer`: one for each group, or two side by side. Where two stand side by side, the chosen group is the title of the container at the right. The action that adds an item stands in that header.
+- **Container.** `DSPanelContainer`: one for each group, or two side by side. Where two stand side by side, the chosen group is the title of the panel at the right. The action that adds an item stands in that header.
 - **Widget.** `DSDataTable` in its `LIST` layout, where the groups are many.
 - **Component.** `DSList` holding `DSItem`, for the groups as lines, with a band behind the chosen one. `DSTable`, where the items are a table. `DSBadge` for a state that is not normal.
 - **Specs.** `groups-and-their-items.dg.json` for a closed set. `groups-and-their-items-two-lists.dg.json` for a list beside a list. `groups-and-their-items-open.dg.json` for a set that can be added to. `groups-and-their-items-many.dg.json` for many groups. `one-action.dg.json` for the page of one item.
@@ -351,21 +351,21 @@ Whether the set of groups is closed decides the arrangement, before any count do
 ### An overview
 
 - **When.** The data is counts and what waits for a person, and the person has just arrived. The page shows how much there is, then what needs them, then the places they often go to.
-- **Layout.** The page level, a row of numbers, then the containers.
+- **Layout.** The page level, a row of numbers, then the panels.
 - **Page level.** `DSPageLevel` at `PAGE`: the title of the page.
 - **Container.** `DSPanelContainer`: what waits for the person, and the places they often go to.
 - **Widget.** None.
 - **Card.** `DSCard` for each number, a card of its own.
 - **Component.** `DSDataUnit` for the number in its card. `DSList` for each thing that waits, as a line that ends with its action.
-- **On a tablet and a phone.** The numbers stand four across at a desktop, and two across on a tablet and a phone. The two containers stand side by side at a desktop, and one under another on a tablet and a phone.
+- **On a tablet and a phone.** The numbers stand four across at a desktop, and two across on a tablet and a phone. The two panels stand side by side at a desktop, and one under another on a tablet and a phone.
 - **Spec.** `overview.dg.json`.
 
 ### A record and its steps
 
 - **When.** The data is one record that moves through known steps. A person with the right role moves it on. The page shows the step the record is at, and only the actions that are open at that step.
-- **Layout.** The page level, the steps, then the containers.
+- **Layout.** The page level, the steps, then the panels.
 - **Page level.** `DSPageLevel` at `PAGE`, holding `DSItem`: the way back, the record's picture, its name, and on the line under the name its state and its facts. Its end holds only the actions open at this step.
-- **Container.** `DSPanelContainer`: the steps, and one container for each group of checks of the record.
+- **Container.** `DSPanelContainer`: the steps, and one panel for each group of checks of the record.
 - **Widget.** None.
 - **Component.** `DSDataUnit` for each check. `DSBadge` only on the value that is not normal. `DSButton` for the actions open at this step.
 - **The design system has no unit for a strip of steps today.** The spec draws the steps as four plain words, with the step the record is at as the heavy one.
@@ -375,42 +375,42 @@ Whether the set of groups is closed decides the arrangement, before any count do
 ### An entry that is a page
 
 - **When.** The data is a large form, with sections or a part that repeats. A person fills it in one sitting.
-- **Layout.** One container.
-- **Page level.** The header of the container, with `fullPage`: the way back, before the title.
+- **Layout.** One panel.
+- **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
 - **Container.** One `DSPanelContainer`. Its sections are the parts of its content, each with its own title. Its actions stand in its footer.
 - **Widget.** None.
 - **Component.** `DSForm` for the fields, each with its title above its control. `DSSticky` for the footer that stays in view.
-- **The sections are parts of one form that is saved once.** So they are not containers of their own, and no list of the sections stands beside the form.
+- **The sections are parts of one form that is saved once.** So they are not panels of their own, and no list of the sections stands beside the form.
 - **On a tablet and a phone.** Fields that are short and belong together share a row at a desktop. On a phone each field takes a row.
 - **Spec.** `entry-as-a-page.dg.json`.
 
 ### Change in place, in a list
 
 - **When.** The data is many small values of one kind, and a person changes one after another. The page is a data table whose rows are read. The action of a row turns its value from words into a box, and the action that saves it stands beside the box. The page holds no form, and nothing opens over it.
-- **Page level.** The header of the container, with `fullPage`: the title, and a line under it.
+- **Page level.** The header of the panel, with `fullPage`: the title, and a line under it.
 - **Container.** One `DSPanelContainer`: the filter bar and the rows in its content, and the paging in its footer.
 - **Widget.** `DSDataTable` and `DSFilterBar`.
 - **Component.** `DSInput`, the box in the one cell that is being changed, as wide as the cell.
 - **On a tablet and a phone.** On a phone the table is in its `LIST` layout. A row that is read is a line. The row that is being changed is its text with its box under it, and the same two actions beside the box.
 - **Spec.** `change-in-place.dg.json`.
 
-## How many containers a page uses — 🔮
+## How many panels a page uses — 🔮
 
-A container frames one thing that a person reads as a whole or saves as a whole. That one fact decides how many containers a page has, in every pattern.
+A panel frames one thing that a person reads as a whole or saves as a whole. That one fact decides how many panels a page has, in every pattern.
 
-- **A page MUST use one container for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that one thing are the parts of its content, each under its own title.
-- **A section of one thing MUST NOT be a container of its own.** A frame around a section says that the section is read or saved by itself.
-- **Two things that are read or saved apart MUST be two containers, each with its own title.** A person then sees where one thing ends and the next begins, and which actions belong to which.
+- **A page MUST use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that one thing are the parts of its content, each under its own title.
+- **A section of one thing MUST NOT be a panel of its own.** A frame around a section says that the section is read or saved by itself.
+- **Two things that are read or saved apart MUST be two panels, each with its own title.** A person then sees where one thing ends and the next begins, and which actions belong to which.
 
-| The page | Its containers |
+| The page | Its panels |
 | --- | --- |
-| an entry that is saved once | one container. Its sections are the parts of its content, and its actions stand in its footer |
-| the page of a record | the head of the record outside any frame, then one container for each thing that belongs to the record, such as its content and the list of its versions |
-| a listing | one container, with the filter bar and the records as the parts of its content |
+| an entry that is saved once | one panel. Its sections are the parts of its content, and its actions stand in its footer |
+| the page of a record | the head of the record outside any frame, then one panel for each thing that belongs to the record, such as its content and the list of its versions |
+| a listing | one panel, with the filter bar and the records as the parts of its content |
 
-The reason is the theme. The parts of a container are the places the look of the app reaches. So a page that draws no frame, no line and no padding of its own takes the theme of a partner with no change.
+The reason is the theme. The parts of a panel are the places the look of the app reaches. So a page that draws no frame, no line and no padding of its own takes the theme of a partner with no change.
 
-- **The page that reads a record and the page that changes it MUST hold the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes the record, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves. The rule holds for the container of the thing that is changed: the page that reads a record may hold more containers, such as the list of its versions.
+- **The page that reads a record and the page that changes it MUST hold the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes the record, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves. The rule holds for the panel of the thing that is changed: the page that reads a record may hold more panels, such as the list of its versions.
 
 ## The listing pages — 🔮
 
@@ -431,12 +431,12 @@ A sign-in is not one of the fourteen patterns: it is the page a person passes be
 
 | Level | The sign-in |
 | --- | --- |
-| Layout | `CANVAS`, the body alone, with the container centred in the window, across and down, in a column as wide as a form reads well. A legal line, where the app has one, is the layout's `footerNode` |
-| Page level | none apart from the container: its header holds an item with the step's title, such as *Sign in to Nimbus*, and its line |
+| Layout | `CANVAS`, the body alone, with the panel centred in the window, across and down, in a column as wide as a form reads well. A legal line, where the app has one, is the layout's `footerNode` |
+| Page level | none apart from the panel: its header holds an item with the step's title, such as *Sign in to Nimbus*, and its line |
 | Container | one `DSPanelContainer` at `SM`, in the theme's look, with `divided` set to `CONTENT`: the first content signs in, and a second content, set apart by its line, holds the other task, *New to Nimbus? Create an account* |
 | Components | in the first content, in this order: the brand as an item at the level `CONTAINER` with its mark; the providers as one centred row of icon buttons of one size, each named by its tooltip; a `DSSeparator` with the label *or*; the fields; the main action across the content; a `DSSeparator` with the label *Other ways to sign in*; and the other ways, such as a passkey, a code by email and single sign-on, as one row of equal outline buttons |
 
-- **A sign-in is one compact container, so the whole of it is seen without a scroll.** Each group stands one step of the scale from the next, and the fields stand one under another, their message lines the space between them.
+- **A sign-in is one compact panel, so the whole of it is seen without a scroll.** Each group stands one step of the scale from the next, and the fields stand one under another, their message lines the space between them.
 - **Every control is a `DSForm.Field`.** A choice between two ways to say who you are, such as an email or a phone, is a `DSToggleGroup` above the one field it switches. The action of a field, such as *Forgot password?*, stands at the end of its label line as `labelEndNode`. A checkbox alone on its line, such as *Remember me*, is a field with `showBlankLabel={false}`.
 - **The providers are icons alone, one row, centred, each its own size with one gap between them**, and never a column of wide buttons.
 - **An alternative stands as an equal of the others, and opens its own step in place.** A one-time code or single sign-on changes the header's title and the content's fields, with a way back to the password, and the page does not move.
@@ -453,7 +453,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 | a field a person enters, and a field a person reads | `DSForm.Field`, and `DSDataUnit`, each with its title above | `architecture-components.md` |
 | a value from an enum | a badge beside other facts, a title where it is the subject of a part, and plain text where it stands alone in a labelled field. `a-value-from-an-enum.dg.json` draws each way | `architecture-components.md` |
 | a filter bar, a value changed in a list, and many groups a person searches | `DSFilterBar` in its one form, and `DSDataTable` | `architecture-widgets.md` |
-| a container, several parts of one content, and a large form | the title and the actions above the outline, and what closes the work in the footer | `architecture-containers.md` |
+| a panel, several parts of one content, and a large form | the title and the actions above the outline, and what closes the work in the footer | `architecture-containers.md` |
 
 ## What is not settled or checked yet
 
@@ -481,11 +481,11 @@ This ref states which pattern covers a given task, and what blocks carry it. It 
 | `RD.SUPPORT.SURFACE.053` | a spec in the plugin equals the spec of the same name in the book |
 | `RD.SUPPORT.SURFACE.054` | a listing page whose query takes a page, a text or a filter stays a data table |
 | `RD.SUPPORT.SURFACE.055` | no heading is made up for choices whose data names no group |
-| `RD.SUPPORT.SURFACE.115` | an editor with its preview is one container, and each thing a person writes stands beside its own result |
-| `RD.SUPPORT.SURFACE.116` | a page uses one container for each thing a person reads or saves as a whole, and a section of one thing is never a container of its own |
+| `RD.SUPPORT.SURFACE.115` | an editor with its preview is one panel, and each thing a person writes stands beside its own result |
+| `RD.SUPPORT.SURFACE.116` | a page uses one panel for each thing a person reads or saves as a whole, and a section of one thing is never a panel of its own |
 | `RD.SUPPORT.SURFACE.117` | the page that reads a record and the page that changes it hold the same parts in the same order |
-| `RD.SUPPORT.SURFACE.205` | a sign-in is one compact container on a canvas, its providers one row of icons and every control a form field |
-| `RD.SUPPORT.SURFACE.217` | a part of a page takes the unit it is for, a container, a card widget, a card or an item, and a skeleton naming another is refused |
+| `RD.SUPPORT.SURFACE.205` | a sign-in is one compact panel on a canvas, its providers one row of icons and every control a form field |
+| `RD.SUPPORT.SURFACE.217` | a part of a page takes the unit it is for, a panel, a card widget, a card or an item, and a skeleton naming another is refused |
 
 ## Proof
 

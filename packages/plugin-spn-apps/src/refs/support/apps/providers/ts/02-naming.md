@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "0e17fc6d"
+      "seen": "5c3760ab"
     }
   ]
 }
@@ -96,10 +96,17 @@
 | a dialog | ends in `Dialog` | `RoleInviteDialog` |
 | a form | ends in `Form` | `RoleForm` |
 | a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RoleAutocomplete` |
+| a record's item line | the state's name, then `Item` | `RoleItem` |
 | a hook | starts with `use` | `useRoleList` |
 | a plain component | no suffix and no prefix is needed | `RoleBadge` |
 
-**A unit that chooses records ends in `Autocomplete`.** `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card` or `Picker` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
+**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker` or `Item` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
+
+**A type registered with `LOOKUP` owes its web module two exports — MUST** (`RD.SUPPORT.APPS.223`): its `<State>Autocomplete`, and the option source that Autocomplete uses, as the hook `use<State>OptionSource()`, which returns `IDSDataOptionSource` of the record. A form field, a filter bar and the custom-field form all choose that record through the same two, and the custom-field form turns a field's source code (`IAM_ROLE`) into that hook, so no picker of a record is written twice. The hook is a hook file like any other: one hook in `useRoleOptionSource.ts`, in the module's `hooks/<area>/`, beside the `components/<area>/` folder that holds `RoleAutocomplete.tsx`.
+
+**A record's item line is `<State>Item`, and its words and facts come from `prepare<State>ItemProps()` in the module's `utils/<state>.ts`** (`RD.SUPPORT.APPS.218`). `RoleItem` draws a role, as `RoleAutocomplete` chooses one, and it sits beside it, in `components/<area>/RoleItem.tsx`. The function takes the record, the place's `IDSItemPlacementProps` and `translate`, and returns the props of `DSItem`; the Item draws what it returns, and a card's head or row spreads the same props, so the two show one line. The function lives in the utils file so the component file keeps its single export: `prepareRoleItemProps` in `utils/role.ts`.
+
+**A form's own state is `I<what it edits>FormState` — MUST** (`RD.SUPPORT.APPS.220`): `IRoleFormState`, `IOrgAuthPolicyFormState`. It is the shape a form holds while a person fills it in, and its fields take the command's own types. The name says which unit holds it, the form, as `IRoleFormProps` does, and keeps the word *state* apart from a contract state, which is a record the server returns. `EntryState` and `Draft` are not used.
 
 **A suffix names where a unit is placed: `App`, `Layout`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
 
@@ -214,7 +221,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 
 **There is no `bulk` verb.** A many-read is the plural of the read level, and a read returning an `<X>List` is named for that type.
 
-**Every contract interface gets one validator named `<Interface>Schema`**, written into `contract/validators/<entity>.ts` by `spnutils apps gen-validators`. The name is derived rather than chosen, which makes `Schema` a reserved interface suffix — a contract interface ending in it fails generation instead of emitting a collision.
+**Every contract interface gets one validator named `<Interface>Schema`**, written into `contract/validators/<entity>.ts` by `spnutils apps gen-validators`. The name is derived rather than chosen, which makes `Schema` a reserved interface suffix — a contract interface ending in it fails generation instead of emitting a collision. A state that extends exactly one interface also gets `<Interface>SchemaBase` beside its schema, which names the base its schema was merged from.
 
 ## Packages
 
@@ -241,7 +248,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 | An error's label | nobody: the key is the error code | `ERROR.STD.<NAME>` · `ERROR.<MOD>.<NAME>` | the same |
 | An enum value's label | `translateEnumLabel`, from the enum's name and the value | `ENUM.<ENUMNAME>.<VALUE>`, from `translateEnumLabel(translate, 'RoleType', role.roleType)` | `ENUM.ROLETYPE.SYSTEM` |
 
-**An enum label's key is built, never written.** A page passes the contract enum's name exactly as declared — `'RoleType'`, never `'roleType'` or a shortened `'role'` — and `buildEnumOptions` takes the same name. **Only a contract enum's value takes an `ENUM.` key**: a code from an open set, such as a module code, an entity kind or a data source type, never does.
+**An enum label's key is built, never written.** A page passes the contract enum's name exactly as declared — `'RoleType'`, never `'roleType'` or a shortened `'role'` — and `buildEnumOptions` takes the same name. **Only a contract enum's value takes an `ENUM.` key**: a code from an open set, such as a module code, or an entity kind, which is also what names a data source, never does. Its label comes from the registry row.
 
 **Scope a label by reuse, not by where it renders.** `common.*` is flat and holds generic vocabulary translated once; a module scope holds module-specific messages and may add a subscope. A `common.*` key mirrors its own English value rather than inventing a semantic name. The second argument is both the English source and the runtime fallback.
 
@@ -273,6 +280,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 | Support provider | area + `Provider` + vendor | `IngressProviderNginx` |
 | Seam interface | `I` + area + `Provider` | `IIngressProvider` |
 | Props interface | `I` + component + `Props` | `IDSButtonProps` |
+| Form state | `I` + what it edits + `FormState` | `IRoleFormState` |
 | Props group | `I` + component + group + `Props`, from the owner's props by `Omit` or `Pick` | `IDSFeatureGridSectionContainerHeadingProps` |
 | Shared props shape | `I` + what it is, no `Props`, no `Config` | `IDSFrameSurface`, `IDSGridColumns` |
 | Web module unit | ends in what it is: `Page`, `Container`, `Widget`, `Dialog`, `Form`, or a pattern's word | `RoleListContainer` |

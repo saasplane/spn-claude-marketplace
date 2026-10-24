@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "4767b7ee"
+      "seen": "6eeeafc7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -108,7 +108,8 @@
   - **Status honesty**: a `SUCCESS` row resolves to a case that ran and passed. No case is `PLANNED`; a case the run met and could not run is `PENDING`.
   - **A run speaks for the tier it ran and the nodes it collected, and nothing else.**
   - **While work is under way, a run covers what the change touched** (`RD.DEVEX.WORKSPACE.207`): rows counted through the capability page, the selection written in the order and passed after `--`, one freshly named run, acceptance read as `SUCCESS` from the run file.
-  - **A whole tier runs before a release, or in one of five named cases** (`RD.DEVEX.WORKSPACE.245`): a published package changed and outsiders import it; a test configuration changed; a file was renamed, moved or deleted; a dependency moved; the developer asks.
+  - **A whole tier runs before a release, or in one of five named cases** (`RD.DEVEX.WORKSPACE.245`): a published package changed and outsiders import it; a test configuration changed; a file was renamed, moved or deleted; a dependency moved; the developer asks. The release's dry run is the full pass: it runs every tier the release can run by itself and lists every failure, so the agent runs only the tier it names as not run, a client's contract tier, with the service up.
+  - **Before a commit, each tier the change touches runs whole for its node, once, at the end of the step**: unit, component and integration, the tiers that need nothing running. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses the commit when no whole, green run covers exactly the content staged, for an apps node and an infra node alike.
   - **A pipeline publishes evidence and never writes a document.**
   - **Keep each claim at one tier.** A gate is not a test, and no gate is inferred from another.
   - **Suites group by actor where the consumer is people, and by capability where it is a system.** **Leave the system as the tests found it.**

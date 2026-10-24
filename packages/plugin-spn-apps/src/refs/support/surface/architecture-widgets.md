@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "64053651"
+      "seen": "ed79925a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "1a9ee519"
+      "seen": "ce155a2b"
     }
   ]
 }
@@ -45,6 +45,8 @@ A widget is built for one purpose. It is not a set of components a page composes
 | Its parts | `parts`, a list in which each part is of one kind | each part in the order given |
 | Its footer | `footer`, any node | the node in the footer of the card. A card with no `footer` has no footer part |
 
+**The library draws** the widget composed from `DSCard`: `size`; `divided`, `headerActions` and `footer` once each; each kind of part once; `opacity` `TRANSLUCENT` once; `frames` and the `surface` keys as modes; and, as its usage, a dashboard's recent orders.
+
 - **`DSCardWidget` MUST take each group of its settings as the props of the unit that draws it, whole** (`RD.SUPPORT.SURFACE.127`). Its head and the small head of a part are the props of `DSItem`. An item of a part is the props of `DSItem`, and a row of a part is the props of `DSList.Item`. A page that knows those units knows the widget. So the picture of a head or of an item is the `media` of `DSItem`, given as data of one kind.
 
 A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every part also takes `key`, `header`, the props of `DSItem` for the small head of the part, and `headerActions`, the actions of that head. That head is drawn at the page level `GROUP` where the page gives none, and a row of an `ITEMS` part at `CONTENT`.
@@ -62,7 +64,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **A row of an `ITEMS` part MUST hold one link, and never a link inside a link.** What `endNode` holds stays outside the link, so a press on an action there does the action and does not follow the link.
 - **A row of an `ITEMS` part or of a `LIST` part MAY be `selected`.** The page says which row is chosen, and the widget draws it as a chosen row of a list, with the band and `aria-current="true"`. The widget holds no state for it.
 - **The widget MUST take `surface` and `frames` for the frame of its card, and `fullHeight`, and MUST hand each to its `DSCard`** (`RD.SUPPORT.SURFACE.261`, `RD.SUPPORT.SURFACE.262`). `surface` is an `IDSFrameSurface` and `frames` is `DSBoxPartType[]`, and they mean on the widget what they mean on the card. `frames` is `HEADER`, `CONTENT` and `FOOTER` where the page names none, so a dashboard tile may list `CONTENT` alone and stand its title flat above a framed body. A key of the surface that the page does not give follows the card look of the theme (`architecture-app.md`).
-- **A planned part.** The widget's `frames` and its `surface` in place of the four paint props, and its look at `theme.widget.card`, are design, and no stack builds them yet. The design system takes them in its own change, and the library is owed.
+- **A built part.** From support 5.22.0 the web widget carries `frames` and `surface` in place of the four paint props, and its look at `theme.widget.card`. The library is owed.
 - **The widget MUST take `divided` from its own prop where the prop is given, else from the theme's `widget.card`** (`RD.SUPPORT.SURFACE.128`). `divided` draws the lines between the head, the parts and the footer of the card, and the default theme draws none.
 - **The rows of an `ITEMS` part and of a `LIST` part take `divided` from the prop of the part, else from `rowsDivided` of the theme's `widget.card`, yes by default. They take `hoverable` from the prop of the part, else from `rowsHoverable`, yes by default.** The widget keeps no value of its own for an unset theme. A prop that says no is given, so a part that says no wins over a theme that says yes.
 - **The widget MUST take one `size`, and MUST pass it to its head, its lists and its rows.**

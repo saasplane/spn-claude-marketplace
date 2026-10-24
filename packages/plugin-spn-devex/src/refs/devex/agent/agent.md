@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "6c53f3a5"
+      "seen": "ab30d65d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -81,7 +81,10 @@ judgment gate*).
 
 **The first reply opens with the welcome, whatever the prompt — MUST** (`RD.DEVEX.WORKSPACE.045`).
 The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
-🤖 who the agent is, 🧭 the eight stages by their names, and 👥 every lens by its role name. The
+🤖 who the agent is, 🧭 the five phases with the eight stages inside them, by their names, and 👥
+every seat on the team by its lens's role name, grouped by function. In a builder's workspace, the one
+`SPN_DEVEX_AGENT_WORKSPACE` names, it also names the partner view by what it guards, because that view
+speaks for the people who build on what the builders publish and is no seat on a partner's team. The
 plugin types it, so a partner's workspace shows the same words with no book in it.
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the

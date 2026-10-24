@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
-      "seen": "a23ce8f9"
+      "seen": "8bad9098"
     }
   ]
 }
@@ -158,7 +158,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 | `CONTRACT` | the source tree | the node's declared interface holds: a layer's input and output shape, a declaration's shape and the names it publishes, and the repository's own stated rules | that anything resolves |
 | `INTEGRATION` | a fixture declaration or the node's own, the provider's own planner under mock providers, and a consumer's committed expectations | a module validates against the providers it pins, and a plan-only render is what its consumer expected | that a provider would accept the plan, or that anything was stood up |
 
-**A node owes the tiers its kind fixes, and no node chooses its own.** The blueprints (`SUPPORT`) owe all three — they derive, declare an interface and render. An `ORGANIZATION`, a `PLATFORM` and a `MODULE` owe `CONTRACT` and `INTEGRATION`: the ground and organization layers render an organization's declaration from a seat of its own; the platform layer renders a platform's declaration once, and the environment and deployments layers again per declared environment; the estate stands a seat for a module's world. A declaration's integration runs under `tofu test`, planning the pinned blueprints with mock providers, and each run's name carries the behaviour id it proves.
+**A node owes the tiers its kind fixes, and no node chooses its own.** Each of them needs nothing running, so a commit to a node asks for every one it owes, run whole. The blueprints (`SUPPORT`) owe all three — they derive, declare an interface and render. An `ORGANIZATION`, a `PLATFORM` and a `MODULE` owe `CONTRACT` and `INTEGRATION`: the ground and organization layers render an organization's declaration from a seat of its own; the platform layer renders a platform's declaration once, and the environment and deployments layers again per declared environment; the estate stands a seat for a module's world. A declaration's integration runs under `tofu test`, planning the pinned blueprints with mock providers, and each run's name carries the behaviour id it proves.
 
 **Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test <run>` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
 

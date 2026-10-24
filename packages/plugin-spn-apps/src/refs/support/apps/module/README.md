@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "bf00b822"
+      "seen": "e5dcf7b2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "44739832"
+      "seen": "a656f1a0"
     }
   ]
 }
@@ -71,6 +71,8 @@ You model an entity at escalating richness so a consumer fetches exactly what it
 | `{Anchor}Summary` | composed from fields, never extension | one line of a listing: the anchor plus the related states the line shows |
 
 **Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain.
+
+**The published specification keeps the ladder** (`RD.SUPPORT.APPS.219`). It composes each read level from the one below, the reference to its base and its own fields joined by `allOf`, so a client reads `RoleInfo = RoleMeta & {…}` with the fields it had before and no caller changes. Every component stays open, and a place that uses a level, a response, a container or a branch of a union, closes it with `unevaluatedProperties: false`. A level that re-declares a field of its base stays flat, and so does a variant whose base holds only `mtype`.
 
 **A listing line that pairs entities is a `{Anchor}Summary`** (`RD.SUPPORT.APPS.217`). The anchor's read model sits under the anchor's own name and is never null. Each related state sits under its own name, `null` when there is none and an array where there can be many, at the level the line needs. It is returned by `search{Anchor}Summaries` as a `{Anchor}SummarySearchResult`, and it maps to no table: the service builds each line from the bulk readers. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
 

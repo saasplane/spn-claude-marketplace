@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "f6422575"
+      "seen": "260e0aaf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9aa52c82"
+      "seen": "a0608440"
     }
   ]
 }
@@ -842,8 +842,9 @@ whole tier unless one of the five cases holds.
 `facts.jsonl` holds what each gate printed at the pin, and the *Before* number comes from there, named
 by the fact's id. Where
 no run on that commit exists, run the gate once before you change anything. **Run the gates once, at
-the end of each step.** Inside a step, run only the cases of what you touched. A whole test tier is
-not one of an order's gates, unless one of the five cases holds.
+the end of each step.** Inside a step, run only the cases of what you touched. The tiers the step touched, run whole for the
+nodes it touched, are one of its gates, and the commit is refused without them. Any other whole tier is
+not a gate, unless one of the five cases holds.
 
 **An agent launches no child agent — MUST.** A child can go on writing after its parent has reported,
 so the coordinator reads a tree that is still moving. Every order says so under *Never*.
