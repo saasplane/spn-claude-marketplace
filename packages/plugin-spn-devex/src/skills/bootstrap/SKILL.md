@@ -252,11 +252,13 @@ Show every answered row as it now stands, and then show what you derived from it
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
-**A go is written down or it did not happen.** Append it to the arc's log as a dated line, in the shape `refs/devex/workspace/workstream.md` carries:
+**A go is written down or it did not happen.** Record it with the command that moves the arc out of `PROPOSED`, carrying their words as they gave them, as `refs/devex/workspace/workstream.md` shows:
 
-```md
-- **2026-09-22 — go.** The coordinates were read back and agreed. Acts 5 to 10 may run.
+```sh
+spn-devex workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words>"
 ```
+
+The log then holds `PROPOSED → DECIDED · <their words>`, and acts 5 to 10 may run.
 
 Then say which act runs next, and run it.
 

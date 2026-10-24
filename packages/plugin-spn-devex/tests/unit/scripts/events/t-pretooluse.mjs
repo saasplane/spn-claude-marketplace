@@ -19,17 +19,33 @@ const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
 const EVENTS = resolve(HOOKS, "src", "scripts", "events");
 
+// An arc's data as the `workstream` commands keep it: `state.json` at `status`, and `log.jsonl` holding the
+// developer's go where `go` says so (RD.DEVEX.WORKSPACE.278) — the state `confirmed` reads.
+function arcFiles(status, go) {
+  const data = { schemaVersion: 1, arc: "N001", subject: "probe", title: "the probe", goal: null, status, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "probe", kind: "change", state: "waiting" }] };
+  const lines = [{ at: "2026-09-29T10:00+05:30", kind: "opened", row: null, note: "opened as PROPOSED" },
+    ...(go ? [{ at: "2026-09-29T10:05+05:30", kind: "status", row: null, note: "PROPOSED → DECIDED · the developer: 'go'" },
+              { at: "2026-09-29T10:06+05:30", kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" }] : [])];
+  return { [join("N001", "state.json")]: `${JSON.stringify(data)}\n`,
+           [join("N001", "log.jsonl")]: lines.map((line) => JSON.stringify(line)).join("\n") + "\n" };
+}
+const arcAt = (workstream, status, go) => Object.fromEntries(Object.entries(arcFiles(status, go))
+  .map(([file, body]) => [join(DEVEX_WORKSTREAMS, "open", workstream, ARCS, file), body]));
+
 // EVERY PROBE SITS IN A TEMPORARY WORKSPACE. A probe path is the target of a simulated tool call,
 // never a file the suite reads, so a neutral repository, `probe-repo`, stands in for any member
-// repository. The workspace holds one open workstream with a dated go, which is the state an
-// ordinary write into a member repository expects.
+// repository. The workspace holds one open workstream whose arc holds the developer's go, which is
+// the state an ordinary write into a member repository expects.
 const WORKSPACE = realpathSync(mkdtempSync(join(tmpdir(), "pretooluse-probe-")));
 process.on("exit", () => rmSync(WORKSPACE, { recursive: true, force: true }));
 const PROBE_REPO = join(WORKSPACE, "probe-repo");
 {
   const arcs = join(workstreamsDir(WORKSPACE, "open"), "041-probe", ARCS);
-  mkdirSync(arcs, { recursive: true });
-  writeFileSync(join(arcs, "N1-probe.md"), "# N1 — probe\n\nStatus: **RUNNING.**\n\n## Log\n\n- **2026-09-29 — go.**\n");
+  for (const [file, body] of Object.entries(arcFiles("RUNNING", true))) {
+    mkdirSync(join(arcs, file, ".."), { recursive: true });
+    writeFileSync(join(arcs, file), body);
+  }
 }
 
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
@@ -150,7 +166,7 @@ function onceForAFile(shown) {
 {
   // F9 — the one the Python dropped on the floor every single time.
   const root = workspace("dispatch-confirmed", {
-    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N1-x.md")]: "# Arc\n\n## Log\n\n- **2026-09-18 — opened.**\n",
+    ...arcAt("001-a-subject", "PROPOSED", false),
     "probe-repo/src/existing.ts": "export const x = 1;\n",
   });
   one("F9: confirmed's warning now reaches the turn",
@@ -205,7 +221,7 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
   // The start file `lib/bash-timing.ts` writes before a timed command, written here by path: the
   // suites run with recording off, and the guard reads the folder whether recording is on or not.
   const root = workspace("dispatch-test-run", {
-    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N1-x.md")]: "# N1 — x\n\nStatus: **RUNNING.**\n\n## Log\n\n- **2026-09-29 — go.**\n",
+    ...arcAt("001-a-subject", "RUNNING", true),
     "spn-x/apps/api/src/a.ts": "export const x = 1;\n",
     "spn-x/docs/a.md": "# A\n",
   });

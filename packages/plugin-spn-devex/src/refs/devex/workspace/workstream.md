@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "6ace9de6"
+      "seen": "e9458c92"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "b85da7e9"
+      "seen": "032c92c1"
     }
   ]
 }
@@ -1029,18 +1029,29 @@ and it turns a question into a fait accompli.
 
 ## A go is written down, or it did not happen
 
-A go lives in the arc's `## Log`, as a line opening with the date and the word:
+A go is the write that moves an arc out of `PROPOSED`, and it carries the developer's words
+(`RD.DEVEX.WORKSPACE.278`):
 
-```markdown
-- **2026-09-09 — go.** The developer said finish it.
+```sh
+spn-devex workstream row write N004 --status DECIDED --note "the developer, 24 Oct: 'good to go'"
 ```
+
+It appends the status line `PROPOSED → DECIDED · the developer, 24 Oct: 'good to go'` to the arc's
+`log.jsonl`, and the arc's `state.json` reads `DECIDED`.
 
 **Nothing else counts, because nothing else survives.** A go held in the conversation ends with the
 window, and the next session opens on a page it cannot tell from a proposal. **The log gets one note per
 milestone, not one per step** (`RD.DEVEX.WORKSPACE.275`): a row that lands or is blocked, an arc that
-changes status, a decision of the developer's, and a handover. So the first
-repository write in a window is checked: one open workstream, no go recorded, one warning. Writing
-the plan never warns, because that is how a session earns the go.
+changes status, a decision of the developer's, and a handover. So the first write into a repository in
+a window is checked. An arc holds a go when it reads `DECIDED`, `RUNNING` or `LANDED` and its log holds
+the status line that moved it out of `PROPOSED`, with words beside the move. An arc opened straight at
+`DECIDED` holds it in its opening line, which carries the developer's words (`RD.DEVEX.WORKSPACE.280`),
+as when one go opens the arc of every step. A move back to `PROPOSED` needs a go again. A `PROPOSED` arc
+holds none, and neither does an arc that reached its status with no such line, because a plan you wrote is not
+the developer's agreement. The check reads the window's workstreams (`RD.DEVEX.WORKSPACE.236`), or every
+open one when the window works on none; where no arc of them holds a go, it warns once in the window,
+and its note names the command above. Writing the plan never warns, because that is how a session earns
+the go.
 
 ## How you work, at every step
 
@@ -1315,4 +1326,4 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | the short rules are in the agent's context from the first turn | `orientation.ts`, at session start |
 | what landed, said out loud | `closed.ts`, after the folder moves |
 | what the agent's own machinery costs | `timing.ts`, on every hook run |
-| a repository write with no go on record | `confirmed.ts`, on the first such write in a window |
+| a repository write while no arc of the window's workstreams reads `DECIDED`, `RUNNING` or `LANDED` with the developer's words where it left `PROPOSED`, in a status line or in the opening line of an arc opened at `DECIDED` | `confirmed.ts`, on the first such write in a window |

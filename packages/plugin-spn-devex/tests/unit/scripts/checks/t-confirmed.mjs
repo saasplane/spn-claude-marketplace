@@ -1,42 +1,49 @@
 import { PLUGIN } from "../../../helpers/harness.mjs";
-// `confirmed` — the known-bad is a repository write with no go recorded anywhere; the untouched is
-// the same write once an arc logs one.
+// `confirmed` — the known-bad is a repository write while no arc holds the developer's go; the untouched is
+// the same write once an arc does. A go is read where an arc keeps it: the arc's status in `state.json`
+// (`DECIDED`, `RUNNING` or `LANDED`) and the status line in `log.jsonl` that moved it out of `PROPOSED`
+// with the developer's words beside the move (RD.DEVEX.WORKSPACE.278).
 //
-// PARITY IS CHECKED AGAINST THE PYTHON CALLED DIRECTLY, not through the dispatcher: through the
-// dispatcher the Python says nothing at all, which is finding F9 and the reason for the port. So the
-// comparison is against its plain-text output, which is the verdict it was always trying to give.
+// EVERY WARNING IS READ FOR WHAT IT ASKS. A note that still asks for the retired `- **<date> — go.**` line
+// sends the agent to write a form nothing reads, so a warning case passes only when its note names the
+// command that records a go, and never the old line.
 import { execFileSync } from "node:child_process";
 import { workspace } from "../../../helpers/fixture.mjs";
-
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { bindNamed } from "../../../../src/scripts/lib/window.ts";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
-const SCRIPTS = resolve(HOOKS, "scripts");
-const EVENTS = resolve(HOOKS, "src", "scripts", "events");
+const OWN = "001-a-subject";
+const OTHER = "002-another-subject";
 
-// THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
-// name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
-// arcs — because what they prove is that the check agrees with the incumbent ON THE CORPUS, and a
-// corpus cannot be invented. A partner holds the plugin without the workspace and runs
-// `partner-shape.ts` instead, which needs nothing but the plugin itself.
-const WORKSPACE = resolve(HOOKS, "..", "..", "..");
+// The log lines the commands write, by the words `row write` puts in each.
+const AT = "2026-10-24T20:05+05:30";
+const opened = { at: AT, kind: "opened", row: null, note: "opened as PROPOSED" };
+const go = { at: AT, kind: "status", row: null, note: "PROPOSED → DECIDED · the developer, 24 Oct: 'good to go'" };
+const goWithoutWords = { at: AT, kind: "status", row: null, note: "PROPOSED → DECIDED" };
+const runs = { at: AT, kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" };
+const lands = { at: AT, kind: "status", row: null, note: "RUNNING → LANDED" };
+const reopened = { at: AT, kind: "status", row: null, note: "DECIDED → PROPOSED · rows 4 to 6 are new scope" };
+const added = { at: AT, kind: "added", row: "1", note: "write the book" };
+// An arc opened straight at DECIDED, as one go opens every step's arc (RD.DEVEX.WORKSPACE.280): the opening
+// write's `--note` replaces the command's own `opened as <status>`, so the words are the go.
+const openedOnAGo = { at: AT, kind: "opened", row: null, note: "decided on N001's go, the developer, 24 Oct: 'all arcs are ready'" };
+const openedDecidedBare = { at: AT, kind: "opened", row: null, note: "opened as DECIDED" };
 
-// THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
-// deletes `hooks/scripts/`, every case runs both implementations and requires them to agree. After
-// that the Python is not there to run, and each case still asserts what the port itself must decide
-// — which is the half that outlives the port.
-const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
+/** An arc's data and log, as the `workstream` commands write them. */
+function arc(folder, status, lines) {
+  const data = { schemaVersion: 1, arc: "N001", subject: "a-subject", title: "a subject", goal: null, status, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "write the book", kind: "change", state: "waiting" }] };
+  return {
+    [`.spndevex/${WORKSTREAMS}/open/${folder}/arcs/N001/state.json`]: `${JSON.stringify(data, null, 2)}\n`,
+    [`.spndevex/${WORKSTREAMS}/open/${folder}/arcs/N001/log.jsonl`]: lines.map((line) => JSON.stringify(line)).join("\n") + "\n",
+  };
+}
 
-
-const arc = (go) =>
-  "# Arc — a subject\n\nStatus: **RUNNING**\n\n## Log\n\n- **2026-09-18 — opened.** Split out.\n" +
-  (go ? "- **2026-09-18 — go.** The developer said finish it.\n" : "");
-
-function build(name, go) {
+function build(name, { status, lines, other }) {
   return workspace(name, {
-    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`]: arc(go),
+    ...arc(OWN, status, lines),
+    ...(other ? arc(OTHER, other.status, other.lines) : {}),
     "spn-support-ts/src/existing.ts": "export const x = 1;\n",
   });
 }
@@ -47,21 +54,6 @@ function ts(payload, cwd) {
   } catch (e) { return `ERROR: ${e.stderr ?? e.message}`; }
 }
 
-function py(payload, cwd) {
-  // The incumbent runs only while it is installed. After the reinstall deletes
-  // `hooks/scripts/` there is nothing to compare against, and the case still asserts its own
-  // expectation — which is the half that outlives the port.
-  if (!hasPython("confirmed.py")) return null;
-  try {
-    return execFileSync("python3", ["-c", `
-import importlib.util, json, sys
-spec = importlib.util.spec_from_file_location("confirmed", "${SCRIPTS}/confirmed.py")
-m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-m.gate_confirmed(json.load(sys.stdin))
-`], { input: JSON.stringify(payload), encoding: "utf8", cwd }).trim();
-  } catch (e) { return `ERROR: ${e.stderr ?? e.message}`; }
-}
-
 const noteOf = (out) => {
   if (!out) return "";
   try { const p = JSON.parse(out.split("\n").filter(Boolean).at(-1));
@@ -69,39 +61,56 @@ const noteOf = (out) => {
   catch { return out; }
 };
 
+// A warning names the command that records a go, and never the line form the arcs left at N002.
+const RECORDS_A_GO = "workstream row write <arc> --status DECIDED --note";
+const RETIRED_LINE = "— go.**";
+const asksForTheCommand = (note) => note.includes(RECORDS_A_GO) && !note.includes(RETIRED_LINE);
+
 let n = 0, failed = 0;
-function one(label, { go, path, session, tool = "Write" }, expect) {
+function one(label, { status = "PROPOSED", lines = [opened], other, own, path = "spn-support-ts/src/probe.ts", tool = "Write", names }, expect) {
   n += 1;
-  const root = build(`confirmed-${n}`, go);
-  // A SEPARATE SESSION ID PER IMPLEMENTATION. The warning is once per session, remembered on disk,
-  // so whichever ran first would silence the other and the comparison would read as a mismatch.
-  const payload = (who) => ({ tool_name: tool, cwd: root, session_id: `${session ?? `s${n}`}-${who}`,
-                    tool_input: tool === "Bash" ? { command: "ls" } : { file_path: path, content: "x" } });
-  const tsNote = noteOf(ts(payload("ts"), root));
-  const pyNote = py(payload("py"), root);
-  const spoke = Boolean(tsNote);
-  const agrees = pyNote === null || (spoke === Boolean(pyNote) && (!spoke || tsNote === pyNote));
-  const ok = spoke === (expect === "note") && agrees;
+  const root = build(`confirmed-${n}`, { status, lines, other });
+  const session = `s${n}`;
+  // A window that works on one workstream is bound to it, as a prompt naming it binds it (RD.DEVEX.WORKSPACE.236).
+  if (own) bindNamed(root, session, own, "prompt");
+  const payload = { tool_name: tool, cwd: root, session_id: session,
+                    tool_input: tool === "Bash" ? { command: "ls" } : { file_path: path, content: "x" } };
+  const note = noteOf(ts(payload, root));
+  const spoke = Boolean(note);
+  const worded = !spoke || (asksForTheCommand(note) && (!names || note.includes(names)));
+  const ok = spoke === (expect === "note") && worded;
   if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}\n        expect ${expect} · ts ${spoke ? "note" : "silent"} · py ${pyNote === null ? "not installed" : pyNote ? "note" : "silent"} · words match ${agrees}`);
-  if (!ok) console.log(`        ts: ${tsNote.slice(0, 200)}\n        py: ${(pyNote ?? "").slice(0, 200)}`);
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}\n        expect ${expect} · ${spoke ? "note" : "silent"}${spoke ? ` · names the command ${worded}` : ""}`);
+  if (!ok && spoke) console.log(`        note: ${note.slice(0, 260)}`);
   return root;
 }
 
 console.log("\n=== confirmed");
-// KNOWN-BAD
-one("a repository write with no go recorded", { go: false, path: "spn-support-ts/src/probe.ts" }, "note");
-one("a write into a second repository, still no go", { go: false, path: "spn-platform-ts/src/a.ts" }, "note");
-// UNTOUCHED
-one("the same write once an arc logs a go", { go: true, path: "spn-support-ts/src/probe.ts" }, "silent");
-one("writing the plan itself is how a go is earned", { go: false, path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md` }, "silent");
-one("wiring the window is not executing the plan", { go: false, path: ".claude/settings.json" }, "silent");
-one("reading a repository file is not writing to it", { go: false, path: "spn-support-ts/src/existing.ts", tool: "Read" }, "silent");
-one("a Bash call carries no file_path", { go: false, tool: "Bash" }, "silent");
+// KNOWN-BAD — no arc holds a go, so the first repository write warns and asks for the command.
+one("a PROPOSED arc: a plan the agent wrote is no go", { status: "PROPOSED", lines: [opened, added] }, "note");
+one("a write into a second repository, still no go", { status: "PROPOSED", path: "spn-platform-ts/src/a.ts" }, "note");
+one("DECIDED in state.json with no status line in its log", { status: "DECIDED", lines: [opened, added] }, "note");
+one("a move out of PROPOSED with no words beside it", { status: "DECIDED", lines: [opened, goWithoutWords] }, "note");
+one("reopened for new scope: the go before it does not cover the move after", { status: "DECIDED", lines: [opened, go, reopened, goWithoutWords] }, "note");
+one("an arc opened at DECIDED with no words of the developer's", { status: "DECIDED", lines: [openedDecidedBare] }, "note");
+one("opened on a go, then moved back to PROPOSED and on with no words", { status: "DECIDED", lines: [openedOnAGo, reopened, goWithoutWords] }, "note");
+one("a go in another window's workstream licenses nothing here",
+  { status: "PROPOSED", own: OWN, other: { status: "RUNNING", lines: [opened, go, runs] }, names: OWN }, "note");
+// UNTOUCHED — an arc holds the developer's go.
+one("a DECIDED arc whose log holds the go with the developer's words", { status: "DECIDED", lines: [opened, go] }, "silent");
+one("a RUNNING arc, decided with words and then started", { status: "RUNNING", lines: [opened, go, runs] }, "silent");
+one("an arc opened at DECIDED with the developer's words", { status: "DECIDED", lines: [openedOnAGo, added] }, "silent");
+one("an arc opened on a go and since started", { status: "RUNNING", lines: [openedOnAGo, runs] }, "silent");
+one("a LANDED arc keeps its go", { status: "LANDED", lines: [opened, go, runs, lands] }, "silent");
+one("a window's own workstream holds the go", { status: "RUNNING", lines: [opened, go, runs], own: OWN }, "silent");
+one("writing the plan itself is how a go is earned", { path: `.spndevex/${WORKSTREAMS}/open/${OWN}/notes/N001/plan.md` }, "silent");
+one("wiring the window is not executing the plan", { path: ".claude/settings.json" }, "silent");
+one("reading a repository file is not writing to it", { path: "spn-support-ts/src/existing.ts", tool: "Read" }, "silent");
+one("a Bash call carries no file_path", { tool: "Bash" }, "silent");
 
 // The no-nag rule needs two writes in ONE workspace and ONE session, so it is run on its own.
 {
-  const root = build("confirmed-nag", false);
+  const root = build("confirmed-nag", { status: "PROPOSED", lines: [opened] });
   const payload = { tool_name: "Write", cwd: root, session_id: "same-session",
                     tool_input: { file_path: "spn-support-ts/src/probe.ts", content: "x" } };
   const first = noteOf(ts(payload, root));
