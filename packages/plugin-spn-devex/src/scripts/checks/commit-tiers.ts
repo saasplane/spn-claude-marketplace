@@ -194,11 +194,18 @@ export function contentHash(entries: Map<string, string>, folder: string): strin
   return createHash("sha256").update(lines.join("")).digest("hex");
 }
 
-/** The node of a path: the nearest folder at or above it, up to the repository's top, that holds a manifest. */
+/**
+ * The node of a path: the nearest folder at or above it, up to the repository's top, that holds a manifest. An
+ * apps node is a project, so its `spkind.json` stands beside a `package.json`; an app-owned module has the manifest
+ * alone, its cases run with its app, and its files count toward the app's run.
+ */
 function nodeOf(top: string, path: string): { folder: string; manifest: string } | null {
   let folder = dirname(join(top, path));
   for (;;) {
-    for (const manifest of MANIFESTS) if (existsSync(join(folder, manifest))) return { folder: relative(top, folder) || ".", manifest };
+    for (const manifest of MANIFESTS) {
+      const project = manifest !== "spkind.json" || existsSync(join(folder, "package.json"));
+      if (project && existsSync(join(folder, manifest))) return { folder: relative(top, folder) || ".", manifest };
+    }
     if (folder === top || !folder.startsWith(top + sep)) return null;
     folder = dirname(folder);
   }
@@ -296,7 +303,7 @@ export function checkCommitTiers(payload: Payload): Verdict {
       const tiers = gaps.filter((one) => one.folder === gap.folder).map((one) => one.tier).join(", ");
       lines.push(`- \`${gap.folder}\` (${tiers}): ${gap.reason}. Run \`spnutils infra test commit ${name}\`.`);
     } else {
-      lines.push(`- \`${gap.folder}\`, ${gap.tier}: ${gap.reason}. Run \`spnutils apps test ${gap.tier} commit-${gap.tier} -p ${name}\`.`);
+      lines.push(`- \`${gap.folder}\`, ${gap.tier}: ${gap.reason}. Run \`spnutils apps test ${gap.tier} commit-${gap.tier} ${name}\`.`);
     }
   }
   return {

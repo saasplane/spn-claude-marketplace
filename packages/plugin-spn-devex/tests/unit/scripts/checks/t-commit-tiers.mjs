@@ -70,6 +70,7 @@ const denial = (verdict) => verdict?.deny ?? "";
 function appsRepo(name, kind = "SUPPORT_WEB") {
   const repo = repository(name, {
     "pkg/spkind.json": JSON.stringify({ kind, name: "Pkg", config: { mtype: kind } }),
+    "pkg/package.json": JSON.stringify({ name: "pkg", private: true }),
     "pkg/src/a.ts": "export const a = 1;\n",
     "pkg/tests/unit/a.spec.ts": "it('a', () => {});\n",
     "pkg/docs/readme.txt": "docs\n",
@@ -93,6 +94,21 @@ console.log("=== a commit that touches no tier passes");
   ok("[MKT.HOOKS.63] a dry run commits nothing and is left out", readCommits("git commit --dry-run -m x", repo).length === 0);
 }
 
+console.log("\n=== an app-owned module is part of its app's run");
+{
+  const repo = repository("app-module", {
+    "app/spkind.json": JSON.stringify({ kind: "APP_WEB", name: "App", config: { mtype: "APP_WEB" } }),
+    "app/package.json": JSON.stringify({ name: "app", private: true }),
+    "app/src/modules/site/spkind.json": JSON.stringify({ kind: "MODULE_WEB", name: "Site", config: { mtype: "MODULE_WEB" } }),
+    "app/src/modules/site/entry/page.ts": "export const page = 1;\n",
+  });
+  write(repo, { "app/src/modules/site/entry/page.ts": "export const page = 2;\n" });
+  git(repo, "add", "app/src/modules/site/entry/page.ts");
+  const refused = checkCommitTiers(commit(repo));
+  ok("[MKT.HOOKS.64] a change in a module with a manifest and no package.json asks for its app's tiers, by the app's name",
+    denial(refused).includes("`app`, component") && denial(refused).includes("spnutils apps test component commit-component app") && !denial(refused).includes("site"), denial(refused));
+}
+
 console.log("\n=== a touched node without a whole, green run on this content is refused, naming its command");
 {
   const none = appsRepo("no-stamp");
@@ -100,8 +116,8 @@ console.log("\n=== a touched node without a whole, green run on this content is 
   const refused = checkCommitTiers(commit(none));
   ok("[MKT.HOOKS.64] a node with no run file is refused", verdictOf(refused) === "deny", JSON.stringify(refused));
   ok("[MKT.HOOKS.64] the refusal names the node, the tier and the command to run",
-    denial(refused).includes("`pkg`, unit") && denial(refused).includes("spnutils apps test unit commit-unit -p pkg"), denial(refused));
-  ok("[MKT.HOOKS.64] and every tier the kind owes, one line each", denial(refused).includes("`pkg`, component") && denial(refused).includes("spnutils apps test component commit-component -p pkg"), denial(refused));
+    denial(refused).includes("`pkg`, unit") && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
+  ok("[MKT.HOOKS.64] and every tier the kind owes, one line each", denial(refused).includes("`pkg`, component") && denial(refused).includes("spnutils apps test component commit-component pkg"), denial(refused));
 
   const bare = appsRepo("bare-run");
   stageSource(bare);
@@ -134,7 +150,7 @@ console.log("\n=== a touched node without a whole, green run on this content is 
   writeFileSync(runFile, JSON.stringify({ run: "r1", tier: "UNIT", phase: null, ranAt: "2026-10-23T21:00:00Z", env: "local", results: [] }), "utf8");
   const refused = checkCommitTiers(commit(empty));
   ok("[MKT.HOOKS.64] a run with no results is refused like a red one, naming its command",
-    denial(refused).includes("proved nothing") && denial(refused).includes("spnutils apps test unit commit-unit -p pkg"), denial(refused));
+    denial(refused).includes("proved nothing") && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
 }
 
 console.log("\n=== a whole green stamped run on exactly this content passes");
@@ -196,7 +212,7 @@ console.log("\n=== a commit by path is read from the working tree of the named p
   const carried = join(BASE, "by-path-shadow");
   mkdirSync(carried, { recursive: true });
   git(carried, "init", "-q");
-  write(carried, { "pkg/spkind.json": JSON.stringify({ kind: "SUPPORT_WEB", name: "Pkg", config: { mtype: "SUPPORT_WEB" } }), "pkg/src/a.ts": "export const a = 5;\n",
+  write(carried, { "pkg/spkind.json": JSON.stringify({ kind: "SUPPORT_WEB", name: "Pkg", config: { mtype: "SUPPORT_WEB" } }), "pkg/package.json": JSON.stringify({ name: "pkg", private: true }), "pkg/src/a.ts": "export const a = 5;\n",
     "pkg/tests/unit/a.spec.ts": "it('a', () => {});\n", "pkg/docs/readme.txt": "docs\n", "pkg/README.md": "# pkg\n" });
   git(carried, "add", "-A");
   const content = indexHash(carried, "pkg");
