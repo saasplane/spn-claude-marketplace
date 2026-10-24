@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "f124a580"
+      "seen": "361bf374"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "b23f563b"
+      "seen": "a8e715ce"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Source Control — Stack-Agnostic
 
-What a repository declares about itself, the branches every repository carries, how a change moves up and what stops it, and the shape of a repo task. Apply this in any stack and in any repository. Source of truth: the foundation's `02-constructs/01-devex/01-function/02-scm.md` and `04-capabilities/01-devex/01-function/02-scm.md`. Where this restatement and those disagree, the sources win and this file is regenerated.
+What a repository declares about itself, the branches every repository carries, how a change moves up and what stops it, the delivery path every repository carries, and the shape of a repo task. Apply this in any stack and in any repository. Source of truth: the foundation's `02-constructs/01-devex/01-function/02-scm.md` and `04-capabilities/01-devex/01-function/02-scm.md`. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## The stages, and where this one sits
 
@@ -105,12 +105,42 @@ feat/* · fix/* · chore/*  ──►  develop  ──►  qa  ──►  uat  �
 
 Protection rules are not conventions a team agrees to follow. They are protection rules the repository host enforces on every branch, applied as state a command converges rather than as a habit somebody remembers.
 
-- Every change **MUST** arrive by pull request, with at least one approval, and new commits **MUST** dismiss stale approvals. There are no direct pushes.
+- Every change **MUST** arrive by pull request, with at least one approval and its code owner's review, and new commits **MUST** dismiss stale approvals. There are no direct pushes.
+- Every check the repository's world requires **MUST** pass before a pull request merges. Each check is bound to GitHub Actions, so only a job can meet it, never a status somebody posts.
 - Promotion **MUST** move one rung at a time.
 - A permanent branch **MUST NOT** be deleted or force-pushed. `main` additionally requires linear history.
 - A `hotfix/*` branch **MUST** branch from `main`, merge back into `main`, and then be back-merged down through `uat` to `develop`. Skip the back-merge and the next change promoted from `develop` quietly removes the fix — the outage returns with no sign of why.
 
-**Two access tiers exist, and nothing between them.** `git-admin` grants write access and the ability to bypass the protection rules, for emergencies only, and the bypass is visible. `git-dev` grants write access with no bypass at all, for everyone doing ordinary work. A middle tier would be a way to be partly exempt, which is a state nobody can reason about during an incident.
+**Two access tiers exist, and nothing between them.** `git-admin` grants write access, and may bypass review only by merging a pull request (`bypass_mode: pull_request`), never by pushing; the host records every bypass. `git-dev` grants write access with no bypass at all, for everyone doing ordinary work. **Neither tier bypasses a required check — MUST.** A middle tier would be a way to be partly exempt, which is a state nobody can reason about during an incident.
+
+**Each branch carries two rulesets, because a bypass actor reaches every rule in its ruleset.** `<branch>-protection` holds review and the branch rules, and `git-admin` may bypass it by pull request. `<branch>-checks` holds the required checks and has no bypass actor, so a failing check blocks the merge for every caller, administrators included. Review keeps its bypass because GitHub never lets an author approve their own pull request: with one member, a review nobody may bypass would block every merge. A solo merge still arrives by pull request, passes every check and is recorded, and review becomes real the day a second member joins, with no change to any ruleset.
+
+## The delivery path
+
+Every repository carries three files that make its delivery path evidence: what runs on every change, who reviews what, and how a weakness is reported. `spnutils repo agent-sync` writes all three from the repository's world, each whole and only when its content changes; `spnutils workspace agent-sync` writes them in every member. Each lands through a pull request, and lands before `repo create` requires its checks, so no pull request waits on a check that does not exist yet.
+
+| File | Holds |
+| --- | --- |
+| `.github/workflows/checks.yml` | one job for each check the world requires, run on every pull request and every push to a permanent branch |
+| `.github/CODEOWNERS` | `git-dev` owns every path; `git-admin` owns `.github/`, `SECURITY.md` and `sprepo.json`, the files that decide how code is checked, reviewed and reported |
+| `SECURITY.md` | how to report a weakness, what happens next and by when, restating the trust chapter's findings rule |
+
+**A job's id is the name of the check the rulesets require**, so one list per world answers both the workflow and the ruleset.
+
+| Check | What it runs | `APPS` | `INFRA` | `FOUNDATION` | `GENERAL` |
+| --- | --- | --- | --- | --- | --- |
+| `test` | the stack's tiers that need no running stack: unit, component and contract in TS; `spnutils infra test` in an estate | runs | runs | — | runs where the root declares a `test` script |
+| `lint` | each project's check target, which typechecks and lints, in TS; `tofu fmt -check` in an estate | runs | runs | — | — |
+| `code-scan` | Semgrep CE with its default rules, failing on any finding | runs | — | — | runs |
+| `dependency-scan` | OSV-Scanner over every lockfile in the tree | runs | — | — | runs |
+| `secret-scan` | TruffleHog over the commits the change adds | runs | runs | runs | runs |
+| `stack-scan` | ZAP's baseline scan of each app the repository ships, served by the local stack of the platform it pins | runs | — | — | — |
+| `cis-scan` | Checkov's Terraform checks, the CIS AWS Foundations Benchmark's among them, over the modules | — | runs where the repository holds modules | — | — |
+
+- **A check that cannot fail is not written — MUST.** A `FOUNDATION` repository holds no code, so it runs only the secret scan. An `INFRA` repository with no modules gets no `cis-scan`, because a scan over nothing passes and proves nothing.
+- **Every action is pinned by its commit and every image by its digest, with its release written beside it — MUST.** A tag can be moved to other code after it was reviewed, and a commit cannot. `spnutils` is installed at a named release. The workflows a repository already runs — a release, a site deploy, an estate's plan and apply — follow the same rule.
+- **`SECURITY.md` names a security address only where an organization reaches the repository.** The workspace sweep passes the estate's organization to the members nothing else connects to it.
+- **A plan that enforces no rulesets is named, never hidden.** The files still land and every check still runs and reports, but nothing blocks a merge, so `repo create` names both rulesets as not enforced and the plan as the reason.
 
 ### A hotfix travels the same rungs, faster
 
@@ -182,13 +212,15 @@ Read `tasks/` as a home, not a backlog. An empty `tasks/` is not the goal.
 spnutils repo create <name> [--from <org-package>[@version]]
 ```
 
-Creates the repository in the bound repository host if it does not exist, and brings it to the standard — branches, protections, team access. Safe to run again: a repository already at the standard is unchanged, and one that has drifted is brought back. It takes its organization context from the current repository's pin, or from `--from` when starting outside one, and it refuses by name before the organization layer of the estate has been created.
+Creates the repository in the bound repository host if it does not exist, and brings it to the standard — branches, protections, the checks its world requires, team access. Safe to run again: a repository already at the standard is unchanged, and one that has drifted is brought back. It takes its organization context from the current repository's pin, or from `--from` when starting outside one, and it refuses by name before the organization layer of the estate has been created. It reads the world from `sprepo.json` on the default branch, and a repository with none gets no checks ruleset, which the command says by name.
 
 ```text
 spnutils repo agent-sync
 ```
 
-Reads `sprepo.json` and converges the agent wiring that world implies: marketplace registration, the plugin set, the managed instruction block, the generated rules beside it, and the permission tiers. One path covers a checkout that was never wired and one that has drifted. Nothing is written into your machine-wide agent settings.
+Reads `sprepo.json` and converges the agent wiring that world implies: marketplace registration, the plugin set, the managed instruction block, the generated rules beside it, the permission tiers, and the three files of the delivery path. One path covers a checkout that was never wired and one that has drifted. Nothing is written into your machine-wide agent settings.
+
+**The two commands never meet, and the order between them matters.** `repo create` works through the host's API and never opens the checkout; `repo agent-sync` writes the checkout and never calls the host. Merge the delivery path's files first, then let `repo create` require their checks — the other order blocks every pull request on a check that does not exist yet.
 
 **The `repo` command group means repository-level change, never the content of code, tests or documents — MUST.** That includes both provider-side things (branches, teams, protection rules) and working-tree-side things (skeletons, settings, agent wiring). The stage is named `SCM`; the command group is named `repo`, and the group is wider than the stage on purpose.
 
@@ -197,6 +229,8 @@ Reads `sprepo.json` and converges the agent wiring that world implies: marketpla
 | If you… | Then |
 | --- | --- |
 | skip a rung on promotion | the protection rules refuse the merge — there is no urgency exception |
+| merge while a required check is red | the checks ruleset refuses it for every caller — fix the finding, never ask for a bypass |
+| pin an action by its tag | the code a reviewer approved can be swapped under the same name — pin it by its commit |
 | rebuild an artifact per environment | the new artifact invalidates every test the old one passed, and "what is running in production" stops tracing to one build |
 | write a config claim in a `FOUNDATION`, `INFRA` or `GENERAL` repository | there is nothing for the claim to be about — write `null` instead |
 | reconstruct a repo task's steps instead of invoking it | you bypass every gate inside it |

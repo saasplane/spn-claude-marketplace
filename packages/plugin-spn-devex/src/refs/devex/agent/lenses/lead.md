@@ -20,7 +20,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "b23f563b"
+      "seen": "a8e715ce"
     }
   ],
   "decisions": [
@@ -87,7 +87,7 @@
 
 ## Produces to
 
-- **The paved road and the repo standard** — held by `spnutils repo` and the branch protections it writes.
+- **The paved road and the repo standard** — held by `spnutils repo`, the branch protections it writes, and the delivery path's checks that no one may bypass.
   - **Is this the right work, in the right order among other work, at the right size?** The lead orders pieces of work against each other and judges how large one should be (`RD.DEVEX.AGENT.087`). The order of the steps inside one piece of work is `ARCHITECT`'s, so two lenses never order the same thing.
   - **Should this be built at all?** Every need enters the ladder and descends only with justification: use what exists, extend by configuration, generalize into a platform capability, build domain-specific, and customer-specific only as a governed, recorded exception. If a second product would need it, it is platform.
   - **Is this the smallest design that meets the requirement?** Simplicity is a budget: every abstraction and layer spends complexity the team repays forever. Pick the smaller when two designs both work.

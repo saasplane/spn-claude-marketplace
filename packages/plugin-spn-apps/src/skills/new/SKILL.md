@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "f124a580"
+      "seen": "361bf374"
     }
   ]
 }
@@ -31,7 +31,7 @@ A new platform monorepo — the workspace root, which declares `sprepo.json` `{ 
 
 Then:
 
-1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, team access). Idempotent.
+1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, the checks its world requires, team access). Idempotent.
 2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the repository's one docs tree — the shape below; a node scaffolded afterwards carries no docs tree of its own) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.FUNCTION.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
 3. **Agent wiring**: `spnutils repo agent-sync` (alias `as`). The marketplace source follows the mode the place implies, so nothing is passed — a builder wires the checkout, a partner does not hold, and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-devex@saasplane` + `spn-apps@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
 4. **Local infra**: `spnutils infra organization up --apply` (once per machine) → `spnutils infra platform up <spc> --apply`, where `<spc>` is the platform code `sprepo.json` pins — see the `run` skill local mode.

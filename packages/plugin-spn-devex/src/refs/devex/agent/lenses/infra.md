@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "b23f563b"
+      "seen": "a8e715ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
@@ -92,7 +92,8 @@
   - **Nothing is named by hand.** Every name, address and identifier is derived from the declared variables and composition rules.
   - **The change runs locally first.** A full platform comes up on a developer's machine from the same manifests; a capability that cannot come up under `infra` is not done.
   - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
-  - **Promotion is the branch map's.** Where a change deploys is manifest data (`branchMap`), one rung at a time, by pull request.
+  - **Promotion is the branch map's.** Where a change deploys is manifest data (each environment row's `deploy` trigger), one rung at a time, by pull request, and a pull request merges only once every check its world requires passes.
+  - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RD.DEVEX.FUNCTION.065`).
   - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RD.DEVEX.FUNCTION.060`).
   - **A repo-scoped script stays, is promoted or retires**, and a script that probes the estate for a fact a manifest declares only retires — promoting it makes the workaround permanent (`RD.SUPPORT.APPS.121`).
   - **Destructive operations are named and gated**: teardown, reset and migration confirm before they mutate and report what they did.

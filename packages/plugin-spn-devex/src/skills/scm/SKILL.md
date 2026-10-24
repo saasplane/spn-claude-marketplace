@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "f124a580"
+      "seen": "361bf374"
     }
   ]
 }
@@ -67,7 +67,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 ## Wiring a repo for agents
 
-`agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
+`agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. It also writes the delivery path the world implies: `.github/workflows/checks.yml`, `.github/CODEOWNERS` and `SECURITY.md`. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state. Read `refs/devex/function/scm.md` § The delivery path for the checks each world runs.
 
 **A stack-agnostic command reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A command that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
 
@@ -116,6 +116,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 - **A directory name is not a declaration.** Naming a folder after a kind does not make a project that kind, and validate will say so.
 - **Structure is a rule, not a preference.** Where a project deviates, either the project is fixed or the kind's profile changes deliberately — never a local exception that the next reader has to learn.
 - **A new kind is a recorded decision**, not an addition someone makes while scaffolding.
+- **A red required check is fixed, never bypassed.** The checks ruleset has no bypass actor, so nobody merges past a failing check, administrators included.
 
 ## Repo tasks — invoke, never reconstruct
 
