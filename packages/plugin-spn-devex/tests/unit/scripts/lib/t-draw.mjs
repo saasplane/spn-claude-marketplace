@@ -1465,12 +1465,12 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
   one("`items.type` `STATS`, a `borderType` the design system lacks, `divided` on a `DSFeature`, and `grid` on another frame are findings",
     [feature({ items: { type: "STATS" } }, GRID).findings, feature({ items: { borderType: "DOTTED" } }, GRID).findings, feature({ divided: true }, LIST).findings,
       draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", grid: { borderType: "GRID" }, rows: [HEAD()] } }] }] } }).findings,
-      gsec({ grid: { borderType: "GRID", desktop: 3 } }, CELLS).findings],
+      gsec({ grid: { borderType: "GRID", columns: 3 } }, CELLS).findings],
     ([stats, dotted, divided, elsewhere, columns]) => says("`items.type` is `STATS`, and a skeleton draws GRID · LIST")(stats)
       && says("a feature's `items.borderType` is `DOTTED`, and it takes NONE · GRID · EDGE")(dotted)
       && says("a `DSFeature`'s lines are its `items.type` `LIST` or its `items.borderType`")(divided)
       && says("`grid` is a field of a `DSFeatureGridSectionContainer`, and this frame is `DSSectionContainer`")(elsewhere)
-      && says("`desktop` is no field of a grid section's `grid`")(columns));
+      && says("`columns` is no field of a grid section's `grid`")(columns));
 
   // 2 · `items.numbered`: a number before each item's title, in the order the rows are read
   const numbered = feature({ items: { type: "LIST", numbered: true } }, [HEAD(), { items: [{ frame: { rows: LIST.slice(0, 2) } }, { slot: "mediaNode · the setup screen", fill: true }] }, LIST[2]]);
@@ -1559,6 +1559,131 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
     { items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", rows: [{ items: [{ head: { title: "Built for messy data" } }] }, { items: [GCELL("Entity resolution"), GCELL("Your schema")] }] } }] }] } }] };
   one("a feature, a split, its item rows and a grid section written with none of these fields draw byte for byte as before",
     createHash("sha256").update(draw(AS_BEFORE).svg).digest("hex"), "c59e5a3e39549f0f1f202dbf5fcc598c4d65cefa57a0db1d6742d290af2db362");
+}
+
+console.log("=== SKELETON — an item's and a head's parts, and a grid's columns (RD.DEVEX.WORKSPACE.294 to .299)");
+{
+  /** Every rect of one class, as [x, y, width, height, corner]. */
+  const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const circles = (g, cls) => [...g.matchAll(new RegExp(`<circle class="${cls}" cx="([\\d.]+)" cy="([\\d.]+)" r="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const wordsAt = (g, words) => [...g.matchAll(/<text class="([^"]+)" x="([\d.]+)" y="([\d.]+)"[^>]*>([^<]*)</g)].map((m) => ({ cls: m[1], x: Number(m[2]), y: Number(m[3]), words: m[4] })).find((t) => t.words === words);
+  /** The glyph strokes, each as its list of [x, y] points. */
+  const strokes = (g) => [...g.matchAll(/<path class="sds-skel-glyph" d="([^"]+)"/g)].map((m) => m[1].split(/ (?=M)/).map((run) => [...run.matchAll(/[ML]([\d.]+) ([\d.]+)/g)].map((p) => [Number(p[1]), Number(p[2])])));
+  const viewBox = (g) => g.match(/viewBox="([^"]+)"/)[1];
+  const feature = (look, rows) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", rows, ...look } }] }] } });
+  const LINE = (line, extra = {}) => ({ items: [{ item: { title: "Live status", description: "Paid, packed or shipped", ...line }, fill: true, ...extra }] });
+
+  // 1 · an item's media in `IDSItemMedia`'s kinds: `ICON` bare, as large as the title on its first line; `MARK` as the word draws it
+  const bare = feature({}, [LINE({ media: { mtype: "ICON", node: "add" } })]), marked = feature({}, [LINE({ media: "add" })]);
+  const bareTitle = wordsAt(bare.svg, "Live status"), [[, top], [, foot]] = strokes(bare.svg)[0]?.[0] ?? [[0, 0], [0, 0]];
+  one("an item's `media` `ICON` is a bare icon: its shape with no circle and no square round it, as large as the title and centred on the title's line, and no finding",
+    [bare.findings, circles(bare.svg, "sds-skel-control").length, boxes(bare.svg, "sds-skel-control").length, foot - top, (top + foot) / 2, bareTitle.y, circles(marked.svg, "sds-skel-control").length],
+    ([found, rings, squares, tall, centre, titleY, markRings]) => found.length === 0 && rings === 0 && squares === 0 && tall > 8 && tall < 12 && Math.abs(centre - (titleY - 4)) < 1 && markRings === 1);
+  one("a bare icon takes the title's size and a gap, so the title stands nearer the start than beside a mark",
+    [bareTitle.x, wordsAt(marked.svg, "Live status").x, wordsAt(feature({}, [LINE({})]).svg, "Live status").x],
+    ([iconX, markX, plainX]) => iconX === plainX + 16 + 8 && markX > iconX);
+  one("an item's `media` `MARK` draws as the name of its icon does, byte for byte",
+    feature({}, [LINE({ media: { mtype: "MARK", icon: "add" } })]).svg === marked.svg, true);
+  one("a kind an item line does not take, a shape the drawer lacks, and a key the kind does not have are findings",
+    [feature({}, [LINE({ media: { mtype: "AVATAR", title: "Ana Ruiz" } })]).findings, feature({}, [LINE({ media: { mtype: "ICON", node: "rocket" } })]).findings,
+      feature({}, [LINE({ media: { mtype: "ICON", node: "add", src: "x.png" } })]).findings],
+    ([avatar, rocket, src]) => says("an item line's `media` is `AVATAR`, and a skeleton draws ICON · MARK on an item line")(avatar)
+      && says("an item's `media` names `rocket`")(rocket) && says("`src` is no field of an item line's `media`")(src));
+
+  // 2 · a head's own media, a `MARK` or an `AVATAR` over its words, in its level's box
+  const HEADW = (extra = {}, level = "WIDGET") => ({ items: [{ head: { pageLevel: level, title: "Documents", description: "Templates rendered to PDF.", ...extra } }] });
+  const headMark = feature({}, [HEADW({ media: { mtype: "MARK", icon: "add" } })]), headPlain = feature({}, [HEADW()]);
+  const [ring] = circles(headMark.svg, "sds-skel-control");
+  one("a head's `media` `MARK` stands over its words at a `WIDGET`'s box, 40 across, 12 above the title, and moves the words down by both, with no finding",
+    [headMark.findings, ring, wordsAt(headMark.svg, "Documents"), wordsAt(headPlain.svg, "Documents")],
+    ([found, [cx, cy, r], title, plainTitle]) => found.length === 0 && r === 20 && cx - r === plainTitle.x && title.y - plainTitle.y === 52 && cy + r < title.y - 12);
+  one("a `CONTAINER` head's box is 48 across",
+    circles(feature({}, [HEADW({ media: { mtype: "MARK" } }, "CONTAINER")]).svg, "sds-skel-bar").map((c) => c[2]), (g) => g.length === 1 && g[0] === 24);
+  const avatar = feature({}, [HEADW({ media: { mtype: "AVATAR", title: "Ana Ruiz" } })]);
+  one("a head's `media` `AVATAR` is a circle of its initials, with no finding",
+    [avatar.findings, circles(avatar.svg, "sds-skel-control").length, wordsAt(avatar.svg, "AR")], ([found, rings, initials]) => found.length === 0 && rings === 1 && initials && initials.cls === "sds-note");
+  const centredMark = feature({}, [HEADW({ media: { mtype: "MARK", icon: "add" }, textAlign: "CENTER" })]);
+  one("a centred head centres its media", [circles(centredMark.svg, "sds-skel-control")[0], boxes(centredMark.svg, "sds-skel-guide")[0]],
+    ([[cx], box]) => Math.abs(cx - (box[0] + box[2] / 2)) <= 1);
+  one("a head's media at `PAGE` draws nothing over the words and is a finding, since a feature there stands its media beside them; an `ICON` on a head is a finding",
+    [feature({}, [HEADW({ media: { mtype: "MARK" } }, "PAGE")]), feature({}, [HEADW({}, "PAGE")]).svg, feature({}, [HEADW({ media: { mtype: "ICON", node: "add" } })]).findings, feature({}, [HEADW({ media: { mtype: "AVATAR" } })]).findings],
+    ([paged, plainPaged, icon, nameless]) => paged.svg === plainPaged && says("a feature at `PAGE` stands its media beside its words")(paged.findings)
+      && says("a head's `media` is a `MARK` or an `AVATAR`")(icon) && says("a head's `AVATAR` carries the name it stands for in `title`")(nameless));
+
+  // 3 · a `BADGE` eyebrow, drawn as a badge among the facts is, packed above the title
+  const badged = feature({}, [HEADW({ eyebrow: { control: "badge", text: "Recommended" } })]), worded = feature({}, [HEADW({ eyebrow: "Recommended" })]);
+  const pill = boxes(badged.svg, "sds-skel-control").find((b) => b[3] === 16), badgedTitle = wordsAt(badged.svg, "Documents");
+  one("a head's `eyebrow` written as a badge is a badge over the title, its word as written, and no finding",
+    [badged.findings, pill, wordsAt(badged.svg, "Recommended"), wordsAt(badged.svg, "RECOMMENDED"), badgedTitle, wordsAt(worded.svg, "RECOMMENDED")],
+    ([found, box, word, capitals, title, wordedCaps]) => found.length === 0 && box && box[4] === 8 && word && word.cls === "sds-code" && !capitals
+      && box[1] + box[3] < title.y - 12 && wordedCaps);
+  one("the badge's line is a badge's height, so the title stands 6 lower than under words in small capitals",
+    wordsAt(badged.svg, "Documents").y - wordsAt(worded.svg, "Documents").y, 6);
+  one("an `eyebrow` that is neither words nor a badge is a finding", feature({}, [HEADW({ eyebrow: { text: "Alpha" } })]).findings, says("a head's `eyebrow` is words, drawn in small capitals, or a badge"));
+
+  // 4 · `factsPlacement` `AFTER_TITLE`: the facts under the title and over the description
+  const META = { title: "Salesforce", description: "Accounts and contacts, both ways.", meta: ["CRM", "OAuth"] };
+  const afterTitle = feature({}, [LINE({ ...META, factsPlacement: "AFTER_TITLE" })]), afterDescription = feature({}, [LINE(META)]);
+  one("`factsPlacement` `AFTER_TITLE` stands the facts under the title and over the description, and the item keeps its height, with no finding",
+    [afterTitle.findings, wordsAt(afterTitle.svg, "Salesforce").y, wordsAt(afterTitle.svg, "CRM").y, wordsAt(afterTitle.svg, META.description).y, viewBox(afterTitle.svg), viewBox(afterDescription.svg)],
+    ([found, title, facts, description, box, plainBox]) => found.length === 0 && title < facts && facts < description && facts - title === 18 && description - facts === 18 && box === plainBox);
+  const written = feature({}, [LINE({ ...META, factsPlacement: "AFTER_DESCRIPTION" })]);
+  one("`AFTER_DESCRIPTION`, or no `factsPlacement`, stands the facts under the description, as before, with no finding",
+    [written.findings, written.svg === afterDescription.svg, wordsAt(afterDescription.svg, "CRM").y > wordsAt(afterDescription.svg, META.description).y], ([found, alike, under]) => found.length === 0 && alike && under);
+  const badgeFacts = feature({}, [LINE({ ...META, meta: ["CRM", { control: "badge", text: "OAuth" }], factsPlacement: "AFTER_TITLE" })]);
+  one("with a badge among the facts, the badge's line stands between the title and the description",
+    [boxes(badgeFacts.svg, "sds-skel-control").find((b) => b[3] === 16), wordsAt(badgeFacts.svg, "Salesforce").y, wordsAt(badgeFacts.svg, META.description).y],
+    ([badge, title, description]) => badge && badge[1] > title && badge[1] + badge[3] < description - 8);
+  one("a `factsPlacement` the design system lacks is a finding", feature({}, [LINE({ ...META, factsPlacement: "BEFORE_TITLE" })]).findings, says("an item line's `factsPlacement` is `BEFORE_TITLE`, and it takes AFTER_DESCRIPTION · AFTER_TITLE"));
+
+  // 5 · the end arrows, `ARROW_RIGHT` and `ARROW_UP_RIGHT`, drawn bare at the end of the line
+  const arrowed = feature({}, [LINE({ end: [{ icon: "ARROW_RIGHT" }] })]), chevron = feature({}, [LINE({ end: [{ icon: "next" }] })]);
+  const shaft = strokes(arrowed.svg).at(-1)?.[0];
+  one("`ARROW_RIGHT` at the end of an item line is its shape alone, a level shaft with its head, at the line's end, with no finding",
+    [arrowed.findings, boxes(arrowed.svg, "sds-skel-control").length, boxes(chevron.svg, "sds-skel-control").length, shaft, boxes(arrowed.svg, "sds-skel-guide")[0]],
+    ([found, squares, chevronSquares, [[x1, y1], [x2, y2]], box]) => found.length === 0 && squares === 0 && chevronSquares === 1 && y1 === y2 && x2 > x1 && box[0] + box[2] - x2 < 40);
+  const upRight = strokes(feature({}, [LINE({ end: [{ icon: "ARROW_UP_RIGHT" }] })]).svg).at(-1)?.[0];
+  one("`ARROW_UP_RIGHT` rises to the end, for a line that leaves the site", [upRight], ([[[x1, y1], [x2, y2]]]) => x2 > x1 && y2 < y1);
+  one("an end arrow anywhere but an item line's `end` is a finding", feature({}, [{ items: [{ icon: "ARROW_RIGHT" }] }]).findings, says("`ARROW_RIGHT` is the end arrow of an item line, and stands in its `end`"));
+
+  // 6 · a selected item line of a feature's boxed items: a heavier line inside its edge
+  const OPTIONS = [LINE({ title: "Shape", selected: true }), LINE({ title: "Build" })];
+  const chosen = feature({ items: { type: "LIST", surface: { raised: true } } }, OPTIONS);
+  const [mark] = boxes(chosen.svg, "sds-skel-control sds-skel-main"), frames = boxes(chosen.svg, "sds-skel-control").filter((b) => b[4] === 8);
+  one("`selected` on an item line of a feature with `items.surface` draws a heavier line 2 inside its box, which keeps its size, and no finding",
+    [chosen.findings, mark, frames], ([found, inner, outer]) => found.length === 0 && inner && outer.length === 2 && inner[0] === outer[0][0] + 2 && inner[1] === outer[0][1] + 2
+      && inner[2] === outer[0][2] - 4 && inner[3] === outer[0][3] - 4 && inner[4] === 6 && outer[1][3] === outer[0][3]);
+  one("`selected` where the items stand in no box is a finding, since the design system reads it only on boxed items, and draws nothing",
+    [feature({}, OPTIONS), feature({}, [LINE({ title: "Shape" }), LINE({ title: "Build" })]).svg],
+    ([unboxed, plain]) => says("`selected` marks the chosen item line of a `DSFeature` whose `items.surface` boxes its items")(unboxed.findings) && unboxed.svg === plain);
+  one("a `selected` that is not true or false is a finding", feature({ items: { surface: {} } }, [LINE({ selected: "yes" })]).findings, (g) => g.length === 1 && g[0] === "an item line's `selected` is `\"yes\"`, and it takes true or false");
+
+  // 7 · a grid section's `grid.desktop`, `grid.tablet` and `grid.mobile`, each read by the view of its class
+  const GCELL = (title) => ({ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { pageLevel: "WIDGET", title } }] }] } });
+  const gview = (viewport, grid, rows) => ({ viewport, frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", grid, rows } }] }] } });
+  const COLUMNS = { borderType: "GRID", desktop: 2, tablet: 2, mobile: 1 };
+  const fits = draw({ kind: "skeleton", views: [gview("DESKTOP", COLUMNS, [{ items: [GCELL("Documents"), GCELL("Audit log")] }, { items: [GCELL("Notifications"), { spacer: true }] }]),
+    gview("MOBILE", COLUMNS, [{ items: [GCELL("Documents")] }, { items: [GCELL("Audit log")] }])] });
+  one("`grid.desktop`, `grid.tablet` and `grid.mobile` are a grid section's own keys, and each view's rows of cells stand in its class's count, with no finding", fits.findings, none);
+  const off = draw({ kind: "skeleton", views: [gview("DESKTOP", COLUMNS, [{ items: [GCELL("Documents"), GCELL("Audit log"), GCELL("Notifications")] }])] });
+  one("a row of cells that holds another count than its view's class is a finding that names both",
+    off.findings, says("the `DESKTOP` view stands a grid section's cells in `grid.desktop`, 2 columns, and a row of them holds 3"));
+  one("a count that is not a whole number from 1 to 4 is a finding; a spec of one frame has no class, and reads no count",
+    [draw({ kind: "skeleton", views: [gview("DESKTOP", { tablet: 5 }, [{ items: [GCELL("Documents")] }])] }).findings,
+      draw({ kind: "skeleton", frame: { rows: [{ items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", grid: { desktop: 2 }, rows: [{ items: [GCELL("A"), GCELL("B"), GCELL("C")] }] } }] }] } }).findings],
+    ([five, single]) => says("a grid section's `grid.tablet` is `5`, and it takes a whole number of columns, 1 to 4")(five) && single.length === 0);
+
+  // 8 · a spec written with none of these fields draws byte for byte as before (the hash of the drawer before this row)
+  const PARTS_BEFORE = { kind: "skeleton", title: "An item's and a head's parts, as before", views: [{ viewport: "DESKTOP", frame: { size: "XS", rows: [
+    { items: [{ fill: true, frame: { unit: "DSSectionContainer", rows: [{ items: [{ fill: true, frame: { unit: "DSFeature", items: { type: "LIST", surface: { raised: true } }, rows: [
+      { items: [{ head: { eyebrow: "Orders", title: "Every phase has an owner", description: "Choose a phase to see who carries it.", facts: [{ control: "badge", text: "Live" }] } }] },
+      { items: [{ item: { media: "default", title: "Shape", description: "The product lead decides", meta: ["Lead", { control: "badge", text: "Now" }], end: [{ icon: "next" }] }, fill: true }] },
+      { items: [{ item: { media: "person", title: "Build", description: "The developers carry it", meta: ["Team"] }, fill: true }] }] } }] }] } }] },
+    { items: [{ fill: true, frame: { unit: "DSFeatureGridSectionContainer", grid: { borderType: "GRID" }, rows: [{ items: [{ head: { title: "Connect what you already use" } }] },
+      { items: [{ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ icon: "default", mark: true }] }, { items: [{ head: { pageLevel: "WIDGET", eyebrow: "Messaging", title: "Notifications", description: "Email, push and in-app." } }] }] } },
+        { fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ item: { media: "default", title: "Salesforce", description: "Accounts, both ways.", meta: ["CRM", "OAuth"] }, fill: true }] }] } }] }] } }] }] } }] };
+  one("items, heads and a grid section written with none of these fields draw byte for byte as before",
+    createHash("sha256").update(draw(PARTS_BEFORE).svg).digest("hex"), "13af0699d5bb3cd2c98af0c36360558e6dd69867283fea8b2a761d059d930cf3");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

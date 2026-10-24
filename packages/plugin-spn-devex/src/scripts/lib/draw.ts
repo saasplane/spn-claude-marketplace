@@ -67,6 +67,11 @@ export type SkeletonLayout = {
  *  actions stand at the end; `back` is the way back at the start of the title's line. */
 export type SkeletonPage = { item: NonNullable<SkeletonItem["item"]>; actions?: SkeletonItem[]; back?: boolean };
 
+/** A picture in the shape of the design system's `IDSItemMedia`: its kind as `mtype`, and the field that kind draws from. An
+ *  item line takes `ICON`, a bare icon named in `node`, and `MARK`, a mark holding `icon`; a feature's head takes `MARK` and
+ *  `AVATAR`, whose `title` gives its initials. Each shape is one the drawer draws itself. */
+export type SkeletonMedia = { mtype: "ICON" | "MARK" | "AVATAR"; node?: string; icon?: string; title?: string };
+
 /**
  * SKELETON — where the parts of a screen or a block sit, and nothing about how they look
  * (05-artifacts.md § `SKELETON`). An item is plain words, a control, an icon, a slot, a stand-in, a
@@ -100,8 +105,9 @@ export type SkeletonItem = {
   mark?: boolean;
   /** The words of a row of tabs, and the place of the chosen one, counted from 0. */
   tabs?: string[]; chosen?: number;
-  /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. */
-  icon?: "close" | "add" | "menu" | "search" | "more" | "previous" | "next" | "select" | "checkbox" | "bell" | "person" | "default";
+  /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. At the end of an
+   *  item line, `ARROW_RIGHT` and `ARROW_UP_RIGHT` are its end arrows, in `DSIconType`'s names, drawn bare. */
+  icon?: "close" | "add" | "menu" | "search" | "more" | "previous" | "next" | "select" | "checkbox" | "bell" | "person" | "default" | "ARROW_RIGHT" | "ARROW_UP_RIGHT";
   /** What bars stand in for; `lines` counts them, and the indexes in `headings` are shorter, taller heading bars.
    *  A `table` shows sample values in place of bars: `columns` are the words of its head row, and `cells` a few rows.
    *  A cell is a word, or an item that is plain words, a note, an icon or a control. A column with an empty head
@@ -119,12 +125,17 @@ export type SkeletonItem = {
   /** A line in the style of the library's item: a `media`, the name of an icon; a `title`; a `description` under it;
    *  `meta`, several facts on the line under the title, each a word or a badge; and `end`, what stands at the end
    *  of the line. `inline` marks a compact line at the level INLINE: with facts and no description, its facts stand on
-   *  the title's line after a dot ("v3 · Draft"). */
-  item?: { media?: string; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[]; inline?: boolean };
+   *  the title's line after a dot ("v3 · Draft"). `media` given as the name of an icon is a mark; given in `IDSItemMedia`'s
+   *  shape it is a bare icon (`ICON`) or a mark (`MARK`). `factsPlacement` `AFTER_TITLE` stands the facts under the title,
+   *  over the description, and `selected` marks the chosen line of a feature's boxed items. */
+  item?: { media?: string | SkeletonMedia; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[]; inline?: boolean;
+    factsPlacement?: "AFTER_DESCRIPTION" | "AFTER_TITLE"; selected?: boolean };
   /** A feature's head, in the names of `IDSFeatureProps`: its `pageLevel`, which sizes it, `CONTAINER` where it is left out;
-   *  the `eyebrow`, the words over the title; the `title`; the `description` under it; `facts`, each a word or a badge, on
-   *  one line under the description; and `textAlign`, `START` where it is left out. It is one block as tall as its lines. */
-  head?: { pageLevel?: "PAGE" | "CONTAINER" | "WIDGET"; eyebrow?: string; title: string; description?: string; facts?: SkeletonItem[]; textAlign?: "START" | "CENTER" };
+   *  the `eyebrow`, the words over the title, or a badge there; the `title`; the `description` under it; `facts`, each a word
+   *  or a badge, on one line under the description; `textAlign`, `START` where it is left out; and `media`, a `MARK` or an
+   *  `AVATAR` over its words. It is one block as tall as its lines. */
+  head?: { pageLevel?: "PAGE" | "CONTAINER" | "WIDGET"; eyebrow?: string | SkeletonItem; title: string; description?: string; facts?: SkeletonItem[]; textAlign?: "START" | "CENTER";
+    media?: SkeletonMedia };
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
@@ -186,9 +197,10 @@ export type SkeletonFrame = {
    *  stretches to its row. */
   verticalAlign?: "TOP" | "CENTER" | "BOTTOM";
   /** On a `DSFeatureGridSectionContainer`, in its own names: `section`, the section it draws, with a `DSSectionContainer`'s fill and
-   *  room; and `grid.borderType`, the lines between its cells. */
+   *  room; `grid.borderType`, the lines between its cells; and `grid.desktop`, `grid.tablet` and `grid.mobile`, the columns at each
+   *  screen class, which a view reads for its own. */
   section?: { color?: "BASE" | "DEFAULT" | "PRIMARY"; strength?: "SUBTLE" | "QUIET" | "SOLID"; inset?: boolean; size?: "XS" | "SM" | "MD" | "LG" | "XL" };
-  grid?: { borderType?: "NONE" | "GRID" | "EDGE" };
+  grid?: { borderType?: "NONE" | "GRID" | "EDGE"; desktop?: number; tablet?: number; mobile?: number };
 };
 /** A section of the content of a container or a card: its title, the actions at the end of that title, its rows, and
  *  the unit of the design system it is, whose name stands at its corner. A section with a title and no unit is a group,
@@ -1731,6 +1743,12 @@ const SKEL_TABLE_HEAD = 24, SKEL_TABLE_ROW_PAD = 8;
 /** The two lines of an item: its title, and its description under it. */
 const SKEL_ITEM_LINE = 18;
 const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"];
+/** The end arrows of an item line, in `DSIconType`'s own names (RD.DEVEX.WORKSPACE.297): read only in an item line's `end`. */
+const SKEL_END_ARROWS = ["ARROW_RIGHT", "ARROW_UP_RIGHT"];
+/** Where an item line's facts stand against its description, in `DSItemFactsPlacementType`'s words (RD.DEVEX.WORKSPACE.296). */
+const SKEL_FACTS_PLACEMENTS = ["AFTER_DESCRIPTION", "AFTER_TITLE"];
+/** A finding said once, however many times the drawer meets what it names. */
+const skelSay = (findings: string[], message: string): void => { if (!findings.includes(message)) findings.push(message); };
 
 /**
  * THE UNITS A SPEC MAY NAME: every unit the design system's barrel exports (`spn-support-ts`
@@ -1802,6 +1820,7 @@ const skelSectionRoom = (frame: SkeletonFrame): number | undefined => {
  *  `border` is `GRID` or `EDGE`; `across` draws a line between the parts of one row too, as a `GRID` of items and a grid of cells
  *  do, where a `LIST` has one item to a row; `cells` reads rows of `DSFeature` cells, where a feature reads rows of item lines. */
 const SKEL_ITEMS_TYPES = ["GRID", "LIST"], SKEL_BORDER_TYPES = ["NONE", "GRID", "EDGE"], SKEL_V_ALIGNS = ["TOP", "CENTER", "BOTTOM"];
+const SKEL_GRID_CLASSES = ["desktop", "tablet", "mobile"];
 type SkelLines = { border: string; across: boolean; cells: boolean };
 /** Filled from the spec once, before it is drawn, each by the rows array it reads, which a view's copy of its frame keeps: the lines
  *  a frame's rows take; the number each item line carries (RD.DEVEX.WORKSPACE.290); the rows that stand centred with a centred head
@@ -1971,8 +1990,19 @@ const skelItemH = (it: SkeletonItem, h: number) => !skelItemFacts(it).length || 
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
  *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
 const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length && !skelItemInline(it) ? skelItemH(it, h) - 4 : h);
+/** AN ITEM'S MEDIA IS READ IN `IDSItemMedia`'S KINDS (RD.DEVEX.WORKSPACE.294). A name written as a word is a mark, as before; `ICON` is
+ *  a bare icon, named in `node`; `MARK` is a mark holding `icon`. A kind an item line does not take keeps a mark's place. */
+const SKEL_ITEM_MEDIA = ["ICON", "MARK"];
+const skelMediaGiven = (media: unknown): media is SkeletonMedia => media !== null && typeof media === "object" && !Array.isArray(media);
+const skelItemMediaOf = (media: unknown): { bare: boolean; shape: string } =>
+  !skelMediaGiven(media) ? { bare: false, shape: media as string }
+    : media.mtype === "ICON" ? { bare: true, shape: media.node ?? "default" } : { bare: false, shape: media.mtype === "MARK" ? media.icon ?? "default" : "default" };
+/** A BARE ICON IS AS LARGE AS THE TITLE, and stands on the title's first line with no circle and no square round it. */
+const skelItemIconW = (it: SkeletonItem) => Math.round(skelItemStep(it) * 4 / 3);
+const skelItemMediaW = (it: SkeletonItem, h: number): number =>
+  it.item?.media === undefined ? 0 : (skelItemMediaOf(it.item.media).bare ? skelItemIconW(it) : skelItemMediaD(it, h)) + SKEL_LABEL_GAP;
 const skelItemW = (it: SkeletonItem, h: number): number =>
-  (it.item?.media !== undefined ? skelItemMediaD(it, h) + SKEL_LABEL_GAP : 0) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+  skelItemMediaW(it, h) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
 
 /** A FEATURE'S HEAD IS DRAWN AT ITS LEVEL, IN `DSFeature`'S OWN NAMES (RD.DEVEX.WORKSPACE.284): its title at its level's step,
  *  heavy; its description a step larger than an item's words, quiet; the eyebrow in small capitals, packed above the title;
@@ -2009,22 +2039,40 @@ function skelHeadWrap(words: string, width: number, measure: (line: string) => n
   }
   return lines;
 }
-/** THE HEAD IS ONE BLOCK AS TALL AS ITS LINES, and takes no control's height: the eyebrow's line, the gap, every line of the
- *  title, the gap and every line of the description, the gap and the line of facts. Each line is placed from the head's top. */
+/** A HEAD'S MEDIA STANDS OVER ITS WORDS, in the box of its level (RD.DEVEX.WORKSPACE.294), as a feature draws its media on top below
+ *  `PAGE`: a `MARK` or an `AVATAR`, 48px at `CONTAINER` and 40px at `WIDGET`, 12px above the eyebrow or the title. A feature at
+ *  `PAGE` stands its media beside its words, so a head there draws none over them. */
+const SKEL_HEAD_MEDIA = ["MARK", "AVATAR"];
+const SKEL_HEAD_MEDIA_BOX: Record<string, number> = { CONTAINER: 48, WIDGET: 40 }, SKEL_HEAD_MEDIA_GAP = 12;
+const skelHeadMediaBox = (head: SkelHead): number =>
+  skelMediaGiven(head.media) && SKEL_HEAD_MEDIA.includes(head.media.mtype) ? SKEL_HEAD_MEDIA_BOX[skelHeadLevel(head)] ?? 0 : 0;
+/** A BADGE EYEBROW IS ONE OF THE FACTS' BADGES (RD.DEVEX.WORKSPACE.295), on a line as tall as a badge among the facts, packed above the title. */
+const SKEL_HEAD_BADGE_LINE = SKEL_FACT_BADGE + 4;
+const skelHeadBadge = (head: SkelHead): SkeletonItem | undefined =>
+  head.eyebrow !== null && typeof head.eyebrow === "object" && !Array.isArray(head.eyebrow) && head.eyebrow.control === "badge" ? head.eyebrow : undefined;
+/** The initials an avatar shows where it has no picture: the first letter of the first two words of its name. */
+const skelInitials = (title: string): string => title.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => [...word][0].toUpperCase()).join("");
+
+/** THE HEAD IS ONE BLOCK AS TALL AS ITS LINES, and takes no control's height: its media's box and the gap, the eyebrow's line, the
+ *  gap, every line of the title, the gap and every line of the description, the gap and the line of facts. Each line is placed
+ *  from the head's top. */
 type SkelHeadLine = { part: "eyebrow" | "title" | "description"; words: string; size: number; top: number; w: number };
-function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[]; factsTop?: number; height: number } {
+function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[]; factsTop?: number; height: number; mediaBox: number; badgeTop?: number } {
   const level = skelHeadLevel(head), step = SKEL_HEAD_TITLE[level], size = SKEL_HEAD_DESCRIPTION[level];
   const lines: SkelHeadLine[] = [];
   let y = 0;
   const put = (part: SkelHeadLine["part"], words: string, at: number, measure: (line: string) => number) => {
     for (const wrapped of skelHeadWrap(words, width, measure)) { lines.push({ part, words: wrapped, size: at, top: y, w: measure(wrapped) }); y += skelHeadLine(at); }
   };
-  // THE EYEBROW IS WRITTEN IN A SENTENCE'S CASE AND DRAWN IN CAPITALS, on one line.
+  const mediaBox = skelHeadMediaBox(head);
+  if (mediaBox) y = mediaBox + SKEL_HEAD_MEDIA_GAP;
+  // THE EYEBROW IS WRITTEN IN A SENTENCE'S CASE AND DRAWN IN CAPITALS, on one line; a badge there stands on a badge's line.
+  let badgeTop: number | undefined;
   if (typeof head.eyebrow === "string" && head.eyebrow) {
     const capitals = head.eyebrow.toUpperCase();
-    lines.push({ part: "eyebrow", words: capitals, size: SKEL_HEAD_EYEBROW, top: 0, w: skelHeadEyebrowW(capitals) });
-    y = skelHeadLine(SKEL_HEAD_EYEBROW) + SKEL_HEAD_EYEBROW_GAP;
-  }
+    lines.push({ part: "eyebrow", words: capitals, size: SKEL_HEAD_EYEBROW, top: y, w: skelHeadEyebrowW(capitals) });
+    y += skelHeadLine(SKEL_HEAD_EYEBROW) + SKEL_HEAD_EYEBROW_GAP;
+  } else if (skelHeadBadge(head)) { badgeTop = y; y += SKEL_HEAD_BADGE_LINE + SKEL_HEAD_EYEBROW_GAP; }
   if (typeof head.title === "string") put("title", head.title, step, (line) => skelStepW(line, step));
   if (typeof head.description === "string" && head.description) {
     y += SKEL_HEAD_GAP;
@@ -2032,7 +2080,7 @@ function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[];
   }
   let factsTop: number | undefined;
   if (skelHeadFacts(head).length) { y += SKEL_HEAD_GAP; factsTop = y; y += SKEL_ITEM_LINE; }
-  return { lines, factsTop, height: y };
+  return { lines, factsTop, height: y, mediaBox, badgeTop };
 }
 /** THE WIDTH EACH HEAD WAS DRAWN AT. A head's lines wrap to the width its row gives it, and a row is laid out only when it is
  *  drawn, after the heights are counted; widths never depend on heights. So a spec that holds a head is drawn twice: once
@@ -2043,10 +2091,11 @@ const skelHeadH = (it: SkeletonItem): number => {
   const head = skelHeadOf(it);
   return skelHeadLayout(head, skelHeadWidths.get(head) ?? Infinity).height;
 };
-/** The room a head needs across: the lines that do not wrap, its eyebrow and its facts. Its title and its description wrap. */
+/** The room a head needs across: what does not wrap, its media, its eyebrow and its facts. Its title and its description wrap. */
 const skelHeadMinW = (it: SkeletonItem, h: number): number => {
-  const head = skelHeadOf(it);
-  return Math.max(typeof head.eyebrow === "string" ? skelHeadEyebrowW(head.eyebrow) : 0, skelFactsW(skelHeadFacts(head), h));
+  const head = skelHeadOf(it), badge = skelHeadBadge(head);
+  return Math.max(typeof head.eyebrow === "string" ? skelHeadEyebrowW(head.eyebrow) : 0, skelFactsW(skelHeadFacts(head), h),
+    ...(badge ? [skelFixedWidth(badge, SKEL_FACT_CTL)] : []), skelHeadMediaBox(head));
 };
 /** Whether a spec holds a head anywhere, and so must be measured before it is drawn. */
 const skelHasHead = (value: unknown): boolean => Array.isArray(value) ? value.some(skelHasHead)
@@ -2353,6 +2402,9 @@ function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
     case "checkbox": return [stroke(line([8, 12], [11, 15], [16, 8]))];
     case "bell": return [solid(line([12, 4], [16, 7], [17, 12], [19.5, 16], [4.5, 16], [7, 12], [8, 7], [12, 4])), dot(12, 19, 1.6)];
     case "person": return [dot(12, 8, 4), solid(line([4, 20], [6, 15], [12, 13], [18, 15], [20, 20], [4, 20]))];
+    // THE END ARROWS OF AN ITEM LINE, in `DSIconType`'s names: a line with its head, across, and up to the end where it leaves the site.
+    case "ARROW_RIGHT": return [stroke(line([5, 12], [19, 12]), line([13, 6], [19, 12], [13, 18]))];
+    case "ARROW_UP_RIGHT": return [stroke(line([7, 17], [17, 7]), line([8, 7], [17, 7], [17, 16]))];
     default: return [dot(12, 12, 2)];
   }
 }
@@ -2415,19 +2467,42 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // its row, and the line inside it at a boundary's padding, at the top.
     const boxed = skelItemFrames.get(it);
     if (boxed) out.push(...skelSurfaceMarks(boxed, ix, iy, iw, ih));
+    // THE CHOSEN LINE OF A FEATURE'S BOXED ITEMS KEEPS ITS FRAME AND DRAWS A HEAVIER LINE INSIDE ITS EDGE (RD.DEVEX.WORKSPACE.298), as
+    // `DSItemCard` marks a selected tile, so it keeps its size. The design system reads `selected` only where the items are boxed.
+    if (item.selected !== undefined && typeof item.selected !== "boolean") skelSay(findings, `an item line's \`selected\` is \`${JSON.stringify(item.selected)}\`, and it takes true or false`);
+    else if (item.selected === true && !boxed)
+      skelSay(findings, "`selected` marks the chosen item line of a `DSFeature` whose `items.surface` boxes its items, as the design system reads it only there, and this line stands in no box");
+    else if (item.selected === true && boxed) {
+      const inner = boxed.rounded === false ? 0 : SKEL_ROUND - 2;
+      out.push(skelRect("sds-skel-control sds-skel-main", ix + 2, iy + 2, iw - 4, ih - 4, inner));
+    }
     const lineH = boxed ? skelItemH(it, h) : ih, lineX = boxed ? ix + SKEL_PAD : ix, lineW = boxed ? iw - SKEL_PAD * 2 : iw;
     const lineMid = boxed ? iy + SKEL_PAD + lineH / 2 : mid;
-    let wx = lineX;
-    if (item.media !== undefined) {
-      if (!SKEL_ICONS.includes(item.media)) findings.push(`an item's \`media\` is \`${item.media}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
-      const across = skelItemMediaD(it, h);
-      out.push(...skelIcon(item.media, lineX + across / 2, lineMid, h, true, undefined, across));
-      wx = lineX + across + SKEL_LABEL_GAP;
-    }
     // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is of medium weight, the facts small and quiet.
     const facts = skelItemFacts(it), top = lineMid - lineH / 2;
     const inline = skelItemInline(it);
     const titleY = facts.length && !inline ? top + (lineH - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : lineMid + 4;
+    let wx = lineX;
+    if (item.media !== undefined) {
+      const media = skelItemMediaOf(item.media);
+      if (skelMediaGiven(item.media)) {
+        const given = item.media;
+        if (!SKEL_ITEM_MEDIA.includes(given.mtype))
+          skelSay(findings, `an item line's \`media\` is \`${String(given.mtype)}\`, and a skeleton draws ${SKEL_ITEM_MEDIA.join(" · ")} on an item line; a mark is drawn in its place`);
+        else if (!SKEL_ICONS.includes(media.shape))
+          skelSay(findings, `an item's \`media\` names \`${media.shape}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+      } else if (!SKEL_ICONS.includes(item.media)) findings.push(`an item's \`media\` is \`${item.media}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+      if (media.bare) {
+        // A BARE ICON (RD.DEVEX.WORKSPACE.294): as large as the title, on the title's first line, with nothing round it.
+        const size = skelItemIconW(it);
+        out.push(...skelGlyph(media.shape, lineX + size / 2, titleY - 4, size));
+        wx = lineX + size + SKEL_LABEL_GAP;
+      } else {
+        const across = skelItemMediaD(it, h);
+        out.push(...skelIcon(media.shape, lineX + across / 2, lineMid, h, true, undefined, across));
+        wx = lineX + across + SKEL_LABEL_GAP;
+      }
+    }
     // A NUMBERED ITEM'S NUMBER STANDS BEFORE ITS TITLE, quiet, at the title's size and weight (RD.DEVEX.WORKSPACE.290).
     const number = skelItemNumber(it), step = skelItemStep(it);
     if (number !== undefined)
@@ -2435,9 +2510,15 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     out.push(skelStepText(item.title ?? "", step, wx + skelItemNumberW(it), titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
     const ownDescription = skelItemOwnDescription(it), below = skelItemDescriptionH(it);
-    if (ownDescription !== undefined) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(titleY + SKEL_ITEM_LINE)}">${esc(ownDescription)}</text>`);
+    // FACTS PLACED AFTER THE TITLE STAND UNDER IT AND OVER THE DESCRIPTION (RD.DEVEX.WORKSPACE.296), as `factsPlacement` `AFTER_TITLE` puts
+    // them; the two lines trade places and the item keeps its height. With no description of its own there is nothing to trade.
+    if (item.factsPlacement !== undefined && !SKEL_FACTS_PLACEMENTS.includes(item.factsPlacement))
+      skelSay(findings, `an item line's \`factsPlacement\` is \`${String(item.factsPlacement)}\`, and it takes ${SKEL_FACTS_PLACEMENTS.join(" · ")}`);
+    const afterTitle = item.factsPlacement === "AFTER_TITLE" && ownDescription !== undefined, badgeLine = skelItemHasBadge(it);
     // AN INLINE ITEM'S FACTS STAND ON THE TITLE'S LINE, after the title and a dot.
-    const factsMid = inline ? titleY - 4 : below + (skelItemHasBadge(it) ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
+    const factsMid = inline ? titleY - 4 : (afterTitle ? 0 : below) + (badgeLine ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
+    const descriptionY = afterTitle ? factsMid + (badgeLine ? SKEL_FACT_BADGE / 2 + 13 : 4 + SKEL_ITEM_LINE) : titleY + SKEL_ITEM_LINE;
+    if (ownDescription !== undefined) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(descriptionY)}">${esc(ownDescription)}</text>`);
     let fx = wx;
     if (inline) {
       fx += skelItemTitleW(it);
@@ -2449,7 +2530,12 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     for (const part of item.end ?? []) {
       const partKind = skelKind(part), pw = skelFixedWidth(part, h);
       if (!SKEL_CELL_KINDS.includes(partKind)) findings.push("the end of an item line holds words, a note, an icon or a control");
-      else skelDrawLeaf(part, partKind!, ex, lineMid - h / 2, pw, h, h, h, findings, out);
+      // AN END ARROW IS DRAWN BARE, its shape alone in the place of an icon (RD.DEVEX.WORKSPACE.297): it says where the line leads, and
+      // nothing round it says it can be pressed apart from the line.
+      else if (partKind === "icon" && SKEL_END_ARROWS.includes(part.icon!)) {
+        out.push(...skelGlyph(part.icon!, ex + h / 2, lineMid, Math.round(h / 2)));
+        if (part.text !== undefined) out.push(`  <text class="sds-code" x="${ex + h + SKEL_LABEL_GAP}" y="${Math.round(lineMid + 4)}">${esc(part.text)}</text>`);
+      } else skelDrawLeaf(part, partKind!, ex, lineMid - h / 2, pw, h, h, h, findings, out);
       ex += pw + SKEL_LABEL_GAP;
     }
     return;
@@ -2472,7 +2558,34 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // `textAlign` `CENTER` CENTRES EVERY LINE OF THE HEAD, each by its own measure.
     const centre = head.textAlign === "CENTER";
     const startOf = (w: number) => (centre ? ix + (iw - w) / 2 : ix);
-    const { lines, factsTop } = skelHeadLayout(head, iw);
+    const { lines, factsTop, mediaBox, badgeTop } = skelHeadLayout(head, iw);
+    // A HEAD'S MEDIA (RD.DEVEX.WORKSPACE.294): a `MARK` or an `AVATAR` over its words, in its level's box; a feature at `PAGE` stands its
+    // media beside its words, where a spec draws it as a slot.
+    if (head.media !== undefined) {
+      const given = head.media;
+      if (!skelMediaGiven(given) || !SKEL_HEAD_MEDIA.includes(given.mtype))
+        skelSay(findings, `a head's \`media\` is a \`MARK\` or an \`AVATAR\`, in \`IDSItemMedia\`'s shape, and this one is \`${JSON.stringify(given)}\``);
+      else if (level === "PAGE") skelSay(findings, "a feature at `PAGE` stands its media beside its words and never over them, so a head at `PAGE` draws no `media`: draw it as a slot beside the head");
+      else if (given.mtype === "MARK" && !SKEL_ICONS.includes(given.icon ?? "default"))
+        skelSay(findings, `a head's \`media\` names \`${given.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+      else if (given.mtype === "AVATAR" && (typeof given.title !== "string" || !given.title.trim()))
+        skelSay(findings, "a head's `AVATAR` carries the name it stands for in `title`, and draws its initials");
+    }
+    if (mediaBox) {
+      const given = head.media!, cx = startOf(mediaBox) + mediaBox / 2, cy = iy + mediaBox / 2;
+      // AN AVATAR WITH NO PICTURE SHOWS ITS INITIALS in a circle; a mark is a circle that holds its shape, as every mark is.
+      if (given.mtype === "AVATAR") out.push(`  <circle class="sds-skel-control" cx="${r2(cx)}" cy="${r2(cy)}" r="${r2(mediaBox / 2)}"/>`,
+        `  <text class="sds-note" x="${r2(cx)}" y="${Math.round(cy + 5)}" text-anchor="middle" style="font-size:${Math.round(mediaBox / 3)}px;font-weight:600">${esc(skelInitials(String(given.title ?? "")))}</text>`);
+      else out.push(...skelIcon(given.icon ?? "default", cx, cy, mediaBox, true, undefined, mediaBox));
+    }
+    // A HEAD'S EYEBROW IS WORDS OR A BADGE (RD.DEVEX.WORKSPACE.295): a badge stands as a badge among the facts does, packed above the title.
+    if (head.eyebrow !== undefined && typeof head.eyebrow !== "string" && !skelHeadBadge(head))
+      skelSay(findings, "a head's `eyebrow` is words, drawn in small capitals, or a badge, `{ \"control\": \"badge\", \"text\": … }`, drawn as a badge among the facts");
+    const badge = skelHeadBadge(head);
+    if (badge && badgeTop !== undefined) {
+      const bw = skelFixedWidth(badge, SKEL_FACT_CTL);
+      skelDrawLeaf(badge, "control", startOf(bw), iy + badgeTop + SKEL_HEAD_BADGE_LINE / 2 - SKEL_FACT_CTL / 2, bw, SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
+    }
     for (const line of lines) {
       const lineBase = Math.round(iy + line.top + (skelHeadLine(line.size) + line.size * 0.7) / 2);
       if (line.part === "title") out.push(skelStepText(line.words, line.size, startOf(line.w), lineBase));
@@ -2485,7 +2598,8 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     return;
   }
   if (kind === "icon") {
-    if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+    if (SKEL_END_ARROWS.includes(it.icon!)) skelSay(findings, `\`${it.icon}\` is the end arrow of an item line, and stands in its \`end\`; an icon elsewhere is one of ${SKEL_ICONS.join(" · ")}`);
+    else if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
     const mark = it.mark ?? it.on !== undefined;
     out.push(...skelIcon(it.icon!, ix + h / 2, mid, h, mark, it.on, mark && it.mark !== true ? h - SKEL_MARK_DROP : h));
     if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
@@ -3077,15 +3191,15 @@ const skelCentrable = (row: SkeletonRow, list: boolean): boolean => {
     && kinds.every((kind) => kind === "control" || kind === "icon" || kind === "plain" || kind === "note" || kind === "spacer" || (kind === "item" && !list));
 };
 /**
- * A SECTION'S FILL, A FEATURE'S FRAMES, LINES, NUMBERS AND ALIGNMENT, read once before anything is drawn (RD.DEVEX.WORKSPACE.285,
- * .286, .288 to .293). `color`, `strength` and `inset` belong to a `DSSectionContainer`; `items`, `surface`, `verticalAlign` and the
+ * A SECTION'S FILL, A FEATURE'S FRAMES, LINES, NUMBERS AND ALIGNMENT, AND A GRID'S COLUMNS, read once before anything is drawn
+ * (RD.DEVEX.WORKSPACE.285, .286, .288 to .293, .299). A view hands down its screen class as `device`. `color`, `strength` and `inset` belong to a `DSSectionContainer`; `items`, `surface`, `verticalAlign` and the
  * parts `TEXT` and `MEDIA` in `frames` to a `DSFeature`; and `section` and `grid` to a `DSFeatureGridSectionContainer`. Each value
  * is one the design system has. Each item line of a feature with `items.surface`, and each slot that is the media of a feature
  * whose `frames` frames it, is kept with the frame it stands in; each item line of a numbered feature with its number; the rows
  * a feature's or a grid's lines part, the rows centred with a centred head, and a split's rows with their alignment. A region of
  * a feature that is no unit of its own is the feature's, and another unit inside it is not.
  */
-function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?: SkelSurface, media?: SkelSurface, feature?: SkelFeatureLook): void {
+function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?: SkelSurface, media?: SkelSurface, feature?: SkelFeatureLook, device?: string): void {
   if (!frame || typeof frame !== "object") return;
   const said = (message: string) => { if (!findings.includes(message)) findings.push(message); };
   const unit = typeof frame.unit === "string" ? frame.unit : undefined;
@@ -3160,6 +3274,19 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
     const border = isObject(frame.grid) ? frame.grid.borderType : undefined;
     enumOf(border, SKEL_BORDER_TYPES, "a grid section's `grid.borderType`");
     if ((border === "GRID" || border === "EDGE") && Array.isArray(frame.rows)) skelLined.set(frame.rows, { border, across: true, cells: true });
+    // THE COLUMNS AT EACH SCREEN CLASS, `IDSGrid`'s `desktop`, `tablet` and `mobile` (RD.DEVEX.WORKSPACE.299): each 1 to 4, and a view reads
+    // its own class's: every row of its cells stands in that many columns, a spacer filling a short row. A spec with one frame has no class.
+    if (isObject(frame.grid)) {
+      const grid = frame.grid as Record<string, unknown>;
+      for (const key of SKEL_GRID_CLASSES)
+        if (grid[key] !== undefined && !(Number.isInteger(grid[key]) && (grid[key] as number) >= 1 && (grid[key] as number) <= 4))
+          said(`a grid section's \`grid.${key}\` is \`${JSON.stringify(grid[key])}\`, and it takes a whole number of columns, 1 to 4`);
+      const key = typeof device === "string" ? device.toLowerCase() : undefined;
+      const columns = key !== undefined && SKEL_GRID_CLASSES.includes(key) ? grid[key] : undefined;
+      if (typeof columns === "number" && Number.isInteger(columns) && columns >= 1 && columns <= 4 && Array.isArray(frame.rows))
+        for (const row of frame.rows) if (Array.isArray(row?.items) && skelLinedRow(row, { border: "NONE", across: true, cells: true }) && row.items.length !== columns)
+          said(`the \`${device}\` view stands a grid section's cells in \`grid.${key}\`, ${columns} columns, and a row of them holds ${row.items.length}; a short row is filled with spacers`);
+    }
   }
   // A REGION OF A FEATURE THAT IS NO UNIT HOLDS THE FEATURE'S ITEMS TOO, and takes their lines.
   if (featureHere?.lines !== undefined && (unit === SKEL_FEATURE || unit === undefined) && Array.isArray(frame.rows)) skelLined.set(frame.rows, featureHere.lines);
@@ -3176,7 +3303,7 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
     if (kind === "slot" && mediaHere) skelItemFrames.set(it, mediaHere);
     // EACH ITEM LINE OF A NUMBERED FEATURE TAKES THE NEXT NUMBER, in the order its rows are read (RD.DEVEX.WORKSPACE.290).
     if (kind === "item" && featureHere?.numbered) skelNumbers.set(it, ++featureHere.count.n);
-    if (kind === "frame") skelLooks(it.frame, findings, itemsHere, mediaHere, featureHere);
+    if (kind === "frame") skelLooks(it.frame, findings, itemsHere, mediaHere, featureHere, device);
   }
 }
 
@@ -3193,12 +3320,13 @@ const SKEL_FIELDS: Record<string, string[]> = {
   row: ["label", "framed", "chosen", "marked", "items", "within", "lead"],
   item: ["text", "note", "fill", "frame", "tag", "slot", "control", "main", "on", "flush", "edgeTop", "inPart", "atPage", "mark", "tabs", "chosen",
     "icon", "standin", "lines", "headings", "columns", "cells", "label", "info", "description", "error", "read", "item", "head", "spacer", "height", "part", "page"],
-  line: ["media", "title", "description", "meta", "end", "inline"],
-  head: ["pageLevel", "eyebrow", "title", "description", "facts", "textAlign"],
+  line: ["media", "title", "description", "meta", "end", "inline", "factsPlacement", "selected"],
+  head: ["pageLevel", "eyebrow", "title", "description", "facts", "textAlign", "media"],
+  media: ["mtype", "node", "icon", "title"],
   items: ["surface", "type", "borderType", "numbered"],
   surface: ["color", "strength", "raised", "elevation", "bordered", "rounded"],
   gridSection: ["color", "strength", "inset", "size"],
-  grid: ["borderType"],
+  grid: ["borderType", "desktop", "tablet", "mobile"],
 };
 const SKEL_OLD_FIELDS = ["tone", "em", "off", "warn"];
 function skelFieldFindings(spec: Spec, findings: string[]): void {
@@ -3212,6 +3340,7 @@ function skelFieldFindings(spec: Spec, findings: string[]): void {
   const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
   const line = (value: unknown) => {
     if (!known(value, "line", "an item line")) return;
+    known(value.media, "media", "an item line's `media`");
     for (const fact of list(value.meta)) if (typeof fact !== "string") item(fact);
     for (const part of list(value.end)) item(part);
   };
@@ -3219,7 +3348,11 @@ function skelFieldFindings(spec: Spec, findings: string[]): void {
     if (!known(value, "item", "an item", true)) return;
     frame(value.frame);
     line(value.item);
-    if (known(value.head, "head", "a head")) for (const fact of list(value.head.facts)) if (typeof fact !== "string") item(fact);
+    if (known(value.head, "head", "a head")) {
+      known(value.head.media, "media", "a head's `media`");
+      if (typeof value.head.eyebrow !== "string") item(value.head.eyebrow);
+      for (const fact of list(value.head.facts)) if (typeof fact !== "string") item(fact);
+    }
     for (const cells of list(value.cells)) for (const cell of list(cells)) if (typeof cell !== "string") item(cell);
   };
   const row = (value: unknown) => { if (known(value, "row", "a row")) for (const it of list(value.items)) item(it); };
@@ -3486,7 +3619,7 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
   skelUnits(spec.frame, findings);
   if (Array.isArray(spec.views)) for (const view of spec.views) skelUnits(view?.frame, findings);
   skelLooks(spec.frame, findings);
-  if (Array.isArray(spec.views)) for (const view of spec.views) skelLooks(view?.frame, findings);
+  if (Array.isArray(spec.views)) for (const view of spec.views) skelLooks(view?.frame, findings, undefined, undefined, undefined, view?.viewport);
   let layout: SkeletonLayout | undefined;
   if (spec.layout !== undefined) {
     if (spec.views === undefined) findings.push("`layout` is the layout the views stand in, so a spec with a `layout` holds `views`; give the frame a `viewport`");
