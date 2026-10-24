@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "f89b6498"
+      "seen": "43441eea"
     }
   ]
 }
@@ -90,8 +90,8 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
 3. **Web apps respond** on their configured dev ports, or through the local proxy's vhosts.
 4. **Login proof**, where the repo seeds credentials — authenticate a seeded principal through its own site host and assert the session comes back active.
 5. **Exercise the changed flow end to end** through the real entry. Tests passing is not the exit criterion; the change working in the running app is.
-6. **Read each changed page against its page pattern.** No check reads a page for its pattern, so this step is a reading, and you report it as one. The rules are in `refs/support/surface/standards-patterns.md`, in this plugin, and each pattern's spec is in `refs/support/surface/patterns/`.
-   - **Name the pattern the page should follow.** Take it from the tree the `design` skill wrote. Where the page has no tree, read its data and its person against the table of the page patterns, and name the one that fits. A page that fits none is a finding.
+6. **Read each changed page against its pattern.** No check reads a page for its pattern, so this step is a reading, and you report it as one. The rules are in `refs/support/surface/standards-patterns.md` for an app's screen and `site-patterns.md` for a site's page, in this plugin, and each pattern's spec is in `refs/support/surface/app-patterns/` or `refs/support/surface/site-patterns/`.
+   - **Name the kind of person and the pattern the page should follow.** Take them from the tree the `design` skill wrote. Where the page has no tree, read the kind from the app's personas and rows (`standards-core.md`, *Who an app is for*), then read the page's data and its person against the table of the app patterns, and name the one whose *For* line names that kind. A page that no pattern fits is derived from the patterns whose person and data fit it; a page that follows a pattern whose *For* line leaves its kind out, or ignores that kind's line, is a finding.
    - **Open the spec of that pattern, and look at the page beside it at each screen class**: a desktop, a tablet and a phone. Look at the page through `spn-devex docs look <page>`, and never through a script inside a repository. The values in a spec are samples, so compare the arrangement and not the words.
    - **Go down the pattern's tree by level**: the page level, the panels, then the widgets and cards, then the components. The page level is the head of the page, `DSPageLevel` at `PAGE` or the header of the one panel that is the page, with `fullPage`, and a card stands at the level of a widget (`RD.SUPPORT.SURFACE.202`). Each line of the tree is on the page, built with the unit the tree names. A suffix names where a unit is placed, and a component, a composite included, takes none (`RD.SUPPORT.SURFACE.229`). A part the page built for itself is a finding. A unit that the stack provides on its own is none: on the web, `DSListDetail` places the two parts of a page of groups and their items, and no core unit does (`RD.SUPPORT.SURFACE.099`). So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
    - **Count the panels against what is read or saved as a whole** (`RD.SUPPORT.SURFACE.116`). A page uses one panel for each such thing, and its sections are content parts. A section framed as a panel of its own is a finding, and so are two things saved apart in one panel. An editor with its preview is one panel, with each thing written beside its own result (`RD.SUPPORT.SURFACE.115`).

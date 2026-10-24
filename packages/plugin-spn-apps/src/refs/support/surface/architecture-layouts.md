@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "a2513cbb"
+      "seen": "8bd22315"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "164e4a35"
+      "seen": "410a6c34"
     }
   ]
 }
@@ -103,7 +103,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 
 ## The spacing — 🔮
 
-- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.200`). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
+- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RD.SUPPORT.SURFACE.200`). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
 - **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and the gap above the header under a floating bar.
 - **Where two parts both float, the space between them is one `--layout-space`, never two.**
 - **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RD.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
@@ -213,7 +213,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.APPS.146` | a layout owns the navigation and the content, and nothing inside that area |
 | `RD.SUPPORT.APPS.160` | the page's fill is the body's colour, and no page sets a fill behind itself |
 | `RD.SUPPORT.SURFACE.226` | a navigation's colour stays in the navigation; the body and the content carry their own surface |
-| `RD.SUPPORT.APPS.161` | the layout keeps one spacing, `--layout-space`, from the theme's size, with no gutter |
+| `RD.SUPPORT.APPS.161` | the layout kept a gutter from the content look; superseded by `RD.SUPPORT.SURFACE.200`, which keeps one spacing, `--layout-space`, from the theme's size, with no gutter |
 | `RD.SUPPORT.APPS.163` | an item's actions are reachable without hover, in every layout type |
 | `RD.SUPPORT.SURFACE.139` | the theme styles a layout by its layout look, with no setting for one layout type |
 | `RD.SUPPORT.SURFACE.140` | a panel of entries of the navigation belongs to the navigation, and a menu of actions does not |

@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "4f058dd9"
+      "seen": "9273d6bc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
@@ -187,7 +187,7 @@
   - **Could a newcomer do this after reading it?** A page with a rule and neither its why nor the symptom of breaking it fails, whatever its share says.
 - **The words of a page, by what it is for** — held by this lens worn. The writer decides whether a page is a doc, an app's screen or a marketing page before writing a word.
   - **A doc** follows the readability bar, holds no persuasion, and names the real command, the real path and what the reader will see.
-  - **An app's screen**: a short label in the product's words; an action that starts with a verb, never *OK* or *Submit* alone; an error that says what went wrong and how to fix it, under its field; a number the person acts on; no persuasion anywhere.
+  - **An app's screen**: a short label in the product's words; an action that is a verb and its object, 1 to 3 words and 4 at most, never a sentence or a question, with an arrow drawn as its icon and never typed, never *OK* or *Submit* alone, and a label a person asks for in their own words kept as they asked (`RD.SUPPORT.SURFACE.335`); an error that says what went wrong and how to fix it, under its field; a number the person acts on; no persuasion anywhere.
   - **A marketing page**: how each sentence reads is this lens's, and what it says, and to whom, is `MARKETING`'s. The words write to the length budget of their level, the hero's title 4 to 8 words, a section's description 15 to 30, a card's title 2 to 5, an eyebrow 1 to 3 words, and siblings share one grammatical form (`RD.SUPPORT.SURFACE.286`).
 
 ## Gates

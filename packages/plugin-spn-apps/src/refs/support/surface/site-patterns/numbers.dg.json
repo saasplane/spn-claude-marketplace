@@ -1,0 +1,265 @@
+{
+ "kind": "skeleton",
+ "title": "Numbers",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature with textAlign START. Its items are STATS, flat, in one row: up to four numbers read from the real system, each its value over its plain label. Under centred words they take CENTER. On a phone two by two.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the real system shows",
+                   "description": "One line on where the numbers are read from.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "STATS"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the real system shows",
+                   "description": "One line on where the numbers are read from.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "STATS"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the real system shows",
+                   "description": "One line on where the numbers are read from.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A number",
+                   "description": "Its label"
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "STATS"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

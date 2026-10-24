@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/02-standards-interaction.md",
-      "seen": "729f5193"
+      "seen": "677fbdf7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/",
-      "seen": "ecf913f8"
+      "seen": "b221fd1a"
     }
   ]
 }
@@ -51,6 +51,8 @@ A task state says where a task stands. There are six, and a task is in exactly o
 
 A block drawn from data, such as a table or a list, shows every one of the six. An action, such as a button, shows working, and then done or failed.
 
+**The task state has one name in the design system, `DSTaskStateType`: `IDLE` · `WORKING` · `DONE` · `FAILED` · `EMPTY` · `DENIED`** (`RD.SUPPORT.SURFACE.309`). A step of `DSStepper` takes four of them, `IDLE`, `WORKING`, `DONE` and `FAILED`: pending is `IDLE` and in progress is `WORKING`, and the stepper invents no state beside them. `EMPTY` and `DENIED` belong to a block's data, never to a step.
+
 **A task state is not a control state.** A task state belongs to one pattern (idle · working · done · failed · empty · denied); a control state belongs to one block (rest · hover · focus · pressed · disabled · error · selected), stated in `architecture-names.md`. A table that draws its rows well and shows nothing when its data fails has every control state and is missing a task state.
 
 ## Every action answers — 🔮
@@ -72,6 +74,7 @@ This ref states what every pattern is made of: its six parts, the task states a 
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.151` | every pattern is stated in six parts, and every action answers: working, and then done or failed |
+| `RD.SUPPORT.SURFACE.309` | the task state is named `DSTaskStateType`, and a step of a stepper takes four of its six values |
 
 ## Proof
 

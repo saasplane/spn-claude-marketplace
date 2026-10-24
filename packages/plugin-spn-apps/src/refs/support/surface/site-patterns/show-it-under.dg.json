@@ -1,0 +1,320 @@
+{
+ "kind": "skeleton",
+ "title": "Show it, the picture under",
+ "caption": "It stands under a top bar, in the window's full width. The section is a DSSectionContainer, and inside it one DSFeature at MEDIA_BOTTOM: the words at the start, with the head packed as one block (the eyebrow in small capitals over the title, the description under it, and its facts as badges under that), the points across as a GRID, one action, and under them the picture at the section's full width, as mediaNode, for what reads only wide, such as two panes compared or a wide chart. Panes are flat, each as tall as its lines. On a phone the points stand one under the other, and the picture keeps its place under the words.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "CONTAINER",
+                   "eyebrow": "Its subject",
+                   "title": "What the picture shows",
+                   "description": "One line that introduces the picture under it.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "First fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Second fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Third fact"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line it shows"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "Another line it shows"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "The one action",
+                  "main": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes compared",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "CONTAINER",
+                   "eyebrow": "Its subject",
+                   "title": "What the picture shows",
+                   "description": "One line that introduces the picture under it.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "First fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Second fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Third fact"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line it shows"
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "Another line it shows"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "The one action",
+                  "main": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes compared",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "CONTAINER",
+                   "eyebrow": "Its subject",
+                   "title": "What the picture shows",
+                   "description": "One line that introduces the picture under it.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "First fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Second fact"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Third fact"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line it shows"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "Another line it shows"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "The one action",
+                  "main": true,
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes compared",
+                  "fill": true,
+                  "height": 5
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

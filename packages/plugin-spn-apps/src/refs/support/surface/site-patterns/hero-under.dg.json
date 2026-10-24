@@ -1,0 +1,318 @@
+{
+ "kind": "skeleton",
+ "title": "Hero, the picture under",
+ "caption": "The same hero, as MEDIA_BOTTOM: the words, the facts and the two actions across the section, and under them, at the section's full width, the picture a half width cannot show, two panes or a wide picture, framed MEDIA and raised LG as a product is. On a phone the order stays: the words and the facts, the buttons one under the other, then the picture.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "PAGE",
+                   "eyebrow": {
+                    "control": "badge",
+                    "text": "Its state"
+                   },
+                   "title": "The page's one claim",
+                   "description": "One line on who it is for and what it gives them.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "Language"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Framework"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Database"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Cloud"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Second action"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes or a wide picture",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "LG"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "LG",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "PAGE",
+                   "eyebrow": {
+                    "control": "badge",
+                    "text": "Its state"
+                   },
+                   "title": "The page's one claim",
+                   "description": "One line on who it is for and what it gives them.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "Language"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Framework"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Database"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Cloud"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Second action"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes or a wide picture",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "LG"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "LG",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "PAGE",
+                   "eyebrow": {
+                    "control": "badge",
+                    "text": "Its state"
+                   },
+                   "title": "The page's one claim",
+                   "description": "One line on who it is for and what it gives them.",
+                   "facts": [
+                    {
+                     "control": "badge",
+                     "text": "Language"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Framework"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Database"
+                    },
+                    {
+                     "control": "badge",
+                     "text": "Cloud"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true,
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Second action",
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · two panes or a wide picture",
+                  "fill": true,
+                  "height": 5
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "LG"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "LG",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

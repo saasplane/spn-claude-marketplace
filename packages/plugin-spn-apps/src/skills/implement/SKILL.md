@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "f89b6498"
+      "seen": "43441eea"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "3106ebcb"
+      "seen": "1ff21d0e"
     }
   ],
   "decisions": [
@@ -86,12 +86,12 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 **The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
 
-## A page is built from the tree of its page pattern
+## A page is built from the tree of its pattern
 
-The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md`, in this plugin, and each pattern's spec is in `refs/support/surface/patterns/`.
+The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md` for an app's screen and in `site-patterns.md` for a site's page, in this plugin. Each pattern's spec is in `refs/support/surface/app-patterns/` or `refs/support/surface/site-patterns/`, by the page's kind.
 
-- **Start from the tree the `design` skill wrote.** It names the facts, the page pattern and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
-- **Build each line of the tree with the unit it names.** A page pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
+- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
+- **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
 - **Use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
@@ -109,8 +109,8 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the table's config, usually read from the address. The table holds no state for it (`RD.SUPPORT.SURFACE.125`) |
 | a card with a head, drawn from data (a card that shows its own info is a `DSCard`) | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
 | subjects compared across the same settings | the page gives `DSComparison` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The composite draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
-| a section of a website: one part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below comes from its `size`, the app's when unset, and the section hands that size to what it holds. It holds one child and hands down no level; what stands in it sets its own. It reaches the edges of its place and stands straight in it. To paint one section the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.254`, `RD.SUPPORT.SURFACE.192`). The section never frames itself; what stands in it is flat, boxed or raised by what it does for the visitor, and a media by its kind (`RD.SUPPORT.SURFACE.293`) |
-| a grid of features under a heading | the page uses `DSFeatureGridSectionContainer` where it writes a section, and gives it `section` (the section's props but its child and `flush`), `heading` (the words, facts and actions of a feature) and `grid` (`IDSGrid`: `desktop`, `tablet` and `mobile` columns, each 1 to 4, and `borderType`), and may take `reveal` (the heading and the cells moving in once as they scroll into view) and, through `section`, `inset`. Each cell is a `DSFeature` that names its own `pageLevel`. The data decides when a section is a grid section: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, with media or without (`RD.SUPPORT.SURFACE.259`, `RD.SUPPORT.SURFACE.271`) |
+| a section of a website: one part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below comes from its `size`, the app's when unset, the sides are the layout's space, `--layout-space`, and the section hands that size to what it holds. A `flush` section draws no room of its own on any side (`RD.SUPPORT.SURFACE.313`). It holds one child and hands down no level; what stands in it sets its own. It reaches the edges of its place and stands straight in it. To paint one section the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.254`, `RD.SUPPORT.SURFACE.192`). The section never frames itself; what stands in it is flat, boxed or raised by what it does for the visitor, and a media by its kind (`RD.SUPPORT.SURFACE.293`) |
+| a grid of features under a heading | the page uses `DSFeatureGridSectionContainer` where it writes a section, and gives it `section` (the section's props but its child and `flush`), `heading` (the words, facts and actions of a feature) and `grid` (`IDSGrid`: `desktop`, `tablet` and `mobile` columns, each 1 to 4, and `borderType`), and may take `reveal` (the heading and the cells moving in once as they scroll into view) and, through `section`, `inset`. Each cell is a `DSFeature` that names its own `pageLevel`, `WIDGET` for a thing of its own. The data decides when a section is a grid section, and `site-patterns.md` gives its uses: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, with media or without (`RD.SUPPORT.SURFACE.259`, `RD.SUPPORT.SURFACE.271`) |
 | a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
 | the paging in the footer of the panel | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
 | a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
@@ -146,7 +146,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Run the conformance gates** — the `verify` skill code mode: codegen freshness, `spnutils apps validate`, build, lint, tests. This is what catches a file whose name no longer matches its contents. It also catches a barrel that was never regenerated, or a reach past another module's contract. A passing build reveals none of them.
 - **Run the tests** — the `run` skill tests mode. Typecheck the touched projects first: `npx nx run <project>:typecheck`, and `npx tsc --noEmit -p <project>/tsconfig.json` for a web app, whose `typecheck` target is disabled.
 - **Contract review gate** — if the contract surface changed, run the `review` skill contract mode before calling the work done. Code review (the `review` skill code mode) for everything else.
-- Report what changed per layer, what was regenerated, and test results. For a page, name its page pattern and each gap of a unit the page met. Never claim green without having run the commands.
+- Report what changed per layer, what was regenerated, and test results. For a page, name its kind of person, its app or site pattern and each gap of a unit the page met. Never claim green without having run the commands.
 
 ## Lenses
 

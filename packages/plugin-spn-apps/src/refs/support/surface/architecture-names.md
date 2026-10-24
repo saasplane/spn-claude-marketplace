@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "bdc3b084"
+      "seen": "8d963e7a"
     }
   ]
 }
@@ -85,7 +85,7 @@ These yes-or-no props each belong to one block or two. Each is no when it is not
 | `DSList.Item` · `DSItem` | `showArrow` | a chevron is drawn at the end of the row, to say that the row leads somewhere |
 | A data cell of `DSTable` | `marked` | the cell stands out in its row, in the medium weight and the default text colour |
 | `DSCard` | `fullHeight` | the card fills the height of a place with a set height. Otherwise it takes no height of its own: alone it is as tall as what it holds, and in a grid or a row it stands as tall as the tallest card |
-| `DSSectionContainer` | `flush` | the child runs to the edges of the section's place, with no gutter. Its words then line up with the box by `--section-box-inset` |
+| `DSSectionContainer` | `flush` | the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. Its words then line up with the box by `--section-box-inset` |
 | `DSCard` | `divided` | a line is drawn between each two parts of the card |
 | `DSSheet` | `modal` | the sheet takes the page over, with a scrim. Otherwise it stands beside the page, and the page stays usable. Yes by default |
 | `DSToolbar` | `bordered` | a frame is drawn around the row of controls. Yes by default |
@@ -120,7 +120,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL` · `FIT`, `MD` when unset | `DSOverlayExtentType` |
-| `DSItem` · `DSItemFacts` · `DSTabs` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
+| `DSItem` · `DSItemFacts` · `DSTabs` · `DSStepper` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the stepper it decides the size: the indicator and the words. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
 | `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
 | `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |
 | `DSItem`, on a fact whose `mtype` is `TEXT` | `color` (the hue of the words of the fact; unset, the muted tone) | `DEFAULT` · `CUSTOM` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
@@ -148,7 +148,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSRadio` · `DSRadioGroup` | `type` | `DEFAULT` · `BADGE` | `DSRadioType` |
 | `DSSkeleton` | `type` | `LINE` · `TEXT` · `LIST` · `CARD` · `FORM` · `TABLE` | `DSSkeletonType` |
 | `DSButton` | `type` | `SUBMIT` · `BUTTON`, `BUTTON` when unset | `DSButtonType` |
-| `DSButtonGroup` · `DSToolbar` · `DSTabs` · `DSSeparator` | `orientation` | `HORIZONTAL` · `VERTICAL`, `HORIZONTAL` when unset | `DSOrientationType` |
+| `DSButtonGroup` · `DSToolbar` · `DSTabs` · `DSSeparator` · `DSStepper` | `orientation` | `HORIZONTAL` · `VERTICAL`, `HORIZONTAL` when unset | `DSOrientationType` |
 | `DSButton` · `DSLink` · `DSMenubar` · `DSDropdownMenu` | `authzDenied` | `HIDE` · `DISABLE`, `HIDE` when unset | `DSAuthzDeniedType` |
 | `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorPlacement` | `LEFT` · `RIGHT`, `LEFT` when unset | `DSPlacementHorizontalType` |
 | `DSAccordion` · `DSAccordionGroup` · `DSCollapsible` | `indicatorExpandedIcon` · `indicatorCollapsedIcon` | an icon of the core's icons, `CHEVRON_UP` open and `CHEVRON_DOWN` closed when unset | `DSIconType` |
@@ -170,6 +170,8 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSTabs` | `color` | `BASE` · `DEFAULT` · `PRIMARY`, the theme's `layout.navigation.color` when unset | `DSSurfaceColorType` |
 | `DSTabs` | `entry` | `SOLID` · `QUIET` · `SUBTLE` · `LINE` · `PLAIN`, the theme's `layout.navigation.entry` when unset | `DSNavEntryType` |
 | `DSTabs` | `raised` | yes or no, no by default: a soft shadow and no colour, on the switch's open tab, on the pill's bar, or on the open tab of either where it stands without a bar; the line ignores it | none |
+| `DSStepper` | `type` | `NUMBER` · `ICON` · `DOT`, `NUMBER` when unset: the form of a step's indicator. `DOT` and not `BULLET`, because the `bulleted` of `DSList` already means a list's marker | `DSStepperType` |
+| `IDSStepperItem`, on `DSStepper`'s `items` | `taskState` | `IDLE` · `WORKING` · `DONE` · `FAILED`, four of the six values of the task state; unset, it follows from the step's place against the active step | `DSTaskStateType` |
 | `DSScrollArea` | `direction` | `VERTICAL` · `HORIZONTAL` · `BOTH`, `VERTICAL` when unset | `DSScrollDirectionType` |
 | `DSDrawer` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `BOTTOM` when unset | `DSDrawerPlacementType` |
 | `DSSheet` | `placement` | `LEFT` · `RIGHT` · `TOP` · `BOTTOM`, `RIGHT` when unset | `DSSheetPlacementType` |
@@ -178,7 +180,7 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSPopover` | `trigger` | `HOVER` · `CLICK`, `HOVER` when unset | `DSTriggerType` |
 | `DSSticky` | `mode` (required) | `TOP` · `BOTTOM` | `DSPlacementVerticalType` |
 
-**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
+**A block that draws itself by its place on a page takes `pageLevel` for that place, with the vocabulary `DSPageLevelType`** (`RD.SUPPORT.SURFACE.113`). The values are read from the top of the page down: `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT`, `INLINE`. `DSItem`, `DSItemFacts`, `DSTabs`, `DSStepper` and `DSFeature` take it, and a block takes no vocabulary of its own for its place on a page. `architecture-components.md` states what each level draws.
 
 **The shared vocabularies of the platform.** The Support contract realizes them for code, and the book states the values for a designer.
 

@@ -1,0 +1,237 @@
+{
+ "kind": "skeleton",
+ "title": "Questions",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature at CONTAINER, START: its title and description, and its contentNode a bordered DSAccordionGroup of three to eight questions, the first one open over its short answer. The accordion runs by the task pattern Disclose. On a phone it stands as it is.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What readers ask before they start",
+                   "description": "One line on who asks these.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSAccordionGroup",
+                   "bordered": true,
+                   "options": [
+                    {
+                     "header": "A question a reader asks?",
+                     "expanded": true,
+                     "content": "Its short answer, in a sentence or two."
+                    },
+                    {
+                     "header": "A second question?"
+                    },
+                    {
+                     "header": "A third question?"
+                    },
+                    {
+                     "header": "A fourth question?"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What readers ask before they start",
+                   "description": "One line on who asks these.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSAccordionGroup",
+                   "bordered": true,
+                   "options": [
+                    {
+                     "header": "A question a reader asks?",
+                     "expanded": true,
+                     "content": "Its short answer, in a sentence or two."
+                    },
+                    {
+                     "header": "A second question?"
+                    },
+                    {
+                     "header": "A third question?"
+                    },
+                    {
+                     "header": "A fourth question?"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What readers ask before they start",
+                   "description": "One line on who asks these.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSAccordionGroup",
+                   "bordered": true,
+                   "options": [
+                    {
+                     "header": "A question a reader asks?",
+                     "expanded": true,
+                     "content": "Its short answer, in a sentence or two."
+                    },
+                    {
+                     "header": "A second question?"
+                    },
+                    {
+                     "header": "A third question?"
+                    },
+                    {
+                     "header": "A fourth question?"
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

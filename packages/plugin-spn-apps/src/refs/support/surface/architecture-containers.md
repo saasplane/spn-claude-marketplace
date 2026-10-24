@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "fa27cfdc"
+      "seen": "33f6cb79"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "3106ebcb"
+      "seen": "1ff21d0e"
     }
   ]
 }
@@ -71,7 +71,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A page that holds several panels MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
 - **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
-- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The page patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
+- **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
 Here is how the parts serve the pages most apps have.
 
@@ -81,7 +81,7 @@ Here is how the parts serve the pages most apps have.
 | A form | the title of the form | its sections, one under another, each under its own title | the actions that save the form or leave it |
 | A dashboard | flat | raised, holding widgets that show numbers | none |
 
-**What the units do.** A listing's paging in the footer of the panel is the form the page patterns are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
+**What the units do.** A listing's paging in the footer of the panel is the form the app patterns are drawn in. `DSDataTable` hands its paging to a place the page gives it. The page puts an element in `DSPanelContainer.Footer` and names it as `settings.pagination.footerElement`, and the table draws its record count and its pager there. The table is handed a place and knows no panel, because a composite is a component, a layer before the panel. Where a page gives no place, the table draws its paging in a footer of its own, at the foot of the records.
 
 ## The look — 🔮
 
@@ -147,12 +147,12 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | Prop | Takes | What it decides |
 | --- | --- | --- |
 | `size` | `DSSizeType`. The app's size when unset | the room above and below, and the size every block inside the section takes |
-| `flush` | yes or no. No by default | whether the child runs to the edges of the section's place, with no gutter |
+| `flush` | yes or no. No by default | whether the section draws no room of its own on any side, above, below or at the sides, so that the child runs to the edges of the section's place. It means here what it means on a card part, a panel part and `DSList`: it draws no padding of its own (`RD.SUPPORT.SURFACE.313`) |
 | `mediaNode` | a node | art drawn behind the child from one edge of the place to the other: a picture, a gradient, a video, a canvas |
 | `inset` | yes or no. No by default | an inner shadow along the section's top and bottom edges, over its fill and its `mediaNode`, from `--shadow-inset`; it sets the section apart from its neighbours |
 | `id` | a string | the anchor a page's own links land on. The section lands below a sticky bar, never under it |
 
-- **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RD.SUPPORT.SURFACE.243`). The sides are the layout's gutter, so a page writes no padding, no maximum width and no gutter for a section. It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
+- **A section of a page MUST be `DSSectionContainer`, and it MUST be the only unit that gives a part of a page its fill and its room** (`RD.SUPPORT.SURFACE.243`). The room above and below comes from the section's size and the sides are the layout's space, `--layout-space` (`RD.SUPPORT.SURFACE.200`), so a page writes no padding, no maximum width and no gutter for a section. A section that is `flush` draws no room of its own on any side (`RD.SUPPORT.SURFACE.313`). It takes no header, no footer, no frame and no parts, and `DSPanelContainer` takes no section's job.
 - **A section MUST take its room above and below from its size, and hand that size to what it holds** (`RD.SUPPORT.SURFACE.247`). The size is the app's where it is unset, and every block inside the section takes it, as the blocks in a panel container take the panel's. Each value is a token, `--section-<step>-room` and `--section-<step>-gap`, with a smaller value under the layouts' phone width, and a partner overrides the tokens once for the whole site.
 
 | Size | Room above and below | Grid gap, or room on each side of a line | Typical use |
@@ -163,7 +163,7 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | `LG` | 112px · 64px | 40px · 24px | a section that leads |
 | `XL` | 128px · 72px | 48px · 32px | the hero |
 
-- **A section MUST reach the edges of its place and no further, and MUST stand straight in a place** (`RD.SUPPORT.SURFACE.254`). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and a `flush` child run from one edge of the place to the other, and the section's words stay in the body's box. A `flush` child lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A section never stands inside a panel, a card, an overlay or the nav column.
+- **A section MUST reach the edges of its place and no further, and MUST stand straight in a place** (`RD.SUPPORT.SURFACE.254`). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and the child of a `flush` section run from one edge of the place to the other, and the section's words stay in the body's box. The child of a `flush` section lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A section never stands inside a panel, a card, an overlay or the nav column.
 - **A partner MAY paint one section with a class of their own, through the paint token** (`RD.SUPPORT.SURFACE.192`). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section draws that colour from edge to edge of its place in place of its `color`. A section that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
 
 **The section stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The section frames nothing: it sets one part of a page apart from the next. A section is for the pages of a website and for a strip that opens an app's page, and an app part with a title and actions is a panel container. The theme holds no look for a section: a page alternates its sections on purpose, and the rhythm is in the stylesheet's tokens.
@@ -187,7 +187,7 @@ A media follows its kind, named before its art exists: the product (a screen, a 
 
 **The library draws `DSSectionContainer`:** `size`; `painted` `DARK`, `flush` and `inset` once each; `color` and `strength` as modes; `mediaNode` as a swap; and, as its usage, a website's band. **It draws `DSFeatureGridSectionContainer`** composed from `DSSectionContainer` with a `DSFeature` grid, and, as its usage, a website's band of features.
 
-A grid of features under a heading is `DSFeatureGridSectionContainer` (`RD.SUPPORT.SURFACE.259`). A section holds one child, so a heading over a few cells has no place in it: the heading would become a cell of the grid, or a second section above it. The grid section gives the heading and the cells one home, and a page writes it where it writes a section. The data decides when a section is a grid section: it holds a set of features that are each a thing of their own, such as the integrations or the component groups of a product, under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, description, facts and actions, with media or without, so media alone decides neither. It draws a `DSSectionContainer` from `section`, and its one child is a `DSFeature` at `CONTAINER` that holds the grid where its items stand.
+A grid of features under a heading is `DSFeatureGridSectionContainer` (`RD.SUPPORT.SURFACE.259`). A section holds one child, so a heading over a few cells has no place in it: the heading would become a cell of the grid, or a second section above it. The grid section gives the heading and the cells one home, and a page writes it where it writes a section. The data decides when a section is a grid section: it holds a set of features that are each a thing of their own, such as the integrations or the component groups of a product, under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, description, facts and actions, with media or without, so media alone decides neither. `site-patterns.md` states when a section of a site's page is a grid section, and its uses: shown features, a directory, plans and quotes. It draws a `DSSectionContainer` from `section`, and its one child is a `DSFeature` at `CONTAINER` that holds the grid where its items stand. A set of modules is such a grid: each cell has its mark, its kind as a fact, and the page it opens as its `anchor`, so it is a door, `frames` `TEXT` with `surface` `DEFAULT`, raised, `elevation` `MD`. Points of one subject, each a title and one line, are not a grid section: they are the items of one `DSFeature`.
 
 | Prop | Takes | What it decides |
 | --- | --- | --- |
@@ -200,8 +200,8 @@ A grid of features under a heading is `DSFeatureGridSectionContainer` (`RD.SUPPO
 
 - **A grid of features under a heading MUST be `DSFeatureGridSectionContainer`, and it MUST take `section`, and MAY take a `heading` and a `grid`.** `DSFeature` is not changed for it.
 - **The actions of the heading MUST stand under it, above the grid.** The unit passes `DSFeatureActionsPlacementType.BEFORE_ITEMS` and does not offer `actionsPlacement`. A feature frames nothing by default, so the heading is not framed.
-- **The grid section MUST NOT take `flush`.** With `flush` the title and the outer cells would stand at the window's edges, out of line with the bar and with the sections above and below.
-- **The grid section MUST take no `pageLevel` and hand the cells none.** The heading stands at `CONTAINER`, as a panel's does. Each cell is a `DSFeature` that names its own `pageLevel`: `WIDGET` for pillars, `GROUP` or `CONTENT` for a denser grid.
+- **The grid section MUST NOT take `flush`.** `flush` takes a child to the edges of its place with no room, for a child that pads its own track. With `flush` the title and the outer cells would stand at the window's edges, out of line with the bar and with the sections above and below.
+- **The grid section MUST take no `pageLevel` and hand the cells none.** The heading stands at `CONTAINER`, as a panel's does. Each cell is a `DSFeature` that names its own `pageLevel`: `WIDGET` for a thing of its own, such as a module or an integration, `GROUP` or `CONTENT` for a denser grid. A cell with none reads its place, which is `PAGE` on a website, so a page names a level on every cell.
 - **The columns MUST follow the screen class, and never a measured width** (`RD.SUPPORT.SURFACE.271`). `grid` states how many columns stand at a desktop, a tablet and a phone, each from 1 to 4, and the live device picks one. A number above 4 is read as 4 and one below 1 as 1. Nothing in the section measures its place.
 - **The gap and the lines MUST follow the section's size.** With `NONE` the cells stand the section's grid gap apart. With `GRID` or `EDGE` each cell keeps that gap as its room on every side and draws its own line at its end and at its bottom, so a short last row keeps its lines at every width. `EDGE` adds a line around the outside, rounded with the theme's radius.
 - **A section MAY take `inset`, the grid section MUST take it through `section`, and a reveal MUST play once** (`RD.SUPPORT.SURFACE.282`). `DSSectionContainer` takes no `reveal`, because a section holds no words of its own.
@@ -274,7 +274,7 @@ A block with `bordered` in a `flush` part keeps its border, because its own prop
 
 ## A panel in use — 🔮
 
-The three parts below are a panel in use. Each says how the same header, content and footer carry one of the page patterns of `standards-patterns.md`. None adds a prop or a part to the panel.
+The three parts below are a panel in use. Each says how the same header, content and footer carry one of the app patterns of `standards-patterns.md`. None adds a prop or a part to the panel.
 
 ### An entry over the page
 
@@ -313,14 +313,14 @@ Some pages hold things in groups: the fields of each record type, or the actions
 - **Both parts MUST be in view at a desktop only** (`RD.SUPPORT.SURFACE.079`). There a person goes from one group to the next without losing the list.
 - **On a tablet and on a phone the items MUST take the place of the groups.** The two parts do not fit side by side there.
 - **The part that holds the groups MAY be narrow, and a named choice MUST say so** (`RD.SUPPORT.SURFACE.119`). Where a group is read by its name alone, the items need most of the width. A unit that places the two parts keeps its usual width for the groups where the page chooses none, and it offers a narrower one by name. A page **MUST NOT** write a width of its own. The choice holds at a desktop, where both parts are in view.
-- **The swap MUST change the address.** It happens in place, and the address still changes to name the chosen group. So the back of the browser does the same as the back action. A reload stays on the chosen group, and a link to one group opens that group on every screen.
+- On the web the swap also changes the address, as `standards-patterns.md` states under *On the web: the address of a screen*.
 - **Each part MUST be shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`). The groups and the items seldom hold data of the same shape.
 - **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
 - **Many groups that a person searches MUST be a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, stated in `architecture-components.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
 
 Where the groups are few and fixed, the page needs no swap. Each group is a panel of its own, one under another on one page, and nothing is hidden.
 
-**What the units do.** The page patterns draw the back action on the title line of the panel that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
+**What the units do.** The app patterns draw the back action on the title line of the panel that holds the items. `DSPanelContainer.Header` has a small place for it before the title: a page gives the header the address to go back to, and the header draws a back action there, in one group with its first block, so the title stays at the start and the last block at the end. The back action stands level with the line of the title. While the items stand alone, that back action is the way back to the groups.
 
 **The foundation names no core unit that places the two parts** (`RD.SUPPORT.SURFACE.099`). The rules above say what a person sees, and they hold whatever places the parts. The web stack has a unit of its own that places them, `DSListDetail`: both parts at a desktop, and one at a time on a tablet and a phone. Its `listWidth` is the named choice for the width of the groups. `providers.md` names it and its values.
 
@@ -369,7 +369,8 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
 | `RD.SUPPORT.SURFACE.077` | an entry is one panel, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |
 | `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one panel, with no panel for each section |
-| `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the swap changes the address |
+| `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the items take the place of the groups on a tablet and a phone |
+| `RD.SUPPORT.SURFACE.313` | `flush` on a section means it draws no room of its own on any side, as it means on a card part, a panel part and a list |
 | `RD.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and never a row of tabs |
 | `RD.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for |
 | `RD.SUPPORT.SURFACE.069` | many groups a person searches are a data table in its `LIST` layout |

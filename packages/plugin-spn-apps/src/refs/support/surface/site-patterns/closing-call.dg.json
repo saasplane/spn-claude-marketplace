@@ -1,0 +1,210 @@
+{
+ "kind": "skeleton",
+ "title": "Closing call",
+ "caption": "A DSSectionContainer at size SM, color PRIMARY, strength SUBTLE, with inset, holds one DSFeature with textAlign CENTER and words alone, never framed: the one SOLID primary, and at most one OUTLINE that opens a page no door above it opens. A site whose brand reads as a solid band takes strength SOLID, with its buttons coloured DEFAULT. On a phone the words, then the buttons, one under another.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What to do now",
+                   "description": "The page's last words, and its one call to act.",
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Another page"
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What to do now",
+                   "description": "The page's last words, and its one call to act.",
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Another page"
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What to do now",
+                   "description": "The page's last words, and its one call to act.",
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true,
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Another page",
+                  "fill": true
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

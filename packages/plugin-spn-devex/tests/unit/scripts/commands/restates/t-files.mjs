@@ -8,8 +8,8 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { BOOK_TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { BOOK_PATTERNS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { exportTemplates, PATTERNS_SET } from "../../../../../src/scripts/commands/restates/files.ts";
+import { BOOK_PATTERNS, BOOK_SITE_PATTERNS, PLUGIN_PATTERNS, PLUGIN_SITE_PATTERNS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { exportTemplates, PATTERNS_SET, SITE_PATTERNS_SET } from "../../../../../src/scripts/commands/restates/files.ts";
 
 const BASE = mkdtempSync(join(tmpdir(), "t-restates-files-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -48,11 +48,11 @@ function exported(book, out, write) {
 
 const BOOK = { "pages/report-template.html": "<h1>report</h1>\n", "agent/hook-template.ts": "export const hook = 1;\n" };
 
-console.log("=== restates files — the specs of the page patterns, a flat folder with a page of the book's own");
+console.log("=== restates files — the specs of the app patterns, a flat folder with a page of the book's own");
 {
   // The book's folder holds two specs and a README it writes by hand; the copy takes the specs, and its README is the index.
   made += 1;
-  const book = join(BASE, `book-${made}`), out = join(BASE, `plugin-${made}`, "patterns"), from = join(book, BOOK_PATTERNS);
+  const book = join(BASE, `book-${made}`), out = join(BASE, `plugin-${made}`, "app-patterns"), from = join(book, BOOK_PATTERNS);
   mkdirSync(from, { recursive: true });
   writeFileSync(join(from, "find-in-a-list.dg.json"), '{"kind":"skeleton"}\n', "utf8");
   writeFileSync(join(from, "overview.dg.json"), '{"kind":"skeleton"}\n', "utf8");
@@ -67,7 +67,7 @@ console.log("=== restates files — the specs of the page patterns, a flat folde
   ok("[MKT.SCRIPTS.176] the book keeps its own README, and gains an index of its specs", readFileSync(join(from, "README.md"), "utf8").startsWith("# The specs, by the book") && readFileSync(join(from, "index.md"), "utf8").includes("`overview.dg.json`"));
   const bookIndex = readFileSync(join(from, "index.md"), "utf8");
   ok("[MKT.SCRIPTS.176] the book's index sits inside the docs tree, so it opens with an `spn:doc` block that holds the set's id and title",
-    bookIndex.startsWith('<!-- spn:doc\n{\n  "id": "surface-standards-patterns-specs-index",\n  "title": ') && bookIndex.includes('"status": "PLANNING"') && bookIndex.includes("-->\n\n# The specs of the page patterns this book owns"), bookIndex.slice(0, 300));
+    bookIndex.startsWith('<!-- spn:doc\n{\n  "id": "surface-standards-patterns-specs-index",\n  "title": ') && bookIndex.includes('"status": "PLANNING"') && bookIndex.includes("-->\n\n# The specs of the app patterns this book owns"), bookIndex.slice(0, 300));
   ok("[MKT.SCRIPTS.176] the block is strict JSON with the fields of a doc block", (() => {
     const block = JSON.parse(bookIndex.slice(bookIndex.indexOf("{"), bookIndex.indexOf("\n-->")));
     return ["id", "title", "lenses", "status", "summary", "keywords"].every((field) => field in block);
@@ -78,6 +78,40 @@ console.log("=== restates files — the specs of the page patterns, a flat folde
   writeFileSync(join(from, "overview.dg.json"), '{"kind":"skeleton","title":"x"}\n', "utf8");
   const behind = [];
   ok("[MKT.SCRIPTS.176] known-bad: an edited spec is reported behind, and the check exits 1", exportTemplates(book, out, false, (line) => behind.push(line), PATTERNS_SET) === 1 && behind.join("\n").includes("overview.dg.json"), behind.join("\n"));
+}
+
+console.log("=== restates files — the specs of the site patterns, a second flat folder beside the app patterns'");
+{
+  // The two folders sit side by side in the book and in the apps plugin, each named by its group.
+  ok("[MKT.SCRIPTS.176] the book's two folders of specs are app-patterns/ and site-patterns/, side by side",
+    BOOK_PATTERNS.endsWith("/01-common/app-patterns") && BOOK_SITE_PATTERNS.endsWith("/01-common/site-patterns")
+      && dirname(BOOK_PATTERNS) === dirname(BOOK_SITE_PATTERNS), `${BOOK_PATTERNS}\n        ${BOOK_SITE_PATTERNS}`);
+  ok("[MKT.SCRIPTS.176] and the apps plugin's two copies take the same names, beside the surface refs",
+    PLUGIN_PATTERNS === "refs/support/surface/app-patterns" && PLUGIN_SITE_PATTERNS === "refs/support/surface/site-patterns", `${PLUGIN_PATTERNS} · ${PLUGIN_SITE_PATTERNS}`);
+  made += 1;
+  const book = join(BASE, `book-${made}`), out = join(BASE, `plugin-${made}`, "site-patterns"), from = join(book, BOOK_SITE_PATTERNS);
+  mkdirSync(from, { recursive: true });
+  writeFileSync(join(from, "hero.dg.json"), '{"kind":"skeleton"}\n', "utf8");
+  writeFileSync(join(from, "README.md"), "# The site specs, by the book's own hand\n", "utf8");
+  // An app pattern's spec in the other folder is no site spec, and is never copied with them.
+  mkdirSync(join(book, BOOK_PATTERNS), { recursive: true });
+  writeFileSync(join(book, BOOK_PATTERNS, "overview.dg.json"), '{"kind":"skeleton"}\n', "utf8");
+  const lines = [];
+  const code = exportTemplates(book, out, true, (line) => lines.push(line), SITE_PATTERNS_SET);
+  ok("[MKT.SCRIPTS.176] the site specs are copied on their own, and the report counts them", code === 0 && /^1 spec\(s\) exported/.test(lines.join("\n")) && !existsSync(join(out, "overview.dg.json")), lines.join("\n"));
+  const index = readFileSync(join(out, "README.md"), "utf8");
+  ok("[MKT.SCRIPTS.176] the copy's index names the site folder in its one stamp, and the site patterns in its title",
+    index.includes(`"path": "spn-foundation/${BOOK_SITE_PATTERNS}"`) && index.includes("# The specs of the site patterns, as a partner has them")
+      && index.includes("[`hero.dg.json`](hero.dg.json)") && !index.includes("by the book's own hand"), index.slice(0, 600));
+  const bookIndex = readFileSync(join(from, "index.md"), "utf8");
+  ok("[MKT.SCRIPTS.176] the book's index of the site specs has an id of its own, apart from the app specs' index",
+    bookIndex.startsWith('<!-- spn:doc\n{\n  "id": "surface-standards-patterns-site-specs-index",') && bookIndex.includes("-->\n\n# The specs of the site patterns this book owns")
+      && SITE_PATTERNS_SET.bookDoc.id !== PATTERNS_SET.bookDoc.id, bookIndex.slice(0, 300));
+  ok("[MKT.SCRIPTS.176] no word of either set names the group by its old name",
+    !/page.pattern/i.test(JSON.stringify(PATTERNS_SET.bookDoc) + JSON.stringify(SITE_PATTERNS_SET.bookDoc) + bookIndex + index
+      + PATTERNS_SET.bookIndex([]).join("\n") + PATTERNS_SET.copyIndex("x", []).join("\n")));
+  const again = [];
+  ok("[MKT.SCRIPTS.176] a second check finds the site copy current", exportTemplates(book, out, false, (line) => again.push(line), SITE_PATTERNS_SET) === 0, again.join("\n"));
 }
 
 console.log("=== restates files — a copy the book no longer holds");

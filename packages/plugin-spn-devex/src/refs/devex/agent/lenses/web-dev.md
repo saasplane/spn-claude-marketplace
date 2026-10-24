@@ -24,7 +24,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",
-      "seen": "31dcdddd"
+      "seen": "8173c4aa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/02-accessibility.md",

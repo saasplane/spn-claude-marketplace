@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "484c7e0c"
+      "seen": "2677562f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "8232789c"
+      "seen": "fd347f81"
     }
   ]
 }
@@ -55,7 +55,7 @@ Twelve groups, each answering one need of a surface. The list holds the core uni
 | Feedback | what a surface says while it works, and when it fails | `DSAlert` · `DSSpinner` · `DSToast` · `DSProgress` · `DSProgressCircle` · `DSSkeleton` · `DSEmpty` |
 | Structure | the small blocks that divide, scroll or fold a part of a page, or stand it on a fill | `DSCollapsible` · `DSHScroll` · `DSScrollArea` · `DSSeparator` · `DSSurface` |
 | Media | images and icons | `DSAspectRatio` · `DSIcon` · `DSMark` · `DSImage` |
-| Navigation | moving between places | `DSBreadcrumb` · `DSMenubar` · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSNavEntry` · `DSPagination` · `DSTabs` · `DSLink` · `DSAnchor` |
+| Navigation | moving between places | `DSBreadcrumb` · `DSMenubar` · `DSNavList` · `DSNavMenu` · `DSNavBarSide` · `DSNavBarTop` · `DSNavEntry` · `DSPagination` · `DSTabs` · `DSStepper` · `DSLink` · `DSAnchor` |
 | Overlays | interruption | `DSDialog` · `DSConfirmDialog` · `DSDrawer` · `DSSheet` · `DSBackdrop` |
 | Popovers | more, shown beside the block that asked for it | `DSContextMenu` · `DSDropdownMenu` · `DSHoverCard` · `DSPopover` · `DSConfirmPopover` · `DSTooltip` |
 | Typography | text | `DSText` · `DSKbd` |
@@ -73,7 +73,7 @@ The surface has two levels (`RD.SUPPORT.SURFACE.081`). The word core unit does n
 
 | Level | Holds | Who states it |
 | --- | --- | --- |
-| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the page patterns and their skeletons | the book, once, for every stack |
+| The core | the units the book names, with their props, their vocabularies and their rules; the task patterns; the app patterns and their skeletons | the book, once, for every stack |
 | A stack's own | further units that help build apps on that stack, most of them put together from core units | the stack, in its own docs |
 
 - **A stack's design system MUST build every core unit, and it MAY provide further units of its own that help build apps.** Such a unit is usually put together from core units, for a need that many pages of that stack share.
@@ -82,6 +82,23 @@ The surface has two levels (`RD.SUPPORT.SURFACE.081`). The word core unit does n
 - **A unit that every stack should build joins the core units, in the book first.** A unit that stays with one stack needs no line there.
 
 So an agent that builds a page reads its pattern and its skeleton from the book. It then picks the units from the stack's design system, the core units and the stack's own, or from a partner's own code.
+
+### A new unit weighs every axis the surface offers
+
+The surface already answers most of what a new unit must decide: how dense it is, where on a page it stands, which hue it wears, how strongly it is filled, which way it runs, which device it is drawn for, where its task stands, and how large its words are. A unit designed from the need in front of it alone misses some of these, and each miss shows only when it stands beside one that took it. Most units take only some of the axes: a select runs one way, and a tooltip has no task of its own. What the rule asks is that each axis was weighed, and the answer written down.
+
+- **A new unit MUST name each shared axis of the surface it takes, and give a reason for each it leaves out, and its preview MUST show that table before the unit is approved** (`RD.SUPPORT.SURFACE.316`). This holds for a core unit, for a stack's own unit and for a unit in a partner's own code. An axis the unit takes uses the shared name and vocabulary, never a prop of its own for the same thing. A reason names what the unit is for, such as *"a value has no place on a page of its own, so it takes the level of the row it stands in"*; *"not needed"* is no reason.
+
+  | Axis | The prop or the source | Take it where |
+  | --- | --- | --- |
+  | Density | `size`, `DSSizeType` | the unit holds a control, a row or a mark that stands beside another unit's |
+  | Place on a page | `pageLevel`, `DSPageLevelType` | the unit's size or look should change between a page, a panel, a card and a row, as the tabs' and the stepper's do |
+  | Hue | `color`, `DSColorType` | the unit draws a brand or a status colour |
+  | Strength | `variant`, the shared surface treatment | the unit draws a fill, a line or a tint |
+  | Direction | `orientation`, `DSOrientationType` | the unit lays its items in a run that could stand across or down |
+  | Device | the device from the context it is drawn in | the unit's layout changes on a phone; it never measures a width of its own |
+  | Task state | `DSTaskStateType`, or the states of the block's data | the unit is drawn from data, or shows where a task stands |
+  | The words of each part | the type step its `size` or `pageLevel` gives | the unit has a title, a label or a description; each part's step follows the unit's size or level, never a fixed step |
 
 ## The contract every component supports — 🔮
 
@@ -132,6 +149,7 @@ Each rule below is of one block or one prop. The props, their values and their d
 | `DSCard` | **A card MAY hold the parts `DSCard.Header`, `DSCard.Content` and `DSCard.Footer`.** A part pads itself, from the size of the card. Each part takes `flush`, which drops that padding so that what the part holds reaches the edge of the card, and no other prop. The title of a card is an item line in its header, and it starts where what the card holds starts. `divided` draws a line between each two parts, from edge to edge. It is a prop of the card that the page writes, and it is no by default. A card takes each key of its `surface` from its own prop where the prop is given, else from the card look of the theme, and the parts its frame holds from its `frames` (`architecture-app.md`). A pressed card is pressed whole, its flat header with it. A part not listed in `frames` stands flat outside the frame, half the card's gap from the frame beside it (`RD.SUPPORT.SURFACE.262`). **A panel or a card that holds parts, or more than one content part, MUST have a title:** an item line in its header, at the level its box gives, `CONTAINER` for a panel and `WIDGET` for a card. A card that is one plain block of content needs none. A card takes no height of its own (`RD.SUPPORT.SURFACE.270`): in a block it is as tall as what it holds, and in a grid or a row every card stands as tall as the tallest, so the cards of one row end on one line. `fullHeight` makes the card fill the height of a place with a set height. A content part of a card is never shorter than what it holds, and only the last content part grows to fill the card, so the footer stands at the end. What then tells a card from a panel is in `architecture-containers.md` |
 | `DSItem` | **A `DSItem` draws its picture, its text and its end node, and nothing around them** (`RD.SUPPORT.SURFACE.175`). It takes no padding, no border and no fill under the pointer, at any level and at any size, and no `bleed`. Its `anchor` stays: one link that covers the item, with its end node outside the link and a focus ring. The place it stands in gives it its room and its highlight. A row of `DSList.Item` pads by its size and lights up under the pointer where the row or the item it holds is a link. A row in a `flush` part keeps the padding of its size above and below and takes the inset of its place at its two sides, so its text lines up with a title in a part that insets and its band runs from edge to edge. A data table's list, a card widget's rows, the header and the parts of a panel and of a card, the header of an overlay and the trigger of a menu that wraps an item line give that room the same way |
 | `DSColorView` | **Shows a stored colour that a person reads:** a small swatch, and the value beside it as text. With no colour it shows a dash, or the words of `emptyLabel`. `swatchOnly` draws the swatch alone. A colour that is part of a block's own look, such as a badge drawn in its colour, is not shown through this block |
+| `DSCarousel` | **A carousel MUST mark every slide that is not in view `inert` and `aria-hidden`** (`RD.SUPPORT.SURFACE.311`). It is the standard carousel pattern. A slide out of view can then be neither reached by the keyboard nor read by a screen reader, and a carousel that shows several slides keeps all of them readable, so a carousel of features adds no `h1` for each slide to the page |
 | `DSTagGroup` | **A set of tags a person removes from.** Each tag is drawn as a `DSBadge` with its close action, and the keyboard reaches each one. The page holds the set: it adds a tag elsewhere, and takes the tag out when the group reports that one was removed. A choice from a fixed set is `DSToggleGroupMulti`, and not this block |
 | `DSToggle` · `DSToggleGroup` · `DSToggleGroupMulti` | **A pressed toggle MUST keep its border in every colour, and a pressed toggle of the default hue MUST take a fill a person can see** (`RD.SUPPORT.SURFACE.146`). A pressed toggle draws `QUIET` of its hue. So the pressed option of a group keeps its edge beside the others. Of the default hue, the pressed fill is `surface-soft-hover`, one step stronger than the fill under the pointer, with the strong border |
 | `DSCalendar` | **The month grid by itself, on the page.** It is the grid that `DSDatePicker` opens, with no field and no popover around it. Its value is one date, or none |
@@ -162,9 +180,11 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 | `pageLevel` | The tabs are | Their look, with no `type` | At the size of the theme, `SM` |
 | --- | --- | --- | --- |
-| `PAGE` | the sub-pages of a page | `PILL`, grouped on its track and not raised | a label of 16px in a row of 40px |
-| `CONTAINER` · `WIDGET` | the parts of a panel or of a card | `LINE` | a label of 14px in a row of 36px |
-| `GROUP` · `CONTENT` · `INLINE` | two ways to show one thing | `SWITCH` | a label of 13px in a row of 32px |
+| `PAGE` | the sub-pages of a page | `PILL`, grouped on its track and not raised | a label of 18px in a row of 44px |
+| `CONTAINER` | the parts of a panel | `LINE` | a label of 16px in a row of 40px |
+| `WIDGET` | the parts of a card | `LINE` | a label of 14px in a row of 36px |
+| `GROUP` · `CONTENT` | two ways to show one thing | `SWITCH` | a label of 13px in a row of 32px |
+| `INLINE` | two ways to show one value | `SWITCH` | a label of 12px in a row of 28px |
 
 - **A page MUST name the `type` of its tabs only where the level's look does not belong, and the pages of a website MUST take `PILL`** (`RD.SUPPORT.SURFACE.209`). `type` takes `DSTabsType` and changes the look alone: the level still gives the size, and the keys and the focus ring are the same in each type. An app keeps choosing by level.
 
@@ -193,12 +213,64 @@ Each rule below is of one block or one prop. The props, their values and their d
 
 - **Every `type` MUST stand one under another and share the whole width** (`RD.SUPPORT.SURFACE.213`). With `orientation` `VERTICAL` the line runs down the side, the switch is a column on the bar's fill and the pill a column on the same fill with a panel's large radius, its tabs fully rounded as across; with `fill` the tabs of every type share the width equally.
 
-- **A unit that takes a page level MUST be given its `pageLevel` first, and its `size` only to override the size the level gives** (`RD.SUPPORT.SURFACE.209`). `DSItem` and `DSItemFacts` take no `size`, so the level is all a page gives them.
+- **A unit that takes a page level MUST be given its `pageLevel` first, and its `size` only to replace the size of its place** (`RD.SUPPORT.SURFACE.209`). The level says where the unit stands, and the size of its place and its level give its size; a page that passes `size` as well says that this one unit counts the level from a size other than its place's, and the level still raises that size. `DSItem` and `DSItemFacts` take no `size`, so the level is all a page gives them.
 
-- **The `size` of the tabs picks the step, and the level says how far above it the tabs are drawn.** At `GROUP`, `CONTENT` and `INLINE` a tab is drawn at the step of its size. At `CONTAINER` and `WIDGET` it is drawn one step above, and at `PAGE` two steps above, and never above `XL`. A step gives the label its content step and the row the height of a control.
+- **The `size` of the tabs MUST pick the step, and the level MUST say how far from it the tabs are drawn, one step for each level** (`RD.SUPPORT.SURFACE.315`). At `GROUP` and `CONTENT` a tab is drawn at the step of its size. At `WIDGET` it is drawn one step above, at `CONTAINER` two steps above and at `PAGE` three, and at `INLINE` one step under, never above `XL` and never under `XS`. So each level from the page down to the widget is one step apart, as the titles of those levels are. A step gives the label its content step and the row the height of a control.
+
+  | Size of the tabs | `INLINE` | `GROUP` · `CONTENT` | `WIDGET` | `CONTAINER` | `PAGE` |
+  | --- | --- | --- | --- | --- | --- |
+  | `XS` | 12px in a row of 28px | 12px in a row of 28px | 13px in a row of 32px | 14px in a row of 36px | 16px in a row of 40px |
+  | `SM` | 12px in a row of 28px | 13px in a row of 32px | 14px in a row of 36px | 16px in a row of 40px | 18px in a row of 44px |
+  | `MD` | 13px in a row of 32px | 14px in a row of 36px | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px |
+  | `LG` | 14px in a row of 36px | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px |
+  | `XL` | 16px in a row of 40px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px | 18px in a row of 44px |
 - **Tabs that say no level and no type draw the switch.** The tabs of the parts of a panel or of a card say `CONTAINER` or `WIDGET`, and the tabs that lead to the sub-pages of a whole page say `PAGE`.
 - **In a `flush` part, the tabs MUST place their first tab and their panel by the inset of their place** (`RD.SUPPORT.SURFACE.118`). The label of the first tab starts at that inset, so it starts where the text under it starts. The line of the tabs still runs from edge to edge. The panel takes the same inset at its sides, and what it holds stands in a padded place. So a title in the panel takes no inset of its own, and a code view or a table in the panel keeps its border.
 - **A page MUST NOT write a padding for the tabs or for their panel.** The part says that it is `flush`, and the tabs do the rest.
+
+### DSStepper
+
+`DSStepper` shows where a person stands in a run of steps: a form in parts, such as a sign-up, or a timeline, such as a parcel's journey or an account being set up. A page hands it its steps as data and never builds the parts one by one (`RD.SUPPORT.SURFACE.308`). It is a block drawn from data, a host and an item, so it names a step by its `key` as `DSTabs` names a tab, and takes the shared names for its look. It sits in Navigation beside `DSTabs`, because it moves a person between the steps of a run, takes the open step as `activeKey` and calls `onActiveKeyChange` when a person returns to one.
+
+| Prop | Takes | Unset | What it decides |
+| --- | --- | --- | --- |
+| `items` | `IDSStepperItem[]`, required | — | the steps, in the order they are drawn |
+| `activeKey` | a step's `key` | the stepper keeps its own | the open step, said by the page. A key and not an index, so a step added or hidden moves no other |
+| `defaultActiveKey` | a step's `key` | the first step | the seed when the page does not hold the open step |
+| `onActiveKeyChange` | `(key: string) => void` | no step can be pressed | given, the steps a person may return to become buttons. It pairs with `activeKey` |
+| `type` | `DSStepperType`: `NUMBER` · `ICON` · `DOT` | `NUMBER` | the form of a step's indicator |
+| `orientation` | `DSOrientationType`: `HORIZONTAL` · `VERTICAL` | `HORIZONTAL` | the axis the steps run along |
+| `pageLevel` | `DSPageLevelType`, all six levels | the level of the box it stands in | where the stepper stands on a page; it raises the size, the indicator and the words |
+| `size` | `DSSizeType`: `XS` to `XL` | the size of its place | the size the level counts from; given, it replaces the size of the place, and the level still raises it |
+| `color` | `DSColorType` | `PRIMARY` | the hue of the done and the current steps and of the bar between them |
+| `testData` | as every unit | — | the root's test hook; each step carries its own |
+
+A step is `IDSStepperItem`, which extends `IDSDataOption`, so a step is an option, as a tab is: `key`, `label`, `disabled`, `data` and `testData` are the option's; `startIcon` is its indicator where `type` is `ICON` (ignored by `NUMBER` and `DOT`); `endIcon` stands after its title, such as a lock on a step the person cannot open yet; `description` is the line under the title; and `taskState` takes `DSTaskStateType`, `IDLE` · `WORKING` · `DONE` · `FAILED`. `NUMBER` draws each step's number and is the one form that draws numbers; `ICON` draws each step's `startIcon`, and a step with none falls back to a dot; `DOT` draws a dot. A done step draws its check in `NUMBER` and `ICON`, and a filled dot in `DOT`.
+
+- **A stepper MUST take its steps as data, and a step MUST take a task state and invent no state of its own** (`RD.SUPPORT.SURFACE.308`, `RD.SUPPORT.SURFACE.309`). There is no `PENDING` and no `IN_PROGRESS`: pending is `IDLE`, and in progress is `WORKING`. `EMPTY` and `DENIED` are task states of a block's data, and a step takes neither.
+- **A step's task state MUST be the one its `taskState` gives, else the one its place gives against `activeKey`** (`RD.SUPPORT.SURFACE.308`). Unset, the steps before the active one are `DONE`, the active one `WORKING` and the steps after it `IDLE`; no step is `FAILED` unless the page says so. A form in steps gives `activeKey` alone; a timeline gives each step its own `taskState`, because two may be in progress at once. A step's own `taskState` wins.
+
+| Task state | Unset, which steps take it | The indicator | The bar after it | Words for a screen reader |
+| --- | --- | --- | --- | --- |
+| `DONE` | the steps before the active one | filled in `color`, a check | filled in `color` | "Done" |
+| `WORKING` | the active one | a ring in `color`, its number, icon or dot in `color` | the track | "In progress"; the active step also carries `aria-current="step"` |
+| `IDLE` | the steps after the active one | an outline in the border token, its number, icon or dot muted | the track | "Not started" |
+| `FAILED` | none: only the page says a step failed | filled in `ERROR`, the error icon | the track | "Failed" |
+
+- **The indicator MUST be a mark at the stepper's size, the title MUST take that size's type step as a tab's label does, and the description MUST stand one step under it** (`RD.SUPPORT.SURFACE.308`, `RD.SUPPORT.SURFACE.314`). A `DOT` is a dot a third of that size. The title is 12, 13, 14, 16 and 18px from `XS` to `XL`, in the title weight; the description is 12, 12, 13, 14 and 16px in the muted tone. An icon after the title follows the title's size.
+- **Horizontal, each step's indicator MUST stand on the row with a bar to the next one, and its words under it. Below the small screen class the row MUST keep its indicators and bars, and only the current step's title and description MUST stand under it, with "Step 2 of 4" before the title** (`RD.SUPPORT.SURFACE.308`). So four titles never crush into a phone's width.
+- **Vertical, the indicator MUST stand at the start of the title's line, the bar MUST run down to the next indicator, and the description MUST stand under the title** (`RD.SUPPORT.SURFACE.308`).
+- **The root MUST be an `ol` and each step an `li`, and the active step MUST carry `aria-current="step"`** (`RD.SUPPORT.SURFACE.308`). A step a person may press is a button inside its `li`, with the focus ring; Tab moves between them and Enter or Space presses one.
+- **A person MUST be able to press a done step and the current one, and MUST NOT be able to press an upcoming step** (`RD.SUPPORT.SURFACE.308`). Going forward waits on what the current step checks, which the page decides when it moves `activeKey`. A step is pressed only where `onActiveKeyChange` is given.
+- **The page level of a stepper MUST decide its size, as the tabs' does** (`RD.SUPPORT.SURFACE.314`, `RD.SUPPORT.SURFACE.315`). The level moves its step by the tabs' steps: `PAGE` three up, `CONTAINER` two, `WIDGET` one, `GROUP` and `CONTENT` none, and `INLINE` one down, never above `XL` and never under `XS`. A `size` given replaces the size of the place the level counts from, and the level still moves it: at `PAGE`, in a place of `SM`, the stepper is `XL`; with `size` `XS` it is `LG`.
+
+  | `pageLevel` | The stepper is | At the theme's `SM`: the indicator, the title, the description |
+  | --- | --- | --- |
+  | `PAGE` | the steps of a page, such as a sign-up | 44px, 18px, 16px |
+  | `CONTAINER` | the steps in a panel | 40px, 16px, 14px |
+  | `WIDGET` | the steps in a card | 36px, 14px, 13px |
+  | `GROUP` · `CONTENT` | the steps inside a part, or a row | 32px, 13px, 12px |
+  | `INLINE` | the steps inside a value | 28px, 12px, 12px |
 
 ## The navigation units — ✅
 
@@ -429,7 +501,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 | A title and a description | the claim in one colour, and a sentence under it | `title`, `description` |
 | Facts | one quiet line of short facts | `facts`, `factsPlacement` |
 | Items | item lines drawn inside the feature, at a level the feature gives them by its own, given as one group | `items` |
-| A part of the page's own | what only the page can draw, such as a stepper, in the place of the items | `contentNode` |
+| A part of the page's own | a node in the place of the items: a stepper is `DSStepper`, given as the `contentNode` | `contentNode` |
 | Actions | what to do next, the main action first, after the items or before them | `actions`, `actionsPlacement` |
 | Media | a small picture in the item line's shape, or a node of art as wide as the feature | `media`, `mediaNode` |
 | The whole feature as a link | the feature pressed as one tile | `anchor` |
@@ -445,7 +517,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 | `numbered` | yes or no. No by default | whether the numbers 1 to n stand before the titles, as text. `GRID` and `LIST` only |
 | `orientation` | `DSOrientationType`. Unset, `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` | how every item stands |
 | `borderType` | `DSGridBorderType`: `NONE` · `GRID` · `EDGE`. Unset, `GRID` for `LIST` and `NONE` for `GRID` and `STATS` | the lines between the items, and around them with `EDGE`. Not read where `surface` is set |
-| `surface` | `IDSFrameSurface`. A key left out takes the card's theme | each item in a frame of its own, the level's gap apart; a boxed item's room lies inside its frame (`RD.SUPPORT.SURFACE.284`) |
+| `surface` | `IDSFrameSurface`: `color` · `strength` · `raised` · `elevation` · `bordered` · `rounded`. A key left out takes the card's theme | each item in a frame of its own, the level's gap apart; a boxed item's room lies inside its frame (`RD.SUPPORT.SURFACE.284`) |
 | `gridColumns` | `IDSGridColumns`: `desktop`, `tablet` and `mobile`, each from 1 to 4. Left out, the count of the items decides the desktop number: one for one item, two for two or four, three for any other count; the tablet is that number held to two, and a phone is one | how many columns a `GRID` and `STATS` stand in at each screen class. A `LIST` is one column |
 
 The level the feature gives its items is part of the prop's comment: `WIDGET` under `PAGE` and `CONTAINER`, `GROUP` under `WIDGET`, `CONTENT` under `GROUP` and `CONTENT`, `INLINE` under `INLINE`.
@@ -495,7 +567,7 @@ Each of these but the box of a small media is a token of the level (`architectur
 - **A feature MUST draw its items as item lines at a level it gives them by its own, and each level MUST take the heading element of its own level** (`RD.SUPPORT.SURFACE.235`). A `PAGE` or a `CONTAINER` feature gives `WIDGET`, a `WIDGET` feature gives `GROUP`, a `GROUP` or a `CONTENT` feature gives `CONTENT`, and an `INLINE` feature gives `INLINE`; the table above gives the size of each. The items are inner content, so they stand a step or more below the feature and never larger than `WIDGET`. Only the room between two items follows the feature's level, not the items' own, and it is the frame padding of the level the items are drawn at (`RD.SUPPORT.SURFACE.275`): 24px at `PAGE` and `CONTAINER`, 16px at `WIDGET`, 12px at `GROUP`, `CONTENT` and `INLINE`. The feature and each item take the heading element of their own level: `h1` at `PAGE`, `h2` at `CONTAINER`, `h3` at `WIDGET`, `h4` at `GROUP`, and none at `CONTENT` and `INLINE`, so an item's element follows the level the feature gives it: `h3` under `PAGE` and `CONTAINER`, `h4` under `WIDGET`, none under the rest. A feature uses items mostly at `PAGE` and `CONTAINER`, one or two at `WIDGET` and seldom at `GROUP`; no rule in code enforces it, and the showcase shows it.
 - **`items.type` MUST decide how the items stand.** `GRID` stands them side by side in the columns `items.gridColumns` asks for, and where the page asks for none, in as many columns as there are items, up to three, with four items in two rows of two. `LIST` stands them one under another with a line between each two. `STATS` stands them side by side, each title a number and each description its label, at the sizes of the level one below the feature's own (the last column of the table above), so a hero's numbers stay large and a number is never a size the page picks.
 - **The feature MUST give the orientation to every item, and an item MUST NOT set its own.** `items.orientation` is `VERTICAL` for `GRID` and `HORIZONTAL` for `LIST` where it is unset. So a grid never mixes an item that stands up with one that lies down.
-- **`items.numbered` MUST draw the numbers 1 to n as text on the title's line,** in the title's size and weight and the muted tone. It applies to `GRID` and `LIST` only, and `STATS` draws none. A stepper with a bar from one number to the next is a part only the page can draw, so it is a `contentNode`.
+- **`items.numbered` MUST draw the numbers 1 to n as text on the title's line,** in the title's size and weight and the muted tone. It applies to `GRID` and `LIST` only, and `STATS` draws none. A stepper with a bar from one number to the next is `DSStepper`, given as the `contentNode`.
 - **`items.gridColumns` MUST follow the screen class, and never a measured width** (`RD.SUPPORT.SURFACE.269`, `RD.SUPPORT.SURFACE.271`). The live device picks the desktop, tablet or mobile number. A number above 4 is read as 4 and one below 1 as 1. The feature's items, the grid section and every other grid share one map of columns.
 - **A `VERTICAL` item and a statistic MUST line up as the feature's heading does, and a `HORIZONTAL` item MUST stand at the start** (`RD.SUPPORT.SURFACE.269`). Under `textAlign` `CENTER` each vertical item's picture, title, description and facts stand centred, under `END` at the end, and under `START` at the start. A `HORIZONTAL` item is a row: its icon and words line up at the start at every `textAlign`, and its group still stands where `textAlign` puts it.
 - **The items of a `GRID` and of `STATS` MUST keep a width of at most one column width per column, and stand where `textAlign` puts them** (`RD.SUPPORT.SURFACE.269`). The column width is 20rem, one value of the design system. The width is an upper bound: a narrower place still steps the columns down by its own width.
@@ -571,7 +643,7 @@ The item line, `DSItem`, shows one thing as a line. It takes no `selected`: in a
 
   | Kind | What the page gives | What the block draws |
   | --- | --- | --- |
-  | `ICON` | the icon, and nothing else | the icon alone, with no background, on the line of the title, as large as the title or the next icon step up |
+  | `ICON` | the icon, and nothing else | the icon alone, with no background, on the line of the title, at the size of its level, as the table of a bare icon below states |
   | `MARK` | what a mark takes that is not a size: its icon or its text, its colour, its variant, its shape and its accessible name | a `DSMark`, at the scale size the level and the rows of the text give. It is a rounded square where the page names no shape |
   | `AVATAR` | what an avatar takes that is not a size: the name it stands for, the address of its picture, and what else an avatar takes | a `DSAvatar`, at that scale size |
   | `AVATAR_GROUP` | what a group of avatars takes that is not a size: its avatars, and how many it shows at most | a `DSAvatarGroup`, at that scale size |
@@ -624,7 +696,16 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 - **The picture MUST stand at the middle of the text at every level, and `mediaAlign` MAY move it.** `mediaAlign` takes `DSVerticalAlignType`: `TOP`, its top at the top of the title's first line; `CENTER`, the default; and `BOTTOM`, its foot at the foot of the text's last line. A title alone keeps its picture in the middle of its room, whatever `mediaAlign` says.
 - **An icon MUST take `tone` as a text does, and `tone` MUST win over `color`** (`RD.SUPPORT.SURFACE.303`). The tone colours the glyph in the foreground of that tone, so a page mutes an icon with the prop and not with a class of its own. Where `tone` is set, `color`, `customColor` and the colour of the pointer do not apply.
 - **A bare icon of an item line that the page gives no `color` and no `tone` MUST draw in the muted tone, as a default mark's icon does** (`RD.SUPPORT.SURFACE.187`, `RD.SUPPORT.SURFACE.304`). A page that wants the colour of the title passes `color` `DEFAULT`.
-- **A bare icon MUST follow the line of the title.** It is as large as the title, or the next icon step up where no step is equal, and it stands in the middle of the title's first line. `mediaAlign` does not move it.
+- **A bare icon MUST be drawn at the size of its level, and it MUST stand in the middle of the title's first line** (`RD.SUPPORT.SURFACE.310`). `mediaAlign` does not move it.
+
+  | `pageLevel` | The bare icon | The title beside it |
+  | --- | --- | --- |
+  | `PAGE` | 32px | 22px |
+  | `CONTAINER` | 24px | 18px |
+  | `WIDGET` | 18px | 16px |
+  | `GROUP` | 14px | 14px |
+  | `CONTENT` | 14px | 13px |
+  | `INLINE` | 12px | 12px |
 - **A line that says who did a thing and when MUST be an item line at `INLINE`.** Its picture is the `AVATAR` of the person, its title the name, and the time a fact, in the form the date units give it. A stack may keep a unit of its own that draws it.
 - **A record's item line MUST be its module's `<State>Item`, and a place MUST give it only `IDSItemPlacementProps`** (`RD.SUPPORT.APPS.218`). The web module that owns a record makes `DSItem` specific for it once, so the record reads the same in its picker, in its list and on its own page: `RoleItem` draws a role. The Item decides every part once, the title, the description, the picture, the facts and their order, the same at every level; the level sets only the sizes, and `INLINE` leaves the description out. The record's state shows only when the record is off, first among the facts, and its code shows at every level. The Item fetches nothing and holds no action: an action belongs to the row or the header that holds it. A place says where the line stands and where it leads (`pageLevel`, `orientation`, `anchor`, `showArrow`, `backAnchor`) and gives its own data at the end (`endNode`, `endAlign`), never a badge or a state of the record, which stand in its facts. It may leave out the description with `hideDescription`, or every fact with `hideFacts`, and it never changes a part or adds one. The design system declares `IDSItemPlacementProps` once, so no Item restates it.
 - **A mark in an item line MUST be a rounded square where the page names no shape, and its corner MUST follow its box.** The corner is one of the theme's radius steps: 6px at 24 and 28px, 8px at 32 and 36px, and 10px from 40px up. A page that names a shape still gets it.
@@ -900,7 +981,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.190` | every overlay takes its width from one scale, `extent`, `XS` 320 px to `XL` 720, and its padding from `size`; a sheet and a drawer default to `MD`, a dialog to `XL` |
 | `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens, a role for each kind of unit, icon motions moved only by their holder, and one reduced-motion rule |
 | `RD.SUPPORT.SURFACE.204` | a row that scrolls sideways is `DSHScroll`, its arrows sized from its size and standing on the ground the row stands on, or on a scrim over a picture |
-| `RD.SUPPORT.SURFACE.209` | `DSTabs` takes a `type`, `LINE`, `SWITCH` or `PILL`, the level giving the size and the look where no type is named, a website's pages taking `PILL`; a unit that takes a page level is given its `pageLevel` first and its `size` only to override |
+| `RD.SUPPORT.SURFACE.209` | `DSTabs` takes a `type`, `LINE`, `SWITCH` or `PILL`, the level giving the size and the look where no type is named, a website's pages taking `PILL`; a unit that takes a page level is given its `pageLevel` first and its `size` only to replace the size of its place |
 | `RD.SUPPORT.SURFACE.213` | the `PILL` bar is raised by its shadow alone with no line, its closed tab takes the brand one step softer under the pointer and the focus, and every type of `DSTabs` stands vertical and shares the width |
 | `RD.SUPPORT.SURFACE.214` | `DSTabs` take their colour and the fill of their open tab from the theme's navigation, and a row may override each with `color` and `entry`, of the navigation's own types |
 | `RD.SUPPORT.SURFACE.215` | `DSTabs` are lifted only where `raised` asks, with no default, and read no card or panel look |
@@ -956,6 +1037,12 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.305` | a page from another address, or a document the page wrote, is drawn through `DSEmbed`, sandboxed and with no look of its own |
 | `RD.SUPPORT.SURFACE.306` | a `CUSTOM` row of a comparison is compared on the values its `compareValue` returns |
 | `RD.SUPPORT.SURFACE.307` | a record is chosen by an autocomplete and never by a select |
+| `RD.SUPPORT.SURFACE.308` | a stepper is `DSStepper`, a block of Navigation drawn from data, whose steps take a task state given by the page or following from the open step |
+| `RD.SUPPORT.SURFACE.310` | a bare icon of an item line is drawn at the size of its level, 32, 24, 18, 14, 14 and 12px from `PAGE` to `INLINE` |
+| `RD.SUPPORT.SURFACE.311` | a carousel marks every slide that is not in view `inert` and `aria-hidden` |
+| `RD.SUPPORT.SURFACE.314` | `DSStepper` takes `pageLevel` as the tabs do, at all six levels, `size` replacing only the size of the place, and a step's words following the size as a tab's label does |
+| `RD.SUPPORT.SURFACE.315` | the tabs and the stepper step one size for each page level, `PAGE` three up, `CONTAINER` two, `WIDGET` one, `GROUP` and `CONTENT` none and `INLINE` one down, held at `XS` and `XL` |
+| `RD.SUPPORT.SURFACE.316` | a new unit names each shared axis of the surface it takes, with a reason for each it leaves out, and its preview shows that table before it is approved |
 | `RD.SUPPORT.SURFACE.184` | a comparison marks a value that differs from the most common value of its row, or from the subject `baselineKey` names; a tie or an unknown key marks none |
 | `RD.SUPPORT.SURFACE.193` | a subject of a comparison carries its own actions in its head, beside its item, taking their size and look from the place |
 | `RD.SUPPORT.SURFACE.068` | the layout of the data table is chosen from the data, and it is `LIST` on a phone. That `LIST` also takes the place of `GRID` on a phone is proposed |

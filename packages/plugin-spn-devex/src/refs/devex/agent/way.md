@@ -3,12 +3,12 @@
   "docs": [
     {
       "path": "spn-foundation/docs/01-purpose/04-way.md",
-      "seen": "ac461d9a"
+      "seen": "2f3ed0cb"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
       "section": "The ask router picks the one lens that owns an ask",
-      "seen": "b9614d64"
+      "seen": "3270a98b"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "ed79925a"
+      "seen": "53a6d9d2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -74,7 +74,7 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 
 ## Boundary
 
-This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is a page pattern, groups and their items, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has one of its own, `DSListDetail`, which `providers.md` names. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
+This ref states what makes a unit a widget, and what `DSCardWidget` is built from. It stops at the edge of the widget. It does not state what a component is, or what any one of the components a widget is built from does — those are in `architecture-components.md`. It does not state how a page shows a list beside the detail of its chosen row. That is an app pattern, groups and their items, and `architecture-containers.md` states what a person sees on such a page. No core unit is built for it; the web stack has one of its own, `DSListDetail`, which `providers.md` names. It does not state what fills a part of a container, or what a widget does in a `flush` part — that is `architecture-containers.md`. It does not state where a widget's size comes from when none is set — that is `architecture-app.md`. It does not state what a data table, a filter bar, a comparison or a feature is; each is a composite of `architecture-components.md`. It does not state how `DSCardWidget` is drawn in the library or built by a stack — those are `delivery-library.md` and `providers.md`.
 
 ## Binds
 

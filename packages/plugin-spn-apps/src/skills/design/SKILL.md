@@ -11,14 +11,14 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "984df23f"
+      "seen": "f4d72cc6"
     }
   ]
 }
 -->
 ---
 name: design
-description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words or in Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it picks the layout, writes down the facts of the data and of the person, chooses the page pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries. For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
+description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words or in Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries. For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
 ---
 
 # design — a page, from its layout down to its blocks
@@ -27,7 +27,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Then read `refs/support/surface/standards-core.md`, `architecture-names.md`, `architecture-containers.md`, `architecture-layouts.md` and `architecture-app.md`, in this plugin.** They hold the levels of a page, the rules of content, the names, the panel, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a page pattern.** It holds the fourteen page patterns, the four steps of the choice, and the tree by level of each pattern. The specs of the patterns are in `refs/support/surface/patterns/`, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field.
+**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -37,17 +37,30 @@ Take the scope from the argument: one page, or a flow of pages. A flow is severa
 
 **Your output is one tree for each page**: every block by the name the book gives it, with its props. State it in the reply. Write it to a file only where the developer or the running arc names one. You write no code here.
 
-The decisions run in one order. Each level of a page owns one thing, and the level above it decides first. A block is the last thing chosen.
+The decisions run in one order. Each level of a page owns one thing, and the level above it decides first. Who the app is for comes before all of them, and a block is the last thing chosen.
 
 | | Decision | What it settles |
 | --- | --- | --- |
+| 0 | who the app is for, and the flow | the kind of person every later decision reads, and the path the page is a step of |
 | 1 | the layout | the navigation, and the content the page gets |
-| 2 | the facts, and the page pattern | what the data and the person are, which arrangement the whole page takes, and what shows each part |
+| 2 | the facts, and the pattern | what the data and the person are, which app pattern the screen takes or which site pattern each section of a site's page takes, and what shows each part |
 | 3 | the panels | which parts of the page are framed as a header, content and a footer |
 | 4 | the pattern for each task | how each thing the person does runs, and what they see in each task state |
 | 5 | the blocks | the named block for each part of each pattern, with its props |
 
-## Before the first decision — say what the page is for
+## 0. Name who the app is for, and the flow the page is a step of
+
+The same list is built one way for a trained team that works in it all day, and another way for many people who open it now and then, on a phone, and were never shown how. So before any pattern is chosen, name the kind of person the app is for (`RD.SUPPORT.SURFACE.330`). `refs/support/surface/standards-core.md`, under *Who an app is for*, holds the four kinds with their answers and the table of what each kind changes.
+
+- **Read the kind once for the app, from what the partner has already written**: the personas whose behaviour rows land in the app, each row's *Who* and *Does*, and the industry brief where there is one. Ask of each persona the four questions: do they use the app as their job (**Team**)? Do they use it for themselves (**Everyday users**)? Are they still deciding, not signed in (**Visitor**)? Did they come to learn or to get a thing working (**Learner**)? The kinds are one closed set (`RD.SUPPORT.SURFACE.331`); name one of the four, never a role, a domain or one of the platform's apps.
+- **Where the personas and the rows do not say, ask the developer, and never guess** (`RD.SUPPORT.SURFACE.330`). A guessed kind looks the same as a read one, so nobody would know to correct it.
+- **Never read the kind from the platform's tier.** A member business on an enterprise account is a Team, and a one-person account in a product sold to the public is an Everyday user.
+- **A page another kind reaches takes that kind** (`RD.SUPPORT.SURFACE.333`): an app's landing and its register page are a Visitor's, whoever the app is for. Where two kinds meet on one page, the less forgiving decides: Everyday users over a Team, a Visitor over a Learner. A page that would need two patterns for its two kinds is two pages.
+- **Name the flow the page is a step of**, from the ten in `refs/support/surface/flow-patterns.md`: which flow, which step, where it starts and where it ends. A page that is no step of a named flow says so. The flow's *For* line and its task states then hold on the page, and on the web its lines for Back, a reload and a link.
+- **Write the kind as the first row of the facts table, and the flow as the second**, each with where you read it (the facts are below, in step 2). The developer then corrects a kind, and not a layout.
+- **Carry the kind into every decision below.** It changes only what the app already sets and the lines its patterns carry (`RD.SUPPORT.SURFACE.334`): the layout's job in step 1, the density, which of two fitting patterns is chosen in step 2, how much an entry asks at once in step 4, the words of a failure and of an empty state, and what a phone must finish. Read each from the table in `standards-core.md`, and never build a second version of a page or a unit of the kind's own.
+
+## Before the first layout — say what the page is for
 
 - **Name the purpose in one sentence**: the main intent, and the main action. A page has one purpose. If the sentence needs *and*, design two pages.
 - **List each task the person does on the page.** Read the tasks from the behavior rows of the owning docs. Where a task has no row, say so: the `ideate` skill writes the row.
@@ -67,7 +80,7 @@ A layout frames the page. It draws the navigation, and it hands the page the con
 | `CANVAS` | none: the body alone | a sign-in, a marketing page or a page of an error |
 
 - **The theme styles the layout in three parts, the body, the navigation and the content, and a page writes no look for any of them** (`RD.SUPPORT.SURFACE.139`, `RD.SUPPORT.SURFACE.200`). The body is the whole window, with the fill behind everything and the width of the box the others stand in; the navigation moves a person around the app; the content is the content. The navigation is attached to the window's edge or floats, the layout's space in (`--layout-space`); the content is attached, a box at the body's width that meets the navigation with the body showing around it, or floats; and the top bar is sticky or not. The width is the body's: `FULL`, `XWIDE`, `WIDE`, `MEDIUM` or `NARROW`. A phone draws one drawer for all three layouts. The layouts alone read the theme. `architecture-layouts.md` states them.
-- **The page chooses its layout, and the theme never does.** Choose it by the job of the app, as the table says, and never by its look (`RD.SUPPORT.SURFACE.206`). Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
+- **The page chooses its layout, and the theme never does.** Choose it by the job of the app, as the table says, and never by its look (`RD.SUPPORT.SURFACE.206`). The kind of person sets that job: a Team takes `RAIL` for the app, `DOCK` for a person's own settings and `CANVAS` to sign in; Everyday users take `TOPNAV` with the few entries that fit on one line, or `DOCK` for their own account, and never a `RAIL` of many sections; a Visitor takes `TOPNAV` for a site and `CANVAS` for one landing; a Learner takes `TOPNAV` for a few pages, with the doc's sections at the side where it has many. Say which type the app's other pages use, and propose it. Where the app has no page yet, show the layout types, and the developer chooses.
 - **Fill the places, named by where they stand** (`RD.SUPPORT.SURFACE.157`): `startNode`, the navigation, `endNode`, `actionsNode`, the content and `footerNode`, and in a dock or a top nav `headerNode`. Every layout type with a navigation takes them in its config; `CANVAS` is the body alone, with no navigation and no overlay.
 - **`headerNode` is the header directly under the bar**, for a hero, a slideshow, or the head of an account or a project (`RD.SUPPORT.SURFACE.258`). What it holds stands in the body's box, as the footer's does, and a hero that needs the whole window is a section placed in it. It scrolls with the page, and the content's box starts under it.
 - **The footer is optional, and it is the place at the page's end, the window's width**, and beside a rail the width of the area beside it. What it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content. An app that gives no footer has none, and the layout decides nothing about what it holds.
@@ -76,7 +89,7 @@ A layout frames the page. It draws the navigation, and it hands the page the con
 - **Mark the place the person is in.** The navigation shows it with the selected state.
 - **Leave the navigation to the layout.** A page that draws its own navigation has taken the layout's job.
 
-## 2. Write the facts down, and choose the page pattern
+## 2. Write the facts down, and choose the pattern
 
 **How a page is shown MUST follow from its data and from the person who uses it** (`RD.SUPPORT.SURFACE.047`). Never arrange a page by how another page looks, or by which block is at hand. So you write the facts down first, and you choose from them.
 
@@ -86,6 +99,8 @@ Read what you can from the contract, and ask for the rest. Write every fact in t
 
 | Fact | Where you read it |
 | --- | --- |
+| the kind of person the app is for, with its answers: how often they come, trained or not, their device, what they never forgive | step 0: the personas, the rows' *Who* and *Does*, the brief; asked where they do not say; never the tier |
+| the flow the page is a step of, and the step | step 0: `flow-patterns.md`, or *none* |
 | what one record holds: a name, a state, a picture, and how many facts | the contract |
 | whether the query takes a page, a text or a filter | the contract |
 | whether the set is fixed or grows | the contract: an enum is a fixed set |
@@ -103,34 +118,37 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 
 | Step | What you decide | Decided from |
 | --- | --- | --- |
-| 1 | the page pattern: the shape of the page | what the page is about, and why a person comes |
+| 1 | the app pattern: the shape of the page | what the page is about, why a person comes, and the kind of person |
 | 2 | what shows each part that has many of one thing | what the contract says of the list, and what one of them holds |
 | 3 | what changes at a tablet and on a phone | the choice of step 2 |
 | 4 | how a thing is entered or changed | how much there is to enter |
 
-**Step 1: name the one page pattern that fits.** A page pattern is chosen from the set below and never invented (`RD.SUPPORT.SURFACE.051`). The names are proposed, and not yet confirmed one by one.
+**Step 1: name the one app pattern that fits.** An app pattern is chosen from the set below and never invented (`RD.SUPPORT.SURFACE.051`). Its *For* line names the kinds of person it serves (`RD.SUPPORT.SURFACE.332`): the kind from step 0 must be among them, and the pattern's line for that kind, in `standards-patterns.md`, is applied. The names are proposed, and not yet confirmed one by one.
 
-| Page pattern | The data | The person | Its spec in `refs/support/surface/patterns/` |
-| --- | --- | --- | --- |
-| Find in a list | a set that grows as people work | comes often, to find one | `find-in-a-list.dg.json` · `find-in-a-list-look.dg.json` |
-| A record and its setup | one record, and a few things set up for it | comes rarely, to see where things stand | `record-and-its-setup.dg.json` |
-| A record and what belongs to it | one record, with lists of other records attached | comes to attach or remove one, or to read what happened | `record-and-what-belongs-to-it.dg.json` |
-| Set up by kind | fixed kinds, with one or a few of each | comes rarely, to connect or change one | `set-up-by-kind.dg.json` |
-| Compare across kinds | one fixed set of settings, for a fixed set of kinds | comes rarely, to check or change a default | `compare-across-kinds.dg.json` · `compare-across-kinds-edit.dg.json` |
-| Groups and their items | things in groups, where a group is a heading | comes to see the whole and open one item | `groups-and-their-items.dg.json`, and its `-two-lists`, `-open` and `-many` forms · `one-action.dg.json` |
-| An overview | counts, and what waits for a person | has just arrived | `overview.dg.json` |
-| A record and its steps | one record that moves through known steps | moves it on, with the right role | `record-and-its-steps.dg.json` |
-| Choose many | many things to tick | ticks several | `choose-many-in-groups.dg.json` · `choose-many-in-one-list.dg.json` |
-| An editor with its preview | content a person writes, and what it becomes | must see the result while writing | `editor-with-preview.dg.json` |
-| An entry over the page | a small or a medium form | needs the page it belongs to, which stays beneath or beside the entry | `entry-over-the-page.dg.json` |
-| Inherit or override | a value that follows a default until someone sets their own | must see which of the two it is, and be able to go back | `inherit-or-override.dg.json` |
-| An entry that is a page | a large form, with sections or a part that repeats | fills it in one sitting | `entry-as-a-page.dg.json` |
-| Change in place, in a list | many small values of one kind | changes one after another | `change-in-place.dg.json` |
+| App pattern | The data | The person | For | Its spec in `refs/support/surface/app-patterns/` |
+| --- | --- | --- | --- | --- |
+| Find in a list | a set that grows as people work | comes often, to find one | Team · Everyday users | `find-in-a-list.dg.json` · `find-in-a-list-look.dg.json` |
+| A record and its setup | one record, and a few things set up for it | comes rarely, to see where things stand | Team · Everyday users | `record-and-its-setup.dg.json` |
+| A record and what belongs to it | one record, with lists of other records attached | comes to attach or remove one, or to read what happened | Team | `record-and-what-belongs-to-it.dg.json` |
+| Set up by kind | fixed kinds, with one or a few of each | comes rarely, to connect or change one | Team | `set-up-by-kind.dg.json` |
+| Compare across kinds | one fixed set of settings, for a fixed set of kinds | comes rarely, to check or change a default | Team | `compare-across-kinds.dg.json` · `compare-across-kinds-edit.dg.json` |
+| Groups and their items | things in groups, where a group is a heading | comes to see the whole and open one item | Team · Learner | `groups-and-their-items.dg.json`, and its `-two-lists`, `-open` and `-many` forms · `one-action.dg.json` |
+| An overview | counts, and what waits for a person | has just arrived | Team · Everyday users | `overview.dg.json` |
+| A record and its steps | one record that moves through known steps | moves it on, with the right role | Team · Everyday users | `record-and-its-steps.dg.json` |
+| Choose many | many things to tick | ticks several | Team · Everyday users | `choose-many-in-groups.dg.json` · `choose-many-in-one-list.dg.json` |
+| An editor with its preview | content a person writes, and what it becomes | must see the result while writing | Team | `editor-with-preview.dg.json` |
+| An entry over the page | a small or a medium form | needs the page it belongs to, which stays beneath or beside the entry | Team · Everyday users | `entry-over-the-page.dg.json` |
+| Inherit or override | a value that follows a default until someone sets their own | must see which of the two it is, and be able to go back | Team | `inherit-or-override.dg.json` |
+| An entry that is a page | a large form, with sections or a part that repeats | fills it in one sitting | Team · Everyday users | `entry-as-a-page.dg.json` |
+| Change in place, in a list | many small values of one kind | changes one after another | Team | `change-in-place.dg.json` |
 
 - **The first eight are a whole page.** The last six are how a person enters or changes something, and each opens from one of the eight.
-- **Where the data and the person point to two patterns, say so and ask.** A list that grows, used by a person who comes once a year, is a different page from the same list used every day.
-- **A sign-in has a shape of its own** (`RD.SUPPORT.SURFACE.205`). It is not one of the fourteen: start from *The sign-in page* in `standards-patterns.md`.
-- **A page that fits no pattern is named in the result, and it waits.** A new page pattern joins the patterns chapter of the book first.
+- **Cite the pattern's *For* line in the result, and follow its line for the kind.** For Everyday users, Find in a list is the `LIST` layout on every screen with a search box and two or three filters in view, An overview is a greeting and one card with no row of counts, and an entry over the page is a small one only, a medium one becoming an entry that is a page in steps with `DSStepper`.
+- **Where the data fits two patterns, the kind of person decides between them** (`RD.SUPPORT.SURFACE.333`). A Team takes the one that keeps the person in place and fast: Find in a list as a table, Change in place, An entry over the page. Everyday users take the one that asks one thing at a time: the data table's `LIST` layout, an entry in steps, a record read before it is changed. Where the kind does not settle it, say so and ask.
+- **A sign-in has a shape of its own** (`RD.SUPPORT.SURFACE.205`). It is not one of the fourteen: start from *The sign-in page* in `standards-patterns.md`, and for the sign-up page, a reset and an invitation from *The pages beside a sign-in* (`RD.SUPPORT.SURFACE.364`).
+- **A page no pattern fits is derived, and it never waits** (`RD.SUPPORT.SURFACE.051`, `RD.SUPPORT.SURFACE.332`). Derive it from the patterns whose person and data fit it, as a board is derived from Groups and their items and a cart from Change in place, in a list, and name in the result which patterns it is derived from. A page shape earns a pattern of its own only when no pattern fits its person and its data, and that pattern joins the book first.
+
+**A site's page takes a site pattern for each section, and no app pattern.** Where step 0 and the words of the page say it is a doc or a marketing page, read `refs/support/surface/site-patterns.md`: name the kind of page by its level (a site home, a group home, a part page, a guide and the rest), list its sections in the order of its reader's questions, and name each section's pattern by the content signals, asked in order with the first yes winning. Each pattern's *For* line names Visitor, Learner or both; follow its line for the kind. Each section starts from its spec in `refs/support/surface/site-patterns/`, and the choice's steps 2 to 4 below apply to an app's screen only.
 
 **Step 2: choose what shows each part.** The contract decides first. Where the query takes a page, a text or a filter, the part is the data table, `DSDataTable`, also where the set is small today (`RD.SUPPORT.SURFACE.054`).
 
@@ -146,7 +164,7 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 | one record | several facts | readings, each a title with its value under it, `DSDataUnit` |
 
 - **A few is up to about 7, and some is up to about 30.** Both numbers are proposed.
-- **A page pattern fixes the arrangement, and never which block fills a part** (`RD.SUPPORT.SURFACE.049`). Choose each part by its own data. Two parts of one page often hold data of different shapes.
+- **An app pattern fixes the arrangement, and never which block fills a part** (`RD.SUPPORT.SURFACE.049`). Choose each part by its own data. Two parts of one page often hold data of different shapes.
 - **A search and a filter of a data table go to the server** (`RD.SUPPORT.SURFACE.070`). Never plan a search that runs in the page over the records already loaded.
 
 **Step 3: say what changes at a tablet and on a phone.** It follows from step 2, because each block has its own way to fit a smaller screen.
@@ -156,13 +174,13 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 | `DSDataTable`, layout `TABLE` | the same, with fewer columns | the same data table, layout `LIST`, with the filters behind one action |
 | `DSDataTable`, layout `GRID` | the same, with fewer across | layout `LIST` |
 | a table, `DSTable` | the same | a list, one group at a time |
-| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; the address changes | the same as a tablet |
+| two parts side by side: the groups, and the items of the chosen one | the items take the place of the groups, with a back action; on the web the address changes | the same as a tablet |
 | a dialog | the same | a sheet from the bottom of the screen |
 | a sheet at the side | the same | the full screen |
 
 **Step 4: decide how a thing is entered or changed.** How much there is to enter decides where the entry opens (`RD.SUPPORT.SURFACE.075`). The two numbers are proposed.
 
-| The entry | At a desktop | On a phone | Page pattern |
+| The entry | At a desktop | On a phone | App pattern |
 | --- | --- | --- | --- |
 | small: up to about 5 fields in one group | a dialog over the page | a sheet from the bottom of the screen | An entry over the page |
 | medium: one column with a few groups, up to about 12 fields | a sheet at the side, with the page still in view | the full screen | An entry over the page |
@@ -170,20 +188,23 @@ A page is decided in four steps, in this order (`RD.SUPPORT.SURFACE.052`). The c
 | one value among many of one kind | in its row | in its line | Change in place, in a list |
 | a thing that is only on or off | in place, as a switch | the same | the pattern of the page it stands on |
 
+- **The kind of person sets how much an entry asks at once** (`standards-core.md`, *What each kind changes*). A Team takes many fields at once, up to about 12 in a sheet, keyboard first, defaults filled. Everyday users take about 5 fields a screen and one decision, every format accepted and nothing they entered lost, so their medium entry is an entry that is a page in steps, with `DSStepper`. A Visitor takes one ask and the fewest fields, with no account before value.
+- **On the web an entry over the page is an address** (`RD.SUPPORT.SURFACE.366`): Back closes it, a reload opens it again, and a link opens it over its page. A confirmation, and proving it is you again, are not.
+
 ### Start from the spec of the pattern
 
-- **Open the spec of the pattern you named, in `refs/support/surface/patterns/`.** It is a skeleton with a view for each screen class. Draw it with `spn-devex docs figure draw <spec>` where you want to see it.
-- **Read the tree by level of that pattern in `standards-patterns.md`.** It names the page level, the panels, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
+- **Open the spec of the pattern you named**: for an app pattern in `refs/support/surface/app-patterns/`, and for each section of a site's page in `refs/support/surface/site-patterns/`, by the page's kind. It is a skeleton with a view for each screen class. Draw it with `spn-devex docs figure draw <spec>` where you want to see it.
+- **Read the tree by level of that pattern in `standards-patterns.md`, or a site pattern's look in `site-patterns.md`.** It names the page level, the panels, the widgets and cards, and the components the pattern is drawn with, and what changes on a tablet and a phone.
 - **The spec names the layout and the page level a tree starts from** (`RD.DEVEX.WORKSPACE.260`). Its `layout` is the setting the sketch is drawn in, and never part of the pattern: the tree writes the layout chosen in decision 1. Its `page` is the page level, the head of the page: `DSPageLevel` at `PAGE` above the panels, or the header of the one panel that is the page, with `fullPage`. Each block's `unit` is the unit the tree writes for it, and a card stands at the level of a widget.
 - **The values in a spec are samples.** They show what kind of data a part holds. Put the page's own data in their place, and keep the arrangement. Every title, description and value the tree writes is in the product's own words, and never the name of a pattern, a unit or a level.
-- **The words follow what the page is for** (`RD.SUPPORT.SURFACE.208`). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once (anything set one under another is a `DSList`, `RD.SUPPORT.SURFACE.288`): on an app's screen a label is short, an action starts with a verb that says what happens, an error says how to fix it, and nothing persuades; on a marketing page the personas come first, each section answers one reader question, and every number is real, in the length its level allows (`RD.SUPPORT.SURFACE.286`). The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
+- **The words follow what the page is for** (`RD.SUPPORT.SURFACE.208`). Decide before writing a word whether the page is a doc, an app's screen or a marketing page, and never two at once (anything set one under another is a `DSList`, `RD.SUPPORT.SURFACE.288`): on an app's screen a label is short, an action is a verb and its object in 1 to 3 words and 4 at most, with an arrow drawn as its icon and never typed (`RD.SUPPORT.SURFACE.335`), an error says how to fix it, and nothing persuades, with everyday words only for Everyday users; on a marketing page the personas come first, each section answers one reader question, and every number is real, in the length its level allows (`RD.SUPPORT.SURFACE.286`). The rule in full is `refs/support/surface/standards-core.md`, under "The words of a page, by what it is for".
 - **Never edit a spec in the plugin.** Work from a copy. Every page of one pattern then starts from the same arrangement.
 
 ## 3. Decide the panels
 
 A panel is optional. Use one where a part of the page has a header, content and a footer as one unit. A page with no such part uses none.
 
-**Take the panels from the tree of the page pattern.** Its Container line says how many panels the page has, and what each part of one holds.
+**Take the panels from the tree of the app pattern.** Its Container line says how many panels the page has, and what each part of one holds.
 
 | A page | Header | Content | Footer |
 | --- | --- | --- | --- |
@@ -196,7 +217,7 @@ A panel is optional. Use one where a part of the page has a header, content and 
 - **Frame a part only when it has a title of its own, and also an action of its own or data it loads by itself** (`RD.SUPPORT.SURFACE.057`, proposed). The record a page is about is the header of the page, and it takes no frame.
 - **An entry over the page is one panel, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header, its fields are its content, and its actions stand in its footer.
 - **A large form is one panel.** Its sections are the parts of its content, each under its own title. A section is never a panel of its own, and no list of the sections stands beside the form (`RD.SUPPORT.SURFACE.078`).
-- **Groups and their items are two panels at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action, and the swap changes the address (`RD.SUPPORT.SURFACE.079`). A set of groups that can be added to is a list, and never a row of tabs (`RD.SUPPORT.SURFACE.080`).
+- **Groups and their items are two panels at a desktop.** On a tablet and on a phone the items take the place of the groups, with a back action (`RD.SUPPORT.SURFACE.079`), and on the web the swap changes the address. A set of groups that can be added to is a list, and never a row of tabs (`RD.SUPPORT.SURFACE.080`).
 - **Give one panel to each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are the parts of its content, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels, or cards. An editor with its preview and *Choose many* are each one panel (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). On the page that changes it, a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added.
 - **Write no prop and no padding to place a title** (`RD.SUPPORT.SURFACE.109`). An item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` starts where what stands under it starts, and in a `flush` part it takes the inset of its place. The part that holds a title gives it its room, and an item line draws no padding of its own (`RD.SUPPORT.SURFACE.175`). A card hands its size to what it holds, as a panel does (`RD.SUPPORT.SURFACE.114`). A panel frames a part of a page. A card, `DSCard`, frames one thing: a record, an app, a file, a number. A card is told from a panel by level and purpose, and it takes `surface` and `frames` itself, all three parts where it names none (`RD.SUPPORT.SURFACE.261`, `RD.SUPPORT.SURFACE.262`, `RD.SUPPORT.SURFACE.263`).
@@ -216,7 +237,7 @@ A panel is optional. Use one where a part of the page has a header, content and 
 
 ## 4. Choose the pattern for each task
 
-The page pattern says where the parts of the page sit. A task pattern says how each task inside those parts runs. Name each task in one verb. Most tasks are one of the intents below under another name: *search* is Find, *edit* is Enter and *delete* is Act.
+The app pattern says where the parts of the page sit. A task pattern says how each task inside those parts runs, and its *For* line says how it runs for the kind of person: for Everyday users a failure in everyday words with what to do next, one action at a time with undo before confirm, and a few options shown whole. Name each task in one verb. Most tasks are one of the intents below under another name: *search* is Find, *edit* is Enter and *delete* is Act.
 
 | Intent | The person | Blocks that carry it | Task states |
 | --- | --- | --- | --- |
@@ -246,7 +267,7 @@ The six task states are idle, working, done, failed, empty and denied.
 
 ## 5. Then the blocks
 
-Take each block from the tree by layer of the page pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
+Take each block from the tree by layer of the app pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
 - **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
@@ -257,14 +278,14 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **Write the `pageLevel` of an item line, and no size, type step, heading element, badge size or picture size for it** (`RD.SUPPORT.SURFACE.094`, `RD.SUPPORT.SURFACE.113`). `PAGE` is the head of the whole page. `CONTAINER` is the title of a panel, a dialog, a sheet or a drawer. `WIDGET` is the title of a widget or a card. `GROUP` is the title of an inner part of a widget, quiet only where no description stands under it. `CONTENT` is a row among others, and the default. `INLINE` is a value inside another unit, such as a row of a popover, a menu or a cell. The level alone decides the type of the text, the size of a badge among the facts and the box of the picture. The heading element follows the level (`RD.SUPPORT.SURFACE.106`): `PAGE` the `h1`, `CONTAINER` the `h2`, `WIDGET` the `h3`, `GROUP` the `h4`. and a title in the header of a box takes the level its box gives (`RD.SUPPORT.SURFACE.107`).
 - **Give every level of a page its title** (`RD.SUPPORT.SURFACE.112`). A page has one `h1` that names it, as an item line at the level `PAGE`. A panel that is the whole page says so with `fullPage`, and its header is then the page head, and any other panel is `CONTAINER` (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). A panel or a card that holds parts, or more than one content part, has an item line in its header, at the level its box gives. An inner part of a widget has an item line at the level `GROUP`, with the action of the group at its end.
 - **An item line cuts nothing it draws, and the page decides what its words say** (`RD.SUPPORT.SURFACE.111`). Write a short summary. Give the heads of a row of cards descriptions of one length where they should stand at one height.
-- **Write the `pageLevel` of a row of tabs first, and a look only for a website's pages** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`). In an app, choose by level and write no `type`: the tabs that lead to the sub-pages of a whole page say `PAGE` and draw the pill, on its track and not raised (`RD.SUPPORT.SURFACE.224`), and the tabs of the parts of a panel or of a card say `CONTAINER` or `WIDGET`, each drawing the line under the open tab; tabs that say no level draw the switch, for two ways to show one thing. The top bar of a website's pages writes `type={DSTabsType.PILL}`, the floating bar. Write `size` on a unit that takes a page level only to override the size its level gives. Write no colour on tabs: they take the theme's navigation colour and entry, neutral by default (`RD.SUPPORT.SURFACE.214`); write `color` or `entry`, of the navigation's own types, only on a row that must differ from the navigation, such as a second row of tabs or the tabs of a busy card.
+- **Write the `pageLevel` of a row of tabs first, and a look only for a website's pages** (`RD.SUPPORT.SURFACE.113`, `RD.SUPPORT.SURFACE.209`). In an app, choose by level and write no `type`: the tabs that lead to the sub-pages of a whole page say `PAGE` and draw the pill, on its track and not raised (`RD.SUPPORT.SURFACE.224`), and the tabs of the parts of a panel or of a card say `CONTAINER` or `WIDGET`, each drawing the line under the open tab; tabs that say no level draw the switch, for two ways to show one thing. The top bar of a website's pages writes `type={DSTabsType.PILL}`, the floating bar. Write `size` on a unit that takes a page level only to replace the size of its place; the level still raises it, one step for each level, `PAGE` three up to `INLINE` one down (`RD.SUPPORT.SURFACE.315`). Write no colour on tabs: they take the theme's navigation colour and entry, neutral by default (`RD.SUPPORT.SURFACE.214`); write `color` or `entry`, of the navigation's own types, only on a row that must differ from the navigation, such as a second row of tabs or the tabs of a busy card.
 - **Write `showArrow` on a line that leads to a page and has no action at its end.** It is a chevron at the end of the line, and it is off unless the page writes it.
 - **In a list the row carries the link, the chosen fill and the reaction to the pointer, and the item line inside it carries none** (`RD.SUPPORT.SURFACE.097`). `DSItem` takes no `selected`: write `selected`, `anchor`, `endNode` and `showArrow` on the row, `DSList.Item`. A chosen row is drawn as a fill across the row, with no check. A row holds plain words, a line of facts through `DSItemFacts`, or an item line (`RD.SUPPORT.SURFACE.132`). An item line that stands alone, in a card or a header, carries its own `anchor` and `showArrow`. Write `hoverable` on a `DSList` whose rows a person acts on; it is off by default.
 - **A line of the `LIST` layout of `DSDataTable` is an item line too.** The page gives the title, the description and the facts of a record. The table's rows carry no padding of their own, and they answer the pointer as the rows of its table do.
 - **Where a page shows one record beside the data table or under it, give the table the id of that record** (`RD.SUPPORT.SURFACE.125`). It is `selectedRecordId` in the `data` of the table's config. The `LIST` and `TABLE` layouts draw its row as a chosen row of a list. The record in view is selected, and the records a person ticks are checked.
 - **A card with a head, drawn from data, is `DSCardWidget`** (`RD.SUPPORT.SURFACE.127`, narrowed by `RD.SUPPORT.SURFACE.221`): a title with its mark, actions in the head, often titled parts. A card that shows its own info, such as a number with its caption, is a `DSCard`, however many stand side by side. Give it `header`, the props of `DSItem`, then `parts`, then `footer`, any node. A part is `ITEMS`, with item lines, `LIST`, with rows of a list, or `FREE`, with any node. The widget has no paging, no search and no working state: a set that needs them is a data table. The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`).
 - **Subjects compared across the same settings are `DSComparison`** (`RD.SUPPORT.SURFACE.181`). Give it `subjects` (each may carry its own `actions`, such as an Edit, which stand in its head and take their look from the place: `RD.SUPPORT.SURFACE.193`), `groups` of rows (a data field's config with a value for each subject, or a `CUSTOM` row with a `renderer`, and a `compareValue` where its values are to be compared) and, where wanted, `differencesOnly`. It draws every value through `DSDataFieldView`, marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.184`), and keeps the label column pinned.
-- **A pitch is `DSFeature`, a section of a website is `DSSectionContainer`, and a grid of features under a heading is `DSFeatureGridSectionContainer`** (`RD.SUPPORT.SURFACE.233`, `RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.259`). A hero, the head of a section with its items, a closing call and the tile of an integration are each a `DSFeature`: the tree gives it data only (an eyebrow, a title, a description, facts, `items`, `actions`, a small `media` or a `mediaNode` of art) and its `pageLevel`, which alone sizes it. It chooses `type` for where the media stands (`ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` stand the words across the feature and the items beside the media), `textAlign` for where the text lines up, `verticalAlign` for how the two columns of a split stand when one is taller, and `actionsPlacement` to put the actions before the items (`RD.SUPPORT.SURFACE.248`, `RD.SUPPORT.SURFACE.251`). The feature gives its items the level that follows its own, and a small picture takes one box per level (`RD.SUPPORT.SURFACE.235`, `RD.SUPPORT.SURFACE.274`). The items are one group, `items`, with the columns per screen class in `gridColumns` and the parting by `borderType` or a boxed `surface` (`RD.SUPPORT.SURFACE.269`). A feature frames nothing unless the page lists its `frames`, and the theme holds no feature look (`RD.SUPPORT.SURFACE.277`). A section sets one part of a page apart: a fill and the room of its `size`, holding one child (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`); it reaches the edges of its place and stands straight in it (`RD.SUPPORT.SURFACE.254`). The grid section takes `section`, `heading` and `grid` and leaves out `flush`. The data decides when a section is a grid section: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points, with media or without. A section frames nothing, and what stands in it takes its depth from what it does for the visitor: a point flat, a door or a choice boxed and raised at `MD`, the product's media framed and raised, a photo flush (`RD.SUPPORT.SURFACE.293`). A `TEXT` eyebrow at `PAGE` and `CONTAINER` stands out, and a state is a `BADGE` eyebrow (`RD.SUPPORT.SURFACE.290`). A part with a title and actions is a `DSPanelContainer`.
+- **A pitch is `DSFeature`, a section of a website is `DSSectionContainer`, and a grid of features under a heading is `DSFeatureGridSectionContainer`** (`RD.SUPPORT.SURFACE.233`, `RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.259`). A hero, the head of a section with its items, a closing call and the tile of an integration are each a `DSFeature`: the tree gives it data only (an eyebrow, a title, a description, facts, `items`, `actions`, a small `media` or a `mediaNode` of art) and its `pageLevel`, which alone sizes it. It chooses `type` for where the media stands (`ITEMS_SPLIT_END` and `ITEMS_SPLIT_START` stand the words across the feature and the items beside the media), `textAlign` for where the text lines up, `verticalAlign` for how the two columns of a split stand when one is taller, and `actionsPlacement` to put the actions before the items (`RD.SUPPORT.SURFACE.248`, `RD.SUPPORT.SURFACE.251`). The feature gives its items the level that follows its own, and a small picture takes one box per level (`RD.SUPPORT.SURFACE.235`, `RD.SUPPORT.SURFACE.274`). The items are one group, `items`, with the columns per screen class in `gridColumns` and the parting by `borderType` or a boxed `surface` (`RD.SUPPORT.SURFACE.269`). A feature frames nothing unless the page lists its `frames`, and the theme holds no feature look (`RD.SUPPORT.SURFACE.277`). A section sets one part of a page apart: a fill and the room of its `size`, holding one child (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`); it reaches the edges of its place and stands straight in it (`RD.SUPPORT.SURFACE.254`), and a `flush` section draws no room of its own on any side (`RD.SUPPORT.SURFACE.313`). Which section a site's page takes, and its look, is its site pattern (`site-patterns.md`). The grid section takes `section`, `heading` and `grid` and leaves out `flush`. The data decides when a section is a grid section: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points, with media or without. A section frames nothing, and what stands in it takes its depth from what it does for the visitor: a point flat, a door or a choice boxed and raised at `MD`, the product's media framed and raised, a photo flush (`RD.SUPPORT.SURFACE.293`). A `TEXT` eyebrow at `PAGE` and `CONTAINER` stands out, and a state is a `BADGE` eyebrow (`RD.SUPPORT.SURFACE.290`). A part with a title and actions is a `DSPanelContainer`.
 - **A line that says roughly when a thing last changed may show how long ago it was** (`RD.SUPPORT.SURFACE.122`). Write `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`. A page that is a log of what happened shows the date and the time on each line.
 - **A mark says what, and an avatar says who.** `DSMark` holds an icon, or `text`, a symbol of one to three characters, such as a step's number or a file's type; it never holds a name. `DSAvatar` holds a picture or the initials of a person, a workspace or a company. Both take `color`, and `shape` as `CIRCLE`, `ROUNDED` or `SQUARE`.
 - **A mark is round unless the page chooses another shape** (`RD.SUPPORT.SURFACE.085`). Choose rounded or square where the thing is better shown so, such as an app or a file. Its `variant` takes the shared vocabulary, and `GHOST` and `LINK` draw the icon alone, with no fill (`RD.SUPPORT.SURFACE.124`). A mark is never pressed.
@@ -284,17 +305,18 @@ Take each block from the tree by layer of the page pattern, and from the list it
 - **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown. One item serves every host that takes one data shape — the three menus take one shape and share `DSMenuNode`. A host whose data differs declares its own item.
 - **What a block does stays in words**: where an action leads, and which permission gates it. Write it beside the block.
 - **A unit the stack's design system provides on its own is written by the name its stack gives it.** The book does not name it, and its stack's docs state its props. Say in the result that it is the stack's own, because another stack may not have it and the library holds no drawing of it.
-- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it. It is proposed to the design system: one that every stack should build joins the core units, in the book first, and one that helps a single stack may be that stack's own unit.
+- **A run of steps is `DSStepper`, given its steps as data** (`RD.SUPPORT.SURFACE.308`): a sign-up or an entry in steps, or a timeline. Write its `pageLevel`, its `activeKey` and, where a person may return to a done step, `onActiveKeyChange`; a step's `taskState` takes `IDLE`, `WORKING`, `DONE` or `FAILED`, and the stepper invents no state of its own (`RD.SUPPORT.SURFACE.309`). In a `DSFeature` it is the `contentNode`.
+- **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it, and with each shared axis of the surface it would take and a reason for each it leaves out (`RD.SUPPORT.SURFACE.316`, `architecture-components.md`). It is proposed to the design system: one that every stack should build joins the core units, in the book first, and one that helps a single stack may be that stack's own unit.
 
 ## 6. State the page as a tree
 
 Write one tree for each page. It reads from the top level down: the page, the layout, each panel, then each widget or component.
 
-**Write the facts above the tree, and then the page pattern with its spec.** A reader of the result names its facts, its pattern and its tree by layer, in that order.
+**Write the kind of person and the flow first, then the facts above the tree, and then the pattern with its *For* line and its spec.** A reader of the result names who the page is for, its facts, its pattern and its tree by layer, in that order.
 
 | A line of the tree | Is written as |
 | --- | --- |
-| The page | its route, its purpose in one sentence, its main action, and its page pattern |
+| The page | its route, its purpose in one sentence, its main action, and its app pattern; on a site's page, its kind of page and each section's site pattern |
 | The layout | `DSLayout`, then its type |
 | A block | its name in the book, then each prop as `name=VALUE` |
 | A part of a block | the name of the part: `DSPanelContainer.Header`, or a named place of the layout. A part of a panel carries `flush` after its name, where the page writes it |
@@ -303,12 +325,15 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | A task | at the right of the block that carries it: the intent, and what the block does |
 
 ```text
+kind     Team: the sales team use the app as their job, every day, trained,   the personas: Sales rep; rows SAL.ORD.*
+         at a desktop; they never forgive a slow task they repeat all day
+flow     Open one and come back, step 1: the list                             flow-patterns.md
 facts    one order holds a number, a customer, a state, a total and a date     the contract
          the query takes a page, a text and a filter                          the contract
          the set grows as people work                                         the contract
          the sales team comes many times a day, to find one order             asked
-pattern  Find in a list · spec: find-in-a-list.dg.json
-shows    the orders: DSDataTable, layout TABLE; on a phone, layout LIST
+pattern  Find in a list · For Team · Everyday users · spec: app-patterns/find-in-a-list.dg.json
+shows    the orders: DSDataTable, layout TABLE, the Team's table that compares; on a phone, layout LIST
 
 page  /orders · purpose: find an order · main action: New order · pattern: Find in a list
 └── DSLayout  RAIL
@@ -350,12 +375,12 @@ The page is a use case, composed from the published library in a file that is no
 
 **Of units, the library draws the core units only** (`RD.SUPPORT.SURFACE.082`). The book does not name a unit that a stack provides on its own, so the library holds no published component for one, and the order of a change does not bind it. Surface's core composites are `DSDataTable`, `DSFilterBar`, `DSComparison` and `DSFeature`, and its core widget is `DSCardWidget`. The unit that places a list beside the detail of its chosen row is the web stack's own, `DSListDetail`, so the library holds none for it (`RD.SUPPORT.SURFACE.099`).
 
-**The library draws nothing of a pattern** (`RD.SUPPORT.SURFACE.099`). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no page pattern, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
+**The library draws nothing of a pattern** (`RD.SUPPORT.SURFACE.099`). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no app pattern, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 
 ## Close
 
 - **Convene the `ux` and `ui` lenses over the tree at the design gate**, and over the drawing where one exists, and `marketing` as well on a marketing page. Run each through the `spn-panel` subagent, with the spn-devex plugin's `refs/devex/agent/lenses/ux.md`, `ui.md` and `marketing.md`. The context that designed the page does not review it.
-- **Report** the purpose, the facts, the page pattern with its spec, the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. Then give the findings of each lens.
+- **Report** the kind of person and where it was read, the flow, the purpose, the facts, the pattern with its *For* line and its spec (or the patterns a page no pattern fits is derived from), the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. Then give the findings of each lens.
 - **Hand off by name.** The `implement` skill builds the page, in its `ui` step.
 
 ## Lenses
