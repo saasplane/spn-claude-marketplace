@@ -200,6 +200,9 @@ export type SkeletonFrame = {
   /** On a `DSFeature`: where the two sides of its split stand against each other, each at its own height. Left out, every part
    *  stretches to its row. */
   verticalAlign?: "TOP" | "CENTER" | "BOTTOM";
+  /** On a `DSFeature`, `DSFeatureType` `BACKDROP`: its media, a slot in a row of its own, stands behind its words and its actions,
+   *  and they keep to three fifths of its width on a tablet and a desktop. The other types are drawn by where its rows place the media. */
+  type?: "BACKDROP";
   /** On a `DSFeatureGridSectionContainer`, in its own names: `section`, the section it draws, with a `DSSectionContainer`'s fill and
    *  room; `grid.borderType`, the lines between its cells; and `grid.desktop`, `grid.tablet` and `grid.mobile`, the columns at each
    *  screen class, which a view reads for its own. */
@@ -1870,10 +1873,20 @@ const skelHoldsSlot = (frame: SkeletonFrame): boolean => (frame.rows ?? []).some
 const skelItemHoldsSlot = (it: SkeletonItem): boolean =>
   skelKind(it) === "slot" || (skelKind(it) === "frame" && it.frame!.unit === undefined && skelHoldsSlot(it.frame!));
 const skelRowHoldsSlot = (row: SkeletonRow): boolean => (row?.items ?? []).some((it) => !!it && typeof it === "object" && skelItemHoldsSlot(it));
+/** A FEATURE OF `type` `BACKDROP` STANDS ITS MEDIA BEHIND ITS WORDS (RD.DEVEX.WORKSPACE.305), as `DSFeature` lays its media under the words
+ *  and the actions over the whole feature. Its media is the slot in a row of its own, which leaves the flow of the rows; the words, the
+ *  actions and the items keep to three fifths of the feature's width on a tablet and a desktop, at the start or centred by `textAlign`,
+ *  and to the whole of it on a phone, and with no screen class. Kept, once before the spec is drawn, by the rows the feature lays out. */
+type SkelBackdrop = { media: SkeletonItem; measure: number; centre: boolean };
+const skelBackdrops = new WeakMap<object, SkelBackdrop>();
+const skelBackdropOf = (frame: SkeletonFrame): SkelBackdrop | undefined => (Array.isArray(frame.rows) ? skelBackdrops.get(frame.rows) : undefined);
+const SKEL_BACKDROP_MEASURE = 3 / 5, SKEL_FEATURE_TYPES = ["BACKDROP"];
 /** Which parts of a `DSFeature` its own frame is drawn round. `TEXT` with `MEDIA`, or `TEXT` where the feature has no media,
  *  is the whole feature; `MEDIA` alone is each slot; `TEXT` alone beside media is the words and the items. */
 function skelFeatureFrames(frame: SkeletonFrame): { whole: boolean; text: boolean; media: boolean } {
   const parts = frame.unit === SKEL_FEATURE && Array.isArray(frame.frames) ? frame.frames : [];
+  // A BACKDROP'S MEDIA LIES UNDER ITS WORDS, so a part named in `frames` frames the whole feature, as the design system frames it.
+  if (skelBackdropOf(frame)) return { whole: parts.some((part) => SKEL_FEATURE_PARTS.includes(part)), text: false, media: false };
   const text = parts.includes("TEXT"), media = parts.includes("MEDIA"), hasMedia = parts.length > 0 && skelHoldsSlot(frame);
   const whole = text && (media || !hasMedia);
   return { whole, text: text && !whole, media: media && !whole && hasMedia };
@@ -2066,12 +2079,88 @@ const skelItemNumberW = (it: SkeletonItem): number => {
 const skelItemTitleW = (it: SkeletonItem) => skelItemNumberW(it) + skelStepW(it.item?.title ?? "", skelItemStep(it));
 const skelItemWordsW = (it: SkeletonItem, h: number) => skelItemInline(it) ? skelItemTitleW(it) + SKEL_FACT_DOT_W + skelItemFactsW(it, h)
   : Math.max(skelItemTitleW(it), skelItemFactsW(it, h), Math.ceil((skelItemOwnDescription(it) ?? "").length * SKEL_W_NOTE));
-/** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. */
-const skelItemH = (it: SkeletonItem, h: number) => skelStats.has(it) ? skelStatH(it) : !skelItemFacts(it).length || skelItemInline(it) ? h
+/** An item with a line under its title stands two lines tall, and a little taller where that line holds a badge. This is its height
+ *  with each of its words on one line; `skelItemH` adds the lines its words wrap to. */
+const skelItemBaseH = (it: SkeletonItem, h: number) => skelStats.has(it) ? skelStatH(it) : !skelItemFacts(it).length || skelItemInline(it) ? h
   : skelItemDescriptionH(it) + (skelItemHasBadge(it) ? Math.max(h, SKEL_ITEM_LINE + SKEL_PACK_GAP + SKEL_FACT_BADGE + SKEL_LABEL_GAP) : Math.max(h, SKEL_ITEM_LINE * 2 + SKEL_LABEL_GAP));
+const skelItemH = (it: SkeletonItem, h: number) => skelItemBaseH(it, h) + skelItemWrapH(it, h);
 /** THE MEDIA OF AN ITEM IS AS LARGE AS THE LINES BESIDE IT: beside a title alone it is as tall as a control, and
- *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. */
-const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length && !skelItemInline(it) ? skelItemH(it, h) - 4 : h);
+ *  beside a title with a description it stands the height of both, so a picture is in proportion to what it names. Words that
+ *  wrap to more lines leave it the size it has beside one line of each. */
+const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).length && !skelItemInline(it) ? skelItemBaseH(it, h) - 4 : h);
+
+/** TEXT THAT FITS (RD.DEVEX.WORKSPACE.303): an item line's description, its line of facts, a head's line of facts and a note wrap at a
+ *  word to their column, as a head's description does, where they run past it; words that fit stand as written. Their room is learnt
+ *  as a head's is, so a spec is drawn twice (`drawSkeleton`): the width each was drawn at is kept here, by the line or the note it is,
+ *  and a part drawn at two widths keeps the narrower. A line of facts breaks between two facts, and a fact in words longer than the
+ *  column breaks at a word; a badge never breaks. A wrapped line of facts steps 18px, or 20px where it holds a badge. */
+const skelWrapWidths = new WeakMap<object, number>();
+const skelWrapKeep = (key: unknown, width: number): void => {
+  if (key === null || typeof key !== "object") return;
+  const known = skelWrapWidths.get(key);
+  skelWrapWidths.set(key, known === undefined ? width : Math.min(known, width));
+};
+const skelWrapAt = (key: unknown): number => (key !== null && typeof key === "object" ? skelWrapWidths.get(key) ?? Infinity : Infinity);
+const SKEL_FACT_BADGE_STEP = SKEL_PACK_GAP + SKEL_FACT_BADGE;
+const skelNoteW = (words: string) => Math.ceil(words.length * SKEL_W_NOTE);
+/** Words wrapped at a word to `width` where they run past it, and kept whole, as written, where they fit. */
+const skelWrapWords = (words: string, width: number, measure: (line: string) => number): string[] =>
+  measure(words) <= width ? [words] : skelHeadWrap(words, width, measure);
+/** The widest word of `words`: the least room they wrap to. */
+const skelWordsMinW = (words: string, measure: (line: string) => number): number =>
+  Math.max(0, ...words.split(/\s+/).filter(Boolean).map(measure));
+/** One line of facts: each fact, and whether a dot stands before it. */
+type SkelFactLine = { fact: string | SkeletonItem; dot: boolean }[];
+const skelFactLineW = (line: SkelFactLine, h: number): number => line.reduce((t, entry) => t + skelFactW(entry.fact, h) + (entry.dot ? SKEL_FACT_DOT_W : 0), 0);
+/** The least room a fact takes: a badge whole, and words their widest word. */
+const skelFactMinW = (fact: string | SkeletonItem, h: number): number => (typeof fact === "string" ? skelWordsMinW(fact, skelFactTextW) : skelFactW(fact, h));
+function skelWrapFacts(facts: (string | SkeletonItem)[], width: number, h: number): SkelFactLine[] {
+  if (skelFactsW(facts, h) <= width) return [facts.map((fact, i) => ({ fact, dot: i > 0 }))];
+  const lines: SkelFactLine[] = [[]];
+  let used = 0;
+  for (const fact of facts) {
+    let line = lines[lines.length - 1];
+    const own = skelFactW(fact, h);
+    if (line.length && used + SKEL_FACT_DOT_W + own <= width) { line.push({ fact, dot: true }); used += SKEL_FACT_DOT_W + own; continue; }
+    if (line.length) { line = []; lines.push(line); }
+    if (typeof fact === "string" && own > width) {
+      skelHeadWrap(fact, width, skelFactTextW).forEach((piece, i) => {
+        if (i) { line = []; lines.push(line); }
+        line.push({ fact: piece, dot: false });
+        used = skelFactTextW(piece);
+      });
+    } else { line.push({ fact, dot: false }); used = own; }
+  }
+  return lines;
+}
+/** The lines an item line's words stand on, at the width it was drawn at: its own description's, and its facts'. */
+function skelItemWrapped(it: SkeletonItem, h: number): { description: string[]; facts: SkelFactLine[] } {
+  const width = skelWrapAt(it.item), own = skelItemOwnDescription(it), facts = skelItemFacts(it);
+  return { description: own !== undefined ? skelWrapWords(own, width, skelNoteW) : [], facts: facts.length ? skelWrapFacts(facts, width, h) : [] };
+}
+/** The room the lines an item's words wrap to add under its one line of each. A statistic and an inline line never wrap. */
+function skelItemWrapH(it: SkeletonItem, h: number): number {
+  if (skelStats.has(it) || skelItemInline(it) || !skelItemFacts(it).length) return 0;
+  const { description, facts } = skelItemWrapped(it, h);
+  return Math.max(0, description.length - 1) * SKEL_ITEM_LINE + Math.max(0, facts.length - 1) * (skelItemHasBadge(it) ? SKEL_FACT_BADGE_STEP : SKEL_ITEM_LINE);
+}
+/** A note's lines at the width it was drawn at; a line of code never wraps. */
+const skelNoteLines = (it: SkeletonItem): string[] => (skelCode.has(it) || typeof it.note !== "string" ? [it.note!] : skelWrapWords(it.note, skelWrapAt(it), skelWordW));
+
+/** CODE AND A ROW OF TABS SCROLL SIDEWAYS (RD.DEVEX.WORKSPACE.304), as `DSCodeBlockView` scrolls a long line inside its block and `DSTabs`
+ *  scrolls a long row in `DSHScroll`: wider than their column, they keep their width and are cut at its end, where a mark stands, the
+ *  design system's arrow at an edge that has more. Each line of a `DSCodeBlockView` that is a note is code, kept here before it is drawn. */
+const SKEL_CODE = "DSCodeBlockView";
+const skelCode = new WeakSet<object>();
+const skelScrolls = (it: SkeletonItem): boolean => skelCode.has(it) || it.control === "tabs";
+/** The mark at the cut edge: a round tile with the `next` shape, standing in from the edge on the line's centre, and the least room a
+ *  scrolling part takes. */
+const SKEL_SCROLL_MARK = 20, SKEL_SCROLL_MIN = SKEL_SCROLL_MARK * 2;
+const skelScrollMark = (edge: number, mid: number): string[] => [
+  skelRect("sds-skel-surface", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK / 2),
+  skelRect("sds-skel-control", edge - SKEL_SCROLL_MARK, mid - SKEL_SCROLL_MARK / 2, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK, SKEL_SCROLL_MARK / 2),
+  ...skelGlyph("next", edge - SKEL_SCROLL_MARK / 2, mid, 12),
+];
 /** AN ITEM'S MEDIA IS READ IN `IDSItemMedia`'S KINDS (RD.DEVEX.WORKSPACE.294). A name written as a word is a mark, as before; `ICON` is
  *  a bare icon, named in `node`; `MARK` is a mark holding `icon`. A kind an item line does not take keeps a mark's place. */
 const SKEL_ITEM_MEDIA = ["ICON", "MARK"];
@@ -2085,6 +2174,14 @@ const skelItemMediaW = (it: SkeletonItem, h: number): number =>
   it.item?.media === undefined ? 0 : (skelItemMediaOf(it.item.media).bare ? skelItemIconW(it) : skelItemMediaD(it, h)) + SKEL_LABEL_GAP;
 const skelItemW = (it: SkeletonItem, h: number): number => skelStats.has(it) ? skelStatW(it)
   : skelItemMediaW(it, h) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+/** The least room an item line takes (RD.DEVEX.WORKSPACE.303): its title, which never wraps, or the widest word of its description or
+ *  fact, or its widest badge, beside its media and its end. A statistic and an inline line take their whole width. */
+const skelItemMinW = (it: SkeletonItem, h: number): number => skelStats.has(it) || skelItemInline(it) || !skelItemFacts(it).length ? skelItemW(it, h)
+  : skelItemMediaW(it, h) + Math.max(skelItemTitleW(it), ...skelItemFacts(it).map((fact) => skelFactMinW(fact, h)), skelWordsMinW(skelItemOwnDescription(it) ?? "", skelNoteW))
+    + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
+/** The width of the words of an item line drawn `lineW` wide: what its media and its end leave. */
+const skelItemWordsAt = (it: SkeletonItem, h: number, lineW: number): number =>
+  lineW - skelItemMediaW(it, h) - (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
 /** A STATISTIC IS ITS VALUE OVER ITS LABEL, one block as tall as its two lines, as the design system stacks them with no room between
  *  (RD.DEVEX.WORKSPACE.300). It is as wide as the wider of the two. */
 const skelStatOf = (it: SkeletonItem): SkelStat => skelStats.get(it)!;
@@ -2151,7 +2248,7 @@ const skelInitials = (title: string): string => title.split(/\s+/).filter(Boolea
  *  gap, every line of the title, the gap and every line of the description, the gap and the line of facts. Each line is placed
  *  from the head's top. */
 type SkelHeadLine = { part: "eyebrow" | "title" | "description"; words: string; size: number; top: number; w: number };
-function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[]; factsTop?: number; height: number; mediaBox: number; badgeTop?: number } {
+function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[]; factsTop?: number; factLines: SkelFactLine[]; factStep: number; height: number; mediaBox: number; badgeTop?: number } {
   const level = skelHeadLevel(head), step = SKEL_HEAD_TITLE[level], size = SKEL_HEAD_DESCRIPTION[level];
   const lines: SkelHeadLine[] = [];
   let y = 0;
@@ -2172,9 +2269,14 @@ function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[];
     y += SKEL_HEAD_GAP;
     put("description", head.description, size, (line) => skelHeadDescriptionW(line, size));
   }
-  let factsTop: number | undefined;
-  if (skelHeadFacts(head).length) { y += SKEL_HEAD_GAP; factsTop = y; y += SKEL_ITEM_LINE; }
-  return { lines, factsTop, height: y, mediaBox, badgeTop };
+  // THE LINE OF FACTS WRAPS TO THE HEAD'S COLUMN (RD.DEVEX.WORKSPACE.303), between two facts, each further line a step under the last.
+  let factsTop: number | undefined, factLines: SkelFactLine[] = [];
+  const facts = skelHeadFacts(head), factStep = facts.some((fact) => typeof fact !== "string") ? SKEL_FACT_BADGE_STEP : SKEL_ITEM_LINE;
+  if (facts.length) {
+    factLines = skelWrapFacts(facts, width, 0);
+    y += SKEL_HEAD_GAP; factsTop = y; y += SKEL_ITEM_LINE + (factLines.length - 1) * factStep;
+  }
+  return { lines, factsTop, factLines, factStep, height: y, mediaBox, badgeTop };
 }
 /** THE WIDTH EACH HEAD WAS DRAWN AT. A head's lines wrap to the width its row gives it, and a row is laid out only when it is
  *  drawn, after the heights are counted; widths never depend on heights. So a spec that holds a head is drawn twice: once
@@ -2185,15 +2287,19 @@ const skelHeadH = (it: SkeletonItem): number => {
   const head = skelHeadOf(it);
   return skelHeadLayout(head, skelHeadWidths.get(head) ?? Infinity).height;
 };
-/** The room a head needs across: what does not wrap, its media, its eyebrow and its facts. Its title and its description wrap. */
+/** The room a head needs across: what does not wrap, its media, its eyebrow and its widest fact. Its title, its description and its line
+ *  of facts wrap. */
 const skelHeadMinW = (it: SkeletonItem, h: number): number => {
   const head = skelHeadOf(it), badge = skelHeadBadge(head);
-  return Math.max(typeof head.eyebrow === "string" ? skelHeadEyebrowW(head.eyebrow) : 0, skelFactsW(skelHeadFacts(head), h),
+  return Math.max(typeof head.eyebrow === "string" ? skelHeadEyebrowW(head.eyebrow) : 0, ...skelHeadFacts(head).map((fact) => skelFactMinW(fact, h)),
     ...(badge ? [skelFixedWidth(badge, SKEL_FACT_CTL)] : []), skelHeadMediaBox(head));
 };
 /** Whether a spec holds a head anywhere, and so must be measured before it is drawn. */
 const skelHasHead = (value: unknown): boolean => Array.isArray(value) ? value.some(skelHasHead)
   : value !== null && typeof value === "object" && ("head" in value || Object.values(value).some(skelHasHead));
+/** Whether a spec holds an item line or a note anywhere, whose words may wrap, and so must be measured before it is drawn. */
+const skelHasWords = (value: unknown): boolean => Array.isArray(value) ? value.some(skelHasWords)
+  : value !== null && typeof value === "object" && ("item" in value || "note" in value || Object.values(value).some(skelHasWords));
 
 /** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
 function skelFixedWidth(it: SkeletonItem, h: number): number {
@@ -2245,6 +2351,8 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
   if (kind === "place" && it.text !== undefined) h = slot + SKEL_TAG_H;
   if (kind === "item") h = skelItemH(it, slot) + skelItemBox(it);
   if (kind === "head") h = skelHeadH(it);
+  // A NOTE THAT WRAPS STANDS A LINE TALLER FOR EACH LINE IT WRAPS TO (RD.DEVEX.WORKSPACE.303).
+  if (kind === "note") h = slot + (skelNoteLines(it).length - 1) * SKEL_ITEM_LINE;
   if (kind === "standin") {
     const count = Math.max(1, it.lines ?? 3);
     if (it.standin === "table") h = skelTableH(it, slot);
@@ -2354,6 +2462,10 @@ const skelParts = (frame: SkeletonFrame): SkeletonFrame[] =>
 /** A frame's header: its tag's line, then its title and note. A frame with neither title nor tag
  *  starts its rows at its own padding. */
 function skelHead(frame: SkeletonFrame): number {
+  // A BACKDROP'S MEDIA IS NAMED AT ITS CORNER, over the words that stand on it (RD.DEVEX.WORKSPACE.305).
+  return skelHeadOwn(frame) + (skelBackdropOf(frame) ? SKEL_TAG_H : 0);
+}
+function skelHeadOwn(frame: SkeletonFrame): number {
   const tag = skelCornerName(frame) ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
   // A CONTAINER HOLDS ITS HEADER: its unit's name at the corner of its outline, its header band under the name, and its
   // content under the line that closes the band. With no header, the content stands under the name.
@@ -2380,22 +2492,33 @@ const skelRowGaps = (row: SkeletonRow) =>
  *  A frame with a fraction asks the row to be wide enough that its share holds it, and the other items
  *  ask it to be wide enough that what the fractions leave holds them. The row needs the larger of the
  *  two, never their sum: a sum asks for more than the row uses, and draws a figure wider than its page. */
+/** The least room one item of a row takes. A fill or a frame still needs room for what it holds; an item line's words and a note
+ *  wrap, and code and a row of tabs scroll, so each takes less than its own width (RD.DEVEX.WORKSPACE.303, .304). */
+function skelItemNeed(it: SkeletonItem, ctl: number): number {
+  const kind = skelKind(it);
+  if (kind === "spacer") return 0;
+  if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl);
+  if (kind === "standin" && it.standin === "table") return skelTableW(it, ctl);
+  if (kind === "item") return skelItemMinW(it, ctl) + skelItemBox(it);
+  if (kind === "head") return skelHeadMinW(it, ctl);
+  if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
+  if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
+  if (kind === "control" && it.fill && !skelOwnWidth(it)) return it.control === "field" ? SKEL_FIELD_W : skelTextW(it.text ?? "");
+  if ((kind === "note" || kind === "control") && skelScrolls(it)) return Math.min(SKEL_SCROLL_MIN, skelFixedWidth(it, ctl));
+  if (kind === "note" && typeof it.note === "string") return skelWordsMinW(it.note, skelWordW);
+  return skelFixedWidth(it, ctl);
+}
+/** Whether an item that keeps its own width gives some of it where its row runs past its room: an item line whose words wrap, a note, and
+ *  code and a row of tabs, which scroll. */
+const skelGives = (it: SkeletonItem): boolean => {
+  const kind = skelKind(it);
+  return (kind === "item" && !it.fill && !skelStats.has(it) && !skelItemInline(it) && skelItemFacts(it).length > 0)
+    || (kind === "note" && typeof it.note === "string") || (kind === "control" && it.control === "tabs");
+};
 function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
-  // A FILL OR A FRAME STILL NEEDS ROOM FOR WHAT IT HOLDS.
   const fractionOf = (it: SkeletonItem): number | undefined =>
     skelKind(it) === "frame" && it.frame!.width ? WIDTH_FRACTIONS[it.frame!.width] : undefined;
-  const need = (it: SkeletonItem): number => {
-    const kind = skelKind(it);
-    if (kind === "spacer") return 0;
-    if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl);
-    if (kind === "standin" && it.standin === "table") return skelTableW(it, ctl);
-    if (kind === "item") return skelItemW(it, ctl) + skelItemBox(it);
-    if (kind === "head") return skelHeadMinW(it, ctl);
-    if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
-    if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
-    if (kind === "control" && it.fill && !skelOwnWidth(it)) return it.control === "field" ? SKEL_FIELD_W : skelTextW(it.text ?? "");
-    return skelFixedWidth(it, ctl);
-  };
+  const need = (it: SkeletonItem): number => skelItemNeed(it, ctl);
   let shares = 0, forShares = 0, others = 0;
   for (const it of row.items) {
     const fraction = fractionOf(it);
@@ -2421,7 +2544,9 @@ function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
   if (skelHasParts(frame)) return Math.max(head + SKEL_PAD * 2, ...skelParts(frame).map((p) => skelFrameMinWidth(p, ctl)));
   const entries = skelAccordionOf(frame);
   if (entries) return SKEL_PAD * 2 + Math.max(head, skelAccordionMinW(frame, entries));
-  const rows = Math.max(0, ...skelRows(frame).map((r) => skelRowMinWidth(r, ctl)));
+  const widest = Math.max(0, ...skelRows(frame).map((r) => skelRowMinWidth(r, ctl)));
+  // THE WORDS OVER A BACKDROP KEEP TO THEIR MEASURE (RD.DEVEX.WORKSPACE.305), so the feature is as wide as that measure needs.
+  const backdrop = skelBackdropOf(frame), rows = backdrop ? Math.ceil(widest / backdrop.measure) : widest;
   return Math.max(SKEL_PAD * 2 + head + headActions, skelInset(frame) * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
 
@@ -2458,6 +2583,14 @@ function skelRowWidths(row: SkeletonRow, available: number, ctl: number, finding
     // A SLOT OR A PART ALONE IN ITS ROW IS THE ROW'S: it takes the row's width, as it takes the column's height with `fill`.
     if (skelFlexes(it) || (n === 1 && (kind === "slot" || kind === "place"))) { flex.push(i); return; }
     widths[i] = skelFixedWidth(it, ctl); fixed += widths[i];
+  });
+  // WHAT KEEPS ITS OWN WIDTH AND RUNS PAST THE ROW GIVES SOME OF IT (RD.DEVEX.WORKSPACE.303, .304): an item line's words and a note wrap,
+  // and code and a row of tabs scroll, each down to the least it takes, in the row's order. A row that fits draws as before.
+  let over = fixed + skelRowGaps(row) - available;
+  if (over > 0) row.items.forEach((it, i) => {
+    if (over <= 0 || flex.includes(i) || skelKind(it) === null || !skelGives(it)) return;
+    const give = Math.min(over, widths[i] - skelItemNeed(it, ctl));
+    if (give > 0) { widths[i] -= give; fixed -= give; over -= give; }
   });
   const left = Math.max(0, available - fixed - skelRowGaps(row));
   const share = flex.length ? Math.round(left / flex.length) : 0;
@@ -2524,11 +2657,12 @@ function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean
   return [circle("sds-skel-control", across / 2), ...skelGlyph(name, cx, cy, Math.round(across / 2))];
 }
 
-/** THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them, from `fx` on the centre line `factsMid`.
- *  A fact that is neither a word nor a badge is the finding `refusal`. */
-function skelDrawFacts(facts: (string | SkeletonItem)[], fx: number, factsMid: number, h: number, refusal: string, findings: string[], out: string[]): void {
-  facts.forEach((fact, i) => {
-    if (i) {
+/** ONE LINE OF FACTS, a dot between every two of them, a badge among them, from `fx` on the centre line `factsMid`: the whole line where
+ *  it fits, or one of the lines it wraps to, which starts with no dot (RD.DEVEX.WORKSPACE.303). A fact that is neither a word nor a badge
+ *  is the finding `refusal`. */
+function skelDrawFactLine(line: SkelFactLine, fx: number, factsMid: number, h: number, refusal: string, findings: string[], out: string[]): void {
+  line.forEach(({ fact, dot }) => {
+    if (dot) {
       out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
       fx += SKEL_FACT_DOT_W;
     }
@@ -2544,7 +2678,21 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
   const mid = iy + ih / 2;
   const baseline = Math.round(mid + 4);
   if (kind === "plain") { out.push(it.part ? skelStepText(it.text!, SKEL_STEP_PART, ix, baseline) : `  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
-  if (kind === "note") { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
+  if (kind === "note") {
+    // A LINE OF CODE WIDER THAN ITS COLUMN KEEPS ITS WIDTH AND IS CUT AT THE COLUMN'S END, where the mark stands (RD.DEVEX.WORKSPACE.304).
+    if (skelCode.has(it) && typeof it.note === "string" && skelWordW(it.note) > iw) {
+      const shown = it.note.slice(0, Math.max(0, Math.floor((iw - SKEL_SCROLL_MARK - SKEL_PACK_GAP) / SKEL_W_LABEL)));
+      out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(shown)}</text>`, ...skelScrollMark(ix + iw, mid));
+      return;
+    }
+    // A NOTE WIDER THAN ITS COLUMN WRAPS AT A WORD (RD.DEVEX.WORKSPACE.303), its lines centred together where its row is taller.
+    skelWrapKeep(it, iw);
+    const lines = skelNoteLines(it);
+    if (lines.length < 2) { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
+    lines.forEach((line, k) =>
+      out.push(`  <text class="sds-code" x="${ix}" y="${Math.round(mid + 4 - (lines.length - 1) * SKEL_ITEM_LINE / 2 + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
+    return;
+  }
   if (kind === "slot") {
     // A SLOT THAT IS A FEATURE'S MEDIA, WITH `frames` NAMING `MEDIA`, STANDS IN THE FEATURE'S FRAME, flush.
     const framed = skelItemFrames.get(it);
@@ -2598,7 +2746,12 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // THE TITLE AND THE LINE UNDER IT ARE TOLD APART BY WEIGHT, SIZE AND SHADE: the title is of medium weight, the facts small and quiet.
     const facts = skelItemFacts(it), top = lineMid - lineH / 2;
     const inline = skelItemInline(it);
+    // ITS WORDS WRAP TO WHAT ITS MEDIA AND ITS END LEAVE OF THE LINE (RD.DEVEX.WORKSPACE.303), and the width is kept for its height.
+    if (!inline) skelWrapKeep(item, skelItemWordsAt(it, h, lineW));
+    const wraps = skelItemWrapH(it, h) > 0;
     const titleY = facts.length && !inline ? top + (lineH - (skelItemH(it, h) - SKEL_LABEL_GAP)) / 2 + 13 : lineMid + 4;
+    // MEDIA BESIDE WORDS THAT WRAP KEEPS ITS SIZE AND STANDS AT THE TOP, beside the title and the first line under it.
+    const mediaMid = wraps ? top + skelItemBaseH(it, h) / 2 : lineMid;
     let wx = lineX;
     if (item.media !== undefined) {
       const media = skelItemMediaOf(item.media);
@@ -2616,7 +2769,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
         wx = lineX + size + SKEL_LABEL_GAP;
       } else {
         const across = skelItemMediaD(it, h);
-        out.push(...skelIcon(media.shape, lineX + across / 2, lineMid, h, true, undefined, across));
+        out.push(...skelIcon(media.shape, lineX + across / 2, mediaMid, h, true, undefined, across));
         wx = lineX + across + SKEL_LABEL_GAP;
       }
     }
@@ -2626,23 +2779,30 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(titleY)}" style="font-size:${step}px;font-weight:${step === SKEL_STEP_ITEM ? 500 : 600}">${number}</text>`);
     out.push(skelStepText(item.title ?? "", step, wx + skelItemNumberW(it), titleY));
     // THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them.
-    const ownDescription = skelItemOwnDescription(it), below = skelItemDescriptionH(it);
+    const ownDescription = skelItemOwnDescription(it);
+    // WORDS THAT RUN PAST THE LINE STAND ON THE LINES THEY WRAP TO (RD.DEVEX.WORKSPACE.303): the description's, then the facts', each line
+    // a step under the last.
+    const wrapped: { description: string[]; facts: SkelFactLine[] } = inline ? { description: [], facts: [facts.map((fact, i) => ({ fact, dot: i > 0 }))] } : skelItemWrapped(it, h);
+    const below = wrapped.description.length * SKEL_ITEM_LINE;
     // FACTS PLACED AFTER THE TITLE STAND UNDER IT AND OVER THE DESCRIPTION (RD.DEVEX.WORKSPACE.296), as `factsPlacement` `AFTER_TITLE` puts
     // them; the two lines trade places and the item keeps its height. With no description of its own there is nothing to trade.
     if (item.factsPlacement !== undefined && !SKEL_FACTS_PLACEMENTS.includes(item.factsPlacement))
       skelSay(findings, `an item line's \`factsPlacement\` is \`${String(item.factsPlacement)}\`, and it takes ${SKEL_FACTS_PLACEMENTS.join(" · ")}`);
     const afterTitle = item.factsPlacement === "AFTER_TITLE" && ownDescription !== undefined, badgeLine = skelItemHasBadge(it);
+    const factStep = badgeLine ? SKEL_FACT_BADGE_STEP : SKEL_ITEM_LINE, factsBelow = Math.max(0, wrapped.facts.length - 1) * factStep;
     // AN INLINE ITEM'S FACTS STAND ON THE TITLE'S LINE, after the title and a dot.
     const factsMid = inline ? titleY - 4 : (afterTitle ? 0 : below) + (badgeLine ? titleY + 5 + SKEL_PACK_GAP + SKEL_FACT_BADGE / 2 : titleY + SKEL_ITEM_LINE - 4);
-    const descriptionY = afterTitle ? factsMid + (badgeLine ? SKEL_FACT_BADGE / 2 + 13 : 4 + SKEL_ITEM_LINE) : titleY + SKEL_ITEM_LINE;
-    if (ownDescription !== undefined) out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(descriptionY)}">${esc(ownDescription)}</text>`);
+    const descriptionY = afterTitle ? factsMid + factsBelow + (badgeLine ? SKEL_FACT_BADGE / 2 + 13 : 4 + SKEL_ITEM_LINE) : titleY + SKEL_ITEM_LINE;
+    wrapped.description.forEach((line, k) =>
+      out.push(`  <text class="sds-note" x="${r2(wx)}" y="${Math.round(descriptionY + k * SKEL_ITEM_LINE)}">${esc(line)}</text>`));
     let fx = wx;
     if (inline) {
       fx += skelItemTitleW(it);
       out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
       fx += SKEL_FACT_DOT_W;
     }
-    skelDrawFacts(facts, fx, factsMid, h, "a fact on the line under an item's title is a word or a badge", findings, out);
+    wrapped.facts.forEach((line, k) =>
+      skelDrawFactLine(line, fx, factsMid + k * factStep, h, "a fact on the line under an item's title is a word or a badge", findings, out));
     let ex = lineX + lineW - skelItemEndW(it, h);
     for (const part of item.end ?? []) {
       const partKind = skelKind(part), pw = skelFixedWidth(part, h);
@@ -2675,7 +2835,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
     // `textAlign` `CENTER` CENTRES EVERY LINE OF THE HEAD, each by its own measure.
     const centre = head.textAlign === "CENTER";
     const startOf = (w: number) => (centre ? ix + (iw - w) / 2 : ix);
-    const { lines, factsTop, mediaBox, badgeTop } = skelHeadLayout(head, iw);
+    const { lines, factsTop, factLines, factStep, mediaBox, badgeTop } = skelHeadLayout(head, iw);
     // A HEAD'S MEDIA (RD.DEVEX.WORKSPACE.294): a `MARK` or an `AVATAR` over its words, in its level's box; a feature at `PAGE` stands its
     // media beside its words, where a spec draws it as a slot.
     if (head.media !== undefined) {
@@ -2708,10 +2868,10 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       if (line.part === "title") out.push(skelStepText(line.words, line.size, startOf(line.w), lineBase));
       else out.push(`  <text class="sds-note" x="${r2(startOf(line.w))}" y="${lineBase}" style="font-size:${line.size}px${line.part === "eyebrow" ? ";letter-spacing:.08em;font-weight:600" : ""}">${esc(line.words)}</text>`);
     }
-    // THE FACTS STAND ON ONE LINE UNDER THE DESCRIPTION, as an item's `meta` stands under its title.
-    const facts = skelHeadFacts(head);
-    if (factsTop !== undefined)
-      skelDrawFacts(facts, startOf(skelFactsW(facts, h)), iy + factsTop + SKEL_ITEM_LINE / 2, h, "a fact under a head is a word or a badge", findings, out);
+    // THE FACTS STAND ON ONE LINE UNDER THE DESCRIPTION, as an item's `meta` stands under its title, and on the lines they wrap to where
+    // they run past the column, each line centred by its own measure with `textAlign` `CENTER` (RD.DEVEX.WORKSPACE.303).
+    if (factsTop !== undefined) factLines.forEach((line, k) =>
+      skelDrawFactLine(line, startOf(skelFactLineW(line, h)), iy + factsTop + SKEL_ITEM_LINE / 2 + k * factStep, h, "a fact under a head is a word or a badge", findings, out));
     return;
   }
   if (kind === "icon") {
@@ -2758,25 +2918,33 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       // its words stand in from that edge by the pill's padding and the track's.
       const pillPad = SKEL_LABEL_GAP, trackPad = 3;
       const inset = pill ? pillPad + trackPad : 0;
+      // A ROW OF TABS WIDER THAN ITS COLUMN KEEPS ITS WIDTH AND SCROLLS (RD.DEVEX.WORKSPACE.304), as `DSTabs` scrolls it in `DSHScroll`: it is
+      // cut at the column's end, the tabs that stand whole before the mark are drawn, and the mark stands at the edge that has more.
+      const cut = iw + 0.5 < skelFixedWidth(it, h), shownTo = ix + iw - SKEL_SCROLL_MARK - SKEL_PACK_GAP;
+      const shows = (from: number, w: number) => !cut || from + w <= shownTo;
       if (pill) {
         // THE PILL: a muted rounded track with an outline holds the words, and the chosen one stands in a filled pill.
-        const pillH = h - trackPad * 2;
-        out.push(skelRect("sds-skel-surface", ix, iy, iw + inset * 2, h, h / 2));
-        out.push(skelRect("sds-skel-control", ix, iy, iw + inset * 2, h, h / 2));
+        const pillH = h - trackPad * 2, trackW = cut ? iw : iw + inset * 2;
+        out.push(skelRect("sds-skel-surface", ix, iy, trackW, h, h / 2));
+        out.push(skelRect("sds-skel-control", ix, iy, trackW, h, h / 2));
         let px = ix + inset;
         words.forEach((word, index) => {
-          if (index === chosen) out.push(skelRect("sds-skel-control", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, pillH / 2));
+          if (index === chosen && shows(px - pillPad, skelTabW(it, word) + pillPad * 2))
+            out.push(skelRect("sds-skel-control", px - pillPad, iy + trackPad, skelTabW(it, word) + pillPad * 2, pillH, pillH / 2));
           px += skelTabW(it, word) + SKEL_GAP;
         });
       } else out.push(`  <path class="sds-skel-control" d="M${r2(ix)} ${r2(foot)} H${r2(ix + iw)}"/>`);
       let tx = ix + inset;
       words.forEach((word, index) => {
         const tw = skelTabW(it, word);
-        if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
-        out.push(`  <text class="${index === chosen ? "sds-label" : "sds-code"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
-        if (index === chosen && !pill) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
+        if (shows(tx, tw)) {
+          if (it.icon !== undefined) out.push(...skelGlyph(it.icon, tx + SKEL_INLINE_ICON / 2, mid, SKEL_INLINE_ICON));
+          out.push(`  <text class="${index === chosen ? "sds-label" : "sds-code"}" x="${r2(tx + skelInlineIconW(it))}" y="${baseline}">${esc(word)}</text>`);
+          if (index === chosen && !pill) out.push(`  <path class="sds-skel-border" d="M${r2(tx)} ${r2(foot)} H${r2(tx + tw)}"/>`);
+        }
         tx += tw + SKEL_GAP;
       });
+      if (cut) out.push(...skelScrollMark(ix + iw - (pill ? trackPad : 0), mid));
       return;
     }
     if (it.control === "badge") {
@@ -3090,6 +3258,15 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
   if (growers.length && slack > 0) for (const i of growers) heights[i] += slack / growers.length;
 
   const itemsX = x + inset + (labelCol ? labelCol + SKEL_GAP : 0);
+  // A BACKDROP'S MEDIA STANDS BEHIND THE ROWS, across the feature under its name, and its own name stands at its corner; the rows keep
+  // to their measure over it, at the start or centred (RD.DEVEX.WORKSPACE.305).
+  const backdrop = skelBackdropOf(frame);
+  if (backdrop) {
+    const top = y + skelHeadOwn(frame) - SKEL_LABEL_GAP;
+    skelDrawLeaf(backdrop.media, "slot", x + SKEL_LABEL_GAP, top, w - SKEL_LABEL_GAP * 2, y + h - SKEL_LABEL_GAP - top, 0, ctl, findings, out);
+  }
+  const backdropW = backdrop ? Math.round(rowContentW * backdrop.measure) : rowContentW;
+  const backdropShift = backdrop?.centre ? Math.round((rowContentW - backdropW) / 2) : 0;
   let rowY = y + skelHead(frame);
   const dividers = skelDividers(frame), partStarts = skelPartStarts(frame);
   const lines = skelLined.get(frame.rows);
@@ -3149,10 +3326,10 @@ function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: numb
     }
 
     const leadH = skelLeadH(row);
-    let innerX = itemsX, innerY = rowY + leadH, innerW = rowContentW;
+    let innerX = itemsX + backdropShift, innerY = rowY + leadH, innerW = backdropW;
     if (row.framed) {
-      out.push(...skelMarks(undefined, itemsX, innerY, rowContentW, rh - leadH));
-      innerX = itemsX + SKEL_GAP; innerY += SKEL_GAP; innerW = rowContentW - SKEL_GAP * 2;
+      out.push(...skelMarks(undefined, innerX, innerY, innerW, rh - leadH));
+      innerX += SKEL_GAP; innerY += SKEL_GAP; innerW -= SKEL_GAP * 2;
     }
 
     const widths = skelRowWidths(row, innerW, ctl, findings);
@@ -3332,7 +3509,7 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
   const which = unit !== undefined ? `\`${unit}\`` : "a frame with no `unit`";
   for (const key of ["color", "strength", "inset"] as const)
     if (frame[key] !== undefined && unit !== SKEL_SECTION) said(`\`${key}\` is a field of a \`DSSectionContainer\`, and this frame is ${which}`);
-  for (const key of ["items", "surface", "verticalAlign"] as const)
+  for (const key of ["items", "surface", "verticalAlign", "type"] as const)
     if (frame[key] !== undefined && unit !== SKEL_FEATURE) said(`\`${key}\` is a field of a \`DSFeature\`, and this frame is ${which}`);
   for (const key of ["section", "grid"] as const)
     if (frame[key] !== undefined && unit !== SKEL_GRID_SECTION) said(`\`${key}\` is a field of a \`DSFeatureGridSectionContainer\`, and this frame is ${which}`);
@@ -3355,6 +3532,27 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
     return surface;
   };
   const isObject = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value);
+  // A FEATURE OF `type` `BACKDROP` (RD.DEVEX.WORKSPACE.305): its media, the slot alone in a row of its own, leaves the flow of its rows and is
+  // kept to be drawn behind them, with the measure its screen class gives the words. The other types are drawn by where the rows place the media.
+  if (unit === SKEL_FEATURE && frame.type !== undefined) {
+    const slotOf = (row: SkeletonRow): SkeletonItem | undefined => {
+      const real = (row?.items ?? []).filter((it) => !!it && typeof it === "object" && skelKind(it) !== "spacer");
+      return real.length === 1 && skelKind(real[0]) === "slot" ? real[0] : undefined;
+    };
+    const at = Array.isArray(frame.rows) ? frame.rows.findIndex((row) => slotOf(row) !== undefined) : -1;
+    if (!SKEL_FEATURE_TYPES.includes(frame.type as string))
+      said(`a \`DSFeature\`'s \`type\` is \`${String(frame.type)}\`, and a skeleton reads ${SKEL_FEATURE_TYPES.join(" · ")}; the other types are drawn by where the feature's rows place its media`);
+    else if (at < 0) said("a `DSFeature` of `type` `BACKDROP` stands its media behind its words: name the media as a slot alone in a row of the feature");
+    else {
+      const media = slotOf(frame.rows[at])!;
+      frame.rows = frame.rows.filter((_, i) => i !== at);
+      const centre = frame.rows.some((row) => (row?.items ?? []).some((it) => !!it && typeof it === "object" && skelKind(it) === "head" && skelHeadOf(it).textAlign === "CENTER"));
+      skelBackdrops.set(frame.rows, { media, measure: device === "DESKTOP" || device === "TABLET" ? SKEL_BACKDROP_MEASURE : 1, centre });
+    }
+  }
+  // EACH LINE OF A `DSCodeBlockView` THAT IS A NOTE IS CODE, which scrolls and never wraps (RD.DEVEX.WORKSPACE.304).
+  if (unit === SKEL_CODE && Array.isArray(frame.rows))
+    for (const row of frame.rows) for (const it of row?.items ?? []) if (!!it && typeof it === "object" && skelKind(it) === "note") skelCode.add(it);
   const ownRows = Array.isArray(frame.rows) ? frame.rows : [];
   let itemsHere = items, mediaHere = media, featureHere = feature;
   if (unit === SKEL_FEATURE) {
@@ -3465,7 +3663,7 @@ const SKEL_FIELDS: Record<string, string[]> = {
   page: ["item", "actions", "back"],
   frame: ["label", "note", "width", "rows", "look", "tag", "height", "fill", "unit", "headed", "frames", "raised", "bordered", "rounded", "size",
     "part", "actions", "footer", "sections", "divided", "marked", "media", "color", "strength", "inset", "items", "surface", "verticalAlign", "section", "grid",
-    "options"],
+    "options", "type"],
   section: ["label", "actions", "rows", "divided", "unit", "part", "sections"],
   row: ["label", "framed", "chosen", "marked", "items", "within", "lead"],
   item: ["text", "note", "fill", "frame", "tag", "slot", "control", "main", "on", "flush", "edgeTop", "inPart", "atPage", "mark", "tabs", "chosen",
@@ -3786,9 +3984,9 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
     skelChosenFindings(spec.views, layout, findings);
   } else if (!spec.frame) return { svg: "", findings: [...findings, "a `skeleton` figure with no `frame` and no `views`; a skeleton is one outer frame, or one for each screen class"] };
   const paint = (said: string[], into: string[]) => views ? skelDrawViews(spec.views!, layout, said, into) : skelDrawFrame(spec.frame!, 24, 24, undefined, said, into);
-  // A HEAD WRAPS TO THE WIDTH ITS ROW GIVES IT, so a spec that holds one is first drawn to learn each head's width, and
-  // that drawing and what it found are put aside. A spec with no head is drawn once.
-  if (skelHasHead(spec) || skelHasOptions(spec)) paint([...findings], []);
+  // A HEAD WRAPS TO THE WIDTH ITS ROW GIVES IT, and so do an item line's words and a note (RD.DEVEX.WORKSPACE.303), so a spec that holds
+  // one is first drawn to learn each width, and that drawing and what it found are put aside. A spec with none is drawn once.
+  if (skelHasHead(spec) || skelHasOptions(spec) || skelHasWords(spec)) paint([...findings], []);
   paint(findings, out);
   if (views && !out.length) return { svg: "", findings };
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };

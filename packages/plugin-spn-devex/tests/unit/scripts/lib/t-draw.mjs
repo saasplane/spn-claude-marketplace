@@ -1792,5 +1792,102 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
     createHash("sha256").update(draw(LOOKS_BEFORE).svg).digest("hex"), "5b5a9173fd518a9865d63b1fe4f42c0c396662365e85628ae55004b4415a57c7");
 }
 
+console.log("=== SKELETON — text that fits: words that wrap, code and tabs that scroll, a picture behind the words (RD.DEVEX.WORKSPACE.303 to .305)");
+{
+  const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
+  const unescape = (s) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  const texts = (g) => [...g.matchAll(/<text class="([^"]+)" x="([\d.]+)" y="([\d.]+)"(?: style="([^"]*)")?>([^<]*)</g)].map((m) => ({ cls: m[1], x: Number(m[2]), y: Number(m[3]), style: m[4] ?? "", words: unescape(m[5]) }));
+  const wordsAt = (g, words) => texts(g).find((t) => t.words === words);
+  const view = (viewport, rows) => draw({ kind: "skeleton", views: [{ viewport, frame: { rows } }] });
+  const wide = (found) => found.some((f) => / needs \d+ across/.test(f));
+  /** A word on a line of facts, measured letter by letter as the drawer measures it. */
+  const factW = (t) => Math.ceil([...t.words].reduce((w, c) => w + (/[A-Z0-9@]/.test(c) ? 7.4 : /[mwMW]/.test(c) ? 9.2 : /[iljt.,:;' ]/.test(c) ? 3.6 : 6.2), 0));
+
+  // 1 · an item line's description wraps at a word to its column, and the item grows a line for each
+  const LONG = "Accounts and contacts, both ways, every hour of the day.";
+  const pair = view("TABLET", [{ items: [{ item: { media: "default", title: "Salesforce", description: LONG }, fill: true }, { item: { media: "default", title: "HubSpot", description: "Deals as they move." }, fill: true }] }]);
+  const lines = texts(pair.svg).filter((t) => t.cls === "sds-note" && LONG.includes(t.words));
+  one("an item line's description wider than its column wraps at a word inside it, each line 18px under the last, with no width finding",
+    [pair.findings, lines], ([found, parts]) => !wide(found) && parts.length >= 2 && parts.map((t) => t.words).join(" ") === LONG
+      && parts.every((t, k) => k === 0 || t.y - parts[k - 1].y === 18) && parts.every((t) => t.x + factW(t) <= 24 + 16 + 280));
+
+  // 2 · a line of facts breaks between two facts, and a fact in words at a word; a dot stands only between facts of one line
+  const facts = view("MOBILE", [{ items: [{ item: { title: "Postgres", description: "Read replicas only.", meta: ["Database", "Key", "Read only, every region", { control: "badge", text: "Beta" }] }, fill: true }, { item: { title: "Stripe", description: "Charges.", meta: ["Billing"] }, fill: true }] }]);
+  const factLines = [...new Set(texts(facts.svg).filter((t) => t.cls === "sds-note" && t.y > 40 && t.words !== "Read replicas only." && t.words !== "Charges." && t.words !== "Billing").map((t) => t.y))];
+  const dotsAtStart = texts(facts.svg).filter((t) => t.words === "·").filter((dot) => !texts(facts.svg).some((t) => t.y === dot.y && t.x < dot.x && t.words !== "·" && t.x > 24));
+  one("an item line's facts wrap between two facts, each further line 20px under the last where the line holds a badge, and no line starts with a dot",
+    [facts.findings, factLines, dotsAtStart], ([found, ys, startDots]) => !wide(found) && ys.length >= 2 && ys[1] - ys[0] === 20 && startDots.length === 0);
+
+  // 3 · a head's line of facts wraps to its column, each line centred where the head is
+  const BADGES = ["TypeScript", "React", "Postgres", "AWS", "Kubernetes"].map((text) => ({ control: "badge", text }));
+  const head = view("MOBILE", [{ items: [{ head: { title: "Ship your SaaS in weeks", pageLevel: "PAGE", facts: BADGES, textAlign: "CENTER" } }] }]);
+  const badgeRows = [...new Set(boxes(head.svg, "sds-skel-control").filter((b) => b[3] === 16).map((b) => b[1]))];
+  one("a head's line of facts wider than its column wraps between two facts, 20px a line, with no width finding",
+    [head.findings, badgeRows], ([found, ys]) => !wide(found) && ys.length === 2 && ys[1] - ys[0] === 20);
+
+  // 4 · a note wraps at a word to its column
+  const NOTE = "header: flat · content: raised, with widgets and a footer";
+  const noted = view("MOBILE", [{ items: [{ frame: { width: "1/2", rows: [{ items: [{ note: NOTE }] }] } }, { fill: true, frame: { rows: [{ items: [{ text: "Orders" }] }] } }] }]);
+  const noteLines = texts(noted.svg).filter((t) => t.cls === "sds-code" && NOTE.includes(t.words));
+  one("a note wider than its column wraps at a word inside it, its lines 18px apart, with no width finding",
+    [noted.findings, noteLines], ([found, parts]) => !wide(found) && parts.length >= 2 && parts.map((t) => t.words).join(" ") === NOTE && parts[1].y - parts[0].y === 18);
+
+  // 5 · code keeps its width: cut at the column's end, with the mark there, and never wrapped
+  const LINE = "  data: { getData: () => api.orders.list({ status: 'OPEN', limit: 50 }) },";
+  const code = view("MOBILE", [{ items: [{ fill: true, frame: { unit: "DSCodeBlockView", label: "apps/web/src/config.ts", rows: [{ items: [{ note: "const config = {" }] }, { items: [{ note: LINE }] }, { items: [{ note: "};" }] }] } }] }]);
+  const cutLine = texts(code.svg).find((t) => t.cls === "sds-code" && t.words.length > 4 && LINE.startsWith(t.words));
+  const marks = boxes(code.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10);
+  one("a line of code wider than its column keeps its width and is cut at the column's end, where the mark of the cut stands, with no width finding",
+    [code.findings, cutLine, marks, wordsAt(code.svg, "const config = {")],
+    ([found, shown, tiles, short]) => !wide(found) && shown && shown.words !== LINE && tiles.length === 1 && shown.x + shown.words.length * 7 <= tiles[0][0] && short);
+
+  // 6 · a row of tabs keeps its width: the tabs that stand whole before the cut, and the mark
+  const TABS = ["Shape", "Plan", "Develop", "Test", "Provision", "Deliver", "Operate"];
+  const tabsIn = (type) => view("MOBILE", [{ items: [{ fill: true, frame: { unit: "DSFeature", rows: [{ items: [{ head: { title: "Every phase has an owner" } }] }, { items: [{ control: "tabs", tabs: TABS, chosen: 0, type }] }] } }] }]);
+  const pills = tabsIn("PILL"), lineTabs = tabsIn("LINE");
+  const shownTabs = (g) => TABS.filter((word) => wordsAt(g, word));
+  one("a row of `PILL` tabs wider than its column scrolls: its track ends at the column, the tabs that stand whole are drawn, and the mark stands at the end, with no width finding",
+    [pills.findings, shownTabs(pills.svg), boxes(pills.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10), boxes(pills.svg, "sds-skel-surface").filter((b) => b[3] === 32 && b[4] === 16)],
+    ([found, shown, tiles, tracks]) => !wide(found) && shown.length > 1 && shown.length < TABS.length && tiles.length === 1 && tracks.length === 1 && tracks[0][0] + tracks[0][2] <= 411 + 24);
+  one("a row of `LINE` tabs scrolls the same way, as `DSTabs` scrolls every horizontal row",
+    [lineTabs.findings, shownTabs(lineTabs.svg), boxes(lineTabs.svg, "sds-skel-surface").filter((b) => b[2] === 20 && b[4] === 10)],
+    ([found, shown, tiles]) => !wide(found) && shown.length > 1 && shown.length < TABS.length && tiles.length === 1);
+
+  // 7 · `type` `BACKDROP`: the media behind the words, the words at three fifths on a tablet and a desktop
+  const HERO = (extra = {}, rows) => ({ fill: true, frame: { unit: "DSFeature", type: "BACKDROP", ...extra, rows: rows ?? [
+    { items: [{ slot: "mediaNode · a mood picture" }] },
+    { items: [{ head: { title: "Ship your SaaS in weeks", pageLevel: "PAGE", description: "One foundation for tenancy, identity and billing.", textAlign: "CENTER" } }] },
+    { items: [{ control: "button", text: "Start building", main: true }, { control: "button", text: "Read the docs" }] }] } });
+  const backdrop = (viewport, extra, rows) => view(viewport, [{ items: [HERO(extra, rows)] }]);
+  const desk = backdrop("DESKTOP"), phone = backdrop("MOBILE");
+  const picture = (g) => boxes(g, "sds-skel-surface").find((b) => b[0] === 24 + 16 + 8);
+  const span = (g) => { const words = texts(g).filter((t) => ["Ship your SaaS in weeks", "Start building", "Read the docs"].includes(t.words)); return [Math.min(...words.map((t) => t.x)), Math.max(...words.map((t) => t.x))]; };
+  one("a `DSFeature` of `type` `BACKDROP` draws its media behind its words: one box across the feature under its name, its name at its corner, the head and the actions inside it, with no finding",
+    [desk.findings, picture(desk.svg), wordsAt(desk.svg, "mediaNode · a mood picture"), wordsAt(desk.svg, "Ship your SaaS in weeks"), wordsAt(desk.svg, "Read the docs")],
+    ([found, box, name, title, action]) => found.length === 0 && box && box[2] === 1052 - 32 - 16 && name.x === box[0] + 8 && name.y === box[1] + 16
+      && title.y > name.y && action.y < box[1] + box[3]);
+  const [deskFrom, deskTo] = span(desk.svg), [phoneFrom] = span(phone.svg);
+  one("over a backdrop the words keep to three fifths of the width on a desktop, centred by the head's `textAlign`, and take the whole width on a phone",
+    [deskFrom, deskTo, phoneFrom, picture(desk.svg)], ([from, to, phoneStart, box]) => from > box[0] + box[2] * 0.15 && to < box[0] + box[2] * 0.85 && phoneStart < from);
+  one("a part named in `frames` frames the whole of a backdrop, as its media lies under its words",
+    boxes(backdrop("DESKTOP", { frames: ["MEDIA"], surface: { bordered: true } }).svg, "sds-skel-border").filter((b) => b[4] === 8), (frames) => frames.length === 1 && frames[0][0] === 24 + 16);
+  one("another `type`, a `BACKDROP` with no slot alone in a row, and `type` on a frame that is not a `DSFeature` are findings",
+    [backdrop("DESKTOP", { type: "SPLIT_END" }).findings, backdrop("DESKTOP", {}, [{ items: [{ head: { title: "Ship" } }] }]).findings,
+      view("DESKTOP", [{ items: [{ fill: true, frame: { unit: "DSSectionContainer", type: "BACKDROP", rows: [{ items: [{ text: "Hi" }] }] } }] }]).findings],
+    ([other, slotless, section]) => says("a `DSFeature`'s `type` is `SPLIT_END`, and a skeleton reads BACKDROP")(other)
+      && says("a `DSFeature` of `type` `BACKDROP` stands its media behind its words")(slotless) && says("`type` is a field of a `DSFeature`, and this frame is `DSSectionContainer`")(section));
+
+  // 8 · words, notes, code and tabs that fit draw byte for byte as before (the hash of the drawer before this row)
+  const FITS_BEFORE = { kind: "skeleton", title: "Words that fit, as before", views: [{ viewport: "TABLET", frame: { size: "XS", rows: [
+    { items: [{ control: "tabs", tabs: ["Overview", "Members"], chosen: 0 }] },
+    { items: [{ fill: true, frame: { unit: "DSFeature", rows: [
+      { items: [{ head: { title: "Connect what you already use", description: "Every connector, one place.", facts: [{ control: "badge", text: "New" }, "12 connectors"] } }] },
+      { items: [{ item: { media: "default", title: "Salesforce", description: "Accounts, both ways.", meta: ["CRM", "OAuth"] }, fill: true }, { item: { title: "Stripe", description: "Charges and refunds." }, fill: true }] },
+      { items: [{ note: "Synced every hour" }] },
+      { items: [{ fill: true, frame: { unit: "DSCodeBlockView", label: "config.ts", rows: [{ items: [{ note: "const config = {};" }] }] } }] }] } }] }] } }] };
+  one("item lines, heads, notes, code and tabs that fit their columns draw byte for byte as before",
+    createHash("sha256").update(draw(FITS_BEFORE).svg).digest("hex"), "1e01355fe79104bc7aa6503a0579260d2a7d63c395adf4749b9ff93623544837");
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
