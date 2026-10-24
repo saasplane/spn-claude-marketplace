@@ -13,6 +13,10 @@
 //               exists and an arc of it: the workstream's number, the arc's number and the subject
 //               from `arcs/N<nnn>/state.json`: `020-N011 artifacts-by-domain`
 //
+// A handover's `also open:` names other workstreams that are open beside it, as its own line or inside
+// the `continue:` value. Those are recorded as visited, never owned, so the window is not asked to carry
+// another window's cards; only what `continue:` names before it is this window's own.
+//
 // A handover names its workstream by the folder or by the number: `025-partner-web, N011` and
 // `025 · N011` name the same workstream, because a number is never given to a second workstream. A
 // prompt with no handover binds a workstream only by its folder's name, because a three-digit number
@@ -27,7 +31,7 @@ import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../li
 import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { ARC_NAME, WORKSTREAM_NAME, handoverLines } from "./stop.ts";
-import { bindNamed, readWindow } from "../lib/window.ts";
+import { bindNamed, bindVisited, readWindow } from "../lib/window.ts";
 
 /** What a session is called, and which of the two forms the name has. */
 export type SessionName = { name: string; form: "workstream" | "arc" };
@@ -72,6 +76,37 @@ function workstreamsOfLine(line: string, root: string): Array<{ name: string | n
   }));
 }
 
+/** Where a handover names the other open workstreams, as a line of its own or inside `continue:`. */
+const ALSO_OPEN = /\balso open\s*:/i;
+
+/** The part of a `continue:` value that names this window's work: everything before an `also open:` in it. */
+function continuedPart(next: string): string {
+  const at = next.search(ALSO_OPEN);
+  return at < 0 ? next : next.slice(0, at);
+}
+
+/**
+ * The workstreams a handover names after `also open:`, each once, that exist: on a line of its own, with
+ * the lines indented under it, or inside the `continue:` value. A prompt with no `continue:` has none.
+ */
+export function alsoOpenOf(prompt: string, root: string): string[] {
+  const next = handoverLines(prompt).get("continue");
+  if (next === undefined) return [];
+  const texts: string[] = [];
+  if (ALSO_OPEN.test(next)) texts.push(next.slice(next.search(ALSO_OPEN)));
+  const lines = prompt.split("\n");
+  lines.forEach((line, index) => {
+    const at = line.search(ALSO_OPEN);
+    if (at < 0) return;
+    const held = [line.slice(at)];
+    for (const after of lines.slice(index + 1)) { if (!/^\s+\S/.test(after)) break; held.push(after.trim()); }
+    texts.push(held.join(" "));
+  });
+  const named = texts.flatMap((text) => workstreamsOfLine(text, root).map((found) => found.name))
+    .filter((name): name is string => name !== null);
+  return [...new Set(named)];
+}
+
 /** Every workstream folder a text names that exists, each one once, in the order the text names them. */
 function workstreamsNamed(text: string, root: string): string[] {
   const named: string[] = [];
@@ -101,7 +136,8 @@ function arcSubject(folder: string, arc: string): string | null {
  * no arc to start on and takes the workstream form. An arc with no `state.json` subject in the
  * workstream's `arcs/N<nnn>/` folder has nothing to show, and it gives the workstream form too.
  */
-function handoverName(line: string, root: string): SessionName | null {
+function handoverName(next: string, root: string): SessionName | null {
+  const line = continuedPart(next);
   const named = workstreamsOfLine(line, root);
   const workstream = named[0]?.name;
   if (!workstream) return null;
@@ -131,15 +167,16 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 /**
  * The workstreams a prompt makes this window OWN (RD.DEVEX.WORKSPACE.236), and how.
  *
- * A handover owns every workstream its `continue:` line names that exists: the reload form names two,
- * and a window that continues one while the other waits on it owns both. A prompt with no handover owns
+ * A handover owns every workstream its `continue:` line names that exists, before any `also open:`: the
+ * reload form names two, and a window that continues one while the other waits on it owns both. What
+ * `also open:` names is visited, never owned (`alsoOpenOf`). A prompt with no handover owns
  * a workstream only where it names exactly one workstream folder that exists, and only while the window
  * owns none yet: a later prompt often names a second workstream to compare it or cite it.
  */
 export function bindingsOf(prompt: string, root: string, session: string): Array<{ name: string; by: "prompt" | "handover" }> {
   const next = handoverLines(prompt).get("continue");
   if (next !== undefined) {
-    const owned = [...new Set(workstreamsOfLine(next, root).map((found) => found.name))]
+    const owned = [...new Set(workstreamsOfLine(continuedPart(next), root).map((found) => found.name))]
       .filter((name): name is string => name !== null);
     if (owned.length) return owned.map((name) => ({ name, by: "handover" as const }));
   }
@@ -193,6 +230,7 @@ export function answerFor(payload: Payload, start: string): string {
   // THE WINDOW'S BINDING, before the name: a window that asks before it writes is asked its cards.
   try {
     for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
+    for (const visited of alsoOpenOf(prompt, root)) bindVisited(root, session, visited);
   } catch { /* a binding that cannot be written is a window that hears less */ }
   const file = recordFile(root, session);
   if (!file) return "";

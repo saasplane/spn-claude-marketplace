@@ -15,7 +15,7 @@ import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
-  markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
+  markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewHrefOf, previewOf,questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, statusMoves, landedLines, logLinesOf,
 } from "../lib/workstream.ts";
 import { DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
@@ -48,8 +48,9 @@ export function previewFindings(ws: string, arc: string, data: ArcData | null): 
     for (const file of filesUnder(base))
       if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE))
         out.push(`\`${under}/${file}\` is a second preview — an arc has one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
-  if (data && data.status !== "PROPOSED" && !isFile(previewOf(ws, arc)))
-    out.push(`${arc} is ${data.status} and has no preview at \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
+  const previewHref = previewHrefOf(arc, data);
+  if (data && data.status !== "PROPOSED" && !isFile(previewOf(ws, arc)) && !isFile(join(ws, previewHref)))
+    out.push(`${arc} is ${data.status} and has no preview at \`${previewHref}\``);
   return out;
 }
 

@@ -196,6 +196,31 @@ console.log("\n=== row write — a status or a row state moved refreshes every v
   ok("a note alone refreshes nothing", note.code === 0 && !/approach:|preview badge/.test(note.out), note.out);
 }
 
+console.log("\n=== row write --preview — a carried arc's Cycles row links where its notes now live (S137)");
+{
+  const carried = await dataWorkspace("commands-preview");
+  const elsewhere = "../032-next/notes/N002/preview.html";
+  put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/preview.html", "<meta charset=\"utf-8\">\n<section id=\"s1\"><h2>Overview</h2></section>\n");
+  put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/samples/table.md", "| a |\n");
+  const page = join(carried.ws, "approach.html");
+  const wrong = cli(carried.root, ["workstream", "row", "write", "031/N001", "--preview", "../032-next/notes/N002/draft.html"]);
+  ok("red: a path that does not end in preview.html is refused, and nothing is written",
+    wrong.code === 2 && wrong.out.includes("`preview.html`") && json(join(carried.ws, "arcs", "N001", "state.json")).preview === "preview.html", wrong.out);
+  const onRow = cli(carried.root, ["workstream", "row", "write", "031/N001", "1", "--preview", elsewhere]);
+  ok("red: `--preview` belongs to the arc, never to a row", onRow.code === 2 && onRow.out.includes("`--preview`"), onRow.out);
+  const moved = cli(carried.root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--preview", elsewhere]);
+  const data = json(join(carried.ws, "arcs", "N001", "state.json"));
+  ok("the path is written onto the arc's data", moved.code === 0 && data.preview === elsewhere && /N001 · status, preview|N001 · preview, status|preview/.test(moved.out), `${moved.out}\n${JSON.stringify(data.preview)}`);
+  const cyclesRow = (/<tr id="N001"[^>]*>.*?<\/tr>/s.exec(readFileSync(page, "utf8")) ?? [""])[0];
+  ok("the Cycles row links the preview and the sample where the notes now live, and not the empty folder",
+    cyclesRow.includes(`href="${elsewhere}"`) && cyclesRow.includes('href="../032-next/notes/N002/samples/table.md"') && !cyclesRow.includes('href="notes/N001/preview.html"'), cyclesRow);
+  ok("no state check finding asks for a preview at notes/N001/", !/has no preview/.test(moved.out), moved.out);
+  const back = cli(carried.root, ["workstream", "row", "write", "031/N001", "--preview", "preview.html"]);
+  ok("`--preview preview.html` gives the fixed place back, and the row links it again",
+    back.code === 0 && json(join(carried.ws, "arcs", "N001", "state.json")).preview === "preview.html"
+      && (/<tr id="N001"[^>]*>.*?<\/tr>/s.exec(readFileSync(page, "utf8")) ?? [""])[0].includes('href="notes/N001/preview.html"'), `${back.out}\n${readFileSync(page, "utf8")}`);
+}
+
 console.log("\n=== state show and state check");
 {
   const show = cli(root, ["workstream", "state", "show", "031"]);

@@ -5,7 +5,9 @@
 //
 // Given the arc alone, it opens the arc as PROPOSED (`--title` and `--subject` needed), or changes its
 // header and its status; `--goal` sets the outcome the arc's name file leads with, and `--subject` takes
-// one to three words of at most 24 characters. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
+// one to three words of at most 24 characters. `--preview` takes the path from the workstream folder to the
+// arc's preview where its notes live in another workstream, as a carried arc's do, and the arc's Cycles row
+// links it; `--preview preview.html` gives the fixed place back. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
 // `--note` alone writes a line on the arc's log, which has no other writer. A write that moves an arc's
 // status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which.
@@ -37,7 +39,7 @@ import { basename } from "node:path";
 import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import {
-  NOTES, PREVIEW_FILE, arcIdsOf, doneOf, logEvent, newArc, previewOf, proposedLines, readArc, stateOfRow, turnPlanToBuild, writeArc,
+  NOTES, PREVIEW_FILE, arcIdsOf, doneOf, logEvent, newArc, previewOf, previewPathFault, proposedLines, readArc, stateOfRow, turnPlanToBuild, writeArc,
 } from "../../lib/workstream.ts";
 import { ALTITUDES, DESIGN_KIND, ROW_ID, ROW_KINDS, ROW_STATES, isBuildRow, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
@@ -52,10 +54,11 @@ const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STATUSES, reason: VALUE, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
   model: VALUE, parent: VALUE, kind: ROW_KINDS, repo: VALUE, altitude: ALTITUDES, mechanism: VALUE, acceptance: VALUE,
   "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE, position: VALUE,
+  preview: VALUE,
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows", "position"];
+const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows", "position", "preview"];
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -70,6 +73,12 @@ function header(data: ArcData, words: Words): string[] {
   if (position !== null) {
     if (!/^[1-9]\d*$/.test(position)) throw new UsageFault(`takes \`--position\` as a whole number from 1, the arc's place in the planned sequence: \`${position}\` is not one.`);
     if (data.position !== Number(position)) { data.position = Number(position); changed.push("position"); }
+  }
+  const preview = words.value("preview");
+  if (preview !== null) {
+    const fault = previewPathFault(preview);
+    if (fault) throw new UsageFault(`takes \`--preview\` as the path from the workstream folder to the arc's preview, such as \`../030-next/notes/N002/${PREVIEW_FILE}\`: \`${preview}\` ${fault}.`);
+    if (data.preview !== preview) { data.preview = preview; changed.push("preview"); }
   }
   const status = words.value("status");
   if (status && status !== data.status) {
@@ -152,6 +161,7 @@ function write(args: string[]): number {
   const before = arcSignatures(ws);
   let closing = false;
   let goes = false;
+  let previewMoved = false;
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
@@ -173,6 +183,7 @@ function write(args: string[]): number {
       // The go turns the plan into build work: every design row not yet landed takes the kind `change`.
       const turned = was === "PROPOSED" && data.status === "DECIDED" ? turnPlanToBuild(data) : [];
       if (turned.length) changed.push("kinds");
+      previewMoved = changed.includes("preview");
       if (changed.length) typed(() => writeArc(ws, data!));
       // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
       const move = `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`;
@@ -231,7 +242,8 @@ function write(args: string[]): number {
       }
     }
   }
-  const refreshed = refreshIfMoved(ws, before);
+  // A preview that moved is a view moved: the Cycles row links it in the same write.
+  const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
@@ -294,7 +306,7 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--note …] …",
+    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
     run: write,
   },
   discard: {

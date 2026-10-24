@@ -183,6 +183,18 @@ export function bindNamed(root: string, session: string | undefined, name: strin
   save(root, session, note);
 }
 
+/**
+ * Record a workstream a handover's `also open:` names as one this window only visits. A workstream
+ * the window already holds keeps its tie, so an owned one is never turned into a visit.
+ */
+export function bindVisited(root: string, session: string | undefined, name: string): void {
+  if (!windowFile(root, session) || !name) return;
+  const note = readWindow(root, session);
+  if (note.workstreams[name]) return;
+  note.workstreams[name] = { since: new Date().toISOString(), by: "handover", tie: "visits" };
+  save(root, session, note);
+}
+
 const isOpen = (root: string, name: string): boolean =>
   [workstreamsDir(root, "open"), legacyWorkstreamsDir(root, "open")].some((dir) => {
     try { return statSync(join(dir, name)).isDirectory(); } catch { return false; }

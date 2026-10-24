@@ -31,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { approachOf, arcIdsOf, blockAt, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { PREVIEW_FILE, approachOf, arcIdsOf, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -216,17 +216,20 @@ function runOrder(a: Cycle, b: Cycle): number {
 
 /**
  * One arc kept as data, read into its Cycles row: the title and the line from its `state.json`, the
- * preview by its fixed name and each sample from `notes/N<nnn>/`, and a reason as one of its facts.
+ * preview by its fixed name and each sample from `notes/N<nnn>/`, or from the folder the arc's
+ * `preview` path names where it carries one, and a reason as one of its facts.
  */
 export function cycleOfData(folder: string, arc: string): Cycle | null {
   const file = join(folder, ARCS, arc, "state.json");
-  let data: { title?: unknown; decides?: unknown; status?: unknown; reason?: unknown } | null = null;
+  let data: { title?: unknown; decides?: unknown; status?: unknown; reason?: unknown; preview?: unknown } | null = null;
   try { data = JSON.parse(read(file)); } catch { return null; }
   if (!data || typeof data !== "object") return null;
   const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) ? data.status : null;
-  const notes = posix.join("notes", arc);
+  // An arc carried to another workstream names where its preview now lives, and its samples sit beside it.
+  const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });
+  const notes = posix.dirname(previewHref);
   const previews: Preview[] = [];
-  if (isFile(join(folder, notes, "preview.html"))) previews.push({ name: "preview.html", href: `${notes}/preview.html`, kind: "preview", state: "" });
+  if (isFile(join(folder, previewHref))) previews.push({ name: PREVIEW_FILE, href: previewHref, kind: "preview", state: "" });
   for (const sample of listdir(join(folder, notes, "samples")))
     previews.push({ name: sample, href: `${notes}/samples/${sample}`, kind: "sample", state: "" });
   return { id: arc, name: typeof data.title === "string" ? data.title : arc, does: typeof data.decides === "string" ? data.decides : "",

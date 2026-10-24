@@ -12,7 +12,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX, WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { bindingsOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
+import { alsoOpenOf, bindingsOf, nameToGive, readRecord, recordFile, sessionName } from "../../../../src/scripts/events/prompt.ts";
 
 const SCRIPT = resolve(PLUGIN, "src", "scripts", "events", "prompt.ts");
 const EVENT = "UserPromptSubmit";
@@ -150,6 +150,22 @@ console.log("\n=== prompt");
     bindingsOf(handover("020 · N011 — row 8"), root, "sess-owns"), [{ name: THIS, by: "handover" }]);
   same("[MKT.HOOKS.49] a handover naming a number with no folder owns nothing, and the prompt binds nothing",
     bindingsOf(bare("099 · N011"), root, "sess-owns"), []);
+}
+
+// ---------------------------------------------------------------- `also open:` is visited, never owned (S175)
+{
+  const root = build("also-open");
+  const withBoth = `${handover(`${toArc("N011")}\n              also open: \`${NEXT}\``)}\nalso open:    \`${DONE}\` (closed, for reference)`;
+  same("a handover with `continue:` and `also open:` owns only the workstream `continue:` names",
+    bindingsOf(withBoth, root, "sess-also"), [{ name: THIS, by: "handover" }]);
+  same("the workstreams `also open:` names, inside `continue:` and on a line of its own, are read as visited",
+    alsoOpenOf(withBoth, root), [NEXT, DONE]);
+  same("the name still comes from the `continue:` line alone", sessionName(withBoth, root), { name: "020-N011 artifacts-by-domain", form: "arc" });
+  same("a prompt with no handover names nothing as also open", alsoOpenOf(`also open: ${NEXT}`, root), []);
+  const ran = hook(event(root, "sess-also", fenced(withBoth)), root);
+  const note = JSON.parse(readFileSync(join(root, DEVEX, ".debug", "windows", "sess-also.json"), "utf8"));
+  same("the hook writes the window as owner of `continue:`'s workstream and visitor of the rest",
+    [ran.exit, note.workstreams[THIS]?.tie, note.workstreams[NEXT]?.tie, note.workstreams[DONE]?.tie], [0, "owns", "visits", "visits"]);
 }
 
 // ---------------------------------------------------------------- the decision

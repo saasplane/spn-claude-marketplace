@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9aa52c82"
+      "seen": "a0608440"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -421,7 +421,11 @@ grows — MUST** (`RD.DEVEX.WORKSPACE.205`). Read the kind's row, hold your draf
 example and the poor ones for that kind, run the check below, and name the change to the developer in
 one line. Do not ask them to approve one. A Subtitle that exists today moves into place only if it
 already passes the plain rule; otherwise write it again. A preview page's Title is the preview's name,
-and its Subtitle says what the developer is asked to decide from the page.
+and its Subtitle says what the developer is asked to decide from the page. **A preview's tab names its
+workstream and its arc**: the `<title>` of `notes/N<nnn>/preview.html` reads the workstream's number,
+the arc's number and the arc's subject in title case, such as `025 · N023 - Small Improvements`, as an
+approach page's reads `025 - Partner Web`. Its `h1`, its rail and its block's `title` stay the
+preview's name.
 
 **An approach page's masthead carries no project shorthand either** — an arc number, a question
 number or a release name, such as *N116* or *R2*, that the same sentence does not explain. The

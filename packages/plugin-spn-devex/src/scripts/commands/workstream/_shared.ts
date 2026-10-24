@@ -61,15 +61,16 @@ export function arcSignatures(ws: string): Map<string, { status: string; rows: M
  * RD.DEVEX.WORKSPACE.273: when a write moved the status of an arc, or the state of a row it already had,
  * every view of it is refreshed in the same command, across all the workstream's arcs. An arc just
  * opened or a row just added moves no status, so `docs cycles write` and the stamp still bring them in.
+ * `alsoRefresh` is a write that moved a view by another field, as an arc's `--preview` does.
  * `said` names each view rewritten, for the command's one line; `lines` carries a part that could not be written.
  */
-export function refreshIfMoved(ws: string, before: ReturnType<typeof arcSignatures>): { said: string[]; lines: string[] } {
+export function refreshIfMoved(ws: string, before: ReturnType<typeof arcSignatures>, alsoRefresh = false): { said: string[]; lines: string[] } {
   const after = arcSignatures(ws);
   const moved = [...before].some(([arc, was]) => {
     const now = after.get(arc);
     return !!now && (now.status !== was.status || [...was.rows].some(([id, state]) => now.rows.has(id) && now.rows.get(id) !== state));
   });
-  if (!moved) return { said: [], lines: [] };
+  if (!moved && !alsoRefresh) return { said: [], lines: [] };
   const { views, skipped } = refreshViews(ws);
   return { said: views, lines: skipped.map((reason) => `! ${reason}`) };
 }

@@ -134,6 +134,22 @@ export const logFileOf = (ws: string, arc: string): string => join(arcDataDir(ws
 export const factsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FACTS_FILE);
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
+/**
+ * Where an arc's preview is linked from its workstream folder: the arc's `preview` field where it is a
+ * path, as an arc carried to another workstream keeps it (`workstream row write <arc> --preview <path>`),
+ * and `notes/N<nnn>/preview.html` where it is the fixed name alone.
+ */
+export function previewHrefOf(arc: string, data: Pick<ArcData, "preview"> | null): string {
+  const given = typeof data?.preview === "string" ? data.preview.trim() : "";
+  return given.includes("/") ? given : `${NOTES}/${arc}/${PREVIEW_FILE}`;
+}
+/** The fault in a `--preview` value, or null: a path from the workstream folder that ends in the fixed name. */
+export function previewPathFault(value: string): string | null {
+  if (value === PREVIEW_FILE) return null;
+  if (value.startsWith("/") || /^[a-z]+:/i.test(value)) return "is not a path from the workstream folder";
+  if (!value.endsWith(`/${PREVIEW_FILE}`)) return `does not end in the arc's one preview, \`${PREVIEW_FILE}\``;
+  return null;
+}
 export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RD.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
@@ -893,8 +909,29 @@ export function previewOpenInside(ws: string, preview: string, questions: readon
 const OPEN_SECTION_MARKER = "<!-- spn:generated open — do not edit inside these markers; `workstream question show` writes it from questions.jsonl -->";
 
 /**
+ * The id of the section the tool adds for a preview's `Open`. A page numbers its own sections
+ * `s1`, `s2` and on, so a word no page numbers with never clashes with one of them.
+ */
+const OPEN_SECTION_ID = "open";
+/** A page drawn from the preview template, or written by an earlier plugin, holds its `Open` in `s5`. */
+const OPEN_SECTION_IDS: readonly string[] = [OPEN_SECTION_ID, "s5"];
+
+/** The section around the open block, where its id is one the `Open` section carries; null otherwise. */
+function openSectionAround(text: string, at: { from: number; to: number }): { from: number; to: number; id: string; idAt: number } | null {
+  const opens = text.lastIndexOf("<section", at.from);
+  const closes = text.indexOf("</section>", at.to);
+  if (opens < 0 || closes < 0 || text.slice(opens, at.from).includes("</section>")) return null;
+  const tag = /^<section\b[^>]*>/.exec(text.slice(opens));
+  const id = tag ? /\bid="([^"]*)"/.exec(tag[0]) : null;
+  if (!tag || !id || !OPEN_SECTION_IDS.includes(id[1]) || opens + tag[0].length > at.from) return null;
+  return { from: opens, to: closes + "</section>".length, id: id[1], idAt: opens + id.index };
+}
+
+/**
  * A preview's page with its `Open` current: the block rewritten, added as the last section where a
- * card is shown and the page has none, and the section dropped where no card is shown there.
+ * card is shown and the page has none, and the section dropped where no card is shown there. The
+ * block is found by its marker; its section by the id `open`, or `s5`. A section held as `s5` on a
+ * page where another element also carries `s5` is given the id `open` as the block is written.
  */
 export function previewWithOpen(ws: string, preview: string, text: string, questions: readonly Question[]): string {
   const rel = fromWorkstream(ws, preview);
@@ -902,15 +939,21 @@ export function previewWithOpen(ws: string, preview: string, text: string, quest
   const at = blockAt(text, "open");
   if (!shown.length) {
     if (!at) return text;
-    const opens = text.lastIndexOf("<section", at.from);
-    const closes = text.indexOf("</section>", at.to);
-    if (opens < 0 || closes < 0) return text.slice(0, at.from) + text.slice(at.to);
-    const end = closes + "</section>".length;
-    return text.slice(0, opens).replace(/[ \t]*$/, "") + text.slice(end).replace(/^\n?/, "");
+    const section = openSectionAround(text, at);
+    if (!section) return text.slice(0, at.from).replace(/[ \t]*$/, "") + text.slice(at.to).replace(/^\n?/, "");
+    return text.slice(0, section.from).replace(/[ \t]*$/, "") + text.slice(section.to).replace(/^\n?/, "");
   }
   const inside = previewOpenInside(ws, preview, questions);
-  if (at) return withBlock(text, "open", inside)!;
-  const section = `<section id="s5" data-block="reasons">\n  ${OPEN_SECTION_MARKER}\n${inside}  ${BLOCK_END}\n</section>\n`;
+  if (at) {
+    const written = withBlock(text, "open", inside)!;
+    const section = openSectionAround(written, blockAt(written, "open")!);
+    if (!section || section.id === OPEN_SECTION_ID) return written;
+    const idText = `id="${section.id}"`;
+    const carriersOfId = written.split(idText).length - 1;
+    if (carriersOfId < 2) return written;
+    return written.slice(0, section.idAt) + `id="${OPEN_SECTION_ID}"` + written.slice(section.idAt + idText.length);
+  }
+  const section = `<section id="${OPEN_SECTION_ID}" data-block="reasons">\n  ${OPEN_SECTION_MARKER}\n${inside}  ${BLOCK_END}\n</section>\n`;
   const last = text.lastIndexOf("</section>");
   if (last < 0) return `${text}\n${section}`;
   const after = last + "</section>".length;

@@ -209,6 +209,35 @@ console.log("\n=== the generated blocks — progress and open");
   ok("and says so when none is open", lib.openHeading([]) === "Open &mdash; no card is open");
 }
 
+console.log("\n=== a preview's Open takes the id `open` — S169");
+{
+  const { CARD } = await import("../../../helpers/workstream-fixture.mjs");
+  const { title, ...card } = CARD;
+  const ws = "/w/.spndevex/workstreams/open/031-probe";
+  const preview = `${ws}/notes/N001/preview.html`;
+  const open = [{ id: "q8", arc: "N001", title, state: "open", raised: "t", shownIn: ["notes/N001/preview.html"], card, answer: null }];
+  const answered = [{ ...open[0], state: "answered", answer: "A" }];
+  const taken = `<div class="sds-wrap">\n<section id="s1"><h2>Overview</h2></section>\n<section id="s5"><h2>Deferred</h2><p>kept</p></section>\n</div>\n`;
+  const added = lib.previewWithOpen(ws, preview, taken, open);
+  ok("a page whose s5 is taken gains the block as `<section id=\"open\">` and keeps its own s5 once",
+    added.includes('<section id="open" data-block="reasons">') && added.split('id="s5"').length === 2 && added.includes("<p>kept</p>"), added);
+  ok("a second write finds it current", lib.previewWithOpen(ws, preview, added, open) === added);
+  const dropped = lib.previewWithOpen(ws, preview, added, answered);
+  ok("the card answered drops the `open` section and leaves the page's s5", !dropped.includes('id="open"') && !dropped.includes("sds-open") && dropped.includes("<p>kept</p>"), dropped);
+  const marker = "  <!-- spn:generated open — do not edit inside these markers; `workstream question show` writes it from questions.jsonl -->";
+  const before = taken.replace("</div>\n", `<section id="s5" data-block="reasons">\n${marker}\n  <p>stale</p>\n  <!-- /spn:generated -->\n</section>\n</div>\n`);
+  const updated = lib.previewWithOpen(ws, preview, before, open);
+  ok("a page written with the block in a second s5 updates, and that section takes the id `open`",
+    updated.includes('<h4 id="q8">') && !updated.includes("<p>stale</p>") && updated.includes('<section id="open" data-block="reasons">') && updated.split('id="s5"').length === 2, updated);
+  const template = `<section id="s1"><h2>Overview</h2></section>\n<section id="s5" data-block="reasons">\n${marker}\n  <p>stale</p>\n  <!-- /spn:generated -->\n</section>\n`;
+  const fromTemplate = lib.previewWithOpen(ws, preview, template, open);
+  ok("a template page holding its Open as its only s5 updates and keeps s5", fromTemplate.includes('<h4 id="q8">') && fromTemplate.includes('<section id="s5" data-block="reasons">'), fromTemplate);
+  ok("and the card answered drops that s5 section", !lib.previewWithOpen(ws, preview, fromTemplate, answered).includes("<section id=\"s5\""));
+  const authored = `<section id="s3"><h2>Mine</h2>\n${marker}\n  <p>stale</p>\n  <!-- /spn:generated -->\n<p>my words</p>\n</section>\n`;
+  const authoredDropped = lib.previewWithOpen(ws, preview, authored, answered);
+  ok("a block inside a section of another id loses the block alone, never the section", authoredDropped.includes("<p>my words</p>") && !authoredDropped.includes("stale"), authoredDropped);
+}
+
 console.log("\n=== the front matter — an order's and a report's");
 {
   const matter = frontMatter(['---', 'row: "57"', 'outcome: landed        # landed · stopped · needs-you', 'proof: "unit 2225 ✓ · ct 750 ✓"',

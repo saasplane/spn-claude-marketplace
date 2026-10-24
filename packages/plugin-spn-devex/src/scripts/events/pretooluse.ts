@@ -41,6 +41,7 @@ import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
 import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
 import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
+import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
@@ -80,6 +81,10 @@ const CHECKS: Check[] = [
   // any refusal above it, and it still runs this early because a Bash call pays no other check here.
   { name: { group: "long-run", action: "long-run" }, run: checkLongRun, needs: ["command"],
     applies: (path, command) => longRunApplies(path, command) },
+  // A `note`, never a `deny`: a call the floor would send for approval only by its shape is told the
+  // plain form. Its fast path is one regular expression over the command; past it, one settings read.
+  { name: { group: "command-shape", action: "command-shape" }, run: checkCommandShape, needs: ["command"],
+    applies: (path, command) => commandShapeApplies(path, command) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Its workspace sweep is the point: an answered card must be caught on ANY write. What it cannot
