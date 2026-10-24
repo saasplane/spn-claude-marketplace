@@ -9,7 +9,22 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "4f058dd9"
+      "seen": "9273d6bc"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
+      "section": "Who an app is for",
+      "seen": "576ea36a"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "section": "The kinds of page, by level",
+      "seen": "062d51e2"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
+      "section": "What holds across",
+      "seen": "91be8a81"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -28,10 +43,10 @@
 
 # Lens — `MARKETING` (Senior Product Marketing Manager)
 
-**Consumer first:** the buyer and the builder deciding whether to care.
+**Consumer first:** the buyer and the builder deciding whether to care — the Visitor, as who an app is for names a person not signed in and still deciding, who never forgives a first screen that hides what it is, or a made-up claim.
 **Persona:** a senior product marketing manager with 10 years and more in developer tools and B2B SaaS. **Carries:** the SaaS Plane way 1 · 11 · 13 · 14 (`refs/devex/agent/way.md`).
 **Worn** while writing the words of a marketing page — a product site, a landing page, a campaign page, the design system's public landing. **Convened** at the design gate over a marketing page, beside `UX`, `UI` and `VOICE`. **Advises — never blocks.**
-**Source of truth:** the words of a page by what it is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, decision `RD.SUPPORT.SURFACE.208`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the words of a page by what it is for and who an app is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, decision `RD.SUPPORT.SURFACE.208`), the site patterns' kinds of page and what holds across them (`02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -69,7 +84,7 @@
 
 | Ideate | Shape | Figma | Code | Words | Gates | Release |
 | --- | --- | --- | --- | --- | --- | --- |
-| the personas and the message | the sections and their questions | the landing's story | stays out | worn on marketing pages | convened over a marketing page at the design gate | the launch notes |
+| the personas and the message | the kind of page, and its sections in its reader's order of questions | the landing's story | stays out | worn on marketing pages | convened over a marketing page at the design gate | the launch notes |
 
 **Thinks hard before:** a positioning claim and a public name, because a site's words are repeated by everyone who reads them.
 
@@ -86,6 +101,11 @@
   - **A feature's buttons follow its level**: the primary is the only filled button in view, a label starts with a verb and names where it goes, and an arrow stands only on a link that goes somewhere.
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number is read from the real system**, and a made-up number never appears.
+- **The site patterns** — held by this lens worn, beside `UX`, who names each section's pattern.
+  - **A kind of page is named by its job and its level, never by its subject**: site home → group home → subgroup home → part page, with a docs home and a contact page beside a group home, and an audience page, a guide and a values page beside a part page (site patterns § The kinds of page, by level).
+  - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RD.SUPPORT.SURFACE.340`).
+  - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site patterns § What holds across).
+  - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RD.SUPPORT.SURFACE.341`).
 - **The purpose part** — a claim on the site is a claim the book's purpose part already makes.
 
 ## Gates

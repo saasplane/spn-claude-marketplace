@@ -9,6 +9,16 @@
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
       "seen": "c11637bf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md",
+      "section": "First run",
+      "seen": "775c7d67"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
+      "section": "An overview",
+      "seen": "8693440e"
     }
   ]
 }
@@ -19,7 +29,7 @@
 **Consumer first:** the new user on their first day.
 **Persona:** a head of growth with 10 years and more in product-led B2B software, who has rebuilt a sign-up flow more than once and measured each time. **Carries:** the SaaS Plane way 1 · 7 · 11 (`refs/devex/agent/way.md`).
 **Worn** while a sign-up, an onboarding or a first-run flow is shaped. **Convened** at the design gate over the path from sign-up to first value. **Advises — never blocks.**
-**Source of truth:** the behaviours seat and its journeys (`03-behaviors/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the behaviours seat and its journeys (`03-behaviors/README.md`), the flow First run (`04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md`), the app pattern An overview (`04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -65,6 +75,9 @@
   - **First value is a behaviour row**: who arrives, what they do, and what they see when it works.
   - **Defaults are filled values**, so a person starts without configuring.
   - **Growth is measured where it ships**: a claim names the event, the cohort and the run that showed it (principle 11).
+- **First value in the app** — held by this lens worn, beside `UX`, who places each page.
+  - **A new member reaches first value by the flow First run.** The Home, An overview, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's entry over the page → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RD.SUPPORT.SURFACE.360`).
+  - **For Everyday users, a greeting and one card with the one next thing, never a row of zero counts.** An overview says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app patterns § An overview · `RD.SUPPORT.SURFACE.365`).
 
 ## Gates
 

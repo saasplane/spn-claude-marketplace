@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "984df23f"
+      "seen": "3be37a15"
     }
   ],
   "decisions": [
@@ -30,7 +30,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.158",
-      "seen": "942a2780"
+      "seen": "87bbae66"
     },
     {
       "repo": "spn-foundation",
@@ -40,7 +40,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "a1c53b80"
+      "seen": "ae3d606f"
     }
   ]
 }
@@ -100,8 +100,8 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 - **Core, components and names** — held by the stack's checks, `spnutils apps surface gaps`, and this lens worn.
   - **The look comes from the theme, and never from the page.** A colour, a padding, a margin, a radius or a gap set by hand is the finding; in a design, a colour bound to no variable, or a copy of a block that is no longer an instance (`RD.SUPPORT.APPS.150`).
-  - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`,   - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
-`.200`).
+  - **The page's fill and padding are the layout's.** The fill is `page-fill`, set by the theme's body colour (`BASE` where the app chose none); the layout keeps one spacing, `--layout-space`, as the page's padding and every gap; the width is the body's, `FULL` to `NARROW`, and a page of edge-to-edge bands takes `CANVAS` or `width: FULL` (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`, `RD.SUPPORT.SURFACE.158`, `.200`).
+  - **A page that opens or closes on a section lets its fill meet the bar and the footer**, with no band of the page between, and a side line the content draws stands within the layout's space, so the words still start where the bar's start; `DOCK` keeps its page space (layout chapter, the page and the content).
   - **The theme styles the layout in three parts — body, navigation, content — in every layout type.** A look a page or one layout type writes is a finding; nothing stands over the content; an entry is drawn by the entry kind its look names; the layouts alone read the theme and hand the look down; a panel of navigation entries takes the navigation's look and a menu of actions does not; the defaults live once, in the default theme (`RD.SUPPORT.SURFACE.139`, `.140`, `.155`, `.156`, `.161`, `.200`).
   - **A frame is drawn once.** Two borders round one table is the finding; a `bordered` block in a `flush` part, and a table, list, code block, accordion or empty state drawing its own border in a `flush` part, are findings (`RD.SUPPORT.APPS.149`).
   - **A line is chosen by what it parts**: `surface-divider` between rows, `surface-border` at the edge of a card, panel, popover or the shell, `surface-border-strong` at the edge of a control. A partner paints one card, card widget or panel with a class that sets the three paint tokens and nothing else, and a block reads only the tokens set on its own root (`RD.SUPPORT.SURFACE.163`, `.192`).
@@ -135,7 +135,7 @@ The question it holds: *is every unit the right one, built as the library draws 
   - **One page holds at each density, theme, device type, language and direction.** A second version of a page, or a block restyled for dark, is a finding.
 - **The design library** — held by the connector's read-back and `spnutils apps surface library`.
   - **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block, and every block that takes the key draws the focus picture (`RD.SUPPORT.APPS.142`).
-  - **The library draws nothing of a pattern**: core units with their properties and cases, the icons and the places of the layout — no task pattern, page pattern, skeleton or sample page (`RD.SUPPORT.SURFACE.099`).
+  - **The library draws nothing of a pattern**: core units with their properties and cases, the icons and the places of the layout — no task pattern, app pattern, skeleton or sample page (`RD.SUPPORT.SURFACE.099`).
 
 ## Gates
 
