@@ -20,8 +20,9 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
 
 ## What exists today, and what depends on it
 
-<!-- Read before anything is planned. A breaking row needs a card on the page, and a major bump its dated go in
-     the arc's Log (RD.DEVEX.WORKSPACE.069). -->
+<!-- Read before anything is planned. A breaking row needs a card on the page, and a major bump the arc's go
+     naming its version: the status write that moves the arc out of PROPOSED, with the developer's words
+     (RD.DEVEX.WORKSPACE.069). -->
 
 | Thing | Today (read at pin) | Who reads or calls it | Twin or prior art | Change class |
 | --- | --- | --- | --- | --- |

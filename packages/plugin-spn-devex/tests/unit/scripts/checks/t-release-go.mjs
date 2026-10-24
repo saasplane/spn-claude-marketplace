@@ -3,7 +3,13 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 //
 // It guards the one act that cannot be taken back: a major release the developer never agreed to.
 // Minor and patch are the standing authorization in `N39`, so the check reads the bump size and
-// looks for a dated go line in an open workstream's arcs.
+// looks for the go of an arc in an open workstream whose words name the version (RD.DEVEX.WORKSPACE.069).
+// The go is read as `confirmed.ts` reads it, from the arc's `state.json` and `log.jsonl`: the arc reads
+// `DECIDED`, `RUNNING` or `LANDED`, and its log holds the line that moved it out of `PROPOSED` with words.
+//
+// EVERY REFUSAL IS READ FOR WHAT IT ASKS. A refusal that still asks for the retired `- **<date> — go.**`
+// line in an arc's `## Log` sends the agent to write a form nothing reads, so a refused case passes only
+// when its message names the command that records a go, and never the old line.
 //
 // IT HAD NO SUITE, and that is how the defect below survived. It was "proven against seven shapes"
 // by hand in the sitting that wrote it, and a hand proof runs once, from one directory.
@@ -55,13 +61,43 @@ function repo(name, tag) {
 mkdirSync(join(BASE, "ws"), { recursive: true });
 const support = repo("spn-support-ts", "v1.2.67");
 const platform = repo("spn-platform-ts", "v0.1.0");
-mkdirSync(join(BASE, "ws", ".spndevex", WORKSTREAMS, "open", "008-x", "arcs"), { recursive: true });
+const open = join(BASE, "ws", ".spndevex", WORKSTREAMS, "open");
 
-const arcs = join(BASE, "ws", ".spndevex", WORKSTREAMS, "open", "008-x", "arcs");
-writeFileSync(join(arcs, "N1-x.md"), "# N1\n\n## Log\n\n- **2026-09-23 — go.** Release this as 3.0.0.\n");
+// The log lines the commands write, by the words `row write` puts in each.
+const AT = "2026-10-24T20:05+05:30";
+const opened = { at: AT, kind: "opened", row: null, note: "opened as PROPOSED" };
+const goFor = (version) => ({ at: AT, kind: "status", row: null, note: `PROPOSED → DECIDED · the developer, 24 Oct: 'go, and release it as ${version}'` });
+const runs = { at: AT, kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" };
+const reopened = { at: AT, kind: "status", row: null, note: "RUNNING → PROPOSED · rows 4 to 6 are new scope" };
+const noteNaming = (version) => ({ at: AT, kind: "note", row: null, note: `the release will be ${version}` });
+// An arc opened straight at DECIDED on the developer's words, as one go opens every step's arc (RD.DEVEX.WORKSPACE.280).
+const openedOnAGoFor = (version) => ({ at: AT, kind: "opened", row: null, note: `decided on N001's go, the developer: 'release it as ${version}'` });
+
+/** An arc's data and log in an open workstream, as the `workstream` commands write them. */
+function arc(workstream, id, status, lines) {
+  const dir = join(open, workstream, "arcs", id);
+  mkdirSync(dir, { recursive: true });
+  const data = { schemaVersion: 1, arc: id, subject: "a-subject", title: "a subject", goal: null, status, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: id, title: "release it", kind: "change", state: "waiting" }] };
+  writeFileSync(join(dir, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  writeFileSync(join(dir, "log.jsonl"), lines.map((line) => JSON.stringify(line)).join("\n") + "\n");
+}
+
+arc("008-x", "N001", "RUNNING", [opened, goFor("3.0.0"), runs]);                 // a go naming 3.0.0
+arc("008-x", "N002", "DECIDED", [openedOnAGoFor("5.0.0")]);                        // opened on a go naming 5.0.0
+arc("008-x", "N003", "PROPOSED", [opened, goFor("6.0.0"), runs, reopened]);      // the go is gone again
+arc("008-x", "N006", "PROPOSED", [opened, noteNaming("8.0.0")]);                  // a plan naming 8.0.0
+arc("008-x", "N004", "DECIDED", [opened, noteNaming("4.0.0")]);                   // DECIDED with no go in its log
+arc("008-x", "N005", "RUNNING", [opened, goFor("12.0.0"), runs]);                 // a go naming 12.0.0, not 2.0.0
+// The retired form, still on disk in an open workstream: a dated go line in an arc kept as Markdown.
+mkdirSync(join(open, "009-old", "arcs"), { recursive: true });
+writeFileSync(join(open, "009-old", "arcs", "N1-x.md"), "# N1\n\n## Log\n\n- **2026-09-23 — go.** Release this as 7.0.0.\n");
 
 const verdict = (command, cwd) => checkReleaseGo({ tool_name: "Bash", cwd: cwd, tool_input: { command: command } });
 const denied = (v) => typeof v?.deny === "string";
+// A refusal names the command that records a go, and never the line form the arcs left at N002.
+const RECORDS_A_GO = "workstream row write <ws>/<arc> --status DECIDED --note";
+const asksForTheCommand = (v) => denied(v) && v.deny.includes(RECORDS_A_GO) && !v.deny.includes("— go.**") && !v.deny.includes("## Log");
 
 // ── the bump rule, which is what the check is for ──
 
@@ -69,10 +105,25 @@ one("a patch release passes, being the standing authorization",
   !denied(verdict("spnutils apps release 1.2.68", support)));
 one("a minor release passes too",
   !denied(verdict("spnutils apps release 1.3.0", support)));
-one("a major release with no recorded go is refused",
-  denied(verdict("spnutils apps release 2.0.0", support)));
-one("a major release WITH a dated go line in an open arc passes",
+one("a major release with no recorded go is refused, and the refusal asks for the go's command",
+  asksForTheCommand(verdict("spnutils apps release 2.0.0", support)));
+
+// ── where the go is read: the arc's data, as `confirmed.ts` reads it ──
+
+one("a major release under an arc whose log holds its go, naming the version, passes",
   !denied(verdict("spnutils apps release 3.0.0", support)));
+one("an arc opened at DECIDED on words naming the version holds that go too",
+  !denied(verdict("spnutils apps release 5.0.0", support)));
+one("an arc moved back to PROPOSED holds no go, though its log once named the version",
+  asksForTheCommand(verdict("spnutils apps release 6.0.0", support)));
+one("a PROPOSED arc whose plan names the version holds no go",
+  asksForTheCommand(verdict("spnutils apps release 8.0.0", support)));
+one("DECIDED with no go in its log: a note naming the version is no go",
+  asksForTheCommand(verdict("spnutils apps release 4.0.0", support)));
+one("a go naming 12.0.0 is no go for 2.0.0",
+  asksForTheCommand(verdict("spnutils apps release 2.0.0", support)));
+one("a dated go line in an arc kept as Markdown counts for nothing",
+  asksForTheCommand(verdict("spnutils apps release 7.0.0", support)));
 one("an omitted version passes — the CLI increments and never bumps a major",
   !denied(verdict("spnutils apps release", support)));
 one("a rehearsal passes, because it publishes nothing",

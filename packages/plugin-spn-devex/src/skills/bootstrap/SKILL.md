@@ -51,7 +51,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | --- | --- | --- | --- |
 | 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
 | 1 | Mint the workspace | `spnutils workspace init` | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
-| 2 | Open the workstream | — `mkdir`, then write the arc | The answers need a home on disk before the first one is given |
+| 2 | Open the workstream | `mkdir`, then `spn-devex workstream row write` | The answers need a home on disk before the first one is given |
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
 | 5 | Make the estate repository | — a ground act | `repo create` refuses by name until the organization layer has run. This is the one hand-made repository |
@@ -83,96 +83,70 @@ The five answers name every account address, package scope, repository name and 
 
 ```
 .spndevex/workstreams/open/{NNN}-new-platform/
+  approach.html                     the page the arc stands on, copied from the template the plugin ships
   arcs/
-    N1-estate-coordinates.md        the estate questions, and each answer as it arrives
+    N001/                           the estate coordinates, written by the arc commands and nobody else
+      state.json                    the arc, and one row per question
+      log.jsonl                     every write, with each answer beside its row
+      estate-coordinates.md         the arc's name file, which the commands write
+  notes/
+    N001/
+      preview.html                  the coordinates as they stand, read back at act 4 for the go
+      plan.md                       acts 5 to 13 as the arc's steps, written with the go
 ```
 
 It opens in `open/` because nothing blocks it — the developer is in front of you and the questions are the work.
 
-### The answers go in the arc, and the walk mints no approach page
+### The answers go in the arc, and the arc commands write it
 
-An approach page argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two. So the coordinates are a record, and a record belongs in the arc.
+**An arc is data, and only the arc commands write it.** `spn-devex workstream row write` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
 
-Two further reasons hold in a partner's folder, where this walk almost always runs:
+**The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Cycles is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
 
-- **An approach page is hand-written HTML with a fixed shape** — a masthead naming its audience, a folding outline, and a `How` section carrying both its halves. The shape lives in a template inside `spn-foundation`, which a partner never checks out, and `docs page write` produces construct pages only. There is nothing for a partner to copy.
-- **A `.md` file under `.spndevex/` is state rather than corpus**, so `doc-check` leaves it alone. Nothing stands between the sentence the developer just said and the file it lands in.
+**A partner has the page to copy.** The template ships with this plugin, at `refs/devex/workspace/docs/templates/workstream/approach-template.html`, so a partner who never checks out the book copies the same page as a builder. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
 
-`refs/devex/workspace/workspace.md` already blesses this shape: a subject with an arc and no approach page is valid, not a gap. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
+### Open the arc before the first question
 
-### The arc the walk writes
+Write these at act 2, in this order, before the first question is asked. `{NNN}` is the number `workspace status` gave.
 
-Write this file at act 2, before the first question. Every answer cell starts as `— not yet asked`, and the date is today's.
+1. **The page.** Copy the template to `approach.html` in the folder. Its masthead reads `{NNN} - New platform`, and its subtitle says it holds the estate's coordinates. Its Why is one paragraph: five answers name every account address, package scope, repository name and code prefix in this estate, permanently, and this workstream holds them until `CONCEPT.md` exists to carry them. Its What is one line: the coordinates are a record, not a choice, with `Read the preview →` linking `notes/N001/preview.html`. Keep How's Cycles table, and take out every slot the walk does not fill, the sample card under Open and the row under Deferred among them.
+2. **The arc**, opened as `PROPOSED`:
 
-````md
-# N1 — The estate coordinates
+   ```sh
+   spn-devex workstream row write {NNN}/N001 --title "The estate coordinates" --subject estate-coordinates \
+     --goal "The answers that name every account address, package scope, repository name and code prefix in this estate, kept here until the platform's CONCEPT.md carries them."
+   ```
 
-Status: **OPEN — day zero, {date}.**
-Repos: none yet. This arc runs before any repository exists.
+3. **One row per question**, rows 1 to 12, in the order of act 3's *What you ask*. The title is the question, and the acceptance is what its answer decides:
 
-## Why this arc exists
+   ```sh
+   spn-devex workstream row write {NNN}/N001 1 --title "The organization's code, its name, and the mail domain" \
+     --acceptance "Every account address, the package scope, the repository names, the estate's root"
+   ```
 
-Five answers name every account address, package scope, repository name and code prefix
-in this estate, and they name them permanently. This file is where they live until
-`CONCEPT.md` exists to carry them. Nothing here is held in a conversation.
+4. **The steps after the questions**, rows 13 to 19, written the same way:
 
-## The coordinates
+   | Row | Title | Acceptance | Lands at |
+   | --- | --- | --- | --- |
+   | 13 | The coordinates and what derives from them, read back and agreed | the log carries the go | act 4, just before the go, with the read-back as its note |
+   | 14 | The estate repository, wired, with both packages released and pinned | `spnutils workspace status` lists an INFRA member | act 8 |
+   | 15 | The platform repository, scaffolded against both pins | `workspace status` lists an APPS member | act 9 |
+   | 16 | Its concept, agreed one block at a time | `CONCEPT.md` exists at its root and carries the coordinates | act 10 |
+   | 17 | The provider keys named, and the machine seat filled | `workspace status` reports each key as set | act 11 |
+   | 18 | The estate up, both layers | the organization and platform layers report their state | act 12 |
+   | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
 
-| # | The question | The answer | What it decides |
-| --- | --- | --- | --- |
-| 1 | The organization's code, its name, and the mail domain | — not yet asked | Every account address, the package scope, the repository names, the estate's root |
-| 2 | The legal entity — registered name and address | — not yet asked | `legal.name` and `legal.address` on the organization |
-| 3 | The hosting account the repositories are created under | — not yet asked | `providers.scm.org` and `providers.scm.mtype` |
-| 4 | The cloud, its home region, and each region's cloud region | — not yet asked | `providers.cloud.mtype`, `.home`, `.regions[].region` |
-| 5 | One platform or several, the code and name for each, and its domain | — not yet asked | The estate nodes, the isolation units, and every `{APP}_` prefix |
-| 6 | The platform's first human — email and name | — not yet asked | `owner.*` on the platform |
-| 7 | The region they launch in, and where each Account's data must stay | — not yet asked | `regions[].code`, and the residency answer |
-| 8 | Which archetypes they launch with | — not yet asked | The tiers, and through them every surface |
-| 9 | Which service domains the product needs | — not yet asked | The app set and the module set |
-| 10 | Whether they want a public marketing site at launch | — not yet asked | Whether `www` is scaffolded |
-| 11 | The stack | — not yet asked | Which apps plugin binds the platform repo, and which scaffolds run |
-| 12 | Which platform here is the closest twin | — not yet asked | Whether a mechanism transfers, or whether they are inventing one |
+5. **The preview's first draft.** Every arc has one preview, and this arc's is the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
+6. **The arc's row in Cycles, then its stamp:**
 
-## What follows from the answers
+   ```sh
+   spn-devex docs cycles write {NNN}
+   spn-devex workstream arc stamp write {NNN}/N001
+   ```
 
-Filled at act 4, before anything is created, and read back for a yes.
+`docs cycles write` also writes the preview's Status badge from the arc. Until the stamp, each write says the arc's part of the page is behind its rows, and the stamp is what answers it. `spn-devex workstream state check {NNN}` now reads the arc with no finding. Every row written while the arc is `PROPOSED` is a design row, and the command gives it that kind. The go at act 4 turns rows 14 to 19 into the build work acts 5 to 13 run. Each of them gets its repository with `--repo` once act 4 has derived the name.
 
-| It derives | The value |
-| --- | --- |
-| The tiers | — not yet derived |
-| The surface set | — not yet derived |
-| The estate repository | — not yet derived |
-| The platform repository | — not yet derived |
-| The environment | — not yet derived |
-
-## What day zero does not ask
-
-Compliance targets, the setup catalog beyond `dev`, and every environment after the
-first are real decisions, and none of them is needed to reach a running platform.
-They are settled inside the concept at act 10 and in the declarations after it.
-
-The vendor integrations are not in this table either, and for a different reason: they
-are keys rather than coordinates. They are asked at act 11 and they never come near a
-file the estate tracks.
-
-## Steps
-
-| # | What | How you would know it works |
-| --- | --- | --- |
-| 1 | The coordinates, asked one at a time and written down as each arrives | every row above carries an answer |
-| 2 | The coordinates and what derives from them, read back and agreed | the log carries the go |
-| 3 | The estate repository, wired, with both packages released and pinned | `spnutils workspace status` lists an INFRA member |
-| 4 | The platform repository, scaffolded against both pins | `workspace status` lists an APPS member |
-| 5 | Its concept, agreed one block at a time | `CONCEPT.md` exists at its root and carries the coordinates |
-| 6 | The provider keys named, and the machine seat filled | `workspace status` reports each key as set |
-| 7 | The estate up, both layers | the organization and platform layers report their state |
-| 8 | The stack running, and the platform answering | they open the surface and it responds |
-
-## Log
-
-- **{date} — opened.** Day zero. The workspace was minted and this arc opened before the
-  first question was asked.
-````
+**What day zero does not ask.** Compliance targets, the setup catalog beyond `dev`, and every environment after the first are real decisions, and none of them is needed to reach a running platform. They are settled inside the concept at act 10 and in the declarations after it. The vendor integrations are not rows either, for a different reason: they are keys rather than coordinates. They are asked at act 11, and they never come near a file the estate tracks.
 
 ## Act 3 — the estate questions
 
@@ -232,7 +206,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 ### How to ask
 
 - **Ask one question and stop.** A numbered list of all of them arrives as a form, and a form gets one careless pass.
-- **Write each answer down before you ask the next one.** Edit that question's row in the arc, replacing the whole line so the match is unambiguous. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
+- **Write each answer down before you ask the next one.** Land that question's row with their answer as its note, `spn-devex workstream row write {NNN}/N001 <row> --state landed --note "<their answer, as they gave it>"`. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back. The legal entity, the owner's name and the cloud region are the ones an agent is most tempted to guess.
 - **The cloud region mapping is a choice, not a derivation.** `ap-south-1` does not follow from `in` by any rule this estate states. Somebody decided it, so somebody has to say it.
 - **The closest twin is the one people skip, and it earns the most.** A twin tells you which mechanisms transfer wholesale. Where this is their first platform there is no twin, and saying so beats inventing one.
@@ -252,13 +226,18 @@ Show every answered row as it now stands, and then show what you derived from it
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
+**The read-back is the preview.** Bring `notes/N001/preview.html` current first: every answer as given in its Proposed, every derived value beside it, and both repository names in its Where it lands. Show them that page. Once they agree, land row 13 with the read-back as its note.
+
 **A go is written down or it did not happen.** Record it with the command that moves the arc out of `PROPOSED`, carrying their words as they gave them, as `refs/devex/workspace/workstream.md` shows:
 
 ```sh
-spn-devex workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words>"
+spn-devex workstream row write {NNN}/N001 13 --state landed --note "<the read-back: the repository names, the tiers, the surfaces>"
+spn-devex workstream row write {NNN}/N001 --status DECIDED --note "<the developer's words>"
 ```
 
-The log then holds `PROPOSED → DECIDED · <their words>`, and acts 5 to 10 may run.
+The log then holds `PROPOSED → DECIDED · <their words>`, and rows 14 to 19 are build work.
+
+**The plan is written with the go, in the same turn.** A decided arc has its `plan.md`. Copy `refs/devex/workspace/docs/templates/workstream/plan-template.md` to `notes/N001/plan.md`. Its steps are acts 5 to 13, each with its command from the table above and the row it lands. Its pins are the published packages and the workspace as `workspace status` reads it, because no repository exists yet. Then `spn-devex workstream state check {NNN}` reads the arc with no finding, and acts 5 to 10 may run.
 
 Then say which act runs next, and run it.
 

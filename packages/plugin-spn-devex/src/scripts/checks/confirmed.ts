@@ -75,38 +75,52 @@ function openedAt(lines: readonly unknown[], at: number, status: string): string
 }
 
 /**
- * Whether an arc's log holds the go its status needs. The go is the last move out of `PROPOSED` that carries
- * words: a status line with words beside its move, or an `opened` line whose note carries them on an arc opened
- * past `PROPOSED`, as one go opens every step's arc at `DECIDED` (RD.DEVEX.WORKSPACE.280). The log is read in
- * order, as `statusMoves` reads it; a status line naming no move moves from the status the log last showed, and
- * a move back to `PROPOSED` needs a go again.
+ * The developer's words of the go an arc's log holds, or null where it holds none. The go is the last move out of
+ * `PROPOSED` that carries words: a status line with words beside its move, or an `opened` line whose note carries
+ * them on an arc opened past `PROPOSED`, as one go opens every step's arc at `DECIDED` (RD.DEVEX.WORKSPACE.280).
+ * The log is read in order, as `statusMoves` reads it; a status line naming no move moves from the status the log
+ * last showed, and a move back to `PROPOSED` needs a go again. `release-go` reads a major release's version in
+ * these words (RD.DEVEX.WORKSPACE.069), so the two checks read one go.
  */
-export function logHoldsGo(lines: readonly unknown[], status: string): boolean {
+export function goWordsOf(lines: readonly unknown[], status: string): string | null {
   let shown: string | null = PROPOSED;
-  let go = false;
+  let go: string | null = null;
   lines.forEach((raw, at) => {
     const line = raw as LogLine | undefined;
     if (!line || typeof line !== "object") return;
     if (line.kind === "opened") {
       shown = openedAt(lines, at, status);
       const words = String(line.note ?? "").trim();
-      go = shown !== PROPOSED && words.length > 0 && !OPENED_BARE.test(words);
+      go = shown !== PROPOSED && words.length > 0 && !OPENED_BARE.test(words) ? words : null;
       return;
     }
     if (line.kind !== "status") return;
     const move = moveOf(line.note);
     const from = move?.from ?? shown;
     const to = move?.to ?? null;
-    if (from === PROPOSED && to !== PROPOSED) go = wordsOf(line.note).length > 0;
-    if (to === PROPOSED) go = false;
+    if (from === PROPOSED && to !== PROPOSED) go = wordsOf(line.note) || null;
+    if (to === PROPOSED) go = null;
     shown = to;
   });
   return go;
 }
 
+/** Whether an arc's log holds the go its status needs: its words, read by `goWordsOf`. */
+export function logHoldsGo(lines: readonly unknown[], status: string): boolean {
+  return goWordsOf(lines, status) !== null;
+}
+
+/**
+ * The developer's words of an arc's go, or null where the arc holds none: a status past the go in `state.json`,
+ * and the go's line in `log.jsonl`.
+ */
+export function arcGoWords(status: unknown, lines: readonly unknown[]): string | null {
+  return typeof status === "string" && PAST_THE_GO.has(status) ? goWordsOf(lines, status) : null;
+}
+
 /** Whether an arc holds the developer's go: a status past it in `state.json`, and the go's line in `log.jsonl`. */
 export function arcHoldsGo(status: unknown, lines: readonly unknown[]): boolean {
-  return typeof status === "string" && PAST_THE_GO.has(status) && logHoldsGo(lines, status);
+  return arcGoWords(status, lines) !== null;
 }
 
 /** Every folder under `workstreams/open/`, which is the state that means available now. */

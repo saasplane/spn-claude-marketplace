@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e9458c92"
+      "seen": "a1dff755"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "032c92c1"
+      "seen": "1cd65054"
     }
   ]
 }
@@ -1025,7 +1025,7 @@ for you, to execute, and it holds nothing the preview already explains.
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
 
-**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.WORKSPACE.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and its go is a dated log line naming the version, so execution reads the record instead of stopping to ask.
+**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.WORKSPACE.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and the answer is the arc's go, the developer's words in it naming the version (`row write <ws>/<arc> --status DECIDED --note "<their words, naming the version>"`), so execution reads the record instead of stopping to ask. `release-go` reads that go as the check of a repository write reads one (§ A go is written down, below), in every open workstream, and the words of the line that moved the arc out of `PROPOSED` must name the version. It refuses a major release no such arc names.
 
 ## A go is written down, or it did not happen
 

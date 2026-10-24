@@ -275,7 +275,7 @@ on the approach page, `approach.html#N<nnn>`, and every link to an arc points th
 
 **A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RD.DEVEX.WORKSPACE.274`). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RD.DEVEX.AGENT.104`). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`).
 
-**A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
+**Every arc stands on its workstream's approach page** (`RD.DEVEX.WORKSPACE.263`). Its row in *Cycles* is its address, `approach.html#N<nnn>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
 
 - **Scope belongs to the developer, and you only ever propose.** A workstream holds as much as they want it to hold. Widening is the default; splitting is the exception you raise, and never a folder you open on your own initiative.
 - **One release train at a time.** That is mechanical and it holds. Any number of arcs in one workstream is their judgement, and you do not overrule it.
