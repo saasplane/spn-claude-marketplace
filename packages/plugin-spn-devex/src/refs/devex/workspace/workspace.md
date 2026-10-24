@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "09c27219"
+      "seen": "f75907cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -107,24 +107,29 @@ Read across freely, in every direction — it needs no ceremony.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
-### Four regions, one writer each
+### Five regions, one writer each
 
 The order is not a preference. Read a file top to bottom and this is what you find:
 
 | # | Region | Writer | What you may do |
 | --- | --- | --- | --- |
-| 1 | `spnutils:producer` | derived | read it. **A partner's file does not have it** |
-| 2 | `spnutils:managed` | derived | read it. A run rewrites it whole, so nothing typed inside survives |
-| 3 | `spnutils:dev` | **the developer, entirely** | **nothing.** Never read between these markers, never write, never reorder |
-| 4 | `spnutils:keep` | you write the key; the developer writes the value | add a key here |
+| 1 | `spnutils:producer` | derived | read it. It holds `SPN_DEVEX_AGENT_WORKSPACE`. **A partner's file does not have it** |
+| 2 | `spnutils:devex` | `spnutils` writes each key once, when it is missing; the developer writes the value | test whether a token is set. It holds `SPN_DEVEX_AGENT_GITHUB_TOKEN` (`repo create`) and `SPN_DEVEX_AGENT_FIGMA_TOKEN` (`surface library --figma`) |
+| 3 | `spnutils:managed` | derived | read it. A run rewrites it whole, so nothing typed inside survives |
+| 4 | `spnutils:dev` | **the developer, entirely** | **nothing.** Never read between these markers, never write, never reorder |
+| 5 | `spnutils:keep` | you write the key; the developer writes the value | add a key here |
 
-**`producer` leads so a partner's file is a truncation.** Theirs starts at `managed` and runs `managed` → `dev` → `keep`. A missing `producer` region in a partner's file is correct, never a fault to repair.
+**`producer` leads so a partner's file is a truncation.** Theirs starts at `devex` and runs `devex` → `managed` → `dev` → `keep`. A missing `producer` region in a partner's file is correct, never a fault to repair.
+
+**The seat holds only what a partner or a builder configures.** The `devex` region is in every file, because a partner signs in to GitHub and Figma too. A variable only a test sets is not configuration: never add one to the seat or name it in a doc. The tool reads each token through the seat's parser and never from the shell, so a `GITHUB_ACCESS_TOKEN` exported in a shell is not what `repo create` uses.
+
+**When `spnutils` first writes the `devex` region, it carries a token's value from wherever the key already sits**, the `dev` region included. That is the one time a run reads inside `dev`, and it writes nothing there; it reports the old line by key name, and deleting it is the developer's.
 
 **`dev` sits above `keep` because the file is plain shell.** It runs top to bottom, so a key the developer defines once resolves in the values below it. That is why a `keep` value may reference a `dev` key and never the reverse.
 
 ### You add the key. You never invent the value
 
-**`spnutils` derives no key.** It provisions the file's shape — the markers, the producer region, the managed region's default setup — and lays the keep region out. Which keys the keep region holds is yours.
+**`spnutils` derives no key from a declaration.** It provisions the file's shape — the markers, the producer region, the devex region's missing keys, the managed region's default setup — and lays the keep region out. Which keys the keep region holds is yours.
 
 So the loop is:
 

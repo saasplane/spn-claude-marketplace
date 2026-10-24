@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "ccebf0ad"
+      "seen": "6d568c1a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "09c27219"
+      "seen": "f75907cb"
     }
   ],
   "decisions": [
@@ -209,17 +209,20 @@ vocabulary, stack adapters are its realizations.
 
 The second machine path, holding your own values, sitting **outside** `~/.spnutils` on purpose — a
 routine `rm -rf ~/.spnutils/*` is an allowed reset, and your typed credentials are the one thing on
-the machine nobody can regenerate. Four regions, one writer each, read top to bottom:
+the machine nobody can regenerate. Five regions, one writer each, read top to bottom:
 
 | # | Region | Writer | Holds |
 | --- | --- | --- | --- |
-| 1 | `producer` | derived | what only a producer workspace has — absent from a partner's file |
-| 2 | `managed` | derived | the local dev CA block, the module-facts pattern |
-| 3 | `dev` | **you, entirely** | your own keys — no run reads or writes between these markers |
-| 4 | `keep` | agent writes the key, you supply the value | every key a piece of built work needs |
+| 1 | `producer` | derived | what only a producer workspace has, `SPN_DEVEX_AGENT_WORKSPACE` — absent from a partner's file |
+| 2 | `devex` | `spnutils` writes each key once, when missing; you supply the value | the DevEx tooling's tokens, `SPN_DEVEX_AGENT_GITHUB_TOKEN` and `SPN_DEVEX_AGENT_FIGMA_TOKEN` |
+| 3 | `managed` | derived | the local dev CA block, the module-facts pattern |
+| 4 | `dev` | **you, entirely** | your own keys — no run writes between these markers |
+| 5 | `keep` | agent writes the key, you supply the value | every key a piece of built work needs |
 
-`spnutils` provisions the shape and derives no key. A value is never printed and never logged — a
-run reports a key name and whether it is set, nothing more.
+A partner's file starts at `devex`. The seat holds only what a partner or a builder configures, so a
+variable only a test sets never reaches it. `spnutils` provisions the shape and derives no key from
+a declaration; it reads a token through the seat's parser, never from the shell. A value is never
+printed and never logged — a run reports a key name and whether it is set, nothing more.
 
 ## The two machine paths under `~/.spnutils`
 
