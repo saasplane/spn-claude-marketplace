@@ -221,6 +221,22 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
     "silent", { cwd: root, parity: false, why: "a new guard" });
 }
 
+console.log("\n=== pretooluse — a commit waits for a whole run of its content");
+{
+  const root = workspace("dispatch-commit-tiers", {});
+  const repo = join(root, "spn-x");
+  mkdirSync(join(repo, "pkg", "src"), { recursive: true });
+  writeFileSync(join(repo, "pkg", "spkind.json"), JSON.stringify({ kind: "SUPPORT_SERVER", name: "Pkg", config: { mtype: "SUPPORT_SERVER" } }));
+  writeFileSync(join(repo, "pkg", "src", "a.ts"), "export const a = 1;\n");
+  for (const args of [["init", "-q"], ["add", "-A"]]) execFileSync("git", ["-C", repo, ...args]);
+  one("[MKT.HOOKS.64] the commit refusal survives the chain, naming the command to run",
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+    "deny", { says: "spnutils apps test unit commit-unit -p pkg", cwd: root, parity: false, why: "a new guard" });
+  one("[MKT.HOOKS.63] a Bash call that is not a commit passes the same chain",
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } },
+    "silent", { cwd: root, parity: false, why: "a new guard" });
+}
+
 console.log("\n=== pretooluse — a long foreground command is met with a note to run it in the background");
 one("[MKT.HOOKS.53] `pnpm test` in the foreground gets a note through the chain",
   { tool_name: "Bash", tool_input: { command: "pnpm test" } }, "note",
