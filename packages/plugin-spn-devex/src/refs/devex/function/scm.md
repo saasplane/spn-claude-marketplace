@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "a8e715ce"
+      "seen": "4509daa2"
     }
   ]
 }
@@ -129,15 +129,16 @@ Every repository carries three files that make its delivery path evidence: what 
 
 | Check | What it runs | `APPS` | `INFRA` | `FOUNDATION` | `GENERAL` |
 | --- | --- | --- | --- | --- | --- |
-| `test` | the stack's tiers that need no running stack: unit, component and contract in TS; `spnutils infra test` in an estate | runs | runs | — | runs where the root declares a `test` script |
-| `lint` | each project's check target, which typechecks and lints, in TS; `tofu fmt -check` in an estate | runs | runs | — | — |
+| `test` | the stack's tiers that need no running stack: unit and component in TS; `spnutils infra test` in an estate | runs | runs | — | runs where the root declares a `test` script |
+| `lint` | each project's check target, which typechecks and lints, in TS; `tofu fmt -check` in an estate | runs | runs where the repository holds modules | — | — |
 | `code-scan` | Semgrep CE with its default rules, failing on any finding | runs | — | — | runs |
 | `dependency-scan` | OSV-Scanner over every lockfile in the tree | runs | — | — | runs |
 | `secret-scan` | TruffleHog over the commits the change adds | runs | runs | runs | runs |
 | `stack-scan` | ZAP's baseline scan of each app the repository ships, served by the local stack of the platform it pins | runs | — | — | — |
 | `cis-scan` | Checkov's Terraform checks, the CIS AWS Foundations Benchmark's among them, over the modules | — | runs where the repository holds modules | — | — |
 
-- **A check that cannot fail is not written — MUST.** A `FOUNDATION` repository holds no code, so it runs only the secret scan. An `INFRA` repository with no modules gets no `cis-scan`, because a scan over nothing passes and proves nothing.
+- **A check that cannot fail is not written — MUST.** A `FOUNDATION` repository holds no code, so it runs only the secret scan. An `INFRA` repository with no modules gets no `lint` and no `cis-scan`, because a check over nothing passes and proves nothing. An `APPS` repository whose platform names none of its apps gets no `stack-scan`, and keeps every other check.
+- **A tier that needs a running stack stays out of `test`.** The contract, integration and journey tiers call running servers, so they join CI with the job that stands the local stack, not before.
 - **Every action is pinned by its commit and every image by its digest, with its release written beside it — MUST.** A tag can be moved to other code after it was reviewed, and a commit cannot. `spnutils` is installed at a named release. The workflows a repository already runs — a release, a site deploy, an estate's plan and apply — follow the same rule.
 - **`SECURITY.md` names a security address only where an organization reaches the repository.** The workspace sweep passes the estate's organization to the members nothing else connects to it.
 - **A plan that enforces no rulesets is named, never hidden.** The files still land and every check still runs and reports, but nothing blocks a merge, so `repo create` names both rulesets as not enforced and the plan as the reason.
