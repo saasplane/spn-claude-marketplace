@@ -10,6 +10,7 @@
 import { draw, KINDS } from "../../../../src/scripts/lib/draw.ts";
 import { checkFigures } from "../../../../src/scripts/lib/figures.ts";
 import { SEAT } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { createHash } from "node:crypto";
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -1212,6 +1213,83 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
     (g) => g[0] === 131 && g[1] && g[2].length === 0);
   one("`open` on a layout that is no `RAIL` is a finding", page(body, { type: "DOCK", navigation: { open: true } }).findings, says("only a `RAIL` takes `open`"));
   one("`open` that is not true or false is a finding", page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: "yes" } }).findings, says("only a `RAIL` takes `open`"));
+}
+
+console.log("=== SKELETON — a feature's head, in DSFeature's own names (RD.DEVEX.WORKSPACE.284)");
+{
+  const SENTENCE = "Each order shows where it stands and what waits on it, from paid to shipped.";
+  const headed = (head, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ head: { title: "Watch every order move", ...head }, ...extra }] }] } });
+  // A head in a column a third of the row wide, a part beside it, and a line of words under the head in the same column.
+  const narrow = (head) => draw({ kind: "skeleton", frame: { rows: [{ items: [
+    { frame: { width: "1/3", rows: [{ items: [{ head: { title: "Watch every order move", ...head } }] }, { items: [{ text: "After the head" }] }] } },
+    { slot: "mediaNode", fill: true }] }] } });
+  const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)"(?: style="([^"]*)")?>([^<]*)<`, "g"))]
+    .map((m) => ({ x: Number(m[1]), y: Number(m[2]), style: m[3] ?? "", words: m[4] }));
+  const sized = (g, px) => texts(g, "sds-note").filter((t) => t.style.startsWith(`font-size:${px}px`));
+  const titleOf = (g) => texts(g, "sds-title").filter((t) => /font-size:(24|20|15)px/.test(t.style));
+  const height = (g) => Number(/viewBox="[-\d.]+ [-\d.]+ [\d.]+ ([\d.]+)"/.exec(g)?.[1]);
+
+  // 1 · the title stands at its level's step, heavy; the description a step larger than an item's words
+  one("a head's title stands at its level's step: 24px at PAGE, 20px at CONTAINER, 15px at WIDGET, and 20px where `pageLevel` is left out",
+    ["PAGE", "CONTAINER", "WIDGET", undefined].map((pageLevel) => titleOf(headed(pageLevel ? { pageLevel } : {}).svg)[0]?.style),
+    (g) => g.join("|") === "font-size:24px|font-size:20px|font-size:15px|font-size:20px");
+  one("a head's description is 16px at PAGE, 14px at CONTAINER and 13px at WIDGET, each larger than an item's 11px line",
+    ["PAGE", "CONTAINER", "WIDGET"].map((pageLevel, i) => sized(headed({ pageLevel, description: "From paid to shipped." }).svg, [16, 14, 13][i]).map((t) => t.words).join("")),
+    (g) => g.every((words) => words === "From paid to shipped."));
+
+  // 2 · the eyebrow is drawn in capitals, small and spaced, packed 6px above the title
+  const withEyebrow = headed({ eyebrow: "Orders" }), without = headed({});
+  one("the eyebrow is written in a sentence's case and drawn in capitals, 11px and spaced",
+    sized(withEyebrow.svg, 11).map((t) => [t.words, t.style]),
+    (g) => g.length === 1 && g[0][0] === "ORDERS" && g[0][1].includes("letter-spacing") && !withEyebrow.svg.includes(">Orders<"));
+  one("the eyebrow's line and a 6px gap stand above the title: the title moves down by 14 + 6 and the head grows by the same",
+    [titleOf(withEyebrow.svg)[0]?.y - titleOf(without.svg)[0]?.y, height(withEyebrow.svg) - height(without.svg), titleOf(withEyebrow.svg)[0]?.y - sized(withEyebrow.svg, 11)[0]?.y],
+    ([moved, grown, apart]) => moved === 20 && grown === 20 && apart > 0 && apart < 30);
+  one("a head is as tall as its lines and takes no control's height: a title alone at 20px stands lower than a row with a button",
+    [height(without.svg), height(draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "Go" }] }] } }).svg)],
+    ([title, button]) => title < button);
+
+  // 3 · the title and the description wrap at a word to the column, and the height counts every line
+  const wrapped = narrow({ description: SENTENCE });
+  const lines = sized(wrapped.svg, 14), after = texts(wrapped.svg, "sds-label").find((t) => t.words === "After the head");
+  one("a long description in a narrow column wraps at a word, onto three lines or more, and keeps every word",
+    [lines.length, lines.map((t) => t.words).join(" ")], ([count, words]) => count >= 3 && words === SENTENCE);
+  one("the wrapped head's height counts every line: the row under it starts below the last line, a gap clear",
+    [after?.y, lines.at(-1)?.y], ([next, last]) => next - last >= 24);
+  one("a title wider than its column wraps at a word too", narrow({ title: "Watch every order move through the shop" }).svg, (g) => titleOf(g).length >= 2);
+  one("a wrapped head draws clean", wrapped.findings, none);
+
+  // 4 · the facts stand on one line under the description, as an item's facts do
+  const facts = headed({ description: "From paid to shipped.", facts: [{ control: "badge", text: "Real time" }, { control: "badge", text: "Shopify" }] });
+  const badges = [...facts.svg.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="[\d.]+" height="16"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  one("a head's facts stand on one line under the description: two badges at the facts' height, side by side, with a dot between",
+    [badges, sized(facts.svg, 14)[0]?.y, texts(facts.svg, "sds-note").filter((t) => t.words === "·").length, facts.findings],
+    ([marks, description, dots, found]) => marks.length === 2 && marks[0][1] === marks[1][1] && marks[1][0] > marks[0][0] && marks[0][1] > description && dots === 1 && found.length === 0);
+  one("a fact that is only words is drawn as a word", headed({ facts: [{ text: "Live" }] }).svg, (g) => texts(g, "sds-note").some((t) => t.words === "Live"));
+
+  // 5 · `textAlign` `CENTER` centres every line
+  const start = headed({ description: "From paid to shipped." }), centred = headed({ description: "From paid to shipped.", textAlign: "CENTER" });
+  one("`textAlign` `CENTER` centres every line: each starts further in than at `START`, and the shorter line further in again",
+    [titleOf(start.svg)[0]?.x, titleOf(centred.svg)[0]?.x, sized(start.svg, 14)[0]?.x, sized(centred.svg, 14)[0]?.x, centred.findings],
+    ([titleStart, titleCentre, lineStart, lineCentre, found]) => titleCentre > titleStart && lineCentre > lineStart && lineCentre > titleCentre && found.length === 0);
+
+  // 6 · the findings
+  one("a head with no `title` is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ head: { eyebrow: "Orders" } }] }] } }).findings, says("a head carries its `title`"));
+  one("a `pageLevel` the head does not take is a finding", headed({ pageLevel: "GROUP" }).findings, says("a head's `pageLevel` is `GROUP`, and a head takes PAGE · CONTAINER · WIDGET"));
+  one("a `textAlign` the head does not take is a finding", headed({ textAlign: "END" }).findings, says("a head's `textAlign` is `END`, and a head takes START · CENTER"));
+  one("a title with one word wider than its column, after wrapping, is a finding",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { width: "1/4", rows: [{ items: [{ head: { pageLevel: "PAGE", title: "Internationalization" } }] }] } }, { slot: "x", fill: true }] }] } }).findings,
+    says("has a word wider than its column: `Internationalization`"));
+  one("a fact under a head that is neither a word nor a badge is a finding", headed({ facts: [{ icon: "more" }] }).findings, says("a fact under a head is a word or a badge"));
+
+  // 7 · a spec written with loose text draws byte for byte as before (the hash of the drawer before the head item)
+  const LOOSE = { kind: "skeleton", title: "Loose words", views: [{ viewport: "DESKTOP", frame: { size: "XS", rows: [
+    { items: [{ note: "Orders" }] },
+    { items: [{ text: "Watch every order move" }] },
+    { items: [{ note: "Where each order stands, and what waits." }, { spacer: true }, { control: "badge", text: "Real time" }] },
+    { items: [{ item: { media: "default", title: "Live status", description: "Paid, packed or shipped" }, fill: true }] }] } }] };
+  one("a spec with loose `text` and `note` items draws byte for byte as it did before the head item",
+    createHash("sha256").update(draw(LOOSE).svg).digest("hex"), "5dad41d636d8f5b8ece28d801e51e4df6adcede2b6863539b049a57d74494a24");
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

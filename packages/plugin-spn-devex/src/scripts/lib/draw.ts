@@ -121,6 +121,10 @@ export type SkeletonItem = {
    *  of the line. `inline` marks a compact line at the level INLINE: with facts and no description, its facts stand on
    *  the title's line after a dot ("v3 · Draft"). */
   item?: { media?: string; title: string; description?: string; meta?: (string | SkeletonItem)[]; end?: SkeletonItem[]; inline?: boolean };
+  /** A feature's head, in the names of `IDSFeatureProps`: its `pageLevel`, which sizes it, `CONTAINER` where it is left out;
+   *  the `eyebrow`, the words over the title; the `title`; the `description` under it; `facts`, each a word or a badge, on
+   *  one line under the description; and `textAlign`, `START` where it is left out. It is one block as tall as its lines. */
+  head?: { pageLevel?: "PAGE" | "CONTAINER" | "WIDGET"; eyebrow?: string; title: string; description?: string; facts?: SkeletonItem[]; textAlign?: "START" | "CENTER" };
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
@@ -1771,10 +1775,11 @@ const SKEL_RAIL_OPEN = 131, SKEL_RAIL_SHUT = 40, SKEL_LAYOUT_BAR = 48, SKEL_APAR
 /** The title of the page level is the largest of a surface's titles, a step over a container's. */
 const SKEL_STEP_PAGE = 24;
 
-type SkelKind = "frame" | "spacer" | "slot" | "item" | "standin" | "control" | "icon" | "place" | "plain" | "note";
+type SkelKind = "frame" | "spacer" | "slot" | "item" | "head" | "standin" | "control" | "icon" | "place" | "plain" | "note";
 /** Which shape an item is; `null` is the thing the spec refuses. A tag with no other claim is a named place. */
 const skelKind = (it: SkeletonItem): SkelKind | null =>
   it.frame ? "frame" : it.spacer ? "spacer" : it.slot !== undefined ? "slot" : it.item !== undefined ? "item"
+    : it.head !== undefined ? "head"
     : it.standin !== undefined || it.lines !== undefined ? "standin"
     : it.control !== undefined ? "control" : it.icon !== undefined ? "icon"
     : it.tag !== undefined ? "place" : it.text !== undefined ? "plain" : it.note !== undefined ? "note" : null;
@@ -1852,11 +1857,10 @@ const SKEL_FACT_BADGE = 16, SKEL_FACT_CTL = SKEL_FACT_BADGE + 8;
 /** A word on the facts line is measured letter by letter, since capitals and digits are wider than small letters and a dot must not touch the word before it. */
 const skelFactTextW = (words: string) => Math.ceil([...words].reduce((t, c) => t + (/[A-Z0-9@]/.test(c) ? 7.4 : /[mwMW]/.test(c) ? 9.2 : /[iljt.,:;' ]/.test(c) ? 3.6 : SKEL_W_FACT + 0.3), 0));
 const skelFactW = (fact: string | SkeletonItem, _h: number) => (typeof fact === "string" ? skelFactTextW(fact) : skelFixedWidth(fact, SKEL_FACT_CTL));
-function skelItemFactsW(it: SkeletonItem, h: number): number {
-  const facts = skelItemFacts(it);
-  return facts.reduce((t: number, fact, i) => t + skelFactW(fact, h)
-    + (i ? SKEL_FACT_DOT_W : 0), 0);
-}
+/** The width of one line of facts, with a dot between every two. */
+const skelFactsW = (facts: (string | SkeletonItem)[], h: number): number =>
+  facts.reduce((t: number, fact, i) => t + skelFactW(fact, h) + (i ? SKEL_FACT_DOT_W : 0), 0);
+const skelItemFactsW = (it: SkeletonItem, h: number): number => skelFactsW(skelItemFacts(it), h);
 const skelItemHasBadge = (it: SkeletonItem) => skelItemFacts(it).some((fact) => typeof fact !== "string");
 const skelItemStep = (it: SkeletonItem) => (it.page ? SKEL_STEP_PAGE : it.part ? SKEL_STEP_CONTAINER : SKEL_STEP_ITEM);
 const skelItemTitleW = (it: SkeletonItem) => skelStepW(it.item?.title ?? "", skelItemStep(it));
@@ -1871,6 +1875,84 @@ const skelItemMediaD = (it: SkeletonItem, h: number) => (skelItemFacts(it).lengt
 const skelItemW = (it: SkeletonItem, h: number): number =>
   (it.item?.media !== undefined ? skelItemMediaD(it, h) + SKEL_LABEL_GAP : 0) + skelItemWordsW(it, h) + (it.item?.end?.length ? SKEL_GAP + skelItemEndW(it, h) : 0);
 
+/** A FEATURE'S HEAD IS DRAWN AT ITS LEVEL, IN `DSFeature`'S OWN NAMES (RD.DEVEX.WORKSPACE.284): its title at its level's step,
+ *  heavy; its description a step larger than an item's words, quiet; the eyebrow in small capitals, packed above the title;
+ *  and the facts on one line under the description, as an item's `meta` stands. Every size is larger than an item's, so the
+ *  head leads and the items follow. `CONTAINER`, a feature in a section, is the level where `pageLevel` is left out. */
+type SkelHead = NonNullable<SkeletonItem["head"]>;
+const SKEL_HEAD_LEVELS = ["PAGE", "CONTAINER", "WIDGET"], SKEL_HEAD_ALIGNS = ["START", "CENTER"];
+const SKEL_HEAD_TITLE: Record<string, number> = { PAGE: SKEL_STEP_PAGE, CONTAINER: SKEL_STEP_CONTAINER, WIDGET: SKEL_STEP_CARD };
+const SKEL_HEAD_DESCRIPTION: Record<string, number> = { PAGE: 16, CONTAINER: 14, WIDGET: 13 };
+/** The eyebrow's size and the gap between it and the title; the gap between the title, the description and the facts. */
+const SKEL_HEAD_EYEBROW = 11, SKEL_HEAD_EYEBROW_GAP = 6, SKEL_HEAD_GAP = 8;
+/** A line of the head is this much taller than its words. */
+const SKEL_HEAD_LEADING = 1.25;
+/** The size a note's measure, `SKEL_W_NOTE`, is taken at, and the measure of a spaced capital of the eyebrow. */
+const SKEL_HEAD_NOTE_SIZE = 11, SKEL_HEAD_W_CAPS = 8;
+/** A spec's head, or an empty one where it wrote something that is not one, so a finding names it and nothing throws. */
+const skelHeadOf = (it: SkeletonItem): SkelHead => (it.head !== null && typeof it.head === "object" ? it.head : ({} as SkelHead));
+const skelHeadLevel = (head: SkelHead): string => (SKEL_HEAD_LEVELS.includes(head.pageLevel as string) ? head.pageLevel! : "CONTAINER");
+const skelHeadLine = (size: number) => Math.round(size * SKEL_HEAD_LEADING);
+const skelHeadDescriptionW = (words: string, size: number) => Math.ceil(words.length * SKEL_W_NOTE * size / SKEL_HEAD_NOTE_SIZE);
+const skelHeadEyebrowW = (words: string) => Math.ceil(words.length * SKEL_HEAD_W_CAPS);
+/** The facts under a head, as an item's `meta` holds them: a badge as itself, and a fact that is only words as its words. */
+const skelHeadFacts = (head: SkelHead): (string | SkeletonItem)[] => (Array.isArray(head.facts) ? head.facts : []).map((fact) =>
+  typeof fact === "string" ? fact
+    : fact !== null && typeof fact === "object" && fact.control === undefined && (skelKind(fact) === "plain" || skelKind(fact) === "note") ? String(fact.text ?? fact.note)
+    : fact);
+/** Words wrapped at a word to `width`, each line measured by `measure`. A word wider than the width stands on a line of its own. */
+function skelHeadWrap(words: string, width: number, measure: (line: string) => number): string[] {
+  const lines: string[] = [];
+  for (const word of words.split(/\s+/).filter(Boolean)) {
+    const last = lines.at(-1);
+    if (last !== undefined && measure(`${last} ${word}`) <= width) lines[lines.length - 1] = `${last} ${word}`;
+    else lines.push(word);
+  }
+  return lines;
+}
+/** THE HEAD IS ONE BLOCK AS TALL AS ITS LINES, and takes no control's height: the eyebrow's line, the gap, every line of the
+ *  title, the gap and every line of the description, the gap and the line of facts. Each line is placed from the head's top. */
+type SkelHeadLine = { part: "eyebrow" | "title" | "description"; words: string; size: number; top: number; w: number };
+function skelHeadLayout(head: SkelHead, width: number): { lines: SkelHeadLine[]; factsTop?: number; height: number } {
+  const level = skelHeadLevel(head), step = SKEL_HEAD_TITLE[level], size = SKEL_HEAD_DESCRIPTION[level];
+  const lines: SkelHeadLine[] = [];
+  let y = 0;
+  const put = (part: SkelHeadLine["part"], words: string, at: number, measure: (line: string) => number) => {
+    for (const wrapped of skelHeadWrap(words, width, measure)) { lines.push({ part, words: wrapped, size: at, top: y, w: measure(wrapped) }); y += skelHeadLine(at); }
+  };
+  // THE EYEBROW IS WRITTEN IN A SENTENCE'S CASE AND DRAWN IN CAPITALS, on one line.
+  if (typeof head.eyebrow === "string" && head.eyebrow) {
+    const capitals = head.eyebrow.toUpperCase();
+    lines.push({ part: "eyebrow", words: capitals, size: SKEL_HEAD_EYEBROW, top: 0, w: skelHeadEyebrowW(capitals) });
+    y = skelHeadLine(SKEL_HEAD_EYEBROW) + SKEL_HEAD_EYEBROW_GAP;
+  }
+  if (typeof head.title === "string") put("title", head.title, step, (line) => skelStepW(line, step));
+  if (typeof head.description === "string" && head.description) {
+    y += SKEL_HEAD_GAP;
+    put("description", head.description, size, (line) => skelHeadDescriptionW(line, size));
+  }
+  let factsTop: number | undefined;
+  if (skelHeadFacts(head).length) { y += SKEL_HEAD_GAP; factsTop = y; y += SKEL_ITEM_LINE; }
+  return { lines, factsTop, height: y };
+}
+/** THE WIDTH EACH HEAD WAS DRAWN AT. A head's lines wrap to the width its row gives it, and a row is laid out only when it is
+ *  drawn, after the heights are counted; widths never depend on heights. So a spec that holds a head is drawn twice: once
+ *  to learn each head's width here, and once with its wrapped lines counted in its height (`drawSkeleton`). A head drawn
+ *  at two widths keeps the narrower, so its room is never short. */
+const skelHeadWidths = new WeakMap<object, number>();
+const skelHeadH = (it: SkeletonItem): number => {
+  const head = skelHeadOf(it);
+  return skelHeadLayout(head, skelHeadWidths.get(head) ?? Infinity).height;
+};
+/** The room a head needs across: the lines that do not wrap, its eyebrow and its facts. Its title and its description wrap. */
+const skelHeadMinW = (it: SkeletonItem, h: number): number => {
+  const head = skelHeadOf(it);
+  return Math.max(typeof head.eyebrow === "string" ? skelHeadEyebrowW(head.eyebrow) : 0, skelFactsW(skelHeadFacts(head), h));
+};
+/** Whether a spec holds a head anywhere, and so must be measured before it is drawn. */
+const skelHasHead = (value: unknown): boolean => Array.isArray(value) ? value.some(skelHasHead)
+  : value !== null && typeof value === "object" && ("head" in value || Object.values(value).some(skelHasHead));
+
 /** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
 function skelFixedWidth(it: SkeletonItem, h: number): number {
   switch (skelKind(it)) {
@@ -1880,6 +1962,7 @@ function skelFixedWidth(it: SkeletonItem, h: number): number {
     case "slot": return it.fill ? 0 : Math.max(skelTagW(it.slot!), SKEL_PAD * 2);
     case "standin": return it.standin === "table" ? (it.fill ? 0 : skelTableW(it, h)) : it.fill ? 0 : SKEL_LINES_W;
     case "item": return it.fill ? 0 : skelItemW(it, h);
+    case "head": return 0; // a head takes the rest of its row, and wraps to it
     case "icon": return h + (it.text !== undefined ? SKEL_LABEL_GAP + skelWordW(it.text) : 0);
     case "control": {
       const text = it.text ?? "";
@@ -1919,6 +2002,7 @@ function skelItemHeight(it: SkeletonItem, slot: number): number {
   let h = slot;
   if (kind === "place" && it.text !== undefined) h = slot + SKEL_TAG_H;
   if (kind === "item") h = skelItemH(it, slot);
+  if (kind === "head") h = skelHeadH(it);
   if (kind === "standin") {
     const count = Math.max(1, it.lines ?? 3);
     if (it.standin === "table") h = skelTableH(it, slot);
@@ -2058,6 +2142,7 @@ function skelRowMinWidth(row: SkeletonRow, ctl: number): number {
     if (kind === "frame") return skelFrameMinWidth(it.frame!, ctl);
     if (kind === "standin" && it.standin === "table") return skelTableW(it, ctl);
     if (kind === "item") return skelItemW(it, ctl);
+    if (kind === "head") return skelHeadMinW(it, ctl);
     if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
     if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
     if (kind === "control" && it.fill && !skelOwnWidth(it)) return it.control === "field" ? SKEL_FIELD_W : skelTextW(it.text ?? "");
@@ -2093,7 +2178,7 @@ function skelFrameMinWidth(frame: SkeletonFrame, inherited: number): number {
 /** Whether an item takes the rest of its row's width. */
 const skelFlexes = (it: SkeletonItem): boolean => {
   const kind = skelKind(it);
-  if (kind === "spacer") return true;
+  if (kind === "spacer" || kind === "head") return true;
   if (kind === "frame") return it.frame!.width === undefined || WIDTH_FRACTIONS[it.frame!.width] === undefined;
   return !!it.fill && kind !== "plain" && kind !== "note" && kind !== "icon" && !skelOwnWidth(it);
 };
@@ -2186,6 +2271,21 @@ function skelIcon(name: string, cx: number, cy: number, h: number, mark: boolean
   return [circle("sds-skel-control", across / 2), ...skelGlyph(name, cx, cy, Math.round(across / 2))];
 }
 
+/** THE FACTS STAND ON ONE LINE, a dot between every two of them, a badge among them, from `fx` on the centre line `factsMid`.
+ *  A fact that is neither a word nor a badge is the finding `refusal`. */
+function skelDrawFacts(facts: (string | SkeletonItem)[], fx: number, factsMid: number, h: number, refusal: string, findings: string[], out: string[]): void {
+  facts.forEach((fact, i) => {
+    if (i) {
+      out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
+      fx += SKEL_FACT_DOT_W;
+    }
+    if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
+    else if (fact.control !== "badge") findings.push(refusal);
+    else skelDrawLeaf(fact, "control", fx, factsMid - SKEL_FACT_CTL / 2, skelFixedWidth(fact, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
+    fx += skelFactW(fact, h);
+  });
+}
+
 /** One item that is a leaf (a control, an icon, a slot, plain words, a stand-in), drawn at `(ix, iy)`, `iw` wide and `ih` tall. */
 function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, iw: number, ih: number, boxH: number, h: number, findings: string[], out: string[]): void {
   const mid = iy + ih / 2;
@@ -2230,16 +2330,7 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
       fx += SKEL_FACT_DOT_W;
     }
-    facts.forEach((fact, i) => {
-      if (i) {
-        out.push(`  <text class="sds-note" x="${r2(fx + 6)}" y="${Math.round(factsMid + 4)}">${SKEL_FACT_DOT}</text>`);
-        fx += SKEL_FACT_DOT_W;
-      }
-      if (typeof fact === "string") out.push(`  <text class="sds-note" x="${r2(fx)}" y="${Math.round(factsMid + 4)}">${esc(fact)}</text>`);
-      else if (fact.control !== "badge") findings.push("a fact on the line under an item's title is a word or a badge");
-      else skelDrawLeaf(fact, "control", fx, factsMid - SKEL_FACT_CTL / 2, skelFixedWidth(fact, SKEL_FACT_CTL), SKEL_FACT_CTL, SKEL_FACT_CTL, SKEL_FACT_CTL, findings, out);
-      fx += skelFactW(fact, h);
-    });
+    skelDrawFacts(facts, fx, factsMid, h, "a fact on the line under an item's title is a word or a badge", findings, out);
     let ex = ix + iw - skelItemEndW(it, h);
     for (const part of item.end ?? []) {
       const partKind = skelKind(part), pw = skelFixedWidth(part, h);
@@ -2247,6 +2338,36 @@ function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, 
       else skelDrawLeaf(part, partKind!, ex, mid - h / 2, pw, h, h, h, findings, out);
       ex += pw + SKEL_LABEL_GAP;
     }
+    return;
+  }
+  if (kind === "head") {
+    // A FEATURE'S HEAD: the eyebrow, the title and the description wrapped at a word to the head's width, and the facts.
+    const head = skelHeadOf(it);
+    const level = skelHeadLevel(head);
+    if (typeof head.title !== "string" || !head.title) findings.push("a head carries its `title`, and this one carries none");
+    if (head.pageLevel !== undefined && !SKEL_HEAD_LEVELS.includes(head.pageLevel))
+      findings.push(`a head's \`pageLevel\` is \`${String(head.pageLevel)}\`, and a head takes ${SKEL_HEAD_LEVELS.join(" · ")}; \`CONTAINER\` is drawn where it is left out`);
+    if (head.textAlign !== undefined && !SKEL_HEAD_ALIGNS.includes(head.textAlign))
+      findings.push(`a head's \`textAlign\` is \`${String(head.textAlign)}\`, and a head takes ${SKEL_HEAD_ALIGNS.join(" · ")}`);
+    const step = SKEL_HEAD_TITLE[level];
+    const wide = typeof head.title === "string" ? head.title.split(/\s+/).find((word) => skelStepW(word, step) > iw) : undefined;
+    if (wide !== undefined)
+      findings.push(`the head \`${head.title}\` has a word wider than its column: \`${wide}\` needs ${skelStepW(wide, step)} across at ${step}px, and the column is ${r2(iw)}; a title wraps at a word, so a word that does not fit runs over its column`);
+    const known = skelHeadWidths.get(head);
+    if (it.head === head) skelHeadWidths.set(head, known === undefined ? iw : Math.min(known, iw));
+    // `textAlign` `CENTER` CENTRES EVERY LINE OF THE HEAD, each by its own measure.
+    const centre = head.textAlign === "CENTER";
+    const startOf = (w: number) => (centre ? ix + (iw - w) / 2 : ix);
+    const { lines, factsTop } = skelHeadLayout(head, iw);
+    for (const line of lines) {
+      const lineBase = Math.round(iy + line.top + (skelHeadLine(line.size) + line.size * 0.7) / 2);
+      if (line.part === "title") out.push(skelStepText(line.words, line.size, startOf(line.w), lineBase));
+      else out.push(`  <text class="sds-note" x="${r2(startOf(line.w))}" y="${lineBase}" style="font-size:${line.size}px${line.part === "eyebrow" ? ";letter-spacing:.08em;font-weight:600" : ""}">${esc(line.words)}</text>`);
+    }
+    // THE FACTS STAND ON ONE LINE UNDER THE DESCRIPTION, as an item's `meta` stands under its title.
+    const facts = skelHeadFacts(head);
+    if (factsTop !== undefined)
+      skelDrawFacts(facts, startOf(skelFactsW(facts, h)), iy + factsTop + SKEL_ITEM_LINE / 2, h, "a fact under a head is a word or a badge", findings, out);
     return;
   }
   if (kind === "icon") {
@@ -3005,16 +3126,18 @@ function drawSkeleton(given: Spec): { svg: string; findings: string[] } {
     if (spec.views === undefined) findings.push("`layout` is the layout the views stand in, so a spec with a `layout` holds `views`; give the frame a `viewport`");
     else if (skelLayoutFindings(spec.layout, findings)) layout = spec.layout;
   }
-  if (spec.views !== undefined) {
+  const views = spec.views !== undefined;
+  if (views) {
     if (spec.frame) findings.push("a skeleton holds `frame` or `views`, never both; a view carries its own `frame`");
     if (!Array.isArray(spec.views) || !spec.views.length) return { svg: "", findings: [...findings, "a `skeleton` figure whose `views` holds no view; give each view a `viewport` and a `frame`"] };
     skelChosenFindings(spec.views, layout, findings);
-    skelDrawViews(spec.views, layout, findings, out);
-    if (!out.length) return { svg: "", findings };
-    return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };
-  }
-  if (!spec.frame) return { svg: "", findings: [...findings, "a `skeleton` figure with no `frame` and no `views`; a skeleton is one outer frame, or one for each screen class"] };
-  skelDrawFrame(spec.frame, 24, 24, undefined, findings, out);
+  } else if (!spec.frame) return { svg: "", findings: [...findings, "a `skeleton` figure with no `frame` and no `views`; a skeleton is one outer frame, or one for each screen class"] };
+  const paint = (said: string[], into: string[]) => views ? skelDrawViews(spec.views!, layout, said, into) : skelDrawFrame(spec.frame!, 24, 24, undefined, said, into);
+  // A HEAD WRAPS TO THE WIDTH ITS ROW GIVES IT, so a spec that holds one is first drawn to learn each head's width, and
+  // that drawing and what it found are put aside. A spec with no head is drawn once.
+  if (skelHasHead(spec)) paint([...findings], []);
+  paint(findings, out);
+  if (views && !out.length) return { svg: "", findings };
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };
 }
 
