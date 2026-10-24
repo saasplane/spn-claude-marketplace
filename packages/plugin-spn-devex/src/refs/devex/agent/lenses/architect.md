@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/README.md",
-      "seen": "924805f7"
+      "seen": "f7680f3a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/README.md",

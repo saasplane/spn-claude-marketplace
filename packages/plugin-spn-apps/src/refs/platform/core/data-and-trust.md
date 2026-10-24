@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "ada992fa"
+      "seen": "a69900d9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "c66571bb"
+      "seen": "5e1f52ea"
     }
   ]
 }
@@ -98,6 +98,12 @@ Read the **effective policy** — the section-by-section merge of the two layers
 
 **Unlike an auth policy, a data policy resolves whole: the nearest layer holding one wins entirely, and it does not merge attribute by attribute.** Retention has no agreed direction — longer is stricter for an audit obligation, shorter for a privacy one — so merging two organizations' answers would produce a promise neither of them made. If you are writing a purge job or a data-subject flow, consult the effective policy every time rather than a constant you hard-coded once; the policy store and merge are implemented, but enforcement is a per-module responsibility, so until your module consults it, the policy is advisory for the data your module owns.
 
+## Each person's rights are controls your module answers
+
+Every privacy law gives a person the same handful of rights over their data, numbered differently, so the platform builds each right once. **A module that holds personal data answers each duty — MUST**: access, export, correction, erasure, consent, retention and deletion, and breach notice. Erase in place where you can. Where a record must stay, such as the audit trail, anonymise it instead. Mark each personal field on its contract, so the export finds it, the erasure clears it and every log line prints it redacted. The contract a module joins to answer a person's request is planned, so until it ships these duties are open for your module's data, and the control map says so row by row.
+
+**Each law is answered in the role held under it** (`RD.PLATFORM.CORE.049`). Your platform is the controller of its own people's data, and SaaS Plane's modules are the processor. So your team runs the controller's share: the privacy notice, the processing agreement with each tenant, the list of subprocessors, the person a request goes to, and the clock on each answer. That clock is one month under GDPR and UK GDPR, 45 days under CCPA and 30 under PIPEDA.
+
 ## A secret you must read back is stored sealed
 
 Most secrets are never read back — a password is checked against a one-way hash, so nothing recoverable is stored. Some must be used later: the key an organization brings for its own email vendor, the client secret of its sign-in provider, a person's authenticator seed. Carry such a secret in the configuration's **`internal` block**, the write-only half of the shape: a caller may write it, and every read model masks it. Give a configuration that holds no supplied secret no block at all, because an empty block claims a protection with no subject (`RD.PLATFORM.CORE.029`).
@@ -122,6 +128,18 @@ Every guarantee on this page carries a test identified by a behaviour id, so a t
 A fixed list of security standards would be wrong for most partners, so the answer starts from the product. **The `TRUST` lens guides a partner by what they build and deliver, and never hands them one fixed list — MUST** (`RD.PLATFORM.CORE.042`). It asks who buys the product, in which markets and regions, what data it holds, and whether it takes payments or runs AI, then names the standards that apply, in order, with what each asks of the code and of the estate.
 
 **The floor is met by construction, and a partner inherits it from the modules they compose — MUST**: OWASP ASVS 5.0 Level 2, the OWASP Top 10 and API Security Top 10, and NIST SP 800-63B AAL2, with AAL3 for an administrator's step-up. Every other standard — SOC 2, ISO/IEC 27001 and 27701, GDPR, HIPAA, PCI DSS, FedRAMP, the AI standards, the CIS Benchmarks — is added by the partner's answers. The whole guide, row by row, is the spn-devex plugin's `refs/devex/agent/lenses/trust.md`. A standard's full text is never carried; its detail is read from its own source when a case needs it.
+
+## Supported, certified, and the control map
+
+**Every control the trust envelope asks for is one row of the control map** (`RD.PLATFORM.CORE.044`), in the trust chapter. A row names the standards that ask for it, who carries it (`foundation`, `estate`, `foundation + estate` or `company`), what answers it, the evidence a reviewer can run again, and whether it is met. You read the same rows: the foundation's are the ones you never build, and the company's are your team's.
+
+**A standard reads supported only once every foundation and estate row asking for it is met — MUST** (`RD.PLATFORM.CORE.045`). A control is met once a test or a check has seen it refuse something, and an estate control once it is deployed. A company row never decides the claim, and only an outside auditor makes a standard certified.
+
+Three more rules travel with the map:
+
+- **A breach of personal data is reported within 72 hours** (`RD.PLATFORM.CORE.047`). As controller, your platform tells the supervisory authority and each person affected; SaaS Plane, as processor, tells you without undue delay.
+- **Every finding is rated with CVSS v4.0 and fixed within its deadline** (`RD.PLATFORM.CORE.046`): 7 days for critical, 30 for high, 90 for medium, 180 for low. A self-assessment is never read as a test.
+- **Production promises an RPO of 15 minutes and an RTO of 4 hours**, proven by a restore once a year (`RD.PLATFORM.CORE.048`).
 
 ## The five pre-ship questions
 

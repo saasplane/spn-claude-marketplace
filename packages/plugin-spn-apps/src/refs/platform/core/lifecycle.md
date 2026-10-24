@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/",
-      "seen": "6f076fb8"
+      "seen": "775fe028"
     }
   ]
 }
