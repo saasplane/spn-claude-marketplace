@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "43441eea"
+      "seen": "3237d17a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "1ff21d0e"
+      "seen": "87535da6"
     }
   ],
   "decisions": [
@@ -122,7 +122,7 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 | where a title starts | the page writes no prop and no padding. The part that holds an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` gives it no padding at its two sides, and in a `flush` part the inset of its place (`RD.SUPPORT.SURFACE.109`). An item line draws no padding or highlight of its own, and a page writes no `bleed` (`RD.SUPPORT.SURFACE.175`) |
 | a control alone on its line, or an action of a field | the page puts every control a person sets in a `DSForm.Field`, a lone checkbox or switch too, and writes `showBlankLabel={false}` on a field with no label alone on its line in a column. A field's own action, such as *Forgot password?*, goes to `labelEndNode` (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`) |
 | a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
-| the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
+| the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first, and gives `DSPanelContainer.Footer` `sticky` so they stay in view on a long form (`RD.SUPPORT.SURFACE.367`). A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
 | an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
 | a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
 | a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |

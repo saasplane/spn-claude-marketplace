@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "33f6cb79"
+      "seen": "3b86e383"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "1ff21d0e"
+      "seen": "87535da6"
     }
   ]
 }
@@ -24,7 +24,7 @@ Read this before you frame a part of a page, or before you draw or build the pan
 | Term | What it means |
 | --- | --- |
 | Container | `DSPanelContainer` — an optional block that frames a part of a page as a header, content and a footer: the head, content and foot unit. `DSDataTablePanelContainer` is built on it, for a data table |
-| Part | `DSPanelContainer.Header` · `DSPanelContainer.Content` · `DSPanelContainer.Footer` — a named place in a panel. It holds anything, and takes only `flush` |
+| Part | `DSPanelContainer.Header` · `DSPanelContainer.Content` · `DSPanelContainer.Footer` — a named place in a panel. It holds anything, and takes only `flush`; the footer also takes `sticky` |
 | Frame | `frames` — the drawn edge and fill of a panel. A frame is drawn once on any part of a page |
 | Part of a box | `DSBoxPartType` — the closed set of the three parts of any box (`HEADER`, `CONTENT`, `FOOTER`): a panel, a card, a dialog, a sheet, a drawer, a popover or the page's head. The parts a frame holds, the parts of a card, and the part a block stands in |
 | Surface | `IDSFrameSurface` — the paint of a frame in one prop: its `color`, `strength`, `raised`, `elevation`, `bordered` and `rounded`, each optional. A key left out takes the theme's |
@@ -41,7 +41,7 @@ Read this before you frame a part of a page, or before you draw or build the pan
 
 A panel is an optional block. A page uses one when a part of it has a header, content and a footer as one unit.
 
-**The library draws `DSPanelContainer`:** `size`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
+**The library draws `DSPanelContainer`:** `size`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode, and the footer with `sticky` once; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
 
 The unit is `DSPanelContainer`, the head, content and foot unit, and its look is the theme's `container.panel` (`RD.SUPPORT.SURFACE.231`). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
 
@@ -49,9 +49,9 @@ The unit is `DSPanelContainer`, the head, content and foot unit, and its look is
 | --- | --- | --- | --- |
 | Header | `DSPanelContainer.Header` | none or one | `flush`, and no other prop |
 | Content | `DSPanelContainer.Content` | one or more | `flush`, and no other prop. Several join in one frame |
-| Footer | `DSPanelContainer.Footer` | none or one | `flush`, and no other prop |
+| Footer | `DSPanelContainer.Footer` | none or one | `flush` and `sticky`, and no other prop |
 
-The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a panel and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. The look of a panel is its `frames`, its `surface` and `unframed`, which holds a part out of the frame.
+The parts sit in one order: the header, then the content, then the footer. The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written; below the medium width the group drops under the title. The footer starts its blocks at the start edge in a page, a panel and a card, and at the end in a dialog, a sheet and a drawer. Every box tells the blocks in each part its level, the part and `flush` (`RD.SUPPORT.SURFACE.178`): an action takes its size and its look from them, the main action being the one given the colour primary, at the outer edge of its group. The end of an item line holds data, never an action. A part holds anything: a `div`, a text, a block or a page's own component. A footer with `sticky` stays at the bottom of the screen while its panel is on screen, with the panel's own line, fill and inset, and rests at the end of the panel once the panel is scrolled past (`RD.SUPPORT.SURFACE.367`). The look of a panel is its `frames`, its `surface` and `unframed`, which holds a part out of the frame.
 
 ### What a page puts in each part
 

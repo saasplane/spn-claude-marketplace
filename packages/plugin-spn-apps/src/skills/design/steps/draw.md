@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "8d963e7a"
+      "seen": "75dfa295"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "1ff21d0e"
+      "seen": "87535da6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
@@ -84,7 +84,7 @@ The design library holds one file for each layer of the design system that is dr
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
 - **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
 - **Draw each part of a container with what the tree puts in it.** The header holds the title of the container at its start and its actions after it, as one group at the end; the actions write no size and no variant, because their place gives both (`RD.SUPPORT.SURFACE.178`). The footer holds what closes its work, such as the paging of a listing or the two actions of an entry. The action of one part of the content stands at the end of that part's title.
-- **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first. A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
+- **Draw the actions that close the work of an entry in their one place and order.** Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last. In an entry that is a page of its own they stand at the start of the footer, the main action first, and the footer takes `sticky` so they stay in view on a long form (`RD.SUPPORT.SURFACE.367`). A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button, and the action that leaves is an outline button.
 - **Draw a part named in `unframed` flat.** It takes no frame in any theme, so a change of the top frame's look leaves it as it is. One such part is a header that is the header of the page.
 - **Draw the header, `headerNode`, only where the tree fills it.** It stands directly under the bar, and what it holds stands in the body's box, as the footer's does, with no fill or line of the layout's own: the body's colours stand behind it. A hero that needs the whole window is a section placed in it (`RD.SUPPORT.SURFACE.258`).
 - **Draw the footer of a layout only where the tree fills it.** It is an optional place that closes the page, the place at its end as the top bar is at its start. It runs the window's width, and beside a rail the area's, and what it holds stands in the body's box, lined up with the bar's items and the page. Where the content is short it stands at the window's bottom, and where the content is long it stands after the content.

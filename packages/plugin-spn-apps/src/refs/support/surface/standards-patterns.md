@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "43441eea"
+      "seen": "3237d17a"
     }
   ]
 }
@@ -353,9 +353,9 @@ The levels are the layout, the page level, the containers, the widgets and cards
 - **Where the content has several forms, a row of tabs MUST choose the form.** The tabs stand at the top of the content, and every part under them belongs to the chosen form. Where the record is saved whole, one save holds every form.
 - **Layout.** One panel.
 - **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
-- **Container.** One `DSPanelContainer`: the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer.
+- **Container.** One `DSPanelContainer`: the tabs, the details and one part for each thing written as the parts of its content, each part under its own title; its actions at the start of its footer, which takes `sticky` so that it stays in view.
 - **Widget.** None.
-- **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it. `DSSticky` for the footer that stays in view.
+- **Component.** `DSTabs` for the forms of the content, such as its channels. `DSForm` for the fields of the details. `DSTextarea` for the editor of each thing written, and the rendered result beside it.
 - **On a tablet and a phone.** At a desktop the editor of each part and its result stand side by side. On a tablet and a phone a person sees one of the two at a time, the writing or the result. A second row of tabs moves between them, and the choice holds for every part of the content at once.
 - **Spec.** `editor-with-preview.dg.json`.
 
@@ -454,9 +454,9 @@ Whether the set of groups is closed decides the arrangement, before any count do
 - **When.** The data is a large form, with sections or a part that repeats. A person fills it in one sitting.
 - **Layout.** One panel.
 - **Page level.** The header of the panel, with `fullPage`: the way back, before the title.
-- **Container.** One `DSPanelContainer`. Its sections are the parts of its content, each with its own title. Its actions stand in its footer.
+- **Container.** One `DSPanelContainer`. Its sections are the parts of its content, each with its own title. Its actions stand in its footer, which takes `sticky` so that it stays in view.
 - **Widget.** None.
-- **Component.** `DSForm` for the fields, each with its title above its control. `DSSticky` for the footer that stays in view.
+- **Component.** `DSForm` for the fields, each with its title above its control.
 - **The sections are parts of one form that is saved once.** So they are not panels of their own, and no list of the sections stands beside the form.
 - **On a tablet and a phone.** Fields that are short and belong together share a row at a desktop. On a phone each field takes a row.
 - **Spec.** `entry-as-a-page.dg.json`.
