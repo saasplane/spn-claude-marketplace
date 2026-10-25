@@ -113,6 +113,10 @@ console.log("\n=== window — owning and visiting a workstream");
     [`${open(B)}/approach.html`]: page(),
     [`${open(B)}/arcs/N001/state.json`]: `${JSON.stringify(DATA_ARC)}\n`,
     [`${open(B)}/notes/N001/plan.md`]: "# plan\n",
+    [`${open(B)}/notes/N001/preview.html`]: "<p>the preview</p>\n",
+    // The answered card is shown on B's preview, which is what the notes rule reads.
+    [`${open(B)}/questions.jsonl`]: `${JSON.stringify({ id: "q9", arc: "N001", title: RAISED_CARD.title, state: "answered", raised: "2026-10-06T09:00+05:30",
+      shownIn: ["notes/N001/preview.html"], card: RAISED_CARD, answer: { key: "B", words: "the developer said so", at: "2026-10-06T10:00+05:30" } })}\n`,
   });
   bindNamed(root, "owner", A, "prompt");
   pre(root, "owner", { file_path: join(root, open(B), "notes", "N001", "plan.md"), old_string: "x", new_string: "y" });

@@ -48,7 +48,7 @@ console.log("\n=== docs cycles write keeps the stamp, and the page is then curre
   const red = cycles.tableDifferences(before.slice(cycles.cyclesTableAt(before).from, cycles.cyclesTableAt(before).to), cycles.cyclesOf(ws));
   ok("red: a sample added and not on the row is a stale row", red.stale.some((line) => /links are not/.test(line)), JSON.stringify(red));
   const wrote = cli(root, ["docs", "cycles", "write", "031"]);
-  ok("write rewrites the table", wrote.code === 0 && /wrote the Cycles table/.test(wrote.out), wrote.out);
+  ok("write rewrites the table, and writes the places of How beside it", wrote.code === 0 && /wrote the places of How, the Cycles table/.test(wrote.out), wrote.out);
   const after = readFileSync(page, "utf8");
   ok("the stamp the page held is kept", new RegExp(`data-arc-stamp="${stamp}"`).test(after));
   ok("the open block is left to its commands", after.includes("Open &mdash; no card is open"));

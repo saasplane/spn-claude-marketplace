@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "0899df14"
+      "seen": "f42cbacc"
     }
   ]
 }
@@ -136,13 +136,13 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 
 **Use one working run name while coding, and one fresh name for the run you stamp from.** Every selective run of one node reuses the working name, so each replaces the one before it and the 20 files a tier keeps are not spent on small runs. One run with a fresh name, over every case the step touched, comes last.
 
-**Stamp the rows from the freshly named run, and never with `--reach repository`.** The stamp writes the rows the run names and leaves every other row as it is, and each stamped row's `Updated at` names the run. `--reach repository` says the run was the whole of its tiers and sets every row it did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran.
+**Stamp the rows from the freshly named run, and never with `--reach repository`.** The stamp writes the rows the run names whose status changed and leaves every other row as it is, and each row it writes gets an `Updated at` naming the run; a row the run only confirms keeps its `Updated at` (`RD.DEVEX.WORKSPACE.306`). `--reach repository` says the run was the whole of its tiers and sets every row it did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran.
 
 **State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code, because the runner exits clean when a selection matches no case. It is never a count of a whole tier, because only a whole run can meet one. Report a selection that matched no case as *nothing proves this*.
 
-**Before a commit, each tier a change touches runs whole for the node it touched, once, at the end of the step.** These are the tiers that need nothing running: unit, component and integration. A source change touches every owed tier of its node, a case file touches its own tier, and a document touches none. A check refuses an agent's commit when no whole, green run covers exactly the content staged, for an apps node and for an infra node alike.
+**Before a commit, each tier a change touches runs whole for the node it touched, once per batch.** A batch of orders is committed as one commit, so this run happens once for the batch and not once per order. These are the tiers that need nothing running: unit, component and integration. A source change touches every owed tier of its node, a case file touches its own tier, and a document touches none. A check refuses an agent's commit when no whole, green run covers exactly the content staged, for an apps node and for an infra node alike.
 
-**A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). The dry run is the full pass before a release: it runs every tier the release can run by itself and lists every failure at once. The agent runs only the tier the dry run names as not run, a client's contract tier, with the service up, and the release go is asked after both. The release command starts no service and releases every library, a generated client among them, at the one version; a client's contract tier calls a running service, so the command names it as not run. Outside a release, a whole tier runs when:
+**A whole tier runs before a commit, in an arc's `PROOF` row, before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). An arc's `PROOF` row is its one final re-check: the whole tiers of each touched node, the browser walks and the look run there, once for the arc, and no order runs them. The dry run is the full pass before a release: it runs every tier the release can run by itself and lists every failure at once. The agent runs only the tier the dry run names as not run, a client's contract tier, with the service up, and the release go is asked after both. The release command starts no service and releases every library, a generated client among them, at the one version; a client's contract tier calls a running service, so the command names it as not run. Outside a release, a commit and an arc's `PROOF` row, a whole tier runs when:
 
 - what the changed package publishes changed, and nodes outside the order import it;
 - a test configuration, a global setup or a runner file changed;

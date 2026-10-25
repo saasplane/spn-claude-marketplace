@@ -28,6 +28,9 @@
 // **`MANUAL` is never written over, and a `PROMISE` row is never stamped.** The first is the one
 // intent no evidence can recover; the second is the foundation's grammar, which carries no proof.
 //
+// **A row is written only where its status changed.** `Updated at` says when the row reached its status, so
+// a run that confirms what a row already says leaves the row, and its `Updated at`, as they are.
+//
 // **Columns are found by heading**, so an eight-, nine- or ten-cell register is stamped alike and
 // keeps its width. A file is rewritten only where a row of it changed.
 //
@@ -82,7 +85,8 @@ function apply(source: string, name: string, runs: Run[], reachIsRepository: boo
     } else {
       continue;                                                      // silence is not evidence of absence
     }
-    if (status === was && stamp === cellValue(row, "updated")) continue;
+    // `Updated at` moves only with the status: a run that confirms a row re-dates nothing (RD.DEVEX.WORKSPACE.306).
+    if (status === was) continue;
 
     const cells = [...row.cells];
     cells[row.columns.status] = repadded(cells[row.columns.status], status);

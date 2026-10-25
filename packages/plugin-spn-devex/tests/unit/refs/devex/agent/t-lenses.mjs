@@ -108,8 +108,8 @@ const workstream = readFileSync(WORKSTREAM, "utf8");
 check("2n: workstream.md has § A card is only for what the rules leave open", /^## A card is only for what the rules leave open$/m.test(workstream));
 check("2n: workstream.md names the three reasons a question reaches the developer",
   /a boundary shifts/.test(workstream) && /information is missing/.test(workstream) && /the choice is people's/.test(workstream));
-check("2n: workstream.md says an answer lands in the arc's notes in the same turn",
-  /An answer lands in the arc's notes in the same turn — MUST/.test(workstream));
+check("2n: workstream.md says an answer lands in the card and the arc in the same turn, and in a preview only where it shows that card",
+  /An answer lands in the card and the arc in the same turn, and in a preview only where the preview\s+shows that card — MUST/.test(workstream));
 const cards = readFileSync(CARDS, "utf8");
 check("2n: decision-cards.md fills a design question as an expert would, with named sources",
   /filled as an expert would fill it/.test(cards) && /OWASP ASVS/.test(cards));

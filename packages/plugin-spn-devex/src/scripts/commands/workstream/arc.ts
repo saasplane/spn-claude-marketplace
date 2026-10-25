@@ -8,10 +8,10 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { approachOf, logEvent, readArc, restamped, rowStamp } from "../../lib/workstream.ts";
+import { approachOf, arcStamp, logEvent, readArc, restamped } from "../../lib/workstream.ts";
 import { arcNamed } from "./_shared.ts";
 
-export const describe = "the stamp an arc's Cycles row carries, written once the page is current with its rows";
+export const describe = "the stamp an arc's Cycles row carries, written once the page is current with its goal, title and repositories";
 
 function stamp(args: string[]): number {
   const words = readWords(args);
@@ -22,7 +22,7 @@ function stamp(args: string[]): number {
   const data = readArc(ws, arc)!;
   const page = approachOf(ws);
   if (!page) throw new UsageFault(`finds no approach page beside ${arc}'s workstream.`);
-  const value = rowStamp(data);
+  const value = arcStamp(data);
   const text = readFileSync(page, "utf8");
   const next = restamped(text, arc, value);
   if (next === null) {

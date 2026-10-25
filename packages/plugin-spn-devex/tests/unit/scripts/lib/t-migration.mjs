@@ -75,7 +75,7 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -224,6 +224,47 @@ console.log("\n=== 004 — every row of an arc at PROPOSED, and every row landed
   ok("green: 004 then finds nothing, and a second run writes nothing",
     m004.check(root).length === 0 && again.length === 0 && readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8") === second
       && readFileSync(join(ws, "arcs", "N003", "state.json"), "utf8") === thirdText, again.join(" | "));
+}
+
+console.log("\n=== 005 — no row writes a plan, and the stamp follows the arc's goal, title and repositories");
+{
+  const m005 = MIGRATIONS.find((one) => one.id === "005");
+  ok("the plugin ships 005 fifth, with a version, one sentence and a script",
+    MIGRATIONS[4]?.id === "005" && /^\d+\.\d+\.\d+$/.test(m005?.version ?? "") && m005.changed.endsWith(".") && typeof m005.script === "function");
+  const { createHash } = await import("node:crypto");
+  const rowsStamp = (data) => createHash("sha256").update(JSON.stringify([...data.rows].map((row) => [row.id, row.title])
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))).digest("hex").slice(0, 12);
+  const planRow = { id: "0", parent: "N001", title: "write notes/N001/plan.md: the pins, the commands", kind: "change", repo: "—", altitude: "DOCS", state: "waiting" };
+  const rows = [planRow, ...arcData().rows.map((row) => ({ ...row, blockedBy: row.id === "1" ? ["0"] : row.blockedBy }))];
+  const data = { ...arcData(rows) };
+  const { root, ws } = await dataWorkspace("lean-005", { rows, stamp: rowsStamp(data) });
+  const landedPlan = { ...arcData([{ ...planRow, parent: "N002", state: "landed" }]), arc: "N002", subject: "second", status: "RUNNING" };
+  mkdirSync(join(ws, "arcs", "N002"), { recursive: true });
+  writeFileSync(join(ws, "arcs", "N002", "state.json"), `${JSON.stringify(landedPlan, null, 2)}\n`);
+  const closed = join(root, ".spndevex/workstreams/closed/020-done/arcs/N001");
+  mkdirSync(closed, { recursive: true });
+  writeFileSync(join(closed, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  const closedText = readFileSync(join(closed, "state.json"), "utf8");
+  const found = m005.check(root);
+  ok("red: 005 names the arc whose row 0 writes the plan and whose Cycles row carries the stamp of its rows",
+    found.length === 1 && found[0] === "open/031-probe/arcs/N001: row 0 writes plan.md → discarded · a stamp of its rows → its goal, title and repositories", found.join(" | "));
+  const lines = m005.script(root);
+  const after = JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8"));
+  const { arcStamp, stampsOn } = await import("../../../../src/scripts/lib/workstream.ts");
+  const page = readFileSync(join(ws, "approach.html"), "utf8");
+  ok("its script takes row 0 out, and out of every blockedBy that named it",
+    !after.rows.some((row) => row.id === "0") && after.rows.find((row) => row.id === "1").blockedBy.length === 0, JSON.stringify(after.rows));
+  ok("the arc's log keeps the row's words in one discarded line",
+    readFileSync(join(ws, "arcs", "N001", "log.jsonl"), "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line))
+      .some((line) => line.kind === "discarded" && line.row === "0" && line.note.includes("write notes/N001/plan.md")));
+  ok("the Cycles row is restamped from the arc's goal, title and repositories", stampsOn(page).get("N001")?.stamp === arcStamp(after), lines.join(" | "));
+  ok("a plan row that landed, and a closed workstream, stay as they are",
+    JSON.parse(readFileSync(join(ws, "arcs", "N002", "state.json"), "utf8")).rows.some((row) => row.id === "0")
+      && readFileSync(join(closed, "state.json"), "utf8") === closedText);
+  const { checkWorkstream } = await import("../../../../src/scripts/checks/workstream-state.ts");
+  ok("the arc it migrated is whole to the state check", !checkWorkstream(ws).some((one) => one.arc === "N001"), JSON.stringify(checkWorkstream(ws)));
+  const again = m005.script(root);
+  ok("green: 005 then finds nothing, and a second run writes nothing", m005.check(root).length === 0 && again.length === 0, again.join(" | "));
 }
 
 console.log("\n=== a broken ledger → reported, never written over");

@@ -243,18 +243,21 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
 
   console.log("\n  --- notes and carried: the lines this window's write added to the arc's log.jsonl");
   {
-    const answered = async (name, { movePreview = false } = {}) => {
+    const answered = async (name, { shown = true, movePreview = false } = {}) => {
       const { root, ws } = await dataWorkspace(name);
       raise(root);
+      if (shown) cli(root, ["workstream", "question", "show", "q1", "--in", "notes/N001/preview.html"]);
       stopAt(root, name);
       command(root, name, ["workstream", "question", "answer", "q1", "--key", "A", "--words", "the first way"]);
-      if (movePreview) writeFileSync(join(ws, "notes", "N001", "preview.html"), readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8") + "<!-- q1: A -->\n");
+      if (movePreview) writeFileSync(join(ws, "notes", "N001", "preview.html"), readFileSync(join(ws, "notes", "N001", "preview.html"), "utf8") + "<p>the first way</p>\n");
       return stopAt(root, name, NEEDS + "q1 answered.");
     };
     const red = await answered("d17-notes-red");
-    check("known-bad: an answer `question answer` logged while the preview and the plan did not move is named, with the files",
-      /\[notes\]/.test(red) && red.includes("notes/N001/preview.html") && red.includes("notes/N001/plan.md") && red.includes("RD.DEVEX.WORKSPACE.193"), red);
+    check("known-bad: an answer to a card the preview shows, logged while the preview did not move, is named once as a note, with the card and the preview",
+      /\[notes\] .*A note, not a refusal/.test(red) && red.includes("Q1 on `notes/N001/preview.html`") && red.includes("RD.DEVEX.WORKSPACE.193"), red);
+    check("the card leaving the preview's Open, which the command writes, is not the preview brought current", /\[notes\]/.test(red), red);
     check("the same answer with the preview moved in the same turn is silent", !/\[notes\]/.test(await answered("d17-notes-green", { movePreview: true })));
+    check("an answer to a card no preview shows owes the preview nothing", !/\[notes\]/.test(await answered("d17-notes-unshown", { shown: false })));
   }
   {
     const { root } = await dataWorkspace("d17-notes-plain");
@@ -262,10 +265,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "the book chapter is read"]);
     check("a log line that records no answer owes the notes nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
     command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "a review point: the probe answers in one line"]);
-    check("known-bad: a note that records a review point is an answer the notes owe", /\[notes\]/.test(stopAt(root, "d17-plain")));
-    // Proof 2 met both on the workspace's own arcs (032 N001, 025 N008): neither is an answer.
-    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "s1 to s4 (the developer's own asks) stay raised"]);
-    check("a note that mentions the developer and quotes nothing is no answer", !/\[notes\]/.test(stopAt(root, "d17-plain")));
+    check("a review point in a log line names no card a preview shows, so it owes the preview nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
     command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--status", "HELD", "--reason", "waits on N002", "--note", "(the developer: hold it)"]);
     check("a status line carrying the developer's words is a move, not an answer", !/\[notes\]/.test(stopAt(root, "d17-plain")));
   }
@@ -1312,7 +1312,16 @@ ${tableOf(cyclesOf(folder))}
   };
   const W = `.spndevex/${WORKSTREAMS}/open/031-probe`;
   const write = (root, session, args) => { cli(root, ["workstream", "row", "write", "031/N001", ...args]); wroteArcs(root, session); };
-  const logAnswer = (root, session) => write(root, session, ["--note", "Q7 B (the developer: the second reading). The check reads setup only."]);
+  // A card the preview shows, raised before the session's first turn end; its answer is what the notes check reads.
+  const showCard = (root) => {
+    writeFileSync(join(root, "card.json"), JSON.stringify(DATA_CARD));
+    cli(root, ["workstream", "question", "raise", "031/N001", "--file", join(root, "card.json")]);
+    cli(root, ["workstream", "question", "show", "q1", "--in", "notes/N001/preview.html"]);
+  };
+  const logAnswer = (root, session) => {
+    cli(root, ["workstream", "question", "answer", "q1", "--key", "B", "--words", "the second reading"]);
+    wroteArcs(root, session);
+  };
   // Row 2 lands in the data alone, so a page the case broke stays broken and its finding is the same one.
   const land = (root, session) => {
     const file = join(root, W, "arcs", "N001", "state.json");
@@ -1334,6 +1343,7 @@ ${tableOf(cyclesOf(folder))}
   }
   {
     const root = await built("n009-held-notes");
+    showCard(root);
     stop(root, "held-notes");                       // the session's first turn end: its baseline
     logAnswer(root, "held-notes");
     const second = stop(root, "held-notes");
@@ -1351,6 +1361,7 @@ ${tableOf(cyclesOf(folder))}
   }
   {
     const root = await built("n009-held-fixed");
+    showCard(root);
     stop(root, "held-fixed");
     logAnswer(root, "held-fixed");
     const held = stop(root, "held-fixed");
@@ -1508,7 +1519,7 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
     if (running) data.rows[0].state = "running";
     writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
     if (status !== "DECIDED" || running) cli(root, ["docs", "cycles", "write", "031"]);
-    if (broken) rmSync(join(ws, "notes", "N001", "preview.html"));
+    if (broken) writeFileSync(join(ws, "notes", "N001", "layout-preview.html"), PREVIEW);
     bindNamed(root, `window-${counter}`, "031-probe", "prompt");   // the window works on this workstream
     const transcript = join(root, "transcript.jsonl");
     writeFileSync(transcript, [...parts, sized(kilo, `msg_w${counter}`)].map((line) => JSON.stringify({ ...line, cwd: ws })).join("\n") + "\n");

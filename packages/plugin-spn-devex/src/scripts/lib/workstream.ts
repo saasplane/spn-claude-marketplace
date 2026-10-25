@@ -3,7 +3,7 @@
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The shared state library: where each file a script owns sits, how it is read and written, the
-// stamp of an arc's rows, the two generated blocks a page holds, and a preview's status. Every `workstream` command, the
+// stamp of what the page states about an arc, the two generated blocks a page holds, and a preview's status. Every `workstream` command, the
 // checks and the hooks read through it, so a path or a format is spelled once.
 
 import { createHash } from "node:crypto";
@@ -557,13 +557,29 @@ export function parallelRows<T extends { touches?: string[] }>(rows: readonly T[
 
 // ---------------------------------------------------------------------------- the stamp
 
+/** A row's repository cell that names no repository: the row changes none, so it reaches no place. */
+export const NO_REPO: ReadonlySet<string> = new Set(["—", "–", "-"]);
+
 /**
- * The stamp of an arc's rows: a hash of their ids and their *What*, never their states, so a row's
- * state changing does not move it and the check fires only when an arc's coverage changes.
+ * The repositories an arc reaches, sorted: its header's `repos` and the `repo` of each of its rows, without
+ * a cell that names no repository. They are the places of the approach page's `How`.
  */
-export function rowStamp(data: Pick<ArcData, "rows">): string {
-  const coverage = [...data.rows].map((row) => [row.id, row.title]).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
-  return createHash("sha256").update(JSON.stringify(coverage)).digest("hex").slice(0, 12);
+export function arcRepos(data: Pick<ArcData, "repos" | "rows">): string[] {
+  const named = [...(Array.isArray(data.repos) ? data.repos : []), ...data.rows.map((row) => row.repo)]
+    .filter((repo): repo is string => typeof repo === "string")
+    .map((repo) => repo.trim())
+    .filter((repo) => repo && !NO_REPO.has(repo));
+  return [...new Set(named)].sort();
+}
+
+/**
+ * The stamp of what the approach page states about an arc: a hash of its goal, its title and its
+ * repositories, never of its rows. A row added, moved or landed inside the arc's goal does not move it, so
+ * the check fires only when the goal, the title or a repository the arc reaches changes.
+ */
+export function arcStamp(data: Pick<ArcData, "goal" | "title" | "repos" | "rows">): string {
+  const stated = [typeof data.goal === "string" ? data.goal.trim() : "", data.title.trim(), arcRepos(data)];
+  return createHash("sha256").update(JSON.stringify(stated)).digest("hex").slice(0, 12);
 }
 
 /** Every Cycles row of a page that names an arc's data, with the stamp it carries. */

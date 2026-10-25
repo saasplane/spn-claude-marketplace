@@ -90,10 +90,10 @@ console.log("\n=== telemetry tags read the data's folders");
 console.log("\n=== the Stop hook refuses a turn while state check fails for this window");
 {
   const data = arcData();
-  data.rows.push({ id: "3", parent: "N001", title: "a row the page has not taken in", kind: "fix", state: "waiting" });
+  data.rows.push({ id: "3", parent: "N001", title: "a row in a repository the page has not taken in", kind: "fix", repo: "spn-y", altitude: "CODE", state: "waiting" });
   writeFileSync(join(arcs, "N001", "state.json"), JSON.stringify(data));
   const red = checkWorkstreamState(root, new Set(["031-probe"]));
-  ok("red: this window's workstream behind its rows is said", red.length === 1 && red[0].check === "state" && /N001's part on the approach page is behind its rows/.test(red[0].message), JSON.stringify(red));
+  ok("red: this window's workstream behind its repositories is said", red.length === 1 && red[0].check === "state" && /N001's part on the approach page is behind its goal, title or repositories/.test(red[0].message), JSON.stringify(red));
   ok("another window's workstream is not this window's to hear", checkWorkstreamState(root, new Set(["099-other"])).length === 0);
   cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("green: restamped, the turn may end", checkWorkstreamState(root, new Set(["031-probe"])).length === 0, JSON.stringify(checkWorkstreamState(root, new Set(["031-probe"]))));

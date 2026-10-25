@@ -24,16 +24,20 @@ console.log("=== a whole workstream");
   ok("green: a workstream kept as data and whole has no finding", findings.length === 0, said(findings));
 }
 
-console.log("\n=== S7 — the stamp on each arc's Cycles row");
+console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title and repositories");
 {
   const { root, ws } = await dataWorkspace("state-stamp");
   const file = join(ws, "arcs", "N001", "state.json");
   const data = arcData();
-  data.rows.push({ id: "3", parent: "N001", title: "a row the page has not taken in", kind: "change", state: "waiting" });
+  data.rows.push({ id: "3", parent: "N001", title: "a row the page has not taken in", kind: "change", repo: "spn-x", altitude: "CODE", state: "waiting" });
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("green: a row added inside the arc's repositories never puts the page behind", !has(checkWorkstream(ws), "stamp", /behind/), said(checkWorkstream(ws)));
+  data.goal = "another outcome";
   writeFileSync(file, JSON.stringify(data, null, 2));
   const red = checkWorkstream(ws);
-  ok("red: a row added with the page left behind fails", has(red, "stamp", /N001's part on the approach page is behind its rows/), said(red));
+  ok("red: the goal changed with the page left behind fails", has(red, "stamp", /N001's part on the approach page is behind its goal, title or repositories/), said(red));
   ok("the finding names the command that restamps", has(red, "stamp", /workstream arc stamp write N001/));
+  cli(root, ["docs", "cycles", "write", "031"]);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("`arc stamp write` restamps the row", stamped.code === 0 && /N001 · stamped [0-9a-f]{12}/.test(stamped.out), stamped.out);
   ok("green: after the restamp the check passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
@@ -149,7 +153,12 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("red: a second preview by another name fails", has(checkWorkstream(ws), "preview", /layout-preview\.html` is a second preview/), said(checkWorkstream(ws)));
   rmSync(join(notes, "layout-preview.html"));
   renameSync(join(notes, "preview.html"), join(notes, "draft.html"));
-  ok("red: an arc past PROPOSED with no preview fails", has(checkWorkstream(ws), "preview", /DECIDED and has no preview/), said(checkWorkstream(ws)));
+  const page = join(ws, "approach.html");
+  const text = readFileSync(page, "utf8");
+  writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
+  ok("green: an arc past PROPOSED with no preview is whole, since a preview is made only where one is owed",
+    !has(checkWorkstream(ws), "preview", /no preview/), said(checkWorkstream(ws)));
+  writeFileSync(page, text);
   renameSync(join(notes, "draft.html"), join(notes, "preview.html"));
   mkdirSync(join(notes, "samples"), { recursive: true });
   writeFileSync(join(notes, "samples", "badge-dark.png"), "png");
@@ -218,8 +227,8 @@ console.log("\n=== the life of an arc — the files of every step it has passed"
 {
   const { ws } = await dataWorkspace("state-steps");
   rmSync(join(ws, "notes", "N001", "plan.md"));
-  ok("red: a decided arc with no plan fails", has(checkWorkstream(ws), "steps", /DECIDED and has no `notes\/N001\/plan.md`/), said(checkWorkstream(ws)));
-  writeFileSync(join(ws, "notes", "N001", "plan.md"), "# plan\n");
+  ok("green: a decided arc with no plan is whole, since a plan is kept only for traps, a set or a move table",
+    !has(checkWorkstream(ws), "steps", /plan\.md/), said(checkWorkstream(ws)));
   const data = JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8"));
   data.rows[0].state = "landed";
   data.rows[0].order = "orders/1.md";

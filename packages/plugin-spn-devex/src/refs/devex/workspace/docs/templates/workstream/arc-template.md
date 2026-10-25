@@ -26,7 +26,7 @@ spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in o
 # each fact read while ideating, the source's commit pinned
 spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fact "{{what the source says, in one line}}" --used-by {{q<n> or row}}
 
-# a row, once the plan is written: its kind, where, at what altitude, how, and its acceptance
+# a row: its kind, where, at what altitude, how, and its acceptance; the rows are the steps, so none writes a plan
 spn-devex workstream row write N{{nnn}} {{row}} --title "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
 
 # the go, the one write that moves the arc out of PROPOSED, with your words beside it; every row not yet landed turns from design to change
@@ -38,7 +38,7 @@ spn-devex workstream row write N{{nnn}} --status {{STATUS}} --reason "{{the card
 # a line on the log, which has no other writer: a decision, a correction, your words
 spn-devex workstream row write N{{nnn}} --note "{{what was decided or corrected, by whom, and why; the notes it changed}}"
 
-# once the approach page's part for this arc is current with its rows
+# once the approach page's part for this arc is current with its goal, its title and its repositories; adding a row never needs it
 spn-devex workstream arc stamp write N{{nnn}}
 ```
 
@@ -53,22 +53,20 @@ spn-devex workstream arc stamp write N{{nnn}}
   "cycle": "{{the cycle it pays}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
   "preview": "preview.html",
   "rows": [
-    { "id": "0", "parent": "N{{nnn}}", "title": "write notes/N{{nnn}}/plan.md: pins, what exists today, commands with their before, rows, orders",
-      "kind": "change", "repo": "—", "altitude": "DOCS", "mechanism": "by hand",
-      "acceptance": "every plan row has Files, Fails before and Proof", "state": "waiting" },
-    { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{plan § 1}}",
+    { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{the step's What: the files, or plan § k}}",
       "kind": "{{change}}", "repo": "{{repo}}", "altitude": "{{DOCS}}", "mechanism": "{{agents}}",
       "acceptance": "{{`command` → before → after}}", "model": "{{sonnet}}",
-      "blockedBy": ["0"], "touches": ["{{repository:place}}"], "decisions": ["{{q<n>}}"], "facts": ["{{f<n>}}"],
+      "blockedBy": [], "touches": ["{{repository:place}}"], "decisions": ["{{q<n>}}"], "facts": ["{{f<n>}}"],
       "state": "waiting", "order": "orders/{{1}}.md" },
-    { "id": "{{n}}", "parent": "N{{nnn}}", "title": "on clean trees, after the last write, cache off: run again what the rows above touched, each gate once and the touched cases under one fresh run name; no whole tier unless one of the five cases holds; and the consumer install",
+    { "id": "{{n}}", "parent": "N{{nnn}}", "title": "the final re-check, on clean trees, after the last write, cache off: run again what the rows above touched; the whole tiers of each touched node, the browser walks and the look, once for the arc; and the consumer install",
       "kind": "change", "repo": "—", "altitude": "PROOF", "mechanism": "command",
-      "acceptance": "each Commands row → its after, and each named id → SUCCESS in that run's file", "state": "waiting" } ] }
+      "acceptance": "each gate → exit 0, and each named id → SUCCESS in that run's file", "state": "waiting" } ] }
 ```
 
 <!-- A row's state is waiting · ready · running · stopped · landed · carried · deferred, and `report write` folds a
      child's hand-back into it: the outcome, the proof, the commits, the cost and the follow-ups. A row with rows under it
-     takes its state from them. Row 0 is a precondition of RUNNING, and the PROOF row is never deleted. -->
+     takes its state from them. The PROOF row is the arc's one final re-check, and it is never deleted. A row added asks
+     for no page edit and no new stamp. -->
 
 ```text
 log.jsonl     {"at":"{{YYYY-MM-DDTHH:MM}}","kind":"{{what happened: opened · header · status · added · a row's new state · landed · stopped · needs-you · stamped · note}}","row":"{{row or null}}","note":"{{one line}}"}
@@ -85,9 +83,10 @@ arcs/N{{nnn}}/{{short-name}}.md   the arc's name, written with its data: the tit
 
 ```text
 notes/N{{nnn}}/
-  preview.html      the arc's one preview, from PROPOSED: each proposal a section, its status in the masthead
+  preview.html      the arc's one preview, only where something must be seen or worded to decide: each proposal a
+                    section, its status in the masthead, frozen at the go
   samples/          real files of the kind the work produces, each in its own format, as many as the work needs
-  plan.md           how the arc will be done, from DECIDED: pins, what exists today, the commands and their before, the traps
+  plan.md           optional, only where the arc has traps, a set or a move table to hold
   orders/
     {{row}}.md          one brief per delegated row, named by the row, its front matter first (order-template.md)
     {{row}}.report.md   the child's hand-back, its front matter first, which `report write` folds into the row

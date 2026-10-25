@@ -41,7 +41,7 @@ console.log("\n=== row write — opens an arc, changes its header, adds and move
   ok("a row is added", added.code === 0 && /row 3 added/.test(added.out), added.out);
   const three = json(arcFile).rows.find((row) => row.id === "3");
   ok("with its lists read at commas and its state waiting", three.state === "waiting" && three.touches.join() === "marketplace:b,foundation:c" && three.blockedBy.join() === "2");
-  ok("the write names the page left behind its rows", /N001's part on the approach page is behind its rows/.test(added.out), added.out);
+  ok("a row added never puts the page behind", !/N001's part on the approach page is behind/.test(added.out), added.out);
   const moved = cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
   ok("a row's state moves, and the log says from where", moved.code === 0 && lines(log).at(-2).kind === "running" && lines(log).at(-2).note === "waiting → running" && lines(log).at(-1).kind === "status", JSON.stringify(lines(log).slice(-2)));
   const wrongKind = cli(root, ["workstream", "row", "write", "031/N001", "4", "--title", "x", "--kind", "chore"]);
@@ -184,7 +184,7 @@ console.log("\n=== row write — a status or a row state moved refreshes every v
   const page = join(views.ws, "approach.html");
   const preview = join(views.ws, "notes", "N001", "preview.html");
   const landed = cli(views.root, ["workstream", "row", "write", "031/N001", "--status", "LANDED"]);
-  ok("red before the change: the line names each view it rewrote", landed.code === 0 && /N001 0\/2 · N001 · status · approach: card, cycles · preview badge/.test(landed.out), landed.out);
+  ok("red before the change: the line names each view it rewrote", landed.code === 0 && /N001 0\/2 · N001 · status · approach: card, places, cycles · preview badge/.test(landed.out), landed.out);
   const text = readFileSync(page, "utf8");
   ok("the Cycles table row shows LANDED as its badge", /<tr id="N001"[^>]*>.*sds-status sds-landed">LANDED<\/span><\/td><\/tr>/s.test(text) && !text.includes("sds-decided"), text);
   ok("the status card moves with the arcs", /<div class="sds-eyebrow">(?:(?!<\/div>).)*sds-status sds-implementing">[^<]*IMPLEMENTING/s.test(text), text);

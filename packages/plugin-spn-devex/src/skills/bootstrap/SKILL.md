@@ -92,7 +92,6 @@ The five answers name every account address, package scope, repository name and 
   notes/
     N001/
       preview.html                  the coordinates as they stand, read back at act 4 for the go
-      plan.md                       acts 5 to 13 as the arc's steps, written with the go
 ```
 
 It opens in `open/` because nothing blocks it — the developer is in front of you and the questions are the work.
@@ -136,7 +135,7 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
    | 18 | The estate up, both layers | the organization and platform layers report their state | act 12 |
    | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
 
-5. **The preview's first draft.** Every arc has one preview, and this arc's is the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
+5. **The preview's first draft.** This arc has a preview because the developer decides the go from the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
 6. **The arc's row in Cycles, then its stamp:**
 
    ```sh
@@ -144,7 +143,7 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
    spn-devex workstream arc stamp write {NNN}/N001
    ```
 
-`docs cycles write` also writes the preview's Status badge from the arc. Until the stamp, each write says the arc's part of the page is behind its rows, and the stamp is what answers it. `spn-devex workstream state check {NNN}` now reads the arc with no finding. Every row written while the arc is `PROPOSED` is a design row, and the command gives it that kind. The go at act 4 turns rows 14 to 19 into the build work acts 5 to 13 run. Each of them gets its repository with `--repo` once act 4 has derived the name.
+`docs cycles write` also writes the preview's Status badge from the arc. Until the stamp, each write says the arc's part of the page is behind its goal, title or repositories, and the stamp is what answers it. A row added later never asks for it again; a repository named for the first time, at act 4, does. `spn-devex workstream state check {NNN}` now reads the arc with no finding. Every row written while the arc is `PROPOSED` is a design row, and the command gives it that kind. The go at act 4 turns rows 14 to 19 into the build work acts 5 to 13 run. Each of them gets its repository with `--repo` once act 4 has derived the name.
 
 **What day zero does not ask.** Compliance targets, the setup catalog beyond `dev`, and every environment after the first are real decisions, and none of them is needed to reach a running platform. They are settled inside the concept at act 10 and in the declarations after it. The vendor integrations are not rows either, for a different reason: they are keys rather than coordinates. They are asked at act 11, and they never come near a file the estate tracks.
 
@@ -237,7 +236,7 @@ spn-devex workstream row write {NNN}/N001 --status DECIDED --note "<the develope
 
 The log then holds `PROPOSED → DECIDED · <their words>`, and rows 14 to 19 are build work.
 
-**The plan is written with the go, in the same turn.** A decided arc has its `plan.md`. Copy `refs/devex/workspace/docs/templates/workstream/plan-template.md` to `notes/N001/plan.md`. Its steps are acts 5 to 13, each with its command from the table above and the row it lands. Its pins are the published packages and the workspace as `workspace status` reads it, because no repository exists yet. Then `spn-devex workstream state check {NNN}` reads the arc with no finding, and acts 5 to 10 may run.
+**The rows are the plan, and no `plan.md` is written.** Rows 14 to 19 already name acts 5 to 13, each with its command from the table above. Give each its repository with `--repo` once act 4 has derived the names, then `spn-devex docs cycles write {NNN}` writes How's places for them, and you write the one line under each, then `spn-devex workstream arc stamp write {NNN}/N001`. Then `spn-devex workstream state check {NNN}` reads the arc with no finding, and acts 5 to 10 may run.
 
 Then say which act runs next, and run it.
 

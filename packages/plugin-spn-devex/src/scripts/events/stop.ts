@@ -58,7 +58,7 @@ import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { NOTES, PREVIEW_FILE, arcDataDir, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
+import { PREVIEW_FILE, arcDataDir, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
          workstreamsOf } from "../lib/workstream.ts";
 import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
@@ -427,10 +427,27 @@ export function notesFiles(arc: string): string[] {
   return out;
 }
 
-/** A signature of the notes files: each one's path, size and time, so reading it costs a stat each. */
+// A region a command writes inside a page, and the section that holds nothing else: `question answer` rewrites a
+// preview's `open` block itself, and drops its section once no card is shown, so a preview whose only change is
+// that has not been brought current by the agent.
+const GENERATED_SECTION = /<section\b[^>]*>\s*<!--\s*spn:generated\b[\s\S]*?<!--\s*\/spn:generated\s*-->\s*<\/section>/g;
+const GENERATED_REGION = /<!--\s*spn:generated\b[\s\S]*?<!--\s*\/spn:generated\s*-->/g;
+
+/** A preview's text as the agent wrote it: without the regions a command writes, its spaces collapsed. */
+export const previewAsWritten = (text: string): string =>
+  text.replace(GENERATED_SECTION, " ").replace(GENERATED_REGION, " ").replace(/\s+/g, " ").trim();
+
+/**
+ * A signature of the notes files. The preview is read for its text as the agent wrote it, so a card leaving its
+ * `Open` is not the agent bringing it current; every other file costs a stat, its path, size and time.
+ */
 function notesSignature(files: string[]): string {
   return createHash("sha256").update(files.map((file) => {
-    try { const stat = statSync(file); return `${file}\u0000${stat.size}\u0000${stat.mtimeMs}`; } catch { return file; }
+    try {
+      if (basename(file) === PREVIEW_FILE) return `${file}\u0000${previewAsWritten(readFileSync(file, "utf8"))}`;
+      const stat = statSync(file);
+      return `${file}\u0000${stat.size}\u0000${stat.mtimeMs}`;
+    } catch { return file; }
   }).join("\n")).digest("hex").slice(0, 12);
 }
 
@@ -442,25 +459,23 @@ export function arcMarks(root: string): Record<string, ArcMark> {
   return out;
 }
 
-// A LINE THAT RECORDS AN ANSWER OR A REVIEW POINT: the `answered` line `question answer` writes, or a
-// note that names a card answered (`Q396 B`, `Q401 revised`), a review point, or quotes the developer
-// (`(the developer: …)`). A status line is a go or a move, which carries the developer's words by
-// design, and an `opened` line opens the arc: neither is an answer, and neither is a landing.
-const RECORDS_AN_ANSWER = /\bQ\d+\s+(?:[A-D]\b|revised\b|answered\b)|\breview points?\b|\(the developer:/i;
-const NOT_AN_ANSWER: ReadonlySet<string> = new Set(["status", "opened", "landed", "stamped"]);
 const CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
 
-/** Whether a log line records an answer or a review point. */
-const recordsAnAnswer = (line: LogLine): boolean =>
-  line.kind === "answered" || (!NOT_AN_ANSWER.has(line.kind) && RECORDS_AN_ANSWER.test(String(line.note ?? "")));
+/**
+ * The card an `answered` line names, which `question answer` writes as `q94 A · <the words>`; null for any other
+ * line. Only an answer to a card can leave a preview behind, and only a preview that shows the card.
+ */
+const answeredCard = (line: LogLine): string | null =>
+  line.kind === "answered" ? /^(q\d+)\b/i.exec(String(line.note ?? ""))?.[1].toLowerCase() ?? null : null;
 
 /**
  * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the lines an arc's `log.jsonl` gained
  * since this session's last Stop, in the arcs this window wrote.
  *
- * `notes`: a line that records an answer or a review point, in an arc whose `notes/N<nnn>/` holds a
- * preview, a plan or samples, when none of those files changed. The answer lands in the card, the arc
- * and the notes in the same turn; a preview left as it was is what the next reader plans from.
+ * `notes`: a soft note, not a refusal. An `answered` line whose card a preview shows (the card's `shownIn`),
+ * when the arc's notes did not change. The answer lands in the card and the arc in the same turn, and a
+ * preview moves only where it shows that card; whether it changed what the preview shows is the agent's
+ * judgement, so the note says so, and it is said once.
  *
  * `carried`: a line saying a point is carried to a later row, in an arc that was PROPOSED. Nothing is
  * built on its spec yet, so the point changes the spec now.
@@ -483,19 +498,19 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
     const added = logLinesOf(homeOf(arc), idOf(arc)).slice(was.log)
       .filter((line): line is LogLine => !!line && typeof line === "object");
     if (!added.length) continue;
-    const files = notesFiles(arc);
-    if (files.length && added.some(recordsAnAnswer) && notesSignature(files) === was.notes) {
-      // The preview and the plan are named by file; the samples folder once, whatever it holds.
-      const fromNotes = (file: string): string => file.slice(file.indexOf(`/${NOTES}/`) + 1);
-      const shown = files.filter((file) => !file.includes(`/${SAMPLES}/`)).map(fromNotes);
-      const sample = files.find((file) => file.includes(`/${SAMPLES}/`));
-      if (sample) shown.push(`${fromNotes(sample).slice(0, fromNotes(sample).indexOf(`/${SAMPLES}/`))}/${SAMPLES}/`);
+    const answered = [...new Set(added.map(answeredCard).filter((card): card is string => card !== null))];
+    const cards = answered.length ? readQuestions(homeOf(arc)) : [];
+    const shownOn = answered.flatMap((id) => {
+      const shownIn = cards.find((card) => card.id.toLowerCase() === id)?.shownIn ?? [];
+      return shownIn.length ? [{ id, shownIn }] : [];
+    });
+    if (shownOn.length && notesSignature(notesFiles(arc)) === was.notes) {
+      const where = shownOn.map((one) => `${one.id.toUpperCase()} on ${one.shownIn.map((path) => `\`${path}\``).join(", ")}`).join(" · ");
       out.push({ check: "notes", message: named(workstreamOf(arc),
-        `\`${fromWorkspace(root, arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
-        `An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every ` +
-        `row it changes) and in the arc's notes: its preview, its plan and any sample they name — MUST ` +
-        `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in a ` +
-        `log line: \`spn-devex workstream row write ${arcRef(arc)} --note "…"\`.`, tie(arc)) });
+        `A note, not a refusal: \`${fromWorkspace(root, arc)}\` logged an answer this turn to a card a preview shows, and its ` +
+        `notes did not move — ${where}. A preview changes only where it shows the card that was answered ` +
+        `(RD.DEVEX.WORKSPACE.193). If the answer changed what that preview shows, bring the section current and name it ` +
+        `in a log line: \`spn-devex workstream row write ${arcRef(arc)} --note "…"\`; if it did not, nothing is owed.`, tie(arc)) });
     }
     const status = statusOf(arc);
     if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(String(line.note ?? ""))))

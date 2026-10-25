@@ -8,14 +8,13 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
-import { pastDecided } from "./arc-status.ts";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
-  markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewHrefOf, previewOf,questionsFileOf, readJsonl, readQuestions, rowStamp, stampsOn, stateFileOf,
+  NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, statusMoves, landedLines, logLinesOf,
 } from "../lib/workstream.ts";
 import { ALTITUDES, DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
@@ -39,18 +38,18 @@ function filesUnder(dir: string, base = dir): string[] {
   });
 }
 
-/** Q99: one preview per arc, by its fixed name, and no `previews/` folder. */
-export function previewFindings(ws: string, arc: string, data: ArcData | null): string[] {
+/**
+ * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. An arc with no preview is whole:
+ * one is made only where something must be seen or worded to decide (RD.DEVEX.WORKSPACE.254).
+ */
+export function previewFindings(ws: string, arc: string): string[] {
   const out: string[] = [];
   const notes = notesDirOf(ws, arc);
   if (isDir(join(notes, "previews"))) out.push(`${arc} keeps a \`previews/\` folder — an arc's one preview is \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   for (const [base, under] of [[notes, `${NOTES}/${arc}`], [join(ws, "arcs", arc), `arcs/${arc}`]] as const)
     for (const file of filesUnder(base))
       if (/preview[^/]*\.html$/i.test(file) && !(base === notes && file === PREVIEW_FILE))
-        out.push(`\`${under}/${file}\` is a second preview — an arc has one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
-  const previewHref = previewHrefOf(arc, data);
-  if (data && data.status !== "PROPOSED" && !isFile(previewOf(ws, arc)) && !isFile(join(ws, previewHref)))
-    out.push(`${arc} is ${data.status} and has no preview at \`${previewHref}\``);
+        out.push(`\`${under}/${file}\` is a second preview — an arc has at most one, \`${NOTES}/${arc}/${PREVIEW_FILE}\``);
   return out;
 }
 
@@ -121,7 +120,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
   return out;
 }
 
-/** S7: the arc's row in Cycles under its address, its stamp against its rows, and its preview linked from `What`. */
+/** S7: the arc's row in Cycles under its address, its stamp against its goal, title and repositories, and its preview linked from `What`. */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
   const out: string[] = [];
@@ -129,8 +128,8 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
   if (!row) out.push(`${arc} has no row in Cycles carrying \`data-arc="arcs/${arc}/state.json"\``);
   else if (!/\bid="([^"]*)"/.test(row.tag) || /\bid="([^"]*)"/.exec(row.tag)![1] !== arc)
     out.push(`${arc}'s row in Cycles carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
-  else if (row.stamp !== rowStamp(data))
-    out.push(`${arc}'s part on the approach page is behind its rows — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
+  else if (row.stamp !== arcStamp(data))
+    out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
   if (isFile(previewOf(ws, arc)) && !sectionText(text, "What").includes(`${NOTES}/${arc}/${PREVIEW_FILE}`))
     out.push(`${arc}'s preview is not linked from the page's What`);
   return out;
@@ -186,9 +185,8 @@ export function statusFindings(arc: string, data: ArcData, lines: readonly unkno
   return out;
 }
 
-// The altitudes in the order they run, and a repository cell that names no repository (01-workstream.md § A step row).
+// The altitudes in the order they run (01-workstream.md § A step row).
 const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
-const NO_REPO = new Set(["—", "–", "-"]);
 
 /**
  * RD.DEVEX.WORKSPACE.183: an arc's build rows, each with a repository and an altitude, in chain order by repository,
@@ -227,12 +225,13 @@ export function stepRowFindings(data: ArcData): string[] {
   return out;
 }
 
-/** The files of every step an arc has passed: its plan once decided, and the report of each landed row with an order. */
+/**
+ * The files of every step an arc has passed: the report of each landed row with an order. A plan is asked of no
+ * arc, because one is kept only where the arc has traps, a set or a move table to hold (RD.DEVEX.WORKSPACE.227).
+ */
 export function stepFindings(ws: string, arc: string, data: ArcData): string[] {
   const out: string[] = [];
   const notes = notesDirOf(ws, arc);
-  if (pastDecided(data.status) || data.status === "DECIDED")
-    if (!isFile(join(notes, "plan.md")) && !["CARRIED", "DROPPED"].includes(data.status)) out.push(`${arc} is ${data.status} and has no \`${NOTES}/${arc}/plan.md\``);
   for (const row of data.rows) {
     if (row.state !== "landed" || typeof row.order !== "string" || !row.order) continue;
     const report = row.order.replace(/\.md$/, ".report.md");
@@ -282,7 +281,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...linesFindings(logFileOf(ws, arc), `arcs/${arc}/${LOG_FILE}`, logFaults).map(say(arc, "schema")));
     out.push(...linesFindings(factsFileOf(ws, arc), `arcs/${arc}/${FACTS_FILE}`, factFaults).map(say(arc, "schema")));
     const data = faults.length ? null : raw as ArcData;
-    out.push(...previewFindings(ws, arc, data).map(say(arc, "preview")));
+    out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
     out.push(...pageFindings(ws, arc, data, page, text).map(say(arc, "stamp")));

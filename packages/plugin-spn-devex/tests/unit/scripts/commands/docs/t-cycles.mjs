@@ -359,5 +359,43 @@ ${linesFor("1.0.0").script}
   rmSync(TMP, { recursive: true, force: true });
 }
 
+console.log("\n=== the places of How, produced from the rows' repo (RD.DEVEX.WORKSPACE.251)");
+{
+  const { placedPage, placesOf } = cyclesModule;
+  const { approachPage, arcData, cli: runCli, dataWorkspace } = await import("../../../../helpers/workstream-fixture.mjs");
+  const page = approachPage("x");
+  const cyclesAt = (text) => text.indexOf(`<h3 id="h9">Cycles</h3>`);
+  const placed = placedPage(page, [{ repo: "spn-x", arcs: ["N001"] }]);
+  const heading = placed.indexOf(`<h3 id="how-spn-x">spn-x</h3>`);
+  ok("red: a repository the rows name with no h3 in How gains one, before Cycles", heading > 0 && heading < cyclesAt(placed), placed.slice(placed.indexOf("<h2>How"), cyclesAt(placed) + 40));
+  ok("and its facts line names the arcs that reach it", placed.includes(`<p><span class="sds-small">Arcs: N001</span></p>`));
+  ok("written twice, the page does not move", placedPage(placed, [{ repo: "spn-x", arcs: ["N001"] }]) === placed);
+  const withPlace = (facts) => page.replace(`<h3 id="h9">Cycles</h3>`,
+    `<h3 id="h1">spn-x &mdash; the book</h3>\n  <p>The chapter changes. Ships: the book.</p>\n  ${facts}\n  <h3 id="h2">spn-xy &mdash; another</h3>\n  <p>Not this one.</p>\n  <h3 id="h9">Cycles</h3>`);
+  const sized = placedPage(withPlace(`<p><span class="sds-small">Size: large</span></p>`), [{ repo: "spn-x", arcs: ["N001", "N002"] }]);
+  ok("a place's h3 is found by the name it starts with, and its facts line takes Arcs first",
+    sized.includes(`<span class="sds-small">Arcs: N001 &middot; N002 &middot; Size: large</span>`) && !sized.includes(`how-spn-x`), sized);
+  ok("the line under the heading stays as the agent wrote it", sized.includes("<p>The chapter changes. Ships: the book.</p>"));
+  ok("a heading whose name only starts the same, spn-xy, is not the place", (sized.match(/Arcs:/g) ?? []).length === 1, sized);
+  const stale = placedPage(withPlace(`<p><span class="sds-small">Arcs: N009 &middot; Size: large</span></p>`), [{ repo: "spn-x", arcs: ["N001"] }]);
+  ok("an Arcs line that names other arcs is rewritten, and the facts after it kept", stale.includes(`<span class="sds-small">Arcs: N001 &middot; Size: large</span>`), stale);
+  const bare = placedPage(withPlace(""), [{ repo: "spn-x", arcs: ["N001"] }]);
+  ok("a place with no facts line gains one under its line", /Ships: the book\.<\/p>\n {2}<p><span class="sds-small">Arcs: N001<\/span><\/p>/.test(bare), bare);
+
+  const { root, ws } = await dataWorkspace("cycles-places", { rows: [
+    ...arcData().rows,
+    { id: "3", parent: "N001", title: "prove it", kind: "change", repo: "—", altitude: "PROOF", state: "waiting" },
+    { id: "4", parent: "N001", title: "the second repository", kind: "change", repo: "spn-y", altitude: "CODE", state: "waiting" },
+  ] });
+  ok("placesOf reads the header's repos and each row's repo, and a row that names none reaches no place",
+    JSON.stringify(placesOf(ws)) === JSON.stringify([{ repo: "spn-x", arcs: ["N001"] }, { repo: "spn-y", arcs: ["N001"] }]), JSON.stringify(placesOf(ws)));
+  const wrote = runCli(root, ["docs", "cycles", "write", "031"]);
+  const text = readFileSync(join(ws, "approach.html"), "utf8");
+  ok("`docs cycles write` writes the places of How", wrote.code === 0 && /the places of How/.test(wrote.out)
+    && text.includes(`<h3 id="how-spn-x">spn-x</h3>`) && text.includes(`<h3 id="how-spn-y">spn-y</h3>`), `${wrote.out}\n${text}`);
+  const again = runCli(root, ["docs", "cycles", "write", "031"]);
+  ok("and a second write finds the page current", again.code === 0 && /is current/.test(again.out), again.out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — docs cycles` : `\n  all ${total} passed — docs cycles`);
 process.exit(failed ? 1 : 0);

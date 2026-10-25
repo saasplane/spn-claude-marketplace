@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "6dae575d"
+      "seen": "f27b5f04"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
@@ -64,12 +64,12 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.207",
-      "seen": "fcbcb27b"
+      "seen": "77e5ad1b"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.245",
-      "seen": "d78d8dd8"
+      "seen": "da0c1b4b"
     }
   ]
 }
@@ -222,21 +222,21 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 | Run name | Used for | Why |
 | --- | --- | --- |
 | one working name, reused | every selective run made while coding | a reused name replaces its own file, so the 20 files a tier keeps are not spent on small runs |
-| one fresh name, used once | one run over every case the step touched, once they pass | this is the run the rows are stamped from, and each row's `Updated at` names it |
+| one fresh name, used once | one run over every case the step touched, once they pass | this is the run the rows are stamped from; a row whose status it moved takes an `Updated at` naming it |
 
-**Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names and leaves every other row as it is. `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says how old that proof is.
+**Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names whose status changed, and leaves every other row as it is: a row the run only confirms keeps its `Updated at` (`RD.DEVEX.WORKSPACE.306`). `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says when it reached that status.
 
 **State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
 
 ## When a whole tier runs
 
-**A whole tier runs before a commit, before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
+**A whole tier runs before a commit, in an arc's `PROOF` row, before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
 
-**Before a commit, each tier the change touches runs whole for its node, once, at the end of the step.** These are the tiers that need nothing running: unit, component and integration. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses an agent's commit when no whole, green run covers exactly the content staged, for an apps node and an infra node alike.
+**Before a commit, each tier the change touches runs whole for its node, once per batch.** A batch of orders is committed as one commit, so the run is not repeated per order. These are the tiers that need nothing running: unit, component and integration. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses an agent's commit when no whole, green run covers exactly the content staged, for an apps node and an infra node alike.
 
 **The dry run is the full pass before a release.** It runs every tier the release can run by itself and lists every failure at once. Run only the tier it names as not run, a client's contract tier, with the service up, and ask for the release go after both. The release command starts no service and releases every library, a generated client among them, so a client's contract tier, which calls a running service, is named as not run.
 
-**Outside a release, run a whole tier only in these five cases:**
+**Outside a release, a commit and an arc's `PROOF` row, run a whole tier only in these five cases:**
 
 | The case | Why a selection is not enough |
 | --- | --- |
@@ -249,7 +249,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 - **A failure that points outside the touched area is your judgement.** Say what you saw, and say that the choice to widen the run was yours.
 - **A flake stays a finding until it is proven environmental.** A wider run is never the way to set one aside.
 - **For a partner, a whole tier means a whole tier of their own nodes.** A failure that points into a published package is a report to the platform, and not a wider run. A version move of the platform or of the toolchain runs every tier of every node, under one run name.
-- **An arc's `PROOF` row runs again, on clean trees, what the arc's rows touched.** It runs no whole tier unless one of the five cases holds.
+- **An arc's `PROOF` row is its one final re-check.** It runs again, on clean trees, what the arc's rows touched, and the whole tiers of each touched node, the browser walks and the look run there, once for the arc. No order runs them.
 
 ## After a run: stamp the rows
 
@@ -261,7 +261,7 @@ spn-devex behaviours stamp write <run> .        # Status and Updated at, from th
 spn-devex behaviours coverage show . --json     # the tests report's measurement
 ```
 
-The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes `Updated at` as `<time> · <run>`, so a row names the run that proved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The run's name in `Updated at` is a label: it tells a reader which run last proved the row, and when. A run file is temporary output, so nothing requires it to be kept and you may delete it at any time. Nothing checks a row against its run file after the stamp. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.
+The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes a row only where its status changed, and `Updated at` as `<time> · <run>`, so a row names the run that moved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The run's name in `Updated at` is a label: it tells a reader which run last moved the row's status, and when. A run file is temporary output, so nothing requires it to be kept and you may delete it at any time. Nothing checks a row against its run file after the stamp. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.
 
 ## Code coverage is reported, never enforced
 

@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An order proves a page by its values
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A page is proved by its values, in the arc's final row
 // The chapter is the source of truth; a rule change is edited there first, then here.
 //
 // A page read as values, never a picture: computed properties, the ancestors' attributes that decide

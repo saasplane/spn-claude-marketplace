@@ -72,11 +72,11 @@ export const CARD = {
  * `spn-x` beside it. The stamp on the page is the arc's own unless `stamp` says otherwise.
  */
 export async function dataWorkspace(name, { stamp = null, rows = undefined } = {}) {
-  const { rowStamp, writeNameFile } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
+  const { arcStamp, writeNameFile } = await import(resolve(PLUGIN, "src", "scripts", "lib", "workstream.ts"));
   const data = arcData(rows);
   const ws = `.spndevex/workstreams/open/031-probe`;
   const root = workspace(name, {
-    [`${ws}/approach.html`]: approachPage(stamp ?? rowStamp(data)),
+    [`${ws}/approach.html`]: approachPage(stamp ?? arcStamp(data)),
     [`${ws}/arcs/N001/state.json`]: `${JSON.stringify(data, null, 2)}\n`,
     [`${ws}/notes/N001/preview.html`]: PREVIEW,
     [`${ws}/notes/N001/plan.md`]: "# N001 plan\n",

@@ -18,7 +18,8 @@
 // (`016-provider-secret-storage`), looked up in `.spndevex/workstreams/{open,backlog,closed}/`.
 //
 // A SUBJECT WITH TWO ACTIONS. `show` writes no file. `write` writes the parts of the page that the
-// arcs decide (RD.DEVEX.WORKSPACE.204): the header's status, the Cycles table and the heading of
+// arcs decide (RD.DEVEX.WORKSPACE.204): the header's status, the places of `How` with their `Arcs:`
+// lines, read from the rows' `repo` (RD.DEVEX.WORKSPACE.251), the Cycles table and the heading of
 // `Open`. `doc-check` compares a page with the same reading, through `tableDifferences` and
 // `headerStatusRule`.
 //
@@ -30,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { PREVIEW_FILE, approachOf, arcIdsOf, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -385,12 +386,98 @@ export function openHeadingFor(text: string): string {
   return `Open — ${open.length ? open.join(" · ") : "no card is open"}`;
 }
 
-/** The parts of a page that the arcs decide, as `write` names them. */
-export const PRODUCED_PARTS = { status: "the header's status", table: "the Cycles table", open: "the heading of Open" } as const;
+// ---------------------------------------------------------------------------- the places of How
+
+/** One place of `How`: a repository the arcs' rows name, and the arcs whose rows reach it, in run order. */
+export type Place = { repo: string; arcs: string[] };
 
 /**
- * A workstream's page as `write` leaves it: the header's status, the Cycles table and the heading
- * of `Open`, each replaced once and only where it differs from what the arcs and the cards give.
+ * The places of `How`, read from the arcs (05-artifacts.md § `How` ends in Cycles): each repository an arc's
+ * header or rows name, in the order the arcs first reach it, with the arcs that reach it. A row that names
+ * no repository reaches no place.
+ */
+export function placesOf(folder: string): Place[] {
+  const places = new Map<string, string[]>();
+  for (const cycle of cyclesOf(folder)) {
+    const data = readArc(folder, cycle.id);
+    if (!data || !Array.isArray(data.rows)) continue;
+    const named = [...(Array.isArray(data.repos) ? data.repos : []), ...data.rows.map((row) => row.repo)]
+      .filter((repo): repo is string => typeof repo === "string").map((repo) => repo.trim())
+      .filter((repo) => repo && !NO_REPO.has(repo));
+    for (const repo of new Set(named)) {
+      const arcs = places.get(repo) ?? [];
+      if (!arcs.includes(cycle.id)) arcs.push(cycle.id);
+      places.set(repo, arcs);
+    }
+  }
+  return [...places].map(([repo, arcs]) => ({ repo, arcs }));
+}
+
+/** The facts value of a place: its arcs, separated by middots as the page writes them. */
+const arcsValue = (place: Place): string => place.arcs.join(" &middot; ");
+/** A place's `Arcs:` fact as a page holds it: the arc numbers, separated by middots, and nothing after them. */
+const ARCS_FACT = /Arcs:[ \t]*(?:N\d+[a-z]?(?:[ \t]*(?:&middot;|·)[ \t]*N\d+[a-z]?)*)?/;
+
+/** Whether an `h3`'s text names a place: it starts with the repository's name, and the name ends there. */
+const namesPlace = (heading: string, repo: string): boolean =>
+  new RegExp(`^${repo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`, "i").test(heading);
+
+/** An `h3` id free on the page for a new place, from the repository's name. */
+function placeId(text: string, repo: string): string {
+  const base = `how-${repo.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "place"}`;
+  let id = base;
+  for (let at = 2; new RegExp(`\\bid="${id}"`).test(text); at += 1) id = `${base}-${at}`;
+  return id;
+}
+
+/**
+ * The page with each place of `How` written from the arcs, and whether it changed. A place whose `h3` is there
+ * gets its `Arcs:` facts line: rewritten where it holds one, put first on its facts line where it has one, or
+ * added under its line. A place with no `h3` is added before Cycles, its heading and its `Arcs:` line, for the
+ * agent to write the one line under it. A heading that names no place is the agent's and is left as it is.
+ */
+export function placedPage(text: string, places: Place[]): string {
+  const how = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*How\b[\s\S]*?<\/h2>/i.exec(text);
+  if (!how || !places.length) return text;
+  let out = text;
+  for (const place of places) {
+    const bodyAt = how.index + how[0].length;
+    const rest = out.slice(bodyAt);
+    const next = rest.search(/<h2\b/i);
+    const body = next < 0 ? rest : rest.slice(0, next);
+    const headings = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
+    const cycles = headings.filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
+    if (!cycles) return out;
+    const before = headings.filter((found) => found.index! < cycles.index!);
+    const value = arcsValue(place);
+    const at = before.findIndex((found) => namesPlace(flat(found[1]), place.repo));
+    if (at < 0) {
+      const where = bodyAt + cycles.index!;
+      const added = `<h3 id="${placeId(out, place.repo)}">${escape(place.repo)}</h3>\n  <p><span class="sds-small">Arcs: ${value}</span></p>\n  `;
+      out = out.slice(0, where) + added + out.slice(where);
+      continue;
+    }
+    const from = bodyAt + before[at].index! + before[at][0].length;
+    const to = bodyAt + (before[at + 1] ?? cycles).index!;
+    const part = out.slice(from, to);
+    let written: string;
+    if (ARCS_FACT.test(part)) written = part.replace(ARCS_FACT, `Arcs: ${value}`);
+    else if (/<span class="sds-small">/.test(part)) written = part.replace(/<span class="sds-small">/, `<span class="sds-small">Arcs: ${value} &middot; `);
+    else {
+      const trail = /\s*$/.exec(part)![0];
+      written = `${part.slice(0, part.length - trail.length)}\n  <p><span class="sds-small">Arcs: ${value}</span></p>${trail}`;
+    }
+    out = out.slice(0, from) + written + out.slice(to);
+  }
+  return out;
+}
+
+/** The parts of a page that the arcs decide, as `write` names them. */
+export const PRODUCED_PARTS = { status: "the header's status", places: "the places of How", table: "the Cycles table", open: "the heading of Open" } as const;
+
+/**
+ * A workstream's page as `write` leaves it: the header's status, the places of `How`, the Cycles table
+ * and the heading of `Open`, each replaced once and only where it differs from what the arcs and the cards give.
  * `wrote` names the parts that changed, and `skipped` says why a part that differs could not be
  * written. Null where the page holds no Cycles table to write.
  */
@@ -417,6 +504,9 @@ export function producedPage(folder: string, text: string, cycles: Cycle[] = cyc
       wrote.push(PRODUCED_PARTS.status);
     }
   }
+
+  const placed = placedPage(out, placesOf(folder));
+  if (placed !== out) { out = placed; wrote.push(PRODUCED_PARTS.places); }
 
   const table = cyclesTableAt(out)!;
   const current = out.slice(table.from, table.to);
@@ -480,7 +570,7 @@ function writeNameFiles(folder: string): string[] {
 }
 
 /** The views of an arc's status that the approach page holds, as a refresh names them. */
-export const VIEW_NAMES: Record<keyof typeof PRODUCED_PARTS, string> = { status: "card", table: "cycles", open: "headings" };
+export const VIEW_NAMES: Record<keyof typeof PRODUCED_PARTS, string> = { status: "card", places: "places", table: "cycles", open: "headings" };
 
 /**
  * Every view of the arcs' state, brought current from the arcs' data in one pass: the name files, each

@@ -73,19 +73,31 @@ console.log("\n=== the schema — the one-line records");
   ok("red: an answered question with no words fails", /no answer/.test(schema.questionFaults({ ...record, state: "answered" }, "q").join()));
 }
 
-console.log("\n=== the stamp — ids and What, never states");
+console.log("\n=== the stamp — the arc's goal, title and repositories, never its rows");
 {
   const data = arcData();
-  const stamp = lib.rowStamp(data);
+  const stamp = lib.arcStamp(data);
   ok("the stamp is twelve hex characters", /^[0-9a-f]{12}$/.test(stamp), stamp);
   const moved = clone(data); moved.rows[0].state = "landed";
-  ok("a row's state changing does not move it", lib.rowStamp(moved) === stamp);
+  ok("a row's state changing does not move it", lib.arcStamp(moved) === stamp);
   const reordered = clone(data); reordered.rows.reverse();
-  ok("the rows' order does not move it", lib.rowStamp(reordered) === stamp);
-  const added = clone(data); added.rows.push({ id: "3", parent: "N001", title: "more", kind: "fix", state: "waiting" });
-  ok("a row added moves it", lib.rowStamp(added) !== stamp);
-  const retitled = clone(data); retitled.rows[0].title = "write the whole book";
-  ok("a row's What changed moves it", lib.rowStamp(retitled) !== stamp);
+  ok("the rows' order does not move it", lib.arcStamp(reordered) === stamp);
+  const added = clone(data); added.rows.push({ id: "3", parent: "N001", title: "more", kind: "fix", repo: "spn-x", state: "waiting" });
+  ok("a row added in a repository the arc reaches does not move it", lib.arcStamp(added) === stamp);
+  const retitledRow = clone(data); retitledRow.rows[0].title = "write the whole book";
+  ok("a row's What changed does not move it", lib.arcStamp(retitledRow) === stamp);
+  const noRepo = clone(data); noRepo.rows.push({ id: "4", parent: "N001", title: "prove it", kind: "change", repo: "—", state: "waiting" });
+  ok("a row that changes no repository does not move it", lib.arcStamp(noRepo) === stamp);
+  const reached = clone(data); reached.rows.push({ id: "5", parent: "N001", title: "elsewhere", kind: "change", repo: "spn-y", state: "waiting" });
+  ok("red: a row in a repository the arc did not reach moves it", lib.arcStamp(reached) !== stamp);
+  const regoaled = clone(data); regoaled.goal = "another outcome";
+  ok("red: the goal changed moves it", lib.arcStamp(regoaled) !== stamp);
+  const retitled = clone(data); retitled.title = "another arc";
+  ok("red: the title changed moves it", lib.arcStamp(retitled) !== stamp);
+  const header = clone(data); header.repos = ["spn-x", "spn-z"];
+  ok("red: a repository added to the header moves it", lib.arcStamp(header) !== stamp);
+  ok("the repositories are the header's and the rows', sorted, with no empty cell",
+    lib.arcRepos({ repos: ["spn-b"], rows: [{ repo: "spn-a" }, { repo: "—" }, { repo: "spn-b" }, {}] }).join() === "spn-a,spn-b");
   const page = approachPage("old");
   ok("the page's stamp is read from the arc's Cycles row", lib.stampsOn(page).get("N001")?.stamp === "old");
   ok("a restamp writes the new value on that row alone", lib.stampsOn(lib.restamped(page, "N001", stamp)).get("N001")?.stamp === stamp);

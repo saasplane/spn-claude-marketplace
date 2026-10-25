@@ -266,6 +266,19 @@ console.log("\n=== behaviours stamp — the rules a writer keeps");
   ok("and leaves the file's modified time where it was", statSync(doc).mtimeMs === first);
 }
 
+{
+  // RD.DEVEX.WORKSPACE.306: `Updated at` says when a row reached its status, so a run that confirms it re-dates nothing.
+  const { root, doc } = stand([
+    { id: "IAM.LOGIN.01", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null },
+    { id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null },
+  ]);
+  const out = run(root, "write");
+  ok("red: a row the run names with the status it already carries keeps its Updated at",
+    cells(doc, "IAM.LOGIN.01").status === "SUCCESS" && cells(doc, "IAM.LOGIN.01").at === "2026-09-19T04:12:08Z", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
+  ok("a row whose status the run moved takes the run's instant", cells(doc, "IAM.LOGIN.02").at === "2026-09-20T09:00:00Z · r1", JSON.stringify(cells(doc, "IAM.LOGIN.02")));
+  ok("and the stamp counts only the row it moved", out.includes("wrote 1 row(s)"), out);
+}
+
 
 console.log("\n=== behaviours stamp — the run is named, and only that run is read");
 
@@ -295,25 +308,26 @@ console.log("\n=== behaviours stamp — the run is named, and only that run is r
 
 {
   // Two runs of the same tier on disk: the stamp reads the one it is told to, and never the other.
+  // r2 is the newer run, and passes; r1 fails. Each stamp moves the row's status, so each one dates it.
   const { root, doc } = stand([{ id: "IAM.LOGIN.01", tier: "CONTRACT", status: "FAILED", title: "t", detail: "x" }]);
   add(root, runPath("apps/api", "CONTRACT", "r2"), runBody("r2", "CONTRACT", PASSED, "2026-09-22T09:00:00Z"));
-  runNamed(root, "r2", "write");
-  ok("[MKT.SCRIPTS.74] a stamp reads only the run it names", cells(doc, "IAM.LOGIN.01").status === "SUCCESS"
-    && cells(doc, "IAM.LOGIN.01").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
   runNamed(root, "r1", "write");
-  ok("[MKT.SCRIPTS.74] and the other name reads the other run", cells(doc, "IAM.LOGIN.01").status === "FAILED"
+  ok("[MKT.SCRIPTS.74] a stamp reads only the run it names", cells(doc, "IAM.LOGIN.01").status === "FAILED"
     && cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z · r1", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
+  runNamed(root, "r2", "write");
+  ok("[MKT.SCRIPTS.74] and the other name reads the other run", cells(doc, "IAM.LOGIN.01").status === "SUCCESS"
+    && cells(doc, "IAM.LOGIN.01").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
 }
 
 {
   // A phased run writes <run>.<phase>.json; the stamp reads it beside <run>.json.
-  const { root, doc } = stand(PASSED);
+  const { root, doc } = stand([{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null }]);
   add(root, runPath("apps/web", "JOURNEY", "r1", "serialized"), runBody("r1", "JOURNEY",
     [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }], "2026-09-21T09:00:00Z", "SERIALIZED"));
   runNamed(root, "r1", "write");
   ok("[MKT.SCRIPTS.74] a phase's file of the named run is read beside the run's own",
      cells(doc, "IAM.LOGIN.03").status === "FAILED" && cells(doc, "IAM.LOGIN.03").at === "2026-09-21T09:00:00Z · r1"
-       && cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z · r1", JSON.stringify([cells(doc, "IAM.LOGIN.03"), cells(doc, "IAM.LOGIN.01")]));
+       && cells(doc, "IAM.LOGIN.02").at === "2026-09-20T09:00:00Z · r1", JSON.stringify([cells(doc, "IAM.LOGIN.03"), cells(doc, "IAM.LOGIN.02")]));
 }
 
 {
@@ -328,10 +342,11 @@ console.log("\n=== behaviours stamp — the run is named, and only that run is r
 
 {
   const { root, doc } = stand([], "CONTRACT");
-  add(root, runPath("apps/api", "CONTRACT", "r2"), runBody("r2", "CONTRACT", PASSED, "2026-09-22T09:00:00Z"));
+  add(root, runPath("apps/api", "CONTRACT", "r2"), runBody("r2", "CONTRACT",
+    [{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null }], "2026-09-22T09:00:00Z"));
   runNamed(root, "r2", "write", "--reach", "repository");
   ok("--reach repository reads over the named run alone: what it named keeps its finding",
-     cells(doc, "IAM.LOGIN.01").status === "SUCCESS" && cells(doc, "IAM.LOGIN.01").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
+     cells(doc, "IAM.LOGIN.02").status === "SUCCESS" && cells(doc, "IAM.LOGIN.02").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.02")));
 }
 
 // ---------------------------------------------------------------- the grammar: an action, a run, a path
