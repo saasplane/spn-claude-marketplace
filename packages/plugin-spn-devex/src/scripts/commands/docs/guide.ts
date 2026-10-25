@@ -459,8 +459,8 @@ function pageOf(guideFile: string, options: { name: string | null; out: string |
 
   const named = locationOf(file, workspace);
   const page = guidePage(pageTemplate(templatesDir(workspace), TEMPLATE), guide, sections, {
-    organisation: process.env.SPN_ORG ?? "SaaS Plane",
-    location: process.env.SPN_LOCATION ?? (named === "—" ? basename(repository) : named),
+    organisation: "SaaS Plane",
+    location: named === "—" ? basename(repository) : named,
     source: slashes(relative(repository, file)),
     hub: hubAbove(docs, out),
   });

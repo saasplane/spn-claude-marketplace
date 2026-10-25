@@ -316,8 +316,8 @@ function run(args: string[], write: boolean): number {
     // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
     const first = groups.flatMap(entriesOf)[0]?.path ?? "";
     const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
-      organisation: process.env.SPN_ORG ?? "SaaS Plane",
-      location: process.env.SPN_LOCATION ?? (named === "—" ? basename(repository) : named),
+      organisation: "SaaS Plane",
+      location: named === "—" ? basename(repository) : named,
       repository,
       hub: base + first,
       back: hubAbove(docs, out),

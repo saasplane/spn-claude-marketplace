@@ -1331,7 +1331,7 @@ export function checkOverviewSource(file: string, src: string, block: any, works
 
   // The source is what parentId names. For a hub that is the repository's CONCEPT.md.
   if (block.parentId !== "concept") return f;
-  const concept = process.env.SPN_DOCS_SOURCE ? resolve(process.env.SPN_DOCS_SOURCE) : findConcept(workspace, file);
+  const concept = findConcept(workspace, file);
   if (!concept) {
     f.push({ check: "overview", grade: "SOFT", file, message: "`parentId` is `concept` and no `CONCEPT.md` was found to compare against" });
     return f;
@@ -1400,8 +1400,8 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
       // THE SAME MARKDOWN `page` RENDERS: the seat without its metadata block, and nothing added.
       // Two halves of one tool disagreeing about what the page IS reads every page as hand-edited.
       markdown: seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""),
-      workspace: process.env.SPN_ORG ?? "SaaS Plane",
-      location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
+      workspace: "SaaS Plane",
+      location: locationOf(seat, workspace),
       furniture: furniture(templates),
       // The same rewriter `page` used, or this check re-renders with seat-relative links and
       // reports every correctly produced page as hand-edited.
@@ -2615,8 +2615,8 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // A construct types no proof (RD.DEVEX.WORKSPACE.132), so the page is the seat and nothing is joined into it.
   // What proves it is read in the tests report, from the behaviour rows at the construct's own path.
   const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
-  const org = process.env.SPN_ORG ?? "SaaS Plane";
-  const location = process.env.SPN_LOCATION ?? locationOf(seat, workspace);
+  const org = "SaaS Plane";
+  const location = locationOf(seat, workspace);
   if (location === "—")
     findings.push({ check: "page", grade: "SOFT", file: seat, message: "no manifest above this file declares a `name`, so the header's location reads `—` (Q79 puts `name` on the manifests)" });
 

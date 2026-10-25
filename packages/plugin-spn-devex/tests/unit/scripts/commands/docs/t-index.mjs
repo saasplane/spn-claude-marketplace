@@ -30,8 +30,6 @@ const NEWEST = "1.10.0";
 
 const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE, SPN_STYLES: STYLES,
   SPN_TEMPLATES: bookTemplatesDir(resolve(WORKSPACE, "spn-foundation")) };
-delete environment.SPN_ORG;
-delete environment.SPN_LOCATION;
 /** One run of `docs index` through the entry, typed after the subject, with its exit code and what it printed. */
 const index = (args, extra = {}) => {
   try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "index", ...args], { encoding: "utf8", env: { ...environment, ...extra }, stdio: "pipe" }) }; }
