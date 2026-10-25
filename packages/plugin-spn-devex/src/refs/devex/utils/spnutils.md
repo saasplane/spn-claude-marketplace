@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "f75907cb"
+      "seen": "2809346a"
     }
   ],
   "decisions": [
@@ -221,7 +221,8 @@ the machine nobody can regenerate. Five regions, one writer each, read top to bo
 
 A partner's file starts at `devex`. The seat holds only what a partner or a builder configures, so a
 variable only a test sets never reaches it. `spnutils` provisions the shape and derives no key from
-a declaration; it reads a token through the seat's parser, never from the shell. A value is never
+a declaration; it reads a token through the seat's reader, where a value exported for the run wins
+and the seat answers otherwise. A value is never
 printed and never logged — a run reports a key name and whether it is set, nothing more.
 
 ## The two machine paths under `~/.spnutils`

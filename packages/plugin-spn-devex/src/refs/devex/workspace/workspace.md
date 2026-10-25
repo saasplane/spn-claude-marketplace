@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "f75907cb"
+      "seen": "2809346a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -121,7 +121,7 @@ The order is not a preference. Read a file top to bottom and this is what you fi
 
 **`producer` leads so a partner's file is a truncation.** Theirs starts at `devex` and runs `devex` → `managed` → `dev` → `keep`. A missing `producer` region in a partner's file is correct, never a fault to repair.
 
-**The seat holds only what a partner or a builder configures.** The `devex` region is in every file, because a partner signs in to GitHub and Figma too. A variable only a test sets is not configuration: never add one to the seat or name it in a doc. The tool reads each token through the seat's parser and never from the shell, so a `GITHUB_ACCESS_TOKEN` exported in a shell is not what `repo create` uses.
+**The seat holds only what a partner or a builder configures.** The `devex` region is in every file, because a partner signs in to GitHub and Figma too. A variable only a test sets is not configuration: never add one to the seat or name it in a doc. The tool reads each token through the seat's reader: a value exported for the run wins, as a pipeline exports its own, and the seat answers otherwise. `GITHUB_ACCESS_TOKEN` is read by nothing, so an old one exported in a shell no longer reaches `repo create`.
 
 **When `spnutils` first writes the `devex` region, it carries a token's value from wherever the key already sits**, the `dev` region included. That is the one time a run reads inside `dev`, and it writes nothing there; it reports the old line by key name, and deleting it is the developer's.
 
