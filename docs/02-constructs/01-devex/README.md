@@ -34,7 +34,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
-| Term | Contract term | What it means |
+| Term | Contract term | Description |
 | --- | --- | --- |
 | **The Plugin** | | |
 | [a construct](01-plugin.md) | — | one folder a plugin may ship: `hooks/`, `agents/`, `skills/`, `scripts/`, `refs/`, `providers/` or `tests/`. A plugin holds any mix and owes none |

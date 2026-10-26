@@ -4,7 +4,7 @@
 {"id":"estate-hooks","variant":"construct","title":"Hooks — One Moment, Every Write","subtitle":"One moment wired, because every rule here is about a file about to be written.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["hook-set","estate-plugin"],"summary":"This plugin wires exactly one moment of a session — the point just before a write happens — because every rule it holds is about what a file contains.","keywords":["hook","hooks.json","PreToolUse","matcher","timeout","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the wiring</strong></p><p>the one file declaring which moments this plugin claims and what it runs at each</p><span class="sds-small">Contract term: <code>hooks.json</code></span></td></tr>
-      <tr><td><p><strong>a call about to run</strong></p><p>the moment before a tool call is performed, and the only moment that may refuse one</p><span class="sds-small">Contract term: <code>PreToolUse</code></span></td></tr>
-      <tr><td><p><strong>the matcher</strong></p><p>the calls the moment is narrowed to, so nothing else pays for the hook at all</p><span class="sds-small">Contract term: <code>Write|Edit</code></span></td></tr>
-      <tr><td><p><strong>the command</strong></p><p>what the harness runs, written against the plugin root rather than against any checkout</p><span class="sds-small">Contract term: <code>command</code></span></td></tr>
-      <tr><td><p><strong>the plugin root</strong></p><p>the installed folder a session reads, which is what makes the wired path portable</p><span class="sds-small">Contract term: <code>CLAUDE_PLUGIN_ROOT</code></span></td></tr>
-      <tr><td><p><strong>the timeout</strong></p><p>the seconds the harness allows the command before it gives up on it</p><span class="sds-small">Contract term: <code>timeout</code></span></td></tr>
+      <tr><td><strong>the wiring</strong></td><td><code>hooks.json</code></td><td>the one file declaring which moments this plugin claims and what it runs at each</td></tr>
+      <tr><td><strong>a call about to run</strong></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
+      <tr><td><strong>the matcher</strong></td><td><code>Write|Edit</code></td><td>the calls the moment is narrowed to, so nothing else pays for the hook at all</td></tr>
+      <tr><td><strong>the command</strong></td><td><code>command</code></td><td>what the harness runs, written against the plugin root rather than against any checkout</td></tr>
+      <tr><td><strong>the plugin root</strong></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, which is what makes the wired path portable</td></tr>
+      <tr><td><strong>the timeout</strong></td><td><code>timeout</code></td><td>the seconds the harness allows the command before it gives up on it</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -144,4 +144,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

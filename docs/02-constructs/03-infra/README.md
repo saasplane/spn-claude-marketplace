@@ -33,7 +33,7 @@ The estate domain is the smallest of the three domains, and the boundary is what
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
-| Term | Contract term | What it means |
+| Term | Contract term | Description |
 | --- | --- | --- |
 | **Plugin** | | |
 | [an INFRA repository](01-plugin.md) | `sprepo.json` | a repository whose declared world is `INFRA` — the estate repository, and the blueprint repository beside it |

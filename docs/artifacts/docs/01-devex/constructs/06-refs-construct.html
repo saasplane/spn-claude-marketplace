@@ -4,7 +4,7 @@
 {"id":"ref-set","variant":"construct","title":"Refs — A Chapter, Restated and Stamped","subtitle":"A copy of a rule that says the moment it has fallen behind.","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a ref</strong></p><p>a markdown file under a plugin's <code>refs/</code>, restating part of the foundation book for a reader who cannot open it</p></td></tr>
-      <tr><td><p><strong>the block</strong></p><p>a comment at the top of that file, holding strict JSON, naming what the file restates</p><span class="sds-small">Contract term: <code>spn:restates</code></span></td></tr>
-      <tr><td><p><strong>a stamp</strong></p><p>one entry of the block — a chapter's path, an optional section, and the hash last read there</p><span class="sds-small">Contract term: <code>Citation</code></span></td></tr>
-      <tr><td><p><strong>the hash</strong></p><p>eight characters over the cited text, with trailing spaces and surrounding blank lines removed</p><span class="sds-small">Contract term: <code>seen</code></span></td></tr>
-      <tr><td><p><strong>drift</strong></p><p>a stamp whose hash no longer matches the chapter's text today</p></td></tr>
-      <tr><td><p><strong>a source line</strong></p><p>a file's own prose naming what it restates; it is read beside the block, and an omission from the block is a finding</p></td></tr>
+      <tr><td><strong>a ref</strong></td><td></td><td>a markdown file under a plugin's <code>refs/</code>, restating part of the foundation book for a reader who cannot open it</td></tr>
+      <tr><td><strong>the block</strong></td><td><code>spn:restates</code></td><td>a comment at the top of that file, holding strict JSON, naming what the file restates</td></tr>
+      <tr><td><strong>a stamp</strong></td><td><code>Citation</code></td><td>one entry of the block — a chapter's path, an optional section, and the hash last read there</td></tr>
+      <tr><td><strong>the hash</strong></td><td><code>seen</code></td><td>eight characters over the cited text, with trailing spaces and surrounding blank lines removed</td></tr>
+      <tr><td><strong>drift</strong></td><td></td><td>a stamp whose hash no longer matches the chapter's text today</td></tr>
+      <tr><td><strong>a source line</strong></td><td></td><td>a file's own prose naming what it restates; it is read beside the block, and an omission from the block is a finding</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -150,4 +150,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

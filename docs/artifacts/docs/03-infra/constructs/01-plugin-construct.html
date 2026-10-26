@@ -4,7 +4,7 @@
 {"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the manifest</strong></p><p><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
-      <tr><td><p><strong>the name</strong></p><p>what the marketplace entry and every install refer to this folder by</p><span class="sds-small">Contract term: <code>spn-infra</code></span></td></tr>
-      <tr><td><p><strong>the description</strong></p><p>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
-      <tr><td><p><strong>the version</strong></p><p>which published bytes a session is reading, shared with the other two plugins</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
-      <tr><td><p><strong>an INFRA repository</strong></p><p>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</p><span class="sds-small">Contract term: <code>sprepo.json</code></span></td></tr>
-      <tr><td><p><strong>the plugin root</strong></p><p>the installed copy a session reads, and the base every wired command is written against</p><span class="sds-small">Contract term: <code>CLAUDE_PLUGIN_ROOT</code></span></td></tr>
+      <tr><td><strong>the manifest</strong></td><td><code>plugin.json</code></td><td><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</td></tr>
+      <tr><td><strong>the name</strong></td><td><code>spn-infra</code></td><td>what the marketplace entry and every install refer to this folder by</td></tr>
+      <tr><td><strong>the description</strong></td><td><code>description</code></td><td>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</td></tr>
+      <tr><td><strong>the version</strong></td><td><code>version</code></td><td>which published bytes a session is reading, shared with the other two plugins</td></tr>
+      <tr><td><strong>an INFRA repository</strong></td><td><code>sprepo.json</code></td><td>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</td></tr>
+      <tr><td><strong>the plugin root</strong></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed copy a session reads, and the base every wired command is written against</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -142,4 +142,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

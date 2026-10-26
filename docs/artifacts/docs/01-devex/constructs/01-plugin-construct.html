@@ -4,7 +4,7 @@
 {"id":"plugin-set","variant":"construct","title":"The Plugin — Delivery Unit of the Marketplace","subtitle":"One folder holds everything a rule needs to reach a running session.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":[],"summary":"A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.","keywords":["plugin","marketplace","manifest","version","install","plugin root"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,14 +32,14 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a plugin</strong></p><p>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
-      <tr><td><p><strong>the marketplace</strong></p><p>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</p><span class="sds-small">Contract term: <code>marketplace.json</code></span></td></tr>
-      <tr><td><p><strong>the version</strong></p><p>the field in a manifest saying which bytes are published; the count moves after a release, never before</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
-      <tr><td><p><strong>the plugin root</strong></p><p>the installed folder a session reads, and the base every wired command path is written against</p><span class="sds-small">Contract term: <code>CLAUDE_PLUGIN_ROOT</code></span></td></tr>
-      <tr><td><p><strong>a construct</strong></p><p>one folder a plugin may ship: <code>hooks/</code>, <code>agents/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> or <code>tests/</code>. A plugin holds any mix and owes none</p></td></tr>
+      <tr><td><strong>a plugin</strong></td><td><code>plugin.json</code></td><td>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
+      <tr><td><strong>the marketplace</strong></td><td><code>marketplace.json</code></td><td>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</td></tr>
+      <tr><td><strong>the version</strong></td><td><code>version</code></td><td>the field in a manifest saying which bytes are published; the count moves after a release, never before</td></tr>
+      <tr><td><strong>the plugin root</strong></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, and the base every wired command path is written against</td></tr>
+      <tr><td><strong>a construct</strong></td><td></td><td>one folder a plugin may ship: <code>hooks/</code>, <code>agents/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> or <code>tests/</code>. A plugin holds any mix and owes none</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -143,4 +143,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

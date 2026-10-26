@@ -4,7 +4,7 @@
 {"id":"checks","variant":"construct","title":"Scripts — The Code a Plugin Ships, Wired or Reached by Name","subtitle":"Every file a plugin can run lives in one folder, sorted by what calls it.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["hook-set"],"summary":"Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.","keywords":["script","check","tool","applies","finding","grade"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,21 +32,21 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a script</strong></p><p>one file a plugin ships under <code>checks/</code>, <code>events/</code>, <code>tools/</code> or <code>lib/</code>, named for what it decides or measures</p><span class="sds-small">Contract term: <code>scripts/</code></span></td></tr>
-      <tr><td><p><strong>a check</strong></p><p>a file a moment's dispatcher composes: it reads one call and returns a verdict</p><span class="sds-small">Contract term: <code>Check</code></span></td></tr>
-      <tr><td><p><strong>the fast path</strong></p><p>a test on the path or the shell command alone, deciding whether this check could have an opinion at all</p><span class="sds-small">Contract term: <code>applies</code></span></td></tr>
-      <tr><td><p><strong>what it reads</strong></p><p>which fields of a call a check requires; a call carrying none of them never reaches it</p><span class="sds-small">Contract term: <code>needs</code></span></td></tr>
-      <tr><td><p><strong>a refusal</strong></p><p>the call is stopped, with the reason a reader is given</p><span class="sds-small">Contract term: <code>deny</code></span></td></tr>
-      <tr><td><p><strong>advice</strong></p><p>the call goes through and the turn is told something; advice from several checks is joined</p><span class="sds-small">Contract term: <code>note</code></span></td></tr>
-      <tr><td><p><strong>a tool</strong></p><p>a file under <code>tools/</code> that nothing wires, reached by naming its own path</p></td></tr>
-      <tr><td><p><strong>a finding</strong></p><p>one thing a run found: which question raised it, its grade, the file, and what a reader should do</p><span class="sds-small">Contract term: <code>Finding</code></span></td></tr>
-      <tr><td><p><strong>the grade</strong></p><p>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</p><span class="sds-small">Contract term: <code>Grade</code></span></td></tr>
-      <tr><td><p><strong>the exit code</strong></p><p>the count of refusals; a report alone leaves a run green</p></td></tr>
-      <tr><td><p><strong>a job</strong></p><p>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>parity</code></p></td></tr>
-      <tr><td><p><strong>silence</strong></p><p>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</p></td></tr>
+      <tr><td><strong>a script</strong></td><td><code>scripts/</code></td><td>one file a plugin ships under <code>checks/</code>, <code>events/</code>, <code>tools/</code> or <code>lib/</code>, named for what it decides or measures</td></tr>
+      <tr><td><strong>a check</strong></td><td><code>Check</code></td><td>a file a moment's dispatcher composes: it reads one call and returns a verdict</td></tr>
+      <tr><td><strong>the fast path</strong></td><td><code>applies</code></td><td>a test on the path or the shell command alone, deciding whether this check could have an opinion at all</td></tr>
+      <tr><td><strong>what it reads</strong></td><td><code>needs</code></td><td>which fields of a call a check requires; a call carrying none of them never reaches it</td></tr>
+      <tr><td><strong>a refusal</strong></td><td><code>deny</code></td><td>the call is stopped, with the reason a reader is given</td></tr>
+      <tr><td><strong>advice</strong></td><td><code>note</code></td><td>the call goes through and the turn is told something; advice from several checks is joined</td></tr>
+      <tr><td><strong>a tool</strong></td><td></td><td>a file under <code>tools/</code> that nothing wires, reached by naming its own path</td></tr>
+      <tr><td><strong>a finding</strong></td><td><code>Finding</code></td><td>one thing a run found: which question raised it, its grade, the file, and what a reader should do</td></tr>
+      <tr><td><strong>the grade</strong></td><td><code>Grade</code></td><td>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</td></tr>
+      <tr><td><strong>the exit code</strong></td><td></td><td>the count of refusals; a report alone leaves a run green</td></tr>
+      <tr><td><strong>a job</strong></td><td></td><td>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>parity</code></td></tr>
+      <tr><td><strong>silence</strong></td><td></td><td>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -175,4 +175,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

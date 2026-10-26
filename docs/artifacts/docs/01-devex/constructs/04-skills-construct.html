@@ -4,7 +4,7 @@
 {"id":"skill-set","variant":"construct","title":"Skills — A Stage's Steps, Loaded on Match","subtitle":"A skill only loads when the work in front of you actually matches it.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches.","keywords":["skill","SKILL.md","description","match","steps","stage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a skill</strong></p><p>one folder under a plugin's <code>skills/</code>, named for its stage, holding the file a session loads</p><span class="sds-small">Contract term: <code>SKILL.md</code></span></td></tr>
-      <tr><td><p><strong>the name</strong></p><p>the value a person types to ask for the skill directly, and the folder's own bare name</p><span class="sds-small">Contract term: <code>name</code></span></td></tr>
-      <tr><td><p><strong>the trigger</strong></p><p>the sentence matched against the work at hand, which decides whether the file is loaded at all</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
-      <tr><td><p><strong>the listing</strong></p><p>every installed skill's name and description, one line each; this is what a session holds in full</p></td></tr>
-      <tr><td><p><strong>a step</strong></p><p>one file a skill's own instructions sequence, read only when they name it</p><span class="sds-small">Contract term: <code>steps/</code></span></td></tr>
-      <tr><td><p><strong>a mode</strong></p><p>an argument a skill's description names, so one folder answers several close asks rather than two folders competing</p></td></tr>
+      <tr><td><strong>a skill</strong></td><td><code>SKILL.md</code></td><td>one folder under a plugin's <code>skills/</code>, named for its stage, holding the file a session loads</td></tr>
+      <tr><td><strong>the name</strong></td><td><code>name</code></td><td>the value a person types to ask for the skill directly, and the folder's own bare name</td></tr>
+      <tr><td><strong>the trigger</strong></td><td><code>description</code></td><td>the sentence matched against the work at hand, which decides whether the file is loaded at all</td></tr>
+      <tr><td><strong>the listing</strong></td><td></td><td>every installed skill's name and description, one line each; this is what a session holds in full</td></tr>
+      <tr><td><strong>a step</strong></td><td><code>steps/</code></td><td>one file a skill's own instructions sequence, read only when they name it</td></tr>
+      <tr><td><strong>a mode</strong></td><td></td><td>an argument a skill's description names, so one folder answers several close asks rather than two folders competing</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -149,4 +149,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

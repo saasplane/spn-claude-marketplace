@@ -4,7 +4,7 @@
 {"id":"agent-set","variant":"construct","title":"Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed","subtitle":"A second reader, convened for just one turn, who holds only what its own file grants it.","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,19 +33,19 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a brief</strong></p><p>a markdown file naming a persona a session can convene by name</p><span class="sds-small">Contract term: <code>agents/</code></span></td></tr>
-      <tr><td><p><strong>the bound model</strong></p><p>an optional field choosing which model runs the persona</p><span class="sds-small">Contract term: <code>model</code></span></td></tr>
-      <tr><td><p><strong>the bound tools</strong></p><p>an optional field narrowing what the persona may call; leaving it out grants everything the session has</p><span class="sds-small">Contract term: <code>tools</code></span></td></tr>
-      <tr><td><p><strong>a parameterized brief</strong></p><p>a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened</p></td></tr>
-      <tr><td><p><strong>a lens</strong></p><p>one file naming what a single engineering function checks when it reads work</p><span class="sds-small">Contract term: <code>lenses/</code></span></td></tr>
-      <tr><td><p><strong>worn</strong></p><p>the agent loading a lens for itself while it writes, so the work is right the first time</p></td></tr>
-      <tr><td><p><strong>convened</strong></p><p>a context that did not write the work reading it through one lens and reporting what it found</p></td></tr>
-      <tr><td><p><strong>the block condition</strong></p><p>the one thing a lens may refuse on; everything the file finds below that is advice and says so</p></td></tr>
-      <tr><td><p><strong>the lens register</strong></p><p>the closed set of viewpoint values, and the reader label each one renders as on a document's own header</p><span class="sds-small">Contract term: <code>LENS_LABEL</code></span></td></tr>
-      <tr><td><p><strong>the audience</strong></p><p>the field in a document's metadata block, drawn from that same closed set</p><span class="sds-small">Contract term: <code>lenses</code></span></td></tr>
+      <tr><td><strong>a brief</strong></td><td><code>agents/</code></td><td>a markdown file naming a persona a session can convene by name</td></tr>
+      <tr><td><strong>the bound model</strong></td><td><code>model</code></td><td>an optional field choosing which model runs the persona</td></tr>
+      <tr><td><strong>the bound tools</strong></td><td><code>tools</code></td><td>an optional field narrowing what the persona may call; leaving it out grants everything the session has</td></tr>
+      <tr><td><strong>a parameterized brief</strong></td><td></td><td>a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened</td></tr>
+      <tr><td><strong>a lens</strong></td><td><code>lenses/</code></td><td>one file naming what a single engineering function checks when it reads work</td></tr>
+      <tr><td><strong>worn</strong></td><td></td><td>the agent loading a lens for itself while it writes, so the work is right the first time</td></tr>
+      <tr><td><strong>convened</strong></td><td></td><td>a context that did not write the work reading it through one lens and reporting what it found</td></tr>
+      <tr><td><strong>the block condition</strong></td><td></td><td>the one thing a lens may refuse on; everything the file finds below that is advice and says so</td></tr>
+      <tr><td><strong>the lens register</strong></td><td><code>LENS_LABEL</code></td><td>the closed set of viewpoint values, and the reader label each one renders as on a document's own header</td></tr>
+      <tr><td><strong>the audience</strong></td><td><code>lenses</code></td><td>the field in a document's metadata block, drawn from that same closed set</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -160,4 +160,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

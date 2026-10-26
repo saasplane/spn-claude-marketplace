@@ -33,7 +33,7 @@ Each construct here is the stack-concrete form of one in the core domain, so rea
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
-| Term | Contract term | What it means |
+| Term | Contract term | Description |
 | --- | --- | --- |
 | **The Plugin** | | |
 | [the description](01-plugin.md) | `description` | the sentences matched against the work at hand, which is how this plugin's material is reached at all |

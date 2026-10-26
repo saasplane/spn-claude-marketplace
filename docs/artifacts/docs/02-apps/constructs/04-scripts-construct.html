@@ -4,7 +4,7 @@
 {"id":"stack-checks","variant":"construct","title":"Scripts — The Code This Plugin Runs","subtitle":"Every file this plugin runs, sorted by what calls it and what stack it serves.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -31,20 +31,20 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the gate</strong></p><p>the stack-free half: it reads the node's declaration and hands the write to the provider for it</p><span class="sds-small">Contract term: <code>subjectsFor</code></span></td></tr>
-      <tr><td><p><strong>a subject</strong></p><p>one grouping of rules a write is asked about, cheapest first</p><span class="sds-small">Contract term: <code>SUBJECT_NAMES</code></span></td></tr>
-      <tr><td><p><strong>the dispatcher</strong></p><p>the single process behind the wired entry, which keeps the first refusal and joins the advice</p><span class="sds-small">Contract term: <code>pretooluse.ts</code></span></td></tr>
-      <tr><td><p><strong>the resulting text</strong></p><p>the source as the pending write would leave it, which is what a rule actually reads</p><span class="sds-small">Contract term: <code>resultingText</code></span></td></tr>
-      <tr><td><p><strong>masking</strong></p><p>blanking comments and string bodies before searching, so a word inside a quote is never read as code</p><span class="sds-small">Contract term: <code>mask</code></span></td></tr>
-      <tr><td><p><strong>a register</strong></p><p>any table carrying the behaviour headings in order, wherever in a repository it sits</p><span class="sds-small">Contract term: <code>HEADINGS</code></span></td></tr>
-      <tr><td><p><strong>a row</strong></p><p>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</p><span class="sds-small">Contract term: <code>cellsOf</code></span></td></tr>
-      <tr><td><p><strong>the tier</strong></p><p>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</p><span class="sds-small">Contract term: <code>tier</code></span></td></tr>
-      <tr><td><p><strong>the results file</strong></p><p>what a test runner wrote about one run, read by behaviour id and by tier</p></td></tr>
-      <tr><td><p><strong>an action</strong></p><p>one published thing a caller can perform, found by its declaration rather than by a folder shape</p><span class="sds-small">Contract term: <code>@SPAPIRouteCommand</code></span></td></tr>
-      <tr><td><p><strong>a hand-checked row</strong></p><p>a row a person proves, which no run ever writes over</p><span class="sds-small">Contract term: <code>MANUAL</code></span></td></tr>
+      <tr><td><strong>the gate</strong></td><td><code>subjectsFor</code></td><td>the stack-free half: it reads the node's declaration and hands the write to the provider for it</td></tr>
+      <tr><td><strong>a subject</strong></td><td><code>SUBJECT_NAMES</code></td><td>one grouping of rules a write is asked about, cheapest first</td></tr>
+      <tr><td><strong>the dispatcher</strong></td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
+      <tr><td><strong>the resulting text</strong></td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
+      <tr><td><strong>masking</strong></td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
+      <tr><td><strong>a register</strong></td><td><code>HEADINGS</code></td><td>any table carrying the behaviour headings in order, wherever in a repository it sits</td></tr>
+      <tr><td><strong>a row</strong></td><td><code>cellsOf</code></td><td>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</td></tr>
+      <tr><td><strong>the tier</strong></td><td><code>tier</code></td><td>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</td></tr>
+      <tr><td><strong>the results file</strong></td><td></td><td>what a test runner wrote about one run, read by behaviour id and by tier</td></tr>
+      <tr><td><strong>an action</strong></td><td><code>@SPAPIRouteCommand</code></td><td>one published thing a caller can perform, found by its declaration rather than by a folder shape</td></tr>
+      <tr><td><strong>a hand-checked row</strong></td><td><code>MANUAL</code></td><td>a row a person proves, which no run ever writes over</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -166,4 +166,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

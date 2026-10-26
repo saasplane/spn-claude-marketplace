@@ -4,7 +4,7 @@
 {"id":"estate-guard","variant":"construct","title":"Scripts — The Write-Time Gate and What Runs It","subtitle":"The gate that catches what should never be written into an infrastructure declaration.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,17 +32,17 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the dispatcher</strong></p><p>this plugin's hook entry point: one process, run for every write and every edit</p><span class="sds-small">Contract term: <code>scripts/events/pretooluse.ts</code></span></td></tr>
-      <tr><td><p><strong>the gate</strong></p><p>what resolves which subjects judge this call, and the one file that knows a provider folder exists</p><span class="sds-small">Contract term: <code>scripts/checks/subjects.ts</code></span></td></tr>
-      <tr><td><p><strong>a subject</strong></p><p>one kind of file with one parse — built output, or a declaration somebody edits</p><span class="sds-small">Contract term: <code>rendering</code> · <code>manifest</code></span></td></tr>
-      <tr><td><p><strong>a rule</strong></p><p>one thing the gate knows how to recognise, carrying its own name and its own refusal message</p><span class="sds-small">Contract term: <code>scripts/lib/&lt;name&gt;.ts</code></span></td></tr>
-      <tr><td><p><strong>the new text</strong></p><p>what this call would add — a write's content, or an edit's replacement — which is what the rules read</p><span class="sds-small">Contract term: <code>content</code> · <code>new_string</code></span></td></tr>
-      <tr><td><p><strong>the estate manifest</strong></p><p>the declaration file where one rule applies and nowhere else</p><span class="sds-small">Contract term: <code>spestate.json</code></span></td></tr>
-      <tr><td><p><strong>a sanctioned home</strong></p><p>the place a provider's own string is legitimate, which is removed from the text before that rule searches</p><span class="sds-small">Contract term: <code>region</code></span></td></tr>
-      <tr><td><p><strong>allowing</strong></p><p>the answer to anything the gate cannot read: no decision, and the ordinary permission flow continues</p></td></tr>
+      <tr><td><strong>the dispatcher</strong></td><td><code>scripts/events/pretooluse.ts</code></td><td>this plugin's hook entry point: one process, run for every write and every edit</td></tr>
+      <tr><td><strong>the gate</strong></td><td><code>scripts/checks/subjects.ts</code></td><td>what resolves which subjects judge this call, and the one file that knows a provider folder exists</td></tr>
+      <tr><td><strong>a subject</strong></td><td><code>rendering</code> · <code>manifest</code></td><td>one kind of file with one parse — built output, or a declaration somebody edits</td></tr>
+      <tr><td><strong>a rule</strong></td><td><code>scripts/lib/&lt;name&gt;.ts</code></td><td>one thing the gate knows how to recognise, carrying its own name and its own refusal message</td></tr>
+      <tr><td><strong>the new text</strong></td><td><code>content</code> · <code>new_string</code></td><td>what this call would add — a write's content, or an edit's replacement — which is what the rules read</td></tr>
+      <tr><td><strong>the estate manifest</strong></td><td><code>spestate.json</code></td><td>the declaration file where one rule applies and nowhere else</td></tr>
+      <tr><td><strong>a sanctioned home</strong></td><td><code>region</code></td><td>the place a provider's own string is legitimate, which is removed from the text before that rule searches</td></tr>
+      <tr><td><strong>allowing</strong></td><td></td><td>the answer to anything the gate cannot read: no decision, and the ordinary permission flow continues</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -156,4 +156,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

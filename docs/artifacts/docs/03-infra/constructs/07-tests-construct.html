@@ -4,7 +4,7 @@
 {"id":"estate-tests","variant":"construct","title":"Tests — How This Plugin Proves Its Own Gate","subtitle":"How this plugin proves the rules it refuses a bad file on.","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,16 +32,16 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the tree</strong></p><p>this plugin's proofs, at the plugin root and never beside the source they prove</p><span class="sds-small">Contract term: <code>tests/</code></span></td></tr>
-      <tr><td><p><strong>a tier</strong></p><p>what kind of proof a suite is, which is the first thing the path says</p><span class="sds-small">Contract term: <code>unit/</code></span></td></tr>
-      <tr><td><p><strong>the mirror</strong></p><p>the rest of the path, repeating the path of the file being proven</p><span class="sds-small">Contract term: <code>unit/&lt;source path&gt;</code></span></td></tr>
-      <tr><td><p><strong>a suite</strong></p><p>one file of cases, named for what it proves rather than for where it sits</p><span class="sds-small">Contract term: <code>t-&lt;subject&gt;.mjs</code></span></td></tr>
-      <tr><td><p><strong>the runner</strong></p><p>one command for every suite; it walks the tree rather than reading a list</p><span class="sds-small">Contract term: <code>tests/run.mjs</code></span></td></tr>
-      <tr><td><p><strong>the harness</strong></p><p>what drives a real process per case and reads the verdict back</p><span class="sds-small">Contract term: <code>tests/helpers/harness.mjs</code></span></td></tr>
-      <tr><td><p><strong>the plugin root</strong></p><p>found once by the harness, so no suite counts folders to reach the code</p><span class="sds-small">Contract term: <code>PLUGIN</code></span></td></tr>
+      <tr><td><strong>the tree</strong></td><td><code>tests/</code></td><td>this plugin's proofs, at the plugin root and never beside the source they prove</td></tr>
+      <tr><td><strong>a tier</strong></td><td><code>unit/</code></td><td>what kind of proof a suite is, which is the first thing the path says</td></tr>
+      <tr><td><strong>the mirror</strong></td><td><code>unit/&lt;source path&gt;</code></td><td>the rest of the path, repeating the path of the file being proven</td></tr>
+      <tr><td><strong>a suite</strong></td><td><code>t-&lt;subject&gt;.mjs</code></td><td>one file of cases, named for what it proves rather than for where it sits</td></tr>
+      <tr><td><strong>the runner</strong></td><td><code>tests/run.mjs</code></td><td>one command for every suite; it walks the tree rather than reading a list</td></tr>
+      <tr><td><strong>the harness</strong></td><td><code>tests/helpers/harness.mjs</code></td><td>what drives a real process per case and reads the verdict back</td></tr>
+      <tr><td><strong>the plugin root</strong></td><td><code>PLUGIN</code></td><td>found once by the harness, so no suite counts folders to reach the code</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -151,4 +151,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

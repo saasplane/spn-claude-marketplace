@@ -4,7 +4,7 @@
 {"id":"apps-plugin","variant":"construct","title":"The Plugin — What spn-apps Is, and When a Session Loads It","subtitle":"The one folder that makes spn-apps its own plugin, separate from every other.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","lockstep"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -31,14 +31,14 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>the manifest</strong></p><p>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</p><span class="sds-small">Contract term: <code>plugin.json</code></span></td></tr>
-      <tr><td><p><strong>the name</strong></p><p>what an install, a marketplace entry and a session all address this folder by</p><span class="sds-small">Contract term: <code>name</code></span></td></tr>
-      <tr><td><p><strong>the description</strong></p><p>the sentences matched against the work at hand, which is how this plugin's material is reached at all</p><span class="sds-small">Contract term: <code>description</code></span></td></tr>
-      <tr><td><p><strong>the world</strong></p><p>what a repository declares about itself, from which its plugin set is derived</p><span class="sds-small">Contract term: <code>sprepo.json</code></span></td></tr>
-      <tr><td><p><strong>the version</strong></p><p>the number saying which bytes are published, shared with the other plugins and moved after a release</p><span class="sds-small">Contract term: <code>version</code></span></td></tr>
+      <tr><td><strong>the manifest</strong></td><td><code>plugin.json</code></td><td>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</td></tr>
+      <tr><td><strong>the name</strong></td><td><code>name</code></td><td>what an install, a marketplace entry and a session all address this folder by</td></tr>
+      <tr><td><strong>the description</strong></td><td><code>description</code></td><td>the sentences matched against the work at hand, which is how this plugin's material is reached at all</td></tr>
+      <tr><td><strong>the world</strong></td><td><code>sprepo.json</code></td><td>what a repository declares about itself, from which its plugin set is derived</td></tr>
+      <tr><td><strong>the version</strong></td><td><code>version</code></td><td>the number saying which bytes are published, shared with the other plugins and moved after a release</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -142,4 +142,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

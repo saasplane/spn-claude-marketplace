@@ -4,7 +4,7 @@
 {"id":"tests","variant":"construct","title":"Tests — How This Plugin Proves Itself","subtitle":"A suite sits at the same path as the file it proves, so nothing has to be searched for.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set","checks"],"summary":"Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path.","keywords":["test","suite","tier","mirror","runner","harness"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -32,15 +32,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a suite</strong></p><p>one file proving one source file, named for what it proves</p><span class="sds-small">Contract term: <code>t-&lt;name&gt;.mjs</code></span></td></tr>
-      <tr><td><p><strong>the tier</strong></p><p>the first folder under <code>tests/</code>, saying what kind of proof the suites below it are</p><span class="sds-small">Contract term: <code>unit/</code> · <code>integration/</code></span></td></tr>
-      <tr><td><p><strong>the mirror</strong></p><p>the path under a tier that repeats the source file's own path inside the plugin</p></td></tr>
-      <tr><td><p><strong>the runner</strong></p><p>the file that finds every suite by walking the tree, runs each, and reports</p><span class="sds-small">Contract term: <code>run.mjs</code></span></td></tr>
-      <tr><td><p><strong>the harness</strong></p><p>what every suite imports instead of computing: the plugin root, a temporary tree, one case, a script's path</p><span class="sds-small">Contract term: <code>helpers/harness.mjs</code></span></td></tr>
-      <tr><td><p><strong>a case</strong></p><p>one named assertion inside a suite; a title carrying a behaviour row's id becomes that row's result</p></td></tr>
+      <tr><td><strong>a suite</strong></td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one source file, named for what it proves</td></tr>
+      <tr><td><strong>the tier</strong></td><td><code>unit/</code> · <code>integration/</code></td><td>the first folder under <code>tests/</code>, saying what kind of proof the suites below it are</td></tr>
+      <tr><td><strong>the mirror</strong></td><td></td><td>the path under a tier that repeats the source file's own path inside the plugin</td></tr>
+      <tr><td><strong>the runner</strong></td><td><code>run.mjs</code></td><td>the file that finds every suite by walking the tree, runs each, and reports</td></tr>
+      <tr><td><strong>the harness</strong></td><td><code>helpers/harness.mjs</code></td><td>what every suite imports instead of computing: the plugin root, a temporary tree, one case, a script's path</td></tr>
+      <tr><td><strong>a case</strong></td><td></td><td>one named assertion inside a suite; a title carrying a behaviour row's id becomes that row's result</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -154,4 +154,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

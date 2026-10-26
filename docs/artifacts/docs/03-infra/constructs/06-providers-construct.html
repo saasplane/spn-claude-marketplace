@@ -4,7 +4,7 @@
 {"id":"estate-providers","variant":"construct","title":"Providers — One Folder per Cloud, Scripts Half Only","subtitle":"One folder per cloud, holding only what changes between them.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -31,15 +31,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a cloud</strong></p><p>one realization this plugin serves — the folder is the whole registration</p><span class="sds-small">Contract term: <code>providers/&lt;cloud&gt;/</code></span></td></tr>
-      <tr><td><p><strong>the scripts half</strong></p><p>what the gate runs for this cloud: one validator per subject</p><span class="sds-small">Contract term: <code>providers/&lt;cloud&gt;/scripts/checks/</code></span></td></tr>
-      <tr><td><p><strong>a subject</strong></p><p>one kind of file with one parse, named the same way in every cloud's folder</p><span class="sds-small">Contract term: <code>manifest</code> · <code>rendering</code></span></td></tr>
-      <tr><td><p><strong>a skills half</strong></p><p>what a skill loads when working in this instance — a procedure, which no cloud here has</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/skills/</code></span></td></tr>
-      <tr><td><p><strong>the vocabulary</strong></p><p>what this cloud calls things, restated as a fact rather than run as code</p><span class="sds-small">Contract term: <code>refs/support/infra/providers/&lt;cloud&gt;/</code></span></td></tr>
-      <tr><td><p><strong>discovery</strong></p><p>the gate reading which folders exist, rather than a list of clouds written anywhere</p><span class="sds-small">Contract term: <code>instances()</code></span></td></tr>
+      <tr><td><strong>a cloud</strong></td><td><code>providers/&lt;cloud&gt;/</code></td><td>one realization this plugin serves — the folder is the whole registration</td></tr>
+      <tr><td><strong>the scripts half</strong></td><td><code>providers/&lt;cloud&gt;/scripts/checks/</code></td><td>what the gate runs for this cloud: one validator per subject</td></tr>
+      <tr><td><strong>a subject</strong></td><td><code>manifest</code> · <code>rendering</code></td><td>one kind of file with one parse, named the same way in every cloud's folder</td></tr>
+      <tr><td><strong>a skills half</strong></td><td><code>providers/&lt;instance&gt;/skills/</code></td><td>what a skill loads when working in this instance — a procedure, which no cloud here has</td></tr>
+      <tr><td><strong>the vocabulary</strong></td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what this cloud calls things, restated as a fact rather than run as code</td></tr>
+      <tr><td><strong>discovery</strong></td><td><code>instances()</code></td><td>the gate reading which folders exist, rather than a list of clouds written anywhere</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -144,4 +144,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

@@ -4,7 +4,7 @@
 {"id":"hook-set","variant":"construct","title":"Hooks — Code the Runtime Calls on Your Behalf","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -33,21 +33,21 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>a hook</strong></p><p>a script a plugin wires to a named moment, declared with a matcher, a command and a timeout</p><span class="sds-small">Contract term: <code>hooks.json</code></span></td></tr>
-      <tr><td><p><strong>a moment</strong></p><p>a named point in a session the harness stops at and runs whatever a plugin wired there</p><span class="sds-small">Contract term: <code>hooks</code></span></td></tr>
-      <tr><td><p><strong>the window opening</strong></p><p>the moment a session begins, resumes or is cleared; its output is the first screen a developer sees</p><span class="sds-small">Contract term: <code>SessionStart</code></span></td></tr>
-      <tr><td><p><strong>a prompt being sent</strong></p><p>the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call</p><span class="sds-small">Contract term: <code>UserPromptSubmit</code></span></td></tr>
-      <tr><td><p><strong>a call about to run</strong></p><p>the moment before a tool call is performed, and the only moment that may refuse one</p><span class="sds-small">Contract term: <code>PreToolUse</code></span></td></tr>
-      <tr><td><p><strong>a command that finished</strong></p><p>the moment after a shell command has run, when its own text and its result can both be read</p><span class="sds-small">Contract term: <code>PostToolUse</code></span></td></tr>
-      <tr><td><p><strong>a turn about to end</strong></p><p>the moment before a reply is handed back, when a warning is still useful and a refusal is not</p><span class="sds-small">Contract term: <code>Stop</code></span></td></tr>
-      <tr><td><p><strong>a matcher</strong></p><p>the names a moment is narrowed to, so a script runs only for the calls it could have an opinion about</p><span class="sds-small">Contract term: <code>matcher</code></span></td></tr>
-      <tr><td><p><strong>the payload</strong></p><p>what the harness hands a hook on standard input: the tool's name, the call's own fields, the working folder, the session</p><span class="sds-small">Contract term: <code>Payload</code></span></td></tr>
-      <tr><td><p><strong>the call</strong></p><p>the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries</p><span class="sds-small">Contract term: <code>ToolInput</code></span></td></tr>
-      <tr><td><p><strong>a verdict</strong></p><p>what a hook decided: <code>deny</code> refuses the call, <code>note</code> is advice the turn reads, and nothing at all is silence</p><span class="sds-small">Contract term: <code>Verdict</code></span></td></tr>
-      <tr><td><p><strong>the dispatcher</strong></p><p>one process that asks every check applying to a call, keeps the first refusal, and joins the advice</p><span class="sds-small">Contract term: <code>dispatch</code></span></td></tr>
+      <tr><td><strong>a hook</strong></td><td><code>hooks.json</code></td><td>a script a plugin wires to a named moment, declared with a matcher, a command and a timeout</td></tr>
+      <tr><td><strong>a moment</strong></td><td><code>hooks</code></td><td>a named point in a session the harness stops at and runs whatever a plugin wired there</td></tr>
+      <tr><td><strong>the window opening</strong></td><td><code>SessionStart</code></td><td>the moment a session begins, resumes or is cleared; its output is the first screen a developer sees</td></tr>
+      <tr><td><strong>a prompt being sent</strong></td><td><code>UserPromptSubmit</code></td><td>the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call</td></tr>
+      <tr><td><strong>a call about to run</strong></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
+      <tr><td><strong>a command that finished</strong></td><td><code>PostToolUse</code></td><td>the moment after a shell command has run, when its own text and its result can both be read</td></tr>
+      <tr><td><strong>a turn about to end</strong></td><td><code>Stop</code></td><td>the moment before a reply is handed back, when a warning is still useful and a refusal is not</td></tr>
+      <tr><td><strong>a matcher</strong></td><td><code>matcher</code></td><td>the names a moment is narrowed to, so a script runs only for the calls it could have an opinion about</td></tr>
+      <tr><td><strong>the payload</strong></td><td><code>Payload</code></td><td>what the harness hands a hook on standard input: the tool's name, the call's own fields, the working folder, the session</td></tr>
+      <tr><td><strong>the call</strong></td><td><code>ToolInput</code></td><td>the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries</td></tr>
+      <tr><td><strong>a verdict</strong></td><td><code>Verdict</code></td><td>what a hook decided: <code>deny</code> refuses the call, <code>note</code> is advice the turn reads, and nothing at all is silence</td></tr>
+      <tr><td><strong>the dispatcher</strong></td><td><code>dispatch</code></td><td>one process that asks every check applying to a call, keeps the first refusal, and joins the advice</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -227,4 +227,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

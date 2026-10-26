@@ -4,7 +4,7 @@
 {"id":"apps-providers","variant":"construct","title":"Providers — Where the Stack Is Allowed to Be Named","subtitle":"The one folder where a language may be named at all.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["provider-set","stack-skills","stack-checks"],"summary":"Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.","keywords":["provider","instance","stack","steps","subject","private"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -31,15 +31,15 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>an instance</strong></p><p>one realization this plugin serves, which in this domain is a stack</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/</code></span></td></tr>
-      <tr><td><p><strong>the claim</strong></p><p>what a repository declares about its own stack, and the only place a gate reads one from</p><span class="sds-small">Contract term: <code>config.stack</code></span></td></tr>
-      <tr><td><p><strong>the skills half</strong></p><p>the procedure a skill loads once it has resolved which stack it is standing in</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/skills/&lt;skill&gt;/</code></span></td></tr>
-      <tr><td><p><strong>the scripts half</strong></p><p>the parse a gate resolves into, and the rules that read what the parse produced</p><span class="sds-small">Contract term: <code>providers/&lt;stack&gt;/scripts/checks/</code></span></td></tr>
-      <tr><td><p><strong>a door</strong></p><p>the file a gate imports for one subject: it parses once, orders the verdicts, and isolates a rule that throws</p><span class="sds-small">Contract term: <code>src.ts</code> · <code>tests.ts</code></span></td></tr>
-      <tr><td><p><strong>a private rule</strong></p><p>one rule, behind an underscore folder, private to the door standing beside it</p><span class="sds-small">Contract term: <code>_&lt;subject&gt;/</code></span></td></tr>
+      <tr><td><strong>an instance</strong></td><td><code>providers/&lt;instance&gt;/</code></td><td>one realization this plugin serves, which in this domain is a stack</td></tr>
+      <tr><td><strong>the claim</strong></td><td><code>config.stack</code></td><td>what a repository declares about its own stack, and the only place a gate reads one from</td></tr>
+      <tr><td><strong>the skills half</strong></td><td><code>providers/&lt;stack&gt;/skills/&lt;skill&gt;/</code></td><td>the procedure a skill loads once it has resolved which stack it is standing in</td></tr>
+      <tr><td><strong>the scripts half</strong></td><td><code>providers/&lt;stack&gt;/scripts/checks/</code></td><td>the parse a gate resolves into, and the rules that read what the parse produced</td></tr>
+      <tr><td><strong>a door</strong></td><td><code>src.ts</code> · <code>tests.ts</code></td><td>the file a gate imports for one subject: it parses once, orders the verdicts, and isolates a rule that throws</td></tr>
+      <tr><td><strong>a private rule</strong></td><td><code>_&lt;subject&gt;/</code></td><td>one rule, behind an underscore folder, private to the door standing beside it</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -153,4 +153,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

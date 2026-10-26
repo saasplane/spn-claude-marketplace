@@ -4,7 +4,7 @@
 {"id":"provider-set","variant":"construct","title":"Providers — How a Plugin Is Extended Per Instance","subtitle":"Everything that changes with a stack or a cloud lives in one folder, and nowhere else.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -31,14 +31,14 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sds-section-head"><h2>Terms</h2></div>
-  <div class="sds-scroll"><table>
-    <thead><tr><th>Term</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td><p><strong>an instance</strong></p><p>one realization a plugin serves — a stack (<code>ts</code>), or a cloud (<code>aws</code>, <code>gcp</code>, <code>local</code>)</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/</code></span></td></tr>
-      <tr><td><p><strong>a gate</strong></p><p>the instance-free half: it resolves the instance and dispatches, and states no rule about any one of them</p><span class="sds-small">Contract term: <code>skills/&lt;verb&gt;/SKILL.md</code> · <code>scripts/checks/&lt;subject&gt;.ts</code></span></td></tr>
-      <tr><td><p><strong>the skills half</strong></p><p>what a skill loads when it is working in this instance — a procedure</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/skills/&lt;skill&gt;/</code></span></td></tr>
-      <tr><td><p><strong>the scripts half</strong></p><p>what a gate runs for this instance — the parse and the rules it carries</p><span class="sds-small">Contract term: <code>providers/&lt;instance&gt;/scripts/checks/</code></span></td></tr>
-      <tr><td><p><strong>the contract</strong></p><p>what is <strong>true</strong> of this instance, restating a construct for a reader</p><span class="sds-small">Contract term: <code>refs/&lt;domain&gt;/…/providers/&lt;instance&gt;/</code></span></td></tr>
+      <tr><td><strong>an instance</strong></td><td><code>providers/&lt;instance&gt;/</code></td><td>one realization a plugin serves — a stack (<code>ts</code>), or a cloud (<code>aws</code>, <code>gcp</code>, <code>local</code>)</td></tr>
+      <tr><td><strong>a gate</strong></td><td><code>skills/&lt;verb&gt;/SKILL.md</code> · <code>scripts/checks/&lt;subject&gt;.ts</code></td><td>the instance-free half: it resolves the instance and dispatches, and states no rule about any one of them</td></tr>
+      <tr><td><strong>the skills half</strong></td><td><code>providers/&lt;instance&gt;/skills/&lt;skill&gt;/</code></td><td>what a skill loads when it is working in this instance — a procedure</td></tr>
+      <tr><td><strong>the scripts half</strong></td><td><code>providers/&lt;instance&gt;/scripts/checks/</code></td><td>what a gate runs for this instance — the parse and the rules it carries</td></tr>
+      <tr><td><strong>the contract</strong></td><td><code>refs/&lt;domain&gt;/…/providers/&lt;instance&gt;/</code></td><td>what is <strong>true</strong> of this instance, restating a construct for a reader</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -146,4 +146,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.5.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>
