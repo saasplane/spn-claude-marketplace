@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "cc127ea7"
+      "seen": "d197bbb5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "cc4a5fba"
+      "seen": "c03daadd"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Ideate — Stack-Agnostic
 
-What the `IDEATE` stage decides, where the decision lives, what a decided section means, how a requirement is classified once the shape holds, how far a change reaches in both directions, the question that stops a mechanism being invented beside one that already works, and what a design lands as. Apply this in any stack and in any repository. Source of truth: the foundation's `02-constructs/01-devex/01-function/03-ideate.md` and `04-capabilities/01-devex/01-function/03-ideate.md`. Where this restatement and those disagree, the sources win and this file is regenerated.
+What the `IDEATE` stage decides, where the decision lives, how a partner platform starts from its industry, what a decided section means, how a requirement is classified once the shape holds, how far a change reaches in both directions, the question that stops a mechanism being invented beside one that already works, and what a design lands as. Apply this in any stack and in any repository. Source of truth: the foundation's `02-constructs/01-devex/01-function/03-ideate.md` and `04-capabilities/01-devex/01-function/03-ideate.md`. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## Where this stage sits, and why it runs second
 
@@ -35,6 +35,12 @@ The DevEx stages are eight: `BOOTSTRAP · SCM · IDEATE · DEVELOP · TEST · PR
 **A feature that quietly redraws a boundary while it is being designed is the failure this stage exists to catch.** Review does not catch it — each individual change looks reasonable. What catches it is noticing that the concept no longer describes the thing.
 
 **A repository has one concept, however many nodes it grows.** `CONCEPT.md` belongs to the repository root, never to a node — adding a package, an application or a module changes *sections* of the repository's concept. A concept file beside a node manifest is always wrong; this is the likeliest wrong turn on a growing repository, because the new node feels like the thing being decided.
+
+## A partner platform starts from its industry
+
+**On a partner platform, before the boundary is drawn, the lenses write the industry brief in the partner's own purpose part — MUST** (`RD.DEVEX.AGENT.099`). A partner builds for an industry, such as health, payments or logistics, and never has to learn the constructs to describe its business: that bridge is the lenses' job. The brief holds the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems, and each fact carries its source and the date it was read. Each lens learns its share for its own discipline and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. Every lens convenes for it, each for its own discipline.
+
+**The brief is a source, never an agreement.** What the concept takes from it is still shown and agreed one block at a time. Where the industry and the SaaS Plane way meet badly, the lens raises it rather than bending either one. A later lens reads the brief before it researches again, and refreshes the part it owns when that part is stale. SaaS Plane is the first case, and its own industry is software engineering. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
 
 ## Designing runs in a fixed order
 
@@ -134,6 +140,7 @@ Each section carries its status beside its heading, and the person reviewing it 
 | --- | --- | --- |
 | nothing yet | ideating | the person, one agreed block at a time |
 | seats that already answer it | harvesting | the seats, cited |
+| an industry it is built for, on a partner platform | bridging | the industry brief, which the lenses write first |
 
 **Harvesting never shortcuts the gate.** A harvested block says nothing the seats do not, and it names the chapters it was read from. Where the seats are silent, that part stays `DRAFT`. Two failures belong to harvesting alone: copying across instead of summarizing up (a chapter states depth, a concept states shape — a harvested field list or signature is wrong at this altitude), and resolving a disagreement quietly (two seats that contradict each other become a register row, never a sentence smoothed over).
 
@@ -171,7 +178,7 @@ An argument closes by being consumed: the half that outlives it is a register ro
 | *verified* | the agent read the source in this session, and names it |
 | *not verified* | the agent states it from what it knows, and has read no source for it |
 
-A statement about another platform that carries no mark reads as a fact, and nobody can tell whether it was checked.
+A statement about another platform that carries no mark reads as a fact, and nobody can tell whether it was checked. A fact in the industry brief already carries its mark, because it names its source and the date it was read.
 
 ## What this phase hands on, and what it never does
 

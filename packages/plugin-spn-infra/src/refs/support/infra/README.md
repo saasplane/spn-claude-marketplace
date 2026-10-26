@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
-      "seen": "86359c7a"
+      "seen": "45c2ad5a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
@@ -55,6 +55,8 @@ The app plane — an application's own rung and the deployment seats beneath it 
 ## 2 · No secrets, no ARNs, no account ids — ever, at any path
 
 Nothing long-lived exists to store. Every provider-assigned value is **discovered** by the tool holding the credential and recorded as resolved state. A value copied from a console is a defect, and that includes the ones a day-zero runbook would have transcribed. Keep credentials in the config plane's stores, whose only readers are the apply and the deploy — never in a manifest, an env file, or a doc.
+
+**A provider resource name is refused at every path, with one exception** (RD.SUPPORT.INFRA.123): S3's resource-name form with an empty region and an empty account, which names only a bucket the same file already names. A MinIO policy has to name its resource in that form, and a name with nothing to copy in carries nothing to leak. Every other provider's resource name, any name of that form carrying a region or an account, and any account id stay refused at every path.
 
 > Defect: a credential in a manifest or env file — the plane was bypassed, and the value now lives wherever that file went. An ARN or account id anywhere — an identifier was typed, and the estate stopped being reproducible.
 

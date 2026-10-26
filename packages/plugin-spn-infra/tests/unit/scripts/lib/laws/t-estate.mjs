@@ -14,7 +14,12 @@ one("a folder merely named distribution", { input: { file_path: "/tmp/estate/dis
 
 // 2 · ARNs.
 one("an ARN in a manifest", { input: { file_path: EST, content: '{"role":"arn:aws:iam::1:role/x"}' }, expect: "deny", says: "ARN" });
-one("an ARN in ordinary source", { input: { file_path: SRC, content: 'const r = "arn:aws-cn:s3:::b";' }, expect: "deny", says: "ARN" });
+one("an S3 name with an empty region and account passes in ordinary source", { input: { file_path: SRC, content: 'const r = "arn:aws-cn:s3:::b";' }, expect: "" });
+one("an S3 name with an empty region and account passes in a manifest", { input: { file_path: EST, content: '{"resource":"arn:aws:s3:::b/*"}' }, expect: "" });
+one("an S3 name carrying a region is refused", { input: { file_path: EST, content: '{"resource":"arn:aws:s3:us-east-1::b"}' }, expect: "deny", says: "ARN" });
+one("an S3 name carrying an account is refused", { input: { file_path: EST, content: '{"resource":"arn:aws:s3::123456789012:b"}' }, expect: "deny", says: "ARN" });
+one("an IAM name with an empty region is still refused", { input: { file_path: EST, content: '{"resource":"arn:aws:iam:::role/x"}' }, expect: "deny", says: "ARN" });
+one("an S3 name beside a regional one is still refused", { input: { file_path: EST, content: '{"a":"arn:aws:s3:::b","b":"arn:aws:s3:us-east-1::c"}' }, expect: "deny", says: "ARN" });
 one("the word arn on its own", { input: { file_path: SRC, content: 'const arn = discovered();' }, expect: "" });
 
 // 2b · the placeholder account, sanctioned only inside a *.tftest.hcl file (N102 step 7, Q-B).
