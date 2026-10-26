@@ -48,5 +48,10 @@
     "sds-docs.css": "702436e5eba24febdadb69a9eb6730f8abccb57ec0ccc1899765fed2d6384716",
     "sds-docs.js": "9774d5a2d2be0eaa901393d7fd3da9f51d366d68d4383fdbb0f27c6e5895b5c3",
     "sds-index.js": "177cb33756fb9dff2cf11fb79326314221d70e080aee84aef46022890498ce9e"
+  },
+  "1.10.0": {
+    "sds-docs.css": "e72602b555415e484bbaefbc8caab001b0cb90ec8c71061b7d9ac761e0fc7f7d",
+    "sds-docs.js": "9774d5a2d2be0eaa901393d7fd3da9f51d366d68d4383fdbb0f27c6e5895b5c3",
+    "sds-index.js": "177cb33756fb9dff2cf11fb79326314221d70e080aee84aef46022890498ce9e"
   }
 }

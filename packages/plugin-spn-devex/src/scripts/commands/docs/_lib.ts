@@ -1855,7 +1855,7 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
     return noted ? `${cell(noted[1].trim(), seat)}<br><span class="sds-small">${cell(noted[2], seat)}</span>` : cell(x, seat);
   };
   const out = [
-    '  <div class="sds-scroll"><table class="sds-glossary">',
+    '  <div class="sds-scroll"><table class="sds-terms">',
     "    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>",
     "    <tbody>",
   ];

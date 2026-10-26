@@ -259,6 +259,22 @@
   td > .sds-small{display:block; margin-top:.5rem}
   td strong,td > p:first-child{@apply text-title}
   tr:last-child td{border-bottom:none}
+  /* THE TERMS TABLE AND A DOMAIN'S GLOSSARY take fixed shares of the width: the term 22 in a hundred, the contract
+     term 26, the meaning the rest, so a term never wraps. Under 40rem each row stacks as term, contract term,
+     meaning. A construct's header row in a glossary, one cell across three columns, reads as a group heading. */
+  table.sds-terms{table-layout:fixed}
+  table.sds-terms th:nth-child(1){width:22%}
+  table.sds-terms th:nth-child(2){width:26%}
+  table.sds-terms td:nth-child(2) code{overflow-wrap:anywhere}
+  table.sds-terms th[scope="rowgroup"]{color:var(--sds-text-title); padding-top:1rem}
+  @media (max-width:40rem){
+    table.sds-terms{min-width:0}
+    table.sds-terms thead{display:none}
+    table.sds-terms tr{display:block; padding:.6rem 0; border-bottom:1px solid var(--sds-rule)}
+    table.sds-terms tr:last-child{border-bottom:0}
+    table.sds-terms td{display:block; border:0; padding:.1rem .75rem}
+    table.sds-terms th[scope="rowgroup"]{display:block; border:0; padding:.1rem .75rem}
+  }
   .sds-number-cell{@apply font-mono text-right whitespace-nowrap; font-variant-numeric:tabular-nums}
   .sds-yes{@apply text-ok; font-weight:650}
   .sds-no{@apply text-gap; font-weight:650}

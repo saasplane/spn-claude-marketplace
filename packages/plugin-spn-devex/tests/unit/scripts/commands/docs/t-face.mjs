@@ -532,7 +532,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   const again = (() => { run(root, ["face", "write", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`); })();
   one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
   one("the glossary is written with the shared stylesheet's names", page,
-    (g) => g.includes('<div class="sds-scroll"><table class="sds-glossary">') && g.includes('<tr class="sds-group">'));
+    (g) => g.includes('<div class="sds-scroll"><table class="sds-terms">') && g.includes('<tr class="sds-group">'));
   one("and with no class of its own making: every class in the region opens with `sds-`",
     page.slice(page.indexOf("spn:generated glossary")),
     (g) => [...g.matchAll(/class="([^"]+)"/g)].flatMap((found) => found[1].split(" ")).every((name) => name.startsWith("sds-")));

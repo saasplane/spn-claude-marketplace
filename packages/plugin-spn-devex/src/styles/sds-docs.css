@@ -1866,6 +1866,48 @@
   tr:last-child td {
     border-bottom: none;
   }
+  table.sds-terms {
+    table-layout: fixed;
+  }
+  table.sds-terms th:nth-child(1) {
+    width: 22%;
+  }
+  table.sds-terms th:nth-child(2) {
+    width: 26%;
+  }
+  table.sds-terms td:nth-child(2) code {
+    overflow-wrap: anywhere;
+  }
+  table.sds-terms th[scope="rowgroup"] {
+    color: var(--sds-text-title);
+    padding-top: 1rem;
+  }
+  @media (max-width:40rem) {
+    table.sds-terms {
+      min-width: 0;
+    }
+    table.sds-terms thead {
+      display: none;
+    }
+    table.sds-terms tr {
+      display: block;
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--sds-rule);
+    }
+    table.sds-terms tr:last-child {
+      border-bottom: 0;
+    }
+    table.sds-terms td {
+      display: block;
+      border: 0;
+      padding: .1rem .75rem;
+    }
+    table.sds-terms th[scope="rowgroup"] {
+      display: block;
+      border: 0;
+      padding: .1rem .75rem;
+    }
+  }
   .sds-number-cell {
     text-align: right;
     font-family: var(--sds-mono);

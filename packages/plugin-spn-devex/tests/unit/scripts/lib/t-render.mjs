@@ -69,6 +69,24 @@ ok("a row with no consumer word is titled by the contract's spelling", terms.inc
 ok("a note the seat adds after the code is set under it in small type",
   terms.includes("<td><code>SPKind</code><br><span class=\"sds-small\">the closed set, stated in the tenancy chapter</span></td>"), terms);
 ok("and no Terms cell is an item cell any more", !terms.includes("<p>") && !terms.includes("Contract term:"), terms);
+const termsTable = produced(table(["Term", "Contract term", "What it means"], ["Estate", "`SPEstate`", "everything a product runs on"]));
+ok("the Terms table carries the class `sds-terms`, which gives the three columns their fixed shares",
+  termsTable.includes('<div class="sds-scroll"><table class="sds-terms">'), termsTable);
+ok("a table that is not the Terms table carries no such class",
+  !produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])).includes("sds-terms")
+  && !produced(table(["Term", "Meaning"], ["Estate", "everything a product runs on"])).includes("sds-terms"));
+const { cutVersions, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
+const { readFileSync } = await import("node:fs");
+const STYLES_HOME = resolve(HERE, "src", "styles");
+ok("the newest version of the shared styles is 1.10.0, so every page writer links it",
+  newestVersion(Object.keys(cutVersions(STYLES_HOME))) === "1.10.0");
+ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows under 40rem",
+  /table\.sds-terms\{table-layout:fixed\}|table\.sds-terms\s*\{[^}]*table-layout:\s*fixed/.test(readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8"))
+  && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
+for (const name of ["construct", "overview", "blocks"]) {
+  const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "pages", `${name}-template.html`), "utf8");
+  ok(`the ${name} template links 1.10.0`, template.includes(linesFor("1.10.0").stylesheet) && !template.includes("/1.9.0/"));
+}
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
   binds.includes("<thead><tr><th>Rule</th><th>Weight</th></tr></thead>") && binds.includes("<tr><td><p><code>RD.X.1</code></p><p>what every provider delivers</p></td><td>MUST</td></tr>"), binds);

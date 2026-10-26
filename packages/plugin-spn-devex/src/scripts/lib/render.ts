@@ -132,10 +132,12 @@ function contractCell(cell: string): string {
  * item becomes a level of the item's cell. The seat file keeps its markdown columns, because the
  * glossary is generated from them. Any other table keeps its columns, except one whose cells hold sentences.
  */
-const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[] }[] = [
+const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[]; tableClass?: string }[] = [
   { // Terms: three columns, because a reader compares the person's word with the contract's spelling down the rows.
     head: [/^Term$/, /^Contract term$/, /^What it means/],
     columns: ["Term", "Contract term", "Description"],
+    // The shared styles give the three columns fixed shares, and stack a row under 40rem.
+    tableClass: "sds-terms",
     row: ([term, contract, means]) => [
       isBlank(term) ? inline(contract) : `<strong>${inline(term)}</strong>`,
       isBlank(term) || isBlank(contract) ? "" : contractCell(contract),
@@ -193,7 +195,7 @@ function table(lines: string[]): string {
     ?? sentenceShape(head, rows);
   const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
   const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
-  return `  <div class="sds-scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
+  return `  <div class="sds-scroll"><table${shape?.tableClass ? ` class="${shape.tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
 function anchorOf(text: string): string {
