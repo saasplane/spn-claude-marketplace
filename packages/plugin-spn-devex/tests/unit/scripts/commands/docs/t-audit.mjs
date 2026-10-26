@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../../helpers/harness.mjs";
+import { PLUGIN, TEMPLATES_DIR } from "../../../../helpers/harness.mjs";
 // `docs audit` — the invariants a page must hold: the block, the outline, headers, links, Binds and
 // Proof, the generated columns, a closed vocabulary against what realizes it, and the gap scan.
 //
@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 import { FINDINGS } from "../../../../../src/scripts/commands/docs/audit.ts";
@@ -1164,7 +1164,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   // A PRODUCED PAGE, AND THE SAME PAGE WITH ITS OWN COPY. `docs page` writes the construct page in the
   // shared form; the audit compares it with what the seat produces. A page that holds its own copy
   // is not compared: it is named once, and `docs page` is what moves it.
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const templates = TEMPLATES_DIR;
   const seat = `docs/${SEAT.constructs}/01-core/x.md`;
   const at = `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/x-construct.html`;
   const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [seat]: construct(SECTIONS),
@@ -1405,7 +1405,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
 console.log("\n=== a preview page: variant `preview`, its own title, a Status chip, and the shared furniture");
 {
   // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const templates = TEMPLATES_DIR;
   const previewTemplate = readFileSync(resolve(templates, "workstream", "approach-preview-template.html"), "utf8");
   const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
   const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
