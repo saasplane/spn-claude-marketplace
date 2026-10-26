@@ -47,7 +47,8 @@
 import { basename, resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, introduced, lineOf, mask, read, resultingText } from "../../../../../scripts/lib/source.ts";
+import { mask, read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder, introduced, lineOf } from "../../../../../scripts/lib/source.ts";
 
 const SPEC = [".spec.ts", ".spec.tsx"];
 const JOURNEY_TIER = "/tests/journeys/";

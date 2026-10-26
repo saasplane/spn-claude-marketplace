@@ -1,0 +1,160 @@
+<meta charset="utf-8">
+<title>spn-surface — The Surface Domain</title>
+<!-- spn:doc
+{
+  "id": "spn-claude-marketplace-surface-overview",
+  "variant": "overview",
+  "title": "spn-surface — The Surface Domain",
+  "lenses": [
+    "UX",
+    "WEB_DEV"
+  ],
+  "summary": "spn-surface is the plugin a repository that builds a page loads beside spn-apps, and this page reads it one folder at a time, with no stack named in it.",
+  "keywords": [
+    "spn-surface",
+    "overview",
+    "surface",
+    "design",
+    "figma",
+    "refs",
+    "skills",
+    "scripts"
+  ]
+}
+-->
+
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
+<div class="sds-page">
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
+  <div class="sds-rail-title">spn-surface — The Surface Domain</div>
+</nav>
+<div class="sds-wrap">
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; spn-surface — The Surface Domain</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Web developer</span></span></span></div>
+  <h1>What a person sees and touches has a plugin of its own.</h1>
+  <p class="sds-subtitle">The standards, the patterns and the design skill, stated before any stack is chosen.</p>
+  <p class="sds-standfirst">spn-surface is the plugin a repository that builds a page loads beside spn-apps, and this page reads it one folder at a time. Read it before you add a rule about how a page looks or behaves, or when you want to know why the design skill is not in the apps plugin. It says only what is in this domain, and sends you to the page that states each part in full.</p>
+</header>
+
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>A page is chosen and drawn before it is built, and the rules for choosing it are true of every stack: what a label says, which container holds a panel, which pattern a task follows. <code>spn-surface</code> carries those rules. Each folder here is the same kind of instrument <code>spn-devex</code> defines.</p>
+  <p>This page is for a UX designer or a web developer working on a page, and for anyone about to add a Surface rule. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know which folder a change belongs in, and why this plugin names no stack.</p>
+  <p><strong>The one thing to unlearn is that the design belongs with the code.</strong> How a block is built in TypeScript is the apps plugin's. What the block is called, when it is used and how its page is arranged is this plugin's. This plugin ships no agents and no providers, and it has no chapter for either.</p>
+  <p><strong>What you can decide after this page.</strong> Whether a rule is about what a person sees or about how a stack builds it, and which plugin it then belongs in.</p>
+</section>
+
+<section id="s1">
+  <div class="sds-section-head"><h2>The Plugin &mdash; what spn-surface is, and when a session loads it</h2></div>
+  <p>Everything this domain ships sits in one folder, and that folder is what an install copies. Its identity is its own: the name and the description in its manifest say what it carries, and the description is what a session matches against when it decides whether to load the plugin at all. Its version reads <code>0.1.0</code>, the number its first release publishes.</p>
+  <p><em>Decide here:</em> whether the description says enough for a session that is designing a page to load this plugin.</p>
+  <p><a class="sds-more" href="constructs/01-plugin-construct.html">Read The Plugin &rarr;</a></p>
+</section>
+
+<section id="s2">
+  <div class="sds-section-head"><h2>Hooks &mdash; one moment, for the connector's script</h2></div>
+  <p>This plugin wires one moment: the call about to hand a script to the Figma connector. The connector refuses some of what it is given and throws on the rest, and either answer arrives after the call, so the one rule here reads the script before it. Every other call a session makes never reaches this plugin.</p>
+  <p><em>Decide here:</em> whether a new rule is about a script's text before the connector runs it, and so belongs on this moment.</p>
+  <p><a class="sds-more" href="constructs/02-hooks-construct.html">Read Hooks &rarr;</a></p>
+</section>
+
+<section id="s3">
+  <div class="sds-section-head"><h2>Skills &mdash; the command a Surface question answers to</h2></div>
+  <p>The design skill states a page, a screen or a flow as a tree of named blocks, in the order the Surface standards decide things: the person, the flow, the pattern, the panels, the tasks, and only then the blocks. It writes no code. Where the window holds the Figma connector it can draw the tree, and where it holds none the tree is still complete.</p>
+  <p><em>Decide here:</em> whether a new request is a design question, and which step of the skill it reaches.</p>
+  <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
+</section>
+
+<section id="s4">
+  <div class="sds-section-head"><h2>Scripts &mdash; the code this plugin runs</h2></div>
+  <p>The folder divides by what calls each file. The wiring starts one process, which asks the connector check and returns one verdict. The command line ships no command today. The helpers a check needs, the masker, the text a write would leave and the stack read, have one copy in the shared support folder, so no plugin reads a neighbour's file.</p>
+  <p><em>Decide here:</em> whether a new piece of code is a check the dispatcher asks, or a helper another plugin also needs.</p>
+  <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
+</section>
+
+<section id="s5">
+  <div class="sds-section-head"><h2>Refs &mdash; the Surface book, restated inside the plugin</h2></div>
+  <p>A partner holding this plugin has no copy of the foundation book beside it, so the Surface rules are written out inside it: the standards, the patterns, the architecture of the design system, its library and its delivery. Two folders of skeleton specs are copies the book owns. A ref states and never executes, and each one says which version of the book it was read at.</p>
+  <p><em>Decide here:</em> whether a fact the design skill needs is a restatement of the book, and where in the mirror it goes.</p>
+  <p><a class="sds-more" href="constructs/05-refs-construct.html">Read Refs &rarr;</a></p>
+</section>
+
+<section id="s6">
+  <div class="sds-section-head"><h2>Tests &mdash; the plugin's own folders, without a framework</h2></div>
+  <p>This plugin runs a rule on a person's design file, so it owes proof of its own. Its suites sit at the plugin root under one tier, mirror the source, and are found by walking. The bundle a hook runs is held to its source twice: it must answer what the source answers, and it must not be older than the source.</p>
+  <p><em>Decide here:</em> where the proof for a new check goes, and why a bundle needs its own two cases.</p>
+  <p><a class="sds-more" href="constructs/06-tests-construct.html">Read Tests &rarr;</a></p>
+</section>
+
+<section id="s7" data-block="glossary">
+  <div class="sds-section-head"><h2>Glossary</h2></div>
+  <p>Every term this domain declares, grouped by the construct that declares it.</p>
+  <!-- spn:generated glossary-html — do not edit inside these markers; `docs.ts face` writes it -->
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">The Plugin</th></tr>
+      <tr><td><strong><a href="constructs/01-plugin-construct.html">the description</a></strong></td><td><code>description</code></td><td>the sentences matched against the work at hand, which is how this plugin's material is reached at all</td></tr>
+      <tr><td><strong><a href="constructs/01-plugin-construct.html">the manifest</a></strong></td><td><code>plugin.json</code></td><td>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</td></tr>
+      <tr><td><strong><a href="constructs/01-plugin-construct.html">the name</a></strong></td><td><code>name</code></td><td>what an install, a marketplace entry and a session all address this folder by</td></tr>
+      <tr><td><strong><a href="constructs/01-plugin-construct.html">the version</a></strong></td><td><code>version</code></td><td>the number saying which bytes are published, <code>0.1.0</code> until the first release</td></tr>
+      <tr><td><strong><a href="constructs/01-plugin-construct.html">the world</a></strong></td><td><code>sprepo.json</code></td><td>what a repository declares about itself, from which its plugin set is derived</td></tr>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">Hooks</th></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">a call about to run</a></strong></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">the connector check</a></strong></td><td><code>figma-connector.ts</code></td><td>the rule that reads a <code>use_figma</code> script before the connector runs it</td></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">the dispatcher</a></strong></td><td><code>pretooluse.ts</code></td><td>the single process the entry names, which hands the call to the check that reads it and returns the verdict</td></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">the entry</a></strong></td><td></td><td>one declaration behind which every rule runs, rather than one declaration per rule</td></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">the matcher</a></strong></td><td><code>mcp__figma__use_figma</code></td><td>the one tool name this entry narrows to, so nothing else in a session reaches the chain at all</td></tr>
+      <tr><td><strong><a href="constructs/02-hooks-construct.html">the wiring</a></strong></td><td><code>hooks.json</code></td><td>the single file declaring what this plugin claims, at which moment, with which command and which timeout</td></tr>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">Skills</th></tr>
+      <tr><td><strong><a href="constructs/03-skills-construct.html">a skill</a></strong></td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>, named for a command of the group this domain answers to</td></tr>
+      <tr><td><strong><a href="constructs/03-skills-construct.html">a step</a></strong></td><td><code>steps/</code></td><td>one file of a longer walk, read only when the skill's own router names it</td></tr>
+      <tr><td><strong><a href="constructs/03-skills-construct.html">a tree</a></strong></td><td></td><td>one page as every block by the name the book gives it, with its props, in the order the decisions were taken</td></tr>
+      <tr><td><strong><a href="constructs/03-skills-construct.html">the stage</a></strong></td><td><code>RD.DEVEX.AGENT.017</code></td><td>the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked</td></tr>
+      <tr><td><strong><a href="constructs/03-skills-construct.html">the value</a></strong></td><td><code>SURFACE_{SKILL}</code></td><td>the name the enum carries for that folder, its domain prefix derived from the plugin's own claim</td></tr>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">Scripts</th></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">a check</a></strong></td><td><code>figma-connector.ts</code></td><td>one rule, in its own file, that returns a verdict and can also run alone</td></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">masking</a></strong></td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">the bundle</a></strong></td><td><code>dist/</code></td><td>the committed build a hook runs, kept current by a staleness test</td></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">the dispatcher</a></strong></td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">the entry</a></strong></td><td><code>cli.ts</code></td><td>the one command line the plugin ships, dispatching by group and action</td></tr>
+      <tr><td><strong><a href="constructs/04-scripts-construct.html">the resulting text</a></strong></td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">Refs</th></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">a domain folder</a></strong></td><td><code>support/</code></td><td>one folder per book domain, and the only kind of folder this tree holds at its top</td></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">a group</a></strong></td><td><code>surface/</code></td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">a ref</a></strong></td><td><code>refs/</code></td><td>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</td></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">a spec copy</a></strong></td><td><code>app-patterns/</code> · <code>site-patterns/</code></td><td>a folder of skeleton specs, byte-identical to the book's, which a page starts from</td></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">drift</a></strong></td><td></td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
+      <tr><td><strong><a href="constructs/05-refs-construct.html">the stamp</a></strong></td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
+      <tr class="sds-group"><th scope="rowgroup" colspan="3">Tests</th></tr>
+      <tr><td><strong><a href="constructs/06-tests-construct.html">a suite</a></strong></td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one thing, named for what it proves rather than for where it sits</td></tr>
+      <tr><td><strong><a href="constructs/06-tests-construct.html">the harness</a></strong></td><td><code>harness.mjs</code></td><td>what a suite is written against: the plugin root, found once</td></tr>
+      <tr><td><strong><a href="constructs/06-tests-construct.html">the mirror</a></strong></td><td></td><td>the path under a tier, which is the source file's own path inside the plugin</td></tr>
+      <tr><td><strong><a href="constructs/06-tests-construct.html">the runner</a></strong></td><td><code>run.mjs</code></td><td>the one command that finds every suite and reports the verdict of each</td></tr>
+      <tr><td><strong><a href="constructs/06-tests-construct.html">the tier</a></strong></td><td><code>unit/</code></td><td>what kind of proof this is, which is the first thing a folder name answers</td></tr>
+    </tbody>
+  </table></div>
+  <!-- /spn:generated -->
+</section>
+
+<section id="s8" data-block="next">
+  <div class="sds-section-head"><h2>Where to go next</h2></div>
+  <ul>
+    <li>What each instrument is, before this domain adds to it &rarr; <a href="../01-devex/devex-overview.html">spn-devex</a></li>
+    <li>The apps plugin, which holds how a block is built in a stack &rarr; <a href="../03-apps/apps-overview.html">spn-apps</a></li>
+    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/02-surface/plugin-spn-surface/README.md">capabilities: spn-surface</a></li>
+    <li>What a developer building a page is promised &rarr; <a href="../../../03-behaviors/02-surface/README.md">behaviours: surface</a></li>
+    <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/02-surface/README.md">constructs: surface</a></li>
+    <li>Back to the whole model &rarr; <a href="../concept-overview.html">the hub</a></li>
+  </ul>
+</section>
+
+</div>
+</div>
+
+<footer>
+  Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; surface; the constructs it links.
+</footer>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

@@ -1,0 +1,9 @@
+{
+  "tool_name": "mcp__figma__use_figma",
+  "tool_input": {
+    "fileKey": "abc",
+    "description": "save a version",
+    "skillNames": "resource:figma-use",
+    "code": "await figma.saveVersionHistoryAsync('before');\nreturn {};"
+  }
+}

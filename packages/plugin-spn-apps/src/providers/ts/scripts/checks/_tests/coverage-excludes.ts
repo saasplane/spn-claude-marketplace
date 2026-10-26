@@ -12,7 +12,8 @@
 import { basename } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, read, resultingText } from "../../../../../scripts/lib/source.ts";
+import { read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder } from "../../../../../scripts/lib/source.ts";
 import { excludesOf, isCodeConfig } from "../../lib/coverage-excludes.ts";
 
 /** Whether this rule reads the file at all: a configuration that runs code. */

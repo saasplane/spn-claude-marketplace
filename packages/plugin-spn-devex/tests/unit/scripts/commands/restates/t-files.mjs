@@ -82,11 +82,11 @@ console.log("=== restates files — the specs of the app patterns, a flat folder
 
 console.log("=== restates files — the specs of the site patterns, a second flat folder beside the app patterns'");
 {
-  // The two folders sit side by side in the book and in the apps plugin, each named by its group.
+  // The two folders sit side by side in the book and in the surface plugin, each named by its group.
   ok("[MKT.SCRIPTS.176] the book's two folders of specs are app-patterns/ and site-patterns/, side by side",
     BOOK_PATTERNS.endsWith("/01-common/app-patterns") && BOOK_SITE_PATTERNS.endsWith("/01-common/site-patterns")
       && dirname(BOOK_PATTERNS) === dirname(BOOK_SITE_PATTERNS), `${BOOK_PATTERNS}\n        ${BOOK_SITE_PATTERNS}`);
-  ok("[MKT.SCRIPTS.176] and the apps plugin's two copies take the same names, beside the surface refs",
+  ok("[MKT.SCRIPTS.176] and the surface plugin's two copies take the same names, beside the surface refs",
     PLUGIN_PATTERNS === "refs/support/surface/app-patterns" && PLUGIN_SITE_PATTERNS === "refs/support/surface/site-patterns", `${PLUGIN_PATTERNS} · ${PLUGIN_SITE_PATTERNS}`);
   made += 1;
   const book = join(BASE, `book-${made}`), out = join(BASE, `plugin-${made}`, "site-patterns"), from = join(book, BOOK_SITE_PATTERNS);
