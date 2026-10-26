@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/08-operate.md",
-      "seen": "cd27106c"
+      "seen": "8b4887eb"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: How a running platform is observed, responded to, and maintained - 
 ---
 
 # operate — a platform you can see into, and change without fear
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **Everything before this stage produces a system; this stage is the only one that meets it under load, at 3am, with a customer waiting.** A capability that works and cannot be observed is a capability nobody can support, and a fix that cannot be applied safely is not a fix.
 

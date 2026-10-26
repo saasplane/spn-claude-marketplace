@@ -1,0 +1,336 @@
+{
+ "kind": "skeleton",
+ "title": "Doors",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature whose items are doors: boxed and raised on the fill that stands off the section, items.surface color DEFAULT, raised, elevation MD. Each door opens a page of its own, so its picture is a mark, media MARK, and it ends on ARROW_RIGHT inside the site or ARROW_UP_RIGHT where it leaves it. The GRID's columns follow the count, as for Points: 3/2/1 for three. A door never stands on a filled section. On a phone one door under another.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Where to go next",
+                   "description": "One line on the places these doors open."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "Another page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "Another site",
+                   "description": "One line on where it leads.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_UP_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Where to go next",
+                   "description": "One line on the places these doors open."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "Another page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Another site",
+                   "description": "One line on where it leads.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_UP_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 },
+                 {
+                  "spacer": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Where to go next",
+                   "description": "One line on the places these doors open."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Another page",
+                   "description": "What the reader finds there.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Another site",
+                   "description": "One line on where it leads.",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "end": [
+                    {
+                     "icon": "ARROW_UP_RIGHT"
+                    }
+                   ]
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

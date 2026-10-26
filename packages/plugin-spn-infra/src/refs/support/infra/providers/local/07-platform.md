@@ -2,21 +2,21 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md",
-      "seen": "a7463981"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/07-platform.md",
+      "seen": "c09bf933"
     }
   ]
 }
 -->
 # Platform — the container group from the pinned declaration
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/07-platform.md`. Read this as the restatement; that node governs.
 
-**`spnutils infra platform up` stands the platform's container group from the pinned declaration.** Nothing about it is a separate local model: the layer reads the same manifests the cloud layer reads, and the driver executes compose trees where the cloud runs the engine.
+**`spnutils infra platform up <spc>` stands the platform's container group from the pinned declaration.** Nothing about it is a separate local model: the layer reads the same manifests the cloud layer reads, and the driver executes compose trees where the cloud runs the engine.
 
 ## What it stands
 
-**The engines of every resource world, at the same versions the cloud runs.** A world stands its own instance, so a platform and a space bound beside it hold separate engines rather than sharing one ([resources](../../resources.md)). Each family takes a world-marked hostname and a derived port, which [`04-addressing.md`](04-addressing.md) states.
+**The engines of every resource world, at the same versions the cloud runs.** A world stands its own instance, so a platform and a space bound beside it hold separate engines rather than sharing one ([resources](../../resources.md)). Each family takes a world-marked hostname and a port from the five hundred the platform declares, which [`04-addressing.md`](04-addressing.md) states.
 
 **Each installed module's local rendering.** A module package carries its own renderings and the tooling carries none: `src/local/` holds one `docker-compose.yml` and what it mounts, applied by `docker compose` with a `.env` the tooling writes (`RD.SUPPORT.INFRA.078`). The tooling parses neither rendering and names no product on either side.
 

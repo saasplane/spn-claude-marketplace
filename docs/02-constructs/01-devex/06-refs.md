@@ -3,10 +3,11 @@
   "id": "ref-set",
   "variant": "construct",
   "title": "Refs — A Chapter, Restated and Stamped",
+  "subtitle": "A copy of a rule that says the moment it has fallen behind.",
   "lenses": ["VOICE", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all.",
+  "summary": "A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read.",
   "keywords": ["ref", "spn:restates", "seen", "hash", "drift", "unstamped"]
 }
 -->
@@ -15,9 +16,11 @@
 
 `For: Editor · Architect` · `Status: 🔮 PLANNING`
 
-A citation nobody checks is a promise nobody keeps. The chapter it names moves on, the words copied from it quietly stop being true, and everybody finds out by accident. A ref is how this repository keeps that promise: a restatement carrying a hash of the exact text it last read, so a run can say *this chapter moved since I copied it*.
+A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. Read this page before you write a new ref, or when a drift check tells you one has fallen behind. It explains how the hash lets a run report a chapter that moved, and the three ways a restatement can fail to be comparable at all.
 
 ## Overview
+
+A citation nobody checks is a promise nobody keeps. The chapter it names moves on, the words copied from it quietly stop being true, and nobody finds out until it matters. A ref is how this repository keeps that promise: the hash lets a run say *this chapter moved since I copied it*.
 
 A ref exists because a reader may hold the plugins and never hold the book. It is a copy, made deliberately, under a stamp. It adds no rule; where a ref and its chapter disagree, the chapter wins and the ref is rewritten.
 
@@ -109,4 +112,4 @@ This page answers what a restatement is, where one belongs in the folder, and ho
 | the foundation's `04-discipline.md` § Restatement discipline | repetition is allowed only as a declared restatement, carrying its source and never a new rule | MUST |
 | [RD.DEVEX.003](../../registers/decisions.md) | a ref that carries no block is unstamped, and a marker no tool reads is not a declaration | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

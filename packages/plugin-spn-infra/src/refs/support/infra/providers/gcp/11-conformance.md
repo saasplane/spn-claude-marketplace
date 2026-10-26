@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/11-conformance.md", "seen": "6fb6fe20" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/11-conformance.md", "seen": "6fb6fe20" }
   ]
 }
 -->
 # Conformance — nothing runs, so nothing is proven
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/11-conformance.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/11-conformance.md`. Read this as the restatement; that node governs.
 
 **There is nothing to prove here, because nothing runs.** No acceptance executes against Google Cloud, no plan is produced for review, no apply is approved, and no evidence is captured.
 

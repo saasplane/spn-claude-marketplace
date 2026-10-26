@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/01-realization.md", "seen": "6f0d6f45" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/01-realization.md", "seen": "6f0d6f45" }
   ]
 }
 -->
 # Realization — Google Cloud is named and not rendered
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/01-realization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/01-realization.md`. Read this as the restatement; that node governs.
 
 **No Google Cloud realization exists, and none is being designed.** Nothing turns an estate declaration into folders, projects, networks or compute here.
 

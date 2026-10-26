@@ -1,0 +1,335 @@
+{
+ "kind": "skeleton",
+ "title": "Points",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature at CONTAINER with textAlign START. Its items are a GRID, flat, with no items.surface: six points, each a title and one line of about one length, with no link and no order. The columns follow the count, 3/2/1 for six. On a phone the words, then one point under another.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What a reader gets",
+                   "description": "One line on the section's one subject.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A third point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A fourth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A fifth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A sixth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What a reader gets",
+                   "description": "One line on the section's one subject.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A third point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A fourth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A fifth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 },
+                 {
+                  "item": {
+                   "title": "A sixth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What a reader gets",
+                   "description": "One line on the section's one subject.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A first point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A second point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A third point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A fourth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A fifth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "A sixth point",
+                   "description": "One line about it, about as long as the others."
+                  },
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "GRID"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

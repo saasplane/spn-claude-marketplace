@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "7b62e9ef"
+      "seen": "ea93e33c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "491f4358"
+      "seen": "8a6817c0"
     }
   ]
 }
@@ -54,6 +54,22 @@ An edit to the folder changes nothing about the cache until an install copies on
 
 **A ref is the only layer a consumer actually has.** The book is not loaded in a session, and a partner holds no checkout of it. So a ref carries the actionable substance itself and cites its chapter **by name**, never by a path that resolves only for somebody holding both trees.
 
+## How a plugin's command is typed
+
+**Every command reads the same way** (`RD.DEVEX.AGENT.078`): `spn-<plugin> <group> [<subject>] <action> [<path>…] [options]`. The last word before the path is a verb, and you always type it.
+
+**A command is typed by the plugin's own name**, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`, and the delivery chapter states how `spnutils` turns that into rules.
+
+| Part | The rule | Example |
+| --- | --- | --- |
+| **Action** | `check` reads and reports. `write` changes files. `show` prints. A subject may have a verb of its own, such as `measure` or `report`. A command with more than one action has no default. | `spn-devex docs face check` |
+| **Path** | It says what the action acts on, and it may be a folder inside a repository or one file. A check of the whole corpus still reads everything and reports only the findings under the path. | `spn-devex docs audit check docs/artifacts` |
+| **Filter** | An option named for what it selects: `--variant` for documents, `--block` for a generated block, `--finding` for a kind of finding. | `--finding link` |
+
+**Name the smallest path the work needs, and run `check` before `write`.** A `write` with no path refuses, so a write never reaches a file nobody named. With no path, `check` and `show` take the repository you are in, and they refuse at a workspace root, where several repositories sit side by side.
+
+**Read the exit.** For `check` and `write`, exit 1 means a rule finding. Exit 2 means the command was typed wrongly, and the refusal prints the usage to type. `spn-<plugin> help` lists every command with its actions.
+
 ## The `spn:restates` stamp
 
 **A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
@@ -66,7 +82,7 @@ An edit to the folder changes nothing about the cache until an install copies on
   // Documents the ref REWRITES in its own words. You read the chapter and restate it.
   "docs": [
     { "path": "spn-foundation/CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md", "seen": "b204d81c" }
   ],
 
   // Files you COPY rather than rewrite — a template, a schema, a sample.
@@ -102,7 +118,7 @@ A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry 
 
 **`section` is optional, and it decides what the hash covers.** Name one and the stamp covers that heading's own text; leave it out and it covers the whole file. A citation is exactly as precise as the sentence it replaces, so a long chapter does not re-stamp every ref that cites one paragraph of it. **Each citation carries its own `seen`, not one stamp per block** — a block citing an eight-thousand-line concept and a hundred-line section would otherwise re-stamp the second every time the first moved, which is usually a wrong finding and teaches you to stop reading the run.
 
-**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions --write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
+**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
 
 ## The three plugins, and how they divide
 
@@ -116,7 +132,7 @@ Plugins are named `spn-devex` plus `spn-<domain>`, mirroring the providers tree,
 
 **There are three plugins, one per domain, and the set is closed.** `spn-devex` installs in every repository. `spn-apps` acts on the nodes an apps repository declares. `spn-infra` acts on the estate.
 
-**A stack or a cloud is a folder inside the plugin that owns its domain — `refs/providers/<name>/` and `scripts/providers/<name>/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
+**A stack or a cloud is a `providers/<name>/` folder inside the plugin that owns its domain — `spn-apps`'s `providers/ts/`, `spn-infra`'s `providers/aws/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
 
 **The reason is that a domain's rules are the stable half and a stack's spelling is the volatile half.** Writing TypeScript and writing Python are different acts, so each needs its own parser and its own steps — but the rule they are checking is the same rule, and stating it once means a second stack joins by adding a folder rather than by copying a plugin. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a new cloud is a blueprint library and a provider folder with no skill of its own.
 
@@ -195,11 +211,54 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
 
+## A release carries its migration, and a window applies what is pending first
+
+**A release that changes a shape the agent writes or keeps ships a migration — MUST** (`RD.DEVEX.AGENT.094`). A shape is the layout of a file the agent works with: the workstream folder, an arc's state, the approach page, a preview, a seat file, a lens. Without a migration, a workspace taking the release holds both shapes, and each old file surfaces only as a check failing in some later window. Code works the same way: a schema change ships the step that moves the existing rows, and that step runs once.
+
+| A migration carries | Meaning |
+| --- | --- |
+| an id | `001`, `002`, …: the order they apply in; once released, never edited or renumbered |
+| a version | the release whose change it carries |
+| what changed | one sentence |
+| a check | each place still in the old shape; nothing once none is left |
+| how to apply it | a script for a mechanical change; steps for the agent where a page is rewritten |
+
+The plugin keeps its migrations in `scripts/lib/migrations/`, one file each, listed in id order by `index.ts`.
+
+**The ledger is `.spndevex/migrations.jsonl`**: one line per applied migration — plugin, id, version, time, who, and how (`script`, `agent`, or `nothing to do`). It is workspace state, not a rule. Only `spn-devex plugin migration write` appends to it, and the owner hook refuses a hand write. It lives in the workspace rather than the machine store because it records what this workspace's files went through, which every machine opening the workspace must agree on; appending one line at a time means two windows never overwrite each other. **A ledger line that does not parse stops every write** and is reported, never rewritten — the developer mends it.
+
+**At a window's start, pending migrations come before any other work — MUST.** The session-start hook runs the check of every migration the ledger lacks and tells the agent once, in its context and never on the developer's pane:
+
+| The check finds | What the agent does |
+| --- | --- |
+| old shapes; the migration has a script | `spn-devex plugin migration write <id>` runs it, checks again and records it |
+| old shapes; the migration has steps | the steps are the first task; `migration write <id> --steps-done` records it once the check is clean |
+| old shapes; the rewrite needs the developer's look | a needs-you that opens the reply; applied after the look |
+| nothing | `migration write <id>` records it with nothing to do |
+
+**The Stop hook holds the turn while a migration the ledger lacks still finds old shapes**, in any window, because the files are the workspace's. `write` applies in id order and refuses a later id while an earlier one is pending.
+
+```text
+spn-devex plugin migration show                         applied, pending, or nothing to do — each one
+spn-devex plugin migration check                        exit 1 while one is pending or the ledger does not read
+spn-devex plugin migration write <id>… [--steps-done]   apply and record, in id order
+```
+
+**Alpha does not change the retrofit rule.** A standard change still brings every existing open and backlog file to it in the same change (`RD.DEVEX.WORKSPACE.255`). The migration is how a workspace *elsewhere* — a partner's — gets that change when it takes the release: the builder's workspace is migrated before the cut, and its ledger says so.
+
 ## What a hook runs, and where its cache lives
 
 **A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
 
 **A plugin's cache lives in the machine store, keyed by content, and never in the shared workspace folder — MUST.** `.spndevex/` is shared by every parallel window and every workstream, so a mutable file written there is overwritten by whichever window finishes second, and neither session did anything wrong — they only disagree about which verdict is current. A cache kept in the machine store and keyed by content sidesteps the race rather than resolving it: two windows either compute the identical verdict or never touch the same key at all.
+
+**The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one; past 450k it asks always, and again only after another 50k (`RD.DEVEX.AGENT.103`).
+
+**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RD.DEVEX.AGENT.104`).
+
+## Who a hook's line is for
+
+**A hook shows the developer a refusal, and gives its advice to the agent alone — MUST** (`RD.DEVEX.AGENT.092`). A refusal stops a tool call, and the developer sees it. Advice lets the call go on: a soft finding of the doc standard, or a reminder. Advice goes to the agent as context, and nothing of it is shown on the developer's screen. In a hook's output, `additionalContext` is the agent's channel and `systemMessage` is the developer's, so advice is written to the first alone. A soft finding of the doc standard is said once for a file in a window, and a finding that changes is said again.
 
 ## What breaks if you skip this
 
@@ -214,3 +273,6 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 | sync the plugins before releasing the tool that changed | the plugins restate a command surface the session cannot run |
 | replace a plugin by hand before running the workspace sync | you lose the one comparison that could tell you what actually changed |
 | type a plugin name into a repository's wiring instead of letting it derive | the repository stops correcting itself when its declared world changes |
+| release a change to a shape the agent keeps with no migration | every workspace that takes it finds its old files one failing check at a time |
+| edit or renumber a released migration | a ledger that recorded it now names something else |
+| start other work while a migration is pending | the work lands in the old shape and has to be moved again |

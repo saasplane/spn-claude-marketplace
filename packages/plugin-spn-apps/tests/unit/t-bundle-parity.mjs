@@ -40,8 +40,8 @@ console.log("\n=== bundle parity — the CLI against a temp project, no side eff
 {
   const root = mkdtempSync(join(tmpdir(), "apps-parity-catalogue-"));
   try {
-    const { source, bundle, parity } = compareRun(CLI_SOURCE, CLI_BUNDLE, { argv: ["library", "catalogue", root] });
-    ok("cli.mjs agrees with cli.ts on `library catalogue` against an empty project", parity,
+    const { source, bundle, parity } = compareRun(CLI_SOURCE, CLI_BUNDLE, { argv: ["library", "catalogue", "check", root] });
+    ok("cli.mjs agrees with cli.ts on `library catalogue check` against an empty project", parity,
        `source: ${JSON.stringify(source)}\n        bundle: ${JSON.stringify(bundle)}`);
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -69,6 +69,20 @@ try {
   }
 } finally {
   process.chdir(before);
+}
+
+console.log("\n=== an installed copy runs every command — the plugin's src/ alone, outside this repository");
+{
+  // The install copies the plugin's src/ and nothing beside it, so a command reaching plugin-support-lib
+  // by its repository path fails there with ERR_MODULE_NOT_FOUND. `help` loads every command.
+  const { cpSync } = await import("node:fs");
+  const { spawnSync } = await import("node:child_process");
+  const installed = mkdtempSync(join(tmpdir(), "installed-plugin-"));
+  cpSync(join(PLUGIN, "src"), installed, { recursive: true });
+  const run = spawnSync("node", [join(installed, "dist", "cli.mjs"), "help", "--json"], { encoding: "utf8", cwd: tmpdir() });
+  rmSync(installed, { recursive: true, force: true });
+  ok("every command loads from the installed copy", run.status === 0 && !run.stderr.includes("ERR_MODULE_NOT_FOUND"),
+    `${run.status} ${run.stderr.slice(0, 400)}`);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bundle parity` : `\n  all ${total} passed — bundle parity`);

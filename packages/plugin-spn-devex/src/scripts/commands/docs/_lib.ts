@@ -6,19 +6,34 @@
 // The docs checks and builders themselves — every constant, reading helper and `check*` function the
 // `docs` group's actions call. A name starting with `_` is a shared-helper convention `cli.ts`
 // already skips when it discovers actions, so this file is never itself dispatched; `audit.ts`,
-// `face.ts`, `page.ts`, `status.ts`, `topics.ts` and `coverage.ts` each import what they need from
+// `face.ts`, `page.ts`, `status.ts`, `topics.ts` and `parity.ts` each import what they need from
 // here, and `figure.ts` imports `walkFiles` for its own `figures check|colour` wiring.
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
+import { STATUSES } from "../../checks/arc-status.ts";
+import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
+import { withOffset } from "../../lib/clock.ts";
+import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
+  artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
+  docsRootOf, isApproachPage, isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
+  workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
+  stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 export type Grade = "RULE" | "SOFT";
-export type Finding = { check: string; grade: Grade; file: string; message: string };
+/**
+ * One finding. `file` is the file it is printed against. `about` is set where the finding compares
+ * several files, and holds each of them, so a run narrowed to any one of them still reports it.
+ */
+export type Finding = { check: string; grade: Grade; file: string; message: string; about?: string[] };
 
 // THE SET IS OWNED BY `SPDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
 // links the two, so a value added there and not here is silently refused, and one added here and
@@ -40,16 +55,30 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 // stated in `03-tree.md` § *A capability is realized by halves*. A new check ships SOFT, so the
 // files are brought to the shape by the pass that rewrites them rather than refused by a gate that
 // arrived first. FACE, ROUTE_MAP and REGISTER still have none, for the reason above.
+//
+// A PREVIEW is a page a workstream shows the developer before the work is built. It sits in
+// `notes/N<nnn>/previews/`, its file name ends `-preview.html`, and it is written from
+// `workstream/approach-preview-template.html`. It carries no fixed outline.
+/**
+ * The kinds a document's block may declare. `guide` and `index` are the two produced pages beside
+ * a construct page (05-artifacts.md § The guide page, § The index of artifacts).
+ */
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
-                  "face", "data_model", "surface_map", "route_map", "register"] as const;
+                  "face", "data_model", "surface_map", "route_map", "register", "preview",
+                  "guide", "index"] as const;
 export type Variant = (typeof VARIANTS)[number];
+
+/** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RD.DEVEX.WORKSPACE.266). */
+export const PREVIEW_STATES: readonly string[] = STATUSES;
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
 export const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
   ARCHITECT: "Architect", SERVER_DEV: "Backend developer", WEB_DEV: "Web developer",
   QA: "Quality engineer", INFRA: "DevOps / SRE", TRUST: "DevSecOps / Security",
-  PARTNER: "Partner / integrator", VOICE: "Editor",
+  PARTNER: "Partner / integrator", VOICE: "Editor", UX: "UX designer",
+  STRATEGY: "Chief executive", UI: "UI designer", MARKETING: "Product marketer", SALES: "Sales lead",
+  GROWTH: "Growth lead", SUPPORT: "Customer success lead", FINANCE: "Finance lead", DATA: "Data lead", AI: "AI lead",
 };
 
 export const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLEMENTING: "IMPLEMENTING", DONE: "DONE" };
@@ -60,10 +89,10 @@ export const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLE
  * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it.
  *
  * `order` IS THE ONLY PLACE THE SEQUENCE IS WRITTEN, and `optional` names which of those sections a
- * page may leave out. Required is derived from the two. The pair used to be `required` and
- * `optional` as separate lists, which meant the order of an optional section was declared nowhere —
- * the order check read every optional name as coming first, so a page carrying `Binds` last was
- * judged out of order by an outline that had no opinion about where `Binds` went.
+ * page may leave out. Required is derived from the two. Two separate lists, `required` and
+ * `optional`, would declare the order of an optional section nowhere: the order check would read
+ * every optional name as coming first, and judge a page carrying `Binds` last out of order by an
+ * outline that has no opinion about where `Binds` goes.
  */
 export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: string[] }>> = {
   construct: {
@@ -201,6 +230,23 @@ export function sections(file: string, src: string, tag: "h1" | "h2" | "h3"): st
 
 // ---------------------------------------------------------------------------- the checks
 
+/**
+ * A moment as a report stamps it: a date, a time and the offset, such as `2026-09-30T12:57+05:30`.
+ * A date alone cannot order two reports of one day, and a time with no offset is read differently
+ * by the UTC database and a developer's machine.
+ */
+export function isMoment(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$/.test(value)) return false;
+  return !Number.isNaN(new Date(value).getTime());
+}
+
+/** Whether a file sits directly in a docs tree's artifacts pocket, in no folder of it. */
+export function directlyInPocket(file: string): boolean {
+  const parts = file.replace(/\\/g, "/").split("/");
+  return parts.length >= 3 && parts.at(-3) === DOCS && parts.at(-2) === POCKET.artifacts;
+}
+
 export function checkBlock(file: string, src: string, block: any, err: string | null): Finding[] {
   const f: Finding[] = [];
   const add = (grade: Grade, message: string) => f.push({ check: "block", grade, file, message });
@@ -209,31 +255,46 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   for (const key of ["id", "title", "summary"]) {
     if (typeof block[key] !== "string" || !block[key].trim()) add("RULE", `\`${key}\` is missing or empty`);
   }
-  if (!Array.isArray(block.lenses) || block.lenses.length === 0) add("RULE", "`lenses` is missing or empty");
+  const variant: Variant | undefined = block.variant;
+  // THE INDEX NAMES NO READER. It is a frame around the other pages, and each page it opens carries
+  // its own lenses, so `lenses` is asked of every kind but the index.
+  if (variant === "index" && block.lenses === undefined) { /* an index has no lenses */ }
+  else if (!Array.isArray(block.lenses) || block.lenses.length === 0) add("RULE", "`lenses` is missing or empty");
   else for (const l of block.lenses) if (!(l in LENS_LABEL)) add("RULE", `\`${l}\` is not a lens`);
 
-  const variant: Variant | undefined = block.variant;
   if (variant && !VARIANTS.includes(variant)) add("RULE", `\`variant\` \`${variant}\` is not one of ${VARIANTS.join(" · ")}`);
 
   // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-artifacts.md § What the pocket holds).
-  // The pocket's folder set is fixed — overviews, constructs, reports, resources — so `approaches/`
-  // was never a legal folder, and the rule held only as long as somebody remembered it. Fifteen
-  // pages had accumulated before this fired. A repository states what is true now; an approach page
-  // weighs options and carries open cards, and a pocket holding both is how a stale argument comes
-  // to be read as a statement of today.
+  // A repository states what is true now; an approach page weighs options and carries open cards,
+  // and a docs tree holding both is how a stale argument comes to be read as a statement of today.
+  // Fifteen pages had accumulated in repositories before this fired.
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
-    add("RULE", "an approach page belongs to the workstream that argues it, never to a repository's `docs/` — move it under `.spndevex/workstreams/`");
+    add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
-  // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE. A `resources/`
-  // folder held "what a document was written from" — and every such file is a file some seat needs,
-  // so each one was a seat depending on a pocket, which is the one thing the pocket rule forbids.
-  // 229 files had collected across five repositories, 187 cited by nothing at all. A fact a seat
-  // needs lives in a seat.
-  if (/\/artifacts\/resources\//.test(file.replace(/\\/g, "/")))
-    add("RULE", "the pocket holds `overviews/`, `constructs/` and `reports/` — a fact a seat needs lives in a seat, never in `resources/`");
+  // THE POCKET'S FOLDER SET IS FIXED: DOCS, GUIDES, REPORTS AND NOTHING ELSE (05-artifacts.md § What
+  // the pocket holds). A file in any other folder of the pocket is a file some seat needs, and a fact
+  // a seat needs lives in a seat. An overview or a construct page out of its place is told its place.
+  const pocketFolder = artifactFolderOf(file);
+  const belongs = pagePlaceOf(file);
+  const pocketSet = ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1");
+  if (pocketFolder !== null && !ARTIFACT_FOLDERS.includes(pocketFolder))
+    add("RULE", belongs === null
+      ? `the pocket holds ${pocketSet} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``
+      : `the pocket holds ${pocketSet}, and no \`${pocketFolder}/\` — this page belongs at ${belongs}`);
+  else if (belongs !== null)
+    add("RULE", `this page is out of its place in \`${pocketFolder}/\` — it belongs at ${belongs}`);
 
-  // An overview describes, and a FOUNDATION construct states a standard; neither carries a status.
-  // Every other page kind carries one. `carriesStatus` states why, in one place.
+  // BESIDE ITS FOLDERS THE POCKET HOLDS ITS FACE AND ONE PAGE, THE INDEX. Every other page sits in
+  // the folder of its kind, and the index sits nowhere but directly in the pocket.
+  const direct = directlyInPocket(file);
+  if (direct && ![FACE, ARTIFACT_INDEX].includes(basename(file)))
+    add("RULE", `\`${ARTIFACT_INDEX}\` is the one page that sits directly in the pocket — this file belongs in ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " or $1")}`);
+  if (variant === "index" && !(direct && basename(file) === ARTIFACT_INDEX))
+    add("RULE", `a repository has one index, and it is \`${DOCS}/${POCKET.artifacts}/${ARTIFACT_INDEX}\` — \`docs index\` writes it there`);
+
+  // An overview describes, a FOUNDATION construct states a standard, and a report is a snapshot;
+  // none of the three carries a status. Every other page kind carries one. `carriesStatus` states
+  // why, in one place, and the report's own keys are checked below.
   //
   // A FOUNDATION CONSTRUCT STILL CARRYING THE WORD IS `docs.ts status`'s FINDING, NOT THIS ONE. That
   // command derives the status and strips it where nothing is derived, so it both reports the fault
@@ -244,6 +305,25 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
     if ("status" in block) add("RULE", "an overview carries no `status` — a face is either current or a defect");
   } else if (carriesStatus(file, block) && !(block.status in STATUS_WORD)) {
     add("RULE", "`status` must be PLANNING · IMPLEMENTING · DONE");
+  }
+
+  // A REPORT CARRIES NO STATUS AND SAYS WHEN IT WAS GENERATED (02-document.md § Metadata,
+  // RD.DEVEX.WORKSPACE.192). `generatedAt` is what lets the next report supersede this one. Only a
+  // tests report adds `measuredAt`, because only its runs can be older than the page. Where no row
+  // cites a run there is no such moment, so the block leaves the key out; `null` is refused.
+  if (variant === "report") {
+    if ("status" in block)
+      add("RULE", "a report carries no `status` — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+    if (!isMoment(block.generatedAt))
+      add("RULE", "a report carries `generatedAt`, the moment the page was generated, as a date and a time with its offset — `2026-09-30T12:57+05:30`");
+    if ("measuredAt" in block) {
+      if (block.reportType !== "TESTS")
+        add("RULE", "only a `tests` report carries `measuredAt` — every other report is generated in the moment it measures, and `generatedAt` says when");
+      else if (block.measuredAt === null)
+        add("RULE", "`measuredAt` is written only where a run is stamped — where no row cites a run, leave the key out of the block and say in Measured that no run is stamped");
+      else if (!isMoment(block.measuredAt))
+        add("RULE", "`measuredAt` is the newest run the tests report read, as a date and a time with its offset — `2026-09-30T12:44+05:30`");
+    }
   }
 
   if (variant === "construct") {
@@ -358,7 +438,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
   const kind = variant ?? want;
   if (!kind) return f;
 
-  const rel = file.replace(/\\/g, "/").split("/04-capabilities/")[1];
+  const rel = splitAtSeat(file, "capabilities")?.rel;
   if (kind === "data_model" && rel !== undefined && rel.split("/").length < 3)
     add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DEVEX.WORKSPACE.134)");
 
@@ -388,7 +468,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
  * THE CHECK THIS ARC WAS OPENED FOR: A GENERATED COLUMN IS READ AGAINST ITS OWN HEADING (N37 step 7).
  *
  * *Where it is stored* carried an environment variable on 64 rows and a status marker on 12, and
- * named a table on none of 252. `audit`, `face --check`, `topics` and `coverage` were all green over
+ * named a table on none of 252. `audit`, `face --check`, `topics` and `parity` were all green over
  * it, because each asked whether a document was well-formed and none asked whether a column meant
  * what its heading said. So every heading a generator writes has a reading of its values here, and
  * **a heading with no reading is itself a finding** — a column cannot ship without somebody saying
@@ -407,7 +487,7 @@ export const COLUMN_READING: Record<string, { says: string; ok: (cell: string) =
     says: "the term as the system spells it — at least one code span, or `—`",
     ok: (c) => c === "—" || (/`[^`]+`/.test(c) && !/^[✅🚧🔮]/u.test(c)),
   },
-  "What it means": { says: "a meaning in words", ok: (c) => /[a-z]{3}/i.test(c) && !/^[✅🚧🔮]/u.test(c) },
+  "Description": { says: "a meaning in words", ok: (c) => /[a-z]{3}/i.test(c) && !/^[✅🚧🔮]/u.test(c) },
   "Chapter": { says: "a link to the chapter", ok: (c) => LINK.test(c) || c === "—" },
   "File": { says: "a link to the mirror", ok: (c) => LINK.test(c) || c === "—" },
   "Realizes": { says: "a construct id in a code span", ok: (c) => /^`[^`\s]+`$/.test(c) || c === "—" },
@@ -489,10 +569,12 @@ export function tagLine(file: string, block: any): string {
  * that lives in every document rather than between markers in a few, which is why it carries no
  * markers: the whole line is the generated region.
  */
-export function writeTagLines(tree: string, write: boolean): { touched: string[]; findings: Finding[] } {
+export function writeTagLines(tree: string, write: boolean, paths: readonly string[] = [tree]): { touched: string[]; findings: Finding[] } {
   const findings: Finding[] = [];
   const touched: string[] = [];
   for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
+    // A tag line is rendered from its own file's block, so a run narrowed to a path reads the files under it alone.
+    if (!under(file, paths)) continue;
     const before = readFileSync(file, "utf8");
     const { block } = readBlock(before);
     if (!block || !block.lenses?.length) continue;
@@ -578,13 +660,22 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // reports every markdown document in the corpus as malformed, which is what it was doing.
   if (!file.endsWith(".html")) return checkSeatHeader(file, src, block);
 
+  // THE INDEX HAS NO HEADER LINE AND NO MASTHEAD (05-artifacts.md § The index of artifacts). It is a
+  // frame around other pages, and each page it opens carries its own, so nothing here is asked of it.
+  if (block.variant === "index") return f;
+
   const head = src.match(/<header[\s\S]*?<\/header>/);
   if (!head) { add("RULE", "no `<header>` — every page opens with the two-line header"); return f; }
   const h = head[0];
 
-  const line1 = h.match(/class="line1"[^>]*>([\s\S]*?)<\/span>/);
-  if (!line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
-  else {
+  // A HEADER'S FIELDS ARE FOUND BY THE SHARED STYLESHEET'S CLASS NAMES, and by no other. A page that
+  // links no shared stylesheet holds the names of its own copy, so only what its header says with
+  // no class is read: its `<h1>`, its file name and the word before its lenses.
+  const shared = !holdsOwnCopy(file, src);
+
+  const line1 = h.match(/class="sds-line1"[^>]*>([\s\S]*?)<\/span>/);
+  if (shared && !line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
+  else if (shared && line1) {
     const parts = text(line1[1]).split("|").map((p) => p.trim()).filter(Boolean);
     if (parts.length !== 3) add("RULE", `the identity line carries ${parts.length} fields, not three`);
     else if (parts[2] !== text(block.title)) add("RULE", `the header title \`${parts[2]}\` is not the block's \`${block.title}\``);
@@ -601,26 +692,55 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     add("RULE", `the \`<h1>\` \`${h1[0]}\` is not the block's \`${block.title}\``);
 
   // Type equals the block's variant, and the file name's suffix.
-  const typeBadge = h.match(/class="badge type"[^>]*>([\s\S]*?)<\/span>/);
+  const typeBadge = h.match(/class="sds-badge sds-type"[^>]*>([\s\S]*?)<\/span>/);
   if (block.variant) {
     const want = block.variant.charAt(0).toUpperCase() + block.variant.slice(1);
-    if (!typeBadge) add("RULE", "no Type chip");
-    else if (text(typeBadge[1]) !== want) add("RULE", `Type reads \`${text(typeBadge[1])}\`; the block's variant is \`${block.variant}\``);
+    if (shared && !typeBadge) add("RULE", "no Type chip");
+    else if (shared && typeBadge && text(typeBadge[1]) !== want) add("RULE", `Type reads \`${text(typeBadge[1])}\`; the block's variant is \`${block.variant}\``);
     const suffix = basename(file).replace(/\.html$/, "").split("-").pop();
     if (suffix !== block.variant && !basename(file).includes(`-${block.variant}.`))
       add("SOFT", `the file name does not end \`-${block.variant}.html\``);
   }
 
   // For: the lenses, rendered as labels, in the block's order. Never who wrote the page.
-  const chips = [...h.matchAll(/class="badge lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
+  // A preview's header names its arc and its Shown date where every other page names its readers,
+  // so its template carries no For chips and none are compared.
+  const chips = [...h.matchAll(/class="sds-badge sds-lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
   const wantChips = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
-  if (chips.join(" · ") !== wantChips.join(" · "))
+  if (shared && block.variant !== "preview" && chips.join(" · ") !== wantChips.join(" · "))
     add("RULE", `For reads \`${chips.join(" · ")}\`; the block's lenses render as \`${wantChips.join(" · ")}\``);
   if (/\bLenses:/.test(h)) add("RULE", "the tag line reads `For:`, never `Lenses:`");
+  if (!shared) return f;
 
   // Status: the chip carries the enum word; a face and a FOUNDATION construct have no chip at all.
-  const statusChip = h.match(/class="badge status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
-  if (!carriesStatus(file, block)) {
+  const statusChip = h.match(/class="sds-badge sds-status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
+  if (block.variant === "report") {
+    // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-artifacts.md § The header,
+    // RD.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
+    // removed, because the template explains the lines inside the header itself.
+    const shown = h.replace(/<!--[\s\S]*?-->/g, " ");
+    if (statusChip || /\bStatus:/.test(shown))
+      add("RULE", "a report shows no status chip — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+    const time = shown.match(/<time\b([^>]*)>/);
+    const datetime = time ? /\bdatetime="([^"]*)"/.exec(time[1])?.[1] : undefined;
+    if (!/>\s*Generated:\s*</.test(shown) || datetime === undefined)
+      add("RULE", "no Generated line — `Generated:` and a `<time class=\"sds-local\" datetime=\"…\">` holding the block's `generatedAt`");
+    else {
+      if (datetime !== block.generatedAt)
+        add("RULE", `Generated reads \`${datetime}\`; the block's \`generatedAt\` is \`${block.generatedAt}\``);
+      if (!/\bclass="(?:[^"]*\s)?sds-local(?:\s[^"]*)?"/.test(time![1]))
+        add("RULE", "the Generated `<time>` carries `class=\"sds-local\"` — the shared script renders only that element in the reader's own time zone");
+    }
+    if (!/>\s*Commit:\s*</.test(shown))
+      add("RULE", "no Commit — a report names the commit it read, beside Generated");
+  } else if (block.variant === "preview") {
+    // A PREVIEW'S CHIP IS THE ARC'S STATUS, never the block's `status` (RD.DEVEX.WORKSPACE.266). The
+    // block's word says how far the workstream's page has come; the chip reads `PROPOSED` until the
+    // developer decides the design and the arc's own status after, so the two are not compared.
+    if (!statusChip) add("RULE", `no Status chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
+    else if (!PREVIEW_STATES.includes(text(statusChip[1])))
+      add("RULE", `the Status chip reads \`${text(statusChip[1])}\`; a preview shows ${PREVIEW_STATES.join(" · ")}`);
+  } else if (!carriesStatus(file, block)) {
     if (statusChip && (block.variant === "overview" || !("status" in block)))
       add("RULE", block.variant === "overview" ? "an overview shows no status chip"
         : "a status chip is here and the block declares no status — produce the page again from its seat file");
@@ -629,13 +749,23 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   } else if (!text(statusChip[1]).includes(STATUS_WORD[block.status])) {
     add("RULE", `the status chip reads \`${text(statusChip[1])}\`; the block says \`${block.status}\``);
   }
+
+  // The masthead's three levels, from the one check the doc-check hook runs too, so the page an
+  // author saves and the page `docs audit` reads are judged by the same rule. The kind is the
+  // block's variant; a hub is the overview named `concept-overview.html`.
+  const kind: MastheadKind | null = basename(file) === HUB ? "hub"
+    : ["overview", "construct", "report", "approach", "preview"].includes(block.variant) ? block.variant : null;
+  for (const [grade, message] of masthead(file, src, kind))
+    f.push({ check: "masthead", grade: grade as Grade, file, message });
   return f;
 }
 
 export function checkCards(file: string, src: string, block: any): Finding[] {
   const f: Finding[] = [];
+  // A card is found by its class, and a page that links no shared stylesheet holds other names.
+  if (holdsOwnCopy(file, src)) return f;
   const variant = block?.variant;
-  const opens = [...src.matchAll(/<div class="open">/g)];
+  const opens = [...src.matchAll(/<div class="sds-open">/g)];
 
   // A construct and an overview carry no cards at all — the status word says how settled it is.
   if (opens.length && (variant === "construct" || variant === "overview"))
@@ -643,13 +773,13 @@ export function checkCards(file: string, src: string, block: any): Finding[] {
 
   // A card never contains another. Whole-file tag balance cannot see this (finding F6).
   let depth = 0, nested = 0;
-  for (const m of src.matchAll(/<div class="open">|<div\b|<\/div>/g)) {
+  for (const m of src.matchAll(/<div class="sds-open">|<div\b|<\/div>/g)) {
     const t = m[0];
-    if (t === '<div class="open">') { if (depth > 0) nested++; depth++; }
+    if (t === '<div class="sds-open">') { if (depth > 0) nested++; depth++; }
     else if (t.startsWith("<div")) { if (depth > 0) depth++; }
     else if (depth > 0) depth--;
   }
-  if (nested) f.push({ check: "cards", grade: "RULE", file, message: `${nested} card${nested > 1 ? "s are" : " is"} nested inside another; a \`.open\` div was left unclosed` });
+  if (nested) f.push({ check: "cards", grade: "RULE", file, message: `${nested} card${nested > 1 ? "s are" : " is"} nested inside another; a \`.sds-open\` div was left unclosed` });
 
   // An answered card does not sit in `Open` — the page is the record, not the arc (finding F5).
   //
@@ -721,17 +851,62 @@ export function folderTree(dir: string): string[] {
 }
 
 /**
- * A figure that names a DIRECTORY draws that directory's folders, and the audit compares them.
- *
- * This is the same promise the pathed-file figure makes, and the reason it was widened is a page
- * that said *that is what makes the shape checkable on sight* while drawing one skeleton of ten and
- * describing the other nine in a paragraph. A described folder set is a second source: it was wrong
- * about a `SUPPORT_WEB` package the day it was measured, and nothing could have caught it.
- *
- * BOTH DIRECTIONS, because one direction is the weaker half of the promise. A folder drawn that
- * does not exist misleads a reader following the page; a folder that exists and is not drawn is how
- * the page silently falls behind the code it describes. Only the second one happens by itself.
+ * Whether a file is an html page that links no shared stylesheet. Such a page holds its own copy of
+ * the styles and the class names that copy used, so no check reads a class of it. A bundled copy,
+ * `<page>.bundled.html`, is not such a page: it holds the shared styles and the shared names.
  */
+export function holdsOwnCopy(file: string, src: string): boolean {
+  return file.endsWith(".html") && !file.endsWith(BUNDLED_SUFFIX) && !linksSharedStyles(src);
+}
+
+/**
+ * Whether a page sits under a workstream's `closed/` folder. A closed argument stays as it is
+ * rendered, so its styles are never checked (05-artifacts.md § The page itself).
+ */
+export function inClosedWorkstream(file: string): boolean {
+  return file.replace(/\\/g, "/").includes(`/${DEVEX_WORKSTREAMS}/closed/`);
+}
+
+/**
+ * The folder that lists each version of the shared styles in its `versions.json`. `SPN_STYLES`
+ * names it; without that it is the plugin's own `styles/` folder. Null where neither is found.
+ */
+export function stylesFolder(): string | null {
+  return process.env.SPN_STYLES ?? stylesDir(fileURLToPath(import.meta.url));
+}
+
+/** The version named by each `<link>` and `<script>` of a page that loads one of the served files. */
+const SERVED_VERSION = new RegExp(
+  `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`, "gi");
+
+/**
+ * A page's furniture is the shared stylesheet's and the shared script's (05-artifacts.md § The page
+ * itself, RD.DEVEX.WORKSPACE.214).
+ *
+ * A PAGE THAT LINKS THE SHARED STYLESHEET IS HELD TO ONE THING: each version its two lines name is
+ * a version that exists. `versions.json` lists them. A line that loads from a folder beside the
+ * page names no version, so there is nothing to compare. A `<style>` block of the page's own draws
+ * no finding, because a page may add a style for a case the shared classes do not cover. A
+ * `<script type="application/json">` draws none either, because data is not furniture.
+ *
+ * A PAGE THAT LINKS NO SHARED STYLESHEET IS NAMED ONCE, AS A RULE, with the text every command uses
+ * for it. Nothing else is said about its styles, its class names or how it is produced.
+ */
+export function checkFurniture(file: string, src: string): Finding[] {
+  if (!file.endsWith(".html") || inClosedWorkstream(file)) return [];
+  if (!linksSharedStyles(src)) return [{ check: "styles", grade: "RULE", file, message: OWN_COPY }];
+  const named = [...new Set([...src.matchAll(SERVED_VERSION)].map((found) => found[1]))];
+  const styles = stylesFolder();
+  if (!named.length || styles === null) return [];
+  const versions = Object.keys(cutVersions(styles));
+  const absent = named.filter((version) => !versions.includes(version));
+  if (!absent.length) return [];
+  return [{ check: "furniture", grade: "RULE", file, message:
+    `this page links version ${absent.map((version) => "`" + version + "`").join(" · ")} of the shared styles, and no such version exists. ` +
+    `The versions that exist: ${versions.map((version) => "`" + version + "`").join(" · ") || "none"}. ` +
+    "Link one of them, or cut the version with `docs sds cut` (05-artifacts.md, One stylesheet, served in versions)" }];
+}
+
 /**
  * A page's stylesheet closes every brace it opens.
  *
@@ -743,206 +918,8 @@ export function folderTree(dir: string): string[] {
  *
  * Comments are removed first, because a brace inside one is text rather than structure.
  */
-/**
- * A page carries the furniture its template carries.
- *
- * A PRODUCED PAGE IS COMPARED TO ITS SEAT AND A HAND-WRITTEN ONE TO NOTHING. `checkProduced` takes
- * the stylesheet and the scripts from `construct-template.html` and refuses any difference — but an
- * overview, a hub, an approach page and every sample is authored by hand, so each one carries
- * whichever furniture was current on the day somebody wrote it.
- *
- * Four drifts were found in a single sitting, every one by looking at a page in a browser: a rail
- * that would not fold, a chevron drawn twice, a number beside every rail entry, and headings with
- * no copy-link. One cohort of pages, one generation behind, and nothing that could say so.
- *
- * The scripts are what is compared, because they are the behaviour: the rail builder, the fold, and
- * the anchor that makes a heading shareable. Whitespace is normalized, because a re-indent is not a
- * change in what the page does.
- *
- * THE PALETTE IS COMPARED BY TOKEN NAME AND NEVER BY COLOUR. Fourteen pages defined the seven
- * code-colour tokens in their light block and in neither dark one, so every code figure on them
- * kept light-mode syntax colours on a near-black ground; four guarded the system-dark block with a
- * bare `:root`, which a reader who had explicitly chosen light could not override. A missing token
- * is not a choice — it falls back to whatever the light block said. A DIFFERENT VALUE IS a choice,
- * because the palette is the one part of the furniture a repository is allowed to set for itself.
- */
-export function checkFurniture(file: string, src: string, templates: string): Finding[] {
-  if (!src.includes('id="rail"')) return [];
-  const flatten = (t: string): string[] =>
-    (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).map((x) => x.replace(/\s+/g, " ").trim()).sort();
-  let want: string[];
-  try { want = flatten(readFileSync(join(templates, "pages", "construct-template.html"), "utf8")); }
-  catch { return []; }
-  if (!want.length) return [];
-  const have = flatten(src);
-  if (have.length === want.length && have.every((h, i) => h === want[i])) return [];
-  const missing = want.filter((w) => !have.includes(w)).length;
-  const extra = have.filter((h) => !want.includes(h)).length;
-  return [{ check: "furniture", grade: "RULE", file, message:
-    `this page's scripts are not the template's — ${missing} missing, ${extra} it does not share. ` +
-    "A page carrying a rail carries the rail builder, the fold and the heading anchor as the template ships them" }];
-}
-
-/** The three palette blocks, in the order a browser resolves them. */
-export const PALETTES: ReadonlyArray<readonly [string, string]> = [
-  [":root", "the light palette"],
-  [':root:not([data-theme="light"])', "the palette a dark system gets"],
-  [':root[data-theme="dark"]', "the palette an explicit dark choice gets"],
-];
-
-/**
- * Every `--token:` declared in the rule with this exact selector, or null when there is no such rule.
- *
- * THE EARLIER OF THE TWO SPELLINGS WINS, never the braced one by preference. Trying `:root{` before
- * `:root {` made the check read a *later* block as the light palette on a page whose dark rule had
- * lost its `:not([data-theme="light"])` guard — and it then reported nine light tokens missing,
- * which was the tool matching the wrong rule rather than the page lacking anything.
- */
-export function paletteTokens(src: string, selector: string): Set<string> | null {
-  const tight = src.indexOf(selector + "{");
-  const loose = src.indexOf(selector + " {");
-  const at = tight < 0 ? loose : loose < 0 ? tight : Math.min(tight, loose);
-  if (at < 0) return null;
-  const open = src.indexOf("{", at);
-  const close = src.indexOf("}", open);
-  if (open < 0 || close < 0) return null;
-  return new Set([...src.slice(open + 1, close).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
-}
-
-/**
- * A page's palette declares every token the template declares, in all three of its blocks.
- *
- * Separate from `checkFurniture` because the remedy is different. A stale script is replaced with
- * the template's; a short palette is filled with the tokens it lacks, and the colours the page
- * already sets are left exactly as they are.
- */
-export function checkPalette(file: string, src: string, templates: string): Finding[] {
-  if (!src.includes('id="rail"')) return [];
-  let tpl: string;
-  try { tpl = readFileSync(join(templates, "pages", "construct-template.html"), "utf8"); }
-  catch { return []; }
-  const f: Finding[] = [];
-  for (const [selector, plain] of PALETTES) {
-    const want = paletteTokens(tpl, selector);
-    if (!want?.size) continue;
-    const have = paletteTokens(src, selector);
-    if (have === null) {
-      f.push({ check: "palette", grade: "RULE", file, message:
-        `there is no \`${selector}\` rule, so ${plain} is missing entirely. ` +
-        "Without it a reader's explicit theme choice loses to whatever their system is set to" });
-      continue;
-    }
-    const short = [...want].filter((t) => !have.has(t));
-    if (!short.length) continue;
-    f.push({ check: "palette", grade: "RULE", file, message:
-      `${plain} declares ${short.length} token(s) fewer than the template — ${short.join(", ")}. ` +
-      "A token the page does not set falls back to the light value, which on a dark ground is unreadable. " +
-      "Add the names; the colours a page already sets are its own" });
-  }
-  return f;
-}
-
-/**
- * The template an authored page declares, or null where the page is produced or declares none.
- *
- * THE VARIANT NAMES THE TEMPLATE, AND A HUB IS THE ONE OVERVIEW NAMED FOR NO DOMAIN. Both the hub and
- * a domain overview declare `overview`; `hub-template.html` ships the id `concept-overview`, so the
- * page a repository writes from it is `concept-overview.html` and every other overview came from
- * `overview-template.html`. A construct page is produced, and `checkProduced` compares it whole.
- */
-export function declaredTemplate(file: string, block: any, templates: string): string | null {
-  if (!file.endsWith(".html")) return null;
-  const variant = block?.variant;
-  if (variant === "overview")
-    return join(templates, "pages", basename(file) === "concept-overview.html" ? "hub-template.html" : "overview-template.html");
-  if (variant === "report") return join(templates, "pages", "report-template.html");
-  if (variant === "approach") return join(templates, "workstream", "approach-template.html");
-  return null;
-}
-
-/**
- * Every selector a page's stylesheets declare, in the order they first appear.
- *
- * EVERY `<style>` BLOCK, NEVER THE FIRST. Every template ships several, and the measurement this
- * replaces once read only the first: it reported the template's own `.prose` and `.nextnav` as
- * bespoke on forty pages, which was the extractor being measured rather than the corpus.
- *
- * A selector list splits at its top-level commas; whitespace and the spacing around a combinator
- * are normalized, because `.a > .b` and `.a>.b` are one selector. A grouping at-rule — `@media`,
- * `@supports` — is read through, since a rule inside one is still a rule the page declares. The
- * body of `@keyframes` is skipped: `from` and `50%` are not selectors.
- */
-export function selectorsIn(src: string): string[] {
-  const seen = new Set<string>();
-  const splitTop = (prelude: string): string[] => {
-    const parts: string[] = [];
-    let depth = 0, current = "";
-    for (const ch of prelude) {
-      if (ch === "(" || ch === "[") depth += 1;
-      if (ch === ")" || ch === "]") depth -= 1;
-      if (ch === "," && depth === 0) { parts.push(current); current = ""; }
-      else current += ch;
-    }
-    parts.push(current);
-    return parts;
-  };
-  const walk = (css: string): void => {
-    let at = 0;
-    while (at < css.length) {
-      const open = css.indexOf("{", at);
-      if (open < 0) return;
-      const prelude = css.slice(at, open).replace(/[;}]/g, " ").trim();
-      let depth = 1, close = open + 1;
-      while (close < css.length && depth) {
-        if (css[close] === "{") depth += 1;
-        else if (css[close] === "}") depth -= 1;
-        close += 1;
-      }
-      const body = css.slice(open + 1, close - 1);
-      if (prelude.startsWith("@")) {
-        if (/^@(media|supports|layer|container)\b/.test(prelude)) walk(body);
-      } else {
-        for (const part of splitTop(prelude)) {
-          const selector = part.replace(/\s+/g, " ").replace(/\s*([>+~])\s*/g, "$1").trim();
-          if (selector) seen.add(selector);
-        }
-      }
-      at = close;
-    }
-  };
-  for (const m of src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)) walk(m[1].replace(/\/\*[\s\S]*?\*\//g, ""));
-  return [...seen];
-}
-
-/**
- * An authored page defines no selector the template it declares does not (N25 step 6).
- *
- * THE FIGURE WAS MEASURED BY HAND THREE TIMES AND GAVE THREE NUMBERS — 71, 79, 49 — because each
- * measure was a new extractor, and one of them read only a page's first stylesheet. A number nobody
- * can reproduce cannot close a step, so the reader is this check and the figure is its count.
- *
- * AGAINST THE TEMPLATE THE PAGE DECLARES, not the construct template for every page. The hub
- * template blesses `.tile .glyph` and the approach template its `.card` set; measuring a hub
- * against the construct template reports as bespoke a rule its own template ships.
- *
- * SOFT, because the check is new and the pages it names move to the standard blocks one by one.
- * Only the direction a page ADDS is read: a template rule the page lacks is `checkFurniture`'s.
- */
-export function checkSelectors(file: string, src: string, block: any, templates: string): Finding[] {
-  const template = declaredTemplate(file, block, templates);
-  if (!template) return [];
-  let declared: Set<string>;
-  try { declared = new Set(selectorsIn(readFileSync(template, "utf8"))); }
-  catch { return []; }
-  if (!declared.size) return [];
-  const bespoke = selectorsIn(src).filter((s) => !declared.has(s));
-  if (!bespoke.length) return [];
-  return [{ check: "selector", grade: "SOFT", file, message:
-    `defines ${bespoke.length} selector(s) \`${basename(template)}\` does not — ${bespoke.map((s) => "`" + s + "`").join(" · ")}. ` +
-    "A page reaches for a standard block rather than styling its own" }];
-}
-
 export function checkStyleBalance(file: string, src: string): Finding[] {
+  if (holdsOwnCopy(file, src)) return [];
   const f: Finding[] = [];
   const blocks = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)];
   blocks.forEach((m, i) => {
@@ -957,6 +934,18 @@ export function checkStyleBalance(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * A figure that names a DIRECTORY draws that directory's folders, and the audit compares them.
+ *
+ * This is the same promise the pathed-file figure makes, and the reason it was widened is a page
+ * that said *that is what makes the shape checkable on sight* while drawing one skeleton of ten and
+ * describing the other nine in a paragraph. A described folder set is a second source: it was wrong
+ * about a `SUPPORT_WEB` package the day it was measured, and nothing could have caught it.
+ *
+ * BOTH DIRECTIONS, because one direction is the weaker half of the promise. A folder drawn that
+ * does not exist misleads a reader following the page; a folder that exists and is not drawn is how
+ * the page silently falls behind the code it describes. Only the second one happens by itself.
+ */
 export function checkTreeFigures(file: string, src: string, root: string): Finding[] {
   const f: Finding[] = [];
   // THE PARAGRAPH BEFORE A TREE NAMES ITS FOLDER, and the path is the LAST `<code>` in it.
@@ -965,7 +954,10 @@ export function checkTreeFigures(file: string, src: string, root: string): Findi
   // including the fixture written to prove it. A real caption names the kind first and the folder
   // last (*the skeleton a `SUPPORT_UNIVERSAL` starts from, in `…/support-universal/`*), so reading
   // the first code span reads the kind and gives up. Taking the last one is what a reader does.
-  for (const m of src.matchAll(/<p>([\s\S]*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
+  //
+  // ONLY THE PARAGRAPH DIRECTLY BEFORE THE TREE IS READ. The caption cannot hold another `<p>`, so a
+  // folder named in an earlier paragraph, or in an earlier section, is never taken as this tree's.
+  for (const m of src.matchAll(/<p>((?:(?!<p[\s>])[\s\S])*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
     const [, caption, body] = m;
     const codes = [...caption.matchAll(/<code>([^<]+)<\/code>/g)].map((c) => c[1]);
     // A CITATION NAMES A FOLDER THAT EXISTS, and it reaches it one of two ways.
@@ -1029,8 +1021,14 @@ export function checkTreeFigures(file: string, src: string, root: string): Findi
 export function checkCodeFigures(file: string, src: string, root: string): Finding[] {
   const f: Finding[] = [];
   // A pathed CODE figure names the file above it. The audit reads that file and compares.
-  for (const m of src.matchAll(/<p>[^<]*<code>([^<]*?\.(?:ts|tsx|json|sql|md|py|sh|yml|yaml))<\/code>[^<]*<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
-    const [, path, body] = m;
+  for (const m of src.matchAll(/<p>[^<]*<code>([^<]*?\.(?:ts|tsx|json|sql|md|py|sh|yml|yaml))<\/code>[^<]*<\/p>\s*<pre([^>]*)>([\s\S]*?)<\/pre>/g)) {
+    const [, path, attributes, body] = m;
+    // A DIFF SHOWS A CHANGE, so it never matches the file its caption names. A page writes one as
+    // `<pre data-lang="diff">`, and such a block is not a figure copied from a file.
+    if (/\bdata-lang="diff"/.test(attributes)) continue;
+    // A STEP'S BLOCK IS A COMMAND TO TYPE. On a guide page the sentence above a command often names the
+    // script the command runs, and the block is never a copy of that script.
+    if (file.endsWith(GUIDE_PAGE_SUFFIX) && /\bdata-lang="(?:bash|sh|shell|zsh)"/.test(attributes)) continue;
     // A PATHED FIGURE NAMES A PATH. A bare file name is a TERM — the book's whole job is to
     // describe `spkind.json`, and refusing the chapter for not containing one gets it exactly
     // backwards: a standard names the file a stack has, and has none of them itself. The rule's
@@ -1083,15 +1081,23 @@ export function worldOf(file: string): string | null {
 /**
  * Whether this document's block carries a `status` at all.
  *
- * TWO KINDS CARRY NONE, and the reason is the same one twice. An overview describes, so a face is
- * either current or a defect. A FOUNDATION repository's construct states a standard, and its
- * behaviour rows are `PROMISE` — five columns, no `Status` and no `Tier` — so there is no run to roll
- * up and no proof state to name. A word written there would be a claim somebody typed once, which is
- * exactly what `05-artifacts.md` § *A construct's status is derived, never typed* forbids.
+ * THREE KINDS CARRY NONE. An overview describes, so a face is either current or a defect. A
+ * FOUNDATION repository's construct states a standard, and its behaviour rows are `PROMISE` — five
+ * columns, no `Status` and no `Tier` — so there is no run to roll up and no proof state to name. A
+ * word written there would be a claim somebody typed once, which is exactly what `05-artifacts.md`
+ * § *A construct's status is derived, never typed* forbids. A report is a snapshot, and the next run
+ * replaces it rather than moving it through states.
  */
 export function carriesStatus(file: string, block: any): boolean {
   if (block?.variant === "overview") return false;
+  // A REPORT IS A SNAPSHOT (RD.DEVEX.WORKSPACE.192). It is true of one moment and the next run
+  // replaces it, so it has no states to move through. A chip on the first coverage page read
+  // IMPLEMENTING, and readers took the page to be unfinished when the repository had gaps.
+  if (block?.variant === "report") return false;
   if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
+  // A GUIDE PAGE AND THE INDEX ARE PRODUCED FROM A SOURCE, and neither has a state of its own
+  // (05-artifacts.md § The guide page). The guide's markdown keeps the status it has.
+  if ((block?.variant === "guide" || block?.variant === "index") && file.endsWith(".html")) return false;
   return true;
 }
 
@@ -1148,7 +1154,7 @@ export function checkProof(file: string, src: string): Finding[] {
     if (!(t.startsWith("|") && t.endsWith("|"))) continue;
     const names = t.slice(1, -1).split("|").map((c) => c.trim().toLowerCase());
     if (names.includes("id") && names.includes("status")) {
-      f.push({ check: "proof", grade: "RULE", file, message: "`Proof` carries a table of behaviour rows. The rows live in `03-behaviors/` — the register the test run writes — and the produced page joins them with the status of the last run (Q131). What is typed here is the checks a reader can run, or nothing" });
+      f.push({ check: "proof", grade: "RULE", file, message: "`Proof` carries a table of behaviour rows. The rows live in \`${SEAT.behaviors}/\` — the register the test run writes — and the produced page joins them with the status of the last run (Q131). What is typed here is the checks a reader can run, or nothing" });
       break;
     }
   }
@@ -1229,7 +1235,7 @@ export function tablesIn(file: string, seg: string): string[][][] {
  * declared name anywhere inside the cell, or the cell anywhere inside a declared name, so
  * `docs/…/10-providers` resolved through `support` and *the estate declaration* through `estate` — loose
  * in the dangerous direction, because a cell that resolves to the wrong node reads as checked. `E`
- * removes the table the cell sits in, and the four set checks in `docs.ts coverage` compare whole paths.
+ * removes the table the cell sits in, and the four set checks in `docs parity` compare whole paths.
  *
  * ONE TABLE OR TWO, BOTH PASS. `E` leaves the rules table alone and takes the realization table out, and
  * the sweep that edits the 122 pages is a separate arc. Demanding two refuses every swept page; so the
@@ -1270,10 +1276,10 @@ export function domainFaceFor(file: string, block: any, workspace: string): stri
   const title = block?.title;
   if (!title) return null;
   let dir = dirname(resolve(file));
-  while (dir !== dirname(dir) && !existsSync(join(dir, "02-constructs"))) dir = dirname(dir);
-  const constructsDir = join(dir, "02-constructs");
-  if (!existsSync(constructsDir)) return null;
-  for (const d of constructFolders(constructsDir).filter((x) => isDomainFolder(constructsDir, x))) {
+  while (dir !== dirname(dir) && !existsSync(constructsDir(dir))) dir = dirname(dir);
+  const seat = constructsDir(dir);
+  if (!existsSync(seat)) return null;
+  for (const d of constructFolders(seat).filter((x) => isDomainFolder(seat, x))) {
     const face = join(d, "README.md");
     if (!existsSync(face)) continue;
     if (readBlock(readFileSync(face, "utf8")).block?.title === title) return d;
@@ -1325,7 +1331,7 @@ export function checkOverviewSource(file: string, src: string, block: any, works
 
   // The source is what parentId names. For a hub that is the repository's CONCEPT.md.
   if (block.parentId !== "concept") return f;
-  const concept = process.env.SPN_DOCS_SOURCE ? resolve(process.env.SPN_DOCS_SOURCE) : findConcept(workspace, file);
+  const concept = findConcept(workspace, file);
   if (!concept) {
     f.push({ check: "overview", grade: "SOFT", file, message: "`parentId` is `concept` and no `CONCEPT.md` was found to compare against" });
     return f;
@@ -1376,9 +1382,12 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
   // file it has nothing to compare: the substitution below is a no-op, so `seat === file`, and it
   // reported the seat as a page missing its own source. Saying nothing is the honest answer — the
   // page does not exist yet, and `docs.ts page` is what creates it.
-  if (!/\/artifacts\/constructs\/.*-construct\.html$/.test(file)) return [];
-  // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
-  const seat = file.replace(/\/artifacts\/constructs\//, "/02-constructs/").replace(/-construct\.html$/, ".md");
+  if (!isProducedPage(file)) return [];
+  // A page that links no shared stylesheet is named once, by the furniture check, and `docs page`
+  // is what moves it. Comparing it here would say the same thing a second time.
+  if (holdsOwnCopy(file, src)) return [];
+  // A domain's folder in the pocket is named as its seat folder, so the pair is found by path alone.
+  const seat = seatOf(file);
   if (seat === file || !existsSync(seat))
     return [{ check: "produced", grade: "SOFT", file, message: "no seat file sits at the mirrored path, so this page cannot be compared with what it would be produced from" }];
   const seatSrc = readFileSync(seat, "utf8");
@@ -1391,8 +1400,8 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
       // THE SAME MARKDOWN `page` RENDERS: the seat without its metadata block, and nothing added.
       // Two halves of one tool disagreeing about what the page IS reads every page as hand-edited.
       markdown: seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""),
-      workspace: process.env.SPN_ORG ?? "SaaS Plane",
-      location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
+      workspace: "SaaS Plane",
+      location: locationOf(seat, workspace),
       furniture: furniture(templates),
       // The same rewriter `page` used, or this check re-renders with seat-relative links and
       // reports every correctly produced page as hand-edited.
@@ -1461,11 +1470,12 @@ export function checkDepends(files: string[], blocks: Map<string, any>): Finding
 export type Declaration = { name: string; members: string[]; file: string };
 
 export const ENUM_BLOCK = /```ts\n([\s\S]*?)```/g;
-// AN ENUM BODY HOLDS NO BRACE, so the body is read as "everything that is not one". Closing at the
-// first line-start `}` instead looked right and was not: a one-line `export enum X { A = 'A' }` has
-// no such brace, so the match ran on into the NEXT enum and reported the neighbour's members as
-// this one's. That produced a confident, precise, wrong finding about a chapter that was correct.
-export const ENUM_HEAD = /export enum ([A-Za-z][A-Za-z0-9_]*)\s*\{([^{}]*)\}/g;
+/**
+ * An enum's name and its body. The body holds no brace of its own, so it ends at its first `}` and a
+ * one-line enum never runs on into the enum after it. A comment inside it may hold a balanced pair,
+ * as `{@link Other}` does, and the body reads through such a pair.
+ */
+export const ENUM_HEAD = /export enum ([A-Za-z][A-Za-z0-9_]*)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g;
 // A member on its own line, or several on one line in a compact declaration.
 export const ENUM_MEMBER = /(?:^|[{,]|\n)\s*([A-Z][A-Z0-9_]*)\s*=/g;
 
@@ -1481,15 +1491,26 @@ export function declarationsIn(file: string, src: string): Declaration[] {
   return found;
 }
 
+/** A name ending in `Type` that source declares as an interface, a type alias or a class. */
+export const SHAPE_HEAD = /export (?:interface|type|(?:abstract )?class) ([A-Z][A-Za-z0-9_]*Type)\b/g;
+
+/** What the workspace's source declares: each enum with its members, and each `…Type` name that is a shape. */
+export type SourceDeclarations = { enums: Map<string, { file: string; members: string[] }>; shapes: Set<string> };
+
 /**
- * Every closed value the workspace's source declares, indexed by name.
+ * Every closed value the workspace's source declares, indexed by name, and every name ending in
+ * `Type` that the source declares as something other than an enum.
  *
  * Built once per run rather than per page. Only `src/` is read: a build output and a dependency
  * hold copies, and a copy disagreeing with its source is a finding about the build rather than
  * about the book.
+ *
+ * A SHAPE IS NOT A CLOSED VALUE. `EntityType` is a row an interface describes, so no chapter owes
+ * it a list of members. A name the source declares both ways is an enum, and stays out of `shapes`.
  */
-export function realizationIndex(workspace: string): Map<string, { file: string; members: string[] }> {
+export function sourceDeclarations(workspace: string): SourceDeclarations {
   const index = new Map<string, { file: string; members: string[] }>();
+  const shaped = new Set<string>();
   const walk = (dir: string, depth: number): void => {
     if (depth > 8) return;
     let entries;
@@ -1502,6 +1523,7 @@ export function realizationIndex(workspace: string): Map<string, { file: string;
       } else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) {
         let body;
         try { body = readFileSync(full, "utf8"); } catch { continue; }
+        if (body.includes("Type")) for (const shape of body.matchAll(SHAPE_HEAD)) shaped.add(shape[1]);
         if (!body.includes("export enum ")) continue;
         for (const decl of body.matchAll(ENUM_HEAD)) {
           const members = [...decl[2].matchAll(ENUM_MEMBER)].map((m) => m[1]);
@@ -1533,7 +1555,12 @@ export function realizationIndex(workspace: string): Map<string, { file: string;
     if (!repo.isDirectory() || repo.name[0] === ".") continue;
     nodesOf(join(workspace, repo.name));
   }
-  return index;
+  return { enums: index, shapes: new Set([...shaped].filter((name) => !index.has(name))) };
+}
+
+/** Every closed value the workspace's source declares, indexed by name. */
+export function realizationIndex(workspace: string): Map<string, { file: string; members: string[] }> {
+  return sourceDeclarations(workspace).enums;
 }
 
 /** Each declaration in this chapter, read against the code that realizes it. */
@@ -1578,7 +1605,14 @@ export function checkVocabulary(
 // exists as `SPDocPassType` is, and the contract had deleted it the day before.
 export const TERMS_CONTRACT = /^\|[^|]*\|\s*`([A-Z][A-Za-z0-9_]*Type)(?:\.[A-Z][A-Za-z0-9_]*)?`\s*\|/gm;
 
-export function checkVocabularyCoverage(files: string[], sources: Map<string, string>): Finding[] {
+/**
+ * The coverage check over a corpus. `shapes` holds the names ending in `Type` that the source
+ * declares as an interface, a type alias or a class: such a term is no closed value, so it is not
+ * reported. A term the source declares nowhere is still reported, because the book may lead the code.
+ */
+export function checkVocabularyCoverage(
+  files: string[], sources: Map<string, string>, shapes: ReadonlySet<string> = new Set<string>()
+): Finding[] {
   const f: Finding[] = [];
   const declaredIn = new Map<string, string[]>();
   for (const file of files) {
@@ -1589,18 +1623,20 @@ export function checkVocabularyCoverage(files: string[], sources: Map<string, st
   // Only where a corpus was given. One page on its own cannot say whether another declares a value.
   if (files.length < 2) return f;
   for (const [name, where] of declaredIn) {
-    if (where.length > 1) f.push({ check: "vocabulary", grade: "SOFT", file: where[0],
+    if (where.length > 1) f.push({ check: "vocabulary", grade: "SOFT", file: where[0], about: where,
       message: `\`${name}\` is declared in ${where.length} chapters — ${where.join(" · ")}; a closed vocabulary is written in one place and cited everywhere else` });
   }
-  const named = new Map<string, string>();
+  // Each term with every file that names it. The finding is printed against the first of them.
+  const named = new Map<string, string[]>();
   for (const file of files) {
     for (const row of (sources.get(file) ?? "").matchAll(TERMS_CONTRACT)) {
-      if (!named.has(row[1])) named.set(row[1], file);
+      const naming = named.get(row[1]) ?? [];
+      if (!naming.includes(file)) named.set(row[1], [...naming, file]);
     }
   }
-  for (const [name, file] of named) {
-    if (declaredIn.has(name)) continue;
-    f.push({ check: "vocabulary", grade: "SOFT", file,
+  for (const [name, naming] of named) {
+    if (declaredIn.has(name) || shapes.has(name)) continue;
+    f.push({ check: "vocabulary", grade: "SOFT", file: naming[0], about: naming,
       message: `\`${name}\` is named as a contract term and no chapter declares its members — a reader cannot write the value from the book` });
   }
   return f;
@@ -1666,7 +1702,7 @@ export function walkFiles(dir: string, keep: (p: string) => boolean, out: string
     // `templates/` is excluded BY THE FOLDER rather than per file (03-tree.md, *A seat may carry
     // `templates/`*). A template's block carries placeholders, it sits in no reading order, and it
     // is never a mirror of anything — so no walk of a seat may pick one up as a document.
-    if (e === "templates") continue;
+    if (e === TEMPLATES) continue;
     const p = join(dir, e);
     let st; try { st = statSync(p); } catch { continue; }
     if (st.isDirectory()) walkFiles(p, keep, out);
@@ -1763,7 +1799,7 @@ export function glossaryRows(domainDir: string): { rows: Array<Row & { group: st
 
 /** The produced page a construct seat becomes, so an HTML page links an HTML page (Q234). */
 export function pageForSeat(seat: string): string {
-  return seat.replace(/\\/g, "/").replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+  return producedPageOf(seat);
 }
 
 /**
@@ -1775,19 +1811,21 @@ export function pageForSeat(seat: string): string {
  */
 export function overviewForDomain(domainDir: string): string | null {
   const dir = resolve(domainDir).replace(/\\/g, "/");
-  const at = dir.lastIndexOf("/02-constructs/");
-  if (at < 0) return null;
+  const split = splitAtSeat(dir, "constructs", "last");
+  if (!split) return null;
   const face = join(dir, "README.md");
   if (!existsSync(face)) return null;
   const title = readBlock(readFileSync(face, "utf8")).block?.title;
   if (!title) return null;
-  const overviews = join(dir.slice(0, at), "artifacts", "overviews");
-  if (!existsSync(overviews)) return null;
-  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
-    const full = join(overviews, f);
-    if (readBlock(readFileSync(full, "utf8")).block?.title === title) return full;
-  }
-  return null;
+  return overviewPages(split.docs).find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title) ?? null;
+}
+
+/**
+ * Every overview of a docs tree, in the order of its path: the hub and each overview beside it, and
+ * the overviews of each domain's folder. A bundled copy ends in another suffix, so it is not one.
+ */
+export function overviewPages(docs: string): string[] {
+  return walkFiles(artifactDocsDir(docs), isOverview).sort();
 }
 
 /** The same glossary, as the domain's overview carries it (Q226 `A`). */
@@ -1795,20 +1833,41 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
   const { rows, findings } = glossaryRows(domainDir);
   const esc = (x: string) => x.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   // `\|` is markdown's way to keep a pipe inside a cell; HTML has no such need, so the pipe is bare.
-  const cell = (x: string) => esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>");
+  // A LINK IN A TERM'S MEANING IS WRITTEN FOR THE SEAT FILE'S OWN FOLDER. The overview sits elsewhere,
+  // so the link is written as an anchor whose address is expressed again from the overview's folder. A
+  // hosted address and a link inside the page are kept as they are.
+  const linked = (text: string, seat: string): string => text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_all, label: string, target: string) => {
+    if (/^(?:[a-z][a-z0-9+.-]*:|#|\/)/i.test(target)) return `<a href="${target}">${label}</a>`;
+    const [path, fragment] = target.split("#");
+    const address = relative(dirname(overviewFile), resolve(dirname(seat), path)).replace(/\\/g, "/");
+    return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
+  });
+  const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);
+  // THREE COLUMNS (05-artifacts.md § The shape of a section, on every page kind): the term, linked to its
+  // construct's page, in bold; the contract's spelling as the seat writes it, in code style, empty where the
+  // seat has a dash, with a note the seat adds after the code under it in small type; and the meaning. A row
+  // with no consumer word is titled by the contract's spelling. A construct's name heads its group as a header
+  // cell spanning the three columns, so it reads as a label and never as one more item.
+  const blank = (x: string) => /^(?:—|–|-)?$/.test(x.trim());
+  const contractOf = (x: string, seat: string): string => {
+    if (blank(x)) return "";
+    const noted = x.match(/^((?:`[^`]+`(?:\s*[·,]\s*)?)+)\s+[—–]\s+([\s\S]+)$/);
+    return noted ? `${cell(noted[1].trim(), seat)}<br><span class="sds-small">${cell(noted[2], seat)}</span>` : cell(x, seat);
+  };
   const out = [
-    '  <div class="scroll"><table class="gloss">',
-    "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
+    '  <div class="sds-scroll"><table class="sds-terms">',
+    "    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>",
     "    <tbody>",
   ];
   let group: string | null = null;
   for (const r of rows) {
-    if (r.group !== group) { out.push(`      <tr class="grp"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
+    if (r.group !== group) { out.push(`      <tr class="sds-group"><th scope="rowgroup" colspan="3">${esc(r.group)}</th></tr>`); group = r.group; }
     const href = relative(dirname(overviewFile), pageForSeat(r.file));
-    const term = r.term && r.term !== "—" ? `<a href="${href}">${esc(r.term)}</a>` : esc(r.term);
-    out.push(`      <tr><td>${term}</td><td>${cell(r.contract)}</td><td>${cell(r.means)}</td></tr>`);
+    const noWord = blank(r.term);
+    const title = noWord ? cell(r.contract, r.file) : `<strong><a href="${href}">${esc(r.term)}</a></strong>`;
+    out.push(`      <tr><td>${title}</td><td>${noWord ? "" : contractOf(r.contract, r.file)}</td><td>${cell(r.means, r.file)}</td></tr>`);
   }
-  if (!rows.length) out.push('      <tr><td>&mdash;</td><td>&mdash;</td><td>no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
+  if (!rows.length) out.push('      <tr><td colspan="3">no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
   out.push("    </tbody>", "  </table></div>");
   return { body: out.join("\n"), findings };
 }
@@ -1816,7 +1875,7 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
 /** One domain's glossary as the markdown face carries it. */
 export function buildGlossary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
   const { rows, findings } = glossaryRows(domainDir);
-  const lines = ["## Glossary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
+  const lines = ["## Glossary", "", "| Term | Contract term | Description |", "| --- | --- | --- |"];
   let group: string | null = null;
   for (const r of rows) {
     if (r.group !== group) { lines.push(`| **${r.group}** | | |`); group = r.group; }
@@ -1843,7 +1902,7 @@ export function buildMap(faceFile: string): { body: string; findings: Finding[] 
   const findings: Finding[] = [];
   const dir = dirname(faceFile);
   // A package folder is the level below a domain: `04-capabilities/<domain>/<package>/README.md`.
-  const rel = faceFile.replace(/\\/g, "/").split("/04-capabilities/")[1] ?? "";
+  const rel = splitAtSeat(faceFile, "capabilities")?.rel ?? "";
   if (rel.split("/").length >= 3) return buildChapterMap(faceFile);
   // WHERE THE SOURCE ROOT IS, READ FROM THE FACE RATHER THAN ASSUMED. A mirror is named for the
   // folder it governs, and almost every node roots that at `src/`. A repository whose source is
@@ -1983,7 +2042,7 @@ export function readingOrder(constructs: { id: string; title: string; summary: s
 }
 
 /**
- * A link target moved from one document into another, re-based.
+ * A link written for one document, re-based for another document that carries the same prose.
  *
  * A face's bridge is the concept's own prose, and the concept sits at the repository root. Its
  * relative links resolve from there. Copied verbatim into `02-constructs/<group>/<domain>/README.md`
@@ -2053,8 +2112,8 @@ export function domainFaces(tree: string, concept: string | null): { faces: Map<
   const sections = concept ? conceptSections(concept) : new Map();
   const conceptDir = concept ? dirname(concept) : tree;
 
-  const constructsDir = join(tree, "02-constructs");
-  const folders = constructFolders(constructsDir);
+  const constructsSeat = constructsDir(tree);
+  const folders = constructFolders(constructsSeat);
 
   type Construct = { id: string; title: string; summary: string; deps: string[]; file: string };
   const constructsUnder = (dir: string): Construct[] => {
@@ -2074,7 +2133,7 @@ export function domainFaces(tree: string, concept: string | null): { faces: Map<
   };
 
   for (const dir of folders) {
-    const depth = relative(constructsDir, dir).split("/").length;
+    const depth = relative(constructsSeat, dir).split("/").length;
     const key = named(dir);
 
     // Invariant 1 asks the concept, and it asks it of a DOMAIN. A group is depth 1 and a domain is
@@ -2125,23 +2184,58 @@ export function placeGlossary(src: string, body: string): string | null {
     if (j < 0) return null;
     next = sec.slice(0, i) + `${begin}\n${body}\n  ${END}` + sec.slice(j + END.length);
   } else {
-    const t = sec.match(/[ \t]*<div class="scroll"><table>[\s\S]*?<\/table><\/div>/);
+    const t = sec.match(/[ \t]*<div class="sds-scroll"><table>[\s\S]*?<\/table><\/div>/);
     if (!t) return null;
     next = sec.replace(t[0], `  ${begin}\n${body}\n  ${END}`);
   }
   return src.replace(sec, next);
 }
 
-export function face(tree: string, write: boolean): Finding[] {
+/**
+ * The generated blocks `face` writes, by the name a run selects one with. `glossary` is a domain's
+ * glossary, on the domain's face and on its overview. `constructs` is the map on a face of the
+ * constructs seat, and `contents` the map on a face of the capabilities seat. `tags` is the tag line
+ * of each document.
+ */
+export const FACE_BLOCKS = ["glossary", "constructs", "contents", "tags"] as const;
+
+/** What one run of `face` is narrowed to: the paths it was handed, and the blocks it was asked for. */
+export type FaceScope = { paths: readonly string[]; blocks: readonly string[] };
+
+/**
+ * Whether a package face lists chapters, which it reads at every depth below it. Every other face
+ * of the capabilities seat lists the mirrors that sit directly beside it.
+ */
+function isPackageFace(faceFile: string): boolean {
+  return (splitAtSeat(faceFile, "capabilities")?.rel ?? "").split("/").length >= 3;
+}
+
+/**
+ * The generated regions of a docs tree, compared with what they are generated from, and written
+ * where `write` is set.
+ *
+ * A RUN IS NARROWED BY ITS SCOPE. A region is read only where the scope's paths feed it: the file
+ * that carries the region sits under a path, or a path sits in the folder the region is generated
+ * from. So a seat file feeds its domain's glossary, the map of each face above it, and its own tag
+ * line, and the faces of every other domain are neither read nor written. With no scope the whole
+ * tree is read.
+ */
+export function face(tree: string, write: boolean, scope: FaceScope = { paths: [tree], blocks: FACE_BLOCKS }): Finding[] {
   const findings: Finding[] = [];
   const touched: string[] = [];
+  const asked = (block: (typeof FACE_BLOCKS)[number]): boolean => scope.blocks.includes(block);
+  /** `carrier` holds the region; `source` is the folder the region is generated from. */
+  const fed = (carrier: string, source: string): boolean =>
+    under(carrier, scope.paths) || scope.paths.some((path) => under(path, [source]));
 
   // ONE DICTIONARY PER DOMAIN, AND NONE ON THE SEAT. The seat face keeps the domain table it already
   // carries, and a reader who wants the words goes to the domain that decides their meaning
   // (`refs/doc-sets.md`, *It sits on the domain, not on the seat face*).
-  const constructsDir = join(tree, "02-constructs");
-  for (const dir of constructFolders(constructsDir).filter((d) => isDomainFolder(constructsDir, d))) {
+  const constructsSeat = constructsDir(tree);
+  for (const dir of asked("glossary") ? constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d)) : []) {
     const domainFace = join(dir, "README.md");
+    const overviewOfDomain = overviewForDomain(dir);
+    if (!fed(domainFace, dir) && !(overviewOfDomain && under(overviewOfDomain, scope.paths))) continue;
     if (!existsSync(domainFace)) {
       findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });
       continue;
@@ -2157,35 +2251,45 @@ export function face(tree: string, write: boolean): Finding[] {
     // the contract term a column there. The rows are gathered once for both, so the two cannot
     // drift; the findings are taken from the markdown build alone, or every two-column `Terms`
     // table would be reported twice.
-    const overview = overviewForDomain(dir);
+    const overview = overviewOfDomain;
     if (overview) {
       const { body: html } = buildGlossaryHtml(dir, overview);
       const ovBefore = readFileSync(overview, "utf8");
-      const ovAfter = placeGlossary(ovBefore, html);
-      if (ovAfter === null)
+      // THE GLOSSARY IS WRITTEN WITH THE SHARED STYLESHEET'S CLASS NAMES, so it goes only into an
+      // overview that links the shared stylesheet. An overview that links none is named once, with
+      // the text every command uses, and nothing is written into it.
+      const ownCopy = holdsOwnCopy(overview, ovBefore);
+      const ovAfter = ownCopy ? ovBefore : placeGlossary(ovBefore, html);
+      if (ownCopy)
+        findings.push({ check: "styles", grade: "RULE", file: overview, message: OWN_COPY });
+      else if (ovAfter === null)
         findings.push({ check: "face", grade: "SOFT", file: overview, message: "this domain's overview has no `Glossary` section with a table in it, so the domain's glossary has nowhere to land" });
       else if (ovAfter !== ovBefore) { if (write) writeFileSync(overview, ovAfter); touched.push(relative(tree, overview)); }
     }
   }
 
-  const seatFace = join(constructsDir, "README.md");
-  if (existsSync(seatFace)) {
+  // The seat face carries no glossary, so nothing feeds it: it is read where it sits under a path.
+  const seatFace = join(constructsSeat, "README.md");
+  const seatFaceInRun = asked("glossary") && under(seatFace, scope.paths);
+  if (seatFaceInRun && existsSync(seatFace)) {
     const before = readFileSync(seatFace, "utf8");
     const after = removeRegion(before, "glossary");
     if (after !== before) { if (write) writeFileSync(seatFace, after); touched.push(relative(tree, seatFace)); }
-  } else {
+  } else if (seatFaceInRun) {
     findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
   }
 
-  // THE DOMAIN FACE IS THE ONE PLACE A CONSTRUCT LIST IS GENERATED. The concept once carried the
-  // same list a second time, and it was the face's inventory wearing the concept's clothes: one
+  // THE DOMAIN FACE IS THE ONE PLACE A CONSTRUCT LIST IS GENERATED. The concept carries no second
+  // copy of it, because that copy would be the face's inventory wearing the concept's clothes: one
   // source, two generated homes, and a reader one click from the place whose whole job is to be
   // that list. A concept states the model at SHAPE depth — which domains exist and why the
   // repository divides that way — and a construct's summary is depth (MD10).
   const conceptFile = ["CONCEPT.md", join("..", "CONCEPT.md")].map((c) => join(tree, c)).find(existsSync) ?? null;
-  const { faces, findings: dfz } = domainFaces(tree, conceptFile);
-  findings.push(...dfz);
+  const { faces, findings: dfz } = asked("constructs") ? domainFaces(tree, conceptFile) : { faces: new Map<string, string>(), findings: [] };
+  // A finding of this step names the folder whose face it is about.
+  findings.push(...dfz.filter((found) => fed(join(found.file, "README.md"), found.file)));
   for (const [file, body] of faces) {
+    if (!fed(file, dirname(file))) continue;
     if (!existsSync(file)) { findings.push({ check: "face", grade: "SOFT", file, message: "no domain face to write into" }); continue; }
     const before = readFileSync(file, "utf8");
     const after = replaceRegion(before, "constructs", body);
@@ -2200,7 +2304,13 @@ export function face(tree: string, write: boolean): Finding[] {
     catch { return false; }
   })();
 
-  for (const faceFile of authored ? [] : walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "README.md")) {
+  for (const faceFile of authored || !asked("contents") ? [] : walkFiles(capabilitiesDir(tree), (p) => basename(p) === "README.md")) {
+    // A package face is fed by every chapter below it; any other face by the mirrors directly beside it.
+    const beside = dirname(faceFile);
+    const feeds = isPackageFace(faceFile)
+      ? fed(faceFile, beside)
+      : under(faceFile, scope.paths) || scope.paths.some((path) => path === beside || dirname(path) === beside);
+    if (!feeds) continue;
     const { body, findings: mf } = buildMap(faceFile);
     findings.push(...mf);
     const before = readFileSync(faceFile, "utf8");
@@ -2208,15 +2318,18 @@ export function face(tree: string, write: boolean): Finding[] {
     if (after !== before) { if (write) writeFileSync(faceFile, after); touched.push(relative(tree, faceFile)); }
   }
 
-  const tags = writeTagLines(tree, write);
+  const tags = asked("tags") ? writeTagLines(tree, write, scope.paths) : { touched: [], findings: [] };
   findings.push(...tags.findings);
 
-  console.log(touched.length
-    ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
-    : "every face is already current");
-  console.log(tags.touched.length
-    ? `${write ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}`
-    : "every tag line is already rendered from its block");
+  // Each line speaks for the blocks the run asked for, and for those alone.
+  if (asked("glossary") || asked("constructs") || asked("contents"))
+    console.log(touched.length
+      ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
+      : "every face is already current");
+  if (asked("tags"))
+    console.log(tags.touched.length
+      ? `${write ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}`
+      : "every tag line is already rendered from its block");
   return findings;
 }
 
@@ -2226,9 +2339,9 @@ export function face(tree: string, write: boolean): Finding[] {
  * The status a set of behaviour rows rolls up to.
  *
  * A construct's status is what the runs say about the behaviours at its own path, and nothing else.
- * It used to be read from the *where it lives today* rows in `Binds` and from `Proof` — a table
+ * It is never read from the *where it lives today* rows in `Binds` or from `Proof` — a table
  * somebody typed about where code sits, which says where the work is rather than whether it works.
- * Decision `E` moves it to the rows, so the word changes when a run changes and at no other moment.
+ * Decision `E` reads it from the rows, so the word changes when a run changes and at no other moment.
  *
  * `PLANNED` is the author's mark and means nothing has run, so a file of `PLANNED` rows and a file of
  * no rows roll up the same way. **A file with no rows is honest** where the product is not built:
@@ -2260,11 +2373,8 @@ export function deriveStatus(rows: BehaviourRow[]): "PLANNING" | "IMPLEMENTING" 
  * An absent file is what path parity reports, and this returns null rather than guessing.
  */
 export function behavioursFor(seat: string): string | null {
-  const norm = seat.replace(/\\/g, "/");
-  const at = norm.indexOf("/02-constructs/");
-  if (at < 0) return null;
-  const mirrored = `${norm.slice(0, at)}/03-behaviors/${norm.slice(at + "/02-constructs/".length)}`;
-  return existsSync(mirrored) ? mirrored : null;
+  const mirrored = mirrorPath(seat, "constructs", "behaviors");
+  return mirrored !== null && existsSync(mirrored) ? mirrored : null;
 }
 
 /**
@@ -2275,8 +2385,11 @@ export function behavioursFor(seat: string): string | null {
  * computed — from the block and from the tag line, the two places it renders.
  *
  * It writes the seat file only. The page follows from `docs.ts page`, so there is one writer per file.
+ *
+ * `say` receives each line the status command prints about a seat. `docs audit` calls this with the
+ * write turned off and passes a `say` that prints nothing, so only the findings reach its output.
  */
-export function statusFor(seat: string, workspace: string, write: boolean): Finding[] {
+export function statusFor(seat: string, workspace: string, write: boolean, say: (line: string) => void = console.log): Finding[] {
   const findings: Finding[] = [];
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
@@ -2292,10 +2405,10 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     const leading = new RegExp(`,\\s*${pair}`);
     const out = (leading.test(src) ? src.replace(leading, "") : src.replace(new RegExp(`${pair}\\s*,\\s*`), ""))
       .replace(/(`For:[^`\n]*`)[ \t]*·[ \t]*`Status:[^`\n]*`/u, "$1");
-    if (out === src) { console.log(`current  ${shown} — a FOUNDATION construct states a standard and carries no status`); return findings; }
+    if (out === src) { say(`current  ${shown} — a FOUNDATION construct states a standard and carries no status`); return findings; }
     // SOFT while the book's constructs still carry the word. The sweep runs this command in write
     // mode over the tree; until it does, the finding says what is owed rather than refusing 51 pages.
-    if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — status removed; a FOUNDATION construct's rows are \`PROMISE\``); }
+    if (write) { writeFileSync(seat, out); say(`wrote    ${shown} — status removed; a FOUNDATION construct's rows are \`PROMISE\``); }
     else findings.push({ check: "status", grade: "SOFT", file: seat,
       message: "a construct in a FOUNDATION repository carries no `status` — its behaviour rows are `PROMISE` and a promise has no proof state" });
     return findings;
@@ -2307,8 +2420,8 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     // rolls up to PLANNING. No file means the derivation has no input at all, so it claims nothing
     // and names what is missing — silently stamping PLANNING would read as a measurement.
     findings.push({ check: "status", grade: "SOFT", file: seat,
-      message: "no behaviours file at this construct's own path, so nothing rolls up — `03-behaviors/` mirrors `02-constructs/` file for file, and `docs.ts coverage` reports the pair" });
-    console.log(`unread   ${shown} — no behaviours file at the mirrored path`);
+      message: `no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and \`docs parity\` reports the pair` });
+    say(`unread   ${shown} — no behaviours file at the mirrored path`);
     return findings;
   }
 
@@ -2326,8 +2439,8 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
                       `$1${glyph[derived]}$3${derived}$5`);
   }
   const from = relative(workspace, behaviours);
-  if (out === src) { console.log(`current  ${shown} — ${derived} from ${rows.length} row(s) in ${from}`); return findings; }
-  if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — ${block.status} → ${derived}, from ${rows.length} row(s) in ${from}`); }
+  if (out === src) { say(`current  ${shown} — ${derived} from ${rows.length} row(s) in ${from}`); return findings; }
+  if (write) { writeFileSync(seat, out); say(`wrote    ${shown} — ${block.status} → ${derived}, from ${rows.length} row(s) in ${from}`); }
   else findings.push({ check: "status", grade: "RULE", file: seat, message: `the block says \`${block.status}\` and the ${rows.length} behaviour row(s) in \`${from}\` derive \`${derived}\`` });
   return findings;
 }
@@ -2335,21 +2448,27 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
 // ---------------------------------------------------------------------------- page
 
 /**
- * The furniture: the template's first stylesheet, then every later stylesheet and every script,
- * taken from the template in its own order. The rail builder runs first, the fold and the anchor
- * links after it, so a script that reads a heading's text sees it before the anchor is appended.
+ * The furniture: the two lines of the construct template that load the shared files. The first is
+ * the line that links `sds-docs.css`, and the second is the line that loads `sds-docs.js`. A
+ * produced page carries those two lines and nothing else of the template's: no `<style>` block and
+ * no script with code (05-artifacts.md § What a stored page carries).
+ *
+ * A TEMPLATE THAT LACKS EITHER LINE IS REFUSED, because a page produced from it would link no
+ * shared file and would show its text with no styling.
+ *
+ * THE TEMPLATE'S FOOTER IS NOT FURNITURE. It is a note to the author who copies the template, and a
+ * produced page is read by somebody else, so the produced footer is empty. A seat carries no footer
+ * of its own today; when it does, it is rendered from the seat, never from the template.
  */
-export function furniture(templates: string): { style: string; scripts: string; footer: string } {
-  const t = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
-  const styles = [...t.matchAll(/<style>[\s\S]*?<\/style>/g)].map((m) => m[0]);
-  const scripts = [...t.matchAll(/<script>[\s\S]*?<\/script>/g)].map((m) => m[0]);
-  const foldStyle = styles.slice(1).join("\n\n");
-  const footer = t.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "<footer></footer>";
-  return {
-    style: styles[0] ?? "",
-    scripts: [scripts[0] ?? "", foldStyle, ...scripts.slice(1)].filter(Boolean).join("\n\n"),
-    footer,
-  };
+export function furniture(templates: string): { stylesheet: string; script: string; footer: string } {
+  const template = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
+  const named = (file: string): string => file.replace(/\./g, "\\.");
+  const stylesheet = new RegExp(`<link\\b[^>]*\\bhref="[^"]*${named(STYLESHEET)}"[^>]*>`, "i").exec(template)?.[0];
+  const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${named(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
+  if (!stylesheet || !script)
+    throw new Error(`\`construct-template.html\` holds no line that loads \`${stylesheet ? PAGE_SCRIPT : STYLESHEET}\`, ` +
+      "so a page produced from it would link no shared file (05-artifacts.md, One stylesheet, served in versions)");
+  return { stylesheet, script, footer: "" };
 }
 
 /** The location field: a declared name, never a folder. */
@@ -2372,10 +2491,13 @@ export function locationOf(seat: string, workspace: string): string {
   return "—";
 }
 
-/** Today, on the clock the reader shares. `toISOString` is UTC, which is a day behind here. */
-export function today(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+/**
+ * The instant this call is made, in the local zone with its offset — `2026-09-29T14:32+05:30`, never
+ * a bare UTC `Z`. An audit measures the tree at the moment it reads it, so this is what it stamps;
+ * `toISOString` is UTC, which reads as a different day on a machine east of Greenwich.
+ */
+export function measuredNow(): string {
+  return withOffset(new Date());
 }
 
 // ---------------------------------------------------------- the Proof join (Q131, opened by Q138)
@@ -2393,11 +2515,10 @@ export function today(): string {
  * make the move impossible to check as it went. A fallback is reported, never silent.
  */
 export function registerFor(seat: string): { file: string; exact: boolean } | null {
-  const norm = seat.replace(/\\/g, "/");
-  const at = norm.indexOf("/02-constructs/");
-  if (at < 0) return null;
-  const rel = norm.slice(at + "/02-constructs/".length);
-  const root = `${norm.slice(0, at)}/03-behaviors/`;
+  const split = splitAtSeat(seat, "constructs");
+  if (!split) return null;
+  const rel = split.rel;
+  const root = `${behaviorsDir(split.docs)}/`;
   if (existsSync(root + rel)) return { file: root + rel, exact: true };
   const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "";
   if (!dir) return null;
@@ -2443,43 +2564,43 @@ export function behaviourRows(file: string): BehaviourRow[] {
 }
 
 /**
- * The page a construct returns to: its domain's overview (Q238).
+ * The page a construct returns to: the overview of its group, always a page (Q238).
  *
- * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. The file is
- * `concept-devex-function-overview.html` in one repository and `concept-iam-overview.html` in
- * another — area in the name here, not there — so the path cannot be computed from the seat. Both
- * carry the block title `DevEx Function`, and that is stable because `face` writes the domain's own
- * README from the same concept section the overview borrows.
+ * THE OVERVIEWS NAME THEIR OWN CONSTRUCTS, SO THE WAY BACK IS THAT LINK READ IN REVERSE. Every
+ * overview links forward to the construct pages it owns (`Read … →`), and a domain may hold several
+ * overviews, so no title and no file name can say which one owns a construct. The overview of the
+ * domain whose own links reach this construct's page is the answer. Nothing is listed in code: each
+ * overview of each domain of each repository is read as it stands.
  *
- * NULL WHERE THE DOMAIN HAS NO OVERVIEW, which is nine domains today, and the caller then keeps the
- * constructs seat's face. A guess would be worse than the old link: it would name a page that is
- * not there, and a link is a promise a reader can follow it.
+ * WHERE NO OVERVIEW NAMES THE CONSTRUCT, the domain's first overview, in the order of its path.
+ * WHERE THE DOMAIN HAS NONE, the repository's hub. NULL ONLY WHERE THERE IS NO HUB EITHER, and the
+ * caller then keeps the constructs seat's face: a guess would name a page that is not there, and a
+ * link is a promise a reader can follow.
  */
 export function overviewAbove(seat: string, out: string): { href: string; label: string } | null {
   const seatPath = resolve(seat).replace(/\\/g, "/");
-  const at = seatPath.lastIndexOf("/02-constructs/");
-  if (at < 0) return null;
-  const constructsDir = seatPath.slice(0, at) + "/02-constructs";
+  const split = splitAtSeat(seatPath, "constructs", "last");
+  if (!split) return null;
+  const seatDir = constructsDir(split.docs);
+  const target = (page: string) => ({
+    href: relative(dirname(out), page),
+    label: String(readBlock(readFileSync(page, "utf8")).block?.title ?? basename(page)),
+  });
 
   // The domain is the folder invariant 1 already tests for: depth 1 under the seat, or depth 2
   // where its parent is a group. Walk up from the seat until one of those is true.
   let dir = dirname(seatPath);
-  while (dir.startsWith(constructsDir) && dir !== constructsDir && !isDomainFolder(constructsDir, dir)) dir = dirname(dir);
-  if (dir === constructsDir || !dir.startsWith(constructsDir)) return null;
+  while (dir.startsWith(seatDir) && dir !== seatDir && !isDomainFolder(seatDir, dir)) dir = dirname(dir);
+  const domainPocket = dir !== seatDir && dir.startsWith(seatDir) ? domainDirOf(dir) : null;
+  const overviews = domainPocket === null ? [] : overviewPages(split.docs).filter((page) => dirname(page).replace(/\\/g, "/") === domainPocket);
 
-  const face = join(dir, "README.md");
-  if (!existsSync(face)) return null;
-  const { block } = readBlock(readFileSync(face, "utf8"));
-  const title = block?.title;
-  if (!title) return null;
-
-  const overviews = join(seatPath.slice(0, at), "artifacts", "overviews");
-  if (!existsSync(overviews)) return null;
-  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
-    const b = readBlock(readFileSync(join(overviews, f), "utf8")).block;
-    if (b?.title === title) return { href: relative(dirname(out), join(overviews, f)), label: title };
-  }
-  return null;
+  const page = resolve(out);
+  const naming = overviews.find((overview) =>
+    [...readFileSync(overview, "utf8").matchAll(/href="([^"#]+)/g)].some((link) => resolve(dirname(overview), link[1]) === page));
+  const chosen = naming ?? overviews[0];
+  if (chosen) return target(chosen);
+  const hub = hubPage(split.docs);
+  return existsSync(hub) ? target(hub) : null;
 }
 
 export function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
@@ -2490,7 +2611,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // guides, data models, even a report — because the seat-to-page mapping below silently falls
   // through for a path with no `/02-constructs/` in it. Eighteen junk pages in one run, all of them
   // claiming to be constructs. A folder is a convenience for the caller, never a licence to produce.
-  if (!seat.replace(/\\/g, "/").includes("/02-constructs/")) return findings;
+  if (!inSeat(seat, "constructs")) return findings;
 
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
@@ -2499,19 +2620,23 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // A construct types no proof (RD.DEVEX.WORKSPACE.132), so the page is the seat and nothing is joined into it.
   // What proves it is read in the tests report, from the behaviour rows at the construct's own path.
   const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
-  const org = process.env.SPN_ORG ?? "SaaS Plane";
-  const location = process.env.SPN_LOCATION ?? locationOf(seat, workspace);
+  const org = "SaaS Plane";
+  const location = locationOf(seat, workspace);
   if (location === "—")
     findings.push({ check: "page", grade: "SOFT", file: seat, message: "no manifest above this file declares a `name`, so the header's location reads `—` (Q79 puts `name` on the manifests)" });
 
-  // The page sits beside its seat file, in the pocket that mirrors the seat folder for folder.
+  // The page sits in the `constructs` folder of its domain's folder in the pocket.
   // It is computed BEFORE rendering because the body's links are re-expressed against it: the seat
   // writes `platform-grants.md` for a sibling, and beside the page that sibling is
   // `platform-grants-construct.html`.
-  const out = seat.replace(/\/02-constructs\//, "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+  const out = producedPageOf(seat);
+
+  let lines: ReturnType<typeof furniture>;
+  try { lines = furniture(templates); }
+  catch (error) { findings.push({ check: "page", grade: "RULE", file: seat, message: (error as Error).message }); return findings; }
 
   const { html, findings: rf } = renderPage({
-    block, markdown, workspace: org, location, furniture: furniture(templates),
+    block, markdown, workspace: org, location, furniture: lines,
     link: hrefForPage(seat, out),
     home: overviewAbove(seat, out) ?? undefined,
   });
@@ -2522,14 +2647,19 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, html);
     console.log(`${before ? "rewrote " : "wrote   "} ${relative(workspace, out)}`);
+  } else if (before && holdsOwnCopy(out, before)) {
+    // THE PAGE ON DISK LINKS NO SHARED STYLESHEET, so it is named once, the way every command names
+    // such a page, and its markup is not compared. `docs page write` is what moves it: the page is
+    // produced again, with the two lines that load the shared files.
+    findings.push({ check: "styles", grade: "RULE", file: out, message: OWN_COPY });
   } else {
     findings.push({ check: "page", grade: "RULE", file: out,
-      message: before ? "this page is not what `docs.ts page` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
+      message: before ? "this page is not what `docs page write` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
   }
   return findings;
 }
 
-// ------------------------------------------------- the topics check, and capability coverage
+// ------------------------------------------------- the topics check, and the parity checks
 
 /** A numbered document's topic name: `04-sign-in.md` is `sign-in`. Unnumbered files are not topics. */
 export function topicName(file: string): string | null {
@@ -2552,7 +2682,7 @@ export function topicName(file: string): string | null {
  * only report noise — it gets obeyed.
  */
 export function constructTopics(repo: string): Map<string, Set<string>> {
-  const seat = join(repo, "docs", "02-constructs");
+  const seat = constructsDir(docsOf(repo));
   const out = new Map<string, Set<string>>();
   if (!existsSync(seat)) return out;
   for (const f of walkFiles(seat, (x) => x.endsWith(".md"))) {
@@ -2585,15 +2715,15 @@ export function topicsCheck(repo: string): Finding[] {
   // that reports clean because it found no rule to apply is worse than no check — it is a green light
   // over an unexamined tree. An absent seat is the one honest silence, and `constructTopics` already
   // gives it.
-  if (!existsSync(join(repo, "docs", "02-constructs"))) return f;
+  if (!existsSync(constructsDir(docsOf(repo)))) return f;
 
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const behaviors = behaviorsDir(docsOf(repo));
   for (const file of existsSync(behaviors) ? walkFiles(behaviors, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
     const domains = named.get(name);
     if (domains === undefined) {
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`02-constructs/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`${SEAT.constructs}/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
       continue;
     }
     const here = relative(behaviors, dirname(file)).replace(/\\/g, "/");
@@ -2607,7 +2737,7 @@ export function topicsCheck(repo: string): Finding[] {
   // the folder carries it and the file's own number is a reading order within the topic. Judging
   // every numbered file by its own name reported 80 perfectly correct chapters of the book as
   // topics nobody had declared.
-  const caps = join(repo, "docs", "04-capabilities");
+  const caps = capabilitiesDir(docsOf(repo));
   for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
@@ -2618,7 +2748,7 @@ export function topicsCheck(repo: string): Finding[] {
     const ancestors = relative(caps, dirname(file)).split(/[\\/]/).filter(Boolean);
     const viaFolder = ancestors.some((a) => /^\d\d-/.test(a) && named.has(a.replace(/^\d\d-/, "")));
     if (!named.has(name) && !viaFolder)
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat, and neither it nor the topic folder it sits in is a construct \`02-constructs/\` names — a chapter realizes a construct or it is not a chapter (Q130)` });
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat, and neither it nor the topic folder it sits in is a construct \`${SEAT.constructs}/\` names — a chapter realizes a construct or it is not a chapter (Q130)` });
   }
   return f;
 }
@@ -2668,10 +2798,10 @@ export function duplicateIds(repo: string): Finding[] {
  * id, a folder name to a package name, a persona to a persona.
  *
  * **Three are here and one is not.** Id coverage — every behaviour id cited by a case, and every
- * cited id declared as a row — is already built, in both directions, in the CLI's own
- * `behaviours-join.ts` under `RD.SUPPORT.APPS.084`, and `spnutils apps validate repo` reports it. Building a
- * second one here would be the divergence that file's own header describes: two implementations of
- * one idea, disagreeing about the same estate.
+ * cited id declared as a row — is the behaviours join's, under `RD.SUPPORT.APPS.084`. It is built in
+ * `spn-apps`, in `scripts/checks/behaviour-join.ts`, and `spn-devex behaviours coverage` lists a case
+ * that cites an id no row declares. Building one more here would be two implementations of one
+ * idea, disagreeing about the same estate.
  *
  * **A check that cannot run says so.** An absent scan and an absent finding must never share a
  * verdict, so a seat with no ids and a seat with no `personas.md` are each reported by name with the
@@ -2705,22 +2835,22 @@ export function topicPaths(seat: string): string[] {
  */
 export function pathParity(repo: string): Finding[] {
   const f: Finding[] = [];
-  const constructs = join(repo, "docs", "02-constructs");
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const constructs = constructsDir(docsOf(repo));
+  const behaviors = behaviorsDir(docsOf(repo));
   if (!existsSync(constructs)) return f;
   if (!existsSync(behaviors)) {
     f.push({ check: "parity", grade: "SOFT", file: constructs,
-      message: "the constructs seat is here and `03-behaviors/` is not, so nothing was compared — the two seats mirror each other file for file" });
+      message: `the constructs seat is here and \`${SEAT.behaviors}/\` is not, so nothing was compared — the two seats mirror each other file for file` });
     return f;
   }
   const here = topicPaths(constructs);
   const there = topicPaths(behaviors);
   for (const p of here) if (!there.includes(p))
     f.push({ check: "parity", grade: "SOFT", file: join(constructs, p),
-      message: `no \`03-behaviors/${p}\` — a construct's rows sit at the construct's own path, and a status is rolled up from them` });
+      message: `no \`${SEAT.behaviors}/${p}\` — a construct's rows sit at the construct's own path, and a status is rolled up from them` });
   for (const p of there) if (!here.includes(p))
     f.push({ check: "parity", grade: "SOFT", file: join(behaviors, p),
-      message: `no \`02-constructs/${p}\` — these rows prove a construct nothing declares` });
+      message: `no \`${SEAT.constructs}/${p}\` — these rows prove a construct nothing declares` });
   return f;
 }
 
@@ -2773,7 +2903,7 @@ export function packageIndex(repo: string): Set<string> {
  */
 export function capabilityMirror(repo: string, workspace: string): Finding[] {
   const f: Finding[] = [];
-  const caps = join(repo, "docs", "04-capabilities");
+  const caps = capabilitiesDir(docsOf(repo));
   if (!existsSync(caps)) return f;
   if (worldOf(caps) === "FOUNDATION") return f;
 
@@ -2799,7 +2929,7 @@ export function capabilityMirror(repo: string, workspace: string): Finding[] {
   for (const name of [...packages].sort())
     if (!mirrored.has(name))
       f.push({ check: "mirror", grade: "SOFT", file: caps,
-        message: `\`${name}\` declares itself a package and \`04-capabilities/\` carries no folder for it — either it realizes a construct nobody wrote down, or it is a package nobody documented (${relative(workspace, repo)})` });
+        message: `\`${name}\` declares itself a package and \`${SEAT.capabilities}/\` carries no folder for it — either it realizes a construct nobody wrote down, or it is a package nobody documented (${relative(workspace, repo)})` });
   return f;
 }
 
@@ -2848,7 +2978,7 @@ export function personasIn(file: string): Map<string, string> {
  */
 export function personaCoverage(repo: string): Finding[] {
   const f: Finding[] = [];
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const behaviors = behaviorsDir(docsOf(repo));
   if (!existsSync(behaviors)) return f;
 
   const used = new Map<string, { shown: string; file: string }>();
@@ -2894,7 +3024,7 @@ export function personaCoverage(repo: string): Finding[] {
  * names a package passes on an empty seat; a check that every package has a chapter passes on a
  * repository with no packages. Only together do they say the seat and the code are the same shape.
  */
-export function coverageCheck(repo: string, workspace: string): Finding[] {
+export function parityCheck(repo: string, workspace: string): Finding[] {
   return [...pathParity(repo), ...capabilityMirror(repo, workspace), ...personaCoverage(repo)];
 }
 
@@ -2916,9 +3046,9 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   const tree = join(repo, "docs");
   if (!existsSync(tree)) { console.error(`${relative(workspace, repo)} has no docs/ tree`); return 2; }
   const name = basename(resolve(repo));
-  const at = today();
+  const at = measuredNow();
 
-  const seats = ["01-purpose", "02-constructs", "03-behaviors", "04-capabilities", "05-guides"];
+  const seats = SEATS;
   const seatRows = seats.map((seat) => ({
     seat,
     present: existsSync(join(tree, seat, "README.md")),
@@ -2946,20 +3076,16 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   // What a domain OWES is what its concept section lists; what it HAS is the files under it.
   const conceptFile = join(repo, "CONCEPT.md");
   const sections = existsSync(conceptFile) ? conceptSections(conceptFile) : new Map();
-  const constructsDir = join(tree, "02-constructs");
-  const domainRows = constructFolders(constructsDir).filter((d) => !isGroup(d)).map((dir) => {
+  const constructsSeat = constructsDir(tree);
+  const domainRows = constructFolders(constructsSeat).filter((d) => !isGroup(d)).map((dir) => {
     const key = [...sections.keys()].find((k) => k === folderKey(basename(dir)));
     return {
-      domain: relative(constructsDir, dir),
+      domain: relative(constructsSeat, dir),
       named: Boolean(key),
       has: walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md").length,
       owed: key ? sections.get(key)!.lines.length : 0,
     };
   });
-
-  const approachDir = join(tree, "artifacts", "approaches");
-  const approaches = existsSync(approachDir)
-    ? readdirSync(approachDir).filter((f) => f.endsWith(".html")).sort() : [];
 
   const pages = walkFiles(tree, (p) => p.endsWith(".md") || p.endsWith(".html"));
   const findings = audit(pages, workspace);
@@ -2992,14 +3118,15 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     `  "id": "${name}-docs-audit",`,
     `  "title": "Docs Audit — ${name}",`,
     '  "lenses": ["ARCHITECT", "VOICE"],',
-    '  "status": "DONE",',
-    `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the arguments still in its pocket, the pages off the standard, and the paragraphs a language pass would read."`,
+    `  "generatedAt": "${at}",`,
+    `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the pages off the standard, and the paragraphs a language pass would read."`,
     "}",
     "-->",
     "",
     `# Docs Audit — ${name}`,
     "",
-    "`For: Architect · Editor` · `Status: ✅ DONE`",
+    // A report is a snapshot and carries no status (RD.DEVEX.WORKSPACE.192).
+    "`For: Architect · Editor`",
     "",
     `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this audit writes one file and touches nothing else.`,
     "",
@@ -3022,13 +3149,6 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
     "> [!NOTE]",
     "> **Read a 0 in the last column as *unmeasured*, never as *owes nothing*.** A concept is given its one line per construct by `docs.ts face`, and it can only write that once the constructs exist. Until then the column reports the concept's own bullet lists, which most concepts do not yet carry.",
-    "",
-    "## The arguments still in the pocket",
-    "",
-    approaches.length
-      ? [`${approaches.length} approach page(s). Each argues one design and stays the record of the moment it was argued. Where a construct comes to carry its *What*, the page is retired rather than deleted.`, "",
-         ...approaches.map((a) => `- [${a.replace(/-approach\.html$/, "")}](../approaches/${a})`)].join("\n")
-      : "None.",
     "",
     "## Pages off the standard",
     "",
@@ -3071,7 +3191,6 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
       seats: seatRows,
       nodeTrees: strays,
       domains: domainRows,
-      approaches: approaches,
       pageFindings: findings,
       proseCandidates: { total: totalFlagged, files: prose.length },
     }, null, 2));
@@ -3079,7 +3198,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   }
   console.log(body);
   console.error(`  seats ${seatRows.filter((r) => r.present).length}/5 · node trees ${strays.length} · domains ${domainRows.length}` +
-    ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)} · approaches ${approaches.length}` +
+    ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)}` +
     ` · page findings ${findings.length} · prose candidates ${totalFlagged} in ${prose.length} file(s)`);
   return 0;
 }
@@ -3120,7 +3239,7 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   if (!file.endsWith(".html")) return [];
   const f: Finding[] = [];
   const seen = new Set<string>();
-  for (const m of src.matchAll(/href="([^"]*\/02-constructs\/[^"]*\.md)"/g)) {
+  for (const m of src.matchAll(new RegExp(`href="([^"]*\\/${SEAT.constructs}\\/[^"]*\\.md)"`, "g"))) {
     const href = m[1];
     if (basename(href.split("#")[0]) === "README.md") continue;
     if (seen.has(href)) continue;
@@ -3133,8 +3252,122 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * In its back link and its previous and next doors, a page opens a page.
+ *
+ * The back link at the top of the rail (`a.sds-home`) and the two doors of the `NEXT` block
+ * (`a.sds-nextnav-card` inside `div.sds-nextnav`) open a page that ends in `.html`; a markdown file
+ * walks a markdown file by its own footer. A link inside the content, Where to go next included, may
+ * open anything a reader needs for reference. An anchor after the path is fine, and a link to another
+ * site or a bare `#fragment` is not a file.
+ */
+export function checkRailLinks(file: string, src: string): Finding[] {
+  if (!file.endsWith(".html") || inTemplates(file)) return [];
+  const f: Finding[] = [];
+  const refuse = (where: string, href: string) => {
+    const path = href.split("#")[0].trim();
+    if (!path || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.includes("{{") || path.endsWith(".html")) return;
+    f.push({ check: "rail", grade: "RULE", file, message:
+      `${where} opens \`${href}\` — the back link and the previous and next doors open a page that ends in \`.html\`; only a link inside the content may open a markdown file` });
+  };
+  const back = src.match(/<a class="sds-home"[^>]*?href="([^"]*)"/);
+  if (back) refuse("the back link", back[1]);
+  for (const nav of src.matchAll(/<div class="sds-nextnav"[^>]*>([\s\S]*?)<\/div>/g))
+    for (const door of nav[1].matchAll(/<a\b([^>]*)>/g)) {
+      const attributes = door[1];
+      if (!/class="[^"]*\bsds-nextnav-card\b/.test(attributes)) continue;
+      const href = attributes.match(/href="([^"]*)"/);
+      if (href) refuse(/class="[^"]*\bsds-next\b/.test(attributes) ? "the next door" : "the previous door", href[1]);
+    }
+  return f;
+}
+
+/**
+ * The hub of a repository as the page at `out` links it: the way back of an overview, a guide, a
+ * report and an index. Null where the repository has no hub, because a link is a promise a reader can
+ * follow and a hub that is not there cannot be followed to.
+ */
+export function hubAbove(docs: string, out: string): { href: string; label: string } | null {
+  const hub = hubPage(docs);
+  if (!existsSync(hub)) return null;
+  // THE BACK LINK NAMES THE REPOSITORY, as the book's templates do: `← spn-foundation`. The hub's own
+  // title is the same word in every repository, so it would tell a reader nothing about where they land.
+  return { href: relative(dirname(out), hub), label: basename(repoOf(hub) ?? dirname(resolve(docs))) };
+}
+
+/** The pages that walk up one step, by kind. The hub and an approach page are the tops of a chain. */
+export type WalkKind = "hub" | "approach" | "preview" | "construct" | "overview" | "guide" | "index" | "report";
+
+/**
+ * A page's kind for the walk up, read as the rest of the audit reads it: the suffix of its file name
+ * and the variant of its metadata block, and never the folder it sits in.
+ */
+export function walkKindOf(file: string, block: any): WalkKind | null {
+  const name = basename(file);
+  const variant = block?.variant;
+  if (name === HUB) return "hub";
+  if (isApproachPage(file) || variant === "approach") return "approach";
+  if (name.endsWith("-preview.html") || variant === "preview") return "preview";
+  if (name.endsWith("-construct.html") || variant === "construct") return "construct";
+  if (name.endsWith("-overview.html") || variant === "overview") return "overview";
+  if (name.endsWith("-guide.html") || variant === "guide") return "guide";
+  if (name === ARTIFACT_INDEX && variant === "index") return "index";
+  if (variant === "report") return "report";
+  return null;
+}
+
+/**
+ * Every page walks up one step, by the back link at the top of its rail; the top of a chain has none.
+ *
+ * A construct page goes back to the overview that links forward to it, an overview, a guide, a report
+ * and an index to the hub, a preview to the approach page of its workstream. The hub and an approach
+ * page carry none. Where the page a link should open is not there (a repository with no hub, a preview
+ * outside a workstream), the page owes no link: a link is a promise a reader can follow. A back link
+ * that opens a markdown file is the rail check's to refuse, so it is not said twice.
+ */
+export function checkWayBack(file: string, src: string, block: any): Finding[] {
+  if (!file.endsWith(".html") || inTemplates(file) || holdsOwnCopy(file, src)) return [];
+  const kind = walkKindOf(file, block);
+  if (!kind) return [];
+  const back = src.match(/<a class="sds-home" href="([^"]*)"/);
+  const rule = (message: string): Finding[] => [{ check: "rail", grade: "RULE", file, message }];
+  if (kind === "hub" || kind === "approach")
+    return back ? rule(`the way back opens \`${back[1]}\` — ${kind === "hub" ? "the hub is the top of a repository's chain" : "an approach page is the top of a workstream's chain"}, so it carries no way back`) : [];
+
+  const norm = slashes(resolve(file));
+  let want: string | null = null;
+  let wantName = "";
+  if (kind === "construct") {
+    const seat = seatOf(norm);
+    const above = seat === norm ? null : overviewAbove(seat, norm);
+    want = above ? resolve(dirname(norm), above.href) : null;
+    wantName = "the overview that links forward to it";
+  } else if (kind === "preview") {
+    const workstream = workstreamDirOf(norm);
+    const approach = workstream && readdirSync(workstream.folder).find((name) => isApproachPage(name));
+    want = workstream && approach ? join(workstream.folder, approach) : null;
+    wantName = "the approach page of its workstream";
+  } else {
+    const docs = docsRootOf(norm);
+    want = docs && existsSync(hubPage(docs)) ? hubPage(docs) : null;
+    wantName = "the hub of its repository";
+  }
+  if (!want) {
+    // No page to open. A preview must still open an approach page, wherever it sits.
+    if (kind === "preview" && back && !isApproachPage(back[1].split("#")[0]))
+      return rule(`the way back opens \`${back[1]}\`, which is not an approach page — a preview goes back to its approach page`);
+    return [];
+  }
+  const should = slashes(relative(dirname(norm), want));
+  if (!back) return rule(`this ${kind} has no way back at the top of its rail — it should open ${wantName}, \`${should}\``);
+  const path = back[1].split("#")[0].trim();
+  if (!path || path.endsWith(".md") || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.includes("{{")) return [];
+  if (resolve(dirname(norm), path) === want) return [];
+  return rule(`the way back opens \`${back[1]}\` — ${/^[aeiou]/.test(kind) ? "an" : "a"} ${kind} goes back to ${wantName}, \`${should}\``);
+}
+
 export function checkLinks(file: string, src: string): Finding[] {
-  if (file.replace(/\\/g, "/").includes("/templates/")) return [];
+  if (inTemplates(file)) return [];
   const f: Finding[] = [];
   const here = dirname(file);
   const seen = new Set<string>();
@@ -3161,16 +3394,33 @@ export function checkLinks(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * Whether the audit reads a path as a page. Three kinds of file are not pages. A file under a
+ * workstream's `samples/` is a real file of the kind the work produces, in its own format. A template,
+ * which is any file under `templates/` or one named `<name>-template.<ext>`, carries placeholders
+ * where a page carries its content. A bundled copy, `<page>.bundled.html`, is a page with its styles
+ * inside it, written to be published, and the page it copies is the one the tree holds.
+ */
+export function isAuditedPage(path: string): boolean {
+  const norm = path.replace(/\\/g, "/");
+  if (inTemplates(norm) || /-template\.[a-z]+$/i.test(basename(norm))) return false;
+  if (norm.endsWith(BUNDLED_SUFFIX)) return false;
+  const workstream = workstreamDirOf(norm);
+  if (workstream && norm.slice(workstream.folder.length).split("/").includes("samples")) return false;
+  return true;
+}
+
 export function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
   const sources = new Map<string, string>();
   // Read once for the whole run. Per page this would walk every repository's source once per
   // chapter, and the corpus is 339 of them.
-  const realized = realizationIndex(workspace);
+  const { enums: realized, shapes } = sourceDeclarations(workspace);
   const templates = process.env.SPN_TEMPLATES
-    ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+    ?? bookTemplatesDir(join(workspace, "spn-foundation"));
   for (const p of paths) {
+    if (!isAuditedPage(p)) continue;
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
     blocks.set(p, block);
@@ -3187,18 +3437,24 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
     findings.push(...checkConstructLink(p, src));
-    findings.push(...checkFurniture(p, src, templates));
-    findings.push(...checkPalette(p, src, templates));
-    findings.push(...checkSelectors(p, src, block, templates));
+    findings.push(...checkRailLinks(p, src));
+    findings.push(...checkWayBack(p, src, block));
+    findings.push(...checkFurniture(p, src));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block));
     findings.push(...checkOverviewSource(p, src, block, workspace));
     findings.push(...checkProduced(p, src, block, workspace, templates));
     findings.push(...checkVocabulary(p, src, realized));
+    // THE STATUS CHECK, WITH ITS WRITE TURNED OFF. A construct whose status differs from what its
+    // behaviour rows derive is an audit finding, and the seat file is left as it is. Only that
+    // refusal is taken: a construct with no behaviours file is the parity check's to report, and a
+    // FOUNDATION construct that still carries the word is the status command's own.
+    if (block.variant === "construct" && p.endsWith(".md"))
+      findings.push(...statusFor(p, workspace, false, () => {}).filter((found) => found.grade === "RULE"));
   }
   findings.push(...checkDepends(paths, blocks));
-  findings.push(...checkVocabularyCoverage(paths, sources));
+  findings.push(...checkVocabularyCoverage(paths, sources, shapes));
   return findings;
 }
 
@@ -3234,9 +3490,10 @@ export function workspaceRoot(from: string): string {
  * means every seat file under it — markdown only, because these two act on the file an author writes
  * rather than on the page produced from it. Shared by `page.ts` and `status.ts`.
  */
-export const seatPaths = (args: string[]): string[] =>
-  args.filter((r) => !r.startsWith("--")).flatMap((p) => {
-    const full = resolve(p);
-    let st; try { st = statSync(full); } catch { return [full]; }
-    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".md") && basename(f) !== "README.md") : [full];
+export const seatPaths = (paths: string[]): string[] =>
+  paths.flatMap((path) => {
+    const full = resolve(path);
+    let folder = false;
+    try { folder = statSync(full).isDirectory(); } catch { return [full]; }
+    return folder ? walkFiles(full, (file) => file.endsWith(".md") && basename(file) !== "README.md") : [full];
   });

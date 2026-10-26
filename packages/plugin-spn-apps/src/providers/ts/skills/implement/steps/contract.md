@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "section": "Evolution — the change classification", "seen": "1a43822e" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md", "section": "Evolution — the change classification", "seen": "1a43822e" }
   ],
   "decisions": []
 }
@@ -56,6 +56,7 @@ createGroup(command: CreateGroupCommand): Promise<Group>;
 ## The read-level ladder — Meta ⊂ Info ⊂ State (+ Details)
 
 - `<X>Meta` (id, org, code/name, `isActive` — navigable label) ⊂ `<X>Info` (+ description-class fields) ⊂ `<X>` (+ timestamps + resolved audit actors) ⊂ `<X>Details` (State + dependent sub-states for a detail page). Each level `extends` the one below — a level that stops extending breaks mapper reuse and FE substitutability.
+- **A listing line that pairs entities is an `<Anchor>Summary`**, composed like Details: the anchor never null, each related state `null` when none or an array, each at the level the line needs; returned by `search<Anchor>Summaries` (`NtfActionSummary`, `LabelTranslationSummary`).
 - **Skip levels the entity genuinely lacks** (Meta-only catalogs exist); never invent levels.
 - Wrappers: `<X>s` / `<X>Metas` / `<X>Infos` wrap `Record<key, X>` under a **named field** (`{ roles: {...} }`, never a bare Record — OpenAPI needs the named shape); `<X>List` wraps `X[]`. Search results: `{ records: X[], total: CDTInt | null }`.
 - **Nest a display dependency's Meta instead of its raw id** (`PrincipalMeta.identity: IdentityMeta`); scope ids stay ids (`orgId` is never nested). Commands still carry raw ids.

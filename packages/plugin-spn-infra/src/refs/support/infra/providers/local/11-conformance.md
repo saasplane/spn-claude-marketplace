@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/11-conformance.md",
-      "seen": "68d0d013"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/11-conformance.md",
+      "seen": "d800a1d9"
     }
   ]
 }
 -->
 # Conformance — what a local pass speaks for
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/11-conformance.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/11-conformance.md`. Read this as the restatement; that node governs.
 
 **An estate change is proven at the tier that would catch it**, and the tiers are the apps ladder's own — `UNIT`, `CONTRACT` and `INTEGRATION` — with the build and a stand-up beside them ([blueprints](../../blueprints.md)). Local is not exempt from any of them, and it is the only target a stand-up has actually run against.
 
@@ -32,7 +32,7 @@
 
 **The two-way join between a declared domain and its local rendering** is proven by the Support repository's own unit cases (`RD.SUPPORT.INFRA.087`).
 
-**The derived engine ports are reproduced identically in the blueprints render and in the CLI** (`RD.SUPPORT.INFRA.062`) — a formula realized twice, so each realization is a check on the other.
+**A space's ports are derived by the CLI and written out by hand in the blueprint package's acceptance fixture** (`RD.SUPPORT.INFRA.062`). The acceptance run compares that fixture's render with the Support sample's committed environment file, which the CLI rendered, so a change to the layout of a platform's five hundred ports shows up as a difference there rather than on a laptop.
 
 ## What exists today, and what a pass does not say
 

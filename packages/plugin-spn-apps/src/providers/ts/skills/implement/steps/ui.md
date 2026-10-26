@@ -2,14 +2,16 @@
 
 Frontend modules are plain packages composed by each app's router — no runtime module registry. Layering: `web-*-ts` app (route table, nav, vite build) → `module-web-<mod>-ts` (pages/components/hooks/URL helpers for ONE module). That module package sits on the shared FE kernel package — app manager, session, auth gates, shell, nav builder. The kernel sits on the web runtime + design system + **API client**. Where a workspace documents its own frontend architecture, that document governs its app composition; this layering is the rule in every case.
 
-**The component standard** is owned by the provider chapter `docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md` and restated in this plugin. It covers the wrapper as the public API, the four-step component recipe, and the density hook (never a `size` destructure default). It also covers naming, and the token tiers a component may consume. Apply the restatement; the chapter is provenance, not a file to open, because the book is not delivered to every seat. This step covers where UI code *lives* and how it plugs in, not how a component is written.
+**The component standard** is owned by the provider chapter `docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md` and restated in this plugin. It covers the wrapper as the public API, the four-step component recipe, and the density hook (never a `size` destructure default). It also covers naming, and the token tiers a component may consume. Apply the restatement; the chapter is provenance, not a file to open, because the book is not delivered to every seat. This step covers where UI code *lives* and how it plugs in, not how a component is written.
 
 > **A client service is not a server service in a browser.** No transaction, no authorization decorator, no cache-build decorator — the server gates every call and owns atomicity. Client-side services belong to the web module's **full form**, which is 🔮 planned and unrealized; today a ui package's data access is hooks over the API client.
 
 ## The UI module package (`MODULE_WEB`)
 
 - Layout: `src/entry/ui/{components/<group>, hooks/<group>, pages/<group>, utils/url}` + generated root barrel — the browser is a transport, so the UI is the web module's **entry** (decision RD.SUPPORT.APPS.031); `assets/` sits beside `entry/`, never inside. **Use named exports only** — no defaults anywhere; the app's `React.lazy` imports do the `{ default: m.Page }` mapping, the one sanctioned place it exists.
-- A ui package owns feature UI for its module and **never** owns routes, nav placement, or session handling — apps own composition. URL helpers (`get<Entity>ListPageUrl` / `…DetailPageUrl`) are how modules name their routes once.
+- A ui package owns feature UI for its module and **never** owns the router, nav placement, or session handling — apps own composition. URL helpers (`get<Entity>ListPageUrl` / `…DetailPageUrl`) are how modules name their routes once today. 🚧 Not yet realized in the platform's modules: the book states a route as data, a key and a path declared once by the module (RD.SUPPORT.APPS.186), read by the app's router, a link and the menu. `ISPRoute` and `getRouteUrl` are built in `@saasplane/support-web-ts`, and the platform's web modules do not declare their routes with them. Read the installed package first, because a package you installed may be older than this step; `refs/support/apps/providers/ts/08-web.md` has the names.
+- **Name every unit for what it is** (RD.SUPPORT.APPS.202): a page ends in `Page`, a container in `Container`, a widget in `Widget`, a dialog in `Dialog`, a form in `Form`. A unit that follows a common pattern carries that pattern's word, such as `Autocomplete` or `Picker`. A hook starts with `use`. Only a plain component needs no suffix. `refs/support/apps/providers/ts/02-naming.md` has the table.
+- **Assemble a page from containers** (RD.SUPPORT.APPS.182, RD.SUPPORT.APPS.183). The page reads the address and places containers under `entry/ui/containers/`. A container takes its data or an id as props and holds no path. A SaaS Plane container takes data only (RD.SUPPORT.APPS.185). `refs/support/apps/support.md` has the table of what each knows and takes.
 - Data access goes through the module's own hooks calling the **API client** — there is never a hand-written client. `src/generated/` in the client package is untouchable (regenerate from the running service instead).
 
 ## Plug-in points — wiring a module into an app (all five, per app)
@@ -26,10 +28,11 @@ App-local modules (a feature owned by one app) live under `apps/<app>/src/module
 
 ## The two contexts — read them, never re-derive them
 
-The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-apps/02-support/02-web/04-design-system.md`):
+The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md`). The restatement is `refs/support/surface/architecture-app.md`, in this plugin; read `standards-core.md` for the levels of a page, `architecture-names.md` for the names, and `architecture-containers.md` for the container.
 
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
-- **DS context** — live theme and its setter, device, `navigate`, image transformation with placeholder/error, and `defaultComponentSize`. Read it with the DS context hook; `DSApp` supplies it.
+- **DS context** — live theme and its setter, device, `navigate`, and image transformation with placeholder/error. Read it with the DS context hook; `DSApp` supplies it.
+- **The default size is the theme's `size`.** A component with no `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. 🚧 Not yet realized: the context holds it as `defaultComponentSize` today, so read the installed package first.
 
 Three rules fall out, all enforced in review:
 
@@ -55,5 +58,5 @@ Auth surfaces: business apps never implement login — the auth gate hands off t
 
 - Run `spnutils apps gen-barrel module-web-<mod>-ts` after adding/removing files.
 - If the BE contract changed: regenerate the API client from the running service **before** consuming it.
-- Write labels as `translate('<scope>.<key>', 'Fallback')` with dotted scope + snake_case leaf (`common.*` flat, mirrors its value; module keys may add one subscope). `spnutils apps gen-labels <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
+- Write a module page's label in its stored form, `translate('<SCOPE>.<KEY>', 'Fallback')`, with a dotted scope and a snake_case leaf (`COMMON.*` flat, mirrors its value; module keys may add one subscope); only the design system writes lower case. An enum value's label is `translateEnumLabel(translate, '<ContractEnumName>', value)`, which builds `ENUM.<ENUMNAME>.<VALUE>`; never write an enum key by hand. `spnutils apps gen-labels <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
 - Verify with the FE builds — `npx nx run-many -t build -p '<ui-pkg>,web-*'`.

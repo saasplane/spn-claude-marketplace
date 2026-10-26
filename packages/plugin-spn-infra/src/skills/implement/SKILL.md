@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "2b989141"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: Author an estate node - locate it, write the choices a person actua
 ---
 
 # implement — locate the node, write the choices, build the module
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **The estate declares; it never implements what it declares.** A change to what exists is an edit to a `src/spestate.json` (or a `spinfrapkg.json`), and the whole change must read back as the small set of choices it makes. Read `refs/support/infra/packages.md`, in this plugin, for the manifest shapes and the locator rules; `refs/support/infra/laws.md` for the lines no edit may cross; `refs/support/infra/modules.md` for what a module is and where it may attach.
 
@@ -32,7 +34,8 @@ Find the node root by `spinfrapkg.json` and read the type from `src/spestate.jso
 | codes, regions, `networkIndex` values, environments, sizes, hosting, deploy triggers, schema rows, module rows, app grant rows, package refs, ports | derived names or addresses · discovered identifiers · secrets, ARNs, account ids · provider strings outside a cloud entry |
 
 - **`src/spestate.json` opens on `type`**, with `config` discriminated by its `mtype`. **`spinfrapkg.json` names the publishable artifact** — `name` · `version` (the semver) · `description` · `author` · `license` — and an infra tree holds no `package.json` (RD.SUPPORT.INFRA.066).
-- **`networkIndex` is append-only, forever** — a freed index is never reused.
+- **`networkIndex` is append-only, forever** — a freed index is never reused. An index places its region, platform or environment in the cloud address plan and says nothing about local ports.
+- **Every local port sits inside the hundred the platform declares in `providers.local.ports: { first, last }`, in the part of it that holds its kind of listener** (RD.SUPPORT.INFRA.062) — engines `+00`–`14`, modules `+15`–`29`, services `+30`–`39`, health listeners `+40`–`49`, web apps `+50`–`69`, spaces `+70`–`99`. Module and space ports derive, so type one only as an override. `infra validate` refuses a port outside the range or in the wrong part of it.
 - A module row's `source` is a locator: a path while iterating (`version: null`), a scoped package + semver once published. Keep `hosting` `null` unless there is a real pin to make.
 - **The `apps[]` rows are the cloud grant list** — deploy requires claim (`spkind.config.code`) ∧ grant (`kindCode`). Granting an app is a declaration change here, never anything in the app's own repo.
 - `setup` is free text and **nothing derives from it** — never encode posture in a name; posture is `workload`.
@@ -80,15 +83,15 @@ On the consuming platform's `modules[]`: `code` · `layer` · `after` (a named s
 
 ```text
 spnutils infra validate module        # tree to type, manifest to contract
-spnutils infra test <package>         # the render harness — templates plan against fixtures
-spnutils infra platform up --plan     # the rendering, locally
+spnutils infra test <run> <package>   # the render harness — templates plan against fixtures
+spnutils infra platform up <spc> --plan   # the rendering, locally
 ```
 
 **A cloud plan refuses the path-resolved ref by name — that is the correct gate**, not a failure to fix around; it opens when the pin exists. See the `verify` skill for what each green run proves.
 
 ## 9 · Release, then flip the pin
 
-Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra release <package>`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `spnutils infra platform up --plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
+Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra release <package>`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `spnutils infra platform up <spc> --plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
 
 ## Hand-off
 

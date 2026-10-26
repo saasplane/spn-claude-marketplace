@@ -52,6 +52,12 @@ The folders under `packages/plugin-spn-infra/src/skills/` are `new`, `implement`
 **What** — `release` bumps the version field in the package manifest as a reviewed edit, then runs the release command. Publishing goes to the organization's registry pair, or stages into the machine store when asked to stay local.
 **How** — the skill also covers repointing a bespoke build script or workflow at the release command, so the second place stops existing. `packages/plugin-spn-infra/src/skills/release/SKILL.md`.
 
+### A platform-scoped command names its platform first
+
+**Why** — *an argument's position is part of its grammar*, and a session copying a command from one skill into another carries the order along with the words (`RD.DEVEX.UTILS.072`).
+**What** — every command naming a platform puts `<spc>` straight after the verb, and `<env>` after that where the layer is the environment. The organization layer takes neither, because a repository has at most one organization, and in an apps repository the `<spc>` given is checked against the `sprepo.json` pin.
+**How** — `run`, `review`, `verify` and `release` all spell it the same way: `infra platform up <spc> --plan`, `infra environment up <spc> <env> --cloud --plan`. `packages/plugin-spn-infra/src/skills/run/SKILL.md`.
+
 ### The cloud never reaches a skill
 
 **Why** — *a skills half is earned by changing the authoring stack*, and the cloud does not change it: an estate declaration is provider-neutral and every rendering is written against the same engine.

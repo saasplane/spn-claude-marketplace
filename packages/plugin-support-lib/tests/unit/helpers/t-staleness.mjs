@@ -93,5 +93,36 @@ console.log("\n=== staleness — a bundle imported from plugin-support-lib turns
   }
 }
 
+console.log("\n=== staleness — the hash follows an import inside the shared folder");
+{
+  // The plugin imports `outer.ts` alone, and `outer.ts` imports `inner.ts`, as `timing.ts` imports
+  // `docs-tree.ts`. No build is needed: the case reads the hash itself.
+  const { root, pluginDir, supportLibDir } = fixture();
+  try {
+    const lib = join(supportLibDir, "src", "lib");
+    writeFileSync(join(lib, "inner.ts"), "export const depth = 1;\n", "utf8");
+    writeFileSync(join(lib, "outer.ts"), 'import { depth } from "./inner.ts";\nexport const v = depth;\n', "utf8");
+    writeFileSync(join(lib, "unreached.ts"), "export const alone = 1;\n", "utf8");
+    writeFileSync(join(pluginDir, "src", "scripts", "events", "ping.ts"),
+      'import { v } from "../../../../plugin-support-lib/src/lib/outer.ts";\nconsole.log("v", v);\n', "utf8");
+    const before = pluginSourceHash(pluginDir, supportLibDir);
+
+    writeFileSync(join(lib, "inner.ts"), "export const depth = 2;\n", "utf8");
+    const afterInner = pluginSourceHash(pluginDir, supportLibDir);
+    ok("[MKT.SCRIPTS.92] known-bad: an edit to a shared file the plugin reaches through another shared file moves its hash",
+      afterInner !== before, `${before.slice(0, 12)} → ${afterInner.slice(0, 12)}`);
+
+    writeFileSync(join(lib, "unreached.ts"), "export const alone = 2;\n", "utf8");
+    ok("[MKT.SCRIPTS.92] an edit to a shared file the plugin does not reach leaves its hash as it was",
+      pluginSourceHash(pluginDir, supportLibDir) === afterInner);
+
+    // Two shared files that import each other are each read once.
+    writeFileSync(join(lib, "inner.ts"), 'import { v } from "./outer.ts";\nexport const depth = 3;\nexport const back = () => v;\n', "utf8");
+    ok("[MKT.SCRIPTS.92] two shared files that import each other still give a hash", /^[0-9a-f]{64}$/.test(pluginSourceHash(pluginDir, supportLibDir)));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — staleness` : `\n  all ${total} passed — staleness`);
 process.exit(failed ? 1 : 0);

@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/04-addressing.md", "seen": "d35f181e" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/04-addressing.md", "seen": "d35f181e" }
   ]
 }
 -->
 # Addressing — the formula computes the same here
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/04-addressing.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/04-addressing.md`. Read this as the restatement; that node governs.
 
 **Nothing states which network objects a computed block becomes on Google Cloud.** There is no network, subnet, routing or endpoint rendering here.
 

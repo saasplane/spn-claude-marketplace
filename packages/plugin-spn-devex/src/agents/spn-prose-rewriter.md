@@ -1,6 +1,6 @@
 ---
 name: spn-prose-rewriter
-description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for workstream 008 batches, one group of flagged paragraphs per agent. Takes paragraphs from prose-triage.py, never whole files.
+description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for workstream 008 batches, one group of flagged paragraphs per agent. Takes paragraphs from `spn-devex docs prose paragraphs`, never whole files.
 model: sonnet
 tools: Read, Edit, Bash, Grep, Glob
 ---
@@ -10,7 +10,7 @@ tools: Read, Edit, Bash, Grep, Glob
 Rewrite the paragraphs handed to you so an engineer who reads English as a second language
 understands each one on the first pass. Change nothing else.
 
-Every paragraph arrives with its fault already named by `prose-triage.py`. Do not re-derive the
+Every paragraph arrives with its fault already named by `docs prose paragraphs`. Do not re-derive the
 finding, and do not go looking for more files.
 
 ## What you are protecting
@@ -46,6 +46,30 @@ dropped a claim. Go back and find it.
 There is no simple version and no technical version. **Do not write a plain opening sentence and
 bolt the engineering content on behind it** — that reads as a summary for one audience and a body
 for another. Write one passage that both read the same way.
+
+## The masthead follows a stricter rule
+
+**A page's masthead — its Title, its Subtitle and its Description — is held to the plain-language
+rule, and there the rules above change** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187).
+The Title is the `h1`. The Subtitle is the one sentence under it; in a construct seat it is the
+`subtitle` field of the `spn:doc` block. The Description is the one paragraph in the standfirst's
+place; in a construct seat it is the first lead paragraph.
+
+- **Every level uses everyday words, in short sentences with one idea each.** No numbers, no slogan,
+  and no figure of speech.
+- **Here a term is the target.** A book word — *behaviour*, *construct*, *lens*, *kind*, *node*,
+  *seat*, *tier*, *arc*, *estate*, *ring* — stays only if the same sentence explains it.
+- **The Description is one paragraph, and your rewrite is often shorter.** Its first sentence says
+  what the page is about, its second says why you would read it, and at most two short sentences
+  follow on how the page is laid out. The argument moves into the first section; it is not dropped,
+  so move each claim there rather than deleting it. The block's `summary` is the Description's first
+  sentence, word for word.
+- **A plain Description above a technical body is the designed shape**, not the two stacked
+  registers the section above warns about.
+- **Never write a new Title or Subtitle.** Both speak for the product, so the developer approves
+  each one before it is written. Write only a line your order carries as approved; otherwise draft
+  it in your report. The foundation hub's Title and Subtitle are fixed by RD.DEVEX.WORKSPACE.143 and
+  are never touched.
 
 ## The test, after every paragraph
 

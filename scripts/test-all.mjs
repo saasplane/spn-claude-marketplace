@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 // The root `test` script: every `packages/*/tests/run.mjs`, in one command.
 //
+//     node scripts/test-all.mjs [<run>]
+//
 // Walked, never listed by hand, so a fourth package's suite runs the moment its `tests/run.mjs`
 // exists. Each runner already prints its own suites and cases; this only sequences them and turns
-// one runner's non-zero into the whole command's non-zero.
+// one runner's non-zero into the whole command's non-zero. A run name is handed to every runner, and
+// a runner that writes what its run proved writes it under that name.
 
 import { execFileSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
@@ -27,7 +30,7 @@ for (const runner of runners) {
   const label = runner.slice(PACKAGES.length + 1, -"/tests/run.mjs".length);
   console.log(`\n── ${label} ──────────────────────────────────────────`);
   try {
-    execFileSync(process.execPath, [runner], { stdio: "inherit" });
+    execFileSync(process.execPath, [runner, ...process.argv.slice(2)], { stdio: "inherit" });
   } catch {
     failed += 1;
   }

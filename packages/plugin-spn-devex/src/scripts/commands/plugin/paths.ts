@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RD.DEVEX.AGENT.070, carried from `N97` step 4 and run here per `N101` step 6b — a path written in a
 // plugin file must name a file the installed plugins carry.
 //
@@ -8,13 +7,18 @@
 // same failure `coherence.ts`'s `PATH` question catches for the foundation book naming a plugin file,
 // read here from the other side: a plugin naming its own.
 //
-//     spn-devex plugin paths [marketplace-root]
+//     spn-devex plugin paths check [<path>]
 //
-// Exit code is the number of findings. SOFT for now — this is a new check, and the corpus it reads
+// A SUBJECT WITH ONE ACTION, AND A `tree` PATH. The marketplace checkout is found by walking up from
+// the path, and the files read are the plugin files that sit under the path: the checkout itself
+// reads every plugin, one plugin's folder reads that plugin, and one skill reads that file.
+//
+// Exit code is 1 where a path resolves to nothing. The finding is graded SOFT: the corpus it reads
 // has not yet been swept to it (that sweep is the path rename `N101` step 6 carries).
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { type Action, OPTIONAL, onePath, readWords, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 const PLACEHOLDER = /[<{*…]|&lt;/;
@@ -80,8 +84,10 @@ export function findDead(pluginRoot: string): Finding[] {
 
 export const describe = "a plugin path named in its own skills/refs/hooks resolves to a shipped file (RD.DEVEX.AGENT.070)";
 
-export function run(args: string[]): number {
-  const root = marketplaceRoot(args.find((a) => !a.startsWith("--")) ?? process.cwd());
+/** The dead paths in the plugin files under one path, printed; 1 where there is one, else 0. */
+export function check(args: string[]): number {
+  const path = onePath(scopeOf(readWords(args).paths, OPTIONAL));
+  const root = marketplaceRoot(path);
   if (root === null) {
     console.log("no `packages/plugin-*` here — nothing to check");
     return 0;
@@ -91,11 +97,13 @@ export function run(args: string[]): number {
   // carries a `.claude-plugin/plugin.json`, the one file that makes something installable.
   const plugins = readdirSync(join(root, "packages"))
     .filter((e) => e.startsWith("plugin-") && isFile(join(root, "packages", e, "src", ".claude-plugin", "plugin.json")))
+    // A plugin is read where its folder sits under the path, or holds it.
+    .filter((e) => under(join(root, "packages", e), [path]) || under(path, [join(root, "packages", e)]))
     .sort();
   let total = 0;
   for (const plugin of plugins) {
     const pluginRoot = join(root, "packages", plugin);
-    const dead = findDead(pluginRoot);
+    const dead = findDead(pluginRoot).filter((one) => under(one.file, [path]));
     total += dead.length;
     for (const d of dead)
       console.log(`! SOFT paths     ${d.file.slice(root.length + 1)}:${d.line}\n         names \`\${CLAUDE_PLUGIN_ROOT}/${d.named}\`, which resolves to no file this plugin ships`);
@@ -103,7 +111,13 @@ export function run(args: string[]): number {
   console.log(total
     ? `\n${total} plugin path(s) named that resolve to nothing, over ${plugins.length} plugin(s)`
     : `\nclean — ${plugins.length} plugin(s)`);
-  return total;
+  return total ? 1 : 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "name each plugin path, in the plugin files under the path, that resolves to no shipped file",
+    usage: "[<path>]",
+    run: check,
+  },
+};

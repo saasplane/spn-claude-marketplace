@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// RESTATES: `docs/02-constructs/01-devex/07-providers.md` — a gate
-// never names an instance. That chapter is the source of truth; this file states no rule of its own.
+// RESTATES: `docs/02-constructs/02-support/02-apps/10-providers.md` § The claim, and what grants it ·
+// § What a provider set adds — one provider per stack, and the stack is the repository's own claim;
+// and RD.DEVEX.AGENT.066 — a gate never names an instance. Those are the source of truth; this file
+// states no rule of its own.
 //
 // **THIS FILE IS THE GATE, AND IT KNOWS NO STACK.** It names the subjects an apps node has and the
 // order they run in, then hands each one to the provider the node's own `sprepo.json` declares.
@@ -18,7 +20,13 @@ import type { ToolInput, Verdict } from "../../../../plugin-support-lib/src/lib/
 import { stackOf } from "../lib/stack.ts";
 
 /** One subject, parsed once by the stack's own validator. */
-export type Subject = { name: string; validate: (input: ToolInput) => Verdict | Promise<Verdict> };
+export type Subject = {
+  name: string;
+  /** The subject and the stack that answers it, as the telemetry line's group and action (`src` › `ts`). */
+  group: string;
+  action: string;
+  validate: (input: ToolInput) => Verdict | Promise<Verdict>;
+};
 
 /**
  * The subjects an apps node has, cheapest first.
@@ -43,7 +51,8 @@ export async function subjectsFor(path: string): Promise<Subject[]> {
   for (const name of SUBJECT_NAMES) {
     try {
       const module = await import(`../../providers/${stack}/scripts/checks/${name}.ts`);
-      if (typeof module.validate === "function") subjects.push({ name: `${name}:${stack}`, validate: module.validate });
+      if (typeof module.validate === "function")
+        subjects.push({ name: `${name}:${stack}`, group: name, action: stack, validate: module.validate });
     } catch {
       // A subject a provider does not ship is a subject that does not run here.
     }

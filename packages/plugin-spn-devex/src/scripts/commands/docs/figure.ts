@@ -1,48 +1,74 @@
-#!/usr/bin/env node
 // RESTATES: `docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` § The figures, and
 // `docs/05-guides/README.md` § Before step 1 — your machine, which names the browser this needs.
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// Two halves under one action: the geometry check reads a spec and the SVG it draws to; the browser
-// render answers what a real layout paints. `check`/`colour` in `args[0]` pick the first; any other
-// `args[0]` is a path, and the whole list renders.
+// Two halves under one subject: the geometry check reads a spec and the SVG it draws to; the browser
+// render answers what a real layout paints; `draw` is the same drawer, offered to a hand-written page.
 //
-//   spn-devex docs figure check <path…>    labels fit and connectors join · a block's colouring matches its text
-//   spn-devex docs figure colour <path…>   the audit's half: a coloured block strips back to what the author wrote
-//   spn-devex docs figure <svg-or-html…>   render each in a headless browser and report what it painted
+//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join, and every spec draws
+//   spn-devex docs figure colour <path…> [--variant <name>]   a code block's file holds plain code, and carries no colour span
+//   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
+//   spn-devex docs figure draw <spec.json…>                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks
+//
+// A SUBJECT WITH FOUR ACTIONS. `check`, `colour` and `render` take a `file` path, one or a folder of
+// them, and `--variant` narrows the first two; `draw` takes one or more spec files directly.
 //
 // THE BROWSER IS OPTIONAL AND THIS SAYS SO RATHER THAN FAILING, on a machine carrying no global
 // `playwright` install (the guides seat carries the line to add one).
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, extname, join, relative, resolve } from "node:path";
-import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
+import { basename, dirname, extname, join, relative } from "node:path";
+import { checkFigures, colouredBlocks } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
-import { begin, record, end } from "../../lib/timing.ts";
-import { resolveWorkspace, walkFiles } from "./_lib.ts";
+import { type Action, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, cutVersions, linesFor, newestVersion } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { VARIANTS, holdsOwnCopy, inClosedWorkstream, readBlock, resolveWorkspace, stylesFolder, walkFiles } from "./_lib.ts";
 
-export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
+/**
+ * Whether an html file is a page of ours: it carries an `spn:doc` block, or it sits in a docs tree or in a
+ * workstream's folder. A test report or an application's own `index.html` is neither, so a walk of a whole
+ * repository reads past it and names nothing.
+ */
+function isPageOfOurs(file: string, src: string): boolean {
+  const path = slashes(file);
+  return /<!--\s*spn:doc\b/.test(src) || hasSegment(path, DOCS) || path.includes(`/${DEVEX_WORKSTREAMS}/`);
+}
+
+export const describe = "a figure's own geometry against the page, and what a browser paints of it";
 
 // ---------------------------------------------------------------------------- check | colour
 
-function geometryCli(sub: string, args: string[], workspace: string): number {
+/** The two actions that read a page's own text: `check` judges its drawings, and `colour` its code blocks. */
+function geometry(sub: "check" | "colour", args: string[]): number {
+  const words = readWords(args, { variant: VARIANTS });
+  const paths = scopeOf(words.paths, REQUIRED);
+  const variants = words.values("variant");
+  const workspace = resolveWorkspace();
   // A PATH IS A FILE OR A FOLDER, exactly as it is for `audit`. Given a folder this reads the
   // directory itself rather than dying on EISDIR with a raw stack trace — `figure check
   // <repo>/docs/artifacts` is the only way a whole corpus gets judged in one call. The same walk
   // `audit` uses, so `templates/` is skipped by the rule that already exists.
   const missing: string[] = [];
-  const files = args.filter((a) => !a.startsWith("--")).flatMap((p) => {
-    const full = resolve(p);
+  const named = paths.flatMap((full) => {
     let st;
     // A PATH THAT IS NOT THERE IS NAMED, never read. Falling through to `readFileSync` turned a typo
     // into a raw ENOENT stack trace, which is the same fault as the folder one wearing a different
     // error code: the tool reporting itself as broken when the argument was.
     try { st = statSync(full); } catch { missing.push(full); return []; }
-    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".html") || f.endsWith(".md")) : [full];
+    return st.isDirectory() ? walkFiles(full, (file) => file.endsWith(".html") || file.endsWith(".md")) : [full];
   });
-  for (const m of missing) console.log(`✗ RULE figure    ${relative(workspace, m)}\n         no such file or folder`);
-  if (!files.length && !missing.length) { console.log("no page under that path"); return 0; }
+  // `--variant` narrows the run to the documents whose block declares one of the variants it names.
+  const declares = (file: string): boolean => {
+    try { return variants.includes(readBlock(readFileSync(file, "utf8")).block?.variant ?? ""); } catch { return false; }
+  };
+  const files = variants.length ? named.filter(declares) : named;
+  for (const gone of missing) console.log(`✗ RULE figure    ${relative(workspace, gone)}\n         no such file or folder`);
+  if (!files.length && !missing.length) {
+    console.log(variants.length && named.length ? `no page under that path declares the variant ${variants.join(" · ")}` : "no page under that path");
+    return 0;
+  }
   if (!files.length) return 1;
 
   if (sub === "check") {
@@ -53,6 +79,13 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     let soft = 0;
     for (const f of files) {
       const src = readFileSync(f, "utf8");
+      // A DRAWING IS READ BY THE SHARED STYLESHEET'S CLASS NAMES. A page that links no shared
+      // stylesheet holds other names, so it is named once, as a RULE, and its drawings are not read.
+      // A page of a closed workstream is not named either.
+      if (holdsOwnCopy(f, src)) {
+        if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { total += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
+        continue;
+      }
       // A SPEC THAT DRAWS NOTHING IS INVISIBLE TO THE REST OF THIS CHECK, which judges the SVGs a
       // page HAS. Eight foundation seats asked for the retired `flow`; the drawer refuses it, the
       // renderer then emits no figure element at all, and seven of those pages carried no figure
@@ -99,43 +132,48 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     return total ? 1 : 0;
   }
 
-  if (sub === "colour") {
-    // The audit's half: a coloured block must strip back to what the author wrote.
-    let bad = 0;
-    for (const f of files) {
-      const src = readFileSync(f, "utf8");
-      for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
-        const round = colour(stripSpans(m[2]), m[1]);
-        if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`figures colour\` produces from its own text`); }
-      }
+  // A page's file holds plain code: the shared script colours a block when the page opens, so a block
+  // whose file carries colour spans holds a second copy of the colouring, and it is named.
+  let bad = 0;
+  let unread = 0;
+  for (const f of files) {
+    const src = readFileSync(f, "utf8");
+    // The shared script colours a block, so a page that links no shared stylesheet and script is
+    // named once, as a RULE, and its blocks are not read.
+    if (holdsOwnCopy(f, src)) {
+      if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { unread += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
+      continue;
     }
-    console.log(bad ? `\n${bad} block${bad > 1 ? "s" : ""} off` : "every coloured block matches its own text");
-    return bad ? 1 : 0;
+    for (const block of colouredBlocks(src)) {
+      bad += 1;
+      console.log(`✗ RULE figure    ${relative(workspace, f)}\n         ${block.language ? `a \`${block.language}\` block` : "a block with no language"} carries colour spans in the file. `
+        + "A page's file holds plain code, and the shared script colours it when the page opens: remove the spans");
+    }
   }
-
-  console.error("usage: spn-devex docs figure check|colour <path…>");
-  return 2;
+  // A page that was not read is counted apart from a block that is off, and either one is a RULE.
+  const summary = [
+    ...(bad ? [`${bad} block${bad > 1 ? "s carry" : " carries"} colour in the file`] : []),
+    ...(unread ? [`${unread} page${unread > 1 ? "s" : ""} not read`] : []),
+  ];
+  console.log(summary.length ? `\n${summary.join(" · ")}` : "every code block is plain in its file");
+  return bad || unread ? 1 : 0;
 }
 
 // ---------------------------------------------------------------------------- browser render
 
-/** The stylesheet a `dg` figure is drawn against, in the theme a reader is most likely to be in. */
-const CSS = `
- body{margin:0;background:#0f1318;padding:20px}
- svg{display:block;width:auto;max-width:none;height:auto}
- .dg{color:#86a9da}
- .dg .box{fill:#171d24;stroke:#242d37;stroke-width:1.5}
- .dg .box.off{fill:none;stroke:#242d37;stroke-width:1.5;stroke-dasharray:5 4}
- .dg .box.em{fill:#18232f;stroke:#86a9da;stroke-width:1.5}
- .dg .box.warn{fill:#2a2113;stroke:#d59d4f;stroke-width:1.5}
- .dg .t{font:650 13px ui-sans-serif,sans-serif;fill:#e3e8ee}
- .dg .l{font:12px ui-sans-serif,sans-serif;fill:#e3e8ee}
- .dg .s{font:11px ui-monospace,monospace;fill:#a3adb9}
- .dg .n{font:11px ui-sans-serif,sans-serif;fill:#6f7986}
- .dg .c{stroke:#86a9da;stroke-width:1.6;fill:none}`;
+/**
+ * The line that links the newest version of the shared stylesheet. A drawing that stands alone is
+ * wrapped in a page that carries this line, so the browser draws it with the same styles a page
+ * gives it. Null where no version is listed.
+ */
+function stylesheetLine(): string | null {
+  const styles = stylesFolder();
+  const newest = styles === null ? null : newestVersion(Object.keys(cutVersions(styles)));
+  return newest === null ? null : linesFor(newest).stylesheet;
+}
 
 /** Where the global install lives today. `null` where there is none, which is not an error. */
-function playwrightPath(): string | null {
+export function playwrightPath(): string | null {
   try {
     const root = execFileSync("npm", ["root", "-g"], { encoding: "utf8" }).trim();
     const entry = join(root, "playwright", "index.mjs");
@@ -189,11 +227,8 @@ const PROBE = `(() => {
   return out;
 })()`;
 
-async function renderCli(files: string[]): Promise<number> {
-  if (!files.length) {
-    console.log("usage: spn-devex docs figure <svg-or-html> [...]");
-    return 2;
-  }
+async function render(args: string[]): Promise<number> {
+  const files = scopeOf(readWords(args).paths, REQUIRED);
   const entry = playwrightPath();
   if (!entry) {
     console.log("No browser on this machine, so nothing was rendered — this is not a failure.");
@@ -204,10 +239,14 @@ async function renderCli(files: string[]): Promise<number> {
   const { chromium } = await import(entry);
   const browser = await chromium.launch();
   let findings = 0;
+  const stylesheet = stylesheetLine();
+  if (stylesheet === null && files.some((file) => extname(file) === ".svg"))
+    console.log("No version of the shared stylesheet is listed, so a bare drawing is rendered with no styling.");
   for (const file of files) {
     const body = readFileSync(file, "utf8");
-    // A bare `.svg` is wrapped; a page is loaded whole, so its own stylesheet wins over the fallback.
-    const html = extname(file) === ".svg" ? `<style>${CSS}</style>${body}` : body;
+    // A bare `.svg` is wrapped in a page that links the shared stylesheet; a page is loaded whole,
+    // with the stylesheet it links itself.
+    const html = extname(file) === ".svg" ? `${stylesheet ?? ""}\n${body}` : body;
     const page = await browser.newPage({ deviceScaleFactor: 2 });
     await page.setContent(html);
     const svg = await page.$("svg");
@@ -226,20 +265,53 @@ async function renderCli(files: string[]): Promise<number> {
   return 0;
 }
 
-// ---------------------------------------------------------------------------- dispatch
+// ---------------------------------------------------------------------------- draw
 
-export async function run(args: string[]): Promise<number> {
+/**
+ * A HAND-WRITTEN PAGE ASKS THE SAME HELPER a seat file's build step calls on its own: no author
+ * places a coordinate either way. A `.json` file is one spec; a `.md` file's own ```` ```dg ```` blocks
+ * are drawn in the order they appear, as the page itself would hold them.
+ */
+function drawSpecs(args: string[]): number {
+  const files = scopeOf(readWords(args).paths, REQUIRED);
   const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
-  const [sub, ...rest] = args;
-  const code = sub === "check" || sub === "colour"
-    ? geometryCli(sub, rest, workspace)
-    : await renderCli(args.filter((a) => !a.startsWith("-")));
-  record("docs-figure", performance.now() - startedAt);
-  end();
-  return code;
+  let total = 0;
+  for (const file of files) {
+    const src = readFileSync(file, "utf8");
+    const texts = file.endsWith(".md") ? [...src.matchAll(/```dg\n([\s\S]*?)```/g)].map((m) => m[1]) : [src];
+    texts.forEach((text, i) => {
+      let spec: { caption?: string; [k: string]: unknown };
+      try { spec = JSON.parse(text); }
+      catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: not valid JSON — ${(e as Error).message}`); return; }
+      const { svg, findings } = draw(spec as Parameters<typeof draw>[0]);
+      for (const f of findings) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: ${f}`); }
+      if (svg) console.log(`<figure>\n${svg}${spec.caption ? `\n<figcaption>${spec.caption}</figcaption>` : ""}\n</figure>`);
+    });
+  }
+  return total ? 1 : 0;
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "figure.ts")
-  process.exit(await run(process.argv.slice(2)));
+// ---------------------------------------------------------------------------- the actions
+
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "labels fit and connectors join, and every spec draws: the findings of each page's own drawings",
+    usage: "<path…> [--variant <name>]",
+    run: (args) => geometry("check", args),
+  },
+  colour: {
+    describe: "a code block's file holds plain code, and carries no colour span",
+    usage: "<path…> [--variant <name>]",
+    run: (args) => geometry("colour", args),
+  },
+  render: {
+    describe: "render each figure in a headless browser, and report what it painted",
+    usage: "<svg-or-html…>",
+    run: render,
+  },
+  draw: {
+    describe: "print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks",
+    usage: "<spec.json…>",
+    run: drawSpecs,
+  },
+};

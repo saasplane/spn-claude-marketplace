@@ -76,20 +76,27 @@ export function watched(path: string): boolean {
  * The walk runs over the MASKED text, so a comma inside a string or a comment is already blank and
  * can never look like an argument boundary. A call that never closes — a fragment, or a file this
  * check cannot parse — answers null, and the caller leaves it alone.
+ *
+ * A TRAILING COMMA ENDS AN ARGUMENT AND STARTS NONE. A comma counts only when something follows it
+ * before the call closes, so `expect(\n  x,\n)` holds one argument.
  */
 export function argumentList(masked: string, openParen: number): [number | null, number] {
   let depth = 0;
   let index = openParen;
-  let commas = 0;
-  let content = false;
+  let count = 0;
+  let inArgument = false;
   while (index < masked.length) {
     const char = masked[index];
-    if (OPENERS.includes(char)) depth += 1;
-    else if (CLOSERS.includes(char)) {
+    if (CLOSERS.includes(char)) {
       depth -= 1;
-      if (depth === 0) return [index, content || commas ? commas + 1 : 0];
-    } else if (char === "," && depth === 1) commas += 1;
-    else if (depth >= 1 && !/\s/.test(char)) content = true;
+      if (depth === 0) return [index, count];
+    } else if (char === "," && depth === 1) {
+      inArgument = false;
+    } else if (depth >= 1 && !/\s/.test(char) && !inArgument) {
+      // The first character of an argument, at the call's own depth or opening a nested one.
+      if (depth === 1) { inArgument = true; count += 1; }
+    }
+    if (OPENERS.includes(char)) depth += 1;
     index += 1;
   }
   return [null, 0];

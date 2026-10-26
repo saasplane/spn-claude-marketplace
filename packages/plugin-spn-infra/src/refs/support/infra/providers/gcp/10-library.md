@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/10-library.md", "seen": "8cbf2cf0" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/10-library.md", "seen": "8cbf2cf0" }
   ]
 }
 -->
 # Library — no blueprint package ships for this cloud
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/10-library.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/10-library.md`. Read this as the restatement; that node governs.
 
 **No blueprint library exists for Google Cloud.** Nothing renders any layer here, so there is no package for a declaration to pin and no version to choose.
 

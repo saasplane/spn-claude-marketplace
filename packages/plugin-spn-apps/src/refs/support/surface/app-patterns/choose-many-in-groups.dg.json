@@ -1,0 +1,412 @@
+{
+ "kind": "skeleton",
+ "title": "Choose many, where the data has groups",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The choices are saved once, so the page is one container, and its header is the page level: the way back, the kind the choices are for, and a line under it. Its actions stand at the start of its footer. The groups come from the data, so each is a part of the content under its own title, with a line above it. The choices stand in columns: each column starts at the same place in every row and in every group, so a person reads down a column as well as along a row. A row with fewer choices leaves its last places empty. Every screen shows every group and every choice. They stand four across at a desktop and on a tablet, and on a phone one under another.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Team"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Enterprise",
+     "description": "What it is offered"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Access",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Members",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Roles",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Directory",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "App sites",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Custom domain",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Sign-in policy",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Data policy",
+               "fill": true
+              },
+              {
+               "spacer": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Billing",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Plans",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Invoices",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Usage",
+               "fill": true
+              },
+              {
+               "spacer": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Enterprise",
+     "description": "What it is offered"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Access",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Members",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Roles",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Directory",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "App sites",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Custom domain",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Sign-in policy",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Data policy",
+               "fill": true
+              },
+              {
+               "spacer": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Billing",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Plans",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Invoices",
+               "fill": true
+              },
+              {
+               "control": "checkbox",
+               "text": "Usage",
+               "fill": true
+              },
+              {
+               "spacer": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Enterprise",
+     "description": "What it is offered"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Access",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Members",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Roles",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Directory",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "App sites",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Custom domain",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Sign-in policy",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Data policy",
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Billing",
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Plans",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Invoices",
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "control": "checkbox",
+               "text": "Usage",
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

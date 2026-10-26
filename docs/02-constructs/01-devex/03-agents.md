@@ -2,22 +2,25 @@
 {
   "id": "agent-set",
   "variant": "construct",
-  "title": "Agents — The Personas a Session Convenes, and the Lenses They Are Handed",
+  "title": "Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed",
+  "subtitle": "A second reader, convened for just one turn, who holds only what its own file grants it.",
   "lenses": ["LEAD", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "ref-set"],
-  "summary": "A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the reviewing viewpoint a parameterized brief is handed, and the one condition that viewpoint may block on.",
+  "summary": "An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.",
   "keywords": ["agent", "brief", "persona", "lens", "panel", "authority"]
 }
 -->
 
-# Agents — The Personas a Session Convenes, and the Lenses They Are Handed
+# Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed
 
 `For: Engineering leader · Architect` · `Status: 🔮 PLANNING`
 
-The context that wrote a change has already agreed with every reason it gave itself. A brief is how a second, independent read arrives without opening a second window: a persona with its own name, convened mid-turn, carrying only what its own file grants it. A backend developer reads a change differently than a security reviewer does, and a lens is that difference written down — one file per engineering function, handed to a reviewing brief at the moment it is convened.
+An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. Read this page before you write a new persona, or if you need to know what one is allowed to decide. It covers the file that decides when a persona answers, the authority its own file grants it, and the viewpoint — called a lens — it is handed when convened.
 
 ## Overview
+
+The context that wrote a change has already agreed with every reason it gave itself. So a persona is convened with its own name in the middle of a turn, carrying only what its own file grants it — a second read without opening a second window. A backend developer reads a change differently than a security reviewer does, and a lens is that difference written down: one file per engineering function, handed to a reviewing brief at the moment it is convened.
 
 The thing to check first in any brief is its authority — what this persona may decide, and whether it may write anything at all. Some of that authority is bound by the frontmatter and some of it is only stated in the prose, and the two are not the same promise.
 
@@ -124,4 +127,4 @@ This page answers what a brief is, how a persona is convened, what a viewpoint f
 | `RD.DEVEX.WORKSPACE.118` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
 | [RD.DEVEX.004](../../registers/decisions.md) | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

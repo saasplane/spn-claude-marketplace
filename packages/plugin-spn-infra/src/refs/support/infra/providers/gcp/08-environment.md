@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/08-environment.md", "seen": "8042744b" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/08-environment.md", "seen": "8042744b" }
   ]
 }
 -->
 # Environment — derived already, rendered nowhere
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/08-environment.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/08-environment.md`. Read this as the restatement; that node governs.
 
 **Nothing renders an environment on Google Cloud.** There is no network, no data service, no cluster, and no DNS or certificate binding produced here.
 

@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/02-ground.md", "seen": "d1ccbf27" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/02-ground.md", "seen": "d1ccbf27" }
   ]
 }
 -->
 # Ground — nothing is brought to a machine
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/02-ground.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/02-ground.md`. Read this as the restatement; that node governs.
 
 **The ground layer validates the things a company brings by hand and discovers their coordinates.** On a machine there is nothing to validate, because nothing is brought. The declaration states the same fact: the `local` provider entry carries no `mtype` ([packages](../../packages.md)).
 

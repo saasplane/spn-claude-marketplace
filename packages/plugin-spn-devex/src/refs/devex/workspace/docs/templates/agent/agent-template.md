@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/01-agent.md § The agent
+<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/01-agent.md § The DevEx Agent
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -15,7 +15,7 @@ tools: [{{Read, Grep, Bash …}}]    # a reviewer has no Edit; a writer has no r
 {{What it is convened for, and by whom.}}
 
 ## Lens
-{{The one lens it wears, by file: `refs/lenses/{{lens}}.md`. Several only at a gate, one per convening.}}
+{{The one lens it wears, by file: `refs/devex/agent/lenses/{{lens}}.md`. Several only at a gate, one per convening.}}
 
 ## What it reads
 - `{{refs/constructs/…}}` · `{{refs/rules/…}}` — never a summary of the artifact; the artifact itself

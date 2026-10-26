@@ -100,12 +100,14 @@ export const statusOf = (row: RegisterRow): string =>
   cellValue(row, "status").replace(/[✅❌⏳🔮👤🚧]/gu, "").trim().toUpperCase();
 
 /**
- * A behaviour id as the registers spell it, and as a case title cites one.
+ * A behaviour id as the registers spell it, and as a case title cites one: `DOMAIN.AREA.NN`.
  *
- * The middle segment admits a digit after its first letter, because `WEB.A11Y.01` is a row this
- * estate declares. `RD.` and `PD.` are the book's register ids, which titles cite and no row declares.
+ * The domain is two to seven letters, so `COMPOSE.BUILD.01` and `SERVICE.HEALTH.01` are read. The
+ * middle segment admits a digit after its first letter, because `WEB.A11Y.01` is a row this estate
+ * declares. `RD.` and `PD.` are the book's register ids, which titles cite and no row declares, and
+ * nothing is read from inside one: an id never follows a letter, a digit or a dot.
  */
-export const BEHAVIOUR_ID = /\b(?!RD\.|PD\.)([A-Z]{2,6}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
+export const BEHAVIOUR_ID = /(?<![A-Za-z0-9.])(?!RD\.|PD\.)([A-Z]{2,7}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
 
 /** Every behaviour id a piece of text cites. */
 export const idsIn = (text: string): string[] => [...text.matchAll(BEHAVIOUR_ID)].map((match) => match[1]);
@@ -130,25 +132,32 @@ export type DeclaredRow = {
 /** Every markdown file under a folder, in a stable order. */
 const markdownUnder = (dir: string): string[] => [...walk(dir)].filter((file) => file.endsWith(".md"));
 
+/** A behaviour id that more than one register row declares, with every row that declares it. */
+export type RepeatedId = { id: string; rows: Array<{ file: string; line: number }> };
+
 /**
- * Every register row under `<root>/docs/`, read by heading. A row declared twice is one row and the
- * first file wins; whether two documents may claim one id is the documents check's question.
+ * Every register row under `<root>/docs/`, read by heading. A row declared twice is one row in
+ * `rows`, and the first file wins. The id is returned in `repeated` with each row that declares it,
+ * so a reader can show both rows and neither is dropped in silence.
  */
-export function declaredRows(root: string): { rows: DeclaredRow[]; registers: number } {
+export function declaredRows(root: string): { rows: DeclaredRow[]; registers: number; repeated: RepeatedId[] } {
   const rows: DeclaredRow[] = [];
-  const seen = new Set<string>();
+  const declaredAt = new Map<string, Array<{ file: string; line: number }>>();
   let registers = 0;
   for (const file of markdownUnder(join(root, "docs"))) {
     const text = read(file);
     if (text === null || !text.includes("|")) continue;
     registers += text.split("\n").filter(isHeader).length;
+    const shown = relative(root, file).split("\\").join("/");
     for (const row of registerRows(text)) {
       const ids = idsIn(cellValue(row, "id"));
-      if (ids.length !== 1 || seen.has(ids[0])) continue;
-      seen.add(ids[0]);
+      if (ids.length !== 1) continue;
+      const earlier = declaredAt.get(ids[0]);
+      if (earlier !== undefined) { earlier.push({ file: shown, line: row.index + 1 }); continue; }
+      declaredAt.set(ids[0], [{ file: shown, line: row.index + 1 }]);
       rows.push({
         id: ids[0],
-        file: relative(root, file).split("\\").join("/"),
+        file: shown,
         line: row.index + 1,
         who: cellValue(row, "who"),
         does: cellValue(row, "does"),
@@ -161,7 +170,11 @@ export function declaredRows(root: string): { rows: DeclaredRow[]; registers: nu
       });
     }
   }
-  return { rows: rows.sort((left, right) => left.id.localeCompare(right.id)), registers: registers };
+  const repeated = [...declaredAt.entries()]
+    .filter(([, declarations]) => declarations.length > 1)
+    .map(([id, declarations]) => ({ id: id, rows: declarations }))
+    .sort((left, right) => left.id.localeCompare(right.id));
+  return { rows: rows.sort((left, right) => left.id.localeCompare(right.id)), registers: registers, repeated: repeated };
 }
 
 /**

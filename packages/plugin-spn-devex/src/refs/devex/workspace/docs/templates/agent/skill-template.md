@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/02-skills.md § Skills · docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A construct's status is derived, never typed
+<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/02-skills.md § DevEx Skills · docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A construct's status is derived, never typed
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->

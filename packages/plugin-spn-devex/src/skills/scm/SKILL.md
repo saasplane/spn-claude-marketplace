@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "81e74177"
+      "seen": "f3d02f7d"
     }
   ]
 }
@@ -27,6 +27,8 @@ description: The repository and project standard - what a project must declare, 
 
 
 # scm — one declaration decides the rest
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **Every node declares exactly one kind, in `spkind.json` at its root, and everything derivable from that kind is never declared again.** Runtime, toolchain profile, structure, packaging, and whether the project publishes at all — all follow. A node without a kind is unfinished; a node that restates what its kind already implies has introduced a second source of truth. A folder with `spkind.json` **is** a node — which is how a module living inside an app is validated and scaffolded exactly like the packaged form. **A node carries `README.md` and no docs tree**: the seats live once, in the repository's own tree, and the node's README links into the ones it realizes.
 
@@ -65,7 +67,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 ## Wiring a repo for agents
 
-`agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
+`agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. It also writes the delivery path the world implies: `.github/workflows/checks.yml`, `.github/CODEOWNERS` and `SECURITY.md`. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state. Read `refs/devex/function/scm.md` § The delivery path for the checks each world runs.
 
 **A stack-agnostic command reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A command that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
 
@@ -82,8 +84,9 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace init` | mints the folder — the permission floor, the marketplace, the state directory, the engine check | the workspace root |
 | `workspace agent-sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
+| `workspace worktree add <NNN>` · `remove <NNN>` | opens and removes the workstream's worktree set, `.worktrees/<NNN>-<subject>/`, with the branch `feat/<NNN>-<subject>` cut from a fresh `origin/develop` in each repository its rows name (`--from <branch>` cuts a fix's set from `main`, `uat` or `qa`) | the set, never a member |
 
-**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
+**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — five marked regions, the producer and managed regions rewritten whole, the devex region's two tokens written once when missing, the keep region laid out. **They derive no key from a declaration.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/devex/workspace/workspace.md` § The machine seat for the regions, the layout and the namespacing rule.
 
 **There is no workstream command, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
@@ -106,7 +109,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 **Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
 
-**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/cross-repo.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
+**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/devex/workspace/workspace.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
 
 ## The lines that hold
 
@@ -114,6 +117,15 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 - **A directory name is not a declaration.** Naming a folder after a kind does not make a project that kind, and validate will say so.
 - **Structure is a rule, not a preference.** Where a project deviates, either the project is fixed or the kind's profile changes deliberately — never a local exception that the next reader has to learn.
 - **A new kind is a recorded decision**, not an addition someone makes while scaffolding.
+- **A red required check is fixed, never bypassed.** The checks ruleset has no bypass actor, so nobody merges past a failing check, administrators included.
+
+## Branches, promotion and releases
+
+- **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch rebases onto `origin/develop` before every push.
+- **Each check runs at the first step that can run it.** The push check runs the offline tiers; the stack tiers run on the pull request into `develop`; a promotion reruns nothing.
+- **The path to `main` is chosen at each promotion** with `spnutils repo promote <to> [--from <branch>]`, a merge commit each time. `main` takes merges from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`, a fork's included, and names `spnutils repo promote`. The agent names the path and asks which branch a change goes to when the developer has not said.
+- **A fix takes its own path.** `hotfix/<subject>` is cut from `main`, `uat` or `qa`, never `develop`, is tested in its own pull request back into its source, and `spnutils repo backmerge <branch>` merges it down to `develop`.
+- **A release is cut only from `main`,** from a clean tree at `origin/main`.
 
 ## Repo tasks — invoke, never reconstruct
 
@@ -126,5 +138,5 @@ A repository's own operations live in `tasks/` — one file per task, reached th
 
 ## Lenses
 
-Wear `refs/lenses/lead.md` when shaping repo standards and process — the paved road, the branch model, and the ladder are its checks.
+Wear `refs/devex/agent/lenses/lead.md` when shaping repo standards and process — the paved road, the branch model, and the ladder are its checks.
 

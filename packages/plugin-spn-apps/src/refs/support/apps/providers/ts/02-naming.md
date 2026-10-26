@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md", "seen": "c0dbfb88" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
+      "seen": "5c3760ab"
+    }
   ]
 }
 -->
@@ -47,7 +50,7 @@
 
 **Declaring a type is not what classifies a file.** Any file may carry the interfaces and enums it needs. What decides the name is the count and kind of a file's *value* exports.
 
-**`utils` says what the code is, never what it is about**, so it works at either level: a `utils.ts` beside the feature it serves, or a `utils/` folder of domain-named module files. Pure is the whole contract — inputs in, value out, nothing held and nothing outside the function touched. A helper that needs state is a class with a file of its own.
+**`utils` says what the code is, never what it is about**, so it works at either level: a `utils.ts` beside the feature it serves, or a `utils/` folder of domain-named module files. Pure is the whole contract — inputs in, value out, nothing held and nothing outside the function touched but the shared `app` object. A util may read `app.config` and log through `app.providers.logger`, because every app has both. A helper that needs state is a class with a file of its own. The `utils/` folder of a support area has a wider contract: a function there may also read a file, run a command or read the environment.
 
 ### `index.ts` does not mean one thing
 
@@ -75,15 +78,71 @@
 | --- | --- | --- |
 | a class interface — service or provider | `I` + PascalCase | `ISPAuthProvider` |
 | React component props | `I` + component + `Props` | `IDSButtonProps` |
+| a group of a component's props | `I` + component + group + `Props`, built from the owner's props with `Omit` or `Pick` | `IDSFeatureGridSectionContainerHeadingProps` |
+| a props shape many units share, which no component owns | `I` + what it is, with no `Props` and no `Config`: neither a component nor a unit's `config` prop owns it | `IDSFrameSurface`, `IDSGridColumns`, `IDSGrid` |
 | an entity or contract shape | PascalCase, no `I` | `User` |
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
+
+### Units of a web module
+
+**Every unit of a web module ends in the word for where it is placed or what it is, and only a plain component needs none — MUST** (`RD.SUPPORT.APPS.202`, amended by `RD.SUPPORT.SURFACE.229`). A reader then knows what a unit is from its name, before opening its file.
+
+| Unit | Its name | Example |
+| --- | --- | --- |
+| a page | ends in `Page` | `RoleListPage` |
+| a container | ends in `Container` | `RoleListContainer` |
+| a widget | ends in `Widget` | `RoleMembersWidget` |
+| a dialog | ends in `Dialog` | `RoleInviteDialog` |
+| a form | ends in `Form` | `RoleForm` |
+| a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RoleAutocomplete` |
+| a record's item line | the state's name, then `Item` | `RoleItem` |
+| a hook | starts with `use` | `useRoleList` |
+| a plain component | no suffix and no prefix is needed | `RoleBadge` |
+
+**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker` or `Item` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
+
+**A type registered with `LOOKUP` owes its web module two exports — MUST** (`RD.SUPPORT.APPS.223`): its `<State>Autocomplete`, and the option source that Autocomplete uses, as the hook `use<State>OptionSource()`, which returns `IDSDataOptionSource` of the record. A form field, a filter bar and the custom-field form all choose that record through the same two, and the custom-field form turns a field's source code (`IAM_ROLE`) into that hook, so no picker of a record is written twice. The hook is a hook file like any other: one hook in `useRoleOptionSource.ts`, in the module's `hooks/<area>/`, beside the `components/<area>/` folder that holds `RoleAutocomplete.tsx`.
+
+**A record's item line is `<State>Item`, and its words and facts come from `prepare<State>ItemProps()` in the module's `utils/<state>.ts`** (`RD.SUPPORT.APPS.218`). `RoleItem` draws a role, as `RoleAutocomplete` chooses one, and it sits beside it, in `components/<area>/RoleItem.tsx`. The function takes the record, the place's `IDSItemPlacementProps` and `translate`, and returns the props of `DSItem`; the Item draws what it returns, and a card's head or row spreads the same props, so the two show one line. The function lives in the utils file so the component file keeps its single export: `prepareRoleItemProps` in `utils/role.ts`.
+
+**A form's own state is `I<what it edits>FormState` — MUST** (`RD.SUPPORT.APPS.220`): `IRoleFormState`, `IOrgAuthPolicyFormState`. It is the shape a form holds while a person fills it in, and its fields take the command's own types. The name says which unit holds it, the form, as `IRoleFormProps` does, and keeps the word *state* apart from a contract state, which is a record the server returns. `EntryState` and `Draft` are not used.
+
+**A suffix names where a unit is placed: `App`, `Layout`, `Container`, `Widget`.** A widget stands beside others or in a sidebar, inside a container or not. A block built for one task and placed nowhere in particular is a component and carries none, as the design system's `DSDataTable` does. **The list of pattern words is not closed.** A module that follows a pattern the stack already names uses that name. A plain component is raw: it has no layer to say. The props interface follows the unit's name, as `IRoleListContainerProps`.
+
+**A module's route keys are one enum, and its routes are one constant. Proposed** (`RD.SUPPORT.APPS.203`). The enum is `<MOD>RouteType`. Each key is in capitals and matches its value, and each value begins with the module's code: `IAMRouteType.ROLE_DETAIL = 'IAM_ROLE_DETAIL'`. The list is the constant `<MOD>_ROUTES`, typed `ISPRoute[]`. The developer has not seen this choice.
+
+### Support classes and seams
+
+**A class under `app/support/` tells you which area its file is in.** The kinds of file are `module/README.md` in this plugin; this is how TypeScript names them.
+
+| What is named | Pattern | Example |
+| --- | --- | --- |
+| a support class | the area, then the subject, then the kind | `KindManifestStore`, `IngressCertificateManager` |
+| a provider | the same, ending with its vendor or its stack | `IngressProviderNginx`, `AppsProviderTS` |
+| a seam's interface | `I`, then the area, then `Provider`; the seam's subject follows the area where an area has more than one seam | `IIngressProvider`, `IDeployReleaseStoreProvider` |
+| an exported type | the area, then the subject | `KindProfile`, `TSNodeIdentifier` |
+| an area's prefix | the area's name, or the short code the area declares where its name is long | `TS` for `typescript/`, `LInfra` for `local-infra/` |
+| the prefix of a sub-area | the sub-area's own name, in the singular, never the parent's before it | `resources/` gives `ResourceManager` |
+| a util file | kebab-case, named for its subject, with no prefix | `utils/platform-slot.ts` |
+
+**Name the file of a class exactly after the class**: `ingress/IngressManager.ts`. A util file takes no prefix, because the folder already says the area. `interface.ts` and `constants.ts` take none for the same reason.
+
+**In a module, the module code is the prefix.** The area follows it only where the module's support holds more than one area: `<MOD><Area><Subject><Kind>`.
+
+**Build a class with `new`; a `static` method never stands in for a function.** A function a class file would export goes to the area's `utils/`.
+
+**A class with no `constructor`, no `extends` and no `implements`, that holds only functions, is a util module.** Write it as one `utils/<subject>.ts` file that holds its functions, the private ones too, and never as a class.
+
+**A util's function may read a file, run a command or read the environment.** It never calls a service or a manager, and never builds a provider. So a util file imports no class file from its own `src/`. It may read the shared `app` object: `app.config`, and a provider set up at boot, such as `app.providers.logger`.
+
+**Build a provider where the knowledge to pick it is**: in a manager that owns the seam, or in the service itself. A service that processes a file reads the file's MIME type and builds `ParserProviderCSV` or `ParserProviderJSON`, both behind `IParserProvider`. The type arrives with the call, so nothing at boot could have picked the parser.
 
 **Enums are PascalCase with a `Type` suffix, always.** In `contract/states/` the enum key is `UPPER_SNAKE_CASE` matching its string value, never a PascalCase key. Values are strings, never numeric.
 
 **Functions and methods are camelCase and start with an action verb** — get, set, create, update, delete, validate. A function that computes or derives a value takes the `prepare*` prefix.
 
-**Write helpers under `app/utils/` as exported `const` arrow functions, verb first.** A never-returning throw or assert helper must stay a `function` declaration, because TypeScript applies never-returning narrowing only to declarations.
+**Write helpers under `app/utils/`, or under a support area's `utils/`, as exported `const` arrow functions, verb first.** A never-returning throw or assert helper must stay a `function` declaration, because TypeScript applies never-returning narrowing only to declarations.
 
 ### The privacy markers, and why they are not interchangeable
 
@@ -94,13 +153,31 @@
 
 **The underscore is the mechanism, not a label** — the generated barrel skips every path holding one, at any depth. **The `Internal` suffix keeps a pair adjacent** wherever names are sorted, so you see both and pick deliberately.
 
+### CSS custom properties
+
+**An app or a module prefixes every CSS custom property it defines with its own code, and the design system's variables stay unprefixed** (`RD.SUPPORT.APPS.208`). The showcase's brand tokens are `--wds-surface` and `--wds-gradient-warm`; a partner's app names its own `--<app code>-…` and a module `--<module code>-…`, so nothing an app or a module defines meets a name of the design system, whose paint tokens `--surface-fill`, `--surface-translucent-fill` and `--surface-blur` are unprefixed. An app names its own classes with its code too, such as `wds-card-promo`.
+
 ### Acronyms and codes
 
 **An acronym keeps every letter capitalized in a type, class or file name** — `SPIntegrationSMSTwilio`, never `SPIntegrationSmsTwilio`. Give it a lowercase tail in a camelCase identifier — `smsProvider`, `getSignedUrl`.
 
 **Treat a trailing acronym as a word: `Id` and `Ids`, never `ID` or `IDs`.**
 
-**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception.
+**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception. **A state carries no module code in capitals** — `NtfTemplate`, `EntComment`, `Org`, `CaptchaConfig`; the module's own word in Pascal case (`Ntf`, `Ent`, `Doc`, `Job`) is part of a state's name where the module names its states so. A module code in capitals stands only on a constant (`IAMErrorCodeType`, `NTFEntityType`), a service (`INTFTemplateService`) and the module's internal classes (`IAMRoleController`) (`RD.SUPPORT.APPS.205`).
+
+**A server module's wiring names** carry its code and kind. At the package root: `interface.ts` holds `SPModule<CODE>` (extends `SPServiceAppRuntimeModule`) and `SPModule<CODE>Config` (extends `SPServiceAppRuntimeModuleConfig`); `<CODE>RuntimeModuleManager.ts` holds class `<CODE>RuntimeModuleManager` (extends `SPServiceAppRuntimeModuleManager`); `index.ts` is the main door and re-exports only. The `remote/` folder is the second door, written by hand: `remote/interface.ts` holds `SPModule<CODE>Remote` (extends `SPServiceAppRemoteModule`), one member under `services.contract` for each contract interface, importing nothing from the module's own `interface.ts`; `remote/<CODE>RemoteModuleManager.ts` holds class `<CODE>RemoteModuleManager` (extends `SPServiceAppRemoteModuleManager`); `remote/<code>Module.ts` holds `<code>Module`, typed `SPModule<CODE>Remote`; `remote/index.ts` exports `contract/` and those three files.
+
+**A module's two managers are named as a pair — MUST.** `<CODE>RuntimeModuleManager` mounts the module and `<CODE>RemoteModuleManager` holds it by its contract; no other manager name exists for a module. The whole family, one base and its two kinds on each row:
+
+| | Base | Mounted | Remote |
+| --- | --- | --- | --- |
+| the manager | `SPServiceAppModuleManager` | `SPServiceAppRuntimeModuleManager` | `SPServiceAppRemoteModuleManager` |
+| the module | `SPAppModule` | `SPAppModuleRuntime`, `SPServiceAppRuntimeModule` | `SPAppModuleRemote`, `SPServiceAppRemoteModule` |
+| the config | `SPAppModuleConfig` | `SPServiceAppRuntimeModuleConfig` | `SPServiceAppRemoteModuleConfig` |
+| a line of the module list | `SPServiceAppBootModule` | `SPServiceAppRuntimeBootModule` | `SPServiceAppRemoteBootModule` |
+| one module's own | | `IAMRuntimeModuleManager`, `SPModuleIAM` | `IAMRemoteModuleManager`, `SPModuleIAMRemote` |
+
+The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (`RUNTIME` · `REMOTE`); a module's type is not a contract state, so the field takes the plain name and not `mtype`. The generated `contract/methods/I<MOD><Entity>Service.ts` holds const `I<MOD><Entity>ServiceMethods`, typed `SPServiceMethods<I<MOD><Entity>Service>`, written by `spnutils apps gen-validators` and never hand-edited; the folder follows `services/` file for file. A second service imports `@saasplane/module-server-iam-ts/remote` for a module held remotely.
 
 **Two spellings of one acronym make a symbol unsearchable.** That is the reason behind all of the above.
 
@@ -144,7 +221,7 @@
 
 **There is no `bulk` verb.** A many-read is the plural of the read level, and a read returning an `<X>List` is named for that type.
 
-**Every contract interface gets one validator named `<Interface>Schema`**, written into `contract/validators/<entity>.ts` by `spnutils apps gen-validators`. The name is derived rather than chosen, which makes `Schema` a reserved interface suffix — a contract interface ending in it fails generation instead of emitting a collision.
+**Every contract interface gets one validator named `<Interface>Schema`**, written into `contract/validators/<entity>.ts` by `spnutils apps gen-validators`. The name is derived rather than chosen, which makes `Schema` a reserved interface suffix — a contract interface ending in it fails generation instead of emitting a collision. A state that extends exactly one interface also gets `<Interface>SchemaBase` beside its schema, which names the base its schema was merged from.
 
 ## Packages
 
@@ -158,9 +235,20 @@
 | --- | --- | --- |
 | Error code | `ERROR.STD.<NAME>` shared, `ERROR.<MOD>.<NAME>` module-owned | `ERROR.IAM.CHALLENGE_EXPIRED` |
 | Permission code | `MOD_FAMILY_TIER`, cumulative `VIEW` then `MANAGE` then `ADMIN` | `IAM_ACCESS_VIEW` |
-| Label key | `<scope>[.<subscope>].<snake_label>` | `common.attach_file` |
+| Label key | `<SCOPE>[.<SUBSCOPE>].<SNAKE_LABEL>`, stored UPPER | `COMMON.ATTACH_FILE` |
 
 **A permission's enum value carries the module prefix; the enum key stays short** so a gate reads cleanly. The prefix is what guarantees uniqueness when every module seeds into one catalog.
+
+**Each family of label has one key form.** The catalog stores every key in its UPPER form, and `normalizeLabelKey` only fixes case.
+
+| Family | Who writes the key | Written as | Stored as |
+| --- | --- | --- | --- |
+| A design-system label | the design system, at the call site | lower case: `translate('common.clear', 'Clear')` | `COMMON.CLEAR` |
+| A module page's label | the page, at the call site | the stored form: `translate('IAM.ROLE_ACTIVATED', 'Role activated')` | `IAM.ROLE_ACTIVATED` |
+| An error's label | nobody: the key is the error code | `ERROR.STD.<NAME>` · `ERROR.<MOD>.<NAME>` | the same |
+| An enum value's label | `translateEnumLabel`, from the enum's name and the value | `ENUM.<ENUMNAME>.<VALUE>`, from `translateEnumLabel(translate, 'RoleType', role.roleType)` | `ENUM.ROLETYPE.SYSTEM` |
+
+**An enum label's key is built, never written.** A page passes the contract enum's name exactly as declared — `'RoleType'`, never `'roleType'` or a shortened `'role'` — and `buildEnumOptions` takes the same name. **Only a contract enum's value takes an `ENUM.` key**: a code from an open set, such as a module code, or an entity kind, which is also what names a data source, never does. Its label comes from the registry row.
 
 **Scope a label by reuse, not by where it renders.** `common.*` is flat and holds generic vocabulary translated once; a module scope holds module-specific messages and may add a subscope. A `common.*` key mirrors its own English value rather than inventing a semantic name. The second argument is both the English source and the runtime fallback.
 
@@ -188,7 +276,15 @@
 | --- | --- | --- |
 | Class | PascalCase | `UserService` |
 | Class interface | `I` + PascalCase | `IUserService` |
+| Support class | area + subject + kind | `KindManifestStore` |
+| Support provider | area + `Provider` + vendor | `IngressProviderNginx` |
+| Seam interface | `I` + area + `Provider` | `IIngressProvider` |
 | Props interface | `I` + component + `Props` | `IDSButtonProps` |
+| Form state | `I` + what it edits + `FormState` | `IRoleFormState` |
+| Props group | `I` + component + group + `Props`, from the owner's props by `Omit` or `Pick` | `IDSFeatureGridSectionContainerHeadingProps` |
+| Shared props shape | `I` + what it is, no `Props`, no `Config` | `IDSFrameSurface`, `IDSGridColumns` |
+| Web module unit | ends in what it is: `Page`, `Container`, `Widget`, `Dialog`, `Form`, or a pattern's word | `RoleListContainer` |
+| Web module plain component | no suffix needed | `RoleBadge` |
 | Contract entity | PascalCase, no `I` | `User` |
 | State levels | Meta inside Info inside the state, by `extends` | `IdentityMeta` |
 | Detail aggregate | `{Entity}Details`, composed | `RoleDetails` |

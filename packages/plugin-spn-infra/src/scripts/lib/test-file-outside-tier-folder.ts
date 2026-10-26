@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `docs/04-capabilities/02-support/02-infra/02-packages/02-tests.md` §
+// RESTATES: `docs/04-capabilities/02-support/03-infra/02-packages/02-tests.md` §
 // The folder is the tier, the extension is the engine. That chapter governs; this file states no
 // rule of its own.
 //

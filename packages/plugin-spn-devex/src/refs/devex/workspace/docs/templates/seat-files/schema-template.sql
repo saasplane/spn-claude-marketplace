@@ -1,4 +1,4 @@
--- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What — capabilities: mirrors of source folders — data-model.md is the mirror of the migrations folder, and this file is its authoritative form
+-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What — capabilities: the standard here, a chapter per construct everywhere else
 --      This file carries rules it does not own. The chapter above is the source of truth.
 --      A rule change is edited there first, then here, in the same change. Never add a rule here.
 --      restate-drift.ts reports this copy when its source moves.

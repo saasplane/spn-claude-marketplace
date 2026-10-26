@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/01-realization.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/01-realization.md",
       "seen": "e3a2f1ac"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Realization — what AWS renders today, and what it binds
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/01-realization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/01-realization.md`. Read this as the restatement; that node governs.
 
 **The AWS provider renders one estate declaration into real cloud accounts.** It is a realization of the design, never a second design. It reads the same manifests the local provider reads, and adds only the choices AWS itself makes concrete.
 

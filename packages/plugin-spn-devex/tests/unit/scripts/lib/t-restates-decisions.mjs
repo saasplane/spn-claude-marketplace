@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import {
   check, parse, registerPath, rowHash, rowText, seenHash, undeclared,
 } from "../../../../src/scripts/lib/restates.ts";
+import { POCKET } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {
@@ -23,7 +24,7 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 const workspace = join(BASE, "ws");
 const registerFile = registerPath(workspace, "spn-foundation");
-mkdirSync(join(workspace, "spn-foundation", "docs", "registers"), { recursive: true });
+mkdirSync(join(workspace, "spn-foundation", "docs", POCKET.registers), { recursive: true });
 const ROW_LINE = "| RD.SUPPORT.APPS.086 | Scaffold and validate read one profile | prevents two ideas of a node | 2026-09-01 |";
 writeFileSync(registerFile,
   "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
@@ -117,18 +118,18 @@ console.log("\n=== undeclared() — a row named in prose the block's object cita
     missing.includes("RD.SUPPORT.APPS.087"), true);
 }
 
-console.log("\n=== restates decisions --write — restamps after the developer's rewrite, never the prose");
+console.log("\n=== restates decisions write — restamps after the developer's rewrite, never the prose");
 {
   const devexRoot = join(BASE, "devex-ws");
   mkdirSync(join(devexRoot, ".spndevex"), { recursive: true });
-  mkdirSync(join(devexRoot, "spn-foundation", "docs", "registers"), { recursive: true });
+  mkdirSync(join(devexRoot, "spn-foundation", "docs", POCKET.registers), { recursive: true });
   const reg = registerPath(devexRoot, "spn-foundation");
   writeFileSync(reg, `# Decisions\n\n${ROW_LINE}\n`);
   const refPath2 = join(devexRoot, "ref.md");
   const staleBody = '<!-- spn:restates\n{\n  "decisions": [\n    {\n      "repo": "spn-foundation",\n      "row": "RD.SUPPORT.APPS.086",\n      "seen": "deadbeef"\n    }\n  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n';
   writeFileSync(refPath2, staleBody);
-  const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "src", "scripts", "commands", "restates", "decisions.ts");
-  const out = execFileSync("node", [TOOL, "--write", refPath2], { encoding: "utf8" });
+  const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "src", "scripts", "cli.ts");
+  const out = execFileSync("node", [TOOL, "restates", "decisions", "write", refPath2], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } });
   const after = readFileSync(refPath2, "utf8");
   one("the writer reports one row restamped", out, (g) => /1 row\(s\) restamped/.test(g));
   one("the seen hash now matches the row's real text", after, (g) => g.includes(`"seen": "${rowHash(reg, "RD.SUPPORT.APPS.086")}"`));

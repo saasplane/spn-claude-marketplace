@@ -1,0 +1,316 @@
+{
+ "kind": "skeleton",
+ "title": "Choose to see, beside",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature that splits as SPLIT_END. The options are a LIST, boxed and raised on the door fill: items.surface color DEFAULT, raised, elevation MD. The chosen one is selected, and each option's line says what it changes. Beside them stands a small picture, whole at half width, such as a loop, a tree or a diagram, in the frame of its kind. On a phone each option says its result in words, and the picture stays at rest below, never pinned.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "Which one is the reader's",
+                        "description": "Choose an option to see what it changes."
+                       }
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "First option",
+                        "description": "What choosing it changes",
+                        "selected": true
+                       },
+                       "fill": true
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "Second option",
+                        "description": "What choosing it changes"
+                       },
+                       "fill": true
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "Third option",
+                        "description": "What choosing it changes"
+                       },
+                       "fill": true
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "slot": "mediaNode · a small picture, lit by the choice",
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "LIST",
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "Which one is the reader's",
+                        "description": "Choose an option to see what it changes."
+                       }
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "First option",
+                        "description": "What choosing it changes",
+                        "selected": true
+                       },
+                       "fill": true
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "Second option",
+                        "description": "What choosing it changes"
+                       },
+                       "fill": true
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "item": {
+                        "title": "Third option",
+                        "description": "What choosing it changes"
+                       },
+                       "fill": true
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "slot": "mediaNode · a small picture, lit by the choice",
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "LIST",
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Which one is the reader's",
+                   "description": "Choose an option to see what it changes."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "First option",
+                   "description": "What choosing it changes",
+                   "selected": true
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Second option",
+                   "description": "What choosing it changes"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "item": {
+                   "title": "Third option",
+                   "description": "What choosing it changes"
+                  },
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · the picture, at rest",
+                  "fill": true,
+                  "height": 5
+                 }
+                ]
+               }
+              ],
+              "items": {
+               "type": "LIST",
+               "surface": {
+                "color": "DEFAULT",
+                "raised": true,
+                "elevation": "MD"
+               }
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

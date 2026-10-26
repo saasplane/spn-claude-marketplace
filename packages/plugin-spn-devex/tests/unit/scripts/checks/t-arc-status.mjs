@@ -1,53 +1,76 @@
-// `arc-status` — an arc's status is one of eight (RD.DEVEX.WORKSPACE.058).
+// `arc-status` — an arc's status is one of six (RD.DEVEX.WORKSPACE.058): the developer's words stored, and RUNNING
+// and LANDED worked out from the steps by one owner (RD.DEVEX.WORKSPACE.307).
 //
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that
-// never does, wearing the other sign. The set drifted in the first place while a template comment
-// declared it and nothing read it.
+// never does, wearing the other sign. The set is stated once, in `arc-status.ts`, and what holds an arc to it is the
+// schema the `workstream` commands run, and the owner check that refuses a hand write under `arcs/`.
+import { cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
 
-const { checkArcStatus, STATUSES, statusIn } = await import("../../../../src/scripts/checks/arc-status.ts");
+const { STATUSES, STORED_STATUSES } = await import("../../../../src/scripts/checks/arc-status.ts");
+const { arcFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+const { arcStatus, statusOfData } = await import("../../../../src/scripts/lib/workstream.ts");
+const { ownedRefusal, levelRefusal } = await import("../../../../src/scripts/checks/workstream-owner.ts");
 
 let n = 0, failed = 0;
-const ARC = "/w/.spndevex/workstreams/open/008-x/arcs/N1-a-subject.md";
-const verdict = (text, path = ARC) =>
-  checkArcStatus({ tool_name: "Write", tool_input: { file_path: path, content: text } });
-
-function one(what, text, expected, path = ARC) {
+const ok = (what, pass, detail = "") => {
   n += 1;
-  const v = verdict(text, path);
-  // IT REFUSES NOW RATHER THAN ADVISING (N66). The check shipped soft on purpose and its own note
-  // said it would advise until the corpus was clean under it; the corpus was cleaned on 2026-09-24
-  // and the word flipped. These cases read `deny` for the same reason they read `note` before — the
-  // question they ask is whether the check SPEAKS about a word outside the set, not how loudly.
-  const got = v && (v.deny || v.note) ? "note" : "silent";
-  const ok = got === expected;
-  if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got}`);
+  if (!pass) failed += 1;
+  console.log(`  ${pass ? "PASS" : "FAIL"}  ${what}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`);
+};
+
+const arc = (status, rows = []) => ({ schemaVersion: 2, arc: "N001", subject: "probe", title: "the probe", status,
+  reason: ["CARRIED", "DROPPED"].includes(status) ? "why" : null, preview: "preview.html", rows });
+const step = (id, state) => ({ id, parent: "N001", title: `step ${id}`, kind: "change", state });
+
+console.log("\n=== the stored words are the schema's, and every other word is refused");
+for (const word of STORED_STATUSES) ok(`${word} is a status the schema stores`, !arcFaults(arc(word)).some((fault) => /`status`/.test(fault)));
+// MEASURED over workstream `008` on 2026-09-23: these are the real off-vocabulary statuses found; RUNNING, HELD and
+// PART-LANDED are the version 1 words, which the steps now work out or a wait now holds.
+for (const word of ["RUNNING", "HELD", "PART-LANDED", "IMPLEMENTING", "PLANNING", "OPEN", "TAKEN", "DONE"])
+  ok(`known-bad: ${word} is refused by the schema, which names the stored set`,
+    arcFaults(arc(word)).some((fault) => fault.includes("`status`") && fault.includes(STORED_STATUSES.join(" · "))));
+ok("the six are the stored set and RUNNING", STATUSES.join() === "PROPOSED,DECIDED,RUNNING,LANDED,CARRIED,DROPPED");
+
+console.log("\n=== the one owner works RUNNING and LANDED out from the steps (RD.DEVEX.WORKSPACE.307)");
+{
+  ok("a decided arc with no step started reads DECIDED", arcStatus(arc("DECIDED", [step("1", "waiting"), step("2", "ready")])) === "DECIDED");
+  ok("red: a step started reads RUNNING", arcStatus(arc("DECIDED", [step("1", "running"), step("2", "waiting")])) === "RUNNING");
+  ok("a step stopped is started too", arcStatus(arc("DECIDED", [step("1", "stopped")])) === "RUNNING");
+  ok("red: every step landed reads LANDED", arcStatus(arc("DECIDED", [step("1", "landed"), step("2", "landed")])) === "LANDED");
+  ok("deferred, carried and replaced steps are left out of LANDED",
+    arcStatus(arc("DECIDED", [step("1", "landed"), step("2", "deferred"), step("3", "carried"), step("4", "replaced")])) === "LANDED");
+  ok("a step still waiting keeps a started arc RUNNING", arcStatus(arc("DECIDED", [step("1", "landed"), step("2", "waiting")])) === "RUNNING");
+  ok("a stored PROPOSED wins over the steps", arcStatus(arc("PROPOSED", [step("1", "landed")])) === "PROPOSED");
+  ok("the review-fixes arc reads RUNNING with every step landed, until the close stores LANDED",
+    arcStatus({ ...arc("DECIDED", [step("1", "landed")]), reviewFixes: true }) === "RUNNING" && arcStatus({ ...arc("LANDED", [step("1", "landed")]), reviewFixes: true }) === "LANDED");
+  ok("CARRIED and DROPPED are the words stored", arcStatus(arc("CARRIED", [step("1", "running")])) === "CARRIED" && arcStatus(arc("DROPPED")) === "DROPPED");
 }
 
-console.log("\n=== every word of the set is silent, and the set is read from the check itself");
-for (const word of STATUSES) one(`Status: **${word}`, `# N1\n\nStatus: **${word} — a line.**`, "silent");
-
-console.log("\n=== the words the corpus actually drifted to, each a known-bad");
-// MEASURED over workstream `008` on 2026-09-23: these are the real off-vocabulary statuses found,
-// not invented ones. A check proven against words nobody writes is proven against nothing.
-for (const word of ["IMPLEMENTING", "PLANNING", "OPEN", "TAKEN", "DONE"])
-  one(`Status: **${word} is off the set`, `# N1\n\nStatus: **${word} — a line.**`, "note");
-
-console.log("\n=== the second spelling is read, because the corpus has both");
-one("**Status: LANDED", "# N1\n\n**Status: LANDED 2026-09-23 — all six steps.**", "silent");
-one("**Status: DONE", "# N1\n\n**Status: DONE 2026-09-23.**", "note");
-
-console.log("\n=== what it must never speak about");
-one("an edit that touches no status line", "# N1\n\nsome prose about the arc", "silent");
-one("a file outside an arcs/ folder", "Status: **DONE**", "silent", "/w/spn-foundation/docs/README.md");
-one("a note file beside the arcs", "Status: **DONE**", "silent", "/w/.spndevex/workstreams/open/008-x/notes/N-plan.md");
-
-console.log("\n=== the reader itself");
+console.log("\n=== the commands hold it: row write refuses a word outside the stored set, and the data reads through the owner");
 {
-  n += 1;
-  const ok = statusIn("# N1\n\nStatus: **PART-LANDED — three of nine.**") === "PART-LANDED";
-  if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  a hyphen is part of the word, so PART-LANDED is not PART`);
+  const { root, ws } = await dataWorkspace("arc-status-row-write");
+  const refused = cli(root, ["workstream", "row", "write", "031/N001", "--status", "DONE"]);
+  ok("known-bad: `row write --status DONE` is refused and writes nothing", refused.code !== 0 && statusOfData(ws, "N001") === "DECIDED", refused.out);
+  cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+  ok("a step started is read as RUNNING through the owner", statusOfData(ws, "N001") === "RUNNING");
+  const moved = cli(root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
+  ok("a stored word of the set is written", moved.code === 0 && statusOfData(ws, "N001") === "CARRIED", moved.out);
+}
+
+console.log("\n=== no hand write reaches an arc: the owner check refuses one into arcs/N<nnn>/, and a file loose in arcs/");
+{
+  const ws = "/w/.spndevex/workstreams/open/020-x";
+  ok("known-bad: a hand write of an arc's state.json is refused", /is written only by/.test(ownedRefusal(`${ws}/arcs/N001/state.json`) ?? ""));
+  ok("known-bad: a Markdown arc made directly under arcs/ is refused", /hold only arc folders/.test(levelRefusal(`${ws}/arcs/N001-book-change.md`) ?? ""));
+  ok("an agent's note beside the arc is not refused", ownedRefusal(`${ws}/notes/N001/plan.md`) === null);
+}
+
+console.log("\n=== which statuses are past DECIDED, in the order of the set");
+{
+  const { pastDecided } = await import("../../../../src/scripts/checks/arc-status.ts");
+  for (const [word, expected] of [["PROPOSED", false], ["DECIDED", false], ["RUNNING", true], ["LANDED", true],
+    ["CARRIED", true], ["DROPPED", true], ["OPEN", false], [null, false]])
+    ok(`[MKT.HOOKS.40] ${word ?? "an arc with no status"} is ${expected ? "" : "not "}past DECIDED`, pastDecided(word) === expected);
 }
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);

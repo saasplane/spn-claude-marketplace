@@ -2,16 +2,16 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md",
-      "seen": "8d9b4633"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/01-shape.md",
+      "seen": "43f0ee13"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "18cbd178"
+      "seen": "662e0f2d"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
-      "seen": "ec7d0930"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/01-layers.md",
+      "seen": "8401454e"
     }
   ]
 }
@@ -19,7 +19,7 @@
 
 # Estate Shape — the words, the edge, the layers and the doors
 
-**Source of truth:** the foundation's `02-constructs/02-support/02-infra/01-shape.md` for what the estate is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` with `04-capabilities/02-support/02-infra/03-blueprints/01-layers.md` for the commands that act on it. Read this as the restatement; the book governs. The realization is `spnutils infra …`.
+**Source of truth:** the foundation's `02-constructs/02-support/03-infra/01-shape.md` for what the estate is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` with `04-capabilities/02-support/03-infra/03-blueprints/01-layers.md` for the commands that act on it. Read this as the restatement; the book governs. The realization is `spnutils infra …`.
 
 ## Four groups of facts, and none borrows from another
 
@@ -50,6 +50,12 @@ Two lists sit at the top of every declaration, because a declaration has to say 
 
 `SPEstateScopeType` says **which rung a fact sits on** — `ORGANIZATION`, `PLATFORM`, `ENVIRONMENT`. Every fact in an estate belongs to exactly one, the coordinates are built from them, and the configuration plane spells its paths the same way, so a path says which rung it belongs to and nothing else.
 
+### What an environment's row writes
+
+An environment declares very little: its `setup`, `region` and `networkIndex`, then its `workload`, `size`, `hosting` and `deploy` trigger. `env` and the cloud's own region are computed at resolve and never declared.
+
+**The row holds nothing for the web firewall — MUST** (`RD.SUPPORT.INFRA.117`). The blueprint builds one on every cluster's public load balancer, as it builds the two gateways and the two load balancers. So an environment has nothing to choose, and no environment stands without one.
+
 ## What a company brings, and what is created for it
 
 **An estate is built from the outside in.** At the outside is the company, which has already bought and signed for things no software can create for it: **somewhere to keep code, somewhere to run it, and a domain**. Just inside sits the declaration — a few short codes, written once, saying what the company is called, what its products are called, and what its running targets are called. From those codes, published code creates the estate, and the applications deploy on top.
@@ -58,18 +64,18 @@ Two lists sit at the top of every declaration, because a declaration has to say 
 
 ## Layer nouns × commands
 
-The layers are nouns; each takes `plan · up · down · status`. Start them in order, and a lower layer missing is the usual reason a higher one will not start.
+The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or `down` is the plan. Start them in order, and a lower layer missing is the usual reason a higher one will not start. **A platform-scoped command names its platform first, as an argument** (`RD.DEVEX.UTILS.072`): `infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`, `show`, `logs`, `web` and `domain register`. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization.
 
 | Noun | Commands | Locally | In the cloud |
 | --- | --- | --- | --- |
-| `organization` | plan · up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress; `--reset-certs` after CA loss | accounts, root guardrails, registry pairs, zones |
-| `platform` | plan · up · down · status | the platform's container group — engines + each module's local rendering + every stored route registered with the ingress; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments, the tenant edge and its route store |
-| `environment` | plan · up · down · status — `<env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
+| `organization` | up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress, and the root door that `up` installs once so the resolver's files ask for nothing (RD.DEVEX.UTILS.073); `down --clean` keeps the CA and its trust, so the next `up` asks for nothing, and `up --reset-certs` replaces the CA on purpose | accounts, root guardrails, registry pairs, zones |
+| `platform` | up · down · status — `<spc>` | the platform's container group — engines + each module's local rendering + every stored route registered with the ingress; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments, the tenant edge and its route store |
+| `environment` | up · down · status — `<spc> <env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
 | `app` | up · down | the app's derived converge — schemas, certificates and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
 
 **Every provisioning run names its mode, and there is no default** (RD.SUPPORT.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
-Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register|unregister` (register a host with the local proxy, `--app <app>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
+Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 
 ## Doors — who may run what, where
 
@@ -100,6 +106,7 @@ The commands divide by **what is being changed**, never by who runs them. Each g
 | a cloud command with a missing layer below → **named refusal** | in the cloud each layer has its own principals; locally prerequisites converge in place instead |
 | an apply that ran from a checkout | an apply fetches the published version and applies *that* — a path ref resolves only where the sibling checkout exists, and deliberately not in CI |
 | a whole-estate command | "all layers" of an unstated subject is a context nothing can resolve |
+| an `<spc>` in an apps repository that differs from its `sprepo.json` pin | the platform is named on every platform-scoped command, and the repository already says which one it belongs to (`RD.DEVEX.UTILS.072`) |
 | `down` on stateful resources | teardown removes network and compute and **refuses its data** — destroying data is a separate act, named and confirmed separately; `--clean` runs only on an explicit instruction against a named target |
 | an unknown `${…}` reference at `config diff` or `config render` | one direction, one pass, resolved against the composed rungs — a literal `${…}` reaching a vendor is the failure this stops; credentials themselves never live in files, see `refs/laws.md` |
 | a release version already present in the registry pair | a published version is immutable — bump instead, never re-publish; the machine store keeps the same rule |

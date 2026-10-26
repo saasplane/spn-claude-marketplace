@@ -3,10 +3,11 @@
   "id": "checks",
   "variant": "construct",
   "title": "Scripts — The Code a Plugin Ships, Wired or Reached by Name",
+  "subtitle": "Every file a plugin can run lives in one folder, sorted by what calls it.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["hook-set"],
-  "summary": "The folder a plugin keeps its code in — the check a moment composes, the tool a person reaches by its own path, the shared library both read, and the rule that one question is decided by one file whichever of the two asks it.",
+  "summary": "Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.",
   "keywords": ["script", "check", "tool", "applies", "finding", "grade"]
 }
 -->
@@ -15,7 +16,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-Everything a plugin can execute lives in one folder. Some of it is called by a moment the runtime reaches, some of it is typed by a person who wants a whole tree read, and a good deal of it is the same code serving both. This page names what that folder holds, how each kind is reached, and the habits every file in it keeps.
+Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. Read this page before you add a new script, or when you are not sure whether a rule belongs in a hook or in a tool. It explains how each kind is reached and the two habits every file in the folder keeps.
 
 ## Overview
 
@@ -39,7 +40,7 @@ This construct realizes the book's `01-devex/02-agent/01-agent`.
 | a finding | `Finding` | one thing a run found: which question raised it, its grade, the file, and what a reader should do |
 | the grade | `Grade` | how a finding is weighted — `RULE` refuses and `SOFT` reports |
 | the exit code | — | the count of refusals; a report alone leaves a run green |
-| a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `coverage` |
+| a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `parity` |
 | silence | — | the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it |
 
 ## Model
@@ -124,7 +125,7 @@ Handing a whole corpus to a rewriting pass is the expensive way to improve it, a
 
 ### A tool that writes rather than reports
 
-One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.
+One tool here writes. It reads the files of the one run it is told to read and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.
 
 ### A tool produces the pages, and the page's own shape belongs to the book
 
@@ -150,6 +151,6 @@ This page answers what a script is, how each kind is reached, and what it answer
 | `RD.DEVEX.WORKSPACE.176` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
 | the foundation's `02-delivery.md` § What it makes checkable | which standards are expected to be answered by a script rather than by a reader | MUST |
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
-| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> <action>` shape `commands/` dispatches by, one command entry | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> [<subject>] <action>` shape `commands/` dispatches by, one command entry | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `spn-devex plugin partner check`

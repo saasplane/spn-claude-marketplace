@@ -2,8 +2,8 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "10177279"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "seen": "8cf9d263"
     }
   ]
 }
@@ -53,11 +53,23 @@
 
 **The implementation class is ordered mappers, then cached reads, then contract methods, then writes.** Every private member takes a leading underscore.
 
-**The registry exposes each service twice**, usually as one instance: `services.contract.<x>Service` typed as the interface, and `services.impl.<x>Service` typed as the class. The implementation registry is the sanctioned internal surface. Reaching into another module's implementation for anything not designed as internal surface bypasses gates.
+**The registry exposes each service twice**, usually as one instance: `services.contract.<x>Service` typed as the interface, and `services.impl.<x>Service` typed as the class. The implementation registry is the sanctioned internal surface. Reaching into another module's implementation for anything not designed as internal surface bypasses gates. **`services.impl` exists only where the module is mounted.** A service that holds a module remotely has `services.contract` and nothing else, so a call into `impl` does not compile there; a module's inner services are reachable in the same process only.
 
 **A service reaches its repositories and its siblings through the module singleton at call time**, never through constructor wiring. That is what makes the pattern cycle-proof.
 
-**A module manager answers every method the interface names.** A module with no CLI commands returns an empty list, stating the absence rather than omitting the key.
+**A module's runtime manager answers every method the interface names.** A module has a typed interface (`SPModule<MOD>`, extending `SPServiceAppRuntimeModule`, with a member of its own such as an SDK client declared on that type), a runtime manager `<MOD>RuntimeModuleManager` (`initModule`, `getEntities`, `getMigrations`, `getAPIControllers`, `getAPIRemoteServices`, `getQueueListeners`, `getCLIControllers`, `getContractSchemas`, `shutdownModule` — all nine mandatory), and a remote manager `<MOD>RemoteModuleManager` in `remote/`. A module with no CLI commands returns an empty list, stating the absence rather than omitting the key.
+
+### The three managers
+
+`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are the nine above bar `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It states no code: the module's code is the one its line in the start file gives, and each proxy sends that code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
+
+**The runtime manager lists the module's contract services** in `getAPIRemoteServices`, whether or not the service opens a remote listener. Each entry is `{ name, methods, impl }` — the service's name, its interface as data (`I<MOD><Entity>ServiceMethods`, produced) and what implements it — written `satisfies SPAPIRemoteService<I<MOD><Entity>Service>`, so a registration does not compile when the implementation does not fit the interface or the methods object misses or adds a method.
+
+**The remote manager names the module's code and its contract services**, and its base does the rest: `getRemoteServices(): SPModuleRemoteServices<SPModule<MOD>Remote>` returns one methods object for each contract service, and the type refuses a list that misses a service or names one the contract does not have. The base's `initModule` reads where the module lives from `{CODE}_{MODULE}_REMOTE_ENDPOINTS` (a missing, empty or multi-address value is refused at boot by the key's name), builds one HTTP client over `SPHttpClientAxiosAPI`, makes one proxy for each contract service with `prepareRemoteProxy`, and returns the module with `moduleType: SPAppModuleType.REMOTE` and `services.contract` alone.
+
+**The proxy has one function for each method the contract lists**, and no other. Each parses the command with the method's validator, posts `{ module, service, method, command }` to `API_REMOTE_ROUTE_PATH`, and parses the reply with the result's validator; a refusal is turned back into the standard error and thrown. A call that gets no answer fails after `{CODE}_REMOTE_TIMEOUT_MS` (ten seconds unless set), with no second try, as `DOWNSTREAM_ERROR` (`ERROR.STD.504`) naming the module.
+
+**A line of a service's module list pairs a config with a manager**, typed by `SPServiceAppRuntimeBootModule` and `SPServiceAppRemoteBootModule`: `{ config: { code: 'DOC', entry: { api: { basePath: '/doc' } } }, moduleManager: new DOCRuntimeModuleManager() }` for a mounted module, and `{ config: { code: 'IAM' }, moduleManager: new IAMRemoteModuleManager() }` (imported from `…/remote`) for a held one. A caller writes the same line either way (`iamModule.services.contract.principalService…`), and one check of `moduleType` (`SPAppModuleType.RUNTIME` or `REMOTE`) tells the compiler whether `services.impl` exists.
 
 ## Controllers stay thin
 
@@ -67,9 +79,32 @@
 
 **Command binding follows the verb** — a read binds from the querystring, a write from the body. An array field on a read has two wire forms, so test both.
 
-**A pre-auth route carries no authorization**, so nothing charges the caller for reaching it. Declare rate limiting and a captcha challenge on the route instead, as counts of seconds rather than phrases.
+**A pre-auth route carries no authorization**, so nothing charges the caller for reaching it. Declare rate limiting and a captcha challenge on the route instead, as counts of seconds rather than phrases. The count is kept by `SPFastifyRateLimitCacheStore`, over the service's default cache, so a declared limit is one limit however many pods serve the route, and a count the store could not make lets the call through.
 
-**Declaring a captcha obliges your application to resolve its configuration.** The server refuses to start when a route asks for a protection the application never wired, so you find out at boot. The framework counts and your own service verifies.
+**Declaring a captcha obliges your application's IAM handler to answer `getCaptchaConfig(request)`**, which is required and returns an `SPCaptchaConfig`, never `null`. The server refuses to start when a route asks for a protection the application never wired, so you find out at boot. **The framework counts; a service verifies.** On a challenge the manager throws `throwErrorCaptchaRequired(config)` (`COMMON_CAPTCHA_REQUIRED`, `ERROR.STD.409`); the client resends the command with `captcha` populated; the method that receives it asks the service that owns the captcha to check the solution — for the platform's captcha, `iamModule.services.contract.sessionService.verifyCaptchaInput({ captchaInput: command.captcha })`, which works from any service. The solution's `mtype` chooses the verifier, and a kind the deployment has no verifier for throws `CAPTCHA_INVALID`. The person's address is read from the call's own context and is not a member of the command. A partner's own captcha is chosen in the handler by route, and its own method checks the solution. `SPCaptchaConfig`, `SPCaptchaInput` and `SPCaptchaResult` each carry `mtype` alone, and a module extends all three with its own vendor enum, base plus `mtype`, never a union alias.
+
+## Authentication — the Issuer and the Verifier
+
+A server app is given its sign-in support as one provider, `serviceApp.providers.auth`, typed `ISPAuthProvider`; layers use the interface and never a class. **Only the identity module says whose token this is and whether the session is alive, and every service asks it — MUST.** So there are two roles: the **Issuer** in the service that mounts the identity module, and the **Verifier** in every other service.
+
+| Interface | Methods | Who has it |
+| --- | --- | --- |
+| `ISPAuthProvider` | `prepareAuthSession`, `authorize`, `prepareAuthPassport`, `prepareAuthUser`, optional `getCaptchaConfig` | every auth provider |
+| `ISPAuthSessionIssuer` | `saveAuthSession`, `clearAuthSession` | only a service that signs people in |
+
+**Which class a service builds — MUST:** a service that mounts the identity module, or signs people in, builds `SPAuthProviderIAMIssuer` (it verifies a token and reads the session cache itself, signs tokens and a passport's proof, and checks one); a service that holds the identity module remotely builds `SPAuthProviderIAMVerifier` (its `prepareAuthSession` asks the identity module, one remote call for each request that carries a token, and a request with no token asks nobody); a service with no identity module builds `SPAuthProviderDefault` (no session for any token); a service with an identity system of its own writes its own class. `SPAuthProviderIAM` is the abstract base both share. The Verifier has no method that saves or ends a session and its config has no place for a secret, so a service cannot be set up to sign by mistake; a service that mounts the identity module with any other provider refuses to start; a newly scaffolded service builds `SPAuthProviderDefault`, and the step that adds the identity module writes the Issuer or the Verifier in its place.
+
+**Handlers.** `support-server-service-ts` cannot import the identity module, so each class is given a handler the app writes: `ISPAuthProviderIAMHandler` (`verifyAuthPassport`, which throws when refused; `getCaptchaConfig`), extended by `ISPAuthProviderIAMIssuerHandler` (`resolveAuthUserPrincipal`, `resolveAuthUserIdentity`) and `ISPAuthProviderIAMVerifierHandler` (`verifyAuthToken`). The Issuer's config is `{ jwtSecret, jwtSecretFallback, cachePrefix, cacheTTL, handler }`, the Verifier's `{ handler }`. The identity module's contract offers `verifyAuthToken` (it answers a state, `AuthTokenVerification`, whose `authSession` is the live session behind the token, or `null` when the token or the session is no longer good; the Verifier's handler reads that member), `verifyAuthPassport` (throws `COMMON_UNAUTHENTICATED` when the signature does not hold or the caller is no longer allowed; never answers nothing), `getCaptchaConfig` and `verifyCaptchaInput` on `IIAMSessionService`, and `getSystemAuthUser` on `IIAMPrincipalService`.
+
+**A signed passport** says the identity module confirmed this caller and nobody has changed it since. The proof is `SPIAMAuthPassportProof` (`issuedAt`, `evidenceId`, `sessionId`, `signature`); the passport types are `SPIAMAuthPassport` (base), `SPIAMAuthPassportPrincipal` (a caller acting in an organization) and `SPIAMAuthPassportIdentity` (the person alone), and `SPIAMAuthUserUnsigned` is a caller before its proof is signed. Nobody signed the system caller in, so it has no session to save: the Issuer signs it with `signAuthUser(authUser: SPIAMAuthUserUnsigned): SPIAMAuthUser`, which caches nothing and which only the identity module calls.
+
+- **Only the identity module signs a passport and checks the signature — MUST**, with the secret it holds; no key goes to any other service.
+- **A proof is signed when a session is made**, at sign-in and when a person switches organization, not on every request; a renewal keeps the session's proof unless the cache entry is gone.
+- **A caller rebuilt from a passport keeps that passport's proof**, so a chain of work keeps the proof of the request that started it.
+- **A passport has no age limit.** Whether the person is still allowed is decided when the work runs. When the signing secret changes, the old secret stays accepted for as long as work can wait in a queue; an event with no proof is refused.
+- **The passport header is base64url JSON** (`formatAPIRemotePassport`, `parseAPIRemotePassport`), encoded and not encrypted.
+
+**The calling service's credential.** A remote call also proves which service is calling, through `serviceApp.providers.remoteCredential`, behind `ISPRemoteCredentialProvider` (`prepareCredential()`, `resolveCaller(credential)`, `close()`). `SPRemoteCredentialProviderKubernetes` (`KUBERNETES`) uses the token the cluster writes to a file in the pod, read ahead and again every minute, checked against the cluster's public keys, issuer, audience and expiry, with a subject of `system:serviceaccount:<namespace>:<app>` in one of the platform's own namespaces. `SPRemoteCredentialProviderLocal` (`LOCAL`) uses a short note naming the service, signed with one fixed local secret. The settings are in `10-configuration.md`.
 
 ## Reads
 
@@ -85,8 +120,11 @@
 | `<X>Info` | extends Meta | Meta plus description-class fields |
 | `<X>` | extends Info | Info plus timestamps and resolved audit actors |
 | `<X>Details` | fields, never `extends` | the state under a named field, with its dependent sub-states beside it |
+| `<Anchor>Summary` | fields, never `extends` | a listing line: the anchor, never null, and each related state the line shows, `null` when none or an array |
 
 **Details composes because it aggregates other entities.** Extending the state would make the aggregate a subtype of one member and force every sub-state into that chain. Composition keeps each member independently nullable, independently versioned, and carried at whatever level the page needs.
+
+**A listing line that pairs entities is a Summary, which composes for the same reason.** The anchor sits under its own name at the level the line needs and is never null (`label: LabelMeta`); each related state sits under its own name, `null` when there is none (`translation: LabelTranslation | null`) or an array where there can be many. It is returned by its own search, `search<Anchor>Summaries`, routed `POST /<entity>/summary/search`, and the service builds each line from the bulk readers.
 
 **Only the full state is universal.** Skip a level an entity genuinely lacks, and never invent one to complete a set.
 
@@ -100,6 +138,7 @@
 | `get<X>List` | none | the caller the auth context names |
 | `get<X>ListBy<Scope>` | the scope's id | one parent |
 | `search<X>s` | a search command | filter and page |
+| `search<Anchor>Summaries` | a search command for the anchor, plus what the related states add | filter and page |
 
 **`getAll` is unbounded and that is a commitment.** It is correct only for a closed reference set the platform controls, and wrong for anything a tenant can grow. Choose search when in doubt, because a `getAll` that outgrows its assumption fails in production rather than in review.
 
@@ -111,6 +150,8 @@
 | Reachable from a controller | yes | no — server-side callers only |
 
 **The masking is in the read path, not the caller**, so a new controller or a forgotten select cannot leak it. **The unmasked read has a different name**, so the audit question becomes who calls the `*Internal` method, which you can grep for.
+
+**An integration's constructor config holds credentials in plain, for use, and stays flat.** The stored entity's `internal` is one sealed string. The service opens it with the seal before it builds that config, and seals it again before it saves the row.
 
 ## Search
 
@@ -186,13 +227,13 @@
 
 **Every request event carries a request key, and the consumer looks it up before writing.** That is what makes at-least-once delivery safe. Choose a semantic key for a once-per-fact send and a fresh identifier where each attempt is its own fact. A key that is too broad suppresses a legitimate resend; one that is too narrow double-sends on redelivery.
 
-**Let the listener rehydrate the originating actor**, so authorization, context reads and audit stamping behave as they do online. Use the plain listener for a system topic with no actor.
+**Let the listener rehydrate the originating actor** through the auth provider's `prepareAuthUser`, so authorization, context reads and audit stamping behave as they do online. The queue carries the base passport, so either kind of caller travels, a person acting in an organization or a person outside any, and a passport the identity module does not vouch for throws. Use the plain listener for a system topic with no actor.
 
-**A topic is pre-created by a migration.** Publishing or subscribing to an undeclared topic is an error, and the subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
+**A topic is made first by the consuming module's `*-queue-topics` migration, as a table is.** The service app's boot builds the queue provider with `allowAutoTopicCreation` set to `false`, and the broker does not create a topic either, so nothing makes a missing topic. Publishing or subscribing to a topic that does not exist is an error that names the connection and the topic (RD.SUPPORT.APPS.178). The subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
 
 **The queue re-enters the module through a deliberately ungated handler** that delegates to the private implementation, because the producer already authorized at request time. Keep it off the API surface, and say in a comment why it is ungated — an unexplained ungated public method reads as a security bug.
 
-**Run gated work with no session under an explicit system actor.** Batch several writes inside one such callback rather than opening a context per call.
+**Run gated work with no session under an explicit system actor.** Batch several writes inside one such callback rather than opening a context per call. `runAsOrgSystem` takes a function, and a function cannot cross between services, so a module in a service that holds the identity module remotely asks for the caller with `iamModule.services.contract.principalService.getSystemAuthUser(command)` and runs its work under it locally; that method has no permission gate and no public route, and the remote route's check of the calling service guards it.
 
 ## Audit
 

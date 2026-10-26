@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "81e74177"
+      "seen": "f3d02f7d"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: Stand up a new estate node or a new estate repository with spnutils
 ---
 
 # new — scaffold the node, then let the validator judge it
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **Never hand-build an estate tree.** `spnutils infra scaffold` writes the tree each type prescribes, and `spnutils infra validate` reports where a tree disagrees with its own type. Scaffold, then validate — that pair is the whole of standing a node up. Read `refs/support/infra/packages.md`, in this plugin, for the four types and the two manifest files; read `refs/support/infra/naming.md` for the name grammar.
 
@@ -33,6 +35,8 @@ description: Stand up a new estate node or a new estate repository with spnutils
 `--name` is what a person calls it — "SaaS Plane", "SPN Demo", "Identity". The positional argument is the token the grammar composes from, and the two are different things: `<org>` and `<spc>` are codes, never sentences.
 
 **`SUPPORT` is the fourth type and has no scaffold.** `@saasplane/infra-blueprints` is what SaaS Plane ships; an organization pins it, and nobody mints one here.
+
+A new estate repository is brought to the standard by `spnutils repo create`, which sets up all four permanent branches, `develop`, `qa`, `uat` and `main`, and their rules. Nothing declares which of them a team uses: the path to `main` is chosen at each promotion with `spnutils repo promote`, a required `promotion-source` job refuses any other head into `qa`, `uat` or `main`, and a release is cut only from `main`.
 
 ## Where it goes
 

@@ -2,24 +2,24 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
       "seen": "8e197811"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/02-repositories.md",
       "seen": "d147b9b0"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "10177279"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "seen": "8cf9d263"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
       "seen": "1607a602"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "8285f6e8"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
+      "seen": "5ab26963"
     }
   ]
 }
@@ -56,15 +56,17 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 - **Decorator order** (top → bottom): `@SPAuthorize` → `@SPRequireReauth` → `@SPCachePurge`/`@SPCacheBuild` → `@Transactional({ connectionName: 'default' })`. Add `@Transactional` to every DB-touching method (delegating one-liners omit it).
 - **Authz**: per-module `<MOD>_AUTHZ` table in `app/utils/authz.ts`. A gate is an `SPIAMAuthConfig` with two terms. `appPermissions` are ways in, and any one passes; inside an entry `any`/`all` over codes, `appScope` narrows it. `enablements` sit on the CONFIG — codes the caller's org TYPE must be offered. Both hold. The offer sits beside the ways in, never inside one, so a second way in cannot reach past it (RD.PLATFORM.CORE.033). A gate pins `appScope: PLATFORM` only to guard a platform master, and **never names an app id** — an id is minted per install (RD.PLATFORM.CORE.034). Authenticated-only is `{ appPermissions: [] }`. Cumulative tiers encoded **at the gate** (a `_VIEW` gate lists VIEW+MANAGE+ADMIN — forgetting the higher tiers locks out admins). Put the gate on the **service** method, not the controller. `resolveScopeOrgId(appScope, orgId)` pins non-PLATFORM sessions to their own org **inside** the method. `@SPRequireReauth` only for the most sensitive self-service flows — system actors can never satisfy it.
 - **Cache**: key grammar `namespace:prefix:params[:suffix]` (suffixes: MT/IF/DT/AL/BE); tenant-scoped keys lead with `[null,'authUser.orgId']`; cache the prepared read model, never the entity; TTL one module constant (60s tenant data, 3600s master data). A purge must reproduce the build key exactly.
-- **Queues**: cross-module writes ride the three request queues (notification / audit / job) via the `request*` helpers. **Publish on commit** (`_publishOnCommit`), never inside the transaction window, and never construct the event base by hand. **RequestKey idempotency**: consumer short-circuits on `getByRequestKey`; semantic keys for once-per-fact sends, `ulid()` when each attempt is its own fact. Queue re-entry is a deliberately **ungated** public `handle*Event` (documented as queue-only, no route). Listeners rehydrate the originating actor from the event's auth passport. `subscriberId` is part of the consumption contract — renaming it replays the backlog.
+- **Queues**: cross-module writes ride the three request queues (notification / audit / job) via the `request*` helpers. **Publish on commit** (`_publishOnCommit`), never inside the transaction window, and never construct the event base by hand. **RequestKey idempotency**: consumer short-circuits on `getByRequestKey`; semantic keys for once-per-fact sends, `ulid()` when each attempt is its own fact. Queue re-entry is a deliberately **ungated** public `handle*Event` (documented as queue-only, no route). Listeners rehydrate the originating actor from the event's auth passport. `subscriberId` is part of the consumption contract — renaming it replays the backlog. A topic is made first by the consuming module's `*-queue-topics` migration; nothing creates a missing topic, so a publish or a subscribe to one is an error that names the topic (RD.SUPPORT.APPS.178).
 - **Audit**: every authenticated mutation calls `recordAuditLog` **after** the fresh read (WHAT/RESULT/TARGET only; WHO/WHERE derive from context; `requestKey: ulid()`); no-session paths use the explicit-actor `requestAuditLog` — never fake a context. Full-State read models expose `createdBy`/`updatedBy` as resolved Metas, batched and deduped via the terminal (non-recursing) resolvers.
-- **System actors**: gated work with no session runs under `runAsOrgSystem(orgId, fn)` / `runAsPlatformSystem(fn)` — batch sub-writes inside one callback.
+- **System actors**: gated work with no session runs under `runAsOrgSystem(orgId, fn)` / `runAsPlatformSystem(fn)` — batch sub-writes inside one callback. A function cannot cross between services, so in a service that holds the identity module remotely ask for the caller with `iamModule.services.contract.principalService.getSystemAuthUser(command)` and run under it locally.
+- **Mounted or remote**: `services.impl` exists only where the module is mounted; a service that holds a module remotely has `services.contract` alone, so a module's inner services are reachable in the same process only. A module has a runtime manager `<MOD>RuntimeModuleManager` (nine methods, `getAPIRemoteServices` lists each contract service as `{ name, methods, impl }`) and a remote manager `<MOD>RemoteModuleManager` in `remote/`, importing from `@saasplane/module-server-<code>-ts/remote`; the methods data under `contract/methods/` is produced by `spnutils apps gen-validators`, never by hand.
+- **Authentication and captcha**: a service builds `SPAuthProviderIAMIssuer` where it mounts the identity module or signs people in, `SPAuthProviderIAMVerifier` where it holds it remotely, and `SPAuthProviderDefault` otherwise. A queue listener rehydrates the caller from the signed passport through `prepareAuthUser`. A captcha-declaring route obliges the handler's `getCaptchaConfig`; the method that receives the command checks the solution with `iamModule.services.contract.sessionService.verifyCaptchaInput`.
 
 ## Guards, errors, masking
 
 - Business invariants are named `_assert*` helpers that **throw** (never return booleans); `throw<MOD>Error(code, message, data?)` from the module error registry (category decided once per code); shared helpers (`throwErrorEntityNotFound`, `throwErrorBadInput({ field })`, …) otherwise. Prefer throwing to logging; logging is not handling — re-throw. Never `Promise<void>` returns — return `SPResultBoolean`.
 - **Anti-enumeration 404**: cross-tenant/cross-owner probes get EntityNotFound, never Forbidden; 403 only for known-entity permission failures.
-- **Secret masking is a mapper responsibility** (no ORM column hiding): secrets live under `internal` in polymorphic configs, nulled by `_mask*` before any read model leaves. That holds in every mapper path including Details. Reveal-once secrets return exactly once at creation in a dedicated state. Never read a secret off a read model — read the stored entity's `internal`.
+- **Secret masking is a mapper responsibility** (no ORM column hiding): secrets live under `internal` in polymorphic configs, nulled by `_mask*` before any read model leaves. That holds in every mapper path including Details. Reveal-once secrets return exactly once at creation in a dedicated state. Never read a secret off a read model — read the stored entity's `internal`. That block is stored as one sealed string: the service opens it with the seal before it builds an integration's config, and seals it again before it saves the row.
 
 ## Entities
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "2b989141"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: Realize the estate - bring a layer up, take it down, read its statu
 ---
 
 # run — layers as nouns, local by default
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **The layers are nouns and they come up in order** — `organization` → `platform` → `environment`, with `app` registered on top of a running local platform. A lower layer missing is the usual reason a higher one will not start. The estate model behind these commands is `refs/support/infra/shape.md`, in this plugin; read it rather than reasoning from the command names.
 
@@ -37,24 +39,26 @@ spnutils infra organization down [--cloud] --plan|--apply [--approve] [--clean]
 spnutils infra organization status [--cloud] [--json]
 spnutils infra organization trust-ca
 
-spnutils infra platform up   [--cloud] --plan|--apply [--approve] [--json]
-spnutils infra platform down [--cloud] --plan|--apply [--approve] [--clean]
-spnutils infra platform status [--cloud] [--json]
+spnutils infra platform up   <spc> [--cloud] --plan|--apply [--approve] [--json]
+spnutils infra platform down <spc> [--cloud] --plan|--apply [--approve] [--clean]
+spnutils infra platform status <spc> [--cloud] [--json]
 
-spnutils infra environment up   <env> --cloud --plan|--apply [--approve] [--json]
-spnutils infra environment down <env> --cloud --plan|--apply [--approve] [--clean]
-spnutils infra environment status <env> --cloud [--json]
+spnutils infra environment up   <spc> <env> --cloud --plan|--apply [--approve] [--json]
+spnutils infra environment down <spc> <env> --cloud --plan|--apply [--approve] [--clean]
+spnutils infra environment status <spc> <env> --cloud [--json]
 
 spnutils infra app up   <package>
 spnutils infra app down <package> [--clean]
 ```
+
+**A platform-scoped command names its platform first, as an argument** (`RD.DEVEX.UTILS.072`): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
 
 | Noun | Locally | In the cloud |
 | --- | --- | --- |
 | `organization` | the machine's trust bootstrap — the CA, its one trust prompt, the shared ingress | accounts, root guardrails, registry pairs, zones |
 | `platform` | the container group — engines plus each module's local rendering; converges the org-local prerequisites first | containers, workload accounts, policies, zone, instruments |
 | `environment` | **no local form exists** — the machine is one environment, and targeting it locally is refused by name | network → resources → compute, in order |
-| `app` | the app's derived converge — schemas, certificates, a hosts entry, the ingress vhost | — deploys ride the pipeline |
+| `app` | the app's derived converge — schemas, certificates, the ingress vhost; no `/etc/hosts` line, because the local resolver answers every local domain | — deploys ride the pipeline |
 
 `--reset-certs` belongs to the local `organization up` and is for one situation: the machine CA was lost. `trust-ca` trusts that CA in the system keychain on its own — what `up` already does as part of its bootstrap.
 
@@ -67,9 +71,9 @@ spnutils infra app down <package> [--clean]
 ## Reading what is running
 
 ```text
-spnutils infra show [--json]            # which declaration reaches here, and PINNED @ version per layer
-spnutils infra <layer> status [--cloud] # what is running
-spnutils infra logs [service] [--cloud] # tail the realization, optionally one service
+spnutils infra show <spc> [--json]                  # which declaration reaches here, and PINNED @ version per layer
+spnutils infra platform status <spc> [--cloud]      # what is running; organization status takes no <spc>
+spnutils infra logs <spc> [service] [--cloud]       # tail the realization, optionally one service
 ```
 
 When a layer will not come up, `show` first: a path ref that resolves on one machine and not in CI, or a pin that is not what you thought, explains more failures than the logs do.

@@ -55,6 +55,25 @@ For each passage, compare before and after:
   changed verb, flag or path is a behaviour change rather than a clearer sentence. Treat one as a
   block, not a note.
 
+## A masthead is judged by a stricter rule
+
+**A page's Title, Subtitle and Description are plain language, and a rewrite of them is judged on
+that too** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). Where the sample holds a
+masthead, answer three more questions:
+
+1. **Plain.** Everyday words, one idea a sentence, no number, no slogan, no figure of speech, and no
+   book word the same sentence does not explain?
+2. **Shape.** Is the Description one paragraph, saying what the page is about, then why you would
+   read it, then at most two short sentences on how it is laid out? Did each claim it lost move
+   into the first section rather than disappear?
+3. **Approval.** Is every new or changed Title and Subtitle one the developer approved, as the order
+   records? One that was not is a **block**. The foundation hub's pair, fixed by
+   RD.DEVEX.WORKSPACE.143, never changes at all.
+
+**A shorter Description is not a finding by itself**, and a plain Description above a technical body
+is the designed shape rather than two stacked registers. The finding is a claim that left the page
+instead of moving into its first section.
+
 ## Also worth reporting
 
 **Reach can fall while every sentence improves.** Splitting a paragraph adds sentences and dilutes
@@ -66,10 +85,10 @@ put it at 18 %. Watch the share, never a count.
 
 State a verdict first, then the evidence:
 
-- **clean** — both passages keep every term, constraint and MUST
+- **clean** — both passages keep every term, constraint and MUST, and a masthead in the sample passes the three questions above
 - **findings** — list each, with the before and after quoted, and say which question
   it fails
-- **block** — an instruction was altered on an operative surface
+- **block** — an instruction was altered on an operative surface, or a Title or Subtitle was written without the developer's approval
 
 Name what you did not read. A sample reported as a sweep is the failure this whole workstream is
 trying not to repeat.

@@ -1,8 +1,8 @@
-# Step: test — unit + repo-level integration
+# Step: test — unit + the contract tier
 
 **Which tier a project owes is derived from its kind** — the `test` skill carries the ladder and the derivation; this step is how TypeScript runs each one. The service harness (test app, principal factory, substitutable providers, capturing log provider) ships in `@saasplane/support-service-ts` under `testing/` — never assemble a boot in a suite.
 
-Keep `tests/{unit, integration, helpers, setup}` at every project's root, **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
+Keep `tests/{unit, integration, helpers, setup}` at every project's root (and `tests/contract/` in a `CLIENT_API`), **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
 
 ## Before you write or fix a case
 
@@ -50,16 +50,16 @@ Two traps here, and both cost real time. Neither shows up as a normal test failu
 
 **A function cannot cross into the browser as a prop.** CT runs the spec in Node and marshals the mounted component's props to the browser, so only data survives. A function prop becomes a one-way call back into Node that answers `undefined` in the browser, and a component *defined* in a spec file cannot be mounted at all. So a mount taking behaviour — a render prop, a compound child like `{({ option }) => <div/>}`, a callback whose answer the component reads — cannot be written inline in the spec.
 
-- Put that JSX in `tests/component/helpers/<subject>-scenarios.tsx` and export it with a **`Scenario` suffix** (`DSWDataTableScenario`). The spec imports the wrapper and drives it through serializable props only, so the function is compiled into the browser bundle and never serialized.
+- Put that JSX in `tests/component/helpers/<subject>-scenarios.tsx` and export it with a **`Scenario` suffix** (`DSDataTableWidgetScenario`). The spec imports the wrapper and drives it through serializable props only, so the function is compiled into the browser bundle and never serialized.
 - **Not every component needs one.** A component mounted with plain serializable props stays inline in its spec — that is simpler and stays the default. Reach for a `Scenario` only when the mount itself takes a function.
-- The name is deliberate: `Fixture` is taken (a fixture is test *data*), and `Story` reads as Storybook, a separate app.
+- The name is deliberate: `Fixture` is taken (a fixture is test *data*), and `Story` reads as a Storybook story, and the showcase is a separate app.
 - Measured: two specs written inline gave 4 failed / 213 passed; the same components behind wrappers gave 217 passed, on the same clean cache.
 
 **The CT build cache is keyed by file name and survives a rename.** `playwright/.cache` holds `metainfo.json` and generated assets under the paths they had when built, and nothing invalidates them when you rename, move or delete a file the tier compiles. The build then fails resolving a module no source references — seen as `Could not resolve .../PrincipalFactorVerificationBadge` when every source file and the spec already said `IdentityFactorVerificationBadge`. **Clear `playwright/.cache` in the same change as the rename**; moving it aside with zero source edits turned a total build failure into a full run. One Vite build serves every spec, so a stale name takes down the whole tier, not one suite.
 
-## Repo-level integration (backend)
+## The contract tier (backend)
 
-- The BE integration suite lives with the **API client package** (`jest.config.integration.cjs`) and drives the **running** service through the API client — the same surface every real client uses. Run: service up, then `npx jest --config jest.config.integration.cjs --runInBand` from the client package.
+- The BE contract suite lives with the **API client package**, in `tests/contract/<mod>/*.contract.spec.ts` (`jest.config.contract.cjs`), and drives the **running** service through the generated client — the same surface every real client uses. Run: service up, then `npx nx run <client>:test:contract`. It fails when the service is unreachable, and its message names the command that starts it.
 - If the contract changed, regenerate the client from the live service **before** the suite — a stale API client tests the old surface.
 - **GET array commands have two wire forms** — test both `?ids=a` and `?ids=a&ids=b`.
 
@@ -72,24 +72,60 @@ The suite runs `--runInBand` against a shared, stateful local DB (seeded platfor
 
 Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/data policies, seeded master data, system providers, DEFAULT notification configs, roles/apps, the platform owner, seeded app-sites. Do not rely on a later reset to clean up; a green run on a fresh DB does not prove hygiene — verify seed rows byte-identical before/after (dump, run, dump, diff).
 
-## Frontend E2E
+## Frontend journeys
 
-- Root Playwright suite (`pnpm test:e2e`) runs **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
+- The journey tier runs `pnpm build test` → `pnpm start` → `spnutils apps test journey <run> <node>`, **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
 
 ## Fixture rules
 
 - **PII is allowed ONLY in `tests/` fixtures, never in `src/`.** Test personas must stay env-overridable; passwords are never hardcoded anywhere — always the env variable.
-- **Behavior ids in titles**: a contract-tier test proving a behavior row embeds its id (`<MOD>.<CAP>.<NN>`) in the test title, so docs↔tests coupling is greppable (foundation decision RD.DEVEX.FUNCTION.008). Internals-only tests are exempt. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
+- **Behavior ids in titles — the tier decides which cases carry one** (foundation decision RD.DEVEX.FUNCTION.064, amending RD.DEVEX.FUNCTION.008). The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
+
+  | Tier | Which cases carry an id | A case with no id |
+  | --- | --- | --- |
+  | contract · component · journey | every case | is a finding |
+  | integration | every case proving a guarantee the integration tier owns — in practice every real case | a fixture or a helper's own check names what it checks |
+  | unit | a case proving a row whose `Tier` is `UNIT` | a case over a private rule names the rule |
+
+  **A row's `Tier` equals the tier of the case that proves it.** A run writes only the rows declaring the tier it ran, so a `CONTRACT` row whose only case runs at integration stays unproved. Where they differ, read the case and correct the side that is wrong. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
 - Fixtures that construct jsonb-persisted contract objects must be updated in the same change as any required-field addition to those types.
+
+## The selective loop — run the cases of what you touched
+
+**While you work, run the cases of what you touched, and no whole tier** (foundation decision RD.DEVEX.WORKSPACE.207). The `test` skill, § The selective loop, states the rule: what counts as touched, the two run names, the stamp, and acceptance as named behaviour ids. This step is how TypeScript writes the selection.
+
+**The selection follows `--`, and its words are the runner's own.** `spnutils apps test` hands everything after `--` to the runner unchanged, so a selection is written for the runner of that tier.
+
+| Tier | Runner | Select by file | Select by behaviour id in the title |
+| --- | --- | --- | --- |
+| unit, in a node project · integration · contract | Jest | `-- <path or pattern>` | `-- -t "<id>"` |
+| unit, in a web project | Vitest | `-- <path or pattern>` | `-- -t "<id>"` |
+| component | Playwright CT | `-- <path or pattern>` | `-- -g "<id>"` |
+| unit, in `toolchain-ts` | `node --test` | none: it is handed the whole folder | none |
+| journey | Playwright | none: the tier names its own folder, so a path adds to it | not part of the selective loop |
+
+```bash
+spnutils apps test contract <working> <client> -- tests/contract/<mod>    # while coding: one module's contract cases, the working name reused
+spnutils apps test contract <fresh> <client> -- tests/contract/<mod>      # once they pass: the run the rows are stamped from
+spn-devex behaviours stamp write <fresh> <repo>                           # never with --reach repository
+```
+
+- **Through `spnutils`, a selection needs a tool newer than `5.1.0`.** Up to `5.1.0` the command loses the `--` on its way to the runner: a path is refused as a second run name, and a flag is dropped, so the whole tier runs. On `5.1.0`, write the same selection from inside the node: `npx spn-test <tier> <run> -- <selection>`.
+- **A selection that matches no file exits clean.** Every runner is given `--passWithNoTests`, so a mistyped path passes. Read each named id as `SUCCESS` from `tests/.output/<tier>/runs/<run>.json`, and report an id the file does not name as *nothing proves this*.
+- **A contract or integration selection still pays the tier's global setup.** Only the cases are fewer.
+- **A changed contract state or a regenerated client touches every caller's cases**, so its selection names each caller's folder, not only the module that changed.
 
 ## Commands
 
+**A whole tier is for the full pass before a release, or for one of the five cases the `test` skill names.** The first three lines below run a whole tier.
+
 ```bash
-npx nx run-many -t test:unit --all   # every unit suite
-npx nx run <project>:test:unit       # one project
-npx nx run <client>:test:integration # the contract tier, against a live service
-pnpm --filter <project> test unit    # the same, through the node's own script
-pnpm test:e2e                       # root Playwright — the root is not an nx project
+npx nx run-many -t test:unit --all --run <run>   # every unit suite, under one run name
+npx nx run <project>:test:unit --run <run>       # one project's whole unit tier
+npx nx run <client>:test:contract --run <run>    # the whole contract tier, against a live service
+pnpm --filter <project> test unit <run>          # the same, through the node's own script
+spnutils apps test <tier> <run> <package> -- <selection>   # the selective loop: the cases of what you touched
+spnutils apps test journey <run> <node>          # the sweep; --phase serialized and --phase window are separate runs under the same name
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```
 

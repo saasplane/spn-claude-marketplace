@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "81e74177"
+      "seen": "f3d02f7d"
     }
   ]
 }
@@ -19,6 +19,8 @@ description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create
 
 # new — scaffold by target
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 Every node declares exactly **one kind**, in `spkind.json` at its root — `{ "kind": "<kind>", "config": null }`. The `config` field carries the mnemonic for module kinds and the app code for app kinds. Everything derivable from the kind (runtime, toolchain profile, structure profile) is never declared again. Scaffolds write the kind automatically; a project without it is unfinished.
 
 **Never invent layout.** `spnutils apps scaffold` writes the structure the kind requires, and `spnutils apps validate` reports where a project disagrees with its own kind. Run the scaffold, then the validator, rather than hand-building a folder tree. The stack is never typed: it comes from the repo's claim in `sprepo.json`. Where a workspace already holds a project of the same kind, match it; where it does not, the kind registry's structure profile is the authority. Keep tests under `tests/`, always — never in `src/`.
@@ -29,27 +31,27 @@ A new platform monorepo — the workspace root, which declares `sprepo.json` `{ 
 
 Then:
 
-1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, team access). Idempotent.
+1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, the checks its world requires, team access). Idempotent. It sets up all four permanent branches, `develop`, `qa`, `uat` and `main`, and their rules; nothing declares which of them a team uses, because the path to `main` is chosen at each promotion with `spnutils repo promote`, and a required `promotion-source` job refuses any other head into `qa`, `uat` or `main`.
 2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the repository's one docs tree — the shape below; a node scaffolded afterwards carries no docs tree of its own) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.FUNCTION.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
 3. **Agent wiring**: `spnutils repo agent-sync` (alias `as`). The marketplace source follows the mode the place implies, so nothing is passed — a builder wires the checkout, a partner does not hold, and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-devex@saasplane` + `spn-apps@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
-4. **Local infra**: `spnutils infra organization up` (once per machine) → `spnutils infra platform up` — see the `run` skill local mode.
+4. **Local infra**: `spnutils infra organization up --apply` (once per machine) → `spnutils infra platform up <spc> --apply`, where `<spc>` is the platform code `sprepo.json` pins — see the `run` skill local mode.
 
 ## Target: one of the supported kinds
 
-**A kind decides its test folders, so nothing is chosen when you scaffold.** `unit/` and `integration/` mirror `src/` path for path; `fixtures/`, `helpers/` and `setup/` are flat siblings any kind adds when it needs them. A folder a kind does not carry is not an omission to fill in.
+**A kind decides its test folders, so nothing is chosen when you scaffold.** `unit/` and `integration/` mirror `src/` path for path. A `CLIENT_API`'s `contract/` follows the service's modules, since those are what it drives. `fixtures/`, `helpers/` and `setup/` are flat siblings any kind adds when it needs them. A folder a kind does not carry is not an omission to fill in. (● where the tier exists, ○ if used.)
 
-| Kind | `unit/` | `component/` | `integration/` | journeys |
-| --- | :--: | :--: | :--: | :--: |
-| `TOOLCHAIN` | ● (`node:test`, mirrors `src/`) | — | — | — |
-| `SUPPORT_UNIVERSAL` | ● | — | — | — |
-| `SUPPORT_SERVER` | ● | — | ● | — |
-| `SUPPORT_WEB` | ● | ● | — | — |
-| `MODULE_SERVER` | ● | — | — | — |
-| `MODULE_WEB` | ● (jsdom, and a browser where only paint shows it) | — | — | cited from the composing app |
-| `APP_SERVER` | ● | — | ● | — |
-| `APP_WEB` | ● | ○ | — | ● over its own surfaces |
-| `CLIENT_API` | ● | — | ● (contract) | — |
-| `APP_UTILITY` | ● | — | ● | — |
+| Kind | `unit/` | `component/` | `integration/` | `contract/` | journeys |
+| --- | :--: | :--: | :--: | :--: | :--: |
+| `TOOLCHAIN` | ● (`node:test`, mirrors `src/`) | — | — | — | — |
+| `SUPPORT_UNIVERSAL` | ● | — | — | — | — |
+| `SUPPORT_SERVER` | ● | — | ○ | — | — |
+| `SUPPORT_WEB` | ● | ● | — | — | — |
+| `MODULE_SERVER` | ● | — | — | — | — |
+| `MODULE_WEB` | ● (jsdom, and a browser where only paint shows it) | — | — | — | cited from the composing app |
+| `APP_SERVER` | ● | — | ● | — | — |
+| `APP_WEB` | ● | ● | — | — | ● over its own surfaces |
+| `CLIENT_API` | ● | — | — | ● | — |
+| `APP_UTILITY` | ● | — | ● | — | — |
 
 **A domain module ships no shell, so it proves at unit and cites the application above it.** A server module cites the composing application's contract suite; a web module cites its journey. **An application owns both faces of what it composes**: the API face through its published client, the UI face in a browser. Neither substitutes for the other.
 
@@ -63,7 +65,7 @@ Then:
 | `module-server` | `MODULE_SERVER` | server | `packages/module-server-<mod>-ts` — the contract/app/entry triad + `migrations/` + module wiring (`interface.ts`, `<mod>Module.ts`, `<MOD>ModuleManager.ts`) + a `README.md`; its mirrors, `data-model.md` and `schema.sql` land in the repository's own tree under its domain (see **Target: app-module § Docs**) | `spnutils apps gen-validators <pkg>` (after states) · `gen-barrel <pkg>` |
 | `module-web` | `MODULE_WEB` | web | `packages/module-web-<mod>-ts` — `src/entry/ui/{components,hooks,pages,utils}` (the browser is a transport, so the UI is the module's **entry**; `contract/` and `app/` arrive beside it only once the module owns client-side rules), named exports only | `spnutils apps gen-barrel <pkg>` |
 | `app-server` | `APP_SERVER` | server | `apps/service-<usecase>-ts` — bootstrap `index.ts`, `<CODE>AppManager.ts`, `interface.ts`, `modules/`, `envs/` (`local.env`, `cloud.env` — no secrets), the platform declaration's `apps[]` row | `spnutils infra app up <app>` · `pnpm migrate:up` |
-| `app-web` | `APP_WEB` | web | `apps/web-<usecase>-ts` — root holds only `index.tsx` · `index.css` · `interface.ts` · `<code>App.ts` · `<CODE>AppManager.ts`; the shell (`AppRouter`, `nav`, app context) lives in `src/modules/boot/entry/ui/`, and vite carries per-module `manualChunks` | `spnutils infra app up <app>` |
+| `app-web` | `APP_WEB` | web | `apps/web-<usecase>-ts` — root holds only `index.tsx` · `interface.ts` · `<code>App.ts` · `<CODE>AppManager.ts`, with its stylesheets in `src/assets/styles/` (the entry is `assets/styles/index.css`); the shell (`AppRouter`, `nav`, app context) lives in `src/modules/boot/entry/ui/`, and vite carries per-module `manualChunks` | `spnutils infra app up <app>` |
 | `app-utility` | `APP_UTILITY` | server | `apps/utility<-usecase>-ts` — the layers of a module, the frame of an app; `src/index.ts` is the executable a user invokes (`#!/usr/bin/env node`), so **never run `gen-barrel` against it** | — |
 | `client-api` | `CLIENT_API` | universal | `packages/client-<usecase>-api-ts` — the **shell** is scaffolded like any kind (manifest, tsconfigs, lint, tests, generator config, hand-written barrel). Only `src/generated/` is emitted, from the running service's published spec; hand edits there are lost by design | `pnpm --filter <app> gen:client` |
 | `app-module` | (the module's own) | — | A module folder inside an app — see **Target: app-module** below | |
@@ -92,7 +94,7 @@ A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — *
 decision RD.DEVEX.WORKSPACE.070). The `repo` target above writes it once, at scaffold time. Every kind
 scaffolded afterwards — an app, a package, an app-module — carries **`README.md` and no seats of
 its own** (decision RD.DEVEX.WORKSPACE.088): about twenty-five lines saying what the node is, what it is for,
-and linking into the seats it realizes. Read `refs/doc-sets.md` in the **spn-devex** plugin before
+and linking into the seats it realizes. Read `refs/devex/workspace/docs/doc-sets.md` in the **spn-devex** plugin before
 writing a word into either.
 
 ```text
@@ -132,8 +134,8 @@ A product module owned by one app — a scaffold target rather than a workspace 
 - **Docs**: the module carries **`README.md` and no docs tree** (decision RD.DEVEX.WORKSPACE.088). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RD.DEVEX.WORKSPACE.125). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
 - Commands: `spnutils apps gen-validators <app-pkg>` after writing `contract/states/**` (gen-validators applies to apps too); do **not** run `gen-barrel` on apps (their `index.ts` is a bootstrap, not a barrel).
 
-**The scaffold writes the gate table; it cannot answer the question behind it.** Every new module gets an `app/utils/authz.ts` and a seeded permission catalog. Before you fill either, decide what varies the answer — a person, an organization type, or a plan. `refs/permission-vs-enablement.md` in the **spn-devex** plugin carries that question, the `{MOD}_MANAGE_{NOUN}` grammar, and the append rule an app-owned module needs when it contributes an option to another module's definition. This plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable mistakes as you write them.
+**The scaffold writes the gate table; it cannot answer the question behind it.** Every new module gets an `app/utils/authz.ts` and a seeded permission catalog. Before you fill either, decide what varies the answer — a person, an organization type, or a plan. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries that question, the `{MOD}_MANAGE_{NOUN}` grammar, and the append rule an app-owned module needs when it contributes an option to another module's definition. This plugin's `providers/ts/scripts/checks/_src/enablement-grammar.ts` refuses the checkable mistakes as you write them.
 
 ## Depth
 
-The kind registry, structure profiles, and toolchain rules are restated in this plugin and are the authority at the seat. Their owning chapters are the foundation provider set (`docs/04-capabilities/02-support/01-apps/10-providers/ts`: `kinds.md`, 02-structure, 08-toolchain) — cited for provenance, **not as a lookup**. The book is not delivered, so never send anyone there to finish a task. If something you need is missing from the restatement, that is a regeneration owed, not a checkout to go find. Read `refs/doc-sets.md` in the **spn-devex** plugin for the node grammar in full. After scaffolding, hand off to the `implement` skill.
+The kind registry, structure profiles, and toolchain rules are restated in this plugin and are the authority at the seat. Their owning chapters are the foundation provider set (`docs/04-capabilities/02-support/02-apps/10-providers/ts`: `kinds.md`, 02-structure, 08-toolchain) — cited for provenance, **not as a lookup**. The book is not delivered, so never send anyone there to finish a task. If something you need is missing from the restatement, that is a regeneration owed, not a checkout to go find. Read `refs/devex/workspace/docs/doc-sets.md` in the **spn-devex** plugin for the node grammar in full. After scaffolding, hand off to the `implement` skill.

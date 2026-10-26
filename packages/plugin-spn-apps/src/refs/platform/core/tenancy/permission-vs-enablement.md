@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "1fa27d47"
+      "seen": "4bbfb9ad"
     }
   ],
   "decisions": [
@@ -118,7 +118,7 @@ A module owns a question, or it contributes an option to someone else's. The two
 
 ## What a hook checks, and what it cannot
 
-`spn-apps` carries `hooks/scripts/enablement-grammar.py`. It refuses four shapes at write time:
+`spn-apps` carries `providers/ts/scripts/checks/_src/enablement-grammar.ts`. It refuses four shapes at write time:
 
 | # | Refused |
 | --- | --- |

@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 // RESTATES: the foundation book — 02-document.md rule 9 (RD.DEVEX.WORKSPACE.162), rules 11-12 (RD.DEVEX.WORKSPACE.096, the
 // one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
-// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the approach document) and
-// 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
+// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
+// and How ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
+// (RD.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RD.DEVEX.WORKSPACE.214)
+// and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
+//
+// EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET. A page that links no shared stylesheet
+// holds its own copy of the styles: its prose and its path are read, its markup is not, and it draws
+// one RULE finding that says how to move it.
 //
 // Calibrated to the rule, never to the corpus (RD.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
 // the corpus's own average). Over prose only — records are exempt, headings and derived chrome are
@@ -40,7 +46,15 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { sentenceColumn } from "../lib/item-cells.ts";
+import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
+         artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
+         workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
+         tableDifferences } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
 
@@ -178,10 +192,25 @@ const NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
 const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 const REACH_MIN_N = 8;
 
-// RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed.
-const POCKET_KIND: Record<string, string> = { approaches: "-approach.html", overviews: "-overview.html" };
+/**
+ * The suffix a page of the pocket is held to by its place, and that place as a message names it. Null
+ * where the place holds a page to no suffix. RD.DEVEX.WORKSPACE.103: the suffix names the kind, and
+ * the set is closed. Under the pocket's `docs` folder a page in a `constructs` folder is a construct
+ * page and every other page is an overview. A page directly in `guides/` is a guide.
+ */
+function pocketKind(parts: string[]): { place: string; suffix: string } | null {
+  const inside = artifactDocsPathOf(parts.join("/"));
+  if (inside !== null)
+    return inside.slice(0, -1).includes(CONSTRUCT_PAGES)
+      ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX }
+      : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
+  return parts.includes(POCKET.artifacts) && parts.at(-2) === ARTIFACT.guides
+    ? { place: `in ${ARTIFACT.guides}/`, suffix: GUIDE_PAGE_SUFFIX } : null;
+}
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
+/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RD.DEVEX.WORKSPACE.262). */
+const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
 const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
@@ -213,32 +242,44 @@ export function structural(path: string): Finding[] {
         "never as a file at the node"]);
   }
 
-  // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree.
+  // RD.DEVEX.WORKSPACE.103 — place and suffix must agree. A page under `guides/` ends `-guide.html`
+  // (RD.DEVEX.WORKSPACE.218). The index of artifacts sits directly in the pocket and has no suffix
+  // (RD.DEVEX.WORKSPACE.219), so it is held to none.
   const parts = slashes(resolve(path)).split("/");
-  if (parts.includes("artifacts") && base.endsWith(".html")) {
-    const pocket = parts[parts.length - 2];
-    const want = POCKET_KIND[pocket];
-    if (want && !base.endsWith(want)) {
-      const other = Object.entries(POCKET_KIND).find(([f]) => f !== pocket)?.[1] ?? "";
-      const hint = base.endsWith(other)
-        ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
-        : "";
-      out.push(["BLOCK", `${base} sits in ${pocket}/ but does not end ${want} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
-    }
+  const kind = base.endsWith(".html") ? pocketKind(parts) : null;
+  if (kind !== null && !base.endsWith(kind.suffix)) {
+    const belongs = pagePlaceOf(parts.join("/"));
+    const hint = base.endsWith(APPROACH_SUFFIX)
+      ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
+      : belongs !== null ? ` — this page belongs at ${belongs}` : "";
+    out.push(["BLOCK", `${base} sits ${kind.place} but does not end ${kind.suffix} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
   }
   return out;
 }
 
-// 05-artifacts.md § `How` has two halves — what is built, and what re-aligns. The chapter names the
-// failure before it happens: *the document half is the one you are most likely to forget*.
-// Recognised two ways, because a page may name the heading or just carry the table.
-const HALF_HEADING = /<h[34]\b[^>]*>(?:(?!<\/h[34]>)[\s\S])*re-?align/i;
-// RULE since workstream 008 closed. It was SOFT for one reason and the reason has gone: fifty pages
-// would have fired the day it landed, and a gate nobody can get green is a gate everybody learns to
-// scroll past. Approach pages no longer sit in a repository at all — they live in the workstream
-// that argues them — and of the ten that exist, eight carry the heading. The two that do not are in
-// CLOSED workstreams, which are records of a moment and are never rewritten.
-const TWO_HALVES = "RULE";
+// ---------------------------------------------------------------------------- the approach page
+
+// An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
+// and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
+// Workstream 008 is exempt by name: its page was written in the shape before this one, and it
+// closes under that shape (05-artifacts.md § The approach document).
+const EXEMPT_WORKSTREAM = /^008-/;
+
+/** The workstream folder a path sits in, and its name, or null outside one. */
+export function workstreamOf(path: string): { folder: string; name: string } | null {
+  return workstreamDirOf(slashes(resolve(path)));
+}
+
+/** Whether the approach-page rules skip this path because its workstream is 008. */
+export function exemptWorkstream(path: string): boolean {
+  return EXEMPT_WORKSTREAM.test(workstreamOf(path)?.name ?? "");
+}
+
+// RULE, as the two-halves rule it replaces was. How ends in Cycles on every approach page; the
+// comparison with the arcs runs where the page sits in a workstream, which is where every approach
+// page now lives.
+const CYCLES = "RULE";
+const FURNITURE = "RULE";
 
 /** The body of one `<h2>` section, to the next `<h2>`. */
 function section(text: string, name: string): string | null {
@@ -247,30 +288,122 @@ function section(text: string, name: string): string | null {
   return found ? found[1] : null;
 }
 
-/** `How` owes two tables: what is built, and which documents the design obliges. */
-export function howHalves(text: string): Finding[] {
-  const body = section(text, "How");
-  if (body === null) return [];
-  // THE TABLE COUNT WAS A FALSE NEGATIVE, and a large one. Allowing "two tables in How" let 22 pages
-  // pass that carry no re-alignment at all. The heading is the signal every page doing this right
-  // uses, and it is the only one that means what it says.
-  if (HALF_HEADING.test(body)) return [];
-  return [[TWO_HALVES,
-    "How carries one half. It says what is built and never which documents this reasoning obliges, " +
-    "so the second table is missing (05-artifacts.md, How has two halves) · add What re-aligns — one " +
-    "row per document, what re-aligns inside it, and its state. An empty one is worth saying out " +
-    "loud; a missing one usually means somebody stopped early"]];
+/** A cell or heading as a person reads it — tags gone, entities resolved, whitespace collapsed. */
+const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+
+const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
+
+// The header of the Cycles table, as a page writes it.
+const CYCLES_HEADER = CYCLES_COLUMNS.join(" · ");
+
+/** Whether a path sits in a closed workstream, whose page keeps the table it closed with. */
+function inClosedWorkstream(path: string): boolean {
+  const home = workstreamOf(path);
+  return home !== null && basename(dirname(home.folder)) === "closed";
 }
 
-/** The chrome an approach page owes its reader, and the one part nothing checked. */
+/**
+ * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
+ * `h3` named Cycles, whose table has two columns, Arc · Status. Inside a workstream the
+ * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
+ * its name, its line and the links to its preview and its samples, and the reason a CARRIED or
+ * DROPPED arc carries (all in the Arc cell), and its status badge.
+ * `spn-devex docs cycles show` prints the rows; this compares the page against the same
+ * reading, which is `tableDifferences` in that command's file. A page in a closed workstream stays as
+ * it closed, and is not compared.
+ */
+export function cyclesRule(path: string, text: string): Finding[] {
+  const body = section(text, "How");
+  if (body === null) return [];                                   // approachShape reports a missing How
+  const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
+  const subsections = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
+  const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
+  if (!named)
+    return [[CYCLES, "How does not end in Cycles — its last subsection is an h3 named Cycles, one row " +
+      `per arc with ${CYCLES_HEADER} (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+  if (named !== subsections.at(-1))
+    return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
+      "subsection (05-artifacts.md § How ends in Cycles)"]];
+
+  if (inClosedWorkstream(path)) return [];                       // a closed page stays as it closed
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
+  const columns = table ? tableColumns(table) : "";
+  if (!table)
+    return [[CYCLES, `Cycles carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
+      `the arcs' data (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+  const home = workstreamOf(path);
+  if (!home) return [];
+  if (columns !== headerOf(CYCLES_COLUMNS))
+    return [[CYCLES, `Cycles carries ${columns.split(" · ").map((name) => name.charAt(0).toUpperCase() + name.slice(1)).join(" · ")} where an open workstream carries ${CYCLES_HEADER} — each row holds the ` +
+      "arc's title, line and links, and its status (05-artifacts.md § How ends in Cycles) · " +
+      "run `spn-devex docs cycles write <workstream>` to write it from the arcs"]];
+
+  // Rows are matched by arc, never by position: the page lists arcs in the order they run.
+  const { missing, unknown, stale } = tableDifferences(table, cyclesOf(home.folder));
+  const out: Finding[] = [];
+  if (missing.length)
+    out.push([CYCLES, `Cycles has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
+      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  if (unknown.length)
+    out.push([CYCLES, `Cycles lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
+      `from the arcs, never typed (05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  if (stale.length)
+    out.push([CYCLES, `Cycles disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
+      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  return out;
+}
+
+// The command that writes the parts of a page the arcs decide (RD.DEVEX.WORKSPACE.204).
+const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
+
+/**
+ * 05-artifacts.md § How ends in Cycles: on a workstream's page the header's status follows the arcs.
+ * It reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has
+ * landed, and `DONE` when the workstream closes. The rule itself is `headerStatusRule`, beside the
+ * command that writes the status; this states the finding. A header that labels none of the three
+ * words is not judged.
+ */
+export function headerRule(path: string, text: string): Finding[] {
+  const home = workstreamOf(path);
+  if (!home) return [];
+  const found = headerStatusRule(home.folder, text);
+  if (!found) return [];
+  if (inClosedWorkstream(path))
+    return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
+      "(05-artifacts.md § How ends in Cycles) · stamp the header's status badge, which a closed page keeps by hand"]];
+  return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
+    `follows the arcs (05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+}
+
+/**
+ * 05-artifacts.md § How ends in Cycles: the heading of `Open` names the cards that are open, each by
+ * its number, and with no card open it reads `Open — no card is open`. A page with no `Open` heading
+ * and a page in a closed workstream are not judged.
+ */
+export function openHeadingRule(path: string, text: string): Finding[] {
+  if (!workstreamOf(path) || inClosedWorkstream(path)) return [];
+  const shows = openHeadingOf(text);
+  const gives = openHeadingFor(text);
+  if (shows === null || shows === gives) return [];
+  return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
+    `(05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+}
+
+/** A page's line that loads the shared script, which builds the rail and folds it. */
+const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
+
+/**
+ * The chrome an approach page owes its reader. The shared script builds the rail from the headings
+ * and folds it, so a page that carries a rail and loads no shared script shows an empty outline.
+ */
 export function pageFurniture(text: string): Finding[] {
-  if (!text.includes('id="rail"') && !text.includes('id="rail-list"')) return [];  // no rail is a short page's right
-  if (text.includes("rail-fold") || text.includes("sub-group")) return [];
-  return [[TWO_HALVES,
-    "The outline does not fold. A rail listing every heading of every section is a wall in the shape " +
-    "of an outline (05-artifacts.md, A page carries its own subsections) · append the rail-fold " +
-    "block, verbatim, after this page's own rail builder — take it from any approach page in the " +
-    "foundation's artifacts pocket"]];
+  if (!text.includes('id="rail"')) return [];                    // no rail is a short page's right
+  if (LOADS_PAGE_SCRIPT.test(text)) return [];
+  return [[FURNITURE,
+    `The outline is not built and does not fold: the page carries a rail and loads no \`${PAGE_SCRIPT}\`. ` +
+    "The shared script builds the rail from the headings and folds it (05-artifacts.md, The page itself) · " +
+    "add the script's line at the end of the page — take it from the approach template, " +
+    `\`${PLUGIN_TEMPLATES}/workstream/approach-template.html\``]];
 }
 
 /** The first word of every `<h2>`, lowercased — what decides a page's kind. */
@@ -281,8 +414,14 @@ function headings(text: string): string[] {
     .map((h) => h.split(/\s+/)[0].replace(/[:—-]+$/, "").toLowerCase());
 }
 
-/** Why -> What -> How -> Open -> Deferred, Terms optional first (05-artifacts). */
-export function approachShape(text: string): Finding[] {
+const APPROACH_SECTIONS = ["why", "what", "how", "open", "deferred"];
+
+/**
+ * An opening, then Why -> What -> How -> Open -> Deferred, in that order and nothing else
+ * (05-artifacts.md § The approach document). `exempt` is workstream 008's page, which keeps the
+ * shape it was written in and is held only to the skeleton.
+ */
+export function approachShape(text: string, exempt = false): Finding[] {
   const heads = headings(text);
   if (!heads.length) return [];
   // The SKELETON decides the kind. A settled approach legitimately lacks Open, and a closed one lacks
@@ -290,9 +429,142 @@ export function approachShape(text: string): Finding[] {
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      "it is an overview: artifacts/overviews/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach " +
-      "is Why > What > How > Open > Deferred"]];
-  return [];
+      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RD.DEVEX.WORKSPACE.102 / 040). An approach ` +
+      "is an opening, then Why > What > How > Open > Deferred"]];
+  if (exempt) return [];
+
+  const out: Finding[] = [];
+  const where = "(05-artifacts.md § The approach document)";
+  if (heads.includes("terms"))
+    out.push(["RULE", `carries a Terms section, and an approach page has none ${where} · explain a word ` +
+      "in brackets where it first appears; a word the product owns belongs in its construct's own Terms table"]);
+  const others = [...new Set(heads.filter((h) => h !== "terms" && !APPROACH_SECTIONS.includes(h)))];
+  if (others.length)
+    out.push(["RULE", `carries ${others.join(" + ")} — an approach page is an opening, then Why > What > ` +
+      `How > Open > Deferred, and nothing else ${where}`]);
+  const order = heads.filter((h) => APPROACH_SECTIONS.includes(h)).map((h) => APPROACH_SECTIONS.indexOf(h));
+  if (order.some((at, i) => i > 0 && at < order[i - 1]))
+    out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
+      `the order is Why > What > How > Open > Deferred ${where}`]);
+  if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
+    out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
+      "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.182) · start from the approach template"]);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- the masthead
+
+// 05-artifacts.md § The masthead, and the opening (RD.DEVEX.WORKSPACE.187, RD.DEVEX.WORKSPACE.182).
+// The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
+// `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
+// while the trees outside the foundation wait for their retrofit (N116 row 9); when every tree
+// audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
+const SECOND_PARAGRAPH = "SOFT";
+const MASTHEAD = "SOFT";
+const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
+
+/**
+ * The page kinds the masthead rule binds, read from a page's file name. The index of artifacts has
+ * no masthead, no Subtitle and no Description, and a guide page's file name names no kind of this
+ * set, so the rule reads neither.
+ */
+export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach" | "preview";
+export function mastheadKind(path: string): MastheadKind | null {
+  const base = basename(path);
+  if (base === HUB) return "hub";
+  const suffix = /-(overview|construct|report|approach|preview)\.html$/.exec(base);
+  return suffix ? suffix[1] as MastheadKind : null;
+}
+
+/** Text as a reader compares it: tags gone, entities resolved, curly apostrophes straight, spaces collapsed. */
+const spoken = (html: string): string => flat(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
+
+/**
+ * The foundation hub's Title and Subtitle, read from `RD.DEVEX.WORKSPACE.143` in the register that
+ * sits beside the page. Null, and the pair is not checked, where that register carries no such row
+ * (every other repository) or where no register is found at all (a partner's workspace).
+ * The row writes the Title in backticks and the Subtitle in italics after *reads*; the Subtitle
+ * opens a sentence on the page, so its first letter is raised and a full stop closes it.
+ */
+export function hubPair(path: string): { title: string; subtitle: string } | "unreadable" | null {
+  let folder = dirname(resolve(path));
+  for (;;) {
+    const register = decisionsRegister(folder);
+    if (exists(register)) {
+      const row = /^\|\s*RD\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
+      if (!row) return null;
+      const title = /`([^`\n]+)`/.exec(row[0])?.[1];
+      const statement = /\breads\s+\*([^*\n]+)\*/.exec(row[0])?.[1];
+      if (!title || !statement) return "unreadable";
+      const subtitle = statement.charAt(0).toUpperCase() + statement.slice(1);
+      return { title: spoken(title), subtitle: spoken(/[.!?]$/.test(subtitle) ? subtitle : subtitle + ".") };
+    }
+    const up = dirname(folder);
+    if (up === folder) return null;
+    folder = up;
+  }
+}
+
+/**
+ * The masthead of one page: `h1`, an optional `p.sds-subtitle`, exactly one `p.sds-standfirst`, in that
+ * order, and no other paragraph. Only a page with a `<header>` is read; a missing header is the
+ * header check's finding. An approach page's missing standfirst is `approachShape`'s RULE, so it is
+ * not reported twice here.
+ */
+export function masthead(path: string, text: string, kind: MastheadKind | null = mastheadKind(path)): Finding[] {
+  if (!kind) return [];
+  const header = /<header\b[^>]*>([\s\S]*?)<\/header>/i.exec(text.replace(/<!--[\s\S]*?-->/g, " "));
+  if (!header) return [];
+  // A table's item cells hold paragraphs of their own (RD.DEVEX.WORKSPACE.259), and none of them is the header's.
+  const body = header[1].replace(/<table\b[\s\S]*?<\/table>/gi, " ");
+  const out: Finding[] = [];
+  const parts = [...body.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
+    if (m[1] !== undefined) return { role: "h1", html: m[1] };
+    const classes = (/\bclass\s*=\s*"([^"]*)"/i.exec(m[2])?.[1] ?? "").split(/\s+/);
+    const role = classes.includes("sds-subtitle") ? "subtitle" : classes.includes("sds-standfirst") ? "standfirst" : "p";
+    return { role, html: m[3] };
+  });
+
+  const subtitles = parts.filter((p) => p.role === "subtitle");
+  const standfirsts = parts.filter((p) => p.role === "standfirst");
+  const paragraphs = parts.filter((p) => p.role !== "h1");
+  // One Subtitle and one Description are the header's whole allowance of paragraphs; anything past
+  // that is a second paragraph, whatever its class says it is.
+  const allowed = Math.min(subtitles.length, 1) + Math.min(standfirsts.length, 1);
+  if (paragraphs.length > allowed) {
+    const extra = paragraphs.length - allowed;
+    out.push([SECOND_PARAGRAPH, `the header carries ${extra} paragraph${extra > 1 ? "s" : ""} past the ` +
+      "Subtitle and the Description — the Description is one paragraph, and nothing follows it in the " +
+      `header ${MASTHEAD_WHERE} · fold the rest into the first section`]);
+  }
+  if (!standfirsts.length && kind !== "approach")
+    out.push([MASTHEAD, `the header has no Description — one \`p.sds-standfirst\` under the Title and the Subtitle ${MASTHEAD_WHERE}`]);
+
+  const order = parts.map((p) => p.role);
+  const h1At = order.indexOf("h1"), subAt = order.indexOf("subtitle"), leadAt = order.indexOf("standfirst");
+  if (subAt >= 0 && (subAt < h1At || (leadAt >= 0 && subAt > leadAt)))
+    out.push([MASTHEAD, `the Subtitle is out of place — it sits directly under the \`h1\` and above the Description ${MASTHEAD_WHERE}`]);
+
+  if (subtitles.length) {
+    const count = spoken(subtitles[0].html).split(/(?<=[.!?])\s+(?=\S)/).filter((s) => words(s).length).length;
+    if (count > 1)
+      out.push([MASTHEAD, `the Subtitle runs to ${count} sentences — it is one sentence, in plain language ${MASTHEAD_WHERE}`]);
+  }
+
+  if (kind === "hub") {
+    const pair = hubPair(path);
+    if (pair === "unreadable")
+      out.push([MASTHEAD, "RD.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
+        "the row writes the Title in backticks and the Subtitle in italics after *reads*"]);
+    else if (pair) {
+      const h1 = parts.find((p) => p.role === "h1");
+      if (!h1 || spoken(h1.html) !== pair.title)
+        out.push([MASTHEAD, `the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
+      if (!subtitles.length || spoken(subtitles[0].html) !== pair.subtitle)
+        out.push([MASTHEAD, `the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
+    }
+  }
+  return out;
 }
 
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
@@ -306,7 +578,7 @@ export function overviewShape(text: string): Finding[] {
 }
 
 /**
- * Each `<div class="open">` with its own matching close, nesting counted.
+ * Each `<div class="sds-open">` with its own matching close, nesting counted.
  *
  * THE BLIND SPOT THIS CLOSES. Splitting the section on headings alone left the LAST card's chunk
  * running to the end of the section, so it borrowed whatever came after it. On the 009 page a card
@@ -315,7 +587,7 @@ export function overviewShape(text: string): Finding[] {
  */
 function cardDivs(body: string): string[] {
   const out: string[] = [];
-  for (const opening of body.matchAll(/<div\b[^>]*class="[^"]*\bopen\b[^"]*"[^>]*>/gi)) {
+  for (const opening of body.matchAll(/<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"[^>]*>/gi)) {
     const from = opening.index! + opening[0].length;
     let depth = 1;
     let at = from;
@@ -330,7 +602,7 @@ function cardDivs(body: string): string[] {
 
 /**
  * Cards are h3 OR h4 — the corpus uses h4, and both read as a card to a person. Where the page marks
- * its cards with `<div class="open">` those bounds win, because they are what the writer actually
+ * its cards with `<div class="sds-open">` those bounds win, because they are what the writer actually
  * drew. The heading split is the fallback for a page that does not.
  */
 function cards(body: string): Array<[string, string]> {
@@ -346,8 +618,15 @@ function cards(body: string): Array<[string, string]> {
   return out;
 }
 
+// The Views part of a card: the labelled block `<span class="sds-key">Views</span>`. Only that label
+// is read, so the word in a card's prose is not the part, and what the part says is never judged.
+const VIEWS_PART = /<[a-z][a-z0-9]*\b[^>]*class="(?:[^"]*\s)?sds-key(?:\s[^"]*)?"[^>]*>\s*Views\s*:?\s*<\//i;
+
 /**
  * Open and Deferred carry cards in the agreed shape (refs/decision-cards.md).
+ *
+ * A card in Open with no Views part does not say whether any other role read the choice
+ * (RD.DEVEX.WORKSPACE.242). A Deferred card is not asked for it.
  *
  * A card with no options is a status update; one with no recommendation makes the reader do the
  * analysis twice; a deferred one with no trigger is a question nobody will bring back. All three read
@@ -366,6 +645,9 @@ export function openCards(text: string): Finding[] {
         out.push(["RULE", `Open card "${name}" carries no options table — a card with no options is a status update (refs/decision-cards.md)`]);
       else if (!/recommend|(?:→|&rarr;|&#8594;)\s*(?:<[^>]+>)*\s*\**[A-D]\b/i.test(rest))
         out.push(["RULE", `Open card "${name}" carries no recommendation — the reader does the analysis twice (refs/decision-cards.md)`]);
+      if (!VIEWS_PART.test(rest))
+        out.push(["RULE", `Open card "${name}" carries no Views part. Add \`<span class="sds-key">Views</span>\` after What and before the ` +
+          `options: one line on who spoke and why those views, then each view's reason in one or two plain sentences (RD.DEVEX.WORKSPACE.242)`]);
     }
   const deferred = section(text, "Deferred");
   if (deferred !== null)
@@ -582,7 +864,7 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
  */
 export function isRegister(path: string): boolean {
   const p = slashes(resolve(path));
-  return p.endsWith(".md") && p.includes("/registers/") && basename(p) !== "README.md";
+  return inRegisters(p);
 }
 
 // 06-registers.md § A row states present truth, and carries no supersession — a row is never
@@ -743,16 +1025,18 @@ export function isOperative(path: string): boolean {
  * CONCEPT.md, every .html under artifacts/, an approach or overview page anywhere, and .html under
  * .spndevex/notes/. A scaffold template counts as the file it writes. Not .md under .spndevex/ —
  * arcs, orders and notes are state, not corpus — and nothing under a build or dependency directory.
+ * Not a page's bundled copy either: it is a copy made to publish, and its page is what is read.
  */
 export function watched(path: string): boolean {
   const p = slashes(resolve(asWritten(path)));
   const parts = p.split("/");
   if (parts.slice(0, -1).some((d) => SKIP.has(d))) return false;
   const base = parts[parts.length - 1];
+  if (base.endsWith(BUNDLED_SUFFIX)) return false;
   if (base.endsWith(".md") && p.includes("/.spndevex/")) return false;
   if (base.endsWith(".html"))
-    return base.endsWith("-approach.html") || base.endsWith("-overview.html")
-        || p.includes("/artifacts/") || p.includes("/.spndevex/notes/");
+    return isApproachPage(base) || base.endsWith("-overview.html")
+        || inArtifacts(p) || p.includes("/.spndevex/notes/") || ARC_PREVIEW.test(p);
   if (base === "README.md" || base === "CONCEPT.md") return true;
   if (!base.endsWith(".md")) return false;
   if (p.includes("/docs/")) return true;
@@ -773,19 +1057,83 @@ export function kindOf(path: string): string {
   return "chapter";
 }
 
+// ---------------------------------------------------------------------------- the shared styles
+
+// 05-artifacts.md § What a stored page carries, and what a published one carries: the check on a page
+// refuses a link to a version that nobody cut. The finding carries the words below, and the hook
+// reads them to tell the one finding it refuses a write for.
+const UNCUT = "links a version of the shared styles that nobody cut";
+
+/** A link or a script of a page that loads one of the served files: everything before the file's name. */
+const SERVED_LINK = new RegExp(
+  `\\b(?:href|src)="([^"]*)(?:${SERVED_FILES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
+/** A version as the last folder of an address or a path: `…/1.0.0/`. */
+const VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
+
+/** The plugin's `styles/` folder, found from this file: `src/styles/` from source, beside `dist/` when installed. */
+function ownStylesDir(): string | null {
+  try { return stylesDir(fileURLToPath(import.meta.url)); } catch { return null; }
+}
+
+/**
+ * Each version a page links that `versions.json` does not hold, as one RULE finding that names the
+ * version and the versions that exist. A page that names no version draws none, and neither does
+ * any page where `versions.json` cannot be found, because then nothing says which versions exist.
+ *
+ * @param styles  the folder that holds `versions.json`; found from the plugin's own files when not given
+ */
+export function uncutVersions(text: string, styles: string | null = ownStylesDir()): Finding[] {
+  if (styles === null) return [];
+  const cut = Object.keys(cutVersions(styles));
+  if (!cut.length) return [];
+  const linked = [...text.matchAll(SERVED_LINK)].map((found) => VERSION_FOLDER.exec(found[1])?.[1])
+    .filter((version): version is string => version !== undefined);
+  return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version): Finding =>
+    ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" · ")}. ` +
+      `Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` ` +
+      "(05-artifacts.md § One stylesheet, served in versions)"]);
+}
+
+/**
+ * Whether a page holds its own copy of the styles: its text links no shared stylesheet. A fragment
+ * carries no link of its own, so the page on disk answers for it, and a fragment of a page that is
+ * not on disk is read as one of a page in the shared form.
+ */
+function holdsOwnCopy(path: string, text: string, fragment: boolean): boolean {
+  if (linksSharedStyles(text)) return false;
+  if (!fragment) return true;
+  const stored = read(path);
+  return stored !== "" && !linksSharedStyles(stored);
+}
+
 // ---------------------------------------------------------------------------- one file
 
 /**
  * All findings for one file. A fragment is an Edit's new_string: path-based structure still applies,
  * the whole-document shape checks do not, and the prose measure runs only once the fragment carries
  * five prose sentences.
+ *
+ * A page that holds its own copy of the styles is named once, as a RULE finding with `OWN_COPY`. Its
+ * path and its prose are still read, and its markup is not. Such a page under a workstream's
+ * `closed/` folder is not read at all, and neither is a page's bundled copy.
  */
 export function check(path: string, text: string, fragment = false): Finding[] {
+  // A bundled copy carries its page's styles inside it, to be published. Its page is what is read.
+  if (path.endsWith(BUNDLED_SUFFIX)) return [];
   const isHtml = path.endsWith(".html");
-  const isApproach = path.endsWith("-approach.html");
+  if (isHtml && holdsOwnCopy(path, text, fragment)) {
+    if (inClosedWorkstream(path)) return [];
+    const ownProse = proseOf(text, true);
+    const ownSentences = sentences(ownProse);
+    const found: Finding[] = [...structural(path), ["RULE", OWN_COPY]];
+    if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
+    return found;
+  }
+  const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
   const prose = proseOf(text, isHtml);
   const out: Finding[] = structural(path);
+  if (isHtml) out.push(...uncutVersions(text));
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))
@@ -798,18 +1146,72 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   }
   if (isApproach) {
     if (!fragment) {
-      out.push(...approachShape(text));
-      out.push(...howHalves(text));
+      const exempt = exemptWorkstream(path);
+      out.push(...approachShape(text, exempt));
+      if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
       out.push(...pageFurniture(text));
     }
     out.push(...openCards(text));
   } else if (isOverview) {
     out.push(...overviewShape(text));
   }
+  // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
+  if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
+  if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
   if (isRegister(path)) out.push(...rows(text)[0]);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- a column nobody reads down
+
+/** The page kinds whose table cells read in three levels (RD.DEVEX.WORKSPACE.259): a report sets its own tables. */
+export function itemCellPage(path: string): boolean {
+  const base = basename(path);
+  if (isApproachPage(path) || base === HUB) return true;
+  if (/-(overview|construct)\.html$/.test(base)) return true;
+  // An arc's preview, by its fixed name in `notes/N<nnn>/`, or a preview outside any workstream.
+  return /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path) || /-preview\.html$/.test(base);
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.259: a table keeps a column only where a reader compares down it. A column, other than the
+ * first, whose cells mostly hold sentences rather than short values draws a SOFT finding naming the column, saying to
+ * make it a level of the item cell: the bold title, the line under it, one `Key: value` line in `sds-small`. A status
+ * column, `th.sds-status-col`, is compared by design and never read here.
+ */
+export function columnRule(text: string): Finding[] {
+  const out: Finding[] = [];
+  for (const table of text.matchAll(/<table\b[\s\S]*?<\/table>/gi)) {
+    const head = /<thead\b[\s\S]*?<\/thead>/i.exec(table[0])?.[0] ?? "";
+    const headers = [...head.matchAll(/<th\b([^>]*)>([\s\S]*?)<\/th>/gi)].map((found) => ({ status: /sds-status-col/.test(found[1]), name: flat(found[2]) }));
+    const body = (/<tbody\b[\s\S]*?<\/tbody>/i.exec(table[0])?.[0] ?? table[0]).replace(/<thead\b[\s\S]*?<\/thead>/i, "");
+    const rows = [...body.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)]
+      .map((found) => [...found[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => cell[1]));
+    const width = Math.max(headers.length, ...rows.map((row) => row.length));
+    // A construct's Terms are three columns, Term · Contract term · Description: the word is compared with the
+    // contract's spelling down the rows, and the Description is the meaning, so none of them is read as a column of
+    // sentences. The old shape, one item cell with the contract term as a fact, is named.
+    if (headers.length === 3 && headers[0].name === "Term" && headers[1].name === "Contract term" && headers[2].name === "Description") continue;
+    if (headers.length === 1 && headers[0].name === "Term" && /<h2\b[^>]*>\s*Terms\s*<\/h2>\s*<\/div>\s*(?:<div\b[^>]*>\s*)?$/i.test(text.slice(0, table.index))) {
+      out.push(["SOFT", "the Terms table is one column of item cells — a construct's Terms are three columns, `Term` · `Contract term` · " +
+        "`Description`: the word in bold, the contract's spelling in code style, and the meaning (RD.DEVEX.WORKSPACE.259)"]);
+      continue;
+    }
+    if (width < 2 || !rows.length) continue;
+    for (let at = 1; at < width; at += 1) {
+      if (headers[at]?.status) continue;
+      const { long, cells, sentences } = sentenceColumn(rows.map((row) => row[at] ?? ""));
+      if (!sentences) continue;
+      const name = headers[at]?.name || `column ${at + 1}`;
+      const first = headers[0]?.name || flat(rows[0][0] ?? "") || "a table";
+      out.push(["SOFT", `the table that opens "${first.slice(0, 40)}" has a column, "${name.slice(0, 40)}", whose cells hold sentences ` +
+        `(${long} of ${cells}) — a table keeps a column only where a reader compares down it, so make it a level of ` +
+        `the item cell: the title in bold, the line under it, one \`Key: value\` line in \`sds-small\` (RD.DEVEX.WORKSPACE.259)`]);
+    }
+  }
   return out;
 }
 
@@ -980,7 +1382,7 @@ export function checkDoc(payload: Payload): Verdict {
   const body = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
   const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DEVEX.WORKSPACE.096"))
     ? "\n  The four moves: split it · say *you* · define the term · land it on your reader — never " +
-      "shorten (`refs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
+      "shorten (`refs/devex/workspace/docs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
     : "";
   const subject = plural ? "these files miss" : "this file misses";
   // A GATE MUST SAY WHAT IT DID NOT CHECK. On an Edit the hook sees the REPLACEMENT TEXT and not the
@@ -993,9 +1395,15 @@ export function checkDoc(payload: Payload): Verdict {
       "and a paragraph's opening sentence is not a fragment's. Sweep the whole file to reach those: " +
       "`node doc-check.ts <path>`."
     : "";
-  return { note: `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
-    "\n  Load `refs/doc-sets.md` (One voice / Every surface / The artifacts pocket) and the `plan` " +
-    "skill's approach-document section." };
+  const note = `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
+    "\n  Load `refs/devex/workspace/docs/doc-sets.md` (One voice / Every surface / The artifacts " +
+    `pocket) and, for an approach page, \`${PLUGIN_TEMPLATES}/workstream/approach-template.html\`.`;
+  // THE ONE FINDING THIS HOOK REFUSES A WRITE FOR. A page that links a version nobody cut loads no
+  // styles at all, and every other finding here is advice about a page a reader can still open.
+  const uncut = found.filter(([, message]) => message.includes(UNCUT));
+  if (uncut.length)
+    return { deny: `Denied: ${uncut.map(([, message]) => message).join(" · ")}`, note };
+  return { note };
 }
 
 // ---------------------------------------------------------------------------- the sweep

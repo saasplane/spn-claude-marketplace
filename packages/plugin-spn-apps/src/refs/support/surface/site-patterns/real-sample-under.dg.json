@@ -1,0 +1,303 @@
+{
+ "kind": "skeleton",
+ "title": "Real sample, the code under",
+ "caption": "The same sample as MEDIA_BOTTOM, because a line runs past about seventy characters: the words across the section, and under them the DSCodeBlockView titled with its file, flat in its own frame. On a tablet and a phone the code keeps its width and scrolls sideways, cut at the column's end with the mark of the cut; it never wraps.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the code proves",
+                   "description": "One line on what the reader sees in the file."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // a line of the file that runs past about seventy characters, so the code"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: readThePart({ from: 'the file', as: 'it stands', cut: 'where lines are cut' }),"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the code proves",
+                   "description": "One line on what the reader sees in the file."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // a line of the file that runs past about seventy characters, so the code"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: readThePart({ from: 'the file', as: 'it stands', cut: 'where lines are cut' }),"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the code proves",
+                   "description": "One line on what the reader sees in the file."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // a line of the file that runs past about seventy characters, so the code"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: readThePart({ from: 'the file', as: 'it stands', cut: 'where lines are cut' }),"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}
