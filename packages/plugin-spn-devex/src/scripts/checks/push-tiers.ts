@@ -138,21 +138,32 @@ export function contentHash(entries: Map<string, string>, folder: string): strin
   return createHash("sha256").update(lines.join("")).digest("hex");
 }
 
+/** The manifest that makes a folder a node, or null. An apps node is a project, so its `spkind.json` stands beside a `package.json`. */
+function manifestOf(folder: string): string | null {
+  for (const manifest of MANIFESTS) {
+    const project = manifest !== "spkind.json" || existsSync(join(folder, "package.json"));
+    if (project && existsSync(join(folder, manifest))) return manifest;
+  }
+  return null;
+}
+
 /**
  * The node of a path: the nearest folder at or above it, up to the repository's top, that holds a manifest. An
- * apps node is a project, so its `spkind.json` stands beside a `package.json`; an app-owned module has the manifest
- * alone, its cases run with its app, and its files count toward the app's run.
+ * app-owned module has the manifest alone, its cases run with its app, and its files count toward the app's run. A
+ * manifest inside another node's `tests/` folder is a fixture that node's cases read, never a node, so its files
+ * count toward the node whose tests hold it.
  */
 function nodeOf(top: string, path: string): { folder: string; manifest: string } | null {
+  const found: { folder: string; manifest: string }[] = [];
   let folder = dirname(join(top, path));
   for (;;) {
-    for (const manifest of MANIFESTS) {
-      const project = manifest !== "spkind.json" || existsSync(join(folder, "package.json"));
-      if (project && existsSync(join(folder, manifest))) return { folder: relative(top, folder) || ".", manifest };
-    }
-    if (folder === top || !folder.startsWith(top + sep)) return null;
+    const manifest = manifestOf(folder);
+    if (manifest) found.push({ folder, manifest });
+    if (folder === top || !folder.startsWith(top + sep)) break;
     folder = dirname(folder);
   }
+  const node = found.find((one) => !found.some((outer) => outer !== one && one.folder.startsWith(join(outer.folder, "tests") + sep)));
+  return node ? { folder: relative(top, node.folder) || ".", manifest: node.manifest } : null;
 }
 
 /** The tiers a node owes that a push asks for, or none for a kind this check does not know. */

@@ -213,6 +213,26 @@ console.log("\n=== an infra node is found by spinfrapkg.json");
   ok("[MKT.HOOKS.66] both tiers whole, green and stamped pass", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
 }
 
+console.log("\n=== a manifest inside another node's tests/ folder is a fixture, never a node");
+{
+  const repo = repository("fixture-manifest", {
+    "tool/spkind.json": JSON.stringify({ kind: "APP_UTILITY", name: "Tool", config: { mtype: "APP_UTILITY" } }),
+    "tool/package.json": JSON.stringify({ name: "tool", private: true }),
+    "tool/tests/fixtures/estate-x/spinfrapkg.json": JSON.stringify({ name: "@spn/estate-x", version: "0.1.0" }),
+    "tool/tests/fixtures/estate-x/src/spestate.json": JSON.stringify({ type: "ORGANIZATION", config: { mtype: "ORGANIZATION" } }),
+    "tool/tests/fixtures/estate-x/src/main.tf": "# tf\n",
+  });
+  write(repo, { "tool/tests/fixtures/estate-x/src/main.tf": "# tf changed\n" });
+  land(repo, "tool/tests/fixtures/estate-x/src/main.tf");
+  const refused = checkPushTiers(push(repo));
+  ok("[MKT.HOOKS.78] a change to a fixture asks for the tiers of the node whose tests hold it, and names no infra node",
+    denial(refused).includes("`tool`, unit") && denial(refused).includes("`tool`, integration") && !denial(refused).includes("estate-x") && !denial(refused).includes("infra test"), denial(refused));
+  const content = indexHash(repo, "tool");
+  leaveRun(repo, "tool", "unit", { content });
+  leaveRun(repo, "tool", "integration", { content });
+  ok("[MKT.HOOKS.78] and the outer node's whole, green runs pass it", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
+}
+
 console.log("\n=== a push is measured from its base, and carries commits only");
 {
   const repo = appsRepo("hotfix-base");
