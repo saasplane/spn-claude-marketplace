@@ -129,17 +129,6 @@ export function notesOf(source: string, read: Read): Finding[] {
         add("hand-set-look", tag, 0, `${signature(tag)}|${looks.join(" ")}`,
           `${where} carries \`${looks.join(" ")}\` in its \`className\`. A design-system unit takes its colour, padding, radius and gap from its props, its place and the theme, never from a class (RD.SUPPORT.APPS.150). Remove the class, and ask a prop or the theme for the look; a margin or a width around the unit is the page's own.`);
     }
-
-    // A record's `<State>Item` only: a bare `DSItem` at `INLINE` may draw a description on its own line (the
-    // item line's rules), and a place that gives a record's Item a description adds a part (RD.SUPPORT.APPS.218).
-    if (/^[A-Z]\w*Item$/.test(tag.name) && !/^DS[A-Z]/.test(tag.name) && memberOf(tag, "pageLevel", "DSPageLevelType") === "INLINE") {
-      const description = attrOf(tag, "description");
-      const literal = description && (description.kind === "string"
-        || (description.kind === "expr" && !/\?|&&|\|\||\bundefined\b|\bnull\b/.test(description.value)));
-      if (literal)
-        add("item-inline-description", tag, 0, signature(tag),
-          `${where} stands at \`INLINE\` and is given a \`description\`. A record's Item draws the same parts at every level and leaves the description out at \`INLINE\`, and a place only leaves parts out, never adds one (RD.SUPPORT.APPS.218). Drop the description here; a place that needs it stands the Item at a higher level.`);
-    }
   }
 
   // ONE SOLID PER VIEW, the branches of a condition apart (RD.SUPPORT.SURFACE.370). A view here is the nearest

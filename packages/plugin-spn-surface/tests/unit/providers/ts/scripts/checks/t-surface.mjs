@@ -1,4 +1,4 @@
-// The Surface check: the JSX tag reader on the shapes that break a pattern, each of the eight notes with
+// The Surface check: the JSX tag reader on the shapes that break a pattern, each of its notes with
 // a seeded wrong file that gets it and the same file corrected that gets none, the write's own notes
 // against the file before it, and the frame that leaves before loading anything on any other path.
 //
@@ -93,9 +93,6 @@ const PAIRS = [
   ["custom-no-colour", "RD.SUPPORT.SURFACE.382",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} />",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} customColor={tag.color} />"],
-  ["item-inline-description", "RD.SUPPORT.APPS.218",
-    "    <RoleItem role={role} pageLevel={DSPageLevelType.INLINE} description=\"Can do everything\" />",
-    "    <RoleItem role={role} pageLevel={DSPageLevelType.INLINE} />"],
 ];
 
 console.log("\n=== each note — a seeded wrong file gets it, through the hook, and the same file corrected gets none");
