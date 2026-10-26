@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { ARCS, artifactDocsDir, artifactIndex, capabilitiesDir, decisionsRegister, docsOf, domainConstructsDir, domainDirOf, constructsDir,
   guidePagesDir, hubPage, registersDir, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, STYLES_ADDRESS, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -605,12 +605,21 @@ try {
 
   console.log("\n=== doc-check — a page that holds its own copy of the styles");
 
-  const { check, checkDoc, uncutVersions } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const { check, checkDoc, uncutVersions, watched } = await import("../../../../src/scripts/checks/doc-check.ts");
   const tell = (label, ok, detail = "") => {
     n += 1;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
   };
+
+  // KNOWN-BAD: an arc's preview written with its own markup, no masthead and no shared stylesheet. Before the
+  // workstreams moved under `.spndevex/workstreams/`, the hook watched `.spndevex/notes/` only, and this page passed unread.
+  const arcPreview = join(TMP, ".spndevex", "workstreams", "open", "060-arc-preview", "notes", "N010", "preview.html");
+  tell("an arc's preview under `.spndevex/workstreams/<state>/<ws>/notes/N<nnn>/` is watched", watched(arcPreview));
+  tell("a sample beside it is not read as a page", !watched(join(dirname(arcPreview), "samples", "page.html")));
+  const handMade = checkDoc({ tool_input: { file_path: arcPreview, content: "<!doctype html><title>x</title><h1>A preview</h1><p>Its own page.</p>\n" } });
+  tell("a preview with its own markup and no masthead draws a RULE note when it is written",
+    typeof handMade?.note === "string" && handMade.note.includes("[RULE]"), JSON.stringify(handMade));
   // KNOWN-BAD FOR A READER OF THE SHARED NAMES: the clean page as it was written before the shared
   // stylesheet. It links nothing, it carries a style block, and its classes have no prefix. Read by
   // the shared names it has no opening and no card in the open shape.

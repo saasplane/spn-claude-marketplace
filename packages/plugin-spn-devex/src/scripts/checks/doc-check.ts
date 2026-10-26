@@ -208,6 +208,8 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 }
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
+/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RD.DEVEX.WORKSPACE.262). */
+const ARC_PREVIEW = /\/\.spndevex\/workstreams\/[^/]+\/[^/]+\/notes\/N\d+\/preview\.html$/;
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
 const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
@@ -1032,7 +1034,7 @@ export function watched(path: string): boolean {
   if (base.endsWith(".md") && p.includes("/.spndevex/")) return false;
   if (base.endsWith(".html"))
     return isApproachPage(base) || base.endsWith("-overview.html")
-        || inArtifacts(p) || p.includes("/.spndevex/notes/");
+        || inArtifacts(p) || p.includes("/.spndevex/notes/") || ARC_PREVIEW.test(p);
   if (base === "README.md" || base === "CONCEPT.md") return true;
   if (!base.endsWith(".md")) return false;
   if (p.includes("/docs/")) return true;
