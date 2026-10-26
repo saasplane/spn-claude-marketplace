@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "3f944c3b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -11,23 +11,23 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "f876d841"
+      "seen": "3318c21c"
     }
   ]
 }
 -->
 ---
 name: design
-description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words or in Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries. For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
+description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words, in Figma, or as a mock with no Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries, and with none it draws the tree as skeletons, a mock, one for each page and each task state, with a flow file that orders the pages (step 8). For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
 ---
 
 # design — a page, from its layout down to its blocks
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
-**Then read `refs/support/surface/standards-core.md`, `architecture-names.md`, `architecture-containers.md`, `architecture-layouts.md` and `architecture-app.md`, in this plugin.** They hold the levels of a page, the rules of content, the names, the panel, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
+**Then read `refs/support/surface/README.md`, in this plugin: the entry ref, and its route 1.** It names each Surface ref this skill reads, in the order the decisions below run: the levels of a page and the rules of content, the flow, the layout, the patterns, the panels, the tasks, then the blocks, whose props come from the choice tables. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field.
+**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field, and under each unit for its choice table.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -35,7 +35,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 Take the scope from the argument: one page, or a flow of pages. A flow is several pages, and each page gets a tree of its own.
 
-**Your output is one tree for each page**: every block by the name the book gives it, with its props. State it in the reply. Write it to a file only where the developer or the running arc names one. You write no code here.
+**Your output is one tree for each page**: every block by the name the book gives it, with its props. State it in the reply. Write it to a file only where the developer or the running arc names one. A mock is the same tree drawn as skeletons (step 8). You write no code here.
 
 The decisions run in one order. Each level of a page owns one thing, and the level above it decides first. Who the app is for comes before all of them, and a block is the last thing chosen.
 
@@ -270,6 +270,7 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the tree by layer of the app pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
+- **Give each closed prop the value its unit's choice table gives** (`architecture-components.md`, under the unit, `RD.SUPPORT.SURFACE.375`). Read the cases from the top, and the first that matches wins: it says each prop's value and who writes it, the page, the place, the level or the unit. Write only what the case gives the page; a value it leaves to the place or the level is never written by hand. `DSBadge`, `DSButton` and `DSMark` have their tables.
 - **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. A badge that names a kind draws `OUTLINE` in `DEFAULT`, a state takes the hue its meaning gives from the book's table, and a view holds at most one `SOLID` button (`RD.SUPPORT.SURFACE.368`, `.369`, `.370`). What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **Every control a person sets is a `DSForm.Field`**, a lone checkbox or switch too (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`). A field with no label of its own keeps a blank label line, so it lines up beside labelled fields in a row; alone on its line in a column, write `showBlankLabel={false}`. A field's own action, such as *Forgot password?*, goes to `labelEndNode`, and never under the field. A switch and a checkbox take their own `label`.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
@@ -344,8 +345,8 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
     └── content
         └── DSPanelContainer
             ├── DSPanelContainer.Header
-            │   ├── DSText    typography=TITLE_LG "Orders"
-            │   └── DSButton  variant=SOLID color=PRIMARY "New order"             Move · leads to /orders/new
+            │   ├── DSItem    title="Orders"
+            │   └── DSButton  color=PRIMARY "New order"                          Move · leads to /orders/new
             ├── DSPanelContainer.Content
             │   └── DSFilterBar                                                  Find
             └── DSPanelContainer.Content  flush
@@ -369,7 +370,7 @@ Missing       nothing. The page reads the device and lists LIST on a phone, and 
 
 ## 7. Draw it in Figma — only where the window holds the connector
 
-A tree is complete with no drawing. Draw it where the window holds the Figma connector and the developer asks for the drawing. Read `skills/design/steps/draw.md` then, and follow it. It draws the tree from the published libraries, by instances, with the look as theme modes. It then reads the page back by name. Where the window holds no connector, say so, and hand over the tree.
+A tree is complete with no drawing. Draw it where the window holds the Figma connector and the developer asks for the drawing. Read `skills/design/steps/draw.md` then, and follow it. It draws the tree from the published libraries, by instances, with the look as theme modes. It then reads the page back by name. Where the window holds no connector, say so, hand over the tree, and offer the mock of step 8.
 
 The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, name the developer's next step, and show the result. A child agent that sends `use_figma` cannot read the connector's own skill, so give a writer of one page `skills/design/steps/writer-brief.md` with its order, and any other child `skills/design/steps/connector-rules.md`. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
 
@@ -377,10 +378,14 @@ The page is a use case, composed from the published library in a file that is no
 
 **The library draws nothing of a pattern** (`RD.SUPPORT.SURFACE.099`). It holds the core units with their properties and their cases, the icons, and the places of the layout. It holds no task pattern, no app pattern, no skeleton and no sample page: a page or a pattern is composed from the published units on request. A stack's own unit that every stack should build joins the book first, and the library draws it then.
 
+## 8. Draw it as skeletons — a mock, with no Figma
+
+A mock is the tree drawn as skeletons, and it needs no connector. Draw it where the developer asks for a mock, or asks to see a page or a flow and the window holds no Figma connector. Read `skills/design/steps/mock.md` then, and follow it: the facts first, then one skeleton for each page in the order a person meets them, each move naming its page; a desktop and a phone view where the pattern changes; each dialog or sheet as its own view; each block drawn from data with its empty, failed and denied pictures as views of their own; and a flow file that orders the pages. It reads the tree the steps above wrote, and decides nothing of its own.
+
 ## Close
 
 - **Convene the `ux` and `ui` lenses over the tree at the design gate**, and over the drawing where one exists, and `marketing` as well on a marketing page. Run each through the `spn-panel` subagent, with the spn-devex plugin's `refs/devex/agent/lenses/ux.md`, `ui.md` and `marketing.md`. The context that designed the page does not review it.
-- **Report** the kind of person and where it was read, the flow, the purpose, the facts, the pattern with its *For* line and its spec (or the patterns a page no pattern fits is derived from), the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. Then give the findings of each lens.
+- **Report** the kind of person and where it was read, the flow, the purpose, the facts, the pattern with its *For* line and its spec (or the patterns a page no pattern fits is derived from), the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. For a mock, add its files in the flow's order, each with its views. Then give the findings of each lens.
 - **Hand off by name.** The `implement` skill builds the page, in its `ui` step.
 
 ## Lenses

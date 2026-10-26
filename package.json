@@ -2,7 +2,7 @@
   "name": "spn-claude-marketplace-build",
   "private": true,
   "version": "0.0.0",
-  "description": "Dev-only build for the three plugins under packages/ — never installed, never shipped (N101 step 2).",
+  "description": "Dev-only build for the four plugins under packages/ — never installed, never shipped (N101 step 2).",
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {

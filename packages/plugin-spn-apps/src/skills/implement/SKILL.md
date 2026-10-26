@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "3f944c3b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "3237d17a"
+      "seen": "f1a569cc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "87535da6"
+      "seen": "c4abeb1d"
     }
   ],
   "decisions": [
@@ -88,7 +88,7 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 ## A page is built from the tree of its pattern
 
-The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md` for an app's screen and in `site-patterns.md` for a site's page, in the spn-surface plugin. Each pattern's spec is in `refs/support/surface/app-patterns/` or `refs/support/surface/site-patterns/` of that plugin, by the page's kind.
+The `ui` step follows this section for every page a change adds or rearranges. **The Surface rules are the spn-surface plugin's, and its entry ref, `refs/support/surface/README.md`, is the one way in: follow its route 3, *Build a screen*.** It reads the page's design tree first; with no tree, the design steps up to the tasks; then what a page writes for each unit on its stack, and what a unit does not do yet; then the choice tables, for every closed prop the page writes.
 
 - **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
 - **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
@@ -96,45 +96,10 @@ The `ui` step follows this section for every page a change adds or rearranges. T
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
-- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md` in the spn-surface plugin). A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
+- **Hold each small thing to its rule of content**, and each closed prop to its unit's choice table, through the entry ref's route 3. A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 - **Style the page with the app's own styles rule** (`refs/support/apps/providers/ts/03-structure.md`, "An app's own styles"). A repeated pattern is a component of the app's own, values come from the design system's tokens, and no selector reaches the design system's insides.
 
-**A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state each one.
-
-| The pattern asks | What the page writes |
-| --- | --- |
-| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTable` reads no device type, and follows the layouts its page lists each time it draws |
-| a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
-| the picture and the end of an item line | the page gives the picture to `media` as data of one kind, `ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, with no size (`RD.SUPPORT.SURFACE.130`). It gives what stands at the end, which is data, a badge, a count or a status and never an action, to `endNode` (`RD.SUPPORT.SURFACE.131`, `RD.SUPPORT.SURFACE.178`). The actions of a head are the other blocks of its header, and they take their size and look from the place. `DSItem` takes no `startIcon` and no `actions` |
-| the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the table's config, usually read from the address. The table holds no state for it (`RD.SUPPORT.SURFACE.125`) |
-| a card with a head, drawn from data (a card that shows its own info is a `DSCard`) | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
-| subjects compared across the same settings | the page gives `DSComparison` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The composite draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
-| a section of a website: one part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below comes from its `size`, the app's when unset, the sides are the layout's space, `--layout-space`, and the section hands that size to what it holds. A `flush` section draws no room of its own on any side (`RD.SUPPORT.SURFACE.313`). It holds one child and hands down no level; what stands in it sets its own. It reaches the edges of its place and stands straight in it. To paint one section the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.254`, `RD.SUPPORT.SURFACE.192`). The section never frames itself; what stands in it is flat, boxed or raised by what it does for the visitor, and a media by its kind (`RD.SUPPORT.SURFACE.293`) |
-| a grid of features under a heading | the page uses `DSFeatureGridSectionContainer` where it writes a section, and gives it `section` (the section's props but its child and `flush`), `heading` (the words, facts and actions of a feature) and `grid` (`IDSGrid`: `desktop`, `tablet` and `mobile` columns, each 1 to 4, and `borderType`), and may take `reveal` (the heading and the cells moving in once as they scroll into view) and, through `section`, `inset`. Each cell is a `DSFeature` that names its own `pageLevel`, `WIDGET` for a thing of its own. The data decides when a section is a grid section, and `site-patterns.md` gives its uses: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, with media or without (`RD.SUPPORT.SURFACE.259`, `RD.SUPPORT.SURFACE.271`) |
-| a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
-| the paging in the footer of the panel | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
-| a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
-| a way back on the title line | the page gives `DSPanelContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetail` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
-| the head of a page that holds several panels | the head stands above the panels, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
-| tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
-| the head of a page, or of a part of a page | the title of a header is an item line. A panel that is the whole page says so with `fullPage`, and its header is then the page head (`RD.SUPPORT.SURFACE.179`); any other box gives the level of its kind: `CONTAINER` for a panel or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element follows the level (`RD.SUPPORT.SURFACE.106`). A page that holds several panels writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RD.SUPPORT.SURFACE.178`). The page writes no type step and no heading element |
-| the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
-| where a title starts | the page writes no prop and no padding. The part that holds an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` gives it no padding at its two sides, and in a `flush` part the inset of its place (`RD.SUPPORT.SURFACE.109`). An item line draws no padding or highlight of its own, and a page writes no `bleed` (`RD.SUPPORT.SURFACE.175`) |
-| a control alone on its line, or an action of a field | the page puts every control a person sets in a `DSForm.Field`, a lone checkbox or switch too, and writes `showBlankLabel={false}` on a field with no label alone on its line in a column. A field's own action, such as *Forgot password?*, goes to `labelEndNode` (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`) |
-| a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
-| the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first, and gives `DSPanelContainer.Footer` `sticky` so they stay in view on a long form (`RD.SUPPORT.SURFACE.367`). A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
-| an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
-| a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
-| a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |
-| a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
-| fewer fields in the filter bar at a tablet | nothing. `DSFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
-
-**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-components.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
-
-| The unit | What it does not do yet |
-| --- | --- |
-| `DSDataTable` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
-| a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
+**Where a unit does not do a thing yet, report the gap, and never build a private copy.** The entry ref's route 3 names what a page writes for each unit on its stack, and what a unit does not do yet.
 
 - **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.
 - **Name each gap in the report**: the unit, what it does not do, and the line of the tree that waits for it. The gap is then proposed to the design system, where one change serves every page.

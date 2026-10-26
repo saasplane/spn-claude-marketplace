@@ -257,7 +257,7 @@ A device type is two closed sets, stated in full in the web's chapter (`docs/04-
 
 ## Boundary
 
-This ref states what a surface is built in, what one page is for, and what a page has to hold through, before any block is named. It stops where a block, a pattern or a name begins — those are `standards-interaction.md`, `standards-patterns.md`, `architecture-names.md` and the refs after it. Reach for `refs/support/apps/support.md` in the spn-apps plugin when the question is where a `ui/` folder sits or what a support package may share.
+This ref states what a surface is built in, what one page is for, and what a page has to hold through, before any block is named. It stops where a block, a pattern or a name begins — those are `standards-interaction.md`, `standards-patterns.md`, `architecture-names.md` and the refs after it. Where a `ui/` folder sits, and what a support package may share, are the stack's, and its build steps state them.
 
 ## Binds
 

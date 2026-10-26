@@ -3,11 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "3c355f20"
+      "seen": "04ba9cf3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
       "seen": "f1a569cc"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "`SKELETON` — a mock of a layout",
+      "seen": "ee4edd9b"
     }
   ]
 }
@@ -246,12 +251,27 @@ The rule adds no unit and no prop. A card that opens its fold grows taller, and 
 
 ## The specs a screen starts from — 🔮
 
-**This plugin carries one or more specs for each app pattern, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 22 specs. 21 are for the fourteen app patterns, and one is for a rule of content. Its `README.md` lists them. The specs of the site patterns are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow has no spec: each of its steps is drawn by the spec of the pattern it follows.
+**This plugin carries one or more specs for each app pattern, in `refs/support/surface/app-patterns/`.** A spec is a skeleton: a file that shows where the parts of a page sit, and nothing about how they look. The folder holds 22 specs. 21 are for the fourteen app patterns, and one is for a rule of content. Its `README.md` lists them. The specs of the site patterns are a second folder beside it, `refs/support/surface/site-patterns/`, which `site-patterns.md` names. A flow is drawn as the skeletons of its pages, each started from the spec of the pattern it follows, and a flow file that puts them in order.
 
 - **A page starts from the spec of its pattern.** Copy the spec, and change the sample values to the page's own. Never start a page from an empty file.
 - **The values in a spec are samples.** They show what kind of data a part holds: a title and a line under it, a picture, a state, an action at the end. Which unit shows that data on a real page is the choice of step 2.
 - **A spec holds a view for each screen class its pattern differs at.** So one file shows the page at a desktop, at a tablet and on a phone.
 - **A spec draws every level of its page.** It names its `layout` (the sketch's setting, never part of the pattern), each view's page level as `page`, and the `unit` of each container, widget and card.
+- **A spec holds a view for each task state its blocks show** (`RD.DEVEX.WORKSPACE.230`). A block drawn from data has more than one picture: its records, and its empty, failed and denied states. A mock that draws only the records hides the pictures a person meets first on a new account. So a view takes `state`, a value of `DSTaskStateType`, and each state a block shows is a view of its own. A view with no `state` shows the page with its data; a view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. The views of one screen class stand together, the one with no `state` first and the others in the order of `DSTaskStateType`. A state the page's blocks do not show is not drawn, and a `state` that is no value of `DSTaskStateType` is a finding.
+- **A flow's pages are listed in a flow file, in the order a person meets them, each with where its moves lead** (`RD.DEVEX.WORKSPACE.230`). A skeleton draws one page and no path, so loose skeletons leave a reader to guess which page follows which, and where a refusal sends a person. The file is `<flow>.flow.json`, beside the specs of its pages. `flow` is its name, the name of the flow pattern where it follows one (`flow-patterns.md`). `pages` lists the pages in order, each with `page`, a word the file is unique by, `spec`, the skeleton that draws it, and `moves`. A move names what a person does and where it leads: `on` is the words of the action or the event, `to` is a page of the file or `end` where the flow is done, and `state` is the task state of the view it lands on, where it lands on one.
+- **The flow file draws nothing.** Each page is drawn by its own spec, and the file is read against them: a `to` that names no page of the file, a page no move reaches but the first, a `spec` that is not there, and a `state` the page's spec does not draw are each a finding.
+
+  ```json
+  { "flow": "Invite a member",
+    "pages": [
+      { "page": "members", "spec": "members.dg.json",
+        "moves": [ { "on": "Invite a member", "to": "invite" } ] },
+      { "page": "invite", "spec": "invite.dg.json",
+        "moves": [ { "on": "Send invite", "to": "members" },
+                   { "on": "Send invite", "to": "invite", "state": "FAILED" },
+                   { "on": "Cancel", "to": "members" } ] }
+    ] }
+  ```
 - **A spec is strict JSON.** It holds no comment. Draw one with `spn-devex docs figure draw <spec>`.
 - **Never edit a file in that folder.** It is a copy of the book's folder. A spec in the plugin MUST equal the spec of the same name in the book (`RD.SUPPORT.SURFACE.053`).
 
@@ -551,7 +571,7 @@ Every spec draws a part of a page the same way, whichever pattern it belongs to.
 
 ## On the web: the address of a screen — 🔮
 
-A browser gives every screen an address. A person goes back with the browser's Back, reloads, and sends a link, and each of them lands by the address alone. These lines are the web's alone; how an address is built and what it names is the web module's, in `refs/support/apps/module/README.md` of the spn-apps plugin under *A page, its route and its address*.
+A browser gives every screen an address. A person goes back with the browser's Back, reloads, and sends a link, and each of them lands by the address alone. These lines are the web's alone; how an address is built and what it names is the web module's, and the stack's build steps state it.
 
 - **Groups and their items: the swap MUST change the address**, although it happens in place. The browser's Back then does the same as the back action, a reload stays on the chosen group, and a link to one group opens it on any screen.
 - **An entry over the page MUST be an address, although it opens in place** (`RD.SUPPORT.SURFACE.366`). The browser's Back then closes the entry and never leaves the page under it, a reload opens it again, and a link opens it over its page. What was typed is lost on a reload.
@@ -599,6 +619,11 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RD.SUPPORT.SURFACE.364` | the pages beside a sign-in take the sign-in's panel |
 | `RD.SUPPORT.SURFACE.365` | an overview says what it shows before anything is counted |
 | `RD.SUPPORT.SURFACE.366` | on the web an entry over the page is an address |
+| `RD.SUPPORT.SURFACE.221` | a card that shows its own info is a `DSCard`, and a `DSCardWidget` is a card with a head |
+| `RD.SUPPORT.SURFACE.371` | a hero's state is a `PRIMARY` badge eyebrow, and its stack is `OUTLINE` `DEFAULT` badge facts, as `site-patterns.md` states |
+| `RD.SUPPORT.SURFACE.372` | a grid cell's eyebrow is its group or kind as text, and a badge only when it says a state |
+| `RD.SUPPORT.SURFACE.373` | a plan holds one eyebrow |
+| `RD.DEVEX.WORKSPACE.230` | a skeleton holds a view for each task state its blocks show, and a flow file orders a flow's pages with where each move leads |
 
 ## Proof
 

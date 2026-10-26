@@ -209,7 +209,7 @@ The web's own share of the device type — screen class and orientation — is s
 
 ## What a stack adds
 
-How a block is built belongs to the stack. For TypeScript, read `refs/support/apps/providers/ts/08-web.md` in the spn-apps plugin and `providers.md` in this one. One rule of it applies every time a block changes: **no file under `_shadcn/` is edited by hand.** The shadcn CLI emits or copies every file there, the hooks and helpers included. Make the change in the block's `DS*` wrapper.
+How a block is built belongs to the stack, and its build steps state it; `providers.md` in this plugin states the TypeScript design system. One rule of it applies every time a block changes: **no file under `_shadcn/` is edited by hand.** The shadcn CLI emits or copies every file there, the hooks and helpers included. Make the change in the block's `DS*` wrapper.
 
 ## Boundary
 

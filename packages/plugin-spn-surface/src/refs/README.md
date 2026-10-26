@@ -14,7 +14,7 @@
 
 ## Where the stack begins
 
-**How a block is built in a stack, and where a web module's files sit, are the apps plugin's.** A Surface ref names that ref and its plugin rather than linking to it, because a plugin never reads a neighbour's file.
+**How a block is built in a stack, and where a web module's files sit, are the stack's, and no Surface ref names them.** spn-apps points into this plugin, at its entry ref `support/surface/README.md`, and this plugin names nothing in spn-apps: a pointer runs only toward a plugin the same world always loads, and never back.
 
 ## What is copied
 

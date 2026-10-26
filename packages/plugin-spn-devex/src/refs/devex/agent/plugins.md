@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "ea93e33c"
+      "seen": "69c821d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "8a6817c0"
+      "seen": "88bc459d"
     }
   ]
 }
@@ -120,23 +120,32 @@ A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry 
 
 **Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
 
-## The three plugins, and how they divide
+## The four plugins, and how they divide
 
-Plugins are named `spn-devex` plus `spn-<domain>`, mirroring the providers tree, and an instance suffix is earned only where instances differ in what the agent authors.
+Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin name never carries an instance. A stack or a cloud is a `providers/<instance>/` folder inside the plugin that owns its domain. The set reads in domain order: how you work first, then Support's three domains in the order the book holds them.
 
 | Plugin | Domain | Carries |
 | --- | --- | --- |
 | `spn-devex` | the foundation itself, stack-agnostic | the stack-agnostic skills, the engineer persona and the reviewer, the lens files, the doc rules, the cross-repository protocol, and the hooks that guard generated files, check every document, print the session's orientation and hold the two write-time gates |
-| `spn-apps` | the apps domain, TypeScript instance | the stack commands, the build-loop step files, the TypeScript standards restated, and the write-time checks specific to that stack |
+| `spn-surface` | the surface, every stack | the Surface refs under `refs/support/surface/`, one file per book construct, reached through one entry ref; the design skill, which draws a page's tree in Figma or as skeletons; and the hook that guards a write through the Figma connector and gives the Surface check's notes, its reader in `providers/<stack>/` |
+| `spn-apps` | the apps domain, stack-agnostic with its stacks inside it | the apps commands, the build-loop step files and standards under `providers/<stack>/`, and the write-time checks: the rule stated once and parsed per stack |
 | `spn-infra` | the estate, every provider | the estate commands, the manifest and layer references, the estate laws, and the hook that refuses secrets, account identifiers and hand edits to built output |
 
-**There are three plugins, one per domain, and the set is closed.** `spn-devex` installs in every repository. `spn-apps` acts on the nodes an apps repository declares. `spn-infra` acts on the estate.
+**There are four plugins, one per domain, and the set is closed** (`RD.DEVEX.AGENT.002`, `RD.DEVEX.AGENT.015`). The plugin's name is the domain, with nothing suffixed onto it. `SPDevExAgentPluginType` holds the four as `DEVEX`, `SURFACE`, `APPS` and `INFRA`, in that order. `DEVEX` names the domain the stack-agnostic plugin serves, how you work, and never the repository that writes the standards.
 
-**A stack or a cloud is a `providers/<name>/` folder inside the plugin that owns its domain — `spn-apps`'s `providers/ts/`, `spn-infra`'s `providers/aws/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
+**A domain earns a plugin when the agent does a different act in it, and so needs different instructions.** Writing TypeScript and writing Python are one act in two languages, so a stack is a `providers/<name>/` folder inside its domain's plugin (`spn-apps`'s `providers/ts/`), with its own parser and its own steps checking the rule stated once beside them. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a cloud is a blueprint library and a provider folder (`spn-infra`'s `providers/aws/`) with no skill of its own. Neither earns a plugin. **A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time, which is the defect the whole restatement discipline exists to stop.
 
-**The reason is that a domain's rules are the stable half and a stack's spelling is the volatile half.** Writing TypeScript and writing Python are different acts, so each needs its own parser and its own steps — but the rule they are checking is the same rule, and stating it once means a second stack joins by adding a folder rather than by copying a plugin. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a new cloud is a blueprint library and a provider folder with no skill of its own.
+**Surface is a domain of its own, so it has a plugin of its own.** Designing, drawing and judging what a person sees is a different act from building, proving and releasing a kind. It reaches a designer who may never open a code file, and a mock of a page comes before any app code exists. The book holds Surface as one of Support's three domains, stated once and realized by every stack.
 
-**A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time — which is the defect the whole restatement discipline exists to stop.
+### The pointer from apps into Surface, and the rule that keeps it safe
+
+Building a screen reads the Surface rules, so `spn-apps`' implement, verify and review steps point into `spn-surface`, at its one entry ref, `refs/support/surface/README.md`. **`spn-surface` names nothing in `spn-apps`.** Every other pointer between plugins goes to `spn-devex`, which every repository loads, and this pointer is safe for one reason: **every repository that loads `spn-apps` also loads `spn-surface`**, because the world loads them together (`RD.DEVEX.AGENT.039`). The pointer then always finds its target, and a partner types nothing. **A pointer may run only toward a plugin that the same world always loads, and never back.**
+
+| Option weighed | What it does | Why it was not taken, or why it was |
+| --- | --- | --- |
+| Surface stays a group of refs inside `spn-apps` | no pointer between plugins | about five thousand lines of Surface rules load into server-only work, and a mock has no home before an `APPS` repository exists |
+| **`spn-surface` carries the Surface refs, and `spn-apps` copies none** | one pointer, apps into Surface, made safe by the world loading both | **taken**: one copy of every Surface rule, and Surface grows without growing `spn-apps` |
+| the Surface refs live in `spn-devex` | no pointer, because every repository loads `spn-devex` | `spn-devex` is how you work in every repository, and would carry a domain's rules into the estate and the foundation, which never draw a page |
 
 ## The listing, the manifest, and what a version means
 
@@ -152,7 +161,7 @@ Two files name a plugin, and they answer different questions.
 { "name": "spn-devex", "version": "0.7.2", "description": "…", "author": { "name": "SaaS Plane" } }
 ```
 
-The listing is the only file that knows all three plugins exist, and nothing generates it. The manifest is a plugin's own claim about itself, read at install time.
+The listing is the only file that knows all four plugins exist, and nothing generates it. The manifest is a plugin's own claim about itself, read at install time.
 
 **A version names what is published, never what you are working on — MUST.** The marketplace releases at the version its plugins carry, and only then moves the number. **That is what makes a stale cache findable** — a cache directory is keyed by name and version, so a plugin edited without moving the number installs over its own published bytes, and nothing tells you which copy you are running.
 
@@ -178,9 +187,12 @@ You never type a plugin name. The wiring command reads the repository's own mani
 | What the repository declares | The set it loads |
 | --- | --- |
 | the foundation world | `spn-devex` |
-| the apps world, with a stack claim | `spn-devex` and that stack's plugin |
+| the apps world | `spn-devex`, `spn-surface` and `spn-apps`; the declared stack picks which `providers/` folder the work reaches, never a plugin |
 | the estate world | `spn-devex` and `spn-infra` |
 | a general world, or no manifest at all | `spn-devex` alone |
+| the workspace root | the union of its members' sets |
+
+**The world decides the set, and nothing else does — MUST** (`RD.DEVEX.AGENT.039`). **`APPS` loads `spn-surface` and `spn-apps` together, because `spn-apps` points into `spn-surface`**: a world that loaded one without the other would send apps' steps to a file that is not there. A workspace with no `APPS` member gets no `spn-surface`.
 
 **A repository with no claim gets `spn-devex` and never a stack's.** Hand such a repository a stack's skills and you have offered commands whose door is not there — the command exists in the session and refuses the moment it runs.
 
@@ -256,6 +268,12 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 
 **The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RD.DEVEX.AGENT.104`).
 
+## Where the Surface check sits among the hooks
+
+**`spn-surface` carries its own PreToolUse hook, and in its first release every rule is a note — MUST** (`RD.DEVEX.AGENT.107`). The hook runs on `Write`, `Edit` and a write through the Figma connector, and a connector write meets the Figma guard first. A write to a `.tsx` file in a web node's `src/` goes to the stack's reader, `providers/<stack>/scripts/checks/surface.ts`; for every other path the hook leaves before it loads anything. The reader judges named design-system tags only, literal values only, and only what the write added. Each note names its book row and the fix, and goes to the agent alone.
+
+**A note becomes a refusal only in a later version**, once a scan of the three TypeScript repositories finds no note on correct code and the rule's book row makes the deciding fact visible in the code. That version's release names the rule that refuses. What one file cannot show, such as a task state, a pattern's fit or a button's view across files, stays with verify and the design review.
+
 ## Who a hook's line is for
 
 **A hook shows the developer a refusal, and gives its advice to the agent alone — MUST** (`RD.DEVEX.AGENT.092`). A refusal stops a tool call, and the developer sees it. Advice lets the call go on: a soft finding of the doc standard, or a reminder. Advice goes to the agent as context, and nothing of it is shown on the developer's screen. In a hook's output, `additionalContext` is the agent's channel and `systemMessage` is the developer's, so advice is written to the first alone. A soft finding of the doc standard is said once for a file in a window, and a finding that changes is said again.
@@ -276,3 +294,5 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 | release a change to a shape the agent keeps with no migration | every workspace that takes it finds its old files one failing check at a time |
 | edit or renumber a released migration | a ledger that recorded it now names something else |
 | start other work while a migration is pending | the work lands in the old shape and has to be moved again |
+| load `spn-apps` without `spn-surface` | apps' steps point at an entry ref the session does not hold |
+| let a Surface note refuse a write before the scan finds it silent on correct code | correct code is stopped, such as two `SOLID` buttons in the two branches of one condition |

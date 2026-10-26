@@ -62,9 +62,11 @@ const MARKETPLACE = "saasplane";
 const CORE = "spn-devex";
 // The derivation `repo agent-sync` already performs, from the manifest and nothing else. A repo with
 // no claim at all — the marketplace itself is one — falls back to the core plugin alone. A stack is a
-// folder inside the domain plugin, so the stack claim selects no plugin (RD.DEVEX.AGENT.015).
+// folder inside the domain plugin, so the stack claim selects no plugin (RD.DEVEX.AGENT.015). `APPS`
+// loads `spn-surface` with `spn-apps`, because apps' steps point at Surface's entry ref (RD.DEVEX.AGENT.039).
+// Each set reads in domain order: devex, surface, apps, infra.
 const WORLD_PLUGINS: Record<string, string[]> = {
-  FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"], APPS: [CORE, "spn-apps"] };
+  FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"], APPS: [CORE, "spn-surface", "spn-apps"] };
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
   "tool-results", "__pycache__", ".venv"]);
 const NODE_MANIFEST: Record<string, string> = { APPS: "spkind.json", INFRA: "spinfrapkg.json" };
@@ -405,7 +407,7 @@ export function cacheState(root: string, pluginNames: string[]): string {
     // THE MANIFEST SAYS WHERE A PLUGIN'S BYTES ARE, AND GUESSING THE LAYOUT IS WHAT BROKE THIS.
     // `marketplace.json` declares `./plugins/<name>/src`, and this compared the cache against
     // `plugins/<name>` — a folder holding `src/` AND `tests/`, which the cache never contains. The
-    // two could not match, so every run reported all three plugins stale whatever their real state,
+    // two could not match, so every run reported every plugin stale whatever their real state,
     // and a stop hook told each sitting to reinstall work that was already installed. A check that
     // is always red is read as noise and then obeyed anyway. Read the declared source instead.
     const declared: Record<string, string> = {};

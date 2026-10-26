@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "2677562f"
+      "seen": "6ecd5f9e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "eeee9ebe"
+      "seen": "8166df61"
     }
   ]
 }
@@ -33,6 +33,8 @@ Read this before you place a block on a page, before you propose a new one, or b
 | Date form | `DSFormatDateType` — the form the two date units write a date in: `DEFAULT`, the date as it is, or `AGO`, how long ago in words |
 | Page level | `DSPageLevelType` — the level of a page a block stands at: `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. The item line and the tabs take it through `pageLevel` |
 | Mark | a picture or an icon that stands for a thing or a person. It is round unless a page chooses another shape |
+| Choice table | what says which value each closed prop of a unit takes: its cases, a mapping where the data decides, the limits across a view, and an index of every value the code accepts, each ruled or never |
+| Mock | a page or a flow drawn before it is built, as its skeletons: one for each page and each task state, and the flow file that orders them |
 | Composite | a block built from components that carries one task end to end, and that no other component is built from |
 | Core unit | a block the book names, which every stack builds under that name. A stack may provide further units of its own |
 
@@ -100,6 +102,25 @@ The surface already answers most of what a new unit must decide: how dense it is
   | Task state | `DSTaskStateType`, or the states of the block's data | the unit is drawn from data, or shows where a task stands |
   | The words of each part | the type step its `size` or `pageLevel` gives | the unit has a title, a label or a description; each part's step follows the unit's size or level, never a fixed step |
 
+## A unit's choice table — 🔮
+
+A unit's props, what the library draws of it and its usage say what the unit can do. They never say which value a page writes, or when: a badge offers seven variants and seven colours, and a page that meets it with no reason picks by guessing. **So a unit with a closed prop has a choice table, which gives every closed prop of the unit a reason** (`RD.SUPPORT.SURFACE.375`). A value is chosen from two facts at once, what the value is and where it stands, and those two facts set the variant, the colour and the size together. So a table never gives one prop alone.
+
+| Form | What it holds | The badge's, for example |
+| --- | --- | --- |
+| **Cases** | a meaning and a place, which give every closed prop at once, and who writes each: the page, the place, the level or the unit. They are read from the top, and the first that matches wins | a state among the facts of a row: `SUBTLE_OUTLINE` from the level, the hue from the mapping, `XS` |
+| **A mapping** | one table from the data to a value, where the data decides | a state to its hue |
+| **Limits across a view** | what holds across every unit of one view, which no single case can say | at most one `SOLID` button in a view |
+| **An index by value** | every value the code accepts for each closed prop, marked ruled, with the cases that rule it, or never, with the reason. It is produced from the cases | `GHOST` on a badge: never, because a word with no fill is a fact in words |
+
+- **A unit with a closed prop MUST have a choice table beside its rules, and the table MUST rule or mark never every value the code accepts for each closed prop** (`RD.SUPPORT.SURFACE.375`). `DSBadge`, `DSButton` and `DSMark` have theirs below, each under its unit. A unit that gains a closed prop gains its table there.
+- **A value is settled in one order: the page's own, else the place's, else the level's, else the unit's default.** A case says which of them writes each prop, and its last column says what the page writes. A value the case leaves to the place or the level is never written by hand.
+- **A case that takes its value from the mapping says so**, and **a limit holds across a view**, where no single case can say it.
+- **`apps surface gaps` reports a member of a closed vocabulary that the index does not list.**
+- **A case of a choice table is a case of the design library: the unit with its props set, named for what it shows.** One word for one thing, so the table is where a unit's usage and its cases come from. A unit's usage, the last part of the column *The library draws*, MUST be the first case of its table that draws the unit, and the table's cases are among the cases the library draws. `apps surface construct` carries the usage and the cases into the CONSTRUCT snapshot the library is drawn from (`delivery-library.md`).
+- **A container and a pattern have no choice table.** Each is chosen from facts about the page, the person's intent, the part of the pattern and the device, and `standards-patterns.md` and `architecture-containers.md` state them keyed by those facts. A block is chosen last (`RD.SUPPORT.SURFACE.052`), so a choice table never decides which block stands where: it gives the props of a block once the page has placed it.
+- **A mock is a skeleton, and it names units and never their props.** A designer's mock of a page or a flow is drawn as the skeleton the docs draw: one for each page, a view for each task state, and a flow file that lists the pages in order (`standards-patterns.md`, *The specs a screen starts from*). It shows where each block stands and which unit it is, and the choice table gives that unit its props when the page is built.
+
 ## The contract every component supports — 🔮
 
 Every realization — the design library's drawing, and each stack's build — gives the same things, whichever block it is: its drawn choices as a property with the choice's own name (`variant`, `color`, `size`); its caller-set states as a property with the state's own name (`disabled`, `loading`); its content as a property named in the book; its behaviour in words, never a description; its permission gate, where the rule that decides stays in words and the denied state is drawn (`permissions`, `enablements`, `authzDenied` name that state); the four shared states it has as the one picture `architecture-names.md` chose; and the size, colour and frame it takes from above as a setting it reads rather than sets anew (`architecture-app.md`).
@@ -163,6 +184,51 @@ Each rule below is of one block or one prop. The props, their values and their d
 - **A block on a fill is `DSSurface`, and what draws a fill gives its surface** (`RD.SUPPORT.SURFACE.199`). `DSSurface` takes `color`, `strength` and `painted`, draws the fill and nothing else, and what it holds reads the fill, the main action included. `useDSSurface` reads the surface for a choice, never to paint; a popover, a menu, a hover card, the body of an overlay and a tooltip give the page's surface again.
 - **A card or a panel frame that draws its own fill inside a coloured surface is a surface of its own** (`RD.SUPPORT.SURFACE.199`). It writes `data-surface-color` and `ds-shell` with its colour, or with `BASE` where it has none, so its text and its main action are its own; on the page's own surface a `BASE` block writes nothing.
 - **A row that scrolls sideways is `DSHScroll`, and its arrows stand on the ground the row stands on** (`RD.SUPPORT.SURFACE.204`). With `arrow`, each edge that hides more of the row shows a round arrow button one scale step below the row's `size`, on a fade 40 to 72 px wide, and a press moves the row by four fifths of its width. `arrowType` is `DEFAULT`, the fade from the fill of the page or of the surface the row is on (a band of the brand included), or `OVERLAY`, the scrim, for a row over a picture, the arrow then glass. An arrow fades out at the end it has reached, and a coarse pointer shows none. `DSTabs` turns `arrow` on and passes its size.
+
+### The button, and its choice table
+
+- **A view MUST hold at most one `SOLID` button, its main action** (`RD.SUPPORT.SURFACE.370`). Every other button is `OUTLINE`, or `GHOST` where it stands at the end of a row or in a toolbar, or is an icon alone. A view is what a person sees as one task: a page, a dialog, a drawer, a sheet or a step, and a dialog over a page is a view of its own that holds its own. A main action that deletes or ends something is `SOLID` `ERROR`, and a view with no main action holds no `SOLID`. On a site's page the closing call says the hero's one act again at the page's end, so its `SOLID` and the hero's are one main action said twice, never on screen together (`site-patterns.md`, *Closing call*). One filled button tells a person where to go next; two make them guess. A feature's buttons are this rule's case for a feature, under `DSFeature` below.
+- **A button with no `variant` MUST draw `OUTLINE` outside a header or a footer** (`RD.SUPPORT.SURFACE.376`). In a header or a footer the place gives the look, as `architecture-containers.md` states. So the default keeps the rule above by itself: a page writes `SOLID` once, on the view's main action, and leaves every other button bare.
+- **A page MUST NOT write `QUIET`, `SUBTLE` or `SUBTLE_OUTLINE` on a button** (`RD.SUPPORT.SURFACE.379`). A page's button is `SOLID`, `OUTLINE`, `GHOST` or `LINK`. The tints are the place's alone: a header draws its main action in the look of its level.
+- **A button's colour MUST say what its act does: `PRIMARY` the main action, `ERROR` a main action that deletes or ends something, and `DEFAULT` every other** (`RD.SUPPORT.SURFACE.384`). `INFO`, `SUCCESS` and `WARNING` say a state, and a button is an act, so it never takes them. It never takes `CUSTOM` either: a button takes no `customColor`, and draws `DEFAULT` for it.
+
+A button is chosen by its view, then by whether it is the view's main action, then by where it stands. "The place's" is the look and the size a header or a footer gives, as `architecture-containers.md` states; "the size above" is the size of the place the button stands in.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The view | The action is | Where it stands | `variant` | `color` | `size` | The page writes |
+| --- | --- | --- | --- | --- | --- | --- |
+| any view | the main action, which neither deletes nor ends anything | the content of the view, outside a feature, or in no box | `SOLID` | `PRIMARY` | the size above | the variant and the colour |
+| any view | the main action, which neither deletes nor ends anything | a footer | `SOLID` (the place's) | `PRIMARY` | the place's: the size of the box | the colour |
+| any view | the main action, which neither deletes nor ends anything | a header | the place's: the look of the header's level | `PRIMARY` | the place's: a step from the box's size, by its level | the colour |
+| any view | the main action, which deletes or ends something | anywhere | `SOLID` | `ERROR` | the place's, else the size above | the variant and the colour |
+| any view | an action of a feature | a feature | by the feature's level, from its table under `DSFeature`: one `SOLID` at `PAGE`, then `OUTLINE`, `GHOST` and `LINK` down the levels | `PRIMARY` on the one `SOLID`, else `DEFAULT` | the level's: `LG` at `PAGE` and `CONTAINER`, `MD` at `WIDGET`, `SM` at `GROUP` | the feature's `actions`, as data |
+| any view | an icon alone | the head of a page | `OUTLINE` (the place's) | `DEFAULT` | the place's | the icon and `ariaLabel` |
+| any view | an icon alone | any other header, or a footer | `GHOST` (the place's) | `DEFAULT` | the place's | the icon and `ariaLabel` |
+| any view | an icon alone | the end of a row, a toolbar, or the content | `GHOST` | `DEFAULT` | the place's, else the size above | the variant, the icon and `ariaLabel` |
+| any view | another action | the end of a row, or a toolbar | `GHOST` | `DEFAULT` | the place's, else the size above | the variant |
+| any view | another action | a header or a footer | `OUTLINE` (the place's) | `DEFAULT` | the place's | nothing |
+| any view | another action | the content, or no box | `OUTLINE` (the unit's) | `DEFAULT` | the size above | nothing |
+
+**The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RD.SUPPORT.SURFACE.370`). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site's page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, never on screen together. A feature leads with at most one `SOLID` `PRIMARY` (`RD.SUPPORT.SURFACE.234`).
+
+**The index by value.**
+
+| Prop | Value | Ruled or never |
+| --- | --- | --- |
+| `variant` | `SOLID` | ruled: the main action in the content, in a footer and in the head of a page; a main action that deletes or ends; a feature's one `SOLID` |
+| `variant` | `QUIET` · `SUBTLE` · `SUBTLE_OUTLINE` | never written by a page (`RD.SUPPORT.SURFACE.379`); a header draws them alone, as its main action's look at its level |
+| `variant` | `OUTLINE` | ruled: every other action, in a header, a footer or the content; an icon alone in the head of a page; a feature's other actions. It is the unit's own default outside a header or a footer (`RD.SUPPORT.SURFACE.376`) |
+| `variant` | `GHOST` | ruled: an icon alone, outside the head of a page; another action at the end of a row or in a toolbar; a feature's action at `CONTAINER` and `WIDGET` |
+| `variant` | `LINK` | ruled: a feature's action from `WIDGET` down. Nowhere else, because a link among words is a `DSLink` |
+| `color` | `PRIMARY` | ruled: the main action, and a feature's one `SOLID` |
+| `color` | `ERROR` | ruled: a main action that deletes or ends something |
+| `color` | `DEFAULT` | ruled: every action that is not the main one. It is the unit's own default |
+| `color` | `INFO` · `SUCCESS` · `WARNING` | never (`RD.SUPPORT.SURFACE.384`): a hue says a state, and a button is an act |
+| `color` | `CUSTOM` | never (`RD.SUPPORT.SURFACE.384`): a button takes no `customColor`, and draws `DEFAULT` for it |
+| `size` | `XS` · `SM` · `MD` · `LG` · `XL` | ruled in every case: the place's, else the size above, and a feature's by its level. A size the page writes wins, and a page writes one only to keep a size of its own |
+
+The library draws `DSButton`'s usage as the first case: a view's main action in its content, `SOLID` `PRIMARY`, beside an `OUTLINE`.
 
 ### The overlays, and the two confirmations
 
@@ -593,7 +659,7 @@ Each of these but the box of a small media is a token of the level (`architectur
 
 - **A feature MUST fold its form on a phone by its type, and it MUST read no device** (`RD.SUPPORT.SURFACE.237`). `SPLIT_END` becomes `MEDIA_BOTTOM`, `SPLIT_START` becomes `MEDIA_TOP`, `ITEMS_SPLIT_END` becomes one column of the words, the items, then the media, `ITEMS_SPLIT_START` one column of the words, the media, then the items, and every other type keeps its shape. The size of the title on a phone is the phone value of its type step, and a page never chooses a smaller step for a phone.
 - **A feature MAY reveal its parts through `reveal`, and it MUST play once, the words first, then the media, then the items** (`RD.SUPPORT.SURFACE.282`). `reveal` is `IDSFeatureRevealProps`: `text` (`NONE`, `FADE`, `RISE`), `media` (adds `SLIDE`, `ZOOM`) and `items` (`NONE`, `FADE`, `RISE`, `ZOOM`), each a member of `DSMotionType`, and nothing moves when it is left out. Items come in 60 ms apart, and from the sixth on together. The words are in the page before any script runs.
-- **A view MUST hold at most one `SOLID` button, its main action** (`RD.SUPPORT.SURFACE.370`). Every other button is `OUTLINE`, or `GHOST` where it stands in a row, a toolbar or a panel's header. A view is a page, a dialog, a drawer or a sheet; a dialog over a page holds its own. A main action that deletes or ends something is `SOLID` `ERROR`, and a view with no main action holds no `SOLID`.
+- **A view MUST hold at most one `SOLID` button, its main action** (`RD.SUPPORT.SURFACE.370`), as *The button, and its choice table* states with the button's cases, and a feature's buttons are that rule's case for a feature.
 - **A feature's buttons MUST follow its level, as the case of a feature for that rule** (`RD.SUPPORT.SURFACE.287`). The primary is the only `SOLID` in view, and an arrow stands only on a link that goes somewhere.
 
 | Level | How many | Their look | Their arrows |
@@ -708,7 +774,7 @@ One item line serves every level of a page, and `pageLevel` says which one it st
   | `CONTENT` | 14px | 13px |
   | `INLINE` | 12px | 12px |
 - **A line that says who did a thing and when MUST be an item line at `INLINE`.** Its picture is the `AVATAR` of the person, its title the name, and the time a fact, in the form the date units give it. A stack may keep a unit of its own that draws it.
-- **A record's item line MUST be its module's `<State>Item`, and a place MUST give it only `IDSItemPlacementProps`** (`RD.SUPPORT.APPS.218`). The web module that owns a record makes `DSItem` specific for it once, so the record reads the same in its picker, in its list and on its own page: `RoleItem` draws a role. The Item decides every part once, the title, the description, the picture, the facts and their order, the same at every level; the level sets only the sizes, and `INLINE` leaves the description out. The record's state shows only when the record is off, first among the facts, and its code shows at every level. The Item fetches nothing and holds no action: an action belongs to the row or the header that holds it. A place says where the line stands and where it leads (`pageLevel`, `orientation`, `anchor`, `showArrow`, `backAnchor`) and gives its own data at the end (`endNode`, `endAlign`), never a badge or a state of the record, which stand in its facts. It may leave out the description with `hideDescription`, or every fact with `hideFacts`, and it never changes a part or adds one. The design system declares `IDSItemPlacementProps` once, so no Item restates it.
+- **A record's item line MUST be its module's `<State>Item`, and a place MUST give it only `IDSItemPlacementProps`** (`RD.SUPPORT.APPS.218`). The web module that owns a record makes `DSItem` specific for it once, so the record reads the same in its picker, in its list and on its own page: `RoleItem` draws a role. The Item decides every part once, the title, the description, the picture, the facts and their order, the same at all six levels from `PAGE` to `INLINE`; the level sets only the sizes, and `INLINE` leaves the description out. The level comes from where the Item stands, never from the room it has. The record's state shows only when the record is off, first among the facts, and its code shows at every level. The Item fetches nothing and holds no action: an action belongs to the row or the header that holds it. A place says where the line stands and where it leads (`pageLevel`, `orientation`, `anchor`, `showArrow`, `backAnchor`) and gives its own data at the end (`endNode`, `endAlign`), never a badge or a state of the record, which stand in its facts. It may leave out the description with `hideDescription`, or every fact with `hideFacts`, and it never changes a part or adds one. The design system declares `IDSItemPlacementProps` once, so no Item restates it.
 - **A mark in an item line MUST be a rounded square where the page names no shape, and its corner MUST follow its box.** The corner is one of the theme's radius steps: 6px at 24 and 28px, 8px at 32 and 36px, and 10px from 40px up. A page that names a shape still gets it.
 - **An item line that is a title MUST start where what stands under it starts** (`RD.SUPPORT.SURFACE.109`). A title is an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP`. It takes no padding of its own at its two sides. So the title of a group starts where the labels of the fields under it start, in a part that insets, in a card, in a dialog and in a sheet. The head of a page starts where the framed parts under it start. Above and below, a title keeps the padding of its place, which the part that holds it gives.
 - **In a `flush` part, a title MUST take the inset of its place at its two sides.** What stands under it there reaches the edge, and the rows start their text at that inset. So the title starts where the text of the rows starts. The place is the panel or the card the part belongs to, and its size sets the inset, as the card (`architecture-containers.md`) states for a card.
@@ -736,15 +802,20 @@ One item line serves every level of a page, and `pageLevel` says which one it st
 
 ### The badge
 
-The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Where it stands, and that the normal state shows none, are rules of content in `standards-core.md`. Two more rules keep a badge readable. Both are proposed, and not yet confirmed (`RD.SUPPORT.SURFACE.065`).
+The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Where it stands, and that the normal state shows none, are rules of content in `standards-core.md`. The rules below keep a badge readable.
 
-- **A badge MUST always show its word.** It then reads without its colour and without its icon, also for a person who cannot tell the colours apart. `DSBadge` asks for its `label` on every use.
-- **The colour of a badge MUST say a state, and never a kind.** A person learns that a coloured badge asks to be looked at. A colour on every kind would spend that signal on things that need no attention.
-- **A badge with no `variant` MUST draw `SUBTLE`, the light tint** (`RD.SUPPORT.SURFACE.153`). A page asks for a stronger fill by writing `QUIET` or `SOLID`. So the badges of a table or a card stay quiet beside the words around them.
-- **A status badge MUST keep its own colour on a coloured surface.** Only a neutral and a primary badge take the surface's tint; success, warning, error and info stay their hue.
-- **A state badge among the facts of an item line MUST take the `variant` the page gives, and else the one its level chooses:** `QUIET` at `PAGE` and `CONTAINER`, so it is seen beside a large title, and `SUBTLE_OUTLINE` at the others, whose line gives a small badge an edge down a list. A badge that names a kind is not a state badge.
-- **A badge that names a kind or a type MUST draw `OUTLINE` in `DEFAULT`, with the icon its enum gives the value where it gives one** (`RD.SUPPORT.SURFACE.368`). Its line gives it an edge with no fill, so it reads as a label and never asks to be looked at. This holds at every level and in a table.
-- **A badge that says a state MUST take the hue its meaning gives, from one table, at the `variant` its place gives** (`RD.SUPPORT.SURFACE.369`). The place gives the page's `variant`, else the level's, else `SUBTLE`.
+- **A badge MUST always show its word** (`RD.SUPPORT.SURFACE.065`). It then reads without its colour and without its icon, also for a person who cannot tell the colours apart. `DSBadge` asks for its `label` on every use.
+- **The colour of a badge MUST say a state, and never a kind** (`RD.SUPPORT.SURFACE.065`). A person learns that a coloured badge asks to be looked at, and a colour on every kind would spend that signal on things that need no attention. The one exception is a colour a person chose for their own label, `CUSTOM`, such as a tenant's tag: that colour is their data, so it may mark a kind.
+- **A badge with no `variant` MUST draw `SUBTLE`, the light tint** (`RD.SUPPORT.SURFACE.153`). A page asks for a stronger fill by writing `QUIET`, so the badges of a table or a card stay quiet beside the words around them.
+- **A badge MUST NOT take `GHOST` or `LINK`** (`RD.SUPPORT.SURFACE.377`). A word with no fill is a fact in words, a `TEXT` fact, and a link is a `DSLink`.
+- **A badge MUST be `SOLID` only over a picture** (`RD.SUPPORT.SURFACE.378`). A strong fill is kept for the one place a tint cannot be read, so a page never writes `SOLID` on a badge to make it stand out.
+- **A badge in a table cell or on its own MUST be `SM`, and a badge over a picture MUST take the size of its place** (`RD.SUPPORT.SURFACE.380`). Among the facts of an item line the level gives the size, as the rule below states.
+- **Several values of one set MUST each be drawn by their own case, one size step smaller than their place** (`RD.SUPPORT.SURFACE.381`). A row of small badges then reads as one fact with several values, and each keeps the look its own meaning gives. No badge is smaller than `XS`.
+- **A label a person coloured MUST be a `SUBTLE` badge in `CUSTOM`, with that colour in `customColor`** (`RD.SUPPORT.SURFACE.382`). The badge works out its fill, its words and its line from that one colour, so a colour a person picks never draws a badge that cannot be read.
+- **A status badge MUST keep its own colour on a coloured surface.** On a surface other than `BASE` only a neutral and a primary badge take the surface's tint; a success, warning, error or info badge stays its hue, so Live, Syncing and Pending draw apart on a stage as they do on the page.
+- **A state badge among the facts of an item line MUST take the `variant` the page gives, and else the one its level chooses:** `QUIET` at `PAGE` and `CONTAINER`, so it is seen beside a large title, and `SUBTLE_OUTLINE` at the others, whose line gives a small badge an edge a person finds down a list. A badge that names a kind is not a state badge, and the next rule is its own.
+- **A badge that names a kind or a type MUST draw `OUTLINE` in `DEFAULT`, with the icon its enum gives the value where it gives one** (`RD.SUPPORT.SURFACE.368`). Its line gives it an edge with no fill, so it reads as a label and never asks to be looked at. This holds at every level and in a table; the level's `variant` is for a state badge.
+- **A badge that says a state MUST take the hue its meaning gives, from one table, at the `variant` its place gives** (`RD.SUPPORT.SURFACE.369`). The place gives the page's `variant`, else the level's, else `SUBTLE`. One table fixes the hue, so Active is green in every app and no module picks a colour of its own for a value.
 
   | What the state tells a person | Hue | Values in the apps |
   | --- | --- | --- |
@@ -756,12 +827,59 @@ The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Wh
   | it marks the one chosen among its peers, or a stage of release | `PRIMARY` | Current, Default, Primary, Alpha, Beta |
 
   A value that fits two rows takes the one that says what the person must do: Expired is `ERROR` where something stops working and `DEFAULT` where nothing needs doing.
-- **A badge over a picture MUST be `SOLID`, and it says a state in that state's hue** (`RD.SUPPORT.SURFACE.374`). A kind over a picture is the picture's caption, never a badge.
+- **A badge over a picture MUST be `SOLID`, and it says a state in that state's hue** (`RD.SUPPORT.SURFACE.374`). A picture can be light or dark anywhere, and a solid fill keeps the words readable on any of them. A kind over a picture is the picture's caption, never a badge.
+
+#### The choice table of `DSBadge`
+
+A badge is chosen from what its value is and where it stands. Every case rests on the rules above: a badge always shows its word, and its colour says a state, never a kind, but for a colour a person chose. A thing shows one state, so several values of one set are kinds or labels.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The value is | Where it stands | `variant` | `color` | `size` | The page writes |
+| --- | --- | --- | --- | --- | --- |
+| the normal state | anywhere | no badge | — | — | nothing |
+| a state | an item line from `WIDGET` to `INLINE` | `SUBTLE_OUTLINE` (the level's) | from the hue table | `SM` at `WIDGET` and `GROUP`, `XS` below (the level's) | the word and the colour |
+| a state | an item line at `PAGE` or `CONTAINER` | `QUIET` (the level's) | from the hue table | `MD` (the level's) | the word and the colour |
+| a state | over a picture | `SOLID` | the state's hue, from the hue table | the place's | the word, the colour and the variant |
+| a state | a table cell, or on its own | `SUBTLE` (the unit's) | from the hue table | `SM` | the word and the colour, and `SM` where the place is larger |
+| a release stage, such as Alpha, Beta or New | a feature's eyebrow | the level's | `PRIMARY` | the level's | the word |
+| a plan's highlight, such as Most popular | a plan | the level's | `PRIMARY` | the level's | the word |
+| several values of one set | anywhere | each by its own case | each by its own case | one step smaller than the place's | the words, and the size |
+| a label a person coloured, such as a tenant's tag | anywhere | `SUBTLE` | `CUSTOM`, with its colour in `customColor` | the place's | the word and the colour |
+| a kind | over a picture | not a badge: the picture's caption | — | — | — |
+| a group or a kind | a grid cell's eyebrow | not a badge: the eyebrow in words, as the feature grid rules it (`site-patterns.md`) | — | — | — |
+| a kind or a type | the facts, the end of a row, a table, anywhere | `OUTLINE` | `DEFAULT` | the place's | the word, the icon its enum gives the value, and the variant |
+| a count | an entry of the navigation, or a button | drawn by the unit, from its `count` | — | — | the count |
+
+**The mapping** is the hue table above: one hue for each state, from what the state tells a person. A case that says *from the hue table* takes its colour there, and a value that fits two rows takes the one that says what the person must do.
+
+**The limits across a view.** The badge holds none of its own. A strong fill stays rare because a badge is `SOLID` only over a picture, which a case holds.
+
+**The index by value.**
+
+| Prop | Value | Ruled or never |
+| --- | --- | --- |
+| `variant` | `SOLID` | ruled: a state over a picture (`RD.SUPPORT.SURFACE.378`) |
+| `variant` | `QUIET` | ruled: a state in an item line at `PAGE` or `CONTAINER`, and a release stage or a plan's highlight at those levels |
+| `variant` | `SUBTLE` | ruled: a state in a table cell or on its own; a label a person coloured. It is the unit's own default |
+| `variant` | `SUBTLE_OUTLINE` | ruled: a state in an item line from `WIDGET` to `INLINE`, and a release stage or a plan's highlight at those levels |
+| `variant` | `OUTLINE` | ruled: a kind or a type, at every level |
+| `variant` | `GHOST` | never (`RD.SUPPORT.SURFACE.377`): a word with no fill is a fact in words |
+| `variant` | `LINK` | never (`RD.SUPPORT.SURFACE.377`): a link is a `DSLink` |
+| `color` | `DEFAULT` | ruled: a kind or a type; a state that is off, ended or not started, by the hue table. It is the unit's own default |
+| `color` | `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | ruled: a state, by the hue table; `PRIMARY` also a release stage and a plan's highlight |
+| `color` | `CUSTOM` | ruled: a label a person coloured, with `customColor` (`RD.SUPPORT.SURFACE.382`). Never for a state the system names |
+| `size` | `XS` | ruled: a state in an item line at `CONTENT` and `INLINE`; several values where their place is `SM` or `XS` |
+| `size` | `SM` | ruled: a state in an item line at `WIDGET` and `GROUP`; a state in a table cell or on its own (`RD.SUPPORT.SURFACE.380`); several values where their place is `MD` |
+| `size` | `MD` | ruled: a state in an item line at `PAGE` and `CONTAINER`; several values where their place is `LG` |
+| `size` | `LG` · `XL` | ruled as the place's alone: a kind, a state over a picture or a label a person coloured, in a place of that size, and several values where their place is `XL`. A page writes neither |
+
+The library draws `DSBadge`'s usage as the first case that draws the unit: a state among the facts of a row at `CONTENT`, Active as `SUBTLE_OUTLINE` `SUCCESS` at `XS`.
 
 ### A value of an enum
 
 - **A value of an enum MUST be shown by its name, and never by its code** (`RD.SUPPORT.SURFACE.066`). The name is the one a person reads. The code is written for the contract and not for a person.
-- **Its icon MUST be chosen in one order.** First the icon of the value, where its enum gives one to each value. Then the icon of the enum. Then the word alone. So a missing icon never stops a page. This order is proposed, and not yet confirmed.
+- **Its icon MUST be chosen in one order.** First the icon of the value, where its enum gives one to each value. Then the icon of the enum. Then the word alone. So a missing icon never stops a page, and a module is held to no icon it cannot find in the library.
 
 Where the value stands decides how it is shown.
 
@@ -783,8 +901,54 @@ A mark is a picture or an icon that stands for a thing or a person: a person's p
 - **A mark MUST draw each value of `variant` from the one surface that a button and a badge draw from, with the step that value has under the pointer.** A mark, a badge and a button of one variant and one hue are then the same colours. A mark with no `variant` draws `SUBTLE`. A default mark in `SUBTLE`, `SUBTLE_OUTLINE` or `OUTLINE` draws its icon in the muted tone, and a ringed mark draws its ring in the colour of its icon (`RD.SUPPORT.SURFACE.187`). The light tint of the default hue is the text colour mixed into transparency, `6` percent at rest and `11` under the pointer, so it stands apart from the page, a card and a dialog in light and in dark (`RD.SUPPORT.SURFACE.180`), and every other tint, light and medium, is a wash of its hue's step 500 into transparency, the light one at the least share that stands `0.04` from them (`RD.SUPPORT.SURFACE.183`). The step under the pointer is for the look alone: a mark is a picture and no control, and it takes no press.
 - **The icon of a mark on the light tint of the default hue MUST take the muted tone.** A mark that states no hue then stays quiet beside the title it stands with.
 - **A filled mark is a thing that is set up, and an empty mark is a thing that is not set up yet.** So a row of marks shows where a setup stands with no count beside it.
+- **A mark that is not set up MUST be `OUTLINE` in `DEFAULT`, and a mark that is set up MUST take the filled tint of its place** (`RD.SUPPORT.SURFACE.386`). The ring with no fill is the empty mark, and the tint is the full one: the level's in an item line, else `SUBTLE`.
+- **A mark's colour MUST say a state, from the badge's hue table, or the brand, in `PRIMARY`, and else be `DEFAULT`** (`RD.SUPPORT.SURFACE.385`). The brand is the app's own mark, the chosen one of a run of marks, and a step's number. A mark says what a thing is, and its colour never marks a kind. It never takes `CUSTOM`: a mark has no colour of its own to draw from, and draws `DEFAULT` for it.
+- **A mark MUST be `SOLID` only for the app's own mark beside its name, and for the chosen one of a run of marks** (`RD.SUPPORT.SURFACE.387`). A run of marks is a row or a column of icons that stand for places, such as a rail shut to its icons.
+- **A mark MUST draw its icon alone, `GHOST`, only in a run of marks, for the marks that are not chosen** (`RD.SUPPORT.SURFACE.388`). The icon keeps the box of the chosen mark beside it, so the run stands in line. An icon alone anywhere else is a `DSIcon`, or the kind `ICON` of an item line's picture.
+- **A mark MUST NOT take `LINK` or `SUBTLE_OUTLINE`** (`RD.SUPPORT.SURFACE.389`). `LINK` draws what `GHOST` draws with no step under the pointer, and a mark is no link. No level rings a mark, and the empty mark is `OUTLINE`, so the light tint with a ring has no meaning of its own on a mark.
 
 `DSMark` says what: it draws an icon, or a symbol of one to three characters (`text`, one of the two, drawn whole in the type step of its scale size), as a mark, on a background of its own. `shape` takes `DSMarkShapeType`: `CIRCLE`, the default; `ROUNDED`, a square with the corner radius of its size step; `SQUARE`, a square with sharp corners. `size` is the density step: a mark with no `scaleSize` takes the scale size of the same name, so its background is as tall as a control of that step. `scaleSize`, from `DSScaleSizeType`, says how large the mark is drawn, with a background of 24 to 96px, and the mark holds the icon of its own step. `color` is the hue. `variant` is how the background is drawn, from `DSVariantType`: `SOLID`, a strong fill; `QUIET`, a medium tint; `SUBTLE`, a light tint and the default; `SUBTLE_OUTLINE`, the light tint with a ring; `OUTLINE`, a ring with no fill; `GHOST` and `LINK`, the icon alone with no fill and no ring. A screen reader passes a mark by; a mark that stands alone takes a name through `ariaLabel`, and is then read as an image. A person's picture stays `DSAvatar`, which is round.
+
+#### The choice table of `DSMark`
+
+A mark is chosen by its level, then by the thing it stands for, then by whether that thing is set up. A person is no mark: their picture is an avatar. An icon inside an action is no mark either: it is the button's own icon, in the button's square.
+
+**The cases**, read from the top; the first that matches wins.
+
+| The level | The thing | Set up | `variant` | `color` | `shape` | `size` and `scaleSize` | The page writes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| an item line from `WIDGET` to `INLINE` | the kind of the thing, as the line's picture | — | `SUBTLE` (the level's) | `DEFAULT`, or the hue of the thing's state | `ROUNDED` (the item's) | the item's box | `media` `MARK` with its icon, and its colour where it says a state |
+| an item line at `PAGE` or `CONTAINER` | the kind of the thing, as the line's picture | — | `QUIET` (the level's) | `DEFAULT`, or the hue of the thing's state | `ROUNDED` (the item's) | the item's box | `media` `MARK` with its icon, and its colour where it says a state |
+| any level | the app's own mark, beside its name | — | `SOLID` | `PRIMARY` | `ROUNDED` | the scale size of the name's title step | the icon, the variant, the colour, the shape and the scale size |
+| any level | a run of marks, such as a rail shut to its icons | the chosen one | `SOLID` | `PRIMARY` | the run's | the run's | the icon, the variant and the colour |
+| any level | a run of marks | every other one | `GHOST` | `DEFAULT` | the run's | the run's | the icon and the variant |
+| any level | a thing a setup holds, in a row of marks, such as a channel | set up | the level's in an item line, else `SUBTLE` (the unit's) | `DEFAULT`, or the hue of its state | `CIRCLE` (the unit's) | the place's | the icon, and its colour where it says a state |
+| any level | a thing a setup holds, in a row of marks | not set up | `OUTLINE` | `DEFAULT` | `CIRCLE` (the unit's) | the place's | the icon and the variant |
+| any level | a symbol of one to three characters: a step's number, or a file's type | — | `SUBTLE` (the unit's) | `PRIMARY` for a step's number, `DEFAULT` for a file's type | `CIRCLE` for a step, `ROUNDED` for a file | the scale size of the title beside it, as *What stands beside what* states | the text, the colour and the scale size |
+| any level | a thing, beside a title or a heading of a builder's own unit | — | `SUBTLE` (the unit's) | `DEFAULT`, or the hue of the thing's state | `CIRCLE` (the unit's), or `ROUNDED` or `SQUARE` where the thing is better shown so, such as an app or a file | as *What stands beside what* states | the icon and the scale size |
+
+**The mapping** is the badge's hue table: a mark that says a state takes the hue that state takes on a badge.
+
+**The limits across a view.** A run of marks holds one chosen mark, the one `SOLID` among them.
+
+**The index by value.**
+
+| Prop | Value | Ruled or never |
+| --- | --- | --- |
+| `variant` | `SOLID` | ruled: the app's own mark; the chosen one of a run of marks (`RD.SUPPORT.SURFACE.387`) |
+| `variant` | `QUIET` | ruled: an item line's picture at `PAGE` and `CONTAINER`, and a set-up mark there |
+| `variant` | `SUBTLE` | ruled: an item line's picture from `WIDGET` down; a set-up mark; a symbol; a mark beside a title or a heading. It is the unit's own default |
+| `variant` | `OUTLINE` | ruled: a thing that is not set up yet (`RD.SUPPORT.SURFACE.386`) |
+| `variant` | `GHOST` | ruled: the marks of a run that are not chosen (`RD.SUPPORT.SURFACE.388`) |
+| `variant` | `SUBTLE_OUTLINE` · `LINK` | never (`RD.SUPPORT.SURFACE.389`): no level rings a mark, and a mark is no link |
+| `color` | `DEFAULT` | ruled: a mark that says no state and is no brand. It is the unit's own default |
+| `color` | `PRIMARY` | ruled: the app's own mark, the chosen one of a run, and a step's number; a state, by the hue table |
+| `color` | `INFO` · `SUCCESS` · `WARNING` · `ERROR` | ruled: a mark that says a state, by the hue table (`RD.SUPPORT.SURFACE.385`) |
+| `color` | `CUSTOM` | never (`RD.SUPPORT.SURFACE.385`): a mark has no colour of its own to draw from, and draws `DEFAULT` for it |
+| `size` | `XS` · `SM` · `MD` · `LG` · `XL` | ruled as the place's: the size above, which also sets the corner of `ROUNDED`. A page sizes a mark by `scaleSize`, and writes `size` only beside it, to set that corner |
+| `scaleSize` | `XXS` to `XXL5` | ruled: the item's box in an item line; the run's in a run; beside a title or a heading, as *What stands beside what* states |
+
+The library draws `DSMark`'s usage as the first case: the picture of a row's item line, `SUBTLE` `DEFAULT` and `ROUNDED`, beside its title.
 
 ### The avatar
 
@@ -937,8 +1101,8 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.APPS.144` | a block drawn from data is declared as a host and an item, and one item serves every host that takes one data shape |
 | `RD.SUPPORT.APPS.164` | an overlay is drawn as its surface alone, over a backdrop, sized to the instance, and never placed as a block of its own |
 | `RD.SUPPORT.SURFACE.064` | the parts of the item line and their order, and the header of a record and a line of a list have one shape |
-| `RD.SUPPORT.SURFACE.065` | a badge always shows its word, and its colour says a state and never a kind. Both are proposed |
-| `RD.SUPPORT.SURFACE.066` | a value of an enum is shown by its name, and the order its icon is chosen in. The order is proposed |
+| `RD.SUPPORT.SURFACE.065` | a badge always shows its word, and its colour says a state and never a kind, but for a colour a person chose for their own label, `CUSTOM` |
+| `RD.SUPPORT.SURFACE.066` | a value of an enum is shown by its name, and the order its icon is chosen in |
 | `RD.SUPPORT.SURFACE.067` | an icon inside an action keeps its square, and what a filled and an empty mark say |
 | `RD.SUPPORT.SURFACE.081` | the foundation defines the core units, and a stack may provide further units of its own |
 | `RD.SUPPORT.SURFACE.085` | a mark supports the shapes round, rounded and square, and is round by default |
@@ -1019,7 +1183,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.242` | an item line takes an eyebrow, a colour on a fact in words, and a place for its facts after the title |
 | `RD.SUPPORT.SURFACE.245` | a drawer, a sheet and a dialog offer the extent `FIT`, as wide or as tall as what they hold |
 | `RD.SUPPORT.SURFACE.246` | the drawer of the filter bar on a phone fits its fields, and the bar's size sets only how dense its controls are |
-| `RD.SUPPORT.APPS.218` | a module makes the item line specific for each record it owns as `<State>Item`, a place gives it `IDSItemPlacementProps`, and may leave out the description or the facts and never changes a part or adds one |
+| `RD.SUPPORT.APPS.218` | a module makes the item line specific for each record it owns as `<State>Item`, the same parts at all six levels with `INLINE` leaving the description out, a place gives it `IDSItemPlacementProps`, and may leave out the description or the facts and never changes a part or adds one |
 | `RD.SUPPORT.SURFACE.248` | a feature's text aligns inside the place its type gives it, by `textAlign`, and `BACKDROP`'s scrim follows it |
 | `RD.SUPPORT.SURFACE.250` | a dialog, a sheet and a drawer are each one surface: the panel draws the fill, the corners, the line and the shadow, and what it holds draws none |
 | `RD.SUPPORT.SURFACE.251` | a feature's actions stand after its items, or before them where `actionsPlacement` says so |
@@ -1072,9 +1236,23 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.073` | the one form of the filter bar, at a desktop, at a tablet and on a phone |
 | `RD.SUPPORT.SURFACE.368` | a badge that names a kind or a type draws `OUTLINE` in `DEFAULT`, with the icon its enum gives the value |
 | `RD.SUPPORT.SURFACE.369` | a badge that says a state takes the hue its meaning gives, from one table, at the page's `variant`, else the level's, else `SUBTLE` |
-| `RD.SUPPORT.SURFACE.370` | a view holds at most one `SOLID` button, its main action; the feature's buttons are the case of a feature |
+| `RD.SUPPORT.SURFACE.370` | a view holds at most one `SOLID` button, its main action; a site page's closing call repeats the hero's one act; the feature's buttons are the case of a feature |
 | `RD.SUPPORT.SURFACE.374` | a badge over a picture is `SOLID`, and says a state in that state's hue |
+| `RD.SUPPORT.SURFACE.375` | a unit with a closed prop has a choice table of cases, a mapping, limits across a view and an index by value; a value is settled by the page, else the place, else the level, else the unit; its cases are the library's cases and its first case that draws the unit is the unit's usage; a container and a pattern have none |
+| `RD.SUPPORT.SURFACE.376` | a button with no `variant` draws `OUTLINE` outside a header or a footer |
+| `RD.SUPPORT.SURFACE.377` | a badge never takes `GHOST` or `LINK` |
+| `RD.SUPPORT.SURFACE.378` | a badge is `SOLID` only over a picture |
+| `RD.SUPPORT.SURFACE.379` | a page never writes `QUIET`, `SUBTLE` or `SUBTLE_OUTLINE` on a button |
+| `RD.SUPPORT.SURFACE.380` | a badge in a table cell or on its own is `SM`, and over a picture takes the size of its place |
+| `RD.SUPPORT.SURFACE.381` | several values of one set are each drawn by their own case, one size step smaller than their place |
+| `RD.SUPPORT.SURFACE.382` | a label a person coloured is a `SUBTLE` badge in `CUSTOM` with that colour |
+| `RD.SUPPORT.SURFACE.384` | a button's colour says what its act does: `PRIMARY` the main action, `ERROR` a main action that deletes or ends, `DEFAULT` every other, and never another hue |
+| `RD.SUPPORT.SURFACE.385` | a mark's colour says a state from the badge's hue table, the brand in `PRIMARY`, `DEFAULT` where it says neither, and never `CUSTOM` |
+| `RD.SUPPORT.SURFACE.386` | a mark that is not set up is `OUTLINE` in `DEFAULT`, and a mark that is set up takes the filled tint of its place |
+| `RD.SUPPORT.SURFACE.387` | a mark is `SOLID` only as the app's own mark beside its name and as the chosen one of a run of marks |
+| `RD.SUPPORT.SURFACE.388` | a mark draws its icon alone, `GHOST`, only in a run of marks, where it keeps their box |
+| `RD.SUPPORT.SURFACE.389` | a mark never takes `LINK` or `SUBTLE_OUTLINE` |
 
 ## Proof
 
-No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The web builds `facts` and `pageLevel` on `DSItem`. It also builds the larger sizes, in Support `5.13.0`: `scaleSize` on `DSIcon`, `DSMark`, `DSAvatar` and `DSAvatarGroup`, the item line and the tabs drawn by their page level, and `flush` on the parts of a card. The web builds the tabs in a `flush` part, the one name of an overlay with a title, the form `AGO` of the two date units, the time format that a block takes from the app alone, the row in view of a table, the order a table takes `striped` and `hoverable` in, and the picture of an item line given as data. The web builds, in a change not released yet, the levels of the item line from `PAGE` to `INLINE` with no size on it, the heading element by nesting, the picture by its fixed table, `mediaAlign`, the tabs at every level, and the variants by strength, with `SUBTLE` as the default of a badge and a mark. In the web the title of a confirmation is still drawn by hand. The design library has not drawn the larger sizes or any of these yet, and it is drawn after the stack. So a page on another stack checks what its stack's units take before it uses one of these.
+No check reads a page against these rules yet. A review applies them by reading the page and by running each task. The web builds `facts` and `pageLevel` on `DSItem`. It also builds the larger sizes, in Support `5.13.0`: `scaleSize` on `DSIcon`, `DSMark`, `DSAvatar` and `DSAvatarGroup`, the item line and the tabs drawn by their page level, and `flush` on the parts of a card. The web builds the tabs in a `flush` part, the one name of an overlay with a title, the form `AGO` of the two date units, the time format that a block takes from the app alone, the row in view of a table, the order a table takes `striped` and `hoverable` in, and the picture of an item line given as data. The web builds, in a change not released yet, the levels of the item line from `PAGE` to `INLINE` with no size on it, the heading element by nesting, the picture by its fixed table, `mediaAlign`, the tabs at every level, and the variants by strength, with `SUBTLE` as the default of a badge and a mark. In the web the title of a confirmation is still drawn by hand. The design library has not drawn the larger sizes or any of these yet, and it is drawn after the stack. So a page on another stack checks what its stack's units take before it uses one of these. The web draws a `DSButton` with no `variant` as `SOLID` outside a header or a footer, where its choice table draws `OUTLINE`; Support draws `OUTLINE` there in its next release, and each app then writes `SOLID` on each view's main action. The library is owed the choice tables' cases. No check reads a choice table yet: `apps surface gaps` reports a value the index does not list once it reads the tables.
