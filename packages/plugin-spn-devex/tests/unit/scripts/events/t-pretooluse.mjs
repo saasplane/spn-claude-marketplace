@@ -22,8 +22,9 @@ const EVENTS = resolve(HOOKS, "src", "scripts", "events");
 // An arc's data as the `workstream` commands keep it: `state.json` at `status`, and `log.jsonl` holding the
 // developer's go where `go` says so (RD.DEVEX.WORKSPACE.278) — the state `confirmed` reads.
 function arcFiles(status, go) {
-  const data = { schemaVersion: 1, arc: "N001", subject: "probe", title: "the probe", goal: null, status, reason: null,
-    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "probe", kind: "change", state: "waiting" }] };
+  // RUNNING is worked out from the steps, never stored: an arc that runs stores the developer's DECIDED, and a step runs.
+  const data = { schemaVersion: 2, arc: "N001", subject: "probe", title: "the probe", goal: null, status: status === "RUNNING" ? "DECIDED" : status, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "probe", kind: "change", state: status === "RUNNING" ? "running" : "waiting" }] };
   const lines = [{ at: "2026-09-29T10:00+05:30", kind: "opened", row: null, note: "opened as PROPOSED" },
     ...(go ? [{ at: "2026-09-29T10:05+05:30", kind: "status", row: null, note: "PROPOSED → DECIDED · the developer: 'go'" },
               { at: "2026-09-29T10:06+05:30", kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" }] : [])];
@@ -156,7 +157,7 @@ function onceForAFile(shown) {
       `${linesFor("1.0.0").stylesheet}<div class="sds-eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table>
         <thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
         <tbody><tr><td>a</td><td>spn-foundation</td><td></td></tr></tbody></table></section>`,
-    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N001", "state.json")]: `${JSON.stringify({ schemaVersion: 1, arc: "N001",
+    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N001", "state.json")]: `${JSON.stringify({ schemaVersion: 2, arc: "N001",
       subject: "x", title: "x", status: "LANDED", reason: null, preview: "preview.html",
       rows: [{ id: "1", parent: "N001", title: "a", kind: "change", repo: "spn-foundation", state: "landed" }] })}\n`,
   });

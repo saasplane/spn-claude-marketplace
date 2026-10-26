@@ -25,9 +25,12 @@ console.log("=== the schema — an arc's state.json");
   const good = arcData();
   ok("a whole arc holds to the schema", schema.arcFaults(good).length === 0, schema.arcFaults(good).join("; "));
   const cases = [
-    ["a schemaVersion other than 1", (d) => { d.schemaVersion = 2; }, /schemaVersion/],
-    ["a status outside the eight", (d) => { d.status = "OPEN"; }, /status/],
-    ["HELD with no reason", (d) => { d.status = "HELD"; }, /HELD and carries no `reason`/],
+    ["a schemaVersion 1, which names migration 006", (d) => { d.schemaVersion = 1; }, /`schemaVersion` is `1`.*plugin migration write 006/],
+    ["a schemaVersion newer than the plugin's, which says to update it", (d) => { d.schemaVersion = 3; }, /`schemaVersion` is 3, and this spn-devex reads 2: update the plugin/],
+    ["a status outside the stored set", (d) => { d.status = "OPEN"; }, /status/],
+    ["RUNNING, which the steps work out and nothing stores", (d) => { d.status = "RUNNING"; }, /`status` is `RUNNING`/],
+    ["DROPPED with no reason", (d) => { d.status = "DROPPED"; }, /DROPPED and carries no `reason`/],
+    ["a wait that is not words", (d) => { d.wait = 3; }, /`wait`/],
     ["an arc id not N<nnn>", (d) => { d.arc = "arc7"; }, /`arc`/],
     ["a row with no kind", (d) => { delete d.rows[0].kind; }, /row 1 has no `kind`/],
     ["a row kind outside fix, change and question", (d) => { d.rows[0].kind = "chore"; }, /`kind` is `chore`/],
@@ -117,69 +120,60 @@ console.log("\n=== the generated blocks — progress and open");
   const inside = lib.progressInside("/nowhere", [data]);
   ok("progress: the card alone — no Overall line, no long bar, no grid of tiles", !inside.includes("<p>") && !inside.includes('class="sds-bar"') && !inside.includes("sds-arcs") && inside.startsWith('  <nav class="sds-footbar"'), inside);
   ok("progress: a chip links its row on the page, never its data", inside.includes('href="#N001"') && inside.includes('style="width:50%"') && !inside.includes("state.json"), inside);
-  const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PART-LANDED" }]);
-  ok("progress: a subject is shown as words, and a two-word status is one class", words.includes("<span class=\"sds-chip-subject\"> &middot; workstream data</span>") && words.includes('class="sds-chip sds-part-landed '), words);
+  const words = lib.progressInside("/nowhere", [{ ...data, arc: "N002", subject: "workstream-data", status: "PROPOSED" }]);
+  ok("progress: a subject is shown as words", words.includes("<span class=\"sds-chip-subject\"> &middot; workstream data</span>") && words.includes('class="sds-chip sds-proposed '), words);
   ok("progress: no arc, no card and nothing else", lib.progressInside("/nowhere", []) === "");
   {
     const order = (list) => lib.executionOrder("/nowhere", list).map((one) => one.arc).join(" ");
     const arc = (id, status, position) => ({ ...arcData(), arc: id, status, ...(position === undefined ? {} : { position }) });
-    ok("progress order: the done arcs, then RUNNING and PART-LANDED, then DECIDED and PROPOSED by position, an arc without one last, the number breaking a tie",
-      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), arc("N003", "RUNNING"), arc("N001", "LANDED"), arc("N010", "PART-LANDED"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]) === "N001 N002 N003 N010 N004 N011 N008 N009");
+    // RUNNING and LANDED are worked out from the steps: a decided arc with a step started runs, and one with every step landed has landed.
+    const started = (id) => ({ ...arc(id, "DECIDED"), rows: arcData().rows.map((row, at) => ({ ...row, state: at ? "waiting" : "running" })) });
+    const done = (id) => ({ ...arc(id, "DECIDED"), rows: arcData().rows.map((row) => ({ ...row, state: "landed" })) });
+    ok("progress order: the done arcs, then RUNNING, then DECIDED and PROPOSED by position, an arc without one last, the number breaking a tie",
+      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), started("N003"), done("N001"), started("N010"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]) === "N001 N002 N003 N010 N004 N011 N008 N009",
+      order([arc("N009", "PROPOSED"), arc("N008", "DECIDED", 5), arc("N004", "DECIDED", 2), started("N003"), done("N001"), started("N010"), arc("N011", "PROPOSED", 4), arc("N002", "CARRIED")]));
     const folder = mkdtempSync(join(tmpdir(), "order-"));
     const written = [["N005", "2026-10-12T10:00+05:30"], ["N006", "2026-10-11T10:00+05:30"]];
     for (const [id, at] of written) { const dir = join(folder, "arcs", id); mkdirSync(dir, { recursive: true }); writeFileSync(join(dir, "log.jsonl"), `${JSON.stringify({ at, kind: "landed", row: "1", note: "waiting → landed" })}\n`); }
-    ok("progress order: done arcs are in the order they finished, by their log, not by number", lib.executionOrder(folder, [arc("N005", "LANDED"), arc("N006", "LANDED")]).map((one) => one.arc).join(" ") === "N006 N005");
+    ok("progress order: done arcs are in the order they finished, by their log, not by number", lib.executionOrder(folder, [done("N005"), done("N006")]).map((one) => one.arc).join(" ") === "N006 N005");
     ok("progress: an arc's position is a whole number the schema accepts", schema.arcFaults({ ...arcData(), position: 3 }).length === 0 && schema.arcFaults({ ...arcData(), position: "x" }).length > 0);
   }
   ok("progress: a sticky card closes the block — the arcs' chips on the left, then the overall chip, and no line along its top edge",
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
       && inside.includes('<span>0 of 1 arcs closed</span>') && !inside.includes("sds-footbar-line"), inside);
   ok("progress: a chip is two lines — the number without the N and the name with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
-    /<a class="sds-chip sds-decided sds-step-3" href="#N001" aria-label="N001 probe, DECIDED, 1 of 2 build rows done"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-decided">DECIDED<\/span><strong>the probe arc<\/strong><span>1 of 2 build rows done<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>DECIDED/.test(inside), inside);
-  ok("progress: the summary is a highlighted section of two lines — Overall with build rows done, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
-    /<div class="sds-footbar-summary sds-planning sds-step-3" tabindex="0" aria-label="Workstream PLANNING, 1 of 2 build rows done, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-planning">PLANNING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 build rows done<\/span><\/span>\s*<\/div>/.test(inside), inside);
+    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 probe, RUNNING, 1 of 2 steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
+  ok("progress: the summary is a highlighted section of two lines — Overall with steps landed, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
+    /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
-    // RD.DEVEX.WORKSPACE.278: a chip and Overall count build rows only; design work shows in the planning look.
-    const design = (id, state) => ({ id, parent: "N001", title: `design ${id}`, kind: "design", state });
+    // RD.DEVEX.WORKSPACE.278: every row is a build step; a chip and Overall count steps, and an arc with none shows its status.
     const build = (id, state) => ({ id, parent: "N001", title: `build ${id}`, kind: "change", state });
     const arc = (id, status, rows) => ({ ...arcData(rows), arc: id, subject: `arc-${id.toLowerCase()}`, status });
     const chipOf = (html, id) => new RegExp(`<a class="sds-chip [^"]*" href="#${id}"[\\s\\S]*?</a>`).exec(html)?.[0] ?? "";
     const summaryOf = (html) => /<div class="sds-footbar-summary[\s\S]*?<\/div>/.exec(html)?.[0] ?? "";
-    const ideated = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed"), design("2", "landed")])]);
-    ok("progress: an all-design arc shows its design work in the planning look, never as done",
-      /class="sds-chip sds-proposed sds-step-design"/.test(chipOf(ideated, "N001")) && chipOf(ideated, "N001").includes('<span class="sds-arc-count">design 2/2</span>')
-        && !ideated.includes("sds-step-done") && summaryOf(ideated).includes('<span class="sds-arc-count">0/0</span>'), ideated);
-    const landedDesign = lib.progressInside("/nowhere", [arc("N001", "LANDED", [design("1", "landed")])]);
-    ok("progress: an arc that only read and sized says landed when it lands, with no bar to fill",
-      chipOf(landedDesign, "N001").includes('<span class="sds-arc-count">landed</span>') && chipOf(landedDesign, "N001").includes('style="width:0%"') && !landedDesign.includes("sds-step-done"), landedDesign);
-    const partBuilt = lib.progressInside("/nowhere", [arc("N002", "RUNNING", [design("1", "landed"), design("2", "landed"), build("3", "landed"), build("4", "running")])]);
-    ok("progress: a part-built arc counts its build rows alone",
+    const shaped = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [])]);
+    ok("progress: an arc with no step yet says its status, with no bar to fill",
+      chipOf(shaped, "N001").includes('<span class="sds-arc-count">proposed</span>') && chipOf(shaped, "N001").includes('style="width:0%"') && !shaped.includes("sds-step-done"), shaped);
+    const partBuilt = lib.progressInside("/nowhere", [arc("N002", "DECIDED", [build("3", "landed"), build("4", "running")])]);
+    ok("progress: a part-built arc reads RUNNING and counts its steps",
       /class="sds-chip sds-running sds-step-3"/.test(chipOf(partBuilt, "N002")) && chipOf(partBuilt, "N002").includes('<span class="sds-arc-count">1/2</span>') && chipOf(partBuilt, "N002").includes('style="width:50%"'), partBuilt);
-    // RD.DEVEX.WORKSPACE.278: Overall takes the workstream's own word, the one the page's header shows; its bar counts build rows.
-    const running = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "RUNNING", [design("1", "landed"), build("2", "running")])]);
-    ok("progress: Overall reads IMPLEMENTING once an arc runs, as the header does, though no build row has landed, its bar counting build rows",
+    const built = lib.progressInside("/nowhere", [arc("N002", "DECIDED", [build("3", "landed"), build("4", "landed")])]);
+    ok("progress: an arc whose steps all landed reads LANDED, in the done shade", /class="sds-chip sds-landed sds-step-done"/.test(chipOf(built, "N002")), built);
+    const waiting = lib.progressInside("/nowhere", [{ ...arc("N003", "DECIDED", [build("1", "waiting")]), wait: "the developer: approved, but wait" }]);
+    ok("progress: a decided arc's wait is in its tooltip and its accessible name", chipOf(waiting, "N003").includes("wait: the developer: approved, but wait"), waiting);
+    const running = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", []), arc("N002", "DECIDED", [build("2", "running")])]);
+    ok("progress: Overall reads IMPLEMENTING once a step has started, as the header does, though none has landed",
       summaryOf(running).includes('class="sds-footbar-summary sds-implementing ') && summaryOf(running).includes('<span class="sds-arc-count">0/1</span>'), summaryOf(running));
-    const decided = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", [design("1", "landed")]), arc("N002", "DECIDED", [design("1", "landed"), build("2", "landed"), build("3", "waiting")])]);
-    ok("progress: Overall reads PLANNING while no arc is past DECIDED, as the header does, whatever has landed",
-      summaryOf(decided).includes('class="sds-footbar-summary sds-planning ') && summaryOf(decided).includes('<span class="sds-arc-count">1/2</span>'), summaryOf(decided));
-    const closed = lib.progressInside("/work/.spndevex/workstreams/closed/031-probe", [arc("N001", "LANDED", [design("1", "landed")])]);
+    const decided = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", []), arc("N002", "DECIDED", [build("2", "waiting"), build("3", "waiting")])]);
+    ok("progress: Overall reads PLANNING until the first step of any arc starts, as the header does",
+      summaryOf(decided).includes('class="sds-footbar-summary sds-planning ') && summaryOf(decided).includes('<span class="sds-arc-count">0/2</span>'), summaryOf(decided));
+    const closed = lib.progressInside("/work/.spndevex/workstreams/closed/031-probe", [arc("N001", "LANDED", [build("1", "landed")])]);
     ok("progress: a closed workstream's Overall reads DONE", summaryOf(closed).includes('class="sds-footbar-summary sds-done '), summaryOf(closed));
     ok("the workstream's word is one function, the header's and Overall's alike",
-      lib.workstreamWord("/nowhere", ["PROPOSED", "DECIDED"]) === "PLANNING" && lib.workstreamWord("/nowhere", ["DECIDED", "HELD"]) === "IMPLEMENTING" && lib.workstreamWord("/x/closed/031-probe", ["PROPOSED"]) === "DONE");
+      lib.workstreamWord("/nowhere", ["PROPOSED", "DECIDED"]) === "PLANNING" && lib.workstreamWord("/nowhere", ["DECIDED", "RUNNING"]) === "IMPLEMENTING" && lib.workstreamWord("/x/closed/031-probe", ["PROPOSED"]) === "DONE");
   }
   {
-    // RD.DEVEX.WORKSPACE.278: the go turns the plan into build work, and an arc's moves are read from its log.
-    const rows = [
-      { id: "1", parent: "N001", title: "read", kind: "design", state: "landed" },
-      { id: "2", parent: "N001", title: "plan", kind: "design", state: "waiting" },
-      { id: "3", parent: "N001", title: "a parent", kind: "design" },
-      { id: "3a", parent: "3", title: "under it", kind: "design", state: "running" },
-      { id: "4", parent: "N001", title: "a build row already", kind: "fix", state: "waiting" },
-    ];
-    const turned = { ...arcData(rows.map((row) => ({ ...row }))), status: "PROPOSED" };
-    const ids = lib.turnPlanToBuild(turned);
-    ok("the go turns every design row not landed into change, and a landed one stays design",
-      ids.join() === "2,3,3a" && turned.rows.map((row) => row.kind).join() === "design,change,change,change,fix", `${ids} ${turned.rows.map((row) => row.kind)}`);
+    // An arc's moves are read from its log.
     ok("a status line's move is read from its note's head", JSON.stringify(lib.moveOf("PROPOSED → DECIDED · the developer: go")) === '{"from":"PROPOSED","to":"DECIDED"}'
       && lib.moveOf("PART-LANDED → LANDED") !== null && lib.moveOf("the developer: go") === null);
     const line = (kind, note, row = null) => ({ at: "2026-10-23T19:00+05:30", kind, row, note });
@@ -339,7 +333,8 @@ console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266"
     lib.writePreviewStatus(ws).join() === "notes/N001/preview.html" && readFileSync(preview, "utf8").includes(status("DECIDED")), readFileSync(preview, "utf8"));
   ok("and a second run writes nothing", lib.writePreviewStatus(ws).length === 0);
   const { cli } = await import("../../../helpers/workstream-fixture.mjs");
-  const moved = cli(root, ["workstream", "row", "write", "031/N001", "--status", "RUNNING"]);
+  // A step started: the arc reads RUNNING, worked out from its steps, and the preview shows it.
+  const moved = cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
   ok("a command that writes the arc writes the preview's status with it",
     moved.code === 0 && readFileSync(preview, "utf8").includes(`${status("RUNNING")}</span></div>`), `${moved.out}\n${readFileSync(preview, "utf8")}`);
 }

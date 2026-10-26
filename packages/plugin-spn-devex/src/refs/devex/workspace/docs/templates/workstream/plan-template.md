@@ -3,7 +3,8 @@
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-<!-- A PLAN IS OPTIONAL. An arc keeps one only when it has traps, a set or a move table to hold; the rows are the steps,
+<!-- A PLAN IS OPTIONAL, AND WRITTEN AT THE GO. An arc keeps one only when it has traps, a set or a move table to hold, and
+     never while it is PROPOSED; the rows are the steps,
      so no row writes a plan and nothing waits on one. Keep only the sections this arc needs and delete the rest. It
      holds no question: a question is a card on the approach page. It holds no status: the arc's rows do. It holds no
      fact: each fact is pinned in the arc's facts.jsonl by `workstream fact write`. -->

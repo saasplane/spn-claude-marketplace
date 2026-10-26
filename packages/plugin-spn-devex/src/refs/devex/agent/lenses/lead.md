@@ -20,7 +20,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "a8e715ce"
+      "seen": "4509daa2"
     }
   ],
   "decisions": [
@@ -92,7 +92,7 @@
   - **Should this be built at all?** Every need enters the ladder and descends only with justification: use what exists, extend by configuration, generalize into a platform capability, build domain-specific, and customer-specific only as a governed, recorded exception. If a second product would need it, it is platform.
   - **Is this the smallest design that meets the requirement?** Simplicity is a budget: every abstraction and layer spends complexity the team repays forever. Pick the smaller when two designs both work.
   - **Is the paved road still the easiest way?** If a workaround is easier than the golden path, the road is the defect — fix the path, not the developer. An undocumented deviation is a defect regardless of the excuse.
-  - **Does the process hold?** Four permanent branches, promotion one rung at a time, everything by pull request, mechanical steps as commands, never instructions.
+  - **Does the process hold?** Four permanent branches, promotion one rung at a time, everything by pull request, mechanical steps as commands, never instructions. A check that cannot fail is not written: a repository is held only to the checks that can find something in it.
   - **Where does a repo-scoped script belong, and is anyone asking?** Ask who invokes it before you ask what it must know. A person or a pipeline reaches for a `tasks/` script or a CLI command, and the agent's own loop reaches for a hook, so a check the agent runs belongs in the plugin under `hooks/` or `hooks/tools/`. The bar there is foundational: a check every SaaS Plane repository owes, proposed and built only once approved (`RD.DEVEX.FUNCTION.060`). A `tasks/` script **stays** where the work is this repository's, is **promoted** to a CLI command where it reads what SPN manifests declare, or **retires** where it was a workaround for something the platform did not answer and now does. **Retirement is the outcome people miss, and the most common one** — promote a workaround and you make it permanent (`RD.SUPPORT.APPS.121`).
   - **Is the foundation making the team faster**, not merely more correct? A velocity claim is checked against the engineering outcomes the purpose part names.
 - **The readability bar** — held by the doc hooks at write time.

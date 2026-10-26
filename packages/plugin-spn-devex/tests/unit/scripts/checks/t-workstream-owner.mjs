@@ -47,8 +47,8 @@ console.log("=== a file a script owns is written only by its command");
   const [notes] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "notes", "N001", "plan.md"), content: "# plan\n" } }, root);
   ok("green: the agent's plan is the agent's to write", notes !== "deny");
   ok("the workspace's own workstreams/state.json is spnutils', not refused here", ownedRefusal(join(root, ".spndevex", "workstreams", "state.json")) === null);
-  const command = cli(root, ["workstream", "row", "write", "031/N001", "--status", "RUNNING"]);
-  ok("green: the command writes state.json itself", command.code === 0 && JSON.parse(readFileSync(state, "utf8")).status === "RUNNING", command.out);
+  const command = cli(root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
+  ok("green: the command writes state.json itself", command.code === 0 && JSON.parse(readFileSync(state, "utf8")).status === "CARRIED", command.out);
 }
 
 console.log("\n=== a generated block is written only by its command");

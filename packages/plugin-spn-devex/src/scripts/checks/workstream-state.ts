@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The folder · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs · § Open and backlog workstreams follow the standard as it moves · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document — a workstream's, never a repository's · § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -13,11 +13,11 @@ import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycl
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
-  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus, statusMoves, landedLines, logLinesOf,
+  strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
 } from "../lib/workstream.ts";
-import { ALTITUDES, DONE_STATES, arcFaults, factFaults, isBuildRow, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ALTITUDES, DONE_STATES, arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -142,46 +142,40 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
 export function viewFindings(ws: string, arc: string, data: ArcData, text: string): string[] {
   const out: string[] = [];
   const fix = `\`spn-devex docs cycles write ${basename(ws).slice(0, 3)}\``;
+  const status = arcStatus(data);
   const row = text ? tableStatuses(text).get(arc) : undefined;
-  if (row && row.word !== data.status)
-    out.push(`${arc} reads ${row.word ?? "no status"} in the approach page's Cycles table and its data reads ${data.status} — ${fix} writes the page from the arcs`);
-  else if (row && !row.cell.includes(`sds-status sds-${data.status.toLowerCase()}`))
-    out.push(`${arc}'s Status in the Cycles table is not its badge, \`sds-status sds-${data.status.toLowerCase()}\` — ${fix} writes it`);
+  if (row && row.word !== status)
+    out.push(`${arc} reads ${row.word ?? "no status"} in the approach page's Cycles table and its data reads ${status} — ${fix} writes the page from the arcs`);
+  else if (row && !row.cell.includes(`sds-status sds-${status.toLowerCase()}`))
+    out.push(`${arc}'s Status in the Cycles table is not its badge, \`sds-status sds-${status.toLowerCase()}\` — ${fix} writes it`);
   const preview = previewOf(ws, arc);
   if (isFile(preview)) {
     const shown = readFileSync(preview, "utf8");
-    if (previewWithStatus(shown, arc, data.status) !== shown)
-      out.push(`${arc}'s preview badge does not show ${data.status} — ${fix} writes it from the arc`);
+    if (previewWithStatus(shown, arc, status) !== shown)
+      out.push(`${arc}'s preview badge does not show ${status} — ${fix} writes it from the arc`);
   }
   return out;
 }
 
 /**
- * RD.DEVEX.WORKSPACE.278: an arc's design rows run under PROPOSED, and only the developer's go moves it. A build
- * row running on a PROPOSED arc started before the go, and a DECIDED arc with one is behind its rows; so is one
- * landed since the arc last moved to PROPOSED or opened there, read from `lines`, the arc's log. A build row landed
- * before that landed under an earlier go, and is history: the check exists to stop build work before a go, and that
- * row was not. One whose landing the log does not show is named, as is every one where the log shows no move to
- * PROPOSED. A design row running or landed is never named. An arc at LANDED with a row neither landed, carried nor
- * deferred is ahead of its rows.
+ * RD.DEVEX.WORKSPACE.278 and .307: no step runs on an arc that is not decided, or that holds the developer's wait. A
+ * stored `PROPOSED` stops what was building, so a step still `running` there is behind the arc. An arc whose `LANDED`
+ * is stored, which only the close and version 1 do, with a step neither landed, replaced, carried nor deferred is
+ * ahead of its steps: a landed arc is never reopened, so the step's fix goes on the review-fixes arc.
  */
-export function statusFindings(arc: string, data: ArcData, lines: readonly unknown[] = []): string[] {
+export function statusFindings(arc: string, data: ArcData): string[] {
   const leaves = leafRows(data);
   const out: string[] = [];
-  const since = statusMoves(lines).toProposed;
-  const landedAt = landedLines(data, lines);
-  const afterGo = (id: string): boolean => since === null || !landedAt.has(id) || landedAt.get(id)! > since;
-  const started = leaves.filter((row) => isBuildRow(row) && (row.state === "running" || (row.state === "landed" && afterGo(row.id))));
-  if (data.status === "PROPOSED" && started.length)
-    out.push(`${arc} is PROPOSED and build row ${started[0].id} is ${started[0].state} — a build row starts only after the developer's go, ` +
-      `which is theirs to give: \`spn-devex workstream row write ${arc} --status DECIDED --note "<the developer's words>"\``);
-  if (data.status === "DECIDED" && started.length)
-    out.push(`${arc} is DECIDED and row ${started[0].id} is ${started[0].state} — \`spn-devex workstream row write ${arc} --status RUNNING\` moves it to what its rows say`);
+  const running = leaves.filter((row) => row.state === "running");
+  if (running.length && !stepsMayStart(data) && !["LANDED", "CARRIED", "DROPPED"].includes(data.status)) {
+    const why = data.status === "DECIDED" ? `holds the developer's wait, "${data.wait}"` : `is ${data.status}`;
+    out.push(`${arc} ${why} and step ${running[0].id} is running — a step runs only on a decided arc with no wait: ` +
+      `\`spn-devex workstream row write ${arc} ${running[0].id} --state stopped\` until the developer's word (RD.DEVEX.WORKSPACE.278)`);
+  }
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
   if (data.status === "LANDED" && open.length)
-    out.push(`${arc} is LANDED and row ${open[0].id} is ${open[0].state ?? "waiting"} — a landed arc owes nothing, so a row that is new scope reopens it: ` +
-      `\`spn-devex workstream row write ${arc} --status PROPOSED\`, with the new information in the preview, and \`DECIDED\` waits for the developer's word ` +
-      `(RD.DEVEX.WORKSPACE.261); a row that is a small decision inside what was agreed lands with \`spn-devex workstream row write ${arc} ${open[0].id} --state landed\``);
+    out.push(`${arc} is LANDED and step ${open[0].id} is ${open[0].state ?? "waiting"} — a landed arc is never reopened: a fix to it is a step ` +
+      `on the review-fixes arc, naming ${arc}, and new scope is a new arc (RD.DEVEX.WORKSPACE.261)`);
   return out;
 }
 
@@ -189,14 +183,13 @@ export function statusFindings(arc: string, data: ArcData, lines: readonly unkno
 const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
 
 /**
- * RD.DEVEX.WORKSPACE.183: an arc's build rows, each with a repository and an altitude, in chain order by repository,
+ * RD.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and an altitude, in chain order by repository,
  * the foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each, read in the order the arc keeps
- * them. A row whose repository is `—` changes none and takes no place in the chain. A design row is the arc's reads
- * and sizing, and is not read. `row write` prints what this finds and never refuses on it: the chain between two
+ * them. A row whose repository is `—` changes none and takes no place in the chain. `row write` prints what this finds and never refuses on it: the chain between two
  * stack repositories is judgement.
  */
 export function stepRowFindings(data: ArcData): string[] {
-  const rows = leafRows(data).filter(isBuildRow);
+  const rows = leafRows(data);
   const bare: string[] = [];
   const disorder: string[] = [];
   const seen = new Set<string>();
@@ -288,7 +281,7 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...viewFindings(ws, arc, data, text).map(say(arc, "views")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
-    out.push(...statusFindings(arc, data, logLinesOf(ws, arc)).map(say(arc, "status")));
+    out.push(...statusFindings(arc, data).map(say(arc, "status")));
   }
   // The status card is read from every arc together, so it belongs to none of them.
   const card = page ? headerStatusRule(ws, text, cyclesOf(ws)) : null;

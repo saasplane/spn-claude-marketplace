@@ -10,7 +10,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { type Migration } from "../migration.ts";
-import { approachOf, arcIdsOf, arcStamp, isDataLayout, logEvent, readArc, restamped, stampsOn, workstreamsOf, writeArc } from "../workstream.ts";
+import { approachOf, arcIdsOf, arcStamp, isDataLayout, logEvent, readArc, restamped, stampsOn, workstreamsOf, writeArcAsIs } from "../workstream.ts";
 import { DONE_STATES, type ArcData, type ArcRow } from "../workstream-schema.ts";
 import { DEVEX_WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
@@ -68,7 +68,7 @@ function writeAll(root: string): string[] {
       const title = one.planRow.title;
       data.rows = data.rows.filter((row) => row !== one.planRow);
       for (const row of data.rows) if (Array.isArray(row.blockedBy)) row.blockedBy = row.blockedBy.filter((blocker) => blocker !== "0");
-      try { writeArc(ws, data); } catch (thrown) {
+      try { writeArcAsIs(ws, data); } catch (thrown) {
         return `${one.name}: not written — ${thrown instanceof Error ? thrown.message : String(thrown)}`;
       }
       logEvent(ws, data.arc, "discarded", "0", `plugin migration 005: no row writes a plan (RD.DEVEX.WORKSPACE.227) · the row read: ${title}`);

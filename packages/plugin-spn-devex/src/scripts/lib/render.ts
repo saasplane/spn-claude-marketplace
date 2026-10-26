@@ -15,6 +15,7 @@ import { dirname, relative, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import { draw, type Spec } from "./draw.ts";
+import { sentenceColumn } from "./item-cells.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Finding = { message: string; line?: number };
@@ -120,7 +121,7 @@ function itemCell(title: string, line: string, facts: [string, string][]): strin
  * The tables every construct carries, and the two shapes the corpus repeats, each written as item
  * cells: a column a reader compares down stays a column, and the rest of what a row says about its
  * item becomes a level of the item's cell. The seat file keeps its markdown columns, because the
- * glossary is generated from them. Any other table is the author's, and is written as it stands.
+ * glossary is generated from them. Any other table keeps its columns, except one whose cells hold sentences.
  */
 const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[] }[] = [
   { // Terms: the term, what it means, and the term the contract spells.
@@ -148,13 +149,37 @@ const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) =
   },
 ];
 
+/**
+ * Any other table, where a column after the first holds sentences (RD.DEVEX.WORKSPACE.259): that column is a level of
+ * the first column's cell, under its title. One such column is the line; where several are, each is a paragraph led by
+ * its column's name. Every other column stays, as written. A table with no column of sentences has no shape here.
+ */
+function sentenceShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[number] | undefined {
+  const folded = head.map((_, at) => at).filter((at) => at > 0 && sentenceColumn(rows.map((r) => inline(r[at] ?? ""))).sentences);
+  if (!folded.length) return undefined;
+  const kept = head.map((_, at) => at).filter((at) => at > 0 && !folded.includes(at));
+  const words = (html: string): boolean => /[a-z]/i.test(html.replace(/<code\b[\s\S]*?<\/code>/gi, "").replace(/<[^>]+>/g, ""));
+  return {
+    head: [],
+    columns: [inline(head[0]), ...kept.map((at) => inline(head[at]))],
+    row: (cells) => {
+      const title = inline(cells[0] ?? "");
+      const lines = folded.map((at) => [head[at], cells[at] ?? ""]).filter(([, cell]) => !isBlank(cell))
+        .map(([name, cell]) => folded.length === 1 ? `<p>${inline(cell)}</p>` : `<p><strong>${inline(name)}:</strong> ${inline(cell)}</p>`);
+      const item = (isBlank(title) ? "" : `<p>${words(title) ? bold(title) : title}</p>`) + lines.join("");
+      return [item, ...kept.map((at) => inline(cells[at] ?? ""))];
+    },
+  };
+}
+
 function table(lines: string[]): string {
   // A `\|` inside a cell is a pipe the author wants shown, not a column break — markdown's own rule,
   // and the one the first pattern table in the corpus needed (`{org}-{family}-public\|-private`).
   const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
-  const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])));
+  const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])))
+    ?? sentenceShape(head, rows);
   const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
   const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
   return `  <div class="sds-scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;

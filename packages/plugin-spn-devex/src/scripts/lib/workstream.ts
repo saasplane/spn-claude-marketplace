@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The approach page keeps up with its arcs · § An arc carries its specification, or names the note that holds it
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
@@ -9,12 +9,12 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { TERMINAL, pastDecided } from "../checks/arc-status.ts";
+import { STATUSES, TERMINAL, type Status } from "../checks/arc-status.ts";
 import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  ARC_ID, BUILD_KIND, DESIGN_KIND, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, isBuildRow, parentIds,
+  ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
 } from "./workstream-schema.ts";
 
@@ -197,8 +197,8 @@ export function arcIdsOf(ws: string): string[] {
 export function firstOpenArc(ws: string): string | null {
   const open: string[] = [];
   for (const arc of arcIdsOf(ws)) {
-    const status = (readJson(stateFileOf(ws, arc)) as { status?: unknown } | null)?.status;
-    if (typeof status === "string" && !TERMINAL.has(status)) open.push(arc);
+    const data = readArc(ws, arc);
+    if (data && typeof data.status === "string" && Array.isArray(data.rows) && !TERMINAL.has(arcStatus(data))) open.push(arc);
   }
   for (const file of markdownArcsOf(ws)) {
     const arc = /^(N\d+[a-z]?)(?=-|\.md$)/.exec(file)?.[1];
@@ -336,6 +336,15 @@ export function writeArc(ws: string, data: ArcData): void {
   writeNameFile(ws, data);
 }
 
+/**
+ * Writes an arc's data at the version it holds, with no schema run: for a migration that changes data written under an
+ * earlier version, which applies before the migration that brings the data to this one. Every other writer uses `writeArc`.
+ */
+export function writeArcAsIs(ws: string, data: ArcData): void {
+  writeWhole(stateFileOf(ws, data.arc), `${JSON.stringify(data, null, 2)}\n`);
+  writeNameFile(ws, data);
+}
+
 /** The Markdown files in an arc's data folder: its name file, and any other, which the check names. */
 export const markdownIn = (ws: string, arc: string): string[] =>
   listdir(arcDataDir(ws, arc)).filter((entry) => entry.endsWith(".md") && isFile(join(arcDataDir(ws, arc), entry)));
@@ -354,7 +363,7 @@ export function nameFileText(ws: string, data: ArcData): string {
     "",
     `**Goal.** ${goal}`,
     "",
-    `**Status.** ${data.status}${data.reason ? ` — ${data.reason}` : ""}`,
+    `**Status.** ${arcStatus(data)}${data.reason ? ` — ${data.reason}` : ""}${typeof data.wait === "string" && data.wait.trim() ? ` — wait: ${data.wait.trim()}` : ""}`,
   ];
   if (typeof data.decides === "string" && data.decides.trim()) lines.push("", `**Decides.** ${data.decides.trim()}`);
   if (Array.isArray(data.repos) && data.repos.length) lines.push("", `**Repos.** ${data.repos.join(" · ")}`);
@@ -436,25 +445,60 @@ export function doneOf(data: ArcData, which: (row: ArcRow) => boolean = () => tr
   return { done: leaves.filter((row) => DONE_STATES.has(row.state ?? "")).length, total: leaves.length };
 }
 
-/** Build rows done of build rows, which a chip and *Overall* count (RD.DEVEX.WORKSPACE.278). */
-export const builtOf = (data: ArcData): { done: number; total: number } => doneOf(data, isBuildRow);
+/** Steps done of steps, which a chip and *Overall* count: every row is a build step (RD.DEVEX.WORKSPACE.278). */
+export const builtOf = (data: ArcData): { done: number; total: number } => doneOf(data);
 
-/** Design rows done of design rows: the work an arc being ideated shows in the planning look. */
-export const designOf = (data: ArcData): { done: number; total: number } => doneOf(data, (row) => !isBuildRow(row));
+// ---------------------------------------------------------------------------- the status: stored, or worked out
 
-/** Whether a build row of the arc has landed: until one has, the arc shows its design work and builds nothing. */
-export const hasBuilt = (data: ArcData): boolean => leafRows(data).some((row) => isBuildRow(row) && row.state === "landed");
+/** The step states a status does not count: work that left the arc or was taken over by later steps. */
+const UNCOUNTED: ReadonlySet<string> = new Set(["deferred", "carried", "replaced"]);
+/** The step states that say a step has started. */
+const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", "landed"]);
 
 /**
- * RD.DEVEX.WORKSPACE.278: the go turns the plan into build work. Every row of the arc not yet landed whose kind is
- * `design` takes the kind it would otherwise take, `change`; a row landed before the go stays design. Changes the
- * rows in place and returns the ids it turned.
+ * THE ONE OWNER OF AN ARC'S STATUS (RD.DEVEX.WORKSPACE.307). The developer's words are stored: `PROPOSED`,
+ * `DECIDED` with any wait, `CARRIED`, `DROPPED`, and `LANDED` where the close stored it. A stored `DECIDED` is worked
+ * out from the steps each time it is read: `RUNNING` once a step has started, and `LANDED` once every step counted
+ * has landed, the deferred, carried and replaced ones left out. The review-fixes arc reads `RUNNING` until the close
+ * stores its `LANDED`. A stored `PROPOSED` wins over the steps. Every reader asks this, so no two disagree.
  */
-export function turnPlanToBuild(data: ArcData): string[] {
-  const turned: string[] = [];
-  for (const row of data.rows)
-    if (row.kind === DESIGN_KIND && stateOfRow(data.rows, row) !== "landed") { row.kind = BUILD_KIND; turned.push(row.id); }
-  return turned;
+export function arcStatus(data: Pick<ArcData, "status" | "rows" | "reviewFixes">): Status {
+  const stored = (STATUSES as readonly string[]).includes(data.status) ? data.status as Status : "PROPOSED";
+  if (stored !== "DECIDED" || !Array.isArray(data.rows)) return stored;
+  const leaves = leafRows(data as ArcData);
+  if (!leaves.some((row) => STARTED.has(row.state ?? ""))) return "DECIDED";
+  const counted = leaves.filter((row) => !UNCOUNTED.has(row.state ?? ""));
+  if (data.reviewFixes !== true && counted.length > 0 && counted.every((row) => row.state === "landed")) return "LANDED";
+  return "RUNNING";
+}
+
+/** An arc's data as a reader shows it: its status worked out. Never written back: the stored status is the words. */
+export const withStatus = <T extends ArcData>(data: T): T => ({ ...data, status: arcStatus(data) });
+
+/** The status an arc of a workstream reads as, from its `state.json`, or null where it has no data that reads. */
+export function statusOfData(ws: string, arc: string): Status | null {
+  const data = readArc(ws, arc);
+  return data && typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) && Array.isArray(data.rows)
+    ? arcStatus(data) : null;
+}
+
+/**
+ * Whether the arc was ever decided: its stored status is past `PROPOSED`, or its log holds a move to `DECIDED` or an
+ * opening at it. An arc never decided is deleted rather than dropped (RD.DEVEX.WORKSPACE.311).
+ */
+export function everDecided(data: Pick<ArcData, "status">, lines: readonly unknown[]): boolean {
+  if (data.status !== "PROPOSED") return true;
+  return lines.some((raw) => {
+    const line = raw as LogLine | undefined;
+    if (!line || typeof line !== "object") return false;
+    const note = String(line.note ?? "");
+    return (line.kind === "status" && /→ DECIDED\b/.test(note)) || (line.kind === "opened" && /^opened as DECIDED\b/.test(note));
+  });
+}
+
+/** Whether a step may start on the arc: its stored status is `DECIDED`, the developer's go, and it holds no wait. */
+export function stepsMayStart(data: Pick<ArcData, "status" | "wait">): boolean {
+  return data.status === "DECIDED" && !(typeof data.wait === "string" && data.wait.trim());
 }
 
 // ---------------------------------------------------------------------------- an arc's moves, from its log
@@ -527,7 +571,7 @@ export function blockerResolved(ws: string, data: ArcData, blocker: string, ques
   if (cross) {
     const other = cross[1] === data.arc ? data : readArc(ws, cross[1]);
     if (!other) return false;
-    if (!cross[2]) return TERMINAL.has(other.status);
+    if (!cross[2]) return TERMINAL.has(arcStatus(other));
     const row = other.rows.find((one) => one.id === cross[2]);
     return !!row && DONE_STATES.has(stateOfRow(other.rows, row));
   }
@@ -535,9 +579,9 @@ export function blockerResolved(ws: string, data: ArcData, blocker: string, ques
   return !!row && DONE_STATES.has(stateOfRow(data.rows, row));
 }
 
-/** The rows ready to run: work rows marked `ready`, or `waiting` with every blocker resolved, in an arc that is decided. */
+/** The rows ready to run: work rows marked `ready`, or `waiting` with every blocker resolved, in a decided arc with no wait. */
 export function readyRows(ws: string, data: ArcData, questions: readonly Question[] = readQuestions(ws)): ArcRow[] {
-  if (["PROPOSED", "HELD", ...TERMINAL].includes(data.status)) return [];
+  if (!stepsMayStart(data)) return [];
   return leafRows(data).filter((row) => (row.state === "ready" || row.state === "waiting") &&
     (row.blockedBy ?? []).every((blocker) => blockerResolved(ws, data, blocker, questions)));
 }
@@ -655,11 +699,14 @@ function finishedAt(ws: string, arc: string): string {
 
 /**
  * The arcs in the order they run: the done ones first, in the order they finished (`CARRIED` and `DROPPED` at the
- * time they closed); then `RUNNING`, `PART-LANDED` and `HELD`; then `DECIDED` and `PROPOSED` in the planned
- * sequence, which is the arc's `position`, an arc without one after the others. The number breaks every tie.
+ * time they closed); then `RUNNING`; then `DECIDED` and `PROPOSED` in the planned sequence, which is the arc's
+ * `position`, an arc without one after the others. The number breaks every tie. Read with the status worked out.
  */
 export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]): T[] {
-  const group = (data: ArcData): number => (TERMINAL.has(data.status) ? 0 : pastDecided(data.status) || data.status === "HELD" ? 1 : 2);
+  const group = (data: ArcData): number => {
+    const status = arcStatus(data);
+    return TERMINAL.has(status) ? 0 : status === "RUNNING" ? 1 : 2;
+  };
   const finished = new Map(arcs.filter((data) => group(data) === 0).map((data) => [data.arc, finishedAt(ws, data.arc)]));
   const position = (data: ArcData): number => (typeof data.position === "number" ? data.position : Number.MAX_SAFE_INTEGER);
   return [...arcs].sort((left, right) => group(left) - group(right)
@@ -670,12 +717,13 @@ export function executionOrder<T extends ArcData>(ws: string, arcs: readonly T[]
 
 /**
  * A workstream's own word, which its page's header shows and *Overall* takes (05-artifacts.md § How ends in
- * Cycles): `DONE` for a workstream in `closed/`, `IMPLEMENTING` once one of its arcs is past `DECIDED`, else
- * `PLANNING`. Read from the arcs' statuses alone, so the header and *Overall* cannot disagree.
+ * Cycles): `DONE` for a workstream in `closed/`, `IMPLEMENTING` once the first step of any arc has started, which an
+ * arc `RUNNING` or `LANDED` says, else `PLANNING`. Read from the arcs' worked-out statuses alone, so the header and
+ * *Overall* cannot disagree.
  */
 export function workstreamWord(ws: string, statuses: readonly (string | null)[]): "PLANNING" | "IMPLEMENTING" | "DONE" {
   if (basename(dirname(resolve(ws))) === "closed") return "DONE";
-  return statuses.some((status) => pastDecided(status)) ? "IMPLEMENTING" : "PLANNING";
+  return statuses.some((status) => status === "RUNNING" || status === "LANDED") ? "IMPLEMENTING" : "PLANNING";
 }
 
 /** How far along an arc is, in five steps of one hue by rows done (0-19, 20-39, 40-59, 60-79, 80-99 per cent), and `done` at 100. */
@@ -686,28 +734,26 @@ export function progressStep(done: number, total: number): string {
 
 /**
  * One arc's chip in the sticky card, two lines: its number without the N and its short name, with its count on
- * the right, and a thin bar. Its border colour says its status, and the status is in its tooltip and accessible name.
- * A chip counts its arc's build rows (RD.DEVEX.WORKSPACE.278): the bar's shade is the chip's third class, `sds-step-1`
- * to `sds-step-5` by build rows done and `sds-step-done` at the end, so it says how far the build is along. Until a
- * build row has landed, the chip shows its design work instead, `design done/total` in the planning look,
- * `sds-step-design`, and never as done; an arc that closed with no build row says its status, with no bar to fill.
- * The chip links the arc's Cycles row.
+ * the right, and a thin bar. Its border colour says its status, worked out by `arcStatus`, and the status is in its
+ * tooltip and accessible name. A chip counts its arc's steps (RD.DEVEX.WORKSPACE.278): the bar's shade is the chip's
+ * third class, `sds-step-1` to `sds-step-5` by steps landed and `sds-step-done` at the end. An arc with no step yet
+ * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Cycles row.
  */
 function arcChip(data: ArcData): string {
-  const word = data.status.toLowerCase();
+  const status = arcStatus(data);
+  const word = status.toLowerCase();
   const number = String(Number(data.arc.replace(/^N/, "")));
   const name = escapeHtml(data.subject.replace(/-/g, " "));
-  const reason = data.reason ? `, ${escapeHtml(data.reason)}` : "";
+  const why = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : data.reason ?? "";
+  const reason = why ? `, ${escapeHtml(why)}` : "";
   const built = builtOf(data);
-  const design = designOf(data);
-  const building = hasBuilt(data);
-  const closedUnbuilt = !building && TERMINAL.has(data.status);
-  const step = building ? progressStep(built.done, built.total) : "design";
-  const count = building ? `${built.done}/${built.total}` : closedUnbuilt ? word : `design ${design.done}/${design.total}`;
-  const width = building ? share(built.done, built.total) : closedUnbuilt ? 0 : share(design.done, design.total);
-  const said = `${built.done} of ${built.total} build rows done${building ? "" : `, ${design.done} of ${design.total} design rows done`}`;
-  const label = `${data.arc} ${name}, ${data.status}, ${said}${reason}`;
-  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(data.status)}</span><strong>${escapeHtml(data.title)}</strong><span>${built.done} of ${built.total} build rows done</span>${building ? "" : `<span>${design.done} of ${design.total} design rows done</span>`}${data.reason ? `<span>${escapeHtml(data.reason)}</span>` : ""}</span>`;
+  const building = built.total > 0;
+  const step = building ? progressStep(built.done, built.total) : "1";
+  const count = building ? `${built.done}/${built.total}` : word;
+  const width = building ? share(built.done, built.total) : 0;
+  const said = `${built.done} of ${built.total} steps landed`;
+  const label = `${data.arc} ${name}, ${status}, ${said}${reason}`;
+  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}</span>`;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" href="#${data.arc}" aria-label="${label}">`
     + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}</span></span>`
     + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
@@ -716,7 +762,7 @@ function arcChip(data: ArcData): string {
 /**
  * The sticky card, fixed to the bottom of the window within the page's width: two sections side by side, divided
  * by a line. The arcs are on the left, one chip each, scrolling sideways inside their section; the overall line
- * is on the right, a highlighted section of two lines like a chip: Overall with build rows done, and a full-width bar;
+ * is on the right, a highlighted section of two lines like a chip: Overall with steps landed, and a full-width bar;
  * the workstream's status is its left edge's colour and its tooltip, and it is the workstream's own word, the one
  * the page's header shows (`workstreamWord`), so the two never disagree; its bar counts build rows only
  * (RD.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each arc is a chip from
@@ -727,16 +773,16 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
   const counts = arcs.map(builtOf);
   const done = counts.reduce((sum, one) => sum + one.done, 0);
   const total = counts.reduce((sum, one) => sum + one.total, 0);
-  const word = workstreamWord(ws, arcs.map((data) => data.status));
+  const word = workstreamWord(ws, arcs.map(arcStatus));
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
     ...arcs.map(arcChip),
     `    </div>`,
-    `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} build rows done, ${closed} of ${arcs.length} arcs closed">`,
+    `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} steps landed, ${closed} of ${arcs.length} arcs closed">`,
     `      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">${done}/${total}</span></span>`,
     `      <span class="sds-chip-bar"><i style="width:${share(done, total)}%"></i></span>`,
-    `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${arcs.length} arcs closed</span><span>${done} of ${total} build rows done</span></span>`,
+    `      <span class="sds-tip"><span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span><strong>Overall</strong><span>${closed} of ${arcs.length} arcs closed</span><span>${done} of ${total} steps landed</span></span>`,
     `    </div>`,
     `  </nav>`,
   ];
@@ -744,7 +790,7 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
 
 /** The inside of the progress block: the sticky card alone, its chips in the order the arcs run. Progress shows nowhere else on the page. */
 export function progressInside(ws: string, arcs: readonly ArcData[] = arcIdsOf(ws).map((arc) => readArc(ws, arc)!).filter(Boolean)): string {
-  const closed = arcs.filter((data) => TERMINAL.has(data.status)).length;
+  const closed = arcs.filter((data) => TERMINAL.has(arcStatus(data))).length;
   const lines = statusBar(ws, executionOrder(ws, arcs), closed);
   return lines.length ? `${lines.join("\n")}\n` : "";
 }
@@ -858,7 +904,7 @@ export function writePreviewStatus(ws: string): string[] {
     const path = previewOf(ws, arc);
     if (!data || typeof data.status !== "string" || !isFile(path)) continue;
     const text = readFileSync(path, "utf8");
-    const next = previewWithStatus(text, arc, data.status);
+    const next = previewWithStatus(text, arc, arcStatus(data));
     if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path)); }
   }
   return wrote;

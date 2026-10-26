@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The formats · § An arc's status says which of eight states it is in · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The formats · § An arc's status is one of six, stored or worked out · § Questions are records, and every card is one rendered · § A suggestion is recorded the moment it is raised · § Ideation is kept as it happens
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The one schema for every file a script owns in a workstream. `workstream state check` runs it, and
@@ -6,31 +6,25 @@
 //
 // A FIELD IS ADDED AND NEVER REPURPOSED, so a field this schema does not know is left alone.
 
-import { STATUSES } from "../checks/arc-status.ts";
+import { STORED_STATUSES } from "../checks/arc-status.ts";
 
-export const SCHEMA_VERSION = 1;
+/** The version this plugin reads and writes. Migration 006 brings a version 1 file to 2. */
+export const SCHEMA_VERSION = 2;
 
 /** A row's state. A row with rows under it takes its state from them and never has one written. */
-export const ROW_STATES = ["waiting", "ready", "running", "stopped", "landed", "carried", "deferred"] as const;
+export const ROW_STATES = ["waiting", "ready", "running", "stopped", "replaced", "landed", "carried", "deferred"] as const;
 export type RowState = (typeof ROW_STATES)[number];
-/** The row states that say what became of a row. */
-export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "carried", "deferred"]);
+/** The row states that say what became of a row: landed, replaced by later steps, carried or deferred. */
+export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "replaced", "carried", "deferred"]);
 /**
- * What kind of work a row is: a small correction, a new prop, token, rule or construct, a wait on a card, or
- * an arc's design — the reads, the sizing, the preview. The command gives `design` to every row added while its
- * arc is `PROPOSED`, and the agent never chooses it; every other row is a build row (RD.DEVEX.WORKSPACE.278).
+ * What kind of build step a row is: a small correction, a change, or a wait on a card. Reading and drafting are
+ * planning jobs and are never recorded, so every row is a build step (RD.DEVEX.WORKSPACE.278).
  */
-export const ROW_KINDS = ["fix", "change", "question", "design"] as const;
-/** The kind of a row added while its arc is `PROPOSED`. */
-export const DESIGN_KIND = "design";
-/** The kind the go gives a design row not yet landed: the kind a row would otherwise take (RD.DEVEX.WORKSPACE.278). */
-export const BUILD_KIND = "change";
-/** Whether a row is build work: any kind but `design`. The bar counts these, and the status rule reads them. */
-export const isBuildRow = (row: Pick<ArcRow, "kind">): boolean => row.kind !== DESIGN_KIND;
+export const ROW_KINDS = ["fix", "change", "question"] as const;
 /** A step row's altitude (§ A step row says where, at what altitude, and how). */
 export const ALTITUDES = ["DOCS", "CODE", "GENERATED", "RELEASE", "PROOF"] as const;
-/** The statuses that carry a reason. */
-export const REASONED: ReadonlySet<string> = new Set(["HELD", "CARRIED", "DROPPED"]);
+/** The stored statuses that carry a reason. */
+export const REASONED: ReadonlySet<string> = new Set(["CARRIED", "DROPPED"]);
 export const SUGGESTION_STATES = ["raised", "shaped", "decided", "parked", "dropped"] as const;
 export const QUESTION_STATES = ["open", "answered", "withdrawn"] as const;
 /** The outcomes a child's report may carry. */
@@ -73,6 +67,7 @@ export type ArcRow = {
 };
 export type ArcData = {
   schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
+  wait?: string | null; reviewFixes?: boolean;
   decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
   preview: string; rows: ArcRow[];
   [field: string]: unknown;
@@ -93,7 +88,8 @@ type Rule =
   | { kind: "text"; required: boolean }                         // a string or null
   | { kind: "enum"; required: boolean; values: readonly string[]; nullable?: boolean }
   | { kind: "strings"; required: boolean; pattern?: RegExp }
-  | { kind: "number"; required: boolean };
+  | { kind: "number"; required: boolean }
+  | { kind: "boolean"; required: boolean };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -125,6 +121,9 @@ function fieldFaults(where: string, record: Record<string, unknown>, fields: Rec
       case "number":
         if (typeof value !== "number" || !Number.isFinite(value)) out.push(`${where}'s \`${name}\` is not a number`);
         break;
+      case "boolean":
+        if (typeof value !== "boolean") out.push(`${where}'s \`${name}\` is neither true nor false`);
+        break;
     }
   }
   return out;
@@ -135,8 +134,10 @@ const ARC_FIELDS: Record<string, Rule> = {
   subject: { kind: "string", required: true },
   title: { kind: "string", required: true },
   goal: { kind: "text", required: false },
-  status: { kind: "enum", required: true, values: STATUSES },
+  status: { kind: "enum", required: true, values: STORED_STATUSES },
   reason: { kind: "text", required: true },
+  wait: { kind: "text", required: false },
+  reviewFixes: { kind: "boolean", required: false },
   decides: { kind: "text", required: false },
   repos: { kind: "strings", required: false },
   cycle: { kind: "text", required: false },
@@ -170,11 +171,21 @@ export function parentIds(rows: readonly ArcRow[]): Set<string> {
   return new Set(rows.map((row) => row.parent).filter((parent): parent is string => typeof parent === "string"));
 }
 
+/**
+ * Why a `schemaVersion` this plugin does not read is refused, naming what to do: a newer file asks for a newer
+ * plugin, and an older one for the migration that brings it to this version.
+ */
+export function versionFault(version: unknown, where = "state.json"): string {
+  if (typeof version === "number" && version > SCHEMA_VERSION)
+    return `${where}'s \`schemaVersion\` is ${version}, and this spn-devex reads ${SCHEMA_VERSION}: update the plugin, and it reads the file`;
+  return `${where}'s \`schemaVersion\` is \`${String(version)}\`, and this spn-devex reads ${SCHEMA_VERSION}: \`spn-devex plugin migration write 006\` brings it to ${SCHEMA_VERSION}`;
+}
+
 /** Every fault of an arc's `state.json`, read as JSON already. Empty where it holds to the schema. */
 export function arcFaults(data: unknown, where = "state.json"): string[] {
   if (!isObject(data)) return [`${where} is not a JSON object`];
   const out: string[] = [];
-  if (data.schemaVersion !== SCHEMA_VERSION) out.push(`${where}'s \`schemaVersion\` is \`${String(data.schemaVersion)}\`, and this plugin reads ${SCHEMA_VERSION}`);
+  if (data.schemaVersion !== SCHEMA_VERSION) out.push(versionFault(data.schemaVersion, where));
   out.push(...fieldFaults(where, data, ARC_FIELDS));
   if (typeof data.status === "string" && REASONED.has(data.status) && !(typeof data.reason === "string" && data.reason.trim()))
     out.push(`${where} is ${data.status} and carries no \`reason\``);

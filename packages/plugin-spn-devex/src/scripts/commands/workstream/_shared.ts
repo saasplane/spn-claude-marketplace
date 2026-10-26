@@ -7,7 +7,7 @@ import { basename } from "node:path";
 import { UsageFault, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { checkWorkstream } from "../../checks/workstream-state.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { arcIdsOf, findWorkstream, readArc, resolveArc, stateOfRow, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
+import { arcIdsOf, arcStatus, findWorkstream, readArc, resolveArc, stateOfRow, workspaceOf, writePreviewStatus, writeProgress } from "../../lib/workstream.ts";
 
 /** A library call whose plain error is a fault in what was typed. */
 export function typed<T>(read: () => T): T {
@@ -52,7 +52,8 @@ export function arcSignatures(ws: string): Map<string, { status: string; rows: M
   const out = new Map<string, { status: string; rows: Map<string, string> }>();
   for (const arc of arcIdsOf(ws)) {
     const data = readArc(ws, arc);
-    if (data) out.set(arc, { status: data.status, rows: new Map(data.rows.map((row) => [row.id, stateOfRow(data.rows, row)])) });
+    // The status as read, worked out from the steps, with any wait: a write that moves either moves a view.
+    if (data) out.set(arc, { status: `${arcStatus(data)}${data.wait ? " · wait" : ""}`, rows: new Map(data.rows.map((row) => [row.id, stateOfRow(data.rows, row)])) });
   }
   return out;
 }

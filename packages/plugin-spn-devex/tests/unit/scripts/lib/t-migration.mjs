@@ -75,7 +75,7 @@ console.log("\n=== a check that finds nothing → recorded without work");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
@@ -265,6 +265,59 @@ console.log("\n=== 005 — no row writes a plan, and the stamp follows the arc's
   ok("the arc it migrated is whole to the state check", !checkWorkstream(ws).some((one) => one.arc === "N001"), JSON.stringify(checkWorkstream(ws)));
   const again = m005.script(root);
   ok("green: 005 then finds nothing, and a second run writes nothing", m005.check(root).length === 0 && again.length === 0, again.join(" | "));
+}
+
+console.log("\n=== 006 — the state's version 2: the developer's words stored, the rest worked out, and no design kind");
+{
+  const m006 = MIGRATIONS.find((one) => one.id === "006");
+  ok("the plugin ships 006 sixth, with a version, one sentence and a script",
+    MIGRATIONS[5]?.id === "006" && /^\d+\.\d+\.\d+$/.test(m006?.version ?? "") && m006.changed.endsWith(".") && typeof m006.script === "function");
+  const { root, ws } = await dataWorkspace("stored-status-006");
+  const v1 = (id, status, rows, extra = {}) => ({ ...arcData(rows), schemaVersion: 1, arc: id, subject: `arc-${id.toLowerCase()}`, status, ...extra });
+  const put1 = (data) => {
+    mkdirSync(join(ws, "arcs", data.arc), { recursive: true });
+    writeFileSync(join(ws, "arcs", data.arc, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  };
+  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", altitude: "CODE", state, ...extra });
+  put1(v1("N002", "HELD", [step("N002", "1", "change", "landed"), step("N002", "2", "change", "waiting")], { reason: "waits on q4" }));
+  put1(v1("N003", "PART-LANDED", [step("N003", "1", "change", "landed"), step("N003", "2", "change", "waiting")]));
+  put1(v1("N004", "PROPOSED", [step("N004", "1", "design", "landed"), step("N004", "2", "design", "waiting"), step("N004", "3", "change", "waiting", { blockedBy: ["2"] })]));
+  put1(v1("N005", "DECIDED", [step("N005", "1", "design", "landed"), step("N005", "2", "design", "waiting")]));
+  const closed = join(root, ".spndevex/workstreams/closed/020-done/arcs/N001");
+  mkdirSync(closed, { recursive: true });
+  writeFileSync(join(closed, "state.json"), `${JSON.stringify(v1("N001", "HELD", [], { reason: "x" }), null, 2)}\n`);
+  const closedText = readFileSync(join(closed, "state.json"), "utf8");
+  const current = readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8");
+  const found = m006.check(root);
+  ok("red: 006 names each arc not at version 2, with what bringing it over changes, and no arc at version 2",
+    found.length === 4 && found.some((line) => line.startsWith("open/031-probe/arcs/N002: HELD → DECIDED, its reason kept as the wait"))
+      && found.some((line) => line.startsWith("open/031-probe/arcs/N003: PART-LANDED → DECIDED, which the steps work out as RUNNING"))
+      && found.some((line) => line.includes("arcs/N004: 2 design row(s) became change · version 1 → 2"))
+      && !found.some((line) => line.includes("arcs/N001")), found.join(" | "));
+  const lines = m006.script(root);
+  const read = (id) => JSON.parse(readFileSync(join(ws, "arcs", id, "state.json"), "utf8"));
+  ok("HELD becomes DECIDED with its reason as the wait, at version 2",
+    read("N002").status === "DECIDED" && read("N002").wait === "waits on q4" && read("N002").reason === null && read("N002").schemaVersion === 2, JSON.stringify(read("N002")));
+  ok("PART-LANDED becomes DECIDED, which the steps work out as RUNNING", read("N003").status === "DECIDED", JSON.stringify(read("N003")));
+  // MEASURED on this workspace, 2026-10-26: version 1 gave the design kind to every row of a PROPOSED arc, and 52 of
+  // them in 022, 026 and 031 were build steps written before the go. So no row leaves the steps.
+  ok("on an arc never decided every design row stays, a change that starts at the go, and its blockers stay",
+    read("N004").rows.map((row) => `${row.id}:${row.kind}:${row.state}`).join() === "1:change:landed,2:change:waiting,3:change:waiting"
+      && read("N004").rows[2].blockedBy.join() === "2", JSON.stringify(read("N004").rows));
+  ok("on a decided arc every design row becomes change, landed or not", read("N005").rows.every((row) => row.kind === "change") && read("N005").rows.length === 2);
+  const log = (id) => existsSync(join(ws, "arcs", id, "log.jsonl"))
+    ? readFileSync(join(ws, "arcs", id, "log.jsonl"), "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+  ok("each status moved is one status line in the log, and no row is discarded",
+    !log("N004").some((line) => line.kind === "discarded")
+      && log("N002").some((line) => line.kind === "status" && line.note === "HELD → DECIDED · plugin migration 006 · wait: waits on q4"), JSON.stringify([log("N004"), log("N002")]));
+  ok("an arc at version 2 and a closed workstream stay as they are",
+    readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8") === current && readFileSync(join(closed, "state.json"), "utf8") === closedText);
+  const again = m006.script(root);
+  ok("green: 006 then finds nothing, and a second run writes nothing", m006.check(root).length === 0 && again.length === 0, again.join(" | "));
+  const { arcFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+  ok("every arc it brought over holds to the version 2 schema", ["N002", "N003", "N004", "N005"].every((id) => arcFaults(read(id)).length === 0),
+    ["N002", "N003", "N004", "N005"].map((id) => arcFaults(read(id)).join("; ")).join(" | "));
+  void lines;
 }
 
 console.log("\n=== a broken ledger → reported, never written over");

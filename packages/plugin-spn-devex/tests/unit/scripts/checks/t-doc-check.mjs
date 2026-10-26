@@ -77,7 +77,7 @@ const REGISTER = join(registersDir(PROBE_DOCS), "probe.md");
 // table reads.
 const putArc = (folder, id, name, status, reason = null) => {
   mkdirSync(join(folder, ARCS, id), { recursive: true });
-  writeFileSync(join(folder, ARCS, id, "state.json"), `${JSON.stringify({ schemaVersion: 1, arc: id, subject: "the-arc", title: name,
+  writeFileSync(join(folder, ARCS, id, "state.json"), `${JSON.stringify({ schemaVersion: 2, arc: id, subject: "the-arc", title: name,
     goal: "it lands", decides: `${name}, in one sentence.`, status, reason, preview: "preview.html", rows: [] }, null, 2)}\n`);
 };
 const stream = (root, name, state = "open", statuses = ["RUNNING", "DECIDED"]) => {
@@ -339,6 +339,12 @@ one("a construct with no Subtitle — the Subtitle is optional",
   write(CONSTRUCT, page(MAST.replace(/  <p class="sds-subtitle">.*\n/, ""))), "silent");
 one("a second paragraph after the Description is SOFT until every tree is retrofitted (N116 row 9)",
   write(CONSTRUCT, page(MAST + "\n  <p>You also read this, and it should be in the first section.</p>")),
+  "reports", "[SOFT] the header carries 1 paragraph past the Subtitle and the Description");
+// MEASURED on a domain's README construct page, 2026-10-26: its table of constructs sits in the header, and each item
+// cell holds two paragraphs of its own (RD.DEVEX.WORKSPACE.259), which are the table's and never the header's.
+one("a table's item cells in the header are not paragraphs of the header, so only the one paragraph is counted",
+  write(CONSTRUCT, page(MAST + "\n  <p>You also read this.</p>\n  <table><thead><tr><th>Construct</th></tr></thead><tbody>" +
+    "<tr><td><p><strong>One</strong></p><p>The first piece of the model.</p></td></tr><tr><td><p><strong>Two</strong></p><p>The second piece.</p></td></tr></tbody></table>")),
   "reports", "[SOFT] the header carries 1 paragraph past the Subtitle and the Description");
 one("two standfirsts are a second paragraph",
   write(CONSTRUCT, page(MAST + `\n  <p class="sds-standfirst">You read a second Description here.</p>`)),
@@ -748,6 +754,45 @@ console.log("\n=== doc-check — every path a Bash command writes");
   const ok = (py === null || ts === py) && ["docs/a.md", "docs/b.md", "docs/d.md", "docs/e.md"].every((f) => ts.includes(f));
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  redirect with a heredoc body, sed -i, cp and tee all found\n        ts [${ts.split("\n").join(" · ")}]\n        py [${py === null ? "not installed" : py.split("\n").join(" · ")}]`);
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.259 — a column whose cells hold sentences is a level of the item cell, as a note");
+{
+  const { check: checkPage, columnRule, itemCellPage } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const { readFileSync } = await import("node:fs");
+  const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const notes = (findings) => findings.filter(([grade, text]) => grade === "SOFT" && text.includes("RD.DEVEX.WORKSPACE.259"));
+  // The shape workstream 030's N010 preview held before 26 Oct: three columns, every cell a sentence.
+  const sentences = `<table><thead><tr><th>Finding</th><th>What it says</th><th>What it causes</th></tr></thead><tbody>
+    <tr><td>Planning</td><td>A planning arc whose reading and drafting are rows, turned into build rows at the go.</td><td>An arc reads RUNNING while nothing is built, then flips back.</td></tr>
+    <tr><td>Cutting</td><td>Arcs are cut by the release each pays, or one per site or repository.</td><td>Ten arcs stand for what the developer reviews as three.</td></tr>
+    <tr><td>Placing</td><td>Six tables place new work, each with its own test to apply.</td><td>Small changes become new arcs, and fixes land in the wrong workstream.</td></tr>
+  </tbody></table>`;
+  const preview = join(WORKSPACE, ".spndevex", "workstreams", "open", "040-probe", "notes", "N002", "preview.html");
+  say("an arc's preview, a construct, an overview, an approach page and the hub are read; a report is not",
+    itemCellPage(preview) && itemCellPage("/d/x-construct.html") && itemCellPage("/d/x-overview.html") && itemCellPage("/w/open/040-probe/approach.html") && !itemCellPage("/d/x-report.html"));
+  const red = notes(columnRule(sentences));
+  say("red: a three-column table of sentences draws a note for each column after the first, naming it",
+    red.length === 2 && red[0][1].includes('"What it says"') && red[1][1].includes('"What it causes"') && red[0][1].includes("the title in bold, the line under it, one `Key: value` line"), JSON.stringify(red));
+  const shared = '<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.9.0/sds-docs.css">';
+  say("red: through the doc hook's check, on an arc's preview", notes(checkPage(preview, `<meta charset="utf-8">\n${shared}\n${sentences}\n`)).length === 2,
+    JSON.stringify(checkPage(preview, `<meta charset="utf-8">\n${shared}\n${sentences}\n`)));
+  const now = readFileSync(join(PLUGIN, "tests", "fixtures", "doc-check", "item-cell-preview.html"), "utf8");
+  say("green: that preview as it is now, its tables item cells, draws none", notes(checkPage(preview, now)).length === 0, JSON.stringify(notes(checkPage(preview, now))));
+  const status = `<table><thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead><tbody>
+    <tr><td><p><strong>N001 &mdash; the patterns</strong></p><p>What the patterns hold, in one place for every app and site.</p></td><td><span class="sds-badge">LANDED and released with the plugins and the book</span></td></tr>
+    <tr><td><p><strong>N002 &mdash; the sites</strong></p><p>The sites follow the patterns.</p></td><td><span class="sds-badge">RUNNING since the morning, with three steps to go</span></td></tr>
+  </tbody></table>`;
+  say("green: a status column is compared down by design, and draws none", notes(columnRule(status)).length === 0);
+  const counts = `<table><thead><tr><th>Domain</th><th>Rows</th><th>Proved</th></tr></thead><tbody>
+    <tr><td>Surface</td><td>42</td><td>40 of 42</td></tr><tr><td>Apps</td><td>17</td><td>17 of 17</td></tr></tbody></table>`;
+  say("green: columns of counts draw none", notes(columnRule(counts)).length === 0);
+  // MEASURED on the hub, 2026-10-26: a Values column lists code, however many values it holds, and is compared down.
+  const values = `<table><thead><tr><th>Vocabulary</th><th>Values</th></tr></thead><tbody>
+    <tr><td>Task state</td><td><code>IDLE</code> · <code>WORKING</code> · <code>DONE</code> · <code>FAILED</code> · <code>EMPTY</code> · <code>DENIED</code> · <code>SKIPPED</code></td></tr>
+    <tr><td>Layer</td><td><code>CORE</code> · <code>COMPONENTS</code> · <code>WIDGETS</code> · <code>CONTAINERS</code> · <code>LAYOUTS</code> · <code>APP</code> · <code>PAGE</code></td></tr></tbody></table>`;
+  say("green: a column of code values, however long the list, draws none", notes(columnRule(values)).length === 0, JSON.stringify(notes(columnRule(values))));
+  say("green: a report's tables are its own, and the same sentences there draw none", notes(checkPage("/d/artifacts/reports/docs-report.html", `<meta charset="utf-8">\n${shared}\n${sentences}\n`)).length === 0);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

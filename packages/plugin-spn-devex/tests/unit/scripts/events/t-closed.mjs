@@ -102,7 +102,7 @@ one("the one spelling the Python did handle, so the port is held to it",
 // THE SPLIT PLAN IS THE ARCS' ROWS. A workstream carries its plan in each arc's `state.json` and may
 // have no page at all, so the count comes from the arcs' rows.
 const ARC_DIR = `.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N002`;
-const stepArc = (rows) => `${JSON.stringify({ schemaVersion: 1, arc: "N002", subject: "the-arc", title: "the arc", goal: "it lands",
+const stepArc = (rows) => `${JSON.stringify({ schemaVersion: 2, arc: "N002", subject: "the-arc", title: "the arc", goal: "it lands",
   status: "LANDED", reason: null, preview: "preview.html", rows: rows.map(([id, repo, state, fields = {}]) =>
     ({ id, parent: "N002", title: "a change", kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
 const logLine = (kind, row, note, at = "2026-09-29T14:32+05:30") => `${JSON.stringify({ at, kind, row, note })}\n`;

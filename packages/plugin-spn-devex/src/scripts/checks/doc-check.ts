@@ -48,8 +48,9 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { sentenceColumn } from "../lib/item-cells.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
-         artifactDocsPathOf, decisionsRegister, inArtifacts, isApproachPage, isRegister as inRegisters, pagePlaceOf,
+         artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerOf, headerStatusRule, openHeadingFor, openHeadingOf, tableColumns,
@@ -209,7 +210,7 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
 /** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RD.DEVEX.WORKSPACE.262). */
-const ARC_PREVIEW = /\/\.spndevex\/workstreams\/[^/]+\/[^/]+\/notes\/N\d+\/preview\.html$/;
+const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
 const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
@@ -305,7 +306,7 @@ function inClosedWorkstream(path: string): boolean {
  * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
  * `h3` named Cycles, whose table has two columns, Arc · Status. Inside a workstream the
  * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
- * its name, its line and the links to its preview and its samples, and the reason a HELD, CARRIED or
+ * its name, its line and the links to its preview and its samples, and the reason a CARRIED or
  * DROPPED arc carries (all in the Arc cell), and its status badge.
  * `spn-devex docs cycles show` prints the rows; this compares the page against the same
  * reading, which is `tableDifferences` in that command's file. A page in a closed workstream stays as
@@ -514,7 +515,8 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   if (!kind) return [];
   const header = /<header\b[^>]*>([\s\S]*?)<\/header>/i.exec(text.replace(/<!--[\s\S]*?-->/g, " "));
   if (!header) return [];
-  const body = header[1];
+  // A table's item cells hold paragraphs of their own (RD.DEVEX.WORKSPACE.259), and none of them is the header's.
+  const body = header[1].replace(/<table\b[\s\S]*?<\/table>/gi, " ");
   const out: Finding[] = [];
   const parts = [...body.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
     if (m[1] !== undefined) return { role: "h1", html: m[1] };
@@ -1155,10 +1157,52 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   }
   // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
   if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
+  if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
   if (isRegister(path)) out.push(...rows(text)[0]);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- a column nobody reads down
+
+/** The page kinds whose table cells read in three levels (RD.DEVEX.WORKSPACE.259): a report sets its own tables. */
+export function itemCellPage(path: string): boolean {
+  const base = basename(path);
+  if (isApproachPage(path) || base === HUB) return true;
+  if (/-(overview|construct)\.html$/.test(base)) return true;
+  // An arc's preview, by its fixed name in `notes/N<nnn>/`, or a preview outside any workstream.
+  return /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path) || /-preview\.html$/.test(base);
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.259: a table keeps a column only where a reader compares down it. A column, other than the
+ * first, whose cells mostly hold sentences rather than short values draws a SOFT finding naming the column, saying to
+ * make it a level of the item cell: the bold title, the line under it, one `Key: value` line in `sds-small`. A status
+ * column, `th.sds-status-col`, is compared by design and never read here.
+ */
+export function columnRule(text: string): Finding[] {
+  const out: Finding[] = [];
+  for (const table of text.matchAll(/<table\b[\s\S]*?<\/table>/gi)) {
+    const head = /<thead\b[\s\S]*?<\/thead>/i.exec(table[0])?.[0] ?? "";
+    const headers = [...head.matchAll(/<th\b([^>]*)>([\s\S]*?)<\/th>/gi)].map((found) => ({ status: /sds-status-col/.test(found[1]), name: flat(found[2]) }));
+    const body = (/<tbody\b[\s\S]*?<\/tbody>/i.exec(table[0])?.[0] ?? table[0]).replace(/<thead\b[\s\S]*?<\/thead>/i, "");
+    const rows = [...body.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)]
+      .map((found) => [...found[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => cell[1]));
+    const width = Math.max(headers.length, ...rows.map((row) => row.length));
+    if (width < 2 || !rows.length) continue;
+    for (let at = 1; at < width; at += 1) {
+      if (headers[at]?.status) continue;
+      const { long, cells, sentences } = sentenceColumn(rows.map((row) => row[at] ?? ""));
+      if (!sentences) continue;
+      const name = headers[at]?.name || `column ${at + 1}`;
+      const first = headers[0]?.name || flat(rows[0][0] ?? "") || "a table";
+      out.push(["SOFT", `the table that opens "${first.slice(0, 40)}" has a column, "${name.slice(0, 40)}", whose cells hold sentences ` +
+        `(${long} of ${cells}) — a table keeps a column only where a reader compares down it, so make it a level of ` +
+        `the item cell: the title in bold, the line under it, one \`Key: value\` line in \`sds-small\` (RD.DEVEX.WORKSPACE.259)`]);
+    }
+  }
   return out;
 }
 

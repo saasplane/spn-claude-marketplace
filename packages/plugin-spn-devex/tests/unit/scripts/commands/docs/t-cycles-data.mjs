@@ -30,10 +30,10 @@ console.log("=== an arc kept as data, read into its row");
   ok("its facts: Preview then Sample, no state beside them, and no link to its data",
     facts === 'Preview: <a href="notes/N001/preview.html">preview.html</a> &middot; Sample: <a href="notes/N001/samples/badge-dark.png">badge-dark.png</a>', facts);
   ok("its status is the badge coloured by its word", cycles.statusCell(cycle) === '<span class="sds-badge sds-status sds-decided">DECIDED</span>');
-  const held = { ...cycle, status: "HELD", detail: "waits on q3" };
-  ok("a HELD reason is a fact on the arc's line", cycles.factsCell(held).endsWith("&middot; waits on q3"));
-  ok("a HELD reason is shown once: in the facts, and not under the badge, which stands alone",
-    cycles.statusCell(held) === '<span class="sds-badge sds-status sds-held">HELD</span>' && cycles.rowCells(held).join("").split("waits on q3").length === 2);
+  const held = { ...cycle, status: "DECIDED", detail: "wait: waits on q3" };
+  ok("a decided arc's wait is a fact on the arc's line", cycles.factsCell(held).endsWith("&middot; wait: waits on q3"));
+  ok("a wait is shown once: in the facts, and not under the badge, which stands alone",
+    cycles.statusCell(held) === '<span class="sds-badge sds-status sds-decided">DECIDED</span>' && cycles.rowCells(held).join("").split("waits on q3").length === 2);
   const row = cycles.tableOf([cycle], new Map([["N001", { stamp: "abc123abc123" }]]));
   ok("the row carries the arc's number as its id, its data's path and the stamp it was given",
     row.includes('<tr id="N001" data-arc="arcs/N001/state.json" data-arc-stamp="abc123abc123">'), row);

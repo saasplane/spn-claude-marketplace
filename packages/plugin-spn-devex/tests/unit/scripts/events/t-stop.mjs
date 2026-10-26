@@ -123,7 +123,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
 {
   const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
   const PRE = `${HOOKS}/src/scripts/events/pretooluse.ts`;
-  const { checkHold, checkRunnable, ordersOut, readyRowsOf, runningRows, rowsMark, stepsMark, workRuns } =
+  const { checkRunnable, ordersOut, readyRowsOf, runningRows, rowsMark, stepsMark, workRuns } =
     await import("../../../../src/scripts/events/stop.ts");
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
   const stopAt = (root, session, reply = "done", extra = {}) => {
@@ -183,7 +183,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
   }
   {
     const { root, ws } = await dataWorkspace("d17-ready-on-card");
-    editData(ws, (data) => { data.status = "RUNNING"; data.rows[0].state = "landed"; data.rows[1].blockedBy = ["q1"]; });
+    editData(ws, (data) => { data.rows[0].state = "landed"; data.rows[1].blockedBy = ["q1"]; });
     const open = [{ id: "q1", state: "open" }], answered = [{ id: "q1", state: "answered" }];
     check("a row waiting on a card that is open is not ready (RD.DEVEX.WORKSPACE.188)", readyRowsOf(arcAt(ws), open).length === 0, readyRowsOf(arcAt(ws), open));
     check("known-bad: once the card is answered the row is ready, by its id and its What",
@@ -207,8 +207,8 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     check("known-bad: once its report is beside the order, the row is named again", ordersOut(arc).size === 0 && runningRows(arc).length === 1);
     check("work runs while a row of this window's arcs is running", workRuns(root, everyone(root)));
     check("a running row in a workstream that is not this window's is not this window's work", !workRuns(root, new Set()));
-    editData(ws, (data) => { data.status = "LANDED"; });
-    check("a row left running in an arc that has landed is history, not work that runs", !workRuns(root, everyone(root)));
+    editData(ws, (data) => { data.status = "DROPPED"; data.reason = "not wanted"; });
+    check("a row left running in an arc that was dropped is history, not work that runs", !workRuns(root, everyone(root)));
   }
   {
     const { root, ws } = await dataWorkspace("d17-marks");
@@ -221,24 +221,13 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
       stepsMark(root, everyone(root)) !== mark && rowsMark(JSON.parse(readFileSync(join(arcAt(ws), "state.json"), "utf8"))) !== before);
   }
 
-  console.log("\n  --- hold: a HELD arc's reason names a card still open or an arc still to land");
+  console.log("\n  --- a wait: a decided arc held by the developer's words has nothing runnable (RD.DEVEX.WORKSPACE.311)");
   {
-    const { root, ws } = await dataWorkspace("d17-hold");
-    raise(root);
-    cli(root, ["workstream", "row", "write", "031/N001", "--status", "HELD", "--reason", "waits on q1"]);
-    check("a HELD arc whose reason names a card still open is silent", checkHold(root, everyone(root)).length === 0, JSON.stringify(checkHold(root, everyone(root))));
-    cli(root, ["workstream", "question", "answer", "q1", "--key", "A", "--words", "the first way"]);
-    const found = checkHold(root, everyone(root));
-    check("known-bad: once that card is answered, the HELD arc is named with its reason",
-      found.length === 1 && found[0].check === "hold" && found[0].message.includes("\"waits on q1\"") && found[0].message.includes("031-probe/arcs/N001"), JSON.stringify(found));
-    check("the hook says it, for the window's own workstream", /\[hold\]/.test(stopAt(root, "d17-hold")));
-    check("a workstream that is not this window's is not read", checkHold(root, new Set()).length === 0);
-    cli(root, ["workstream", "row", "write", "031/N002", "--title", "the next arc", "--subject", "next", "--note", "the developer: open the next arc"]);
-    cli(root, ["workstream", "row", "write", "031/N001", "--reason", "waits on N002 to land"]);
-    check("a HELD arc whose reason names an arc still to land is silent", checkHold(root, everyone(root)).length === 0, JSON.stringify(checkHold(root, everyone(root))));
-    cli(root, ["workstream", "row", "write", "031/N002", "--status", "DROPPED", "--reason", "not needed", "--note", "the developer: drop it"]);
-    check("known-bad: once that arc is dropped, the HELD arc is named again", checkHold(root, everyone(root)).length === 1, JSON.stringify(checkHold(root, everyone(root))));
-    void ws;
+    const { root, ws } = await dataWorkspace("d17-wait");
+    editData(ws, (data) => { data.wait = "the developer: approved, but wait"; });
+    check("a decided arc holding a wait has no ready row", readyRowsOf(arcAt(ws), []).length === 0, readyRowsOf(arcAt(ws), []));
+    editData(ws, (data) => { data.wait = null; });
+    check("known-bad: once the wait is cleared its first row is ready", readyRowsOf(arcAt(ws), []).length === 1, readyRowsOf(arcAt(ws), []));
   }
 
   console.log("\n  --- notes and carried: the lines this window's write added to the arc's log.jsonl");
@@ -266,7 +255,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     check("a log line that records no answer owes the notes nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
     command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "a review point: the probe answers in one line"]);
     check("a review point in a log line names no card a preview shows, so it owes the preview nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
-    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--status", "HELD", "--reason", "waits on N002", "--note", "(the developer: hold it)"]);
+    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--wait", "waits on N002", "--note", "(the developer: hold it)"]);
     check("a status line carrying the developer's words is a move, not an answer", !/\[notes\]/.test(stopAt(root, "d17-plain")));
   }
   {
@@ -294,11 +283,11 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     check("a workstream with an arc and no page is named by [state]", /\[state\].*N001 has no approach page to stand on/.test(out), out);
   }
   {
-    const { root } = await dataWorkspace("d17-landed");
-    cli(root, ["workstream", "row", "write", "031/N001", "--status", "LANDED"]);
+    const { root, ws } = await dataWorkspace("d17-landed");
+    editData(ws, (data) => { data.status = "LANDED"; });
     const out = stopAt(root, "d17-landed");
-    check("a LANDED arc with a row not landed is named by [state], which says a row of new scope reopens it at PROPOSED",
-      /\[state\].*N001 is LANDED and row 1 is waiting.*--status PROPOSED.*RD\.DEVEX\.WORKSPACE\.261/.test(out), out);
+    check("a stored LANDED arc with a step not landed is named by [state]: a landed arc is never reopened",
+      /\[state\].*N001 is LANDED and step 1 is waiting — a landed arc is never reopened.*RD\.DEVEX\.WORKSPACE\.261/.test(out), out);
   }
   {
     const { root, ws } = await dataWorkspace("d17-card-off-page");
@@ -937,7 +926,7 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
   const A = `.spndevex/${WORKSTREAMS}/open/001-a-subject`, B = `.spndevex/${WORKSTREAMS}/open/002-b-subject`;
   // Two open workstreams. A is whole: a page, and no arc. B keeps an arc as data that its page does not
   // carry, which `workstream state check` names, and an open card.
-  const ARC_DATA = `${JSON.stringify({ schemaVersion: 1, arc: "N001", subject: "b-subject", title: "the b arc", goal: "it lands",
+  const ARC_DATA = `${JSON.stringify({ schemaVersion: 2, arc: "N001", subject: "b-subject", title: "the b arc", goal: "it lands",
     status: "DECIDED", reason: null, preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "a thing", kind: "change", state: "waiting" }] })}\n`;
   const two = (name) => workspace(name, {
     [`${A}/approach.html`]: page({}),
@@ -1075,7 +1064,7 @@ console.log("\n=== runnable — a running row whose order is out with an agent i
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
   const WS = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
   // Arc N003, RUNNING: row 1 landed, row 2 running since its log line.
-  const RUNNING_ARC = { schemaVersion: 1, arc: "N003", subject: "a-subject", title: "a subject", goal: "it is built", status: "RUNNING", reason: null,
+  const RUNNING_ARC = { schemaVersion: 2, arc: "N003", subject: "a-subject", title: "a subject", goal: "it is built", status: "DECIDED", reason: null,
     preview: "preview.html", rows: [
       { id: "1", parent: "N003", title: "the chapter", kind: "change", state: "landed" },
       { id: "2", parent: "N003", title: "the split check", kind: "change", state: "running" }] };
@@ -1131,9 +1120,10 @@ console.log("\n=== stop — a page left stale by an arc this session wrote");
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail.slice(0, 600)}`}`); };
   const A = `.spndevex/${WORKSTREAMS}/open/001-a-subject`, B = `.spndevex/${WORKSTREAMS}/open/002-b-subject`;
   // Arc N001, kept as data: row 1 landed, row 2 at `state`.
-  const arcText = (status, state = "waiting") => `${JSON.stringify({ schemaVersion: 1, arc: "N001", subject: "the-chapter", title: "the chapter",
-    goal: "the chapter says where the model sits", status, reason: null, preview: "preview.html", rows: [
-      { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", altitude: "DOCS", state: "landed" },
+  // RUNNING and LANDED are worked out from the steps: the arc stores the developer's DECIDED, and its first step has landed.
+  const arcText = (status, state = "waiting") => `${JSON.stringify({ schemaVersion: 2, arc: "N001", subject: "the-chapter", title: "the chapter",
+    goal: "the chapter says where the model sits", status: ["RUNNING", "LANDED"].includes(status) ? "DECIDED" : status, reason: null, preview: "preview.html", rows: [
+      { id: "1", parent: "N001", title: "the chapter", kind: "change", repo: "spn-foundation", altitude: "DOCS", state: ["RUNNING", "LANDED"].includes(status) ? "landed" : "waiting" },
       { id: "2", parent: "N001", title: "the check", kind: "change", repo: "spn-support-ts", altitude: "CODE", state }] }, null, 2)}\n`;
   // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
   const pageFor = (folder, status, glyph) => `<!doctype html>
@@ -1297,7 +1287,7 @@ ${tableOf(cyclesOf(folder))}
     const { root, ws } = await dataWorkspace(name);
     const file = join(ws, "arcs", "N001", "state.json");
     const data = JSON.parse(readFileSync(file, "utf8"));
-    data.status = "RUNNING";
+    // RUNNING is worked out: the arc stores the developer's DECIDED, and its first step has landed.
     data.rows[0].state = "landed";
     data.rows[1].state = state;
     writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
@@ -1484,7 +1474,7 @@ console.log("\n=== migration — a pending plugin migration holds the turn");
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
   };
   // The old shape migration 004 moves: a row of a PROPOSED arc that is not of the kind `design`.
-  const owedData = { schemaVersion: 1, arc: "N001", subject: "a-subject", title: "a subject", goal: "it lands", status: "PROPOSED", reason: null,
+  const owedData = { schemaVersion: 2, arc: "N001", subject: "a-subject", title: "a subject", goal: "it lands", status: "PROPOSED", reason: null,
     preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "a thing", kind: "change", state: "waiting" }] };
   const files = { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N001/state.json`]: `${JSON.stringify(owedData)}\n` };
   const old = workspace("migration-owed", files, [], { migrated: false });
@@ -1515,7 +1505,9 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
     const { root, ws } = await dataWorkspace(`window-${counter}`);
     const file = join(ws, "arcs", "N001", "state.json");
     const data = JSON.parse(readFileSync(file, "utf8"));
-    data.status = status;
+    // RUNNING is worked out from the steps: the arc stores the developer's DECIDED, and a step has started.
+    data.status = status === "RUNNING" ? "DECIDED" : status;
+    if (status === "RUNNING" && !running) data.rows[0].state = "landed";
     if (running) data.rows[0].state = "running";
     writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
     if (status !== "DECIDED" || running) cli(root, ["docs", "cycles", "write", "031"]);

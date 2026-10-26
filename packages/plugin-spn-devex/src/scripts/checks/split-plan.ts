@@ -39,7 +39,8 @@
 // their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
 import { readdirSync, statSync } from "node:fs";
-import { TERMINAL, statusOfData } from "./arc-status.ts";
+import { TERMINAL } from "./arc-status.ts";
+import { statusOfData } from "../lib/workstream.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -411,7 +412,7 @@ export function arcStatus(root: string, subject: string, arc: string): string | 
         if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
         const arcs = join(dir, entry, "arcs");
         if (!isDir(arcs)) continue;
-        const kept = statusOfData(arcs, arc.toUpperCase());
+        const kept = statusOfData(dirname(arcs), arc.toUpperCase());
         if (kept) return kept;
       }
     }
@@ -1134,13 +1135,13 @@ export function gateClose(payload: Payload): Verdict {
     // A TERMINAL STATUS IS THE WHOLE TEST. `LANDED` says nothing is owed, `CARRIED` says the work
     // left and names where, `DROPPED` says it was abandoned and why. Any other word means somebody
     // has to decide which of those three it is, and a receipt written before that decision records
-    // a state nobody checked. Each arc's status is read from its `state.json`, where the schema
-    // keeps it to the eight.
+    // a state nobody checked. Each arc's status is read through the one owner, `statusOfData`, so an
+    // arc PROPOSED or DECIDED, which nothing built, refuses the close (RD.DEVEX.WORKSPACE.313).
     const unfinished: string[] = [];
     const arcDirs = [...new Set([...folders, ...pages.map(dirname)].map((f) => join(f, "arcs")))];
     for (const dir of arcDirs.filter(isDir)) {
       for (const arc of listdir(dir).filter((x) => /^N\d+[a-z]?$/.test(x))) {
-        const st = statusOfData(dir, arc);
+        const st = statusOfData(dirname(dir), arc);
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${arc} — ${st}`);
       }
     }
@@ -1155,9 +1156,10 @@ export function gateClose(payload: Payload): Verdict {
           `and the status names where) and \`DROPPED\` (abandoned on purpose, with the reason).\n\n` +
           `${listed}${more}\n\n` +
           `For each one, decide which of the three it is and write it with ` +
-          `\`spn-devex workstream row write <arc> --status …\`. An arc ` +
-          `left at \`PART-LANDED\` inside a closed workstream is a receipt that disagrees with ` +
-          `itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
+          `\`spn-devex workstream row write <arc> --status …\`; an arc never decided is deleted with ` +
+          `\`spn-devex workstream arc delete <arc>\`, and the review-fixes arc lands on the developer's word to close. ` +
+          `An arc left \`PROPOSED\`, \`DECIDED\` or \`RUNNING\` inside a closed workstream is a receipt that disagrees ` +
+          `with itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
       };
     }
 

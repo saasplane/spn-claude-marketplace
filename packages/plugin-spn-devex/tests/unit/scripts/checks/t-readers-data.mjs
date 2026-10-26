@@ -6,7 +6,7 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { arcData, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 
-const { statusOfData } = await import("../../../../src/scripts/checks/arc-status.ts");
+const { statusOfData } = await import("../../../../src/scripts/lib/workstream.ts");
 const split = await import("../../../../src/scripts/checks/split-plan.ts");
 const { factPinsOf } = await import("../../../../src/scripts/commands/plan/stale.ts");
 const { titlesOf, withTitles } = await import("../../../../src/scripts/commands/workspace/tokens.ts");
@@ -25,8 +25,8 @@ const arcs = join(ws, "arcs");
 
 console.log("=== arc-status and split-plan read state.json");
 {
-  ok("the status is read from the arc's data", statusOfData(arcs, "N001") === "DECIDED");
-  ok("an arc with no data has none", statusOfData(arcs, "N009") === null);
+  ok("the status is read from the arc's data, through the one owner", statusOfData(ws, "N001") === "DECIDED");
+  ok("an arc with no data has none", statusOfData(ws, "N009") === null);
   ok("the close gate's lookup reads it too", split.arcStatus(root, "031-probe", "N001") === "DECIDED");
   const rows = split.dataRowsOf(ws);
   ok("each row is a split-plan row, by its repository, and a waiting row is one nobody decided", rows.map((row) => `${row.label}|${row.scope}|${split.stateOf(row)}`).join() ===

@@ -7,17 +7,17 @@
 // being shown something, and the first they learn otherwise is a diff. The failure is silent on both
 // sides: the agent believes the plan is agreement, and the developer believes the plan is a plan.
 //
-// WHAT A GO LOOKS LIKE, so this can be checked at all. A go is the write that moves an arc out of
-// `PROPOSED`, and it carries the developer's words (RD.DEVEX.WORKSPACE.278):
+// WHAT A GO LOOKS LIKE, so this can be checked at all. A go is the write that stores `DECIDED` on an
+// arc, and it carries the developer's words (RD.DEVEX.WORKSPACE.278 and .307):
 //
 //     workstream row write <arc> --status DECIDED --note "<the developer's words>"
 //
-// It leaves two marks, and the hook reads both: the arc's status in `arcs/N<nnn>/state.json` reads
-// `DECIDED`, `RUNNING` or `LANDED`, and its `log.jsonl` holds the status line that moved it out of
+// It leaves two marks, and the hook reads both: the status `arcs/N<nnn>/state.json` stores reads
+// `DECIDED`, or `LANDED` where the close stored it, and its `log.jsonl` holds the status line that moved it out of
 // `PROPOSED`, the words beside the move (`PROPOSED → DECIDED · <their words>`). A status alone is not
 // enough, and neither is a move with no words: a plan the agent wrote must not pass as an agreement.
-// An arc opened straight at `DECIDED` on the developer's words, as one go opens every step's arc
-// (RD.DEVEX.WORKSPACE.280), holds its go in the `opened` line. An arc moved back to `PROPOSED` needs a
+// An arc opened straight at `DECIDED` on the developer's words, as the review-fixes arc is
+// (RD.DEVEX.WORKSPACE.261), holds its go in the `opened` line. An arc moved back to `PROPOSED` needs a
 // go again, so only the last move out of it counts.
 //
 // Nothing else counts, because nothing else is written down. A conversation is not a record: the
@@ -47,8 +47,8 @@ import { emit, isDir, listdir, readPayload, runAlone, workspaceRoot,
 const DEBUG = ".debug";
 const CONFIRMED = "confirmed";
 
-/** The statuses an arc reaches only after a go. */
-const PAST_THE_GO: ReadonlySet<string> = new Set(["DECIDED", "RUNNING", "LANDED"]);
+/** The stored statuses an arc holds only after a go: the go itself, and the close's `LANDED`. */
+const PAST_THE_GO: ReadonlySet<string> = new Set(["DECIDED", "LANDED"]);
 const PROPOSED = "PROPOSED";
 
 /** The words a status line carries beside its move: everything after `FROM → TO`, or the whole note where it names none. */
@@ -57,8 +57,9 @@ function wordsOf(note: unknown): string {
   return (moveOf(text) ? text.replace(/^[A-Z][A-Z-]* → [A-Z][A-Z-]*/, "") : text).replace(/^[\s·:—-]+/, "").trim();
 }
 
-/** The note `row write` gives an `opened` line when the opening write carries no `--note`. */
+/** The note `row write` gives an `opened` line: the status it opened at, then the developer's words where it carries them. */
 const OPENED_BARE = /^opened as ([A-Z][A-Z-]*)$/;
+const OPENED_WITH = /^opened as ([A-Z][A-Z-]*) · ([\s\S]+)$/;
 
 /**
  * The status an arc was opened at, as the commands record it. With no `--note`, the `opened` line says it
@@ -67,7 +68,8 @@ const OPENED_BARE = /^opened as ([A-Z][A-Z-]*)$/;
  * A next line that names no move says nothing, and the arc is read as opened at `PROPOSED`, as `newArc` opens it.
  */
 function openedAt(lines: readonly unknown[], at: number, status: string): string {
-  const bare = OPENED_BARE.exec(String((lines[at] as LogLine).note ?? "").trim());
+  const note = String((lines[at] as LogLine).note ?? "").trim();
+  const bare = OPENED_BARE.exec(note) ?? OPENED_WITH.exec(note);
   if (bare) return bare[1];
   const next = lines.slice(at + 1).find((raw) => (raw as LogLine | undefined)?.kind === "status") as LogLine | undefined;
   if (!next) return status;
@@ -77,7 +79,7 @@ function openedAt(lines: readonly unknown[], at: number, status: string): string
 /**
  * The developer's words of the go an arc's log holds, or null where it holds none. The go is the last move out of
  * `PROPOSED` that carries words: a status line with words beside its move, or an `opened` line whose note carries
- * them on an arc opened past `PROPOSED`, as one go opens every step's arc at `DECIDED` (RD.DEVEX.WORKSPACE.280).
+ * them on an arc opened past `PROPOSED`, as the review-fixes arc opens at `DECIDED` (RD.DEVEX.WORKSPACE.261).
  * The log is read in order, as `statusMoves` reads it; a status line naming no move moves from the status the log
  * last showed, and a move back to `PROPOSED` needs a go again. `release-go` reads a major release's version in
  * these words (RD.DEVEX.WORKSPACE.069), so the two checks read one go.
@@ -90,8 +92,9 @@ export function goWordsOf(lines: readonly unknown[], status: string): string | n
     if (!line || typeof line !== "object") return;
     if (line.kind === "opened") {
       shown = openedAt(lines, at, status);
-      const words = String(line.note ?? "").trim();
-      go = shown !== PROPOSED && words.length > 0 && !OPENED_BARE.test(words) ? words : null;
+      const note = String(line.note ?? "").trim();
+      const words = OPENED_WITH.exec(note)?.[2] ?? (OPENED_BARE.test(note) ? "" : note);
+      go = shown !== PROPOSED && words.length > 0 ? words : null;
       return;
     }
     if (line.kind !== "status") return;

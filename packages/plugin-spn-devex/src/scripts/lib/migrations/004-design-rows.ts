@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status says which of eight states it is in · § The formats · § Open and backlog workstreams follow the standard as it moves
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out · § The formats · § Open and backlog workstreams follow the standard as it moves
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Migration 004: rows that were design work take the kind `design` (RD.DEVEX.WORKSPACE.278), as the command gives it
@@ -9,8 +9,11 @@
 
 import { join, relative } from "node:path";
 import { type Migration } from "../migration.ts";
-import { arcIdsOf, isDataLayout, landedLines, logLinesOf, readArc, statusMoves, workstreamsOf, writeArc } from "../workstream.ts";
-import { DESIGN_KIND, type ArcData, type ArcRow } from "../workstream-schema.ts";
+import { arcIdsOf, isDataLayout, landedLines, logLinesOf, readArc, statusMoves, workstreamsOf, writeArcAsIs } from "../workstream.ts";
+import { type ArcData, type ArcRow } from "../workstream-schema.ts";
+
+/** The kind this migration gave, which version 1 of the data held; migration 006 takes it out. */
+const DESIGN_KIND = "design";
 import { DEVEX_WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /**
@@ -57,7 +60,7 @@ export function rowsOwedDesign(root: string): string[] {
 function writeAll(root: string): string[] {
   return owedArcs(root).map((one) => {
     for (const row of one.owed) row.kind = DESIGN_KIND;
-    try { writeArc(one.ws, one.data); } catch (thrown) {
+    try { writeArcAsIs(one.ws, one.data); } catch (thrown) {
       return `${one.name}: not written — ${thrown instanceof Error ? thrown.message : String(thrown)}`;
     }
     return `${one.name}: ${one.owed.length} row(s) ${why(one.data)} given the kind design (${one.owed.map((row) => row.id).join(", ")})`;

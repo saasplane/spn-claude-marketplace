@@ -12,7 +12,7 @@ import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-
 import { TERMINAL } from "../../checks/arc-status.ts";
 import { checkWorkstream, staleFacts } from "../../checks/workstream-state.ts";
 import {
-  arcIdsOf, doneOf, markdownArcsOf, readArc, readJsonl, readQuestions, stateOfRow, suggestionsFileOf, workspaceOf, workstreamsOf,
+  arcIdsOf, arcStatus, doneOf, markdownArcsOf, readArc, readJsonl, readQuestions, stateOfRow, suggestionsFileOf, workspaceOf, workstreamsOf,
 } from "../../lib/workstream.ts";
 import { type Suggestion } from "../../lib/workstream-schema.ts";
 import { workstreamNamed } from "./_shared.ts";
@@ -30,7 +30,7 @@ export function standingOf(ws: string): Standing {
   const name = basename(ws);
   if (markdownArcsOf(ws).length) return { workstream: name, moved: false, arcs: [], openCards: [], suggestions: {} };
   const arcs = arcIdsOf(ws).map((arc) => readArc(ws, arc)).filter((data) => data !== null).map((data) => ({
-    arc: data!.arc, status: data!.status, reason: data!.reason, ...doneOf(data!),
+    arc: data!.arc, status: arcStatus(data!), reason: data!.wait ? `wait: ${data!.wait}` : data!.reason, ...doneOf(data!),
     running: data!.rows.filter((row) => ["running", "stopped"].includes(stateOfRow(data!.rows, row)) && !data!.rows.some((one) => one.parent === row.id))
       .map((row) => `${row.id} ${stateOfRow(data!.rows, row)}`),
   }));
@@ -47,7 +47,7 @@ export function standingLine(standing: Standing): string {
   const parts = [number];
   const closed = standing.arcs.filter((arc) => TERMINAL.has(arc.status));
   for (const arc of standing.arcs.filter((one) => !TERMINAL.has(one.status))) {
-    if (["RUNNING", "PART-LANDED"].includes(arc.status)) parts.push(`${arc.arc} ${arc.done}/${arc.total}`, ...arc.running);
+    if (arc.status === "RUNNING") parts.push(`${arc.arc} ${arc.done}/${arc.total}`, ...arc.running);
     else parts.push(`${arc.arc} ${arc.status.toLowerCase()}${arc.reason ? ` (${arc.reason})` : ""}`);
   }
   if (closed.length) parts.push(`${closed.length} arc(s) closed`);

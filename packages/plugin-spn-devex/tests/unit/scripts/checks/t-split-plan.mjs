@@ -101,8 +101,8 @@ const ownCard = (n, decision) => card(n, decision).replace(/class="sds-(open|scr
 // THE STATUS IS A PARAMETER because a sequencing row resolves through it, and its default is `LANDED`:
 // the close gate refuses a workstream holding an arc that is not terminal, so a fixture carries an
 // unfinished arc only where its case is about one.
-const dataArc = (id, status = "LANDED", rows = []) => `${JSON.stringify({ schemaVersion: 1, arc: id, subject: "the-arc",
-  title: "the arc", goal: "it lands", status, reason: ["HELD", "CARRIED", "DROPPED"].includes(status) ? "a reason" : null,
+const dataArc = (id, status = "LANDED", rows = []) => `${JSON.stringify({ schemaVersion: 2, arc: id, subject: "the-arc",
+  title: "the arc", goal: "it lands", status, reason: ["CARRIED", "DROPPED"].includes(status) ? "a reason" : null,
   preview: "preview.html", rows: rows.map(([rowId, repo, title, state, fields = {}]) =>
     ({ id: rowId, parent: id, title, kind: "change", repo, altitude: "DOCS", state, ...fields })) }, null, 2)}\n`;
 // A line of an arc's `log.jsonl`.
@@ -499,10 +499,15 @@ one("and it closes once that three-digit arc has landed", "close",
 // workstream moved to `closed/`. Measured across the closed workstreams on 2026-09-24: eight arcs
 // still read `OPEN`, and one of them recorded in its own log that it had landed.
 
-one("a workstream holding an unfinished arc cannot close", "close",
-  build("sp-arc-unfinished", { arcStatus: "PART-LANDED" }),
+one("a workstream holding a DECIDED arc, agreed and never built, cannot close (RD.DEVEX.WORKSPACE.313)", "close",
+  build("sp-arc-unfinished", { arcStatus: "DECIDED" }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "not terminal" });
+
+one("nor can one holding a PROPOSED arc, shaped and never decided", "close",
+  build("sp-arc-proposed", { arcStatus: "PROPOSED" }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "arc delete" });
 
 one("and a DROPPED arc closes, because abandoning on purpose is finished", "close",
   build("sp-arc-dropped", { arcStatus: "DROPPED" }),

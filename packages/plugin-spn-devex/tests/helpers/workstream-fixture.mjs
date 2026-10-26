@@ -50,7 +50,7 @@ export const PREVIEW = `<meta charset="utf-8">\n<div class="sds-wrap">\n<section
 /** The arc's data: decided, two rows, the second waiting on the first. */
 export function arcData(rows) {
   return {
-    schemaVersion: 1, arc: "N001", subject: "probe", title: "the probe arc", goal: "the probe is answered", status: "DECIDED", reason: null,
+    schemaVersion: 2, arc: "N001", subject: "probe", title: "the probe arc", goal: "the probe is answered", status: "DECIDED", reason: null,
     decides: "what it decides", repos: ["spn-x"], cycle: "a plugin release", follows: null, model: "Opus 5.5", preview: "preview.html",
     rows: rows ?? [
       { id: "1", parent: "N001", title: "write the book", kind: "change", repo: "spn-x", altitude: "DOCS", blockedBy: [], touches: ["foundation:a"], state: "waiting" },

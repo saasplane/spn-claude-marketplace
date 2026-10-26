@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "f77e264e"
+      "seen": "827691e6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -20,13 +20,13 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "section": "An arc's status says which of eight states it is in",
-      "seen": "2ca1f4ef"
+      "section": "An arc's status is one of six, stored or worked out",
+      "seen": "23256a3c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "section": "An arc reopens by the moment, and a closed workstream reopens nothing",
-      "seen": "55df7200"
+      "section": "A landed arc is never reopened",
+      "seen": "14638107"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
@@ -48,12 +48,12 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.058",
-      "seen": "1f6e8b76"
+      "seen": "9875bea1"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.261",
-      "seen": "b91a6929"
+      "seen": "d9b77fe5"
     },
     {
       "repo": "spn-foundation",
@@ -68,7 +68,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.UTILS.048",
-      "seen": "672ff778"
+      "seen": "32c30358"
     },
     {
       "repo": "spn-foundation",
@@ -463,67 +463,60 @@ Plan one change across repos as an **arc**: ordered rows, one per step, each car
 
 **The partner boundary crosses upward only as an ask, never as work.** No level takes orders from the level below.
 
-### An arc carries a status, and it is one of eight
+### An arc carries a status, and it is one of six
 
-**The set is closed (`RD.DEVEX.WORKSPACE.058`).** Every check that reads an arc reads this word, so a word
-outside the set is a state nothing can act on, and an arc with no status is one no check can see.
+**The set is closed (`RD.DEVEX.WORKSPACE.058`), and the developer's words are stored while the rest is
+worked out (`RD.DEVEX.WORKSPACE.307`).** Every check reads the status through one owner, `arcStatus` in the
+plugin's workstream library, so no two of them disagree.
 
-| Status | What it means | Runnable work? | Terminal | Must also carry |
+| Status | Stored or worked out | Runnable work? | Terminal | Must also carry |
 | --- | --- | --- | --- | --- |
-| `PROPOSED` | Written and argued, but nobody has said go yet | **no** — not agreed | no | — |
-| `DECIDED` | Agreed and waiting its turn; no step has started | **no** — waiting, by definition | no | — |
-| `RUNNING` | Being executed now — steps are landing in this sitting | **yes** | no | — |
-| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | **no** | no | the blocker, in its reason |
-| `PART-LANDED` | Some steps landed, the rest are owed, and nobody is on it | **yes** | no | — |
-| `LANDED` | Every step landed. Nothing is owed | no | yes | — |
-| `CARRIED` | The remaining work left this workstream | no | yes | where it went |
-| `DROPPED` | Abandoned on purpose | no | yes | its reason |
+| `PROPOSED` | stored: being shaped, and reshaped freely while never decided | **no** — not agreed | no | — |
+| `DECIDED` | stored: the developer's go on its preview, and any wait they gave | **yes**, unless it holds a wait | no | the wait, where they gave one |
+| `RUNNING` | worked out: decided, and a step has started | **yes** | no | — |
+| `LANDED` | worked out: every step landed, the deferred, carried and replaced left out, and the proof passed | no | yes | — |
+| `CARRIED` | stored: the remaining work left this workstream | no | yes | where it went |
+| `DROPPED` | stored: not wanted, once decided | no | yes | its reason |
 
-**The runnable column is stated because a check that has to infer it gets it wrong.** *Runnable*
-asks whether there is work here somebody could pick up now, and four of the eight answer no for four
-different reasons: nobody agreed it, its turn has not come, it is blocked, or it is finished. A gate
-left to infer reads *unfinished steps* as *work waiting*, which is true of two rows and false of the
-rest — so an arc opened at `DECIDED` on the day it is planned gets reported as work somebody
-abandoned, and the next reader stops using the status.
+**Words that are not statuses**, and each already had a word in the set: `OPEN` and `PREPARED` are
+`DECIDED` (or `PROPOSED` where nobody agreed it); `CLOSED`, `CLOSED IN` and `CLOSING` are `LANDED`, or
+`CARRIED` where the work moved to another workstream; `IN FLIGHT` and `PART-LANDED` are `RUNNING`, which the
+steps work out; `HELD` is `DECIDED` with the developer's words as its wait. The pattern is a word for a
+**stage** rather than a word for a **state**.
 
-**Six spellings are not statuses**, and each already had a word in the set: `OPEN` is `DECIDED` (or
-`PROPOSED` where nobody agreed it); `CLOSED`, `CLOSED IN` and `CLOSING` are `LANDED`, or `CARRIED`
-where the work moved to another workstream; `IN FLIGHT` is `RUNNING`; `PREPARED` is `DECIDED`. The
-pattern in all six is a word for a **stage** rather than a word for a **state** — *closing* says what
-somebody is doing, and only what is true of the arc can be read by anything but a person.
-
-**An arc's design rows run under `PROPOSED`, and only the developer's go moves it — MUST** (decision `RD.DEVEX.WORKSPACE.278`). An arc's first rows are its design: the reads, the sizing, the preview. The command gives every row added while the arc is `PROPOSED` the kind `design`, and those rows run and land while the arc reads `PROPOSED`. **The go is its own write, and it carries the developer's words**: `row write <ws>/<arc> --status DECIDED --note "<the developer's words>"` is the only write that moves an arc from `PROPOSED` to `DECIDED`, the log keeps the words beside the move (`PROPOSED → DECIDED · <their words>`), and no write moves a `PROPOSED` arc to `RUNNING`. **The go turns the plan into build work**: the go's write gives every row not yet landed the kind `change` and says how many, and a row landed before the go stays `design`. An arc nobody wants is still `DROPPED`, with its reason. **A build row starts only after the go**: written `running` or `landed` on an arc at `DECIDED`, `HELD` or `PART-LANDED`, it moves the arc to `RUNNING`, logs one header event and refreshes every view, as a status write does. The write never sets `LANDED`, `CARRIED` or `DROPPED`; when every row is landed it prints `every row landed: write --status LANDED once proven`. The state check refuses a build row running on a `PROPOSED` or `DECIDED` arc, one landed on it since the arc last moved to `PROPOSED` or opened there, and an arc at `LANDED` with a row not landed, and prints the command that fixes it. Rows added after the go are new scope, such as a standing arc's next batch: they are design rows until the developer says go on them. **A reopened arc's earlier build rows are history to the check**: it reads the arc's log for when the arc last moved to `PROPOSED`, and names only a build row landed after it.
-
-**`PART-LANDED` is how a sitting resumes.** When an agent stops after changing some of what an arc asked for, that arc is `PART-LANDED`, and the next sitting reads it to find where the work was left. That gives it two moments: at the end of a turn only an arc **this sitting touched** is worth reporting, because a warning for every parked arc is one nobody reads twice; at the start of a sitting **every** `PART-LANDED` arc is listed, because that is the whole reason the status exists.
+**No step starts before the go, and reading is never a step — MUST** (`RD.DEVEX.WORKSPACE.278`). Reading and
+drafting are planning jobs, which record no step. Steps may be written before the go; `row write` refuses
+one written `running` or `landed` on an arc not `DECIDED`, or holding a wait. **The go is its own write, and
+it carries the developer's words**: `row write <ws>/<arc> --status DECIDED --note "<the developer's words>"`,
+logged beside the move. A stored `PROPOSED` wins over the steps: a changed goal stops what was building until
+the next go. The review-fixes arc reads `RUNNING` until the word to close stores its `LANDED`.
 
 **The status decides none of these three.** It does not carry **ordering**, which is the plan's
 business. It does not describe a **workstream**, whose state is the folder it sits in. It does not
 describe the **approach document**, which carries the document status vocabulary instead. Three
 altitudes, three vocabularies, and no word shared between them.
 
-**The status is written by `row write --status`, into the arc's `state.json`.** The plugin's schema
-holds the eight, so `row write` refuses a word outside them and `workstream state check` names a
-`state.json` that holds one.
+**The stored status is written by `row write --status`, into the arc's `state.json`.** The plugin's schema
+holds the stored set, so `row write` refuses a word outside it, `RUNNING` among them, and `workstream state
+check` names a `state.json` that holds one. A file at `schemaVersion` 1 is brought to 2 by plugin migration 006.
 
-**`HELD` names its blocker in its reason and `DROPPED` names its reason.** A status that records
-a stop without recording what it waits for moves the question somewhere nobody can find it. So the
-Stop hook reads the reason of each `HELD` arc of this window's workstreams, and names one whose
-reason names no card still open in `questions.jsonl` and no arc still to land.
+**A terminal status means the arc is finished, so its unlanded steps are history rather than work.**
 
-**A terminal status means the arc is finished, so its unlanded rows are history rather than work.**
+### A landed arc is never reopened
 
-### An arc reopens by the moment, and a closed workstream reopens nothing
+**The kind of change decides what moves (`RD.DEVEX.WORKSPACE.261`).**
 
-**The kind of change decides the status (`RD.DEVEX.WORKSPACE.261`).**
-
-| Moment | Status |
+| Moment | What moves |
 | --- | --- |
-| A small decision while building, inside what was agreed | stays `DECIDED` or `RUNNING`; the decision is logged on its card and the arc |
-| New scope after `LANDED` while the workstream is open | back to `PROPOSED`, with the new information in the preview and new rows; `DECIDED` at the developer's word |
-| A change that stops the building | back to `PROPOSED`; its rows stop until the developer decides |
+| A small decision while building, inside what was agreed | a step; no status moves, and the decision is logged |
+| A fix to what a landed arc delivered, its goal unchanged | a step on the review-fixes arc, naming the arc it fixes |
+| New scope, which no arc's goal promised | a new arc, `PROPOSED` |
+| The developer agrees an open arc's goal changed | the arc back to `PROPOSED`; its running steps stop until their go |
 | The workstream is closed | nothing reopens; new scope is a new workstream |
 
-**A `LANDED` arc with a row that is not landed, carried or deferred has gained scope after it landed.** `workstream state check` names it, and the Stop hook runs that check for this window's workstreams. The finding says *reopen it as `PROPOSED`* where the row is new scope, and to land the row where it is a small decision inside what was agreed.
+**A step is never added to an arc that reads `LANDED`**: `row write` refuses it, and names the review-fixes
+arc. A stored `LANDED` arc with a step not landed is named by `workstream state check`, which the Stop hook
+runs for this window's workstreams.
 
 
 ## Producer and partner — two shapes of workspace

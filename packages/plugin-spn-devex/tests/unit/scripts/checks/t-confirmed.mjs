@@ -32,8 +32,10 @@ const openedDecidedBare = { at: AT, kind: "opened", row: null, note: "opened as 
 
 /** An arc's data and log, as the `workstream` commands write them. */
 function arc(folder, status, lines) {
-  const data = { schemaVersion: 1, arc: "N001", subject: "a-subject", title: "a subject", goal: null, status, reason: null,
-    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "write the book", kind: "change", state: "waiting" }] };
+  // RUNNING is worked out from the steps, never stored: an arc that runs stores the developer's DECIDED, and a step runs.
+  const stored = status === "RUNNING" ? "DECIDED" : status;
+  const data = { schemaVersion: 2, arc: "N001", subject: "a-subject", title: "a subject", goal: null, status: stored, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "write the book", kind: "change", state: status === "RUNNING" ? "running" : "waiting" }] };
   return {
     [`.spndevex/${WORKSTREAMS}/open/${folder}/arcs/N001/state.json`]: `${JSON.stringify(data, null, 2)}\n`,
     [`.spndevex/${WORKSTREAMS}/open/${folder}/arcs/N001/log.jsonl`]: lines.map((line) => JSON.stringify(line)).join("\n") + "\n",

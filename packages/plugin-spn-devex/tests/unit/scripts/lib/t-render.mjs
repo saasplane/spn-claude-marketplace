@@ -77,8 +77,21 @@ ok("a Boundary keeps Owns beside Refuses, and who owns the refused part is a fac
   edges.includes("<thead><tr><th>Owns</th><th>Refuses</th></tr></thead>") &&
   edges.includes("<tr><td>the build</td><td>what a kind is<span class=\"sds-small\">Owned by: <a href=\"targets.md\">Targets</a></span></td></tr>"), edges);
 const other = rowsOf(produced(table(["Key", "Example", "Why"], ["`a`", "`b`", "c"])), "<thead>");
-ok("any other table is the author's, and is written as it stands",
+ok("any other table of short values keeps its columns, as written",
   other.includes("<thead><tr><th>Key</th><th>Example</th><th>Why</th></tr></thead>") && other.includes("<tr><td><code>a</code></td><td><code>b</code></td><td>c</td></tr>"), other);
+// RD.DEVEX.WORKSPACE.259: a column whose cells hold sentences is a level of the item cell, never a column.
+const one = rowsOf(produced(table(["Gate", "Why there", "Weight"],
+  ["the release", "it is the last point where a change can still be stopped cheaply", "MUST"],
+  ["the commit", "a change is smallest there, so a finding costs the least to answer", "SHOULD"])), "<thead>");
+ok("red: one column of sentences is the line under the first column's title, and the short column stays",
+  one.includes("<thead><tr><th>Gate</th><th>Weight</th></tr></thead>")
+  && one.includes("<tr><td><p><strong>the release</strong></p><p>it is the last point where a change can still be stopped cheaply</p></td><td>MUST</td></tr>"), one);
+const two = rowsOf(produced(table(["Direction", "The question", "What it costs"],
+  ["`UP`", "does the plan still hold when the estate grows by one ring", "one more pass of every check over the new ring"],
+  ["`DOWN`", "can the estate shrink without a reader losing a page they rely on", "a redirect for every page that goes"])), "<thead>");
+ok("red: several columns of sentences are a paragraph each, led by the column's name, under a title of code left as code",
+  two.includes("<thead><tr><th>Direction</th></tr></thead>")
+  && two.includes("<tr><td><p><code>UP</code></p><p><strong>The question:</strong> does the plan still hold when the estate grows by one ring</p><p><strong>What it costs:</strong> one more pass of every check over the new ring</p></td></tr>"), two);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
 process.exit(failed ? 1 : 0);

@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § An arc's status says which of eight states it is in · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § An arc's status is one of six, stored or worked out · § An arc carries its specification, or names the note that holds it · § The workstream is kept as data, and every file has one owner · § The folder · § The formats · § The commands · § The life of an arc, and every file it touches · § The approach page keeps up with its arcs
      and docs/04-capabilities/02-support/02-apps/06-tests/README.md § When a whole tier runs
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
@@ -16,12 +16,12 @@
 ## Open it — the commands write `arcs/N{{nnn}}/`
 
 ```sh
-# open the arc as PROPOSED: its title names the cycle it pays, its subject is one to three words of at most 24
-# characters, and its goal is the outcome once it is done, in a sentence or two
-spn-devex workstream row write N{{nnn}} --title "{{the cycle it pays, named: R: the support release that carries X}}" --subject {{short-name}} --goal "{{what is true once the arc is done}}"
+# open the arc as PROPOSED, as many as the plan needs: its title says what it delivers in its domain, its subject is
+# one to three words of at most 24 characters, and its goal is the outcome once it is done, in a sentence or two
+spn-devex workstream row write N{{nnn}} --title "{{the domain and what lands there: Surface: the patterns standard and the design system}}" --subject {{short-name}} --goal "{{what is true once the arc is done}}"
 
-# its header: what it decides, the repositories in chain order, the cycle, what it follows, the coordinator's model
-spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{a book change · a support release · a plugin release and reinstall · a renumbering · a corpus pass · a symbols regeneration · a full verification}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
+# its header: what it decides, the repositories in chain order, the package it releases, what it follows, the coordinator's model
+spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{the package it releases, after the last step that changes it, or none}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
 
 # each fact read while ideating, the source's commit pinned
 spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fact "{{what the source says, in one line}}" --used-by {{q<n> or row}}
@@ -29,11 +29,18 @@ spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fac
 # a row: its kind, where, at what altitude, how, and its acceptance; the rows are the steps, so none writes a plan
 spn-devex workstream row write N{{nnn}} {{row}} --title "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
 
-# the go, the one write that moves the arc out of PROPOSED, with your words beside it; every row not yet landed turns from design to change
+# the go, the one write that stores DECIDED, with your words beside it; no step starts before it
 spn-devex workstream row write N{{nnn}} --status DECIDED --note "<the developer's words>"
 
-# the status after the go, at your word: RUNNING, HELD, PART-LANDED, LANDED, CARRIED or DROPPED, with a reason for the last three and HELD
-spn-devex workstream row write N{{nnn}} --status {{STATUS}} --reason "{{the card it waits on · where it went · why}}"
+# a wait, then a start, each in your words; nothing starts while the wait holds
+spn-devex workstream row write N{{nnn}} --wait "<the developer's words>"
+spn-devex workstream row write N{{nnn}} --start --note "<the developer's words>"
+
+# your other words: CARRIED or DROPPED, with where it went or why; RUNNING and LANDED are worked out from the steps
+spn-devex workstream row write N{{nnn}} --status {{CARRIED · DROPPED}} --reason "{{where it went · why}}" --note "<the developer's words>"
+
+# an arc never decided is deleted, never dropped
+spn-devex workstream arc delete N{{nnn}} --note "<the developer's words>"
 
 # a line on the log, which has no other writer: a decision, a correction, your words
 spn-devex workstream row write N{{nnn}} --note "{{what was decided or corrected, by whom, and why; the notes it changed}}"
@@ -45,12 +52,12 @@ spn-devex workstream arc stamp write N{{nnn}}
 ## What the commands keep — `arcs/N{{nnn}}/state.json`
 
 ```json
-{ "schemaVersion": 1,
-  "arc": "N{{nnn}}", "subject": "{{short-name}}", "title": "{{the cycle it pays, named}}",
+{ "schemaVersion": 2,
+  "arc": "N{{nnn}}", "subject": "{{short-name}}", "title": "{{the domain and what lands there}}",
   "goal": "{{what is true once the arc is done, in a reader's words}}",
-  "status": "PROPOSED", "reason": null,
+  "status": "PROPOSED", "reason": null, "wait": null,
   "decides": "{{what this arc decides}}", "repos": ["{{repo}}", "{{repo}}"],
-  "cycle": "{{the cycle it pays}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
+  "cycle": "{{the package it releases, or none}}", "follows": "{{N<m>, or nothing}}", "model": "{{Opus 5.5}}",
   "preview": "preview.html",
   "rows": [
     { "id": "{{1}}", "parent": "N{{nnn}}", "title": "{{the step's What: the files, or plan § k}}",
@@ -86,16 +93,16 @@ notes/N{{nnn}}/
   preview.html      the arc's one preview, only where something must be seen or worded to decide: each proposal a
                     section, its status in the masthead, frozen at the go
   samples/          real files of the kind the work produces, each in its own format, as many as the work needs
-  plan.md           optional, only where the arc has traps, a set or a move table to hold
+  plan.md           optional, written at the go only where the arc has traps, a set or a move table; never while PROPOSED
   orders/
     {{row}}.md          one brief per delegated row, named by the row, its front matter first (order-template.md)
     {{row}}.report.md   the child's hand-back, its front matter first, which `report write` folds into the row
   scripts/          what a script row runs
 ```
 
-## Before the status reads LANDED
+## Before the steps work out LANDED
 
-Every row is landed, carried or deferred, and none is stopped or waits on a card. The PROOF row's output is in its
+Every row is landed, replaced, carried or deferred, and none is stopped or waits on a card. The PROOF row's output is in its
 `proof`, run with the cache off. Every card this arc answered has left `Open`, and the page's `What` states its
 result. The approach page's part for the arc is current, its stamp written, and its Cycles row reads LANDED. The
 landing is committed.

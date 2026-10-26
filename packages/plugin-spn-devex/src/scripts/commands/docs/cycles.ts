@@ -1,10 +1,10 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
-//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status says which of eight states it is in
+//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // A workstream's Cycles table, read from its arcs' data (`arcs/N<nnn>/state.json`): one row per arc, in
 // the order the arcs run, in two columns. Arc holds the title, the description and the facts as links
-// separated by middots: the preview by its fixed name, each sample, and for HELD, CARRIED and DROPPED
+// separated by middots: the preview by its fixed name, each sample, and for CARRIED and DROPPED the reason, and for a decided arc its wait
 // the reason. Status holds the badge. The arc's number is the row's id, so `approach.html#N013` opens it
 // (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the row; a rewrite keeps the stamp, which
 // only `workstream arc stamp write` writes. `write` also writes
@@ -31,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -51,7 +51,7 @@ export type Cycle = {
   name: string;            // the arc's title
   does: string;            // one line: what the arc decides
   status: string | null;   // one of STATUSES, or null where the data holds none the set knows
-  detail: string;          // the blocker, destination or reason a HELD, CARRIED or DROPPED arc carries
+  detail: string;          // the blocker, destination or reason a CARRIED or DROPPED arc carries
   file: string;
   previews: Preview[];     // the preview by its fixed name, then each sample
 };
@@ -61,8 +61,8 @@ export const CYCLES_COLUMNS = ["Arc", "Status"];
 /** A header as `tableColumns` reads it: lower case, joined by a middle dot. */
 export const headerOf = (columns: string[]): string => columns.join(" · ").toLowerCase();
 
-const MUST_CARRY = new Set(["HELD", "CARRIED", "DROPPED"]);
-// Longest word first, so `PART-LANDED` is never read as `LANDED`.
+const MUST_CARRY = new Set(["CARRIED", "DROPPED"]);
+// Longest word first, so a longer word that ends in another is never read as the shorter one.
 const BY_LENGTH = [...STATUSES].sort((a, b) => b.length - a.length);
 
 /** A cell's text as a person reads it: links to their text, code and emphasis marks gone, spaces collapsed. */
@@ -75,7 +75,7 @@ function plain(text: string): string {
     .trim();
 }
 
-/** The status word at the start of a text, or null. `HELD on Q5` and `HELD · no account` both read HELD. */
+/** The status word at the start of a text, or null. `DROPPED on Q5` and `DROPPED · no account` both read DROPPED. */
 export function statusWord(text: string): string | null {
   const head = plain(text).toUpperCase();
   return BY_LENGTH.find((word) => new RegExp(`^${word}(?![A-Z-])`).test(head)) ?? null;
@@ -96,10 +96,13 @@ function runOrder(a: Cycle, b: Cycle): number {
  */
 export function cycleOfData(folder: string, arc: string): Cycle | null {
   const file = join(folder, ARCS, arc, "state.json");
-  let data: { title?: unknown; decides?: unknown; status?: unknown; reason?: unknown; preview?: unknown } | null = null;
+  let data: { title?: unknown; decides?: unknown; status?: unknown; reason?: unknown; wait?: unknown; preview?: unknown; rows?: unknown } | null = null;
   try { data = JSON.parse(read(file)); } catch { return null; }
   if (!data || typeof data !== "object") return null;
-  const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) ? data.status : null;
+  // The status as it reads, from the one owner: the developer's words, or worked out from the steps (RD.DEVEX.WORKSPACE.307).
+  const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) && Array.isArray(data.rows)
+    ? arcStatus(data as Parameters<typeof arcStatus>[0]) : null;
+  const wait = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : "";
   // An arc carried to another workstream names where its preview now lives, and its samples sit beside it.
   const previewHref = previewHrefOf(arc, { preview: typeof data.preview === "string" ? data.preview : PREVIEW_FILE });
   const notes = posix.dirname(previewHref);
@@ -108,7 +111,7 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   for (const sample of listdir(join(folder, notes, "samples")))
     previews.push({ name: sample, href: `${notes}/samples/${sample}`, kind: "sample" });
   return { id: arc, name: typeof data.title === "string" ? data.title : arc, does: typeof data.decides === "string" ? data.decides : "",
-           status, detail: typeof data.reason === "string" ? data.reason : "", file, previews };
+           status, detail: wait || (typeof data.reason === "string" ? data.reason : ""), file, previews };
 }
 
 /** Every arc of a workstream folder kept as data, as Cycles rows in run order. A folder with no `arcs/` has none. */
@@ -121,7 +124,7 @@ export function arcLabel(cycle: Cycle): string {
   return `${cycle.id} — ${cycle.name}`;
 }
 
-/** The Status cell: the word, then what a HELD, CARRIED or DROPPED arc must also carry. */
+/** The Status cell: the word, then what a CARRIED or DROPPED arc must also carry. */
 export function statusLabel(cycle: Cycle): string {
   if (!cycle.status) return "(no status)";
   return cycle.detail ? `${cycle.status} · ${cycle.detail}` : cycle.status;
@@ -133,14 +136,14 @@ const attribute = (text: string) => escape(text).replace(/"/g, "&quot;");
 
 /**
  * The facts of an arc, one line of `Key: value` facts separated by middots: its preview first and each
- * sample, keyed by its kind, its name a link; then a HELD, CARRIED or DROPPED reason. The arc's data is
+ * sample, keyed by its kind, its name a link; then a CARRIED or DROPPED reason. The arc's data is
  * not linked: it rides on the row as `data-arc`.
  */
 export function factsCell(cycle: Cycle): string {
   const link = (href: string, text: string) => `<a href="${attribute(href)}">${escape(text)}</a>`;
   const keyOf = (kind: string) => kind[0].toUpperCase() + kind.slice(1);
   const facts = cycle.previews.map((preview) => `${keyOf(preview.kind)}: ${link(preview.href, preview.name)}`);
-  if (cycle.detail && cycle.status && MUST_CARRY.has(cycle.status)) facts.push(escape(cycle.detail));
+  if (cycle.detail && cycle.status && (MUST_CARRY.has(cycle.status) || cycle.detail.startsWith("wait: "))) facts.push(escape(cycle.detail));
   return facts.join(" &middot; ");
 }
 
@@ -157,7 +160,7 @@ export function arcCell(cycle: Cycle): string {
 }
 
 /**
- * The Status cell's HTML: the status as its badge. A HELD, CARRIED or DROPPED reason is one of the arc's
+ * The Status cell's HTML: the status as its badge. A CARRIED or DROPPED reason, or a wait, is one of the arc's
  * facts, and is shown once, in the Arc cell.
  */
 export function statusCell(cycle: Cycle): string {

@@ -10,5 +10,6 @@ import { migration002 } from "./002-fixed-notes-tree.ts";
 import { migration003 } from "./003-preview-status.ts";
 import { migration004 } from "./004-design-rows.ts";
 import { migration005 } from "./005-lean-arcs.ts";
+import { migration006 } from "./006-stored-status.ts";
 
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006];

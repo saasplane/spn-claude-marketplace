@@ -12,14 +12,13 @@
 //              is open; a row waiting on an open card is not ready
 //   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
 //              full there, once, and every card still open from an earlier reply named in one line
-//   notes      an answer logged in an arc lands in that arc's notes (preview, plan, samples) the same turn
+//   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
-//   hold       an arc whose status reads HELD names, in its reason, a card still open or an arc still to land
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
 //              once while the rows stand, and names each open card in one line
 //   page-stale an arc this window wrote left its workstream's page behind the arcs
 //   state      `workstream state check` fails for a workstream of this window: among its findings an arc
-//              the page does not carry, a workstream with no page, and a LANDED arc with a row not landed
+//              the page does not carry, a workstream with no page, and a step running on an arc not decided
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
 //   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
@@ -58,7 +57,7 @@ import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, arcDataDir, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
+import { PREVIEW_FILE, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
          workstreamsOf } from "../lib/workstream.ts";
 import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
@@ -212,15 +211,13 @@ const idOf = (arc: string): string => basename(arc);
 /** An arc's data, from its `state.json`, or null where it has none. */
 const dataOf = (arc: string): ArcData | null => readArc(homeOf(arc), idOf(arc));
 /** An arc's status, or "" where it has no data. */
-const statusOf = (arc: string): string => dataOf(arc)?.status ?? "";
+/** An arc's status as it reads, from the one owner (RD.DEVEX.WORKSPACE.307), or "" where its data does not read. */
+const statusOf = (arc: string): string => { const data = dataOf(arc); return data ? arcStatus(data) : ""; };
 /** The cards still open in a workstream's `questions.jsonl`. */
 const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((one) => one.state === "open");
 /** The way a command names an arc: the workstream's number and the arc, `030/N004`. */
 const arcRef = (arc: string): string => `${basename(homeOf(arc)).slice(0, 3)}/${idOf(arc)}`;
 
-// A STATUS THAT MEANS *DO NOT START THIS* IS NOT RUNNABLE: nobody agreed it, its turn has not come, or
-// it is blocked. The finished ones are `TERMINAL`, which `arc-status.ts` states once.
-const NOT_RUNNABLE = new Set(["PROPOSED", "DECIDED", "HELD"]);
 
 const DEBUG = ".debug";
 
@@ -289,7 +286,7 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
 export function workRuns(root: string, mine: Set<string>): boolean {
   return openArcs(root, mine).some((arc) => {
     const data = dataOf(arc);
-    return !!data && !TERMINAL.has(data.status) && leafRows(data).some((row) => row.state === "running");
+    return !!data && !TERMINAL.has(arcStatus(data)) && leafRows(data).some((row) => row.state === "running");
   });
 }
 
@@ -561,11 +558,10 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
       // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM, AND IT IS THIS SESSION'S FACT. A status
       // word is a claim any window can have written. What this session wrote is in its window's note,
       // and an arc it wrote whose rows moved since its own last Stop is the arc it is executing.
-      if (TERMINAL.has(data.status)) continue;     // its unfinished rows are history, not work
-      // `HELD` names its blocker in its reason, and that blocker is frequently an ARC rather than a
-      // card, which the `cards.length` guard below cannot see. `PROPOSED` and `DECIDED` have not
-      // started. None of the three is runnable, whoever touched it.
-      if (NOT_RUNNABLE.has(data.status)) continue;
+      if (TERMINAL.has(arcStatus(data))) continue;     // its unfinished rows are history, not work
+      // AN ARC NOBODY AGREED, OR ONE HELD BY THE DEVELOPER'S WAIT, IS NOT RUNNABLE, whoever touched it: no step
+      // starts until the arc is DECIDED with no wait (RD.DEVEX.WORKSPACE.278).
+      if (!stepsMayStart(data)) continue;
       // NO BASELINE MEANS NO INFERENCE. A session's first Stop has nothing of its own to compare
       // against, and a headless window has only a first Stop, so it stays quiet.
       if (!since) continue;
@@ -605,33 +601,6 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
   return out;
 }
 
-/**
- * Every arc of this window's workstreams that reads HELD while its reason names no blocker that still
- * holds: no card open in the workstream's `questions.jsonl` and no arc of it still to land
- * (02-workstream/01-workstream.md § An arc's status says which of eight states it is in). A card is
- * named `q<n>` or `Q<n>`, and an arc `N<nnn>`.
- */
-export function checkHold(root: string, mine: Set<string>): Warning[] {
-  const out: Warning[] = [];
-  for (const ws of scoped(openWorkstreamFolders(root), mine)) {
-    const open = new Set(openQuestionsOf(ws).map((one) => one.id.toLowerCase()));
-    for (const arc of arcFoldersOf(ws)) {
-      const data = dataOf(arc);
-      if (data?.status !== "HELD") continue;
-      const reason = typeof data.reason === "string" ? data.reason : "";
-      const cards = [...reason.matchAll(/\bq(\d+)\b/gi)].map((found) => `q${found[1]}`);
-      const arcs = [...reason.matchAll(/\bN\d+[a-z]?\b/g)].map((found) => found[0]).filter((other) => other !== data.arc);
-      const holds = cards.some((card) => open.has(card)) ||
-        arcs.some((other) => { const blocker = readArc(ws, other); return !!blocker && !TERMINAL.has(blocker.status); });
-      if (!holds)
-        out.push({ check: "hold", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads HELD and its reason ` +
-          `${reason ? `("${reason.slice(0, 80)}") ` : ""}names no card still open and no arc still to land. A HELD arc waits on a ` +
-          `named blocker, in its reason: a card in \`questions.jsonl\`, or an arc that must land first. If its blocker is gone, ` +
-          `re-plan it and lift the hold: \`spn-devex workstream row write ${arcRef(arc)} --status …\`.`) });
-    }
-  }
-  return out;
-}
 
 /**
  * A REPLY THAT ENDS A SITTING owes the next window the seven fields, because a session's context ends
@@ -1509,7 +1478,6 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "migration" }, () => checkMigrations(root)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),
-    ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given)),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),

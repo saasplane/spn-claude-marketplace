@@ -44,7 +44,7 @@ const folder = join(TMP, ".spndevex", WORKSTREAMS, "backlog", "042-probe");
  * `fields` are the arc's header: its title, what it decides, its status and its reason.
  */
 function putArc(home, id, fields, { preview = false, samples = [] } = {}) {
-  const data = { schemaVersion: 1, arc: id, subject: "the-arc", title: "an arc", goal: "it lands", status: "DECIDED", reason: null,
+  const data = { schemaVersion: 2, arc: id, subject: "the-arc", title: "an arc", goal: "it lands", status: "DECIDED", reason: null,
     preview: "preview.html", rows: [], ...fields };
   mkdirSync(join(home, "arcs", id), { recursive: true });
   writeFileSync(join(home, "arcs", id, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
@@ -54,10 +54,13 @@ function putArc(home, id, fields, { preview = false, samples = [] } = {}) {
 }
 
 putArc(folder, "N2", { title: "the check", decides: "A check reads the new shape.", status: "DECIDED" });
-putArc(folder, "N1", { title: "the chapter", decides: "The chapter says where the model sits.", status: "RUNNING" });
-putArc(folder, "N10", { title: "the release", decides: "The plugins ship once.", status: "HELD", reason: "waits on Q7" }, { preview: true, samples: ["close_message.md"] });
+// RUNNING is worked out from the steps: a decided arc with a step started reads it.
+putArc(folder, "N1", { title: "the chapter", decides: "The chapter says where the model sits.", status: "DECIDED",
+  rows: [{ id: "1", parent: "N1", title: "write it", kind: "change", state: "running" }] });
+putArc(folder, "N10", { title: "the release", decides: "The plugins ship once.", status: "DECIDED", wait: "waits on Q7" }, { preview: true, samples: ["close_message.md"] });
 putArc(folder, "N1a", { title: "a brief", decides: "The brief moves on.", status: "CARRIED", reason: "→ N98 rows 1-2" });
-putArc(folder, "N3", { title: "part of it", decides: "Half the rows landed.", status: "PART-LANDED" });
+putArc(folder, "N3", { title: "part of it", decides: "Half the rows landed.", status: "DECIDED",
+  rows: [{ id: "1", parent: "N3", title: "one", kind: "change", state: "landed" }, { id: "2", parent: "N3", title: "two", kind: "change", state: "waiting" }] });
 putArc(folder, "N7", { title: "a status nobody knows", decides: "", status: "OPEN" });
 // THE RETIRED FORM COUNTS FOR NOTHING: an arc written as a Markdown file under `arcs/` is no row.
 writeFileSync(join(folder, "arcs", "N9-the-old-form.md"), "# N9 — the old form\n\nStatus: **RUNNING**\n");
@@ -65,8 +68,8 @@ writeFileSync(join(folder, "arcs", "N9-the-old-form.md"), "# N9 — the old form
 try {
   console.log("=== docs cycles — reading the status word");
   {
-    ok("the status word is read from the set", statusWord("HELD · no cloud account") === "HELD");
-    ok("PART-LANDED is never read as LANDED", statusWord("PART-LANDED — today") === "PART-LANDED");
+    ok("the status word is read from the set", statusWord("DROPPED · no cloud account") === "DROPPED");
+    ok("a word of the version 1 set is read as none", statusWord("PART-LANDED — today") === null && statusWord("HELD · on Q7") === null);
     ok("a word outside the set reads as none", statusWord("OPEN") === null);
   }
 
@@ -79,7 +82,8 @@ try {
     const byId = Object.fromEntries(cycles.map((c) => [c.id, c]));
     ok("the label is the number and the title", arcLabel(byId.N1) === "N1 — the chapter", arcLabel(byId.N1));
     ok("the line is what the arc decides", byId.N10.does === "The plugins ship once.", byId.N10.does);
-    ok("HELD carries its reason", statusLabel(byId.N10) === "HELD · waits on Q7", statusLabel(byId.N10));
+    ok("a decided arc carries the developer's wait", statusLabel(byId.N10) === "DECIDED · wait: waits on Q7", statusLabel(byId.N10));
+    ok("a decided arc half built reads RUNNING, worked out from its steps", byId.N3.status === "RUNNING" && byId.N1.status === "RUNNING");
     ok("CARRIED carries where it went", statusLabel(byId.N1a) === "CARRIED · → N98 rows 1-2", statusLabel(byId.N1a));
     ok("an arc whose status the set does not know is still a row, marked", statusLabel(byId.N7) === "(no status)");
     ok("a folder with no arcs/ has no Cycles", cyclesOf(TMP).length === 0);
@@ -87,7 +91,7 @@ try {
     ok("the Arc cell is three levels: the title in bold, the line, then the preview, each sample and the reason as facts",
       arcCell(byId.N10) === `<p><strong>N10 &mdash; the release</strong></p><p>The plugins ship once.</p><span class="sds-small">` +
         ["Preview: " + link("notes/N10/preview.html", "preview.html"), "Sample: " + link("notes/N10/samples/close_message.md", "close_message.md"),
-          "waits on Q7"].join(" &middot; ") + "</span>", arcCell(byId.N10));
+          "wait: waits on Q7"].join(" &middot; ") + "</span>", arcCell(byId.N10));
   }
 
   console.log("\n=== docs cycles — the table the approach template carries");
@@ -96,8 +100,8 @@ try {
     const table = tableOf(cycles);
     ok("the header is Arc · Status, two columns",
       table.includes('<thead><tr><th>Arc</th><th class="sds-status-col">Status</th></tr></thead>') && !table.includes("What it does") && !table.includes("<th>Previews</th>"));
-    ok("a row carries the arc's address and its data, and a HELD arc's Status cell is its badge alone",
-      table.includes('<tr id="N10" data-arc="arcs/N10/state.json">') && table.includes(`<td><span class="sds-badge sds-status sds-held">HELD</span></td></tr>`), table);
+    ok("a row carries the arc's address and its data, and a waiting arc's Status cell is its badge alone",
+      table.includes('<tr id="N10" data-arc="arcs/N10/state.json">') && table.includes(`<td><span class="sds-badge sds-status sds-decided">DECIDED</span></td></tr>`), table);
     ok("a RUNNING arc's Status cell is its badge", table.includes('<td><span class="sds-badge sds-status sds-running">RUNNING</span></td></tr>'), table);
 
     const { tableDifferences } = cyclesModule;
@@ -105,8 +109,8 @@ try {
     const plainWord = table.replace('<span class="sds-badge sds-status sds-running">RUNNING</span>', "RUNNING");
     ok("a Status written as its plain word is named stale: every status is its badge",
       plainWord !== table && tableDifferences(plainWord, cycles).stale.some((line) => /Status is not its badge/.test(line)), JSON.stringify(tableDifferences(plainWord, cycles)));
-    const reasonless = table.replace(" &middot; waits on Q7", "");
-    ok("a HELD arc's reason missing from its facts is named",
+    const reasonless = table.replace(" &middot; wait: waits on Q7", "");
+    ok("a decided arc's wait missing from its facts is named",
       tableDifferences(reasonless, cycles).stale.some((line) => /N10's links are not the arc's preview and samples/.test(line)), JSON.stringify(tableDifferences(reasonless, cycles)));
     const extra = table.replace("</tbody>", `<tr><td><p><strong>N9 &mdash; the old form</strong></p></td><td>RUNNING</td></tr>\n    </tbody>`);
     ok("a row for the Markdown arc names no arc the data holds", tableDifferences(extra, cycles).unknown.join() === "N9", JSON.stringify(tableDifferences(extra, cycles)));
@@ -182,7 +186,7 @@ try {
       ["PLANNING while no arc is past DECIDED", ["PROPOSED", "DECIDED", null], "PLANNING"],
       ["IMPLEMENTING once an arc runs", ["DECIDED", "RUNNING"], "IMPLEMENTING"],
       ["IMPLEMENTING once an arc has landed", ["PROPOSED", "LANDED"], "IMPLEMENTING"],
-      ["IMPLEMENTING while an arc is part-landed", ["PART-LANDED"], "IMPLEMENTING"],
+      ["PLANNING while arcs are only carried or dropped", ["CARRIED", "DROPPED"], "PLANNING"],
       ["PLANNING for a workstream with no arc yet", [], "PLANNING"],
     ]) ok(`[MKT.HOOKS.40] the arcs give ${what}`, cyclesModule.headerStatusFor(open, statuses.map(arcAt)) === expected, cyclesModule.headerStatusFor(open, statuses.map(arcAt)));
     ok("[MKT.HOOKS.40] a closed workstream gives DONE, whatever its arcs read", cyclesModule.headerStatusFor(closed, [arcAt("RUNNING")]) === "DONE");

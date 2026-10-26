@@ -28,7 +28,7 @@ const answered = (...cards) => cards.map((q) => JSON.stringify({ id: `q${q}`, ar
   raised: "2026-10-06T09:00+05:30", shownIn: [], card: WHOLE_CARD, answer: { key: "A", words: "the developer chose A", at: "2026-10-06T10:00+05:30" } })).join("\n") + "\n";
 
 // An arc kept as data, for the cases about the arcs a window writes.
-const DATA_ARC = { schemaVersion: 1, arc: "N001", subject: "a-subject", title: "a subject", goal: "it lands", status: "RUNNING", reason: null,
+const DATA_ARC = { schemaVersion: 2, arc: "N001", subject: "a-subject", title: "a subject", goal: "it lands", status: "RUNNING", reason: null,
   preview: "preview.html", rows: [{ id: "1", parent: "N001", title: "a thing", kind: "change", state: "waiting" }] };
 
 /** Two open workstreams. Each has a page that still asks Q7, and a record in `questions.jsonl` that holds it answered. */

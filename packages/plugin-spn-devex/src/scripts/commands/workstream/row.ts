@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is named for the cycle it pays · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status says which of eight states it is in · § An arc opens when its work can be reviewed on its own, and a workstream ideates one at a time
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status is one of six, stored or worked out · § Shaping: arcs open as the plan becomes clear
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //   spn-devex workstream row write <arc> [<row>] [--field value …] [--position <n>] [--note "…"]
@@ -12,24 +12,21 @@
 // `--note` alone writes a line on the arc's log, which has no other writer. A write that moves an arc's
 // status or a row's state refreshes every view of it (RD.DEVEX.WORKSPACE.273), and says which.
 //
-// An arc's design rows run under PROPOSED, and only the developer's go moves it (RD.DEVEX.WORKSPACE.278). A row
-// added while its arc is PROPOSED takes the kind `design` from the command, whatever `--kind` says, and needs no
-// `--kind`; on any other arc `--kind design` is refused, and a row's kind is never moved to or from `design`. The go
-// is its own write, and it carries the developer's words: `--status DECIDED --note "<the developer's words>"`, logged
-// beside the move as `PROPOSED → DECIDED · <their words>`; every status line leads with its move. A move out of
-// PROPOSED without `--note` is refused, and no write moves a PROPOSED arc to RUNNING. The go turns the plan into build
-// work: every row not yet landed turns from `design` to `change`, and the write says how many; it also lists each
-// line of the arc's preview whose text says "proposed", outside the masthead's status badge, and checks none of them
-// (RD.DEVEX.WORKSPACE.273). A build row starts only after
-// the go: one written `running` or `landed` on a PROPOSED arc is refused, and on an arc at DECIDED, HELD or
-// PART-LANDED it moves the arc to RUNNING. It never sets LANDED, CARRIED or DROPPED: the last row landed prints a
-// line asking for `--status LANDED`, except on a PROPOSED arc, whose next step is the go.
+// The developer's words are stored (RD.DEVEX.WORKSPACE.307): `--status` takes PROPOSED, DECIDED, CARRIED, DROPPED,
+// and LANDED for the review-fixes arc at the close; RUNNING and LANDED are otherwise worked out from the steps by
+// `arcStatus`. The go is its own write, with the developer's words: `--status DECIDED --note "<their words>"`, logged
+// beside the move. Every move of the stored status needs `--note`. `--wait "<their words>"` holds a decided arc, and
+// `--start --note "…"` clears the wait (RD.DEVEX.WORKSPACE.311). A move back to PROPOSED stops the arc's running steps.
+// DROPPED is for an arc decided before; one never decided is deleted with `arc delete`. `--review-fixes` opens the
+// review-fixes arc, DECIDED on the developer's words, one per workstream (RD.DEVEX.WORKSPACE.261). The go lists each
+// line of the arc's preview whose text says "proposed", and checks none of them (RD.DEVEX.WORKSPACE.273).
 //
-// After each write it names, in a `note:` line, a build row of the arc with no repo or no altitude and a row out
-// of chain order (RD.DEVEX.WORKSPACE.183). It refuses nothing for them: the chain between two stacks is judgement.
+// Steps are build steps of the kinds `fix`, `change` and `question` (RD.DEVEX.WORKSPACE.278). They may be written
+// before the go; one written `running` or `landed` is refused unless the arc is DECIDED with no wait. A step is never
+// added to an arc that reads LANDED: a landed arc is never reopened, and its fix goes on the review-fixes arc.
 //
-// A workstream ideates one arc at a time (RD.DEVEX.WORKSPACE.280). While one arc reads PROPOSED, opening another
-// is refused unless `--note` carries the developer's words, and the refusal names the arc being ideated.
+// After each write it names, in a `note:` line, a step with no repo or no altitude and a step out of chain order
+// (RD.DEVEX.WORKSPACE.183). It refuses nothing for them: the chain between two stacks is judgement.
 //
 //   spn-devex workstream row discard <arc> <row> --note "<the developer's words>"
 //
@@ -39,12 +36,12 @@
 
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
-import { type Action, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
+import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { STORED_STATUSES } from "../../checks/arc-status.ts";
 import {
-  NOTES, PREVIEW_FILE, arcIdsOf, doneOf, logEvent, newArc, previewOf, previewPathFault, proposedLines, readArc, stateOfRow, turnPlanToBuild, writeArc,
+  NOTES, PREVIEW_FILE, arcIdsOf, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, previewOf, previewPathFault, proposedLines, readArc, stateOfRow, stepsMayStart, writeArc,
 } from "../../lib/workstream.ts";
-import { ALTITUDES, DESIGN_KIND, ROW_ID, ROW_KINDS, ROW_STATES, isBuildRow, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
+import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 
@@ -55,14 +52,14 @@ const ROW_TEXT = ["parent", "title", "repo", "mechanism", "acceptance", "model",
 const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", touches: "touches", decisions: "decisions", facts: "facts" };
 
 const OPTIONS = {
-  title: VALUE, subject: VALUE, goal: VALUE, status: STATUSES, reason: VALUE, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
+  title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
   model: VALUE, parent: VALUE, kind: ROW_KINDS, repo: VALUE, altitude: ALTITUDES, mechanism: VALUE, acceptance: VALUE,
   "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE, position: VALUE,
   preview: VALUE,
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-const HEADER_ONLY = ["subject", "goal", "status", "reason", "decides", "repos", "cycle", "follows", "position", "preview"];
+const HEADER_ONLY = ["subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "position", "preview"];
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -87,9 +84,13 @@ function header(data: ArcData, words: Words): string[] {
   const status = words.value("status");
   if (status && status !== data.status) {
     data.status = status;
-    if (!["HELD", "CARRIED", "DROPPED"].includes(status) && !words.given("reason")) data.reason = null;
+    if (!["CARRIED", "DROPPED"].includes(status) && !words.given("reason")) data.reason = null;
+    if (status !== "DECIDED") data.wait = null;
     changed.push("status");
   }
+  const wait = words.value("wait");
+  if (wait !== null && data.wait !== wait) { data.wait = wait; changed.push("wait"); }
+  if (words.given("start") && data.wait) { data.wait = null; changed.push("start"); }
   return changed;
 }
 
@@ -115,40 +116,29 @@ function rowFields(row: ArcRow, words: Words): string[] {
 const hasWords = (note: string | null): note is string => !!note?.trim();
 
 /**
- * RD.DEVEX.WORKSPACE.278: an arc leaves PROPOSED only with the developer's words in the same write, and never to
- * RUNNING. Throws where `--status` would move an arc at `was` against that.
+ * RD.DEVEX.WORKSPACE.307 and .311: the stored status is the developer's words. Throws where a write would store a
+ * status, a wait or a start against them: any move of the stored status, a wait or a start without `--note`; a wait
+ * or a start on an arc that is not DECIDED; a start with no wait; LANDED stored on any arc but the review-fixes arc;
+ * DROPPED on an arc never decided, which `arc delete` deletes instead.
  */
-function goGuard(arc: string, was: string, words: Words): void {
+function wordsGuard(arc: string, data: ArcData | null, decidedBefore: boolean, words: Words): void {
   const status = words.value("status");
-  if (was !== "PROPOSED" || !status || status === "PROPOSED") return;
-  if (status === "RUNNING")
-    throw new UsageFault(`keeps ${arc} at PROPOSED: no write moves a \`PROPOSED\` arc to \`RUNNING\`. The go is \`--status DECIDED --note "<the developer's words>"\`, and a build row written running after it moves the arc on (RD.DEVEX.WORKSPACE.278).`);
-  if (!hasWords(words.value("note")))
-    throw new UsageFault(`keeps ${arc} at PROPOSED: an arc leaves \`PROPOSED\` only with the developer's words in the same write — \`--status ${status} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.278).`);
-}
-
-/**
- * RD.DEVEX.WORKSPACE.280: a workstream ideates one arc at a time. Throws where another arc reads PROPOSED and the
- * opening write carries no words of the developer's, naming the arc being ideated.
- */
-function openingGuard(ws: string, arc: string, note: string | null): void {
-  if (hasWords(note)) return;
-  const ideated = arcIdsOf(ws).filter((other) => other !== arc && readArc(ws, other)?.status === "PROPOSED");
-  if (!ideated.length) return;
-  const named = ideated.join(", ");
-  throw new UsageFault(`refuses to open ${arc}: ${basename(ws)} is ideating ${named} — a new arc opens when ${named} has its go, ` +
-    `or with the developer's words: \`--note "<their words>"\` (RD.DEVEX.WORKSPACE.280).`);
-}
-
-/**
- * RD.DEVEX.WORKSPACE.278: the kind of a row added to an arc at `status` — `design` while the arc is PROPOSED,
- * whatever was typed, and else the kind typed, which is never `design`.
- */
-function kindAdded(arc: string, rowId: string, status: string, typedKind: string | null): string | null {
-  if (status === "PROPOSED") return DESIGN_KIND;
-  if (typedKind === DESIGN_KIND)
-    throw new UsageFault(`gives \`design\` only to a row added while its arc is \`PROPOSED\`, and ${arc} is ${status}: row ${rowId} is a build row — \`--kind\` ${ROW_KINDS.filter((one) => one !== DESIGN_KIND).join(" · ")} (RD.DEVEX.WORKSPACE.278).`);
-  return typedKind;
+  const was = data?.status ?? "PROPOSED";
+  const moves = !!status && status !== was;
+  const said = hasWords(words.value("note"));
+  if (moves && !said)
+    throw new UsageFault(`keeps ${arc} at ${was}: a status is the developer's words, so it moves only with them in the same write — \`--status ${status} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.307).`);
+  if (moves && status === "LANDED" && data?.reviewFixes !== true)
+    throw new UsageFault(`keeps ${arc} at ${was}: its steps work out LANDED when the last one and its proof land, and only the review-fixes arc stores it, at the close (RD.DEVEX.WORKSPACE.307).`);
+  if (moves && status === "DROPPED" && !decidedBefore)
+    throw new UsageFault(`keeps ${arc}: an arc never decided is deleted, not dropped — \`workstream arc delete ${arc} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.311).`);
+  const after = status ?? was;
+  if ((words.value("wait") !== null || words.given("start")) && after !== "DECIDED")
+    throw new UsageFault(`holds or starts only a decided arc, and ${arc} is ${after} (RD.DEVEX.WORKSPACE.311).`);
+  if ((words.value("wait") !== null || words.given("start")) && !said)
+    throw new UsageFault(`keeps ${arc} as it is: a wait and a start are the developer's words — add \`--note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.311).`);
+  if (words.given("start") && !data?.wait)
+    throw new UsageFault(`finds no wait on ${arc} to clear: it starts as soon as a step does (RD.DEVEX.WORKSPACE.311).`);
 }
 
 function write(args: string[]): number {
@@ -163,38 +153,47 @@ function write(args: string[]): number {
   let data = readArc(ws, arc);
   const said: string[] = [];
   const before = arcSignatures(ws);
-  let closing = false;
+  const statusBefore = data ? arcStatus(data) : null;
   let goes = false;
   let previewMoved = false;
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
     if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")} — name the row after the arc.`);
-    goGuard(arc, data?.status ?? "PROPOSED", words);
     if (!data) {
       const title = words.value("title");
       if (!title || !subject) throw new UsageFault(`opens ${arc} with \`--title\` and \`--subject\`.`);
-      openingGuard(ws, arc, note);
+      const reviewFixes = words.given("review-fixes");
+      if (reviewFixes) {
+        const other = arcIdsOf(ws).find((one) => readArc(ws, one)?.reviewFixes === true);
+        if (other) throw new UsageFault(`keeps one review-fixes arc: ${other} takes every fix to a landed arc (RD.DEVEX.WORKSPACE.261).`);
+        if (!hasWords(note)) throw new UsageFault(`opens the review-fixes arc on the developer's words: \`--note "<their words>"\` (RD.DEVEX.WORKSPACE.261).`);
+      }
       data = newArc(arc, subject, title);
+      if (reviewFixes) { data.reviewFixes = true; data.status = "DECIDED"; }
+      wordsGuard(arc, null, reviewFixes, words);
       header(data, words);
       typed(() => writeArc(ws, data!));
-      logEvent(ws, arc, "opened", null, note ?? `opened as ${data.status}`);
-      said.push(`${arc} opened · ${data.status}`);
+      logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
+      said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     } else {
       const was = data.status;
+      wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
       const changed = header(data, words);
       if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
-      // The go turns the plan into build work: every design row not yet landed takes the kind `change`.
-      const turned = was === "PROPOSED" && data.status === "DECIDED" ? turnPlanToBuild(data) : [];
-      if (turned.length) changed.push("kinds");
+      // A stored PROPOSED wins over the steps: a changed goal stops what the arc was building.
+      const stopped = changed.includes("status") && data.status === "PROPOSED"
+        ? data.rows.filter((row) => row.state === "running").map((row) => { row.state = "stopped"; return row.id; }) : [];
       previewMoved = changed.includes("preview");
       if (changed.length) typed(() => writeArc(ws, data!));
       // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
-      const move = `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`;
-      logEvent(ws, arc, changed.includes("status") ? "status" : changed.length ? "header" : "note", null,
-        changed.includes("status") ? (note ? `${move} · ${note}` : move) : note ?? `changed ${changed.join(", ")}`);
+      const move = changed.includes("status") ? `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`
+        : changed.includes("wait") ? `${data.status} · wait: ${data.wait}` : changed.includes("start") ? `${data.status} · started` : "";
+      logEvent(ws, arc, move ? "status" : changed.length ? "header" : "note", null,
+        move ? (note ? `${move} · ${note}` : move) : note ?? `changed ${changed.join(", ")}`);
+      for (const id of stopped) logEvent(ws, arc, "stopped", id, "the goal changed: stopped until the developer's next go");
       said.push(changed.length ? `${arc} · ${changed.join(", ")}` : `${arc} · log line written`);
-      if (turned.length) said.push(`${turned.length} row(s) not landed turned from design to change: ${turned.join(", ")}`);
+      if (stopped.length) said.push(`stopped until the next go: ${stopped.length} step(s)`);
       if (was === "PROPOSED" && data.status === "DECIDED") goes = true;
     }
   } else {
@@ -203,13 +202,22 @@ function write(args: string[]): number {
     const stray = HEADER_ONLY.filter((name) => words.given(name));
     if (stray.length) throw new UsageFault(`changes the arc's header with ${stray.map((name) => `\`--${name}\``).join(", ")} — leave the row out.`);
     let row = data.rows.find((one) => one.id === rowId);
+    const startsNow = (state: string | undefined | null): boolean => ["running", "landed"].includes(state ?? "");
+    const mayStart = (state: string | undefined | null): void => {
+      if (!startsNow(state) || stepsMayStart(data!)) return;
+      const why = data!.status !== "DECIDED" ? `${arc} is ${arcStatus(data!)}, and a step starts only after the developer's go — \`row write ${arc} --status DECIDED --note "<the developer's words>"\``
+        : `${arc} holds the developer's wait, "${data!.wait}", and starts at their word — \`row write ${arc} --start --note "<their words>"\``;
+      throw new UsageFault(`keeps step ${rowId} from starting: ${why} (RD.DEVEX.WORKSPACE.278).`);
+    };
     if (!row) {
       const title = words.value("title");
-      const kind = kindAdded(arc, rowId, data.status, words.value("kind"));
+      const kind = words.value("kind");
       if (!title || !kind) throw new UsageFault(`adds row ${rowId} with \`--title\` and \`--kind\`.`);
+      if (statusBefore === "LANDED" || statusBefore === "CARRIED" || statusBefore === "DROPPED")
+        throw new UsageFault(`keeps ${arc} as it is: it is ${statusBefore}, and a landed arc is never reopened — a fix to it is a step on the review-fixes arc, naming ${arc}; new scope is a new arc (RD.DEVEX.WORKSPACE.261).`);
       row = { id: rowId, parent: arc, title, kind, state: "waiting" };
       rowFields(row, words);
-      row.kind = kind;
+      mayStart(row.state);
       data.rows.push(row);
       // A row that now has rows under it takes its state from them.
       const parents = parentIds(data.rows);
@@ -219,40 +227,24 @@ function write(args: string[]): number {
       said.push(`row ${rowId} added`);
     } else {
       const was = stateOfRow(data.rows, row);
-      const wasKind = row.kind;
       const changed = rowFields(row, words);
       if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
-      // RD.DEVEX.WORKSPACE.278: the command gives `design`, so no hand moves a row to it or from it.
-      if (changed.includes("kind") && (wasKind === DESIGN_KIND || row.kind === DESIGN_KIND))
-        throw new UsageFault(`keeps row ${rowId} a ${wasKind} row: a row's kind is never moved to or from \`design\` by hand — the command gives it to every row added while its arc is \`PROPOSED\` (RD.DEVEX.WORKSPACE.278).`);
-      const starts = changed.includes("state") && ["running", "landed"].includes(row.state!) && isBuildRow(row);
-      // A build row starts only after the go.
-      if (starts && data.status === "PROPOSED")
-        throw new UsageFault(`keeps row ${rowId} ${was}: ${arc} is PROPOSED, and a build row starts only after the developer's go — \`row write ${arc} --status DECIDED --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.278).`);
-      // After the go, a build row that runs or lands moves a decided, held or part-landed arc to RUNNING.
-      const startedFrom = starts && ["DECIDED", "HELD", "PART-LANDED"].includes(data.status) ? data.status : null;
-      if (startedFrom) { data.status = "RUNNING"; data.reason = null; }
+      if (changed.includes("state")) mayStart(row.state);
       if (changed.length) typed(() => writeArc(ws, data!));
       const kind = changed.includes("state") ? row.state! : changed.length ? "changed" : "note";
       logEvent(ws, arc, kind, rowId, note ?? (changed.includes("state") ? `${was} → ${row.state}` : `changed ${changed.join(", ")}`));
       said.push(changed.length ? `row ${rowId} · ${changed.join(", ")}` : `row ${rowId} · log line written`);
-      if (startedFrom) {
-        logEvent(ws, arc, "status", null, `${startedFrom} → RUNNING · row ${rowId} ${row.state}`);
-        said.push(`${arc} ${startedFrom} → RUNNING`);
-      }
-      if (changed.includes("state") && row.state === "landed" && !TERMINAL.has(data.status) && data.status !== "PROPOSED") {
-        const counted = doneOf(data);
-        if (counted.total > 0 && counted.done === counted.total) closing = true;
-      }
     }
   }
+  // The status the steps work out moved: say so, in the line.
+  const statusAfter = arcStatus(data);
+  if (statusBefore && statusAfter !== statusBefore && rowId !== undefined) said.push(`${arc} reads ${statusAfter}`);
   // A preview that moved is a view moved: the Cycles row links it in the same write.
   const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
-  if (closing) console.log(`every row landed: write --status LANDED once proven`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
   return 0;
 }
@@ -304,14 +296,13 @@ function discard(args: string[]): number {
   const { done, total } = doneOf(data);
   console.log(`ok · ${arc} ${done}/${total} · ${[`row ${rowId} discarded`, ...refreshed.said].join(" · ")}`);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
-  if (total > 0 && done === total && !TERMINAL.has(data.status)) console.log(`every row landed: write --status LANDED once proven`);
   return 0;
 }
 
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
+    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
     run: write,
   },
   discard: {

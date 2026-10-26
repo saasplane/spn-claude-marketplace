@@ -1,0 +1,306 @@
+<!-- An arc's one preview: notes/N010/preview.html, from approach-preview-template.html. -->
+<meta charset="utf-8">
+<title>030 · N010 - Lean Agent Work</title>
+<!-- spn:doc
+{"id": "ws-030-page-patterns-lean-agent-work", "variant": "preview", "title": "How the agent works a workstream", "lenses": ["LEAD", "ARCHITECT", "PRODUCT", "PARTNER"], "status": "PLANNING", "summary": "How the agent opens a workstream and its arcs, moves them on your words, and keeps its own steps out of what you read.", "keywords": ["workstream", "arc", "status", "go", "intake", "review fixes", "light form", "state machine"]}
+-->
+
+
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.9.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../../approach.html#c10">&larr; 030 - Page Patterns</a>
+  <div class="sds-rail-title">How the agent works a workstream</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 030 &nbsp;|&nbsp; How the agent works a workstream</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <a class="sds-badge" href="../../approach.html#N010">N010</a><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-26</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-running" href="../../approach.html#N010">RUNNING</a></span></span></div>
+  <h1>How the agent works a workstream</h1>
+  <p class="sds-subtitle">Whether the agent should open, shape and move a workstream&rsquo;s arcs as this page shows, so the book and spn-devex say it next.</p>
+  <p class="sds-standfirst">Today planning can look like building, arcs are cut by release or by repository, a landed arc gets reopened, and you are told about steps by number. This page shows the workstream as it would run instead: what the agent needs before it opens one, how arcs are shaped while you plan, which of your words move what, the three state machines, and every case. It ends with where the change lands.</p>
+</header>
+
+<section id="s1" data-block="reasons">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>You are asked to decide whether the workstream should run as § Proposed shows. It serves the approach page&rsquo;s <a href="../../approach.html#c10">The agent spends its tokens on the change</a>.</p>
+  <p>Look first at the arc&rsquo;s status and the kinds of go, then read the cases: each one says what the agent does and what you would see.</p>
+  <p>Not final: the names <em>review-fixes arc</em> and <em>wait</em> are working names, and the cost targets are checked again on the next workstream. Delegated work in the light form is already built, and it is shown here so the whole way of working is on one page.</p>
+</section>
+
+<section id="s2" data-block="sequence">
+  <div class="sds-section-head"><h2>Today</h2></div>
+  <p class="sds-standfirst">A workstream runs on eight arc statuses, reading counted as building, and six tables that each place new work a different way.</p>
+
+  <h3 id="s2a">What happens today, and what it causes</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>What happens today</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>Planning</strong></p><p>A planning arc whose reading and drafting are rows, turned into build rows at the go.</p><span class="sds-small">You see: an arc reading RUNNING while nothing is built, then flipping back</span></td></tr>
+      <tr><td><p><strong>Cutting arcs</strong></p><p>By the release each pays, or one per site or repository.</p><span class="sds-small">You see: ten arcs for what you review as three</span></td></tr>
+      <tr><td><p><strong>Placing new work</strong></p><p>Six tables, each with its own test.</p><span class="sds-small">You see: small changes becoming new arcs, and machinery fixes landing in the subject&rsquo;s workstream</span></td></tr>
+      <tr><td><p><strong>After an arc lands</strong></p><p>A new ask reopens it as PROPOSED, with a new preview.</p><span class="sds-small">You see: the same arc reopened twice in one day</span></td></tr>
+      <tr><td><p><strong>The page</strong></p><p>Every added row puts the page behind until Why, What and How are edited by hand.</p><span class="sds-small">You see: slow replies about bookkeeping</span></td></tr>
+      <tr><td><p><strong>Talking to you</strong></p><p>Steps and briefs cited by number.</p><span class="sds-small">You see: &ldquo;row 7 cannot proceed&rdquo;, which tells you nothing</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s3" data-block="comparison">
+  <div class="sds-section-head"><h2>Proposed</h2></div>
+  <p class="sds-standfirst">At any moment you can tell what is being shaped, what you agreed, what is being built and what is done; everything you review is an arc with its preview, and the agent does the bookkeeping and tells you each move in one line.</p>
+
+  <h3 id="s3a">What you see, and what stays the agent&rsquo;s</h3>
+  <ul>
+    <li><strong>You see</strong> the approach page, the arcs&rsquo; previews and the changes in the repositories. An arc is named by its number and title, because an arc is what you review.</li>
+    <li><strong>The agent keeps</strong> its steps (the rows) and its briefs to children (the orders). Neither is ever cited to you by number: not on the approach page, a preview, a card, a suggestion or a reply.</li>
+    <li><strong>A block is said in words:</strong> <em>&ldquo;the test sign-in on the provider page waits on the server change&rdquo;</em>, never <em>&ldquo;row 7 cannot proceed&rdquo;</em>.</li>
+  </ul>
+
+  <h3 id="s3b">The units</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Unit</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>Workstream</strong></p><p>One subject with one goal, created only when you and the agent agree. Its approach page holds the goal, Why, What (each decision as a statement), How (the arcs, and one line for each arc still expected) and Open (the cards).</p><span class="sds-small">Status: PLANNING · IMPLEMENTING · DONE &middot; Folder: <code>backlog/</code>, <code>open/</code> or <code>closed/</code></span></td></tr>
+      <tr><td><p><strong>Arc</strong></p><p>What you review together on one preview and what releases together, named for the domain it lands in as the repository&rsquo;s own concept names its domains; where a concept names none, the agent asks you. It says what will be true when it lands, and how that is proved.</p><span class="sds-small">Status: six, § Arc status</span></td></tr>
+      <tr><td><p><strong>Step</strong></p><p>One build step, in chain order: book, registers, repository docs, code, release. Only build steps are recorded; reading and drafting never are.</p><span class="sds-small">Status: the agent&rsquo;s own, § The agent&rsquo;s steps</span></td></tr>
+      <tr><td><p><strong>Planning job</strong></p><p>A read or a draft that prepares a preview, done by the agent itself, and by a child only when it would take more than about 15 minutes. What comes back is facts and the preview section, with no report file.</p><span class="sds-small">Status: none, ever</span></td></tr>
+      <tr><td><p><strong>Build job</strong></p><p>A light-form brief for build steps (§ Delegated work), only for judgement work of more than about 15 minutes.</p><span class="sds-small">Status: through its steps</span></td></tr>
+      <tr><td><p><strong>Card</strong></p><p>A choice that changes what gets built, in Open until you answer; the answer then becomes a statement in What and in the preview it touches.</p><span class="sds-small">Status: open · answered</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s3c">Before a workstream exists: what the agent needs</h3>
+  <p>You ask for a workstream, or the agent suggests one while you discuss something else and you agree. The agent reads what it can from disk first, never asks again for what you already said, and then asks two or three plain questions at a time until it can say these back to you in one block.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Base information</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>The subject</strong></p><p>In a few words.</p><span class="sds-small">For 030: page patterns &middot; Becomes: the folder name</span></td></tr>
+      <tr><td><p><strong>The goal</strong></p><p>What is true when it is done, for whom, and how we will know.</p><span class="sds-small">For 030: every page of our apps and sites follows a named pattern a partner can reuse; each page names its pattern, and the showcase shows each one &middot; Becomes: the page&rsquo;s subtitle, and the proof of the last arc</span></td></tr>
+      <tr><td><p><strong>Why now</strong></p><p>What goes wrong if nothing changes.</p><span class="sds-small">For 030: pages are built one by one, and each looks different &middot; Becomes: Why</span></td></tr>
+      <tr><td><p><strong>What it reaches</strong></p><p>As far as is known: the domains, the apps, the sites.</p><span class="sds-small">For 030: the Surface standard, the design system, the platform&rsquo;s apps, saasplane.ai &middot; Becomes: the domains, and whether a partner is affected</span></td></tr>
+      <tr><td><p><strong>What you want to see first</strong></p><p>The thing you would review first, and in what form.</p><span class="sds-small">For 030: the patterns as a page of sketches &middot; Becomes: N001 and its preview</span></td></tr>
+      <tr><td><p><strong>Limits</strong></p><p>What must not change, and what a release may be.</p><span class="sds-small">For 030: minor releases only; Launchpad&rsquo;s apps stay as they are &middot; Becomes: traps, and steps that are never written</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>It does not need the list of arcs, the steps or the sizes: shaping finds those. At your yes to the block, the agent creates the workstream at the next free number, writes its approach page from the block, and opens <strong>N001</strong>, the arc for what you want to see first, named for its domain, as <span class="sds-badge sds-status sds-proposed">PROPOSED</span> with its preview. Each arc it expects beyond N001 is one line in How. From its first write the new workstream passes <code>state check</code> and the Stop hook, with N001 PROPOSED and no steps.</p>
+
+  <h3 id="s3d">Shaping: arcs while you plan</h3>
+  <ol>
+    <li>As the discussion makes things clear, an expected line in How becomes an arc with its own preview. The agent merges arcs that turn out to be reviewed together or that release the same package, and rewrites an arc&rsquo;s goal when the discussion moves it. A preview section already written moves with the arc that takes it.</li>
+    <li>An arc never decided is reshaped freely: renumbered, merged or deleted, with no history.</li>
+    <li>Several arcs can be PROPOSED at once, and none is a placeholder: an arc opens only with a goal and a preview section you can read, or with its steps when there is nothing to look at.</li>
+    <li>Steps may be written before the go, as the plan of the build; none starts until the arc is DECIDED.</li>
+    <li>Planning jobs fill the preview and the arc&rsquo;s facts, and the arc stays PROPOSED the whole time. <code>plan.md</code> is not written while an arc is PROPOSED; at the go it is written only where there are traps or a move table.</li>
+    <li>Each move is told in one line: <em>N002 opened from How: the platform&rsquo;s screens and flows, with its preview.</em></li>
+  </ol>
+
+  <h3 id="s3e">How arcs are cut</h3>
+  <ol>
+    <li>The edge of an arc is what you review together and what releases together. The domain gives it its name.</li>
+    <li>A package is released by one arc only. When another arc needs a change in it, the change is a step of the arc that releases it, and the work that needs it waits on that release.</li>
+    <li>Each package releases after the last step that changes it, not all of them at the end. Where a domain does not release on its own, such as a module inside one app, the arc lands at its proof.</li>
+    <li>A goal too big to review once is split by when you would review it. If both halves touch one package it releases twice, and if that is not worth it the split is wrong.</li>
+    <li>A fix to the agent&rsquo;s machinery, a plugin or the design system outside the goal&rsquo;s domains goes to the workstream that owns it, or where you say, and the reply links where it went. In a partner&rsquo;s workspace, where nobody owns the plugin, it becomes an issue the agent drafts for SaaS Plane&rsquo;s public marketplace repository.</li>
+  </ol>
+  <p class="sds-small">For 030 this gives three arcs where there are ten: Surface (the patterns standard, the design system, the plugin), Platform (the demo site, the screens and the flows), and saasplane.ai.</p>
+
+  <h3 id="s3m">Placing something new</h3>
+  <p>One order of questions replaces the six tables. The agent reads where the workstream stands first: its goal, which arcs landed, which are building, which wait, and each open arc&rsquo;s goal. Then it asks, in this order, and stops at the first yes:</p>
+  <ol>
+    <li><strong>Is it a question?</strong> It is answered, and nothing opens.</li>
+    <li><strong>Is it another subject, or outside the goal&rsquo;s domains?</strong> A workstream is suggested, or it goes where § How arcs are cut says.</li>
+    <li><strong>Does it fall inside an arc that has not landed?</strong> The test is whether that arc&rsquo;s goal already covers it. Yes: a step there, or a section of its preview while it is PROPOSED.</li>
+    <li><strong>Does it fix what a landed arc delivered?</strong> The test is whether the landed arc&rsquo;s goal would stay word for word as it is. Yes: something it promised does not hold, or needs a polish, so it is a step on the review-fixes arc, naming the arc it fixes.</li>
+    <li><strong>Otherwise it is new scope</strong>, something no arc&rsquo;s goal promised: a new arc, PROPOSED, named for its domain, with a preview when there is something to see. Its package rule still holds: a change in a package another open arc releases is a step of that arc.</li>
+  </ol>
+  <p>A landed arc is never reopened, because its goal and your review of it are the record of what was delivered. The reply says in one line where the new thing went and why (<em>&ldquo;a fix to N006&rsquo;s band buttons, on review fixes: N006&rsquo;s goal is unchanged&rdquo;</em>), so you can move it with one word if the agent read it wrongly.</p>
+
+  <h3 id="s3f">The kinds of go, and the other words that move things</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Your words</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>Create</strong></p><p>The workstream, its approach page, and N001 PROPOSED.</p><span class="sds-small">For example: &ldquo;yes, create it&rdquo;</span></td></tr>
+      <tr><td><p><strong>Go on a preview</strong></p><p>Each arc named moves from PROPOSED to DECIDED, and building starts.</p><span class="sds-small">For example: &ldquo;N002&rsquo;s preview is good to go&rdquo;, &ldquo;all arcs are ready&rdquo;</span></td></tr>
+      <tr><td><p><strong>Wait</strong></p><p>The arc is decided and held: the wait is kept with your words, and nothing starts, in this window or the next.</p><span class="sds-small">For example: &ldquo;approved, but wait&rdquo;, &ldquo;stop N003&rdquo;</span></td></tr>
+      <tr><td><p><strong>Start</strong></p><p>Clears the wait, and building starts.</p><span class="sds-small">For example: &ldquo;start N003&rdquo;</span></td></tr>
+      <tr><td><p><strong>An answer</strong></p><p>No status moves; the answer goes into What and the preview.</p><span class="sds-small">For example: &ldquo;Q18 A&rdquo;</span></td></tr>
+      <tr><td><p><strong>A change</strong></p><p>A step; a status moves only when you agree an arc&rsquo;s goal changed.</p><span class="sds-small">For example: &ldquo;fix the footer&rsquo;s gap&rdquo;</span></td></tr>
+      <tr><td><p><strong>Drop</strong></p><p>An arc never decided is deleted; one decided before becomes DROPPED.</p><span class="sds-small">For example: &ldquo;drop N004&rdquo;</span></td></tr>
+      <tr><td><p><strong>Move</strong></p><p>CARRIED, and its work opens in the other workstream.</p><span class="sds-small">For example: &ldquo;move N004 to 031&rdquo;</span></td></tr>
+      <tr><td><p><strong>Park</strong></p><p>The folder moves to <code>backlog/</code>, with the blocker named.</p><span class="sds-small">For example: &ldquo;park this until the cloud account exists&rdquo;</span></td></tr>
+      <tr><td><p><strong>A version</strong></p><p>The release&rsquo;s version.</p><span class="sds-small">For example: &ldquo;release it as 6.0.0&rdquo;</span></td></tr>
+      <tr><td><p><strong>Close</strong></p><p>After the review links, the page reads DONE and the folder moves to <code>closed/</code>.</p><span class="sds-small">For example: &ldquo;close it&rdquo;</span></td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>A go answers only what it names. &ldquo;Approved&rdquo; on one arc&rsquo;s preview decides that arc, not its neighbours and not an open card. Words that name no arc, such as &ldquo;looks good&rdquo; while several arcs are PROPOSED, move nothing, and the agent asks which arc.</li>
+    <li>Every go is logged with your words, and the reply says in one line what it moved and what stays open: <em>N002 decided, building started; Q19 still open.</em></li>
+  </ul>
+
+  <h3 id="s3g">Arc status</h3>
+  <p>Six statuses. Only your words and the steps move them; a planning job, a fact, a preview edit, a card&rsquo;s answer or a step added inside the arc&rsquo;s goal never does.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 18 1016 300" width="1016" height="300" role="img" aria-label="PROPOSED moves to DECIDED on your go on its preview; DECIDED to RUNNING when the first step starts, unless you said wait; RUNNING to LANDED when the last step and its proof land. DECIDED or RUNNING go back to PROPOSED when you agree the goal changed. An arc decided at least once can become CARRIED or DROPPED by your words. An arc never decided is reshaped or deleted.">
+    <defs><marker id="ar-arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="20" y="100" width="200" height="80" rx="3"/><text class="sds-title" x="36" y="128">PROPOSED</text><text class="sds-code" x="36" y="150">being shaped</text><text class="sds-code" x="36" y="168">never decided: reshaped</text>
+    <rect class="sds-box sds-tone-blue" x="292" y="100" width="200" height="80" rx="3"/><text class="sds-title" x="308" y="128">DECIDED</text><text class="sds-code" x="308" y="150">your go, kept with</text><text class="sds-code" x="308" y="168">your words (and any wait)</text>
+    <rect class="sds-box" x="564" y="100" width="200" height="80" rx="3"/><text class="sds-title" x="580" y="128">RUNNING</text><text class="sds-code" x="580" y="150">worked out from</text><text class="sds-code" x="580" y="168">the steps</text>
+    <rect class="sds-box" x="832" y="100" width="200" height="80" rx="3"/><text class="sds-title" x="848" y="128">LANDED</text><text class="sds-code" x="848" y="150">never reopened; fixes go</text><text class="sds-code" x="848" y="168">to the review-fixes arc</text>
+    <path class="sds-connector" d="M220 140 H290" marker-end="url(#ar-arc)"/><text class="sds-code" x="224" y="92">go on preview</text>
+    <path class="sds-connector" d="M492 140 H562" marker-end="url(#ar-arc)"/><text class="sds-code" x="496" y="92">first step</text>
+    <path class="sds-connector" d="M764 140 H830" marker-end="url(#ar-arc)"/><text class="sds-code" x="768" y="92">all landed</text>
+    <path class="sds-connector" d="M664 100 V44 H120 V98" marker-end="url(#ar-arc)"/><text class="sds-code" x="240" y="36">you agree its goal changed: back to PROPOSED, running steps stop</text>
+    <rect class="sds-box" x="292" y="236" width="200" height="60" rx="3"/><text class="sds-title" x="308" y="262">CARRIED</text><text class="sds-code" x="308" y="282">moved to another workstream</text>
+    <rect class="sds-box" x="564" y="236" width="200" height="60" rx="3"/><text class="sds-title" x="580" y="262">DROPPED</text><text class="sds-code" x="580" y="282">not wanted</text>
+    <path class="sds-connector" d="M392 180 V234" marker-end="url(#ar-arc)"/><path class="sds-connector" d="M664 180 V234" marker-end="url(#ar-arc)"/><text class="sds-code" x="40" y="270">your words, once decided</text>
+  </svg>
+  <figcaption>Your words are stored: the go, a wait, a changed goal, CARRIED, DROPPED. RUNNING and LANDED are worked out from the steps each time they are read, so they cannot flip or go stale.</figcaption>
+  </figure>
+  <ul>
+    <li><strong>A stored PROPOSED wins over the steps:</strong> when you agree an arc&rsquo;s goal changed, anything it was building stops until your next go.</li>
+    <li><strong>LANDED</strong> means every step landed, deferred and carried steps left out of the count, and the final proof passed.</li>
+    <li><strong>PART-LANDED and HELD go.</strong> A stalled arc shows what it is doing and when it last moved, and a held one shows your wait.</li>
+    <li><strong>The review-fixes arc</strong> opens at the first &ldquo;fix X&rdquo; after any arc lands, DECIDED on those words, and takes fixes for every arc of the workstream, each saying which arc it fixes. It is the one arc that lands on your word: it reads RUNNING until you close the workstream.</li>
+  </ul>
+
+  <h3 id="s3h">Workstream status</h3>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 18 1016 230" width="1016" height="230" role="img" aria-label="The approach page reads PLANNING until the first step of any arc starts, then IMPLEMENTING, which says waiting for your review once every arc has landed, then DONE on your word to close. The folder moves between backlog and open on your word, and to closed when you close.">
+    <defs><marker id="ar-ws" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="20" y="40" width="280" height="80" rx="3"/><text class="sds-title" x="36" y="68">PLANNING</text><text class="sds-code" x="36" y="90">arcs PROPOSED or DECIDED,</text><text class="sds-code" x="36" y="108">nothing built yet</text>
+    <rect class="sds-box sds-tone-blue" x="376" y="40" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="68">IMPLEMENTING</text><text class="sds-code" x="392" y="90">building; with every arc landed:</text><text class="sds-code" x="392" y="108">&ldquo;waiting for your review&rdquo;</text>
+    <rect class="sds-box" x="752" y="40" width="280" height="80" rx="3"/><text class="sds-title" x="768" y="68">DONE</text><text class="sds-code" x="768" y="90">your word to close,</text><text class="sds-code" x="768" y="108">after the review links</text>
+    <path class="sds-connector" d="M300 80 H374" marker-end="url(#ar-ws)"/><path class="sds-connector" d="M676 80 H750" marker-end="url(#ar-ws)"/>
+    <rect class="sds-box" x="20" y="160" width="280" height="60" rx="3"/><text class="sds-title" x="36" y="186">backlog/</text><text class="sds-code" x="36" y="206">parked, the blocker named</text>
+    <rect class="sds-box" x="376" y="160" width="300" height="60" rx="3"/><text class="sds-title" x="392" y="186">open/</text><text class="sds-code" x="392" y="206">park and resume on your word</text>
+    <rect class="sds-box" x="752" y="160" width="280" height="60" rx="3"/><text class="sds-title" x="768" y="186">closed/</text><text class="sds-code" x="768" y="206">the close gate passed</text>
+    <path class="sds-connector" d="M374 190 H302" marker-end="url(#ar-ws)"/><path class="sds-connector" d="M676 190 H750" marker-end="url(#ar-ws)"/>
+  </svg>
+  <figcaption>A new arc opened after some have landed is PROPOSED, and the page stays IMPLEMENTING. Closing is refused while any arc is still PROPOSED or DECIDED: each is built, deleted, dropped or carried first.</figcaption>
+  </figure>
+
+  <h3 id="s3i">The agent&rsquo;s steps</h3>
+  <p>You never need these; they are here so the record is whole.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>State</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>waiting · ready</strong></p><p>Written; ready once what it waits on has landed, and only on a DECIDED arc with no wait.</p></td></tr>
+      <tr><td><p><strong>running</strong></p><p>Started, with the time it started.</p></td></tr>
+      <tr><td><p><strong>stopped</strong></p><p>Put down, with what has to happen first: often a card, or a changed goal.</p></td></tr>
+      <tr><td><p><strong>replaced</strong></p><p>Started, then replaced by new steps after your change; its words are kept.</p></td></tr>
+      <tr><td><p><strong>landed</strong></p><p>In its repository, with its commit and proof.</p></td></tr>
+      <tr><td><p><strong>deferred · carried</strong></p><p>Comes back when its event happens · moved to another workstream.</p></td></tr>
+      <tr><td><p><strong>discarded</strong></p><p>Found wrong or not needed before it started: it leaves the arc, and the log keeps its words.</p></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s3j">Every case, and what the agent does</h3>
+  <p>Each rule is stated once, in its subsection above; this table points to it.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Case</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>You ask for a new workstream</strong></p><p>§ Before a workstream exists.</p><span class="sds-small">Status: N001 PROPOSED · page PLANNING</span></td></tr>
+      <tr><td><p><strong>The agent sees another subject while you discuss</strong></p><p>It suggests a workstream in one line; at your yes, as above.</p><span class="sds-small">Status: none until your yes</span></td></tr>
+      <tr><td><p><strong>The discussion makes things clearer</strong></p><p>§ Shaping.</p><span class="sds-small">Status: new arcs PROPOSED</span></td></tr>
+      <tr><td><p><strong>You say go, wait, start, drop or move</strong></p><p>§ The kinds of go.</p><span class="sds-small">Status: as that table says</span></td></tr>
+      <tr><td><p><strong>Your words name no arc while several are PROPOSED</strong></p><p>It asks which arc, and moves nothing.</p><span class="sds-small">Status: unchanged</span></td></tr>
+      <tr><td><p><strong>You add something while arcs are under review</strong></p><p>§ Placing something new: into the matching PROPOSED arc&rsquo;s preview; on a DECIDED arc, a step when it is inside the goal; outside every goal, a new PROPOSED arc. Told in one line.</p><span class="sds-small">Status: unchanged, or a new arc</span></td></tr>
+      <tr><td><p><strong>You ask for a change while an arc is building</strong></p><p>Inside the goal, a step. If it changes what is being built right now, the agent stops at the next commit, shows you the new plan in words and resumes. If it thinks the goal moved, it asks you.</p><span class="sds-small">Status: unchanged, or PROPOSED at your yes</span></td></tr>
+      <tr><td><p><strong>A card&rsquo;s answer is needed while building</strong></p><p>It stops only the work the answer can change, says in words what waits, and the rest keeps going.</p><span class="sds-small">Status: unchanged</span></td></tr>
+      <tr><td><p><strong>An arc has landed and you ask for a fix to it</strong></p><p>§ Placing something new: a step on the review-fixes arc, saying which arc it fixes.</p><span class="sds-small">Status: review fixes RUNNING; the landed arc stays LANDED</span></td></tr>
+      <tr><td><p><strong>Some arcs have landed and you ask for something bigger</strong></p><p>§ Placing something new: same subject, a new arc with a preview if there is something to see; another subject, a workstream suggested.</p><span class="sds-small">Status: new arc PROPOSED; page stays IMPLEMENTING</span></td></tr>
+      <tr><td><p><strong>Every arc has landed</strong></p><p>It shows you the review links, one per changed app, and waits.</p><span class="sds-small">Status: &ldquo;waiting for your review&rdquo;</span></td></tr>
+      <tr><td><p><strong>You are not happy with the review</strong></p><p>The fixes go on the review-fixes arc.</p><span class="sds-small">Status: review fixes RUNNING</span></td></tr>
+      <tr><td><p><strong>You say close</strong></p><p>It runs the close gate (§ Workstream status) and moves the folder.</p><span class="sds-small">Status: DONE · <code>closed/</code></span></td></tr>
+      <tr><td><p><strong>You ask a question</strong></p><p>It answers it, and opens nothing.</p><span class="sds-small">Status: none</span></td></tr>
+      <tr><td><p><strong>A machinery, plugin or design-system fix outside the goal</strong></p><p>§ How arcs are cut, the last point.</p><span class="sds-small">Status: none here</span></td></tr>
+      <tr><td><p><strong>The work is blocked by something outside the workstream</strong></p><p>It says what blocks it and suggests parking; it parks on your word.</p><span class="sds-small">Status: folder in <code>backlog/</code></span></td></tr>
+      <tr><td><p><strong>A window ends while building</strong></p><p>The next window resumes from the first step not landed, and keeps any wait you gave.</p><span class="sds-small">Status: unchanged</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s3k">Delegated work takes the light form</h3>
+  <p>Built already, and shown here so the whole way of working is on one page.</p>
+  <ol>
+    <li>A mechanical step, such as a pin move, a rename or a prop swap the brief can list, is done by the agent itself, with no child, brief or report.</li>
+    <li>A brief names the files to change, the one rule they follow and the acceptance, and nothing else to read first.</li>
+    <li>A child runs <code>apps check</code> on each node it touched and the specs it changed or added, narrowed. A fail-once proof is only for new behaviour.</li>
+    <li>Whole test tiers, browser walks and the look run once, at the arc&rsquo;s final re-check, and you see the look as soon as a batch lands.</li>
+    <li>Commits are fewer and bigger: each touched tier runs whole once per batch.</li>
+    <li>A report is at most 15 lines, and a hand-back at most 8.</li>
+  </ol>
+
+  <h3 id="s3l">What each event writes</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Event</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>Create</strong></p><p>The folder, the approach page, N001&rsquo;s record and preview.</p></td></tr>
+      <tr><td><p><strong>An arc opened, merged or re-goaled while planning</strong></p><p>The arc&rsquo;s record and preview, one line in How, one log line.</p></td></tr>
+      <tr><td><p><strong>A go, a wait, a start</strong></p><p>One status line with your words.</p></td></tr>
+      <tr><td><p><strong>A step added, started or landed</strong></p><p>One record write each, and no page edit.</p></td></tr>
+      <tr><td><p><strong>A card answered</strong></p><p>The card&rsquo;s record, one sentence in What, the preview section it touches.</p></td></tr>
+      <tr><td><p><strong>An arc lands</strong></p><p>What brought current in a sentence or two.</p></td></tr>
+      <tr><td><p><strong>Close</strong></p><p>The close gate, and the folder move.</p></td></tr>
+    </tbody>
+  </table></div>
+  <p class="sds-small">Targets, counted again on the next workstream: about three log events per step and three per arc, and for each arc before its go its notes in KB and its planning jobs&rsquo; tokens, against what 030&rsquo;s sizing cost (the measurements are in the arc&rsquo;s plan).</p>
+</section>
+
+<section id="s4" data-block="sequence">
+  <div class="sds-section-head"><h2>Where it lands</h2></div>
+  <p class="sds-standfirst">The book first, then spn-devex and its migration, then one release and a sync of the workspace.</p>
+
+  <h3 id="s4a">Every change, by repository, in the order the work runs</h3>
+  <p><strong>1 &middot; spn-foundation</strong> &mdash; the workstream chapter and its register say § Proposed</p>
+  <pre>spn-foundation/
+└── docs/
+    ├── 04-capabilities/01-devex/04-workspace/
+    │   ├── 02-workstream/
+    │   │   └── 01-workstream.md       changed  the intake and N001; shaping; how arcs are cut; the kinds of go;
+    │   │                                       six statuses, stored and worked out; one § Placing new work in
+    │   │                                       place of six tables; the review-fixes arc; steps never cited to you;
+    │   │                                       closing on your word (the light form is in already)
+    │   └── 04-docs/
+    │       ├── 05-artifacts.md        changed  the page's status and the progress block read six statuses
+    │       └── templates/workstream/
+    │           ├── arc-template.md    changed  no design kind
+    │           └── plan-template.md   changed  written at the go, only where there are traps
+    ├── 02-constructs/01-devex/04-workspace/
+    │   └── 02-workstream.md           changed  restated to match
+    └── registers/
+        └── decisions.md               changed  RD.278 and RD.261 rewritten; new rows for stored and worked-out
+                                                status, the kinds of go and placing new work</pre>
+  <p><strong>2 &middot; spn-claude-marketplace</strong> &mdash; spn-devex restates the book, and its commands follow it</p>
+  <pre>spn-claude-marketplace/
+└── packages/plugin-spn-devex/src/
+    ├── refs/devex/workspace/
+    │   └── workstream.md              changed  restated from the book
+    └── scripts/
+        ├── lib/
+        │   ├── workstream.ts          changed  the one owner that works out RUNNING and LANDED
+        │   └── migrations/
+        │       └── 006-…ts            new      the state's version 2
+        ├── commands/workstream/
+        │   └── row.ts                 changed  no design kind, no second-arc refusal; no step starts on an arc
+        │                                       that is not DECIDED or that holds a wait
+        ├── commands/docs/cycles.ts    changed  reads the status from the owner
+        ├── checks/
+        │   ├── workstream-state.ts    changed  six statuses; a workstream with N001 and no steps passes
+        │   └── confirmed.ts           changed  a go is the stored DECIDED with your words
+        └── events/stop.ts             changed  no HELD; reads the status from the owner</pre>
+  <p>The other readers of the status (<code>arc-status.ts</code>, <code>split-plan.ts</code>) read it from the same owner.</p>
+  <p><strong>3 &middot; the release and the workspace</strong> &mdash; one spn-devex release carries the light form and this; its notes open with the migration and with what replaces the design kind, a planning job</p>
+  <pre>every workspace
+└── .spndevex/workstreams/
+    └── */arcs/N*/state.json           changed  version 2: HELD becomes DECIDED with its reason kept as a wait;
+                                                PART-LANDED becomes RUNNING; an unlanded design row on an arc
+                                                not yet decided leaves the steps, its words kept in the log</pre>
+  <p>After the update, <code>spn-devex plugin migration check</code> names the migration and <code>plugin migration write</code> applies it once; running it again changes nothing. An older spn-devex that meets a version 2 file refuses it by name and says to update the plugin. Then <code>spnutils workspace agent-sync</code>.</p>
+</section>
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.9.0/sds-docs.js"></script>

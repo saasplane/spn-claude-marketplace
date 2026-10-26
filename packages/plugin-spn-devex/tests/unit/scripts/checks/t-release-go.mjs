@@ -77,8 +77,9 @@ const openedOnAGoFor = (version) => ({ at: AT, kind: "opened", row: null, note: 
 function arc(workstream, id, status, lines) {
   const dir = join(open, workstream, "arcs", id);
   mkdirSync(dir, { recursive: true });
-  const data = { schemaVersion: 1, arc: id, subject: "a-subject", title: "a subject", goal: null, status, reason: null,
-    preview: "preview.html", rows: [{ id: "1", parent: id, title: "release it", kind: "change", state: "waiting" }] };
+  // RUNNING is worked out from the steps, never stored: an arc that runs stores the developer's DECIDED, and a step runs.
+  const data = { schemaVersion: 2, arc: id, subject: "a-subject", title: "a subject", goal: null, status: status === "RUNNING" ? "DECIDED" : status, reason: null,
+    preview: "preview.html", rows: [{ id: "1", parent: id, title: "release it", kind: "change", state: status === "RUNNING" ? "running" : "waiting" }] };
   writeFileSync(join(dir, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
   writeFileSync(join(dir, "log.jsonl"), lines.map((line) => JSON.stringify(line)).join("\n") + "\n");
 }

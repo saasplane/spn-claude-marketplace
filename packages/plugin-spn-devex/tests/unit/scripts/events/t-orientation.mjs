@@ -686,7 +686,7 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   says("green: once the ledger records 001, the window's start says nothing of it", !/\*\*001\*\*|- 001[:,]/.test(recorded), recorded.slice(recorded.indexOf(HEADING), recorded.indexOf(HEADING) + 300));
   const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
   says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
-    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005`"));
+    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006`"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

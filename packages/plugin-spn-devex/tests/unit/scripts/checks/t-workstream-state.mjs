@@ -51,7 +51,8 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title an
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc whose preview What does not link fails", has(checkWorkstream(ws), "stamp", /not linked from the page's What/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
-  const apart = (findings) => findings.filter((one) => one.check !== "status");
+  // The row landed by hand moved the status the steps work out, so the page's views and the name file wait for their command.
+  const apart = (findings) => findings.filter((one) => !["status", "views", "name"].includes(one.check));
   ok("green: the page put back passes", apart(checkWorkstream(ws)).length === 0, said(checkWorkstream(ws)));
 }
 
@@ -235,7 +236,7 @@ console.log("\n=== the life of an arc — the files of every step it has passed"
   writeFileSync(join(ws, "arcs", "N001", "state.json"), JSON.stringify(data));
   ok("red: a landed row with an order and no report fails", has(checkWorkstream(ws), "steps", /row 1 landed and its report/), said(checkWorkstream(ws)));
   put(ws, "notes/N001/orders/1.report.md", "---\nrow: \"1\"\noutcome: landed\n---\n");
-  ok("green: the report there, the check passes", checkWorkstream(ws).filter((one) => one.check !== "status").length === 0, said(checkWorkstream(ws)));
+  ok("green: the report there, the check passes", checkWorkstream(ws).filter((one) => !["status", "views", "name"].includes(one.check)).length === 0, said(checkWorkstream(ws)));
   mkdirSync(join(ws, "notes", "N002"), { recursive: true });
   ok("red: a notes folder with no arc data fails", has(checkWorkstream(ws), "steps", /`notes\/N002\/` has no `arcs\/N002\/state.json`/), said(checkWorkstream(ws)));
   rmSync(join(ws, "notes", "N002"), { recursive: true });
@@ -247,7 +248,7 @@ console.log("\n=== the schema — data that does not hold");
   const file = join(ws, "arcs", "N001", "state.json");
   const good = readFileSync(file, "utf8");
   writeFileSync(file, good.replace('"DECIDED"', '"OPEN"'));
-  ok("red: a status outside the eight fails", has(checkWorkstream(ws), "schema", /`status` is `OPEN`/), said(checkWorkstream(ws)));
+  ok("red: a status outside the stored set fails", has(checkWorkstream(ws), "schema", /`status` is `OPEN`/), said(checkWorkstream(ws)));
   writeFileSync(file, "{ not json");
   ok("red: a state.json that is not JSON fails", has(checkWorkstream(ws), "schema", /is not JSON/), said(checkWorkstream(ws)));
   writeFileSync(file, good);
@@ -280,85 +281,48 @@ console.log("\n=== a section of a page, by its heading");
   ok("a page with no such heading gives nothing", sectionText(text, "Why") === "");
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.278 — a status the rows contradict");
+console.log("\n=== RD.DEVEX.WORKSPACE.278 and .307 — no step runs on an arc not decided, or held by a wait");
 {
   const { ws } = await dataWorkspace("state-status");
   const file = join(ws, "arcs", "N001", "state.json");
+  const statusOnly = () => checkWorkstream(ws).filter((one) => one.check === "status");
   const data = arcData();
   data.rows[0].state = "running";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  const red = checkWorkstream(ws);
-  ok("red: a DECIDED arc with a running row is named, with the command", has(red, "status", /N001 is DECIDED and row 1 is running.*row write N001 --status RUNNING/), said(red));
+  ok("green: a decided arc with a step running has no status finding: it reads RUNNING", statusOnly().length === 0, said(statusOnly()));
   data.status = "PROPOSED";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("red: a build row running on a PROPOSED arc is named, with the go as its fix and never --status RUNNING",
-    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 1 is running .*--status DECIDED --note/) && !has(checkWorkstream(ws), "status", /--status RUNNING/), said(checkWorkstream(ws)));
-  data.status = "RUNNING";
+  ok("red: a step running on a PROPOSED arc is named, with the command that stops it",
+    has(checkWorkstream(ws), "status", /N001 is PROPOSED and step 1 is running .*--state stopped/), said(statusOnly()));
+  data.status = "DECIDED";
+  data.wait = "the developer: approved, but wait";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("green: at RUNNING the same rows pass the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
+  ok("red: a step running against the developer's wait is named, quoting it",
+    has(checkWorkstream(ws), "status", /N001 holds the developer's wait, "the developer: approved, but wait" and step 1 is running/), said(statusOnly()));
+  data.wait = null;
   data.status = "LANDED";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("red: a LANDED arc with a row not landed is named", has(checkWorkstream(ws), "status", /N001 is LANDED and row 1 is running/), said(checkWorkstream(ws)));
-  ok("[RD.DEVEX.WORKSPACE.261] its finding says a row of new scope reopens the arc at PROPOSED, and a small decision lands",
-    has(checkWorkstream(ws), "status", /new scope reopens it: `spn-devex workstream row write N001 --status PROPOSED`.*RD\.DEVEX\.WORKSPACE\.261.*--state landed/),
-    said(checkWorkstream(ws)));
+  ok("red: a stored LANDED arc with a step not landed is named: a landed arc is never reopened",
+    has(checkWorkstream(ws), "status", /N001 is LANDED and step 1 is running — a landed arc is never reopened.*review-fixes arc.*RD\.DEVEX\.WORKSPACE\.261/), said(statusOnly()));
   data.rows[0].state = "landed";
   data.rows[1].state = "landed";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("green: LANDED with every row landed passes the status check", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
+  ok("green: LANDED with every step landed passes the status check", statusOnly().length === 0, said(statusOnly()));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.278 — design rows run under PROPOSED; a build row waits for the go");
+console.log("\n=== RD.DEVEX.WORKSPACE.278 — the kind design is gone: reading and drafting are planning jobs");
 {
   const { ws } = await dataWorkspace("state-design");
   const file = join(ws, "arcs", "N001", "state.json");
   const data = arcData();
+  data.rows[0].kind = "design";
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  ok("red: a step of the kind design fails the schema, which names the three kinds", has(checkWorkstream(ws), "schema", /row 1's `kind` is `design`, and it is one of fix · change · question/), said(checkWorkstream(ws)));
+  data.rows[0].kind = "change";
   data.status = "PROPOSED";
-  data.rows = data.rows.map((row) => ({ ...row, kind: "design" }));
-  data.rows[0].state = "landed";
-  data.rows[1].state = "running";
   writeFileSync(file, JSON.stringify(data, null, 2));
-  const quiet = checkWorkstream(ws).filter((one) => one.check === "status" || one.check === "schema");
-  ok("green: a PROPOSED arc with design rows landed and running holds to the schema and has no status finding", quiet.length === 0, said(quiet));
-  data.status = "DECIDED";
-  writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("green: a DECIDED arc whose only started rows are design has no status or schema finding",
+  ok("green: a PROPOSED arc with steps written before the go, none started, is whole",
     !checkWorkstream(ws).some((one) => one.check === "status" || one.check === "schema"), said(checkWorkstream(ws)));
-  data.rows.push({ id: "3", parent: "N001", title: "build it", kind: "change", state: "landed" });
-  writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("red: a DECIDED arc with a build row landed beside its design rows is named, with --status RUNNING",
-    has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is landed.*--status RUNNING/) && !has(checkWorkstream(ws), "status", /row [12] /), said(checkWorkstream(ws)));
-}
-
-console.log("\n=== RD.DEVEX.WORKSPACE.278 — a reopened arc's earlier build rows are history to the check");
-{
-  const { ws } = await dataWorkspace("state-reopened");
-  const file = join(ws, "arcs", "N001", "state.json");
-  const trail = join(ws, "arcs", "N001", "log.jsonl");
-  const line = (kind, note, row = null) => JSON.stringify({ at: "2026-10-23T19:00+05:30", kind, row, note });
-  const data = arcData();
-  data.status = "PROPOSED";
-  data.rows = data.rows.map((row) => ({ ...row, state: "landed" }));
-  data.rows.push({ id: "3", parent: "N001", title: "the next batch's design", kind: "design", state: "waiting" });
-  writeFileSync(file, JSON.stringify(data, null, 2));
-  const before = [line("opened", "opened as PROPOSED"), line("status", "PROPOSED → DECIDED · the developer: go"), line("landed", "waiting → landed", "1"),
-    line("landed", "running → landed", "2"), line("status", "RUNNING → LANDED"), line("status", "LANDED → PROPOSED · new scope: row 3")];
-  writeFileSync(trail, `${before.join("\n")}\n`);
-  const quiet = checkWorkstream(ws).filter((one) => one.check === "status" || one.check === "schema");
-  ok("green: a reopened arc whose build rows landed under its earlier go has no status finding", quiet.length === 0, said(quiet));
-  writeFileSync(trail, `${before.slice(0, 5).join("\n")}\n`);
-  ok("red: with no move to PROPOSED after them in the log, the same landed build rows are named",
-    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 1 is landed/), said(checkWorkstream(ws)));
-  writeFileSync(trail, `${[...before, line("landed", "waiting → landed", "2")].join("\n")}\n`);
-  ok("red: a build row landed after the reopening is named",
-    has(checkWorkstream(ws), "status", /N001 is PROPOSED and build row 2 is landed/), said(checkWorkstream(ws)));
-  writeFileSync(trail, `${[...before, line("status", "PROPOSED → DECIDED · the developer: go on row 3")].join("\n")}\n`);
-  data.status = "DECIDED";
-  writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("green: at its next go, its earlier build rows are still history", !checkWorkstream(ws).some((one) => one.check === "status"), said(checkWorkstream(ws)));
-  data.rows[2] = { ...data.rows[2], kind: "change", state: "running" };
-  writeFileSync(file, JSON.stringify(data, null, 2));
-  ok("red: a build row running on the DECIDED arc is named", has(checkWorkstream(ws), "status", /N001 is DECIDED and row 3 is running/), said(checkWorkstream(ws)));
 }
 
 console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and an altitude, in chain order");
@@ -377,7 +341,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a reposi
     rows(["1", "spn-foundation", "DOCS"], ["2", "spn-support-ts", "DOCS"], ["3", "spn-foundation", "CODE"]).some((line) => /returns to spn-foundation/.test(line)));
   ok("known-bad: a build row with no repository or no altitude is named, with the set",
     rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no altitude from DOCS · CODE/.test(line)));
-  ok("a design row is the arc's reads and sizing, and is not read", rows(["1", null, null, "design"]).length === 0);
+  ok("a step that changes no repository, `—`, takes no place in the chain", rows(["1", "spn-foundation", "DOCS"], ["2", "—", "PROOF"]).length === 0);
   const { root, ws } = await dataWorkspace("state-chain");
   const wrote = cli(root, ["workstream", "row", "write", "031/N001", "3", "--title", "the book again", "--kind", "change", "--repo", "spn-foundation", "--altitude", "DOCS"]);
   ok("known-bad: `row write` prints the finding in a note line after the write, and still writes",
