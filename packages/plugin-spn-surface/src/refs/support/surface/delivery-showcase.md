@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/12-delivery-showcase.md",
-      "seen": "4f1ee75c"
+      "seen": "040d645d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/12-delivery-showcase/",
@@ -81,7 +81,7 @@ The group of a unit is its path in the sidebar, so the title of a unit is its gr
 
 The theme is not a page. A floating theme bar on every page is the one place it is set (`RD.SUPPORT.SURFACE.212`): the brand colours, the mode (System, Light and Dark, System first) and Theme, which opens the theme's one sheet, and no page draws a Theme button of its own. The theme a person chooses is saved in the browser and followed by every page. The bar stands on the page itself alone, never in a frame, a picture, a thumbnail or a screen opened full screen; it never covers content, keeping room at a page's end, shrinking to a small pill on a reference page while the reader scrolls down and opening on hover or focus, and on a phone showing the colours and a *more* button.
 
-The tool's chrome keeps only what a reader of the public site uses (`RD.SUPPORT.SURFACE.212`): the search, the sidebar, a way back to the site at the toolbar's start, the device as one group of icon toggles (Desktop, Phone, Tablet portrait and Tablet landscape, each named, the chosen one pressed, kept between pages) and the code toggle, one icon toggle in the same look, in the toolbar, a link to the page, and on a component page the controls and the accessibility checks. The sidebar opens with every section and folder expanded down to the units, each unit closed until the reader opens it, and keeps a reader's own choices. A tool or menu that serves the people who build a component goes, by the tool's configuration where it has a setting and by its stylesheet only where it has none. The public site is a static build: every page comes from code at build time, and nothing in a browser creates, changes or saves a story, an argument or a source file. The site's pages (Overview, Get started and Sample apps) show no toolbar, and on a phone no bottom bar with the page's path; Home and a unit's pages keep their toolbar (`RD.SUPPORT.SURFACE.289`).
+The tool's chrome keeps only what a reader of the public site uses (`RD.SUPPORT.SURFACE.212`): the search, the sidebar, a way back to the site at the toolbar's start, which the site's bar names Showcase (`RD.SUPPORT.SURFACE.302`), the device as one group of icon toggles (Desktop, Phone, Tablet portrait and Tablet landscape, each named, the chosen one pressed, kept between pages) and the code toggle, one icon toggle in the same look, in the toolbar, a link to the page, and on a component page the controls and the accessibility checks. The sidebar opens with every section and folder expanded down to the units, each unit closed until the reader opens it, and keeps a reader's own choices. A tool or menu that serves the people who build a component goes, by the tool's configuration where it has a setting and by its stylesheet only where it has none. The public site is a static build: every page comes from code at build time, and nothing in a browser creates, changes or saves a story, an argument or a source file. The site's pages (Overview, Get started and Sample apps) show no toolbar, and on a phone no bottom bar with the page's path; Home and a unit's pages keep their toolbar (`RD.SUPPORT.SURFACE.289`).
 
 Home, the site with its sample apps, and Core hold pages, and every other group holds units. Core holds the pages Colour, Type, Scale, Icons, States, Motion, Primitives, Page levels, Patterns and Inline alignment. App holds three units, `DSApp`, `DSContext` and `DSAppContext`, each with exactly three pages: its Overview, its main page and its Playground. A group of units opens with its Overview, also when it has one unit, and a unit sits in exactly one group. Every layer matches a library file: Core to Layouts are DS 1-core to DS 5-Layouts, and App is DS 6-App.
 
@@ -370,6 +370,29 @@ The showcase never restyles a unit, and it marks a unit its stack provides on it
 ## Boundary
 
 This ref states what a showcase shows, in what outline, and how the page of a unit is derived. It stops at the edge of that catalogue. It does not state which units or groups exist — that is `architecture-components.md` and every construct the outline names. It does not state what the layers are — that is `architecture-names.md`. It does not state how a unit is drawn before it is built — that is `delivery-library.md`. It does not state how a stack builds the showcase, with which tool — that is `providers.md`. And it does not prove a behaviour: the showcase shows a unit, and proving what it does is the component tier of tests.
+
+## Binds
+
+| Rule | What it decides |
+| --- | --- |
+| `RD.SUPPORT.SURFACE.004` | every stack that realizes Surface delivers a showcase in one outline |
+| `RD.SUPPORT.SURFACE.011` | a unit declares its tags, and its page in the showcase is derived from them |
+| `RD.SUPPORT.SURFACE.012` | the code of an example is the usage only, and it is shown whole |
+| `RD.SUPPORT.SURFACE.013` | every page of a showcase follows the same rules of words, size and width |
+| `RD.SUPPORT.SURFACE.014` | a prop that takes an object is explained under the props table, and a scenario page explains its own config |
+| `RD.SUPPORT.SURFACE.015` | a section of a showcase page is one container |
+| `RD.SUPPORT.SURFACE.016` | a size is a tab of the page or the section that shows the unit, and never a page of its own |
+| `RD.SUPPORT.SURFACE.017` | a showcase is built from the units of the design system it proves |
+| `RD.SUPPORT.SURFACE.018` | no container stands inside another container in a showcase |
+| `RD.SUPPORT.SURFACE.019` | a choice a unit has under another prop's name is a tab of Cases |
+| `RD.SUPPORT.SURFACE.020` | the two labelled groups of the opening stand side by side from the start of the row, with a bar between them |
+| `RD.SUPPORT.SURFACE.021` | a showcase is read by a developer or a partner, and names no document of the book |
+| `RD.SUPPORT.SURFACE.022` | a unit stands in its preview by its showcase layout, and several cases stand in one grid of equal cells |
+| `RD.SUPPORT.SURFACE.039` | the section of a unit's main page that holds its cases is named Cases |
+| `RD.SUPPORT.SURFACE.083` | a showcase also shows the units its stack provides on its own, each marked as the stack's own |
+| `RD.SUPPORT.SURFACE.212` | the theme is set in one floating bar on every page and in no tool of the toolbar, the toolbar keeps only what a reader uses, and the public site is a static build that writes nothing |
+| `RD.SUPPORT.SURFACE.280` | the showcase's sidebar opens on one page, Home, then six sections, Core, App, Layout, Container, Widget and Components, and the site's pages and the sample apps stand full page, outside the sidebar |
+| `RD.SUPPORT.SURFACE.302` | the showcase's toolbar opens on a way back to its site, and the site's bar names the showcase Showcase |
 
 ## Proof
 

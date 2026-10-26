@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/01-standards-core.md",
-      "seen": "36da06ae"
+      "seen": "bfcee00d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
@@ -274,6 +274,7 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RD.SUPPORT.SURFACE.061` | a field a person reads has its title above its value, and readings stand in a grid |
 | `RD.SUPPORT.SURFACE.062` | the choices of one set stand in columns |
 | `RD.SUPPORT.SURFACE.063` | a line stands between each two lines of a list |
+| `RD.SUPPORT.SURFACE.201` | the surface moves by one set of tokens: a clamped duration for each place, three shared eases, a role for each kind of unit, and one rule for reduced motion |
 | `RD.SUPPORT.SURFACE.330` | an app names the kind of person it is for before any pattern is chosen, read from its personas and rows, asked where they do not say, and never read from the tier |
 | `RD.SUPPORT.SURFACE.331` | the kinds of person are one closed set, Team, Everyday users, Visitor and Learner, each named by how a person uses a product |
 | `RD.SUPPORT.SURFACE.333` | the kind decides between two patterns that fit, a page another kind reaches takes that kind, and the less forgiving decides where two meet |

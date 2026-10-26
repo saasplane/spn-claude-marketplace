@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "8bd22315"
+      "seen": "3d6d0000"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
@@ -227,6 +227,8 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.SURFACE.255` | each layout marks one size container for each place a section stands in, carrying no padding: the window in `TOPNAV` and `CANVAS`, the header and the footer, the content part in `RAIL` and `DOCK` |
 | `RD.SUPPORT.SURFACE.257` | `TOPNAV` and `DOCK` take `barWidth`, and `RAIL`, `DOCK` and `TOPNAV` take `size`, in their config, the bar's height, the dock column's and the open rail's width following the step |
 | `RD.SUPPORT.SURFACE.258` | `headerNode` stands in the body's box in `TOPNAV` and `DOCK`, as `footerNode` does |
+| `RD.SUPPORT.SURFACE.281` | `XWIDE` stands at most 1400 px, the widest step that still leaves a margin on a 1440 laptop |
+| `RD.SUPPORT.SURFACE.300` | the default theme draws the open entry of the navigation as `SUBTLE` |
 | `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |
 | `RD.SUPPORT.SURFACE.206` | a layout is chosen by the job of the app: an admin app, a profile, a website or a sign-in |
 

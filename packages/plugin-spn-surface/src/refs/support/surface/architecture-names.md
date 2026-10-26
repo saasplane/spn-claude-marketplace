@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "af312396"
+      "seen": "6a21cc4e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
@@ -280,6 +280,7 @@ This ref states which three props mean one thing everywhere, which of the two si
 | `RD.SUPPORT.SURFACE.249` | an alignment takes `DSHorizontalAlignType` or `DSVerticalAlignType` on any unit, and no unit defines an alignment vocabulary of its own |
 | `RD.SUPPORT.SURFACE.043` | a unit or a prop of the design library follows the order construct, Figma, stack, showcase |
 | `RD.SUPPORT.SURFACE.082` | that order binds the core units, and not a unit that a stack provides on its own |
+| `RD.SUPPORT.SURFACE.098` | a block's name says its layer by its last word, and no block carries a letter for its layer before its name |
 | `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |
 | `RD.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RD.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "5638425d"
+      "seen": "7ee58198"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
@@ -87,7 +87,7 @@ A snapshot has four parts and three levels:
 | `tokens` | 2 | the ramps, the roles for light and for dark, the scale, the type steps and the theme |
 | `measures` | 3 | for each unit and each size: the height, paddings, gap, radii, border and text size, each as a value and, where the side can say it, the token it is bound to |
 
-A `MODE` entry names its `collection`, by the one name "Color is a mode, and the rest are properties" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column: the cases are what it draws once, its modes, its texts and its swaps, and the usage names the instances the plugin places, with their props.
+A `MODE` entry names its `collection`, by the one name "Color is a mode, and the rest are properties" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column, and a unit with a choice table takes both from its table (`RD.SUPPORT.SURFACE.375`): the cases are what it draws once, its modes, its texts and its swaps, and a choice table's cases are among them; the usage is the table's first case that draws the unit, and names the instances the plugin places, with their props.
 
 Level 1 finds most gaps. Level 2 finds a value that differs. Level 3 is read only for the units that levels 1 and 2 flag, because it is the largest. The category, the showcase layout and what a unit has are tags of the showcase only: they are never in a snapshot and never a gap.
 
@@ -678,6 +678,9 @@ This ref states what the library draws, how its files are layered, and what stay
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.141` | the design library draws the look of each named block, and behavior stays in words |
+| `RD.SUPPORT.SURFACE.006` | the design library is not a provider |
+| `RD.SUPPORT.SURFACE.023` | a design system is compared through one neutral snapshot, and a person or a model reads only the gaps |
+| `RD.SUPPORT.SURFACE.024` | the tool reads the units of a library file from Figma and builds its inventory, and the connector reads the variables and the styles and makes every write |
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.082` | this order binds the core units, and not a unit that a stack provides on its own |
 | `RD.SUPPORT.SURFACE.099` | the library draws the core units, the icons and the places of the layout only, and nothing of a pattern |
@@ -694,6 +697,8 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.295` | the plugin builds the library's sets from the CONSTRUCT snapshot alone, and the tool writes the snapshot from the book and writes the plugin out |
 | `RD.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RD.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
+| `RD.SUPPORT.SURFACE.038` | a set's properties are its size, its states and the shared `variant`, a prop of forms of the block, and a property a named unit keeps crossed, and the unit's column says which |
+| `RD.SUPPORT.SURFACE.044` | the comparison of the library with a stack asks one question: does the stack support everything the library asks for |
 
 ## Proof
 

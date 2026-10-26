@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "f1a569cc"
+      "seen": "aa82da09"
     }
   ]
 }
@@ -98,6 +98,7 @@ Read the ports and hosts from the pinned platform declaration's `apps[]` row —
    - **Read the page that changes a record beside the page that reads it.** The two hold the same parts in the same order (`RD.SUPPORT.SURFACE.117`): a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. A part that moves is a finding.
    - **Check each rule of content with its reviewer's check**, through the entry ref: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
    - **Check each closed prop the page writes against its unit's choice table**, through the entry ref's route 3. The first case that matches gives each value and who writes it; a value the page wrote where the case leaves it to the place or the level, or a value the index marks never, is a finding. A second `SOLID` button in one view is a finding (`RD.SUPPORT.SURFACE.370`); a site page's closing call repeats the hero's one act, so its `SOLID` is the same main action said again, never a second.
+   - **Read each site section's eyebrows against its site pattern.** A hero's state is a `PRIMARY` badge eyebrow, a grid cell's eyebrow is text unless it says a state, and a plan holds one eyebrow; a second eyebrow on a plan, or a badge that names a kind as a cell's eyebrow, is a finding (`RD.SUPPORT.SURFACE.371`, `.372`, `.373`).
    - **Read each confirmation against what its act does.** An act a person can undo asks in a popover, `DSConfirmPopover`, and an act that cannot be undone asks in a dialog, `DSConfirmDialog`. A dialog for a small act that can be undone is a finding. Both stay open while the act runs, and a failure is shown where the person confirmed.
    - **Look behind each overlay.** One that covers the page dims it with the one scrim. A sheet that is not modal stands beside the page and draws no scrim, and the page stays usable.
    - **Type a search that matches a record on another page of the list.** A search that finds nothing ran in the page, and that is a finding (`RD.SUPPORT.SURFACE.070`).

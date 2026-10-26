@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "e3c633d5"
+      "seen": "453a4498"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
@@ -180,9 +180,11 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.SURFACE.008` | an icon placed beside a title or beside running text takes the scale size of that text's own step name, and the two sit on one centre line |
+| `RD.SUPPORT.SURFACE.010` | the one picture of focus, error and disabled reads the roles of Core by their one name, and no block types their values |
 | `RD.SUPPORT.SURFACE.141` | the neutral shades of the surfaces and the text in light and in dark, and small text a person reads is never subtle |
 | `RD.SUPPORT.SURFACE.101` | the pixels an icon, a mark and an avatar are drawn at for each scale size, and a mark holds the icon of its own step |
 | `RD.SUPPORT.SURFACE.102` | Title runs to `TITLE_XXL5` and Heading to `HEADING_XXL5`, and Content runs to `CONTENT_XXL5` |
+| `RD.SUPPORT.SURFACE.225` | Content runs to `CONTENT_XXL5`, in five steps above `CONTENT_XL` |
 | `RD.SUPPORT.SURFACE.227` | a website's words are 14px or larger, and only data and code shown inside a demo may be smaller |
 | `RD.SUPPORT.SURFACE.238` | each level from `PAGE` to `GROUP` holds one set of level tokens, and a unit reads a title through the type step so the phone size follows |
 | `RD.SUPPORT.SURFACE.239` | the words of a feature's items are 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature, and a smaller feature's items are the one waiver |

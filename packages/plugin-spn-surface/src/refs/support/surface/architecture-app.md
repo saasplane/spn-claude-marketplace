@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
-      "seen": "9fc29ff6"
+      "seen": "c10ab333"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
@@ -220,6 +220,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.150` | a partner changes the look of an app through one theme, and the layout type is not a choice of it |
+| `RD.SUPPORT.SURFACE.045` | a block with no `mode` follows the mode of the theme around it, and a block whose `mode` names light or dark draws in that mode's own values wherever it stands |
 | `RD.SUPPORT.SURFACE.126` | the theme holds the table look, and the order a table takes its stripes and its hover in |
 | `RD.SUPPORT.SURFACE.139` | the theme holds the layout look, in three parts, the body, the navigation and the content, and a surface takes a colour and a strength |
 | `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; the width is the body's, attached and sticky are the navigation's and the content's, and the spacing follows the theme's size |

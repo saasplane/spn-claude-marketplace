@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/07-architecture-widgets.md",
-      "seen": "53a6d9d2"
+      "seen": "89600de6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
@@ -80,6 +80,7 @@ This ref states what makes a unit a widget, and what `DSCardWidget` is built fro
 
 | Rule | What it decides |
 | --- | --- |
+| `RD.SUPPORT.SURFACE.099` | the library draws nothing of a pattern, and the unit that places a list beside its detail is not a core unit |
 | `RD.SUPPORT.SURFACE.127` | the card widget is a core widget, each group of its settings is the props of the unit that draws it, the kinds of its parts, and it folds no rows away |
 | `RD.SUPPORT.SURFACE.128` | the order the card widget takes its lines and the hover of its rows in: its own prop, else the theme's card widget look |
 | `RD.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, and the widget hands it to its card |
