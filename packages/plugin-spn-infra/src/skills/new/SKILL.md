@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "361bf374"
+      "seen": "e0f5cfde"
     }
   ]
 }
@@ -35,6 +35,8 @@ description: Stand up a new estate node or a new estate repository with spnutils
 `--name` is what a person calls it — "SaaS Plane", "SPN Demo", "Identity". The positional argument is the token the grammar composes from, and the two are different things: `<org>` and `<spc>` are codes, never sentences.
 
 **`SUPPORT` is the fourth type and has no scaffold.** `@saasplane/infra-blueprints` is what SaaS Plane ships; an organization pins it, and nobody mints one here.
+
+A new estate repository is brought to the standard by `spnutils repo create`, which sets up all four permanent branches, `develop`, `qa`, `uat` and `main`, and their rules. Nothing declares which of them a team uses: the path to `main` is chosen at each promotion with `spnutils repo promote`, and a release is cut only from `main`.
 
 ## Where it goes
 

@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "f27b5f04"
+      "seen": "a08c1401"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
@@ -120,7 +120,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 ## Where a gate belongs
 
-Format, lint, and generated-file protection run **pre-commit**. Codegen freshness, structure, and type checking run pre-commit where fast and otherwise on the **pull request**. The unit, component and integration suites of the nodes a change touches run **before the commit**, read from a run of exactly the content committed, and the check at the commit runs nothing and stays offline. Contract tiers run on the **affected projects**, on the pull request. Journeys run **after deployment to a rung**, on a quiesced stack, and release gates run **inside the release**, before anything is versioned.
+Format, lint, and generated-file protection run **pre-commit**. Codegen freshness, structure, and type checking run pre-commit where fast and otherwise on the **pull request**. The unit, component and integration suites of the nodes a change touches run **before the push**, read from a run of exactly the tree at the pushed commit, and the check at the push runs nothing and stays offline. The tiers that need a running stack run in the **pull request into `develop`**, in the job that stands the local stack. Journeys run there against the local stack until a rung is hosted, and on that rung after its deploy once it is, and release gates run **inside the release**, before anything is versioned.
 
 Two rules: a gate runs at **exactly one placement**, and a pre-commit gate **never reaches the network or a resource** — a commit must work offline.
 
@@ -198,7 +198,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 ## The selective loop: run the cases of what you touched
 
-**While work is under way, run the cases of what you touched, and no whole tier — MUST** (`RD.DEVEX.WORKSPACE.207`). A whole tier answers a question about every row a node holds, and a change to one module asks about a few of them. At the end of the step the tiers it touched run whole for the nodes it touched, once, and the commit is refused without them. The loop holds for unit, component, contract and integration, in every kind. Journeys stay outside it, because they need a quiesced running stack.
+**While work is under way, run the cases of what you touched, and no whole tier — MUST** (`RD.DEVEX.WORKSPACE.207`). A whole tier answers a question about every row a node holds, and a change to one module asks about a few of them. At the end of the step the tiers it touched run whole for the nodes it touched, once, and the push is refused without them. The loop holds for unit, component, contract and integration, in every kind. Journeys stay outside it, because they need a quiesced running stack.
 
 **Count what you touched in behaviour rows, never in folders.** The capability page that claims the changed code names the rows it realizes, and each row names its cases through the id in their titles.
 
@@ -230,13 +230,13 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 
 ## When a whole tier runs
 
-**A whole tier runs before a commit, in an arc's `PROOF` row, before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
+**A whole tier runs before a push, in an arc's `PROOF` row, before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
 
-**Before a commit, each tier the change touches runs whole for its node, once per batch.** A batch of orders is committed as one commit, so the run is not repeated per order. These are the tiers that need nothing running: unit, component and integration. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses an agent's commit when no whole, green run covers exactly the content staged, for an apps node and an infra node alike.
+**Before a push, each tier the change touches runs whole for its node, once per batch.** A batch of orders is pushed together, so the run is not repeated per order. These are the tiers that need nothing running: unit, component and integration without its live cases, and for an infra node its offline contract tier too. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses an agent's push when no whole, green run covers exactly the tree at the pushed commit, for each node the commits in `origin/develop..HEAD` touch, an apps node and an infra node alike. The commit itself runs no test check of the agent's.
 
 **The dry run is the full pass before a release.** It runs every tier the release can run by itself and lists every failure at once. Run only the tier it names as not run, a client's contract tier, with the service up, and ask for the release go after both. The release command starts no service and releases every library, a generated client among them, so a client's contract tier, which calls a running service, is named as not run.
 
-**Outside a release, a commit and an arc's `PROOF` row, run a whole tier only in these five cases:**
+**Outside a release, a push and an arc's `PROOF` row, run a whole tier only in these five cases:**
 
 | The case | Why a selection is not enough |
 | --- | --- |

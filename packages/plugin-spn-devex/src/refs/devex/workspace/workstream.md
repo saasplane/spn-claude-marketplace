@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "561e8e92"
+      "seen": "b640e52f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -217,7 +217,7 @@ has nothing to decide; a written order on Sonnet; shaping, cards, previews and r
 with you on the largest. Every launch names its model, and a fork is refused (`RD.DEVEX.AGENT.104`).
 **An order quotes the facts it needs, each with its commit, and points to the rules it follows**
 (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`), and you offer a
-new window from 200k at a clean point, always past 450k (`RD.DEVEX.AGENT.103`). **The offer tells the
+new window from 200k at a clean point, writes the handover unasked at the next clean point past 300k, and always moves past 450k (`RD.DEVEX.AGENT.103`). Between 200k and 300k the offer comes once, and again only after another 50k; past 300k it stays in every reply until the developer moves or says to stay. **The offer tells the
 person, in one or two plain sentences in their words beside the handover, why, what is kept and how:**
 each reply re-reads the whole window, so a long one makes every reply dearer; the handover and the
 workstream's folder carry every open point, so nothing is lost; and a new chat at the workspace root, in
@@ -227,6 +227,18 @@ ask is small enough that moving costs more than it saves. **A small fix gets cod
 in one gate:** the whole test tiers, one restart of the showcase or the app, the walks and the look run
 once, in the arc's final re-check row before a release, and the look of each batch is shown to the
 developer as soon as the batch lands.
+
+**A tool's output stays short, because every later turn reads it again — MUST** (`RD.DEVEX.AGENT.106`). A file over 20 KB is read in parts: search it first, then read the lines needed. A command whose output may pass 10 KB writes to a file, and the agent reads the part it needs. A child's hand-back stays at 15 lines.
+
+### A workstream works on one branch per repository
+
+**A workstream commits on one branch in each repository its rows name, `feat/<NNN>-<subject>`, and every arc commits on it by path — MUST** (`RD.DEVEX.WORKSPACE.314`). The branch is cut from a fresh `origin/develop` when the worktree set opens (`refs/devex/workspace/workspace.md` § The workspace's working state), so two arcs of one workstream never need a branch each, and the pull request that carries the work into `develop` is one per repository and not one per arc.
+
+- **One pull request per repository, opened at the first push — MUST.** It stays open for the workstream and targets `develop`. The checks workflow runs on it.
+- **The pull request is rebase-merged into `develop` each time an arc lands a group of rows — MUST.** Each row's commit stays as it was written. The branch is not deleted then, because the workstream goes on using it.
+- **The branch rebases onto `origin/develop` before every push — MUST.** Git drops the commits already upstream, so the push carries only what `develop` does not hold.
+- **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
+- **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
 
 **A page is checked by its computed values, once, in the arc's final re-check row, and a picture is
 taken only where the developer asked to see a look — MUST** (`RD.DEVEX.WORKSPACE.277`). An order runs

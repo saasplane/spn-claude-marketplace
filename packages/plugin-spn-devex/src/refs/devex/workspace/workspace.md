@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "919526a6"
+      "seen": "daabf061"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
@@ -213,6 +213,21 @@ A run writes what it can see, and it stops there. **It never deletes a key becau
 ## The workspace's working state — `.spndevex/`
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
+
+**While a workstream is open, the folder also carries its worktree set, which is no home and no member (RD.DEVEX.WORKSPACE.315).** A workstream works in a folder of its own, so two workstreams never share a checkout and a main checkout never holds work. The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root — MUST. `spnutils workspace worktree add <NNN>` fetches every member and makes it, and a `--repo` option adds one repository more. A fix that production or one environment needs is cut from that branch: `--from <branch>` cuts the workstream's branch from `main`, `uat` or `qa` in place of `develop`.
+
+| In the set | What it is |
+| --- | --- |
+| a worktree, for each repository the workstream's rows name | on `feat/<NNN>-<subject>`, cut from a fresh `origin/develop` |
+| a link, for each other member | to the member's main checkout, so a sibling path such as `../spn-infra` still resolves |
+| `.spndevex` | a link to the workspace's one store, so every window reads the same workstreams |
+| `.claude/settings.json` | written by the writer `workspace init` uses |
+
+- **The set holds no `CLAUDE.md` — MUST NOT.** A window in the set reads the workspace's own as an ancestor, and a second copy would load the same text twice on every turn.
+- **The set is not a member — MUST.** A member is a folder directly under the root holding `sprepo.json` or `.git`, and `.worktrees/` holds neither. So `workspace status` and the plugin list the same members with or without a set, and the leading dot keeps the folder out of every reader that skips one.
+- **The set needs no new permission.** The workspace's settings already allow reads and edits under the root.
+- **The main checkouts stay on `develop`, fetched, and the agent never commits in one — MUST.** A release is the one time a main checkout is switched to `main`.
+- **`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin — MUST.** It refuses while any worktree holds a commit that is not on origin or a change that is not committed. Once the repository's pull requests are merged, it deletes the branch on origin too.
 
 **The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about.
 

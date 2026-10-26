@@ -26,8 +26,9 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | **Repo** | `{{repo}}` · **Run from:** `{{absolute path}}` |
 | **Arc** | `{{NNN-subject}}` [`N{{nnn}}`](../../../approach.html#N{{nnn}}), row {{row}} |
 
-**Launch no agent.** **Read only** the files below; read further only where one of them sends you. **Hand back** at most
-8 lines; save the report, at most 15 lines, as `orders/{{row}}.report.md` beside this order, its front matter first.
+**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and
+hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
+parts. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{row}}.report.md` beside this order, its front matter first.
 
 ## The files
 

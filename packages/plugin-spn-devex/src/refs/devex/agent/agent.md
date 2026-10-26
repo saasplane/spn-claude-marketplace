@@ -34,7 +34,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "6d7484c3"
+      "seen": "95f02946"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "What every window carries before its first word is kept small",
+      "seen": "0849c8cc"
     }
   ]
 }
@@ -144,6 +149,22 @@ first, then in its reference, then in its line.
 **No script judges whether a prompt opens a discussion about a shape.** You read the prompt and
 decide, as you do for every prompt. A reference is read when a skill names it, and a reply in the
 middle of an arc calls no skill, so these lines are what carries the rules into that reply.
+
+## What every window carries before its first word is kept small
+
+**What every window carries before its first word is kept small — MUST** (`RD.DEVEX.AGENT.105`).
+Every turn of every window reads the same fixed base again, so each byte in it is paid for on every
+reply of every session.
+
+- **The session-start output holds what a first reply needs, under 8 KB:** the welcome word for word,
+  the status line, the ask router's one-line index and the short rules, one line each. The ground
+  tables are read on asking, with `spnutils workspace status`.
+- **The memory index holds one short line per memory, under 8 KB.** The detail stays in each
+  memory's own file, and the line's name says what the memory is for. When you write a memory, its
+  index line is its link and a name that carries its meaning, and nothing more.
+
+You answer *where are we?* by running the command, and you open a memory's file when its name matches
+the task.
 
 ## A reply speaks as a teammate: the moment chooses its register, its icon and its shape
 
@@ -332,4 +353,9 @@ work. This rule orders all the pieces of an arc against each other.
 
 **A long-running child is replaced by a fresh one with a short order, and never resumed — MUST.** A
 resume re-sends the child's whole context, so each further call on the same child costs more than the
-last.
+last. Long means 150,000 tokens of context or 100 turns, whichever comes first (`RD.DEVEX.AGENT.081`). A child
+stops at that size at the next whole step: it finishes the step it is on, writes its report and stops, and
+the rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
+`SendMessage` to a child past 150,000: it becomes the first line of a fresh child's order. An order is cut
+so that each child can stop between rows. A child's stop records the child's turns in telemetry, tagged with
+its `agent`, so the cost of a child is read from telemetry as a window's is (`RD.DEVEX.AGENT.082`).

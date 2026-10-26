@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "361bf374"
+      "seen": "e0f5cfde"
     }
   ]
 }
@@ -84,6 +84,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace init` | mints the folder — the permission floor, the marketplace, the state directory, the engine check | the workspace root |
 | `workspace agent-sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
+| `workspace worktree add <NNN>` · `remove <NNN>` | opens and removes the workstream's worktree set, `.worktrees/<NNN>-<subject>/`, with the branch `feat/<NNN>-<subject>` cut from a fresh `origin/develop` in each repository its rows name (`--from <branch>` cuts a fix's set from `main`, `uat` or `qa`) | the set, never a member |
 
 **The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — five marked regions, the producer and managed regions rewritten whole, the devex region's two tokens written once when missing, the keep region laid out. **They derive no key from a declaration.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/devex/workspace/workspace.md` § The machine seat for the regions, the layout and the namespacing rule.
 
@@ -117,6 +118,14 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 - **Structure is a rule, not a preference.** Where a project deviates, either the project is fixed or the kind's profile changes deliberately — never a local exception that the next reader has to learn.
 - **A new kind is a recorded decision**, not an addition someone makes while scaffolding.
 - **A red required check is fixed, never bypassed.** The checks ruleset has no bypass actor, so nobody merges past a failing check, administrators included.
+
+## Branches, promotion and releases
+
+- **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch rebases onto `origin/develop` before every push.
+- **Each check runs at the first step that can run it.** The push check runs the offline tiers; the stack tiers run on the pull request into `develop`; a promotion reruns nothing.
+- **The path to `main` is chosen at each promotion** with `spnutils repo promote <to> [--from <branch>]`, a merge commit each time. `main` takes merges from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch. The agent names the path and asks which branch a change goes to when the developer has not said.
+- **A fix takes its own path.** `hotfix/<subject>` is cut from `main`, `uat` or `qa`, never `develop`, is tested in its own pull request back into its source, and `spnutils repo backmerge <branch>` merges it down to `develop`.
+- **A release is cut only from `main`,** from a clean tree at `origin/main`.
 
 ## Repo tasks — invoke, never reconstruct
 
