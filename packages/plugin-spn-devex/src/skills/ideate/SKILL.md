@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "cc127ea7"
+      "seen": "d197bbb5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -33,7 +33,7 @@ description: Decide what a node IS, and design a requirement inside that shape -
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
-Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DEVEX.WORKSPACE.080). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`. Never code.
+Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DEVEX.WORKSPACE.080). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`, with one exception: on a partner platform the industry brief goes in the partner's own purpose part (`RD.DEVEX.AGENT.099`). Never code.
 
 ## One skill, three modes — and `plan` is not a fourth
 
@@ -76,6 +76,7 @@ A page that the requirement holds → the `design` skill of the apps plugin, bef
 | --- | --- | --- |
 | nothing yet | **ideating** — the four gates below | the person, one block at a time |
 | seats that already answer it | **harvesting** — summarizing up | the seats, cited |
+| an industry it is built for, on a partner platform | **bridging** — the brief, before the gates | the industry brief, which the lenses write first |
 
 **Harvesting is not a shortcut past the gates. It is the same loop with a different source.** You read the seats, write the block at concept altitude, and show it before landing it — never a whole section, never several at once.
 
@@ -89,6 +90,15 @@ A page that the requirement holds → the `design` skill of the apps plugin, bef
 **A repo has one concept, however many nodes it grows.** Adding a package, app or module changes *sections* of the repo's concept — a `CONCEPT.md` beside a node manifest is always wrong (decision RD.DEVEX.WORKSPACE.080). When a node is scaffolded, ask whether the concept needs a new section or a moved boundary; never offer the node a concept of its own. This is the likeliest wrong turn on a growing repo, because the node feels like the thing being decided.
 
 **You do not draft the whole document and present it.** Each step is a gate: you produce one thing, the person reviews it, and only then do you move on. This is the entire mechanism — a concept produced in one pass is a concept nobody agreed to.
+
+### Before the gates — the industry brief, on a partner platform
+
+**On a partner platform, the lenses write the industry brief before the boundary is drawn — MUST** (`RD.DEVEX.AGENT.099`). The partner describes its business in its own words and never learns the constructs to do it; that bridge is yours.
+
+- **Each lens learns its share of the industry for its own discipline**, from named sources, and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
+- **Write it once, in the partner's own purpose part**: the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems. Each fact names its source and the date it was read.
+- **Read it before you research again**, and refresh the part your lens owns when it is stale.
+- **The brief is a source, never an agreement.** What the concept takes from it still goes through the four gates below, one block at a time. Where the industry and the SaaS Plane way meet badly, raise it rather than bending either one.
 
 ### 1 · Boundary
 
