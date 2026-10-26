@@ -10,6 +10,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { PLUGIN_TEMPLATES } from "../../../plugin-support-lib/src/lib/docs-tree.ts";
+
 // `tests/` SITS BESIDE `src/`, NEVER INSIDE IT, which is the whole point of the package layout: what
 // a partner installs is `src/`, and 38 test files stop shipping without anything being excluded by
 // name. So a test walks UP to the plugin root and back down into `src/scripts/`.
@@ -27,6 +29,10 @@ export const LIB = resolve(SCRIPTS, "lib");
 // corpus cannot be invented. A partner holds the plugin without the workspace and runs
 // `partner-shape.ts` instead, which needs nothing but the plugin itself.
 export const WORKSPACE = resolve(PLUGIN, "..", "..", "..");
+
+// THE BOOK'S PAGE TEMPLATES, FROM THE PLUGIN'S OWN COPY — never from a sibling checkout, which a runner
+// does not have. `t-bundle-parity` keeps this copy byte-identical to the book's.
+export const TEMPLATES_DIR = resolve(PLUGIN, "src", PLUGIN_TEMPLATES);
 
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
 // deletes `hooks/scripts/`, every case runs both implementations and requires them to agree. After

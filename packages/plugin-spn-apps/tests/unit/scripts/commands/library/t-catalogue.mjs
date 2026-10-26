@@ -86,14 +86,19 @@ console.log("\n=== library catalogue command — a workspace of its own: `check`
   ok("[MKT.SCRIPTS.180] after the write a `check` reads the table as current and exits 0", again.code === 0 && again.out.includes("current"), again.out);
 }
 
-console.log("\n=== library catalogue command — against the real workspace, `check` only");
+console.log("\n=== library catalogue command — a workspace with a support checkout and no table yet, `check` only");
 
 {
-  const workspace = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "..", "..", "..");
+  // A fixture, never the real workspace: a runner holds this repository alone, with no sibling checkouts.
+  const workspace = mkdtempSync(join(tmpdir(), "catalogue-sibling-"));
+  kept.push(workspace);
+  const put = (path, body) => { mkdirSync(join(workspace, path, ".."), { recursive: true }); writeFileSync(join(workspace, path), body, "utf8"); };
+  put("spn-support-ts/packages/utility/package.json", JSON.stringify({ name: "@spn/utility-ts", version: "1.2.3", description: "Shared helpers" }));
+  put("spn-support-ts/packages/other/package.json", JSON.stringify({ name: "@spn/other-ts", version: "0.4.0", description: "Other helpers" }));
+  mkdirSync(join(workspace, "spn-claude-marketplace", "packages", "plugin-spn-apps", "src", "refs", "support", "apps", "providers", "ts"), { recursive: true });
   const { out, code } = run(CLI, "library", "catalogue", "check", workspace);
-  ok("finds the sibling support checkout and reports current or would-write, never a crash",
-     code === 0 || code === 1, out);
-  ok("names the count of packages, one way or the other", /\d+ package\(s\)/.test(out), out);
+  ok("finds the sibling support checkout and reports would-write, never a crash", code === 1, out);
+  ok("names the count of packages", out.includes("2 package(s)"), out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — library catalogue command` : `\n  all ${total} passed — library catalogue command`);

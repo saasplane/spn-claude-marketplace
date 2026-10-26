@@ -5,8 +5,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { PLUGIN, WORKSPACE } from "../../../../helpers/harness.mjs";
-import { ARTIFACT, ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, HUB, POCKET, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { PLUGIN, TEMPLATES_DIR } from "../../../../helpers/harness.mjs";
+import { ARTIFACT, ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, HUB, POCKET } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -29,7 +29,7 @@ writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10
 const NEWEST = "1.10.0";
 
 const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE, SPN_STYLES: STYLES,
-  SPN_TEMPLATES: bookTemplatesDir(resolve(WORKSPACE, "spn-foundation")) };
+  SPN_TEMPLATES: TEMPLATES_DIR };
 /** One run of `docs index` through the entry, typed after the subject, with its exit code and what it printed. */
 const index = (args, extra = {}) => {
   try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "index", ...args], { encoding: "utf8", env: { ...environment, ...extra }, stdio: "pipe" }) }; }

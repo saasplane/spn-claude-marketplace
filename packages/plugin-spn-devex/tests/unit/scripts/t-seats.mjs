@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../helpers/harness.mjs";
+import { PLUGIN, TEMPLATES_DIR } from "../../helpers/harness.mjs";
 // The seat-shaped `docs` checks that are not their own command's whole file: the Proof join, the
 // Proof-carries-a-register-table refusal, `figure check`, a code file's own `// RESTATES:` header,
 // `findBook`, and `face` over a capability seat. `docs status` · `docs topics` · `docs parity` each
@@ -8,11 +8,11 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { linesFor } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
-const TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+const TEMPLATES = TEMPLATES_DIR;
 const BASE = mkdtempSync(join(tmpdir(), "t-seats-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 

@@ -249,6 +249,11 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
   // receives it bundled into `dist/`. The copy runs the `.ts` source, so the shared folder sits
   // where that relative path lands, four levels above `scripts/events/`.
   cpSync(join(HOOKS, "..", "plugin-support-lib", "src", "lib"), join(cache, "..", "plugin-support-lib", "src", "lib"), { recursive: true });
+  // A workspace of its own, never the one this checkout sits in: a runner holds no sibling checkouts.
+  const ROOT = join(BASE, "ws");
+  mkdirSync(join(ROOT, ".spndevex"), { recursive: true });
+  mkdirSync(join(ROOT, "spn-infra"), { recursive: true });
+  writeFileSync(join(ROOT, "spn-infra", "sprepo.json"), JSON.stringify({ type: "INFRA" }));
   const installed = join(cache, "0.0.1", "scripts", "events", "orientation.ts");
 
   const check = (label, text, must, mustNot = []) => {
@@ -259,20 +264,20 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
   };
 
   check("a window behind the newest install says so, and names both versions",
-    run("node", [installed, WORKSPACE], WORKSPACE),
+    run("node", [installed, ROOT], ROOT),
     ["this window loaded", "0.0.1", "9.9.9", "take a fresh window"]);
 
   // N33's lesson, as a case: a retired install carries `.orphaned_at` and nothing loads it, so a
   // clock that counts one reports a window behind a version that no longer exists.
   writeFileSync(join(cache, "9.9.9", ".orphaned_at"), "retired\n");
   check("a retired install is a corpse and does not count",
-    run("node", [installed, WORKSPACE], WORKSPACE),
+    run("node", [installed, ROOT], ROOT),
     [], ["this window loaded"]);
   rmSync(join(cache, "9.9.9", ".orphaned_at"), { force: true });
 
   // The everyday case, and the one that must never speak: a checkout is not behind an install.
   check("running from source says nothing — a checkout IS the source",
-    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE),
+    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, ROOT], ROOT),
     [], ["this window loaded"]);
 }
 

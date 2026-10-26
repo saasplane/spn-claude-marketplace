@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../../helpers/harness.mjs";
+import { PLUGIN, TEMPLATES_DIR } from "../../../../helpers/harness.mjs";
 // `docs page` — producing a construct page from its seat file: the rail, the way back, re-based
 // links, tables, HTML escaping and lists carried through the produced page correctly.
 //
@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles, sharedStyles } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -80,7 +80,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       [`docs/${SEAT.capabilities}/x.md`]: "# X\n",
     });
     // `page` needs the real construct template for its furniture; the throwaway repo has none.
-    const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+    const templates = TEMPLATES_DIR;
     process.env.SPN_TEMPLATES = templates;
     run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/other.md`]);
@@ -235,7 +235,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
   }
 console.log("\n=== the rail names the page, and the way back opens the overview that names the construct (Q238, Q239)");
 {
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const templates = TEMPLATES_DIR;
   process.env.SPN_TEMPLATES = templates;
   const seat = (id, title) => doc(
     { id, variant: "construct", parentId: "core", title, lenses: ["ARCHITECT"],
@@ -279,7 +279,7 @@ console.log("\n=== the rail names the page, and the way back opens the overview 
 
 {
   // NO OVERVIEW IN THE DOMAIN: the repository's hub. With no hub either, no guess is written.
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const templates = TEMPLATES_DIR;
   process.env.SPN_TEMPLATES = templates;
   const files = {
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
@@ -313,7 +313,7 @@ const USAGE = "usage: spn-devex docs page check <seat…>\n" +
 
 console.log("\n=== `docs page` needs its action as a word, and both actions need a seat file");
 {
-  process.env.SPN_TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  process.env.SPN_TEMPLATES = TEMPLATES_DIR;
   const seat = (id) => doc(
     { id, variant: "construct", parentId: "concept", title: id, lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: [] },
     "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
