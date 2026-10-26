@@ -487,7 +487,7 @@ export const COLUMN_READING: Record<string, { says: string; ok: (cell: string) =
     says: "the term as the system spells it — at least one code span, or `—`",
     ok: (c) => c === "—" || (/`[^`]+`/.test(c) && !/^[✅🚧🔮]/u.test(c)),
   },
-  "What it means": { says: "a meaning in words", ok: (c) => /[a-z]{3}/i.test(c) && !/^[✅🚧🔮]/u.test(c) },
+  "Description": { says: "a meaning in words", ok: (c) => /[a-z]{3}/i.test(c) && !/^[✅🚧🔮]/u.test(c) },
   "Chapter": { says: "a link to the chapter", ok: (c) => LINK.test(c) || c === "—" },
   "File": { says: "a link to the mirror", ok: (c) => LINK.test(c) || c === "—" },
   "Realizes": { says: "a construct id in a code span", ok: (c) => /^`[^`\s]+`$/.test(c) || c === "—" },
@@ -1843,26 +1843,31 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
     return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
   });
   const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);
-  // ONE COLUMN OF ITEM CELLS (05-artifacts.md § The shape of a section, on every page kind): the term,
-  // linked to its construct's page, in bold; what it means below it; the contract's spelling as a fact.
-  // Nobody compares down a glossary, so no column of it stays. A term the contract does not spell has
-  // no facts line, and a row with no consumer word is titled by the contract's spelling. A construct's
-  // name heads its group as a header cell, so it reads as a label and never as one more item.
+  // THREE COLUMNS (05-artifacts.md § The shape of a section, on every page kind): the term, linked to its
+  // construct's page, in bold; the contract's spelling as the seat writes it, in code style, empty where the
+  // seat has a dash, with a note the seat adds after the code under it in small type; and the meaning. A row
+  // with no consumer word is titled by the contract's spelling. A construct's name heads its group as a header
+  // cell spanning the three columns, so it reads as a label and never as one more item.
   const blank = (x: string) => /^(?:—|–|-)?$/.test(x.trim());
+  const contractOf = (x: string, seat: string): string => {
+    if (blank(x)) return "";
+    const noted = x.match(/^((?:`[^`]+`(?:\s*[·,]\s*)?)+)\s+[—–]\s+([\s\S]+)$/);
+    return noted ? `${cell(noted[1].trim(), seat)}<br><span class="sds-small">${cell(noted[2], seat)}</span>` : cell(x, seat);
+  };
   const out = [
     '  <div class="sds-scroll"><table class="sds-glossary">',
-    "    <thead><tr><th>Term</th></tr></thead>",
+    "    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>",
     "    <tbody>",
   ];
   let group: string | null = null;
   for (const r of rows) {
-    if (r.group !== group) { out.push(`      <tr class="sds-group"><th scope="rowgroup">${esc(r.group)}</th></tr>`); group = r.group; }
+    if (r.group !== group) { out.push(`      <tr class="sds-group"><th scope="rowgroup" colspan="3">${esc(r.group)}</th></tr>`); group = r.group; }
     const href = relative(dirname(overviewFile), pageForSeat(r.file));
-    const title = blank(r.term) ? cell(r.contract, r.file) : `<strong><a href="${href}">${esc(r.term)}</a></strong>`;
-    const facts = blank(r.term) || blank(r.contract) ? "" : `<span class="sds-small">Contract term: ${cell(r.contract, r.file)}</span>`;
-    out.push(`      <tr><td><p>${title}</p><p>${cell(r.means, r.file)}</p>${facts}</td></tr>`);
+    const noWord = blank(r.term);
+    const title = noWord ? cell(r.contract, r.file) : `<strong><a href="${href}">${esc(r.term)}</a></strong>`;
+    out.push(`      <tr><td>${title}</td><td>${noWord ? "" : contractOf(r.contract, r.file)}</td><td>${cell(r.means, r.file)}</td></tr>`);
   }
-  if (!rows.length) out.push('      <tr><td><p>no construct in this domain carries a <code>Terms</code> table yet</p></td></tr>');
+  if (!rows.length) out.push('      <tr><td colspan="3">no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
   out.push("    </tbody>", "  </table></div>");
   return { body: out.join("\n"), findings };
 }
@@ -1870,7 +1875,7 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
 /** One domain's glossary as the markdown face carries it. */
 export function buildGlossary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
   const { rows, findings } = glossaryRows(domainDir);
-  const lines = ["## Glossary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
+  const lines = ["## Glossary", "", "| Term | Contract term | Description |", "| --- | --- | --- |"];
   let group: string | null = null;
   for (const r of rows) {
     if (r.group !== group) { lines.push(`| **${r.group}** | | |`); group = r.group; }

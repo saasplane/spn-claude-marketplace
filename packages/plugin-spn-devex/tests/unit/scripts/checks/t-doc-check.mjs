@@ -792,6 +792,19 @@ console.log("\n=== RD.DEVEX.WORKSPACE.259 — a column whose cells hold sentence
     <tr><td>Task state</td><td><code>IDLE</code> · <code>WORKING</code> · <code>DONE</code> · <code>FAILED</code> · <code>EMPTY</code> · <code>DENIED</code> · <code>SKIPPED</code></td></tr>
     <tr><td>Layer</td><td><code>CORE</code> · <code>COMPONENTS</code> · <code>WIDGETS</code> · <code>CONTAINERS</code> · <code>LAYOUTS</code> · <code>APP</code> · <code>PAGE</code></td></tr></tbody></table>`;
   say("green: a column of code values, however long the list, draws none", notes(columnRule(values)).length === 0, JSON.stringify(notes(columnRule(values))));
+  // A construct's Terms: Term · Contract term · Description, and the hub's glossary stays one column.
+  const termsOf = (head, rows) => `<section id="s1">\n  <div class="sds-section-head"><h2>Terms</h2></div>\n  <div class="sds-scroll"><table>\n    <thead><tr>${head}</tr></thead>\n    <tbody>\n${rows}\n    </tbody>\n  </table></div>\n</section>`;
+  const meaning = "the one membership accountable for a node, from the moment the node exists, and the only one who may hand it on";
+  const threeColumns = termsOf("<th>Term</th><th>Contract term</th><th>Description</th>",
+    `<tr><td><strong>Owner</strong></td><td><code>PrincipalMeta</code></td><td>${meaning}</td></tr>\n<tr><td><strong>Anchor</strong></td><td></td><td>${meaning}</td></tr>`);
+  say("a construct's Terms in three columns draw no note, the Description being the meaning and not a column of sentences",
+    notes(columnRule(threeColumns)).length === 0 && !checkPage("/d/x-construct.html", `<meta charset="utf-8">\n${shared}\n${threeColumns}\n`).some(([, text]) => text.includes("Terms table")),
+    JSON.stringify(columnRule(threeColumns)));
+  const oneCell = termsOf("<th>Term</th>", `<tr><td><p><strong>Owner</strong></p><p>${meaning}</p><span class="sds-small">Contract term: <code>PrincipalMeta</code></span></td></tr>`);
+  const refused = columnRule(oneCell).filter(([grade, text]) => grade === "SOFT" && text.includes("Terms table is one column"));
+  say("red: the old one-cell Terms shape is named as a note", refused.length === 1 && refused[0][1].includes("`Term` · `Contract term` · `Description`"), JSON.stringify(columnRule(oneCell)));
+  const hubGlossary = oneCell.replace("<h2>Terms</h2>", "<h2>Glossary</h2>");
+  say("green: a hub's one-column glossary is untouched", columnRule(hubGlossary).length === 0, JSON.stringify(columnRule(hubGlossary)));
   say("green: a report's tables are its own, and the same sentences there draw none", notes(checkPage("/d/artifacts/reports/docs-report.html", `<meta charset="utf-8">\n${shared}\n${sentences}\n`)).length === 0);
 }
 

@@ -1191,6 +1191,15 @@ export function columnRule(text: string): Finding[] {
     const rows = [...body.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)]
       .map((found) => [...found[1].matchAll(/<t[dh]\b[^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((cell) => cell[1]));
     const width = Math.max(headers.length, ...rows.map((row) => row.length));
+    // A construct's Terms are three columns, Term · Contract term · Description: the word is compared with the
+    // contract's spelling down the rows, and the Description is the meaning, so none of them is read as a column of
+    // sentences. The old shape, one item cell with the contract term as a fact, is named.
+    if (headers.length === 3 && headers[0].name === "Term" && headers[1].name === "Contract term" && headers[2].name === "Description") continue;
+    if (headers.length === 1 && headers[0].name === "Term" && /<h2\b[^>]*>\s*Terms\s*<\/h2>\s*<\/div>\s*(?:<div\b[^>]*>\s*)?$/i.test(text.slice(0, table.index))) {
+      out.push(["SOFT", "the Terms table is one column of item cells — a construct's Terms are three columns, `Term` · `Contract term` · " +
+        "`Description`: the word in bold, the contract's spelling in code style, and the meaning (RD.DEVEX.WORKSPACE.259)"]);
+      continue;
+    }
     if (width < 2 || !rows.length) continue;
     for (let at = 1; at < width; at += 1) {
       if (headers[at]?.status) continue;

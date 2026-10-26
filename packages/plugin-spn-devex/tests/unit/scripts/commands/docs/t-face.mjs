@@ -318,7 +318,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
   one("a term the domain's data model names is not stored-column joined — the column is gone",
     domain, lacks("sp_session"));
   one("and the table is three columns wide",
-    domain, has("| Term | Contract term | What it means |"));
+    domain, has("| Term | Contract term | Description |"));
   one("the seat face carries the domain table and no dictionary",
     readAt(root, `docs/${SEAT.constructs}/README.md`), lacks("sign-in"));
 }
@@ -503,15 +503,14 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   one("the overview gains a generated region, the first in any HTML page",
     page, has("spn:generated glossary"));
-  // THE PAGE READS IN ITEM CELLS (05-artifacts.md § The shape of a section, on every page kind): one
-  // column, the term in bold, what it means below it, and the contract's spelling as a fact. The
-  // markdown face keeps its three columns, because the glossary is generated from them.
-  one("and it carries the glossary as one column of item cells",
-    page, (g) => g.includes("<thead><tr><th>Term</th></tr></thead>") && !g.includes("<th>Contract term</th>"));
-  one("each row is the term in bold, what it means, and the contract's spelling as a fact",
-    page, (g) => /<tr><td><p><strong><a href="[^"]*session-construct\.html">sign-in<\/a><\/strong><\/p><p>one person's live access[^<]*<a [^>]*>the rule<\/a>[\s\S]*?<\/p><span class="sds-small">Contract term: <code>SPSession<\/code><\/span><\/td><\/tr>/.test(g));
-  one("a construct heads its group as a header cell, never as one more item",
-    page, (g) => /<tr class="sds-group"><th scope="rowgroup">[^<]+<\/th><\/tr>/.test(g));
+  // THE PAGE READS IN THREE COLUMNS (05-artifacts.md § The shape of a section, on every page kind): the
+  // term in bold, linked to its construct's page; the contract's spelling in code style; the meaning.
+  one("and it carries the glossary as three columns, Term · Contract term · Description",
+    page, (g) => g.includes("<thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>") && !g.includes("<th>What it means</th>"));
+  one("each row is the term in bold and linked, the contract's spelling in code style, and the meaning in plain text",
+    page, (g) => /<tr><td><strong><a href="[^"]*session-construct\.html">sign-in<\/a><\/strong><\/td><td><code>SPSession<\/code><\/td><td>one person's live access[^<]*<a [^>]*>the rule<\/a>[\s\S]*?<\/td><\/tr>/.test(g));
+  one("a construct heads its group as a header cell spanning the three columns, never as one more item",
+    page, (g) => /<tr class="sds-group"><th scope="rowgroup" colspan="3">[^<]+<\/th><\/tr>/.test(g));
   one("the term links to the construct PAGE, never the markdown seat (Q234)",
     page, has(`href="${CONSTRUCT_PAGES}/session-construct.html"`));
   // A term's meaning may hold a link, written for the seat file's folder. The overview sits in another

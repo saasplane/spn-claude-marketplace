@@ -118,18 +118,29 @@ function itemCell(title: string, line: string, facts: [string, string][]): strin
 }
 
 /**
+ * A Terms row's contract term as the page writes it: the seat's code as written, and a note the seat adds after the
+ * code (`` `OrgType` — the closed set … ``) under it in the page's small type. A dash is an empty cell.
+ */
+function contractCell(cell: string): string {
+  const noted = cell.match(/^((?:`[^`]+`(?:\s*[·,]\s*)?)+)\s+[—–]\s+([\s\S]+)$/);
+  return noted ? `${inline(noted[1].trim())}<br><span class="sds-small">${inline(noted[2])}</span>` : inline(cell);
+}
+
+/**
  * The tables every construct carries, and the two shapes the corpus repeats, each written as item
  * cells: a column a reader compares down stays a column, and the rest of what a row says about its
  * item becomes a level of the item's cell. The seat file keeps its markdown columns, because the
  * glossary is generated from them. Any other table keeps its columns, except one whose cells hold sentences.
  */
 const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[] }[] = [
-  { // Terms: the term, what it means, and the term the contract spells.
+  { // Terms: three columns, because a reader compares the person's word with the contract's spelling down the rows.
     head: [/^Term$/, /^Contract term$/, /^What it means/],
-    columns: ["Term"],
-    row: ([term, contract, means]) => isBlank(term)
-      ? [itemCell(inline(contract), means, [])]
-      : [itemCell(bold(inline(term)), means, [["Contract term", contract]])],
+    columns: ["Term", "Contract term", "Description"],
+    row: ([term, contract, means]) => [
+      isBlank(term) ? inline(contract) : `<strong>${inline(term)}</strong>`,
+      isBlank(term) || isBlank(contract) ? "" : contractCell(contract),
+      inline(means),
+    ],
   },
   { // Binds: the rule and what it decides; the weight is read down the column.
     head: [/^Rule$/, /^What it decides$/, /^Weight$/],

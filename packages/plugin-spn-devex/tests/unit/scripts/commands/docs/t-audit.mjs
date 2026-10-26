@@ -1072,7 +1072,7 @@ console.log("\n=== a generated column is read against its own heading (N37 step 
     "`For: Architect`");
   const at = `docs/${SEAT.constructs}/01-core/README.md`;
   const mk = (region) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: face(region) });
-  const good = "| Term | Contract term | What it means |\n| --- | --- | --- |\n| **Session** | | |\n" +
+  const good = "| Term | Contract term | Description |\n| --- | --- | --- |\n| **Session** | | |\n" +
     "| [sign-in](session.md) | `SPSession` | one person's live access |\n| [device](session.md) | — | the client a session opened from |\n";
   one("a glossary whose cells answer their headings is silent", run(mk(good), ["audit", "check", at]), lacks("column"));
   // THE DEFECT THAT OPENED THE ARC, REPRODUCED: the column no reading was ever written for.
