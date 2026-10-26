@@ -18,13 +18,22 @@ import type { Payload, Verdict } from "../../../../plugin-support-lib/src/lib/pa
 import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { FIGMA_TOOL, run as runFigmaConnector } from "../checks/figma-connector.ts";
+import { isTsxSource } from "../lib/node.ts";
 
 export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
   // THE CONNECTOR'S SCRIPT RUNNER IS READ BY ITS OWN CHECK: its call has no file path and the check
   // knows no stack.
   if (event.tool_name === FIGMA_TOOL)
     return span({ group: "figma", action: "connector" }, () => runFigmaConnector(event));
-  return null;
+  // THE SURFACE CHECK (RD.DEVEX.AGENT.107). Every other path leaves here, on a test of the path's own
+  // text, before a file is read or the check is loaded: start-up and loading were nine tenths of a
+  // hook's cost, and most writes are not Surface code.
+  const path = event.tool_input?.file_path;
+  if ((event.tool_name !== "Write" && event.tool_name !== "Edit") || !path || !isTsxSource(path)) return null;
+  const reader = await span({ group: "surface", action: "load" },
+    async () => (await import("../checks/subjects.ts")).surfaceFor(path));
+  if (!reader) return null;
+  return span({ group: "surface", action: reader.stack }, () => reader.validate(event.tool_input ?? {}));
 }
 
 const event = await payload();

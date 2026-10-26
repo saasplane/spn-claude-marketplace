@@ -1,4 +1,6 @@
 {
-  "groups": {},
+  "groups": {
+    "check": "allow"
+  },
   "commands": {}
 }
