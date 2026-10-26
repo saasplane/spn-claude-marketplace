@@ -77,5 +77,17 @@ console.log("\n=== same — each page's card equal to its record's (state check)
   ok("red: an answered card left in Open fails", cardsDiffer(ws, after).includes("q1 is answered and its card still stands on approach.html"), cardsDiffer(ws, after).join(" | "));
 }
 
+console.log("\n=== shownIn is read for open cards only (state check)");
+{
+  const gone = "notes/N001/removed-preview.html";
+  const clean = readQuestions(ws);
+  const answeredNaming = [{ ...clean[0], state: "answered", shownIn: [gone] }];
+  ok("green: an answered card naming a page that is gone leaves no finding",
+    !cardsDiffer(ws, answeredNaming).some((line) => line.includes(gone)), cardsDiffer(ws, answeredNaming).join(" | "));
+  const openNaming = [{ ...clean[0], state: "open", shownIn: [gone] }];
+  ok("red: an open card naming a page that is gone is still a finding",
+    cardsDiffer(ws, openNaming).includes(`${gone} is named by a card's \`shownIn\` and is not there`), cardsDiffer(ws, openNaming).join(" | "));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — questions` : `\n  all ${total} passed — questions`);
 process.exit(failed ? 1 : 0);

@@ -75,7 +75,8 @@ export function openWithoutCard(ws: string, records: readonly Question[] = readQ
 export function cardsDiffer(ws: string, records: readonly Question[] = readQuestions(ws)): string[] {
   const out: string[] = [];
   const byId = new Map(records.map((record) => [record.id, record]));
-  const pages = new Set<string>(records.flatMap((record) => record.shownIn));
+  // An answered or withdrawn card has left every page, so a page it names that is gone is no finding.
+  const pages = new Set<string>(records.filter((record) => record.state === "open").flatMap((record) => record.shownIn));
   const approach = approachOf(ws);
   if (approach) pages.add(fromWorkstream(ws, approach));
   for (const rel of [...pages].sort()) {

@@ -288,3 +288,60 @@ export function readCommand(command: string, cwd: string, programs: Program[], r
     return found;
   } catch { return []; }
 }
+
+/** One `git commit` as the command typed it. */
+export type CommitCall = { dir: string; all: boolean; pathspecs: string[] };
+
+/** Options of `git commit` that take the next word as their value. */
+const COMMIT_VALUED_LONG = new Set(["--message", "--file", "--author", "--date", "--reuse-message", "--reedit-message",
+  "--template", "--cleanup", "--fixup", "--squash", "--trailer", "--gpg-sign", "--pathspec-from-file"]);
+const COMMIT_VALUED_SHORT = new Set(["m", "F", "C", "c", "t"]);
+/** Options of `git` itself, before the subcommand, that take the next word. */
+const GIT_VALUED = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace"]);
+
+/**
+ * Every `git commit` a command runs, each with the folder it runs in (a `cd` or `git -C` moves it), whether
+ * it takes every tracked change (`-a`), and the paths it names. A `--dry-run` commits nothing and is left out.
+ */
+export function readCommits(command: string, cwd: string): CommitCall[] {
+  const out: CommitCall[] = [];
+  let dir = cwd;
+  for (const words of segments(command)) {
+    let at = 0;
+    while (at < words.length && ASSIGNMENT.test(words[at])) at += 1;
+    if (words[at] === "cd" && words[at + 1]) { dir = resolve(dir, words[at + 1]); continue; }
+    if (words[at] !== "git") continue;
+    at += 1;
+    let where = dir;
+    while (at < words.length && words[at].startsWith("-")) {
+      if (words[at] === "-C" && words[at + 1]) where = resolve(where, words[at + 1]);
+      at += GIT_VALUED.has(words[at]) ? 2 : 1;
+    }
+    if (words[at] !== "commit") continue;
+    const call: CommitCall = { dir: where, all: false, pathspecs: [] };
+    let dryRun = false;
+    let afterDashes = false;
+    for (let index = at + 1; index < words.length; index += 1) {
+      const word = words[index];
+      if (afterDashes) { call.pathspecs.push(word); continue; }
+      if (word === "--") { afterDashes = true; continue; }
+      if (word.startsWith("--")) {
+        if (word === "--all") call.all = true;
+        if (word === "--dry-run") dryRun = true;
+        if (COMMIT_VALUED_LONG.has(word)) index += 1;
+        continue;
+      }
+      if (word.startsWith("-") && word.length > 1) {
+        for (let letter = 1; letter < word.length; letter += 1) {
+          const flag = word[letter];
+          if (flag === "a") call.all = true;
+          if (COMMIT_VALUED_SHORT.has(flag)) { if (letter === word.length - 1) index += 1; break; }
+        }
+        continue;
+      }
+      call.pathspecs.push(word);
+    }
+    if (!dryRun) out.push(call);
+  }
+  return out;
+}

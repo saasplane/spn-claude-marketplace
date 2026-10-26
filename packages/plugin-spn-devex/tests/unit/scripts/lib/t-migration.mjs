@@ -69,13 +69,64 @@ console.log("\n=== applied → recorded, and never pending again");
   ok("red: recording it twice is refused", /recorded already/.test(refused), refused);
 }
 
+console.log("\n=== 007 — a planning job is never a step: it leaves a decided arc's steps for one line on its log");
+{
+  const m007 = MIGRATIONS.find((one) => one.id === "007");
+  ok("the plugin ships 007 seventh, with a version, one sentence and a script",
+    MIGRATIONS[6]?.id === "007" && /^\d+\.\d+\.\d+$/.test(m007?.version ?? "") && m007.changed.endsWith(".") && typeof m007.script === "function");
+  const { root, ws } = await dataWorkspace("planning-rows-007");
+  const step = (arc, id, kind, state, extra = {}) => ({ id, parent: arc, title: `${kind} ${id}`, kind, repo: "spn-x", altitude: "CODE", state, ...extra });
+  const preview = (arc, id, state) => step(arc, id, "change", state, { title: `The code preview, notes/${arc}/preview.html: the diffs` });
+  const put2 = (data) => {
+    mkdirSync(join(ws, "arcs", data.arc), { recursive: true });
+    writeFileSync(join(ws, "arcs", data.arc, "state.json"), `${JSON.stringify(data, null, 2)}\n`);
+  };
+  const arc = (id, status, rows) => ({ ...arcData(rows), arc: id, subject: `arc-${id.toLowerCase()}`, status, preview: `notes/${id}/preview.html` });
+  // N002: a landed question row ahead of build steps that have not started. N003: the same, by a title naming the preview,
+  // and a step that waits on it. N004: a build step has landed. N005: never decided. N006: a question row still waiting.
+  put2(arc("N002", "DECIDED", [step("N002", "0", "question", "landed"), step("N002", "1", "change", "ready")]));
+  put2(arc("N003", "DECIDED", [preview("N003", "0", "landed"), step("N003", "1", "change", "waiting", { blockedBy: ["0"] })]));
+  put2(arc("N004", "DECIDED", [step("N004", "0", "question", "landed"), step("N004", "1", "change", "landed")]));
+  put2(arc("N005", "PROPOSED", [step("N005", "0", "question", "landed"), step("N005", "1", "change", "ready")]));
+  put2(arc("N006", "DECIDED", [step("N006", "0", "question", "waiting"), step("N006", "1", "change", "ready")]));
+  const closed = join(root, ".spndevex/workstreams/closed/020-done/arcs/N001");
+  mkdirSync(closed, { recursive: true });
+  writeFileSync(join(closed, "state.json"), `${JSON.stringify(arc("N001", "DECIDED", [step("N001", "0", "question", "landed")]), null, 2)}\n`);
+  const closedText = readFileSync(join(closed, "state.json"), "utf8");
+  const read = (id) => JSON.parse(readFileSync(join(ws, "arcs", id, "state.json"), "utf8"));
+  const log = (id) => existsSync(join(ws, "arcs", id, "log.jsonl"))
+    ? readFileSync(join(ws, "arcs", id, "log.jsonl"), "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+  const { arcStatus } = await import("../../../../src/scripts/lib/workstream.ts");
+  const before = { n2: arcStatus(read("N002")), n3: arcStatus(read("N003")) };
+  const found = m007.check(root);
+  ok("red: 007 names the two decided arcs whose only started step is a planning row, and no other arc",
+    found.length === 2 && found.some((line) => line.startsWith("open/031-probe/arcs/N002: row 0")) && found.some((line) => line.startsWith("open/031-probe/arcs/N003: row 0")), found.join(" | "));
+  ok("red: before it, both arcs read RUNNING by the landed planning row", before.n2 === "RUNNING" && before.n3 === "RUNNING", JSON.stringify(before));
+  const untouched = ["N004", "N005", "N006"].map((id) => readFileSync(join(ws, "arcs", id, "state.json"), "utf8"));
+  const lines = m007.script(root);
+  ok("each row leaves its arc's steps, by kind or by the title naming the preview, and the build steps stay",
+    read("N002").rows.map((row) => row.id).join() === "1" && read("N003").rows.map((row) => row.id).join() === "1", JSON.stringify([read("N002").rows, read("N003").rows]));
+  ok("a step that waited on the row no longer names it as a blocker", (read("N003").rows[0].blockedBy ?? []).length === 0, JSON.stringify(read("N003").rows));
+  ok("green: both arcs now read DECIDED", arcStatus(read("N002")) === "DECIDED" && arcStatus(read("N003")) === "DECIDED" && read("N002").status === "DECIDED");
+  ok("each row becomes one line on its arc's log, with the title it read",
+    log("N002").filter((line) => line.kind === "discarded").length === 1 && log("N002").some((line) => line.kind === "discarded" && line.row === "0" && /plugin migration 007/.test(line.note) && line.note.includes("question 0"))
+      && log("N003").some((line) => line.kind === "discarded" && line.note.includes("notes/N003/preview.html")), JSON.stringify([log("N002"), log("N003")]));
+  ok("an arc with a landed build step, an arc never decided, a row not landed and a closed workstream stay as they are",
+    ["N004", "N005", "N006"].every((id, at) => readFileSync(join(ws, "arcs", id, "state.json"), "utf8") === untouched[at])
+      && readFileSync(join(closed, "state.json"), "utf8") === closedText && lines.length === 2, lines.join(" | "));
+  const again = m007.script(root);
+  ok("green: 007 then finds nothing, and a second run writes nothing", m007.check(root).length === 0 && again.length === 0 && log("N002").filter((line) => line.kind === "discarded").length === 1, again.join(" | "));
+  const { arcFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
+  ok("every arc it wrote holds to the schema", ["N002", "N003"].every((id) => arcFaults(read(id)).length === 0), arcFaults(read("N002")).concat(arcFaults(read("N003"))).join("; "));
+}
+
 console.log("\n=== a check that finds nothing → recorded without work");
 {
   const root = current("nothing-to-do");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());

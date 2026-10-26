@@ -46,7 +46,7 @@
 // test is a byte-for-byte diff of the two against this workspace and against fixtures for the states
 // it is not in.
 
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
@@ -219,13 +219,6 @@ function countNodes(path: string, world: string | null): number | null {
     }
   }
   return found;
-}
-
-function age(seconds: number): string {
-  const days = Math.floor((Date.now() / 1000 - seconds) / 86400);
-  if (days <= 0) return "touched today";
-  if (days === 1) return "touched yesterday";
-  return `untouched ${days} days`;
 }
 
 function newest(paths: string[]): number {
@@ -539,16 +532,16 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
 export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply, and each line names the reference that holds its rule whole";
 
 export const SHORT_RULES: string[] = [
-  "Your lenses take part in a discussion about a shape, each as a named view. Such a discussion decides what a thing is before it is built. It can open at any moment of a workstream, also in the middle of a run. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
-  "Three signs say how many views speak: the choice crosses a repository, it changes what a partner builds on, or it sets a pattern others will follow. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
-  "No sign: the one view that owns the question, in one sentence. One sign: the architect's view and the owning view. Two signs or more: the starting group with product and partner, each view a fresh agent, and a second pass after the developer's answer. → `refs/devex/agent/lenses.md` § How a view is made",
-  "Show each view in its own voice: its name, then its words as a colleague would say them out loud, in short full sentences and everyday words, never a slogan. On a card, a view is one or two sentences, and names no option by its letter. Never sum up what \"the views\" thought. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
-  "Write every reply as one person talking to another: full sentences in a natural order, and no clipped one-line verdicts. Use a table only for facts that are a table. The moment chooses the register (teammate, teacher, senior table, straight), one meaning-icon opens the reply, and the shape follows the moment. A failure opens straight, and a code preview passes the standards you would hold a developer to. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-  "A decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built, unless a rule or the construct's purpose settles it. Then name the rule or the purpose and log it. Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
-  "Structure comes before content: design the units, their names and their grouping, and show them, before you fill them. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
-  "**Needs you** opens a reply in two cases only. A reply that raises a card holds it there in full, once. A reply that ends the work or stops it names each open card in one line. A progress reply has no such part. → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
-  "The arcs of a workstream are yours to manage: open, split, order, pause and close them, and say what you did in one line. A new workstream is always the developer's decision. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
-  "No script tells you that a prompt opens a discussion about a shape. You read each prompt and decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
+  "Your lenses take part in a discussion about a shape, at any moment of a workstream, also in the middle of a run. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
+  "Three signs say how many views speak: the choice crosses a repository, changes what a partner builds on, or sets a pattern others follow. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
+  "No sign: the owning view, in one sentence. One sign: the architect's and the owning view. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
+  "Show each view in its own voice, as a colleague would say it, never a slogan; on a card, one or two sentences, no option by its letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
+  "Write every reply as one person talking to another: full sentences, a table only for facts; one meaning-icon opens it; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+  "A decision that sets a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
+  "Structure comes before content: design the units, names and grouping, and show them first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
+  "**Needs you** opens a reply in two cases only: it raises a card, in full, once; or it ends or stops the work, one line per open card. → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
+  "The arcs of a workstream are yours to manage; a new workstream is always the developer's decision. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
+  "No script tells you a prompt opens a discussion about a shape; you decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
 ];
 
 /** The short rules as the block the agent reads: the heading, then one list line for each rule. */
@@ -557,7 +550,7 @@ export function shortRules(): string {
 }
 
 /**
- * The always-loaded index: the SaaS Plane way and the ask router, one line each (RD.DEVEX.AGENT.102).
+ * The always-loaded index: the ask router, one line for each kind of ask (RD.DEVEX.AGENT.102).
  *
  * IT IS READ FROM THE REF, NEVER TYPED HERE. `refs/devex/agent/way.md` restates the way chapter and the
  * router, and `restates check` holds it to the book; a copy in this file would be a second home that
@@ -565,8 +558,8 @@ export function shortRules(): string {
  * because the installed plugin IS `src/`.
  *
  * EVERYTHING ELSE IS READ ON DEMAND. A lens file is loaded only for the task that calls for it, so a
- * window starts with this index and nothing more; a test holds it under 2,000 tokens. A missing ref
- * costs the index and never the window: the block is dropped and orientation carries on.
+ * window starts with this index and nothing more. A missing ref costs the index and never the window:
+ * the block is dropped and orientation carries on.
  */
 export function wayIndex(): string {
   let text: string;
@@ -574,12 +567,18 @@ export function wayIndex(): string {
   catch { return ""; }
   if (!text) return "";
   const body = text.replace(/<!--[\s\S]*?-->\s*/g, "").trim();
-  // One level down, so the index sits under the context's own headings rather than beside its title.
-  return body.replace(/^(#{1,5}) /gm, "#$1 ") + "\n\n";
+  // THE ROUTER ONLY. The way's seventeen principles are read on asking, so the index carries the one line
+  // per kind of ask and says where the rest is.
+  const router = body.indexOf("## The ask router");
+  if (router < 0) return "";
+  return "## The SaaS Plane way, and the ask router\n\n"
+    + "The way's seventeen principles are read on asking: `refs/devex/agent/way.md`. A lens is at `refs/devex/agent/lenses/<lens>.md`.\n\n"
+    // One level down, so the router sits under the context's own headings rather than beside its title.
+    + body.slice(router).replace(/^(#{1,5}) /gm, "#$1 ") + "\n\n";
 }
 
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
-                unwired: number; stale: string | null; behind: string | null; rung: string | null };
+                unwired: number; stale: string | null; behind: string | null; late: string[]; rung: string | null };
 
 /**
  * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
@@ -596,6 +595,7 @@ export function statusLine(s: Status): string {
   if (s.unwired) parts.push(`${s.unwired} unwired`);
   if (s.stale) parts.push(s.stale);
   if (s.behind) parts.push(s.behind);
+  parts.push(...s.late);
   if (s.rung) parts.push(s.rung);
   return parts.join(" · ");
 }
@@ -654,52 +654,6 @@ function sessionsHere(root: string): number {
 }
 
 /**
- * What is available now, above what is parked, above the receipt. State is printed on every row
- * rather than as a heading, so a window skimming one line still knows what it is looking at. Closed
- * collapses to one wrapped line — its number is what a later sitting cites.
- */
-function workstreamLines(streams: Workstream[]): string[] {
-  if (!streams.length)
-    return ["### Workstreams — none yet", "",
-            "A subject becomes one by `mkdir` under `backlog/` or `open/` — then update the agent "
-            + "and reload BEFORE executing it (`cross-repo.md`)."];
-  const byState: Record<string, Workstream[]> = Object.fromEntries(
-    STATES.map((state) => [state, streams.filter((w) => w.state === state)]));
-  const tally = STATES.filter((s) => byState[s].length).map((s) => `${byState[s].length} ${s}`).join(" · ");
-  // RD.DEVEX.AGENT.049. The MUST binds the moment a workstream is picked up, and this is the surface a
-  // session meets before any skill. Printed with the tally rather than under a workstream: it is
-  // true of whichever one you open, including one you are about to create.
-  const out = [`### Workstreams — ${tally}`, "",
-    "Open one with the agent update and the reload, then execute — `cross-repo.md`."];
-  // A TABLE, BECAUSE THESE ROWS ARE COMPARED RATHER THAN READ. A reader scanning for what to pick up
-  // is comparing the same four facts across every workstream, and aligned columns are what makes
-  // that a glance instead of a parse. Markdown rather than padding: the surface renders it.
-  const live = [...byState.open, ...byState.backlog];
-  if (live.length) {
-    out.push("", "| | # | Workstream | Page | Arcs | Touched |", "| --- | --- | --- | --- | --- | --- |");
-    for (const state of ["open", "backlog"])
-      for (const w of byState[state]) {
-        // A page nobody can open is a page nobody reads. VS Code shows an `.html` file as source, so
-        // the cell offers the URL a browser takes rather than the path an editor opens. Only an OPEN
-        // workstream gets a link: a parked page is not being read.
-        const page = !w.page ? "—"
-          : state === "open" ? `[approach page](file://${w.page})`
-          : "approach page";
-        const legacy = w.legacy ? ` · still in ${w.legacy}` : "";
-        out.push(`| ${state === "open" ? "🟢 open" : "⏸ backlog"} | ${w.number || "—"} | ${w.subject} `
-          + `| ${page} | ${w.arcs} | ${age(w.when)}${legacy} |`);
-      }
-  }
-  // CLOSED STAYS A LINE. It is a receipt rather than something to pick up, and twelve rows of it
-  // would outweigh the handful a reader can actually act on.
-  if (byState.closed.length) {
-    out.push("", `**${byState.closed.length} closed** — `
-      + byState.closed.map((w) => "`" + w.folder + "`").join(" · "));
-  }
-  return out;
-}
-
-/**
  * The last thing a session says before you type.
  *
  * Two offers and no menu: the open question you arrived with, and — only when exactly one workstream
@@ -721,11 +675,6 @@ function closingLines(streams: Workstream[], others: number): string[] {
       `workspace. I will not touch it unless you ask me to.`
     : `Or ask me to continue ${name}, and I will start where we stopped.`;
   return ["", ask, "", ...wrap(offer, 84), ""];
-}
-
-function claim(repo: Repo): string {
-  if (!repo.world) return "—";
-  return repo.world + (repo.stack ? ` · ${repo.stack}` : "");
 }
 
 export const MIGRATIONS_HEADING = "### Plugin migrations — before any other work";
@@ -817,69 +766,83 @@ export function orient(root: string, cwd: string): [message: string, context: st
     unwired: repos.filter((r) => !r.wired).length,
     stale: cache?.startsWith("cache stale") ? cache : null,
     behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
+    late: repos.flatMap((r) => lateBranch(r.name, r.path) ?? []),
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
   });
   const message = clean([...greeting, WELCOME_SPACER, status]);
 
-  // THE TABLES ARE FOR WHEN YOU ASK. A partner's first session opens on the welcome and one line, and
-  // a table of repos tells them nothing about what this is or what the agent is for. The agent holds
-  // the tables so that *where are we?* is answered without a second read.
-  const head = plugins.length
-    ? `floor ${plugins.length} plugins · ${cache}`
-    : "floor not minted — no plugins enabled here";
-  const lines: string[] = ["## The ground", "", `\`${root}\` · ${head}`];
+  // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
+  // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
+  // reply needs and nothing else (RD.DEVEX.AGENT.105).
+  const lines: string[] = [];
   if (behind)
-    lines.push("", `⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
-      "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file");
-  if (resolve(cwd) !== root) lines.push("", `Rooted in \`${relative(root, resolve(cwd))}\`.`);
-  lines.push("");
-
-  // A TABLE, NOT PADDED COLUMNS. This text is rendered as markdown wherever a session actually
-  // reads it, and a proportional font throws away every space `padEnd` inserted — so the columns
-  // that lined up in a terminal arrive as ragged prose. The pipes survive both surfaces.
-  lines.push("### Repositories", "",
-    "| Repo | Law | Plugins | Wiring | Holds |",
-    "| --- | --- | --- | --- | --- |");
-  for (const r of repos) {
-    const facts: string[] = [];
-    if (r.nodes) facts.push(`${r.nodes} node${r.nodes !== 1 ? "s" : ""}`);
-    facts.push(...r.pins);
-    lines.push(`| \`${r.name}\` | ${r.world ? claim(r) : "_no claim_"} | ${r.want.join(" ") || "—"} `
-      + `| ${r.wired ? "wired" : "**UNWIRED**"} | ${facts.join(" · ") || "—"} |`);
-  }
-  lines.push("");
-
-  lines.push(...workstreamLines(streams));
+    lines.push(`⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
+      "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
+  if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
   lines.push(...closingLines(streams, others));
-  const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
-    "three states. `open/` is available now, `backlog/` is parked behind a named " +
-    "blocker, and `closed/` is the receipt. The number is an identity, never a " +
-    `priority. Rung ${level}: ${why}. The welcome and the status line open the first reply as the ` +
-    "line at the top says: in some editors this reply is the only place the developer sees it. " +
-    "Show the tables only when asked (*where are we?*). " +
-    "The closing question is asked ONLY when the developer's first message does not already " +
-    "say what to do. A handover block, an arc name, or any named next step replaces it — under " +
-    "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
-    "does>.* Then the first thing you will do, never by asking again. A handover block names a " +
-    "`model:` with a model and an effort: before any action, compare the model with the one your system " +
-    "prompt names. On a mismatch, one line under the status line names both models and how to switch — " +
-    "the model picker or the `/model` command — and nothing runs until the developer switches or says " +
-    "to go on. The effort on that line is a note for the developer to set in the picker, and nothing " +
-    "compares it. If that row's State reads " +
-    "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
-    "ask before you touch it. " +
-    "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +
-    "options and never a `Q<n>` card: a card lives on the approach page, which does not exist yet. " +
-    "Publish nothing unless the developer asks (RD.DEVEX.WORKSPACE.117): an approach page, a sample or a " +
-    "report stays where it was written, and you hand it over as the full path to the file, to open in a " +
-    "browser. That holds over a publishing tool's own default to publish without being asked. " +
-    "Never turn the rung into a menu. The standing offer " +
-    "under that question appears only when exactly one workstream is open and no other " +
-    "session is live here — so where you cannot see one, do not propose resuming " +
-    "anything.\n";
+  const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
+    "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
+    "or any named next step replaces it — under the status line, one line: *Picking up N<nn> — <the arc's title>, " +
+    "at row <n>: <what the row does>.* Then do the first thing, never by asking again. A handover block names a " +
+    "`model:`: before any action, compare it with the model your system prompt names. On a mismatch, one line " +
+    "under the status line names both and how to switch — the model picker or the `/model` command — and nothing " +
+    "runs until the developer switches or says to go on. Its effort is a note for the picker; nothing compares it. " +
+    "If the row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark " +
+    "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
+    "never lettered options or a `Q<n>` card. Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any " +
+    "tool's default: hand a page over as its full file path.\n";
   return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + wayIndex() + shortRules()];
+}
+
+/** Whether a folder is a git checkout: `.git` is a folder, or a file where the checkout is a worktree. */
+function isCheckout(path: string): boolean {
+  return isDir(join(path, ".git")) || isFile(join(path, ".git"));
+}
+
+/** Runs git in a member and returns its output, or null when it fails. */
+function gitIn(path: string, args: string[]): string | null {
+  try { return execFileSync("git", ["-C", path, ...args], { encoding: "utf8", timeout: 2000, stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+  catch { return null; }
+}
+
+/** The branches a pull request promotes to: a checkout on one of these is never told to rebase. */
+const PERMANENT = ["develop", "qa", "uat", "main"];
+
+/**
+ * A member's branch that is behind its base, as one clause of the status line, or null. The base is
+ * `origin/develop` unless the branch's git config records another in `spnBase`. A permanent branch, a
+ * detached HEAD and a branch that is not behind say nothing.
+ */
+export function lateBranch(name: string, path: string): string | null {
+  if (!isCheckout(path)) return null;
+  const branch = gitIn(path, ["branch", "--show-current"]);
+  if (!branch || PERMANENT.includes(branch)) return null;
+  const base = `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
+  const count = Number(gitIn(path, ["rev-list", "--count", `HEAD..${base}`]));
+  return count > 0 ? `${name}  ${branch}  ${count} behind ${base}: rebase before the next push` : null;
+}
+
+/** The longest the session start waits for the members' remotes. */
+export const FETCH_BUDGET_MS = 5000;
+
+/**
+ * Fetches every member's origin, all at once, and gives up on whatever has not answered when the budget is
+ * spent. A fetch that fails, hangs or has no remote costs the window nothing: the clause it would have
+ * fed is simply not there.
+ */
+export function fetchMembers(paths: string[]): Promise<void> {
+  const env = { ...process.env, GIT_TERMINAL_PROMPT: "0" };
+  const running = paths.filter(isCheckout).map((path) => new Promise<void>((done) => {
+    try {
+      const child = spawn("git", ["-C", path, "fetch", "--quiet", "--no-tags", "origin"],
+        { env, stdio: "ignore", timeout: FETCH_BUDGET_MS, killSignal: "SIGKILL" });
+      child.on("error", () => done());
+      child.on("close", () => done());
+    } catch { done(); }
+  }));
+  return Promise.all(running).then(() => undefined);
 }
 
 if (runAlone("orientation.ts")) {
@@ -899,7 +862,11 @@ if (runAlone("orientation.ts")) {
   begin({ script: "spn-devex", event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload),
           process: { group: "events", action: "orientation" } }, cwd);
   let result: [string, string] | null = null;
-  try { result = orient(workspaceRootOf(cwd), cwd); }
+  try {
+    const root = workspaceRootOf(cwd);
+    await fetchMembers(members(root).map(([, path]) => path));
+    result = orient(root, cwd);
+  }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);
   }

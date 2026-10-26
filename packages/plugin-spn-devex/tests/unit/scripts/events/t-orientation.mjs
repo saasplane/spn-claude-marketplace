@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { WELCOME_LEAD } from "../../../../src/scripts/events/orientation.ts";
+import { WELCOME_LEAD, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -87,8 +87,7 @@ const IN_WORKSPACE = existsSync(resolve(WORKSPACE, ".spndevex"));
 console.log(IN_WORKSPACE ? "\n=== orientation — the real workspace"
   : "\n=== orientation — the real workspace: not run, this copy sits outside one");
 if (IN_WORKSPACE) compare("this workspace, as a window actually sees it", `${WORKSPACE}`,
-  ["Welcome back to SaaS Plane!", "🧭 I work with you through", `\`${WORKSPACE}\``,
-   "### Workstreams", "So — what are we building?"],
+  ["Welcome back to SaaS Plane!", "🧭 I work with you through", "The ground is read on asking", "So — what are we building?"],
   ["Your team's time belongs to your product.", "I am the DevEx agent"]);
 
 console.log("\n=== orientation — the states this workspace is not in");
@@ -121,7 +120,7 @@ compare("an estate-only workspace, rung 1",
     "spn-infra/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-infra@saasplane": true } }),
     ".spndevex/README.md": "state\n",
   }),
-  ["spn-infra", "INFRA", "wired", "none yet"]);
+  ["1 repo · rung 1: estate only — no APPS repo yet"], ["none yet"]);
 
 compare("an APPS repo carrying no CONCEPT.md, rung 2",
   fixture("no-concept", {
@@ -129,7 +128,7 @@ compare("an APPS repo carrying no CONCEPT.md, rung 2",
     "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
     ".spndevex/README.md": "state\n",
   }),
-  ["UNWIRED"]);
+  ["1 repo · 1 unwired"], ["UNWIRED"]);
 
 // EXACTLY ONE OPEN, NO OTHER SESSION — the standing offer. This workspace can never show it while
 // three other windows are live here, so it exists only as a fixture.
@@ -143,23 +142,28 @@ const one = compare("exactly one workstream open: the standing offer appears",
     [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1/state.json`]: "{}\n",
     [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   }),
-  ["Or ask me to continue 042 widget-pricing", "1 open · 1 backlog · 1 closed", "file://", "041-finished"]);
+  ["Or ask me to continue 042 widget-pricing", "1 workstream open (042) · 1 in backlog"], ["041-finished", "file://"]);
 
 // ARCS NUMBERED WITH THREE DIGITS ARE COUNTED, beside one numbered with one digit, each by its data. The
 // notes folder `notes/N001/` holds no arc, whatever sits in it, and a Markdown arc file is no arc.
-compare("arcs kept as data N001, N002 and N3 are counted, and neither notes/N001/ nor a Markdown arc file is",
-  fixture("three-digit-arcs", {
-    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
-    "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N001/state.json`]: "{}\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N002/state.json`]: "{}\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N3/state.json`]: "{}\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N9-the-old-form.md`]: "# arc\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/plan.md`]: "# plan\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/samples/close-message.md`]: "Closing.\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/approach.html`]: "<html></html>",
-  }),
-  ["| 3 |"]);
+const threeDigit = fixture("three-digit-arcs", {
+  "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+  "spn-app-ts/CONCEPT.md": "# concept\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N001/state.json`]: "{}\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N002/state.json`]: "{}\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N3/state.json`]: "{}\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N9-the-old-form.md`]: "# arc\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/plan.md`]: "# plan\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/samples/close-message.md`]: "Closing.\n",
+  [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/approach.html`]: "<html></html>",
+});
+// The ground is read on asking now, so the count is read from the function the status command shares.
+{
+  n += 1;
+  const ok = workstreams(threeDigit).length === 1 && workstreams(threeDigit)[0].arcs === 3;
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  arcs kept as data N001, N002 and N3 are counted, and neither notes/N001/ nor a Markdown arc file is`);
+}
 
 compare("two open: no offer is made, because naming one would be choosing for you",
   fixture("two-open", {
@@ -168,27 +172,32 @@ compare("two open: no offer is made, because naming one would be choosing for yo
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
     [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1/state.json`]: "{}\n",
   }),
-  ["2 open"], ["Or ask me to continue"]);
+  ["2 workstreams open (042, 044)"], ["Or ask me to continue"]);
 
 // THE CONTAINER'S OLDER NAME STILL READS, and a bare Markdown arc under `.spndevex/arcs/`, the shape
 // before workstreams, is no workstream.
-compare("the container's older name still reads: sessions/, and a bare arc file is no workstream",
-  fixture("legacy", {
-    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
-    "spn-app-ts/CONCEPT.md": "# concept\n",
-    ".spndevex/sessions/open/old-subject/arcs/N1/state.json": "{}\n",
-    ".spndevex/arcs/arc-older-subject.md": "# arc\n",
-  }),
-  ["still in sessions/"], ["older-subject", "still in arcs/"]);
+const legacyRoot = fixture("legacy", {
+  "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+  "spn-app-ts/CONCEPT.md": "# concept\n",
+  ".spndevex/sessions/open/old-subject/arcs/N1/state.json": "{}\n",
+  ".spndevex/arcs/arc-older-subject.md": "# arc\n",
+});
+{
+  n += 1;
+  const found = workstreams(legacyRoot);
+  const ok = found.length === 1 && found[0].legacy === "sessions/" && found[0].subject === "old-subject";
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  the container's older name still reads: sessions/, and a bare arc file is no workstream`);
+}
 
-compare("a repo with no claim at all reports one, rather than guessing",
+compare("a repo with no claim at all still counts as a member, rather than being guessed at",
   fixture("no-claim", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "some-repo/.git/HEAD": "ref: refs/heads/main\n",
     ".spndevex/README.md": "state\n",
   }),
-  ["no claim"]);
+  ["2 repos"]);
 
 console.log(IN_WORKSPACE ? "\n=== orientation — the hook form, which is what a window actually runs"
   : "\n=== orientation — the hook form: not run, this copy sits outside a workspace");
@@ -218,7 +227,7 @@ if (IN_WORKSPACE) {
     shape = Boolean(parsed.systemMessage) &&
       parsed.hookSpecificOutput?.hookEventName === "SessionStart" &&
       parsed.hookSpecificOutput.additionalContext.startsWith(`${WELCOME_LEAD}\n\n${parsed.systemMessage}`) &&
-      parsed.hookSpecificOutput.additionalContext.includes("Ground, read at load");
+      parsed.hookSpecificOutput.additionalContext.includes("The ground is read on asking");
   } catch { shape = false; }
   ok = ok && shape;
   if (!ok) failed += 1;
@@ -296,11 +305,11 @@ console.log("\n=== orientation — the closing question is asked only when nothi
   says("the ground still ends with the question, because the hook cannot see the first message",
     text.includes("So — what are we building?"));
   says("and the note now makes asking it conditional",
-    text.includes("The closing question is asked ONLY when the developer's first message does not already"));
+    text.includes("Ask the closing question ONLY when the first message does not say what to do"));
   says("it names what replaces the question, rather than only forbidding it",
     text.includes("A handover block, an arc name, or any named next step replaces it"));
-  says("and the standing-offer rule beside it is untouched",
-    text.includes("The standing offer") && text.includes("do not propose resuming"));
+  says("and the standing offer is the script's to print, only with exactly one workstream open and no other session live",
+    !text.includes("Or ask me to continue") && !text.includes("The standing offer"));
 }
 
 // ── the welcome, and one status line (N116 row 6 item 2) ──
@@ -489,13 +498,14 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     && behindOut.context.includes("take a fresh window") && !behindOut.message.includes("take a fresh window"));
 
   // THE TABLES ARE FOR WHEN YOU ASK: in the agent's context, never in the developer's pane.
-  const tables = ["## The ground", "### Repositories", "| Repo | Law |", "### Workstreams", "So — what are we building?",
-    "Or ask me to continue 042 widget-pricing"];
+  const tables = ["## The ground", "### Repositories", "| Repo | Law |", "### Workstreams"];
+  const closing = ["So — what are we building?", "Or ask me to continue 042 widget-pricing"];
   const offer = hook(ordinary, null);
   says("the developer's pane carries the welcome and the status line and no table",
-    tables.every((t) => !offer.message.includes(t)));
-  says("the agent's context opens with the lead line, then the same opening, then every table and the closing question",
-    offer.context.startsWith(`${WELCOME_LEAD}\n\n${offer.message}`) && tables.every((t) => offer.context.includes(t)));
+    [...tables, ...closing].every((t) => !offer.message.includes(t)));
+  says("the agent's context opens with the lead line, then the same opening, then the closing question, and no table",
+    offer.context.startsWith(`${WELCOME_LEAD}\n\n${offer.message}`) && closing.every((t) => offer.context.includes(t))
+    && tables.every((t) => !offer.context.includes(t)));
   says("the lead line says the welcome comes word for word and whole, before any tool call, and names every part",
     WELCOME_LEAD.includes("word for word and whole, before any tool call")
     && WELCOME_LEAD.includes("the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after each of the three, then the status line. Trim nothing."));
@@ -509,9 +519,8 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     Buffer.byteLength(offer.context.slice(0, offer.context.indexOf(status) + status.length), "utf8") < 2000);
   says("N020 known-bad: no instruction to say the welcome stands below the tables",
     !offer.context.slice(offer.context.indexOf("## The ground")).includes("word for word"));
-  says("the note points at the lead line, and holds the tables",
-    offer.context.includes("The welcome and the status line open the first reply as the line at the top says")
-    && offer.context.includes("Show the tables only when asked"));
+  says("the note reads the ground on asking, by the status command",
+    offer.context.includes("The ground is read on asking: run `spnutils workspace status` for *where are we?*"));
   says("known-bad: the loose wording the proof windows shortened is gone",
     !offer.context.includes("Open your first reply with the welcome above, whatever the prompt, then the status line"));
   // N116 row 8, F5: a handover window took over a row another window had marked in progress.
@@ -519,27 +528,26 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
   // Q380 A: a window picking up a handover checks its model against the block's `model:` line first.
   says("a pasted handover's model is compared with the window's own before any action, and a mismatch names /model",
-    offer.context.includes("A handover block names a `model:` with a model and an effort: before any action, compare the model with the one your system prompt names")
+    offer.context.includes("A handover block names a `model:`: before any action, compare it with the model your system prompt names")
     && offer.context.includes("nothing runs until the developer switches or says to go on"));
   // N8 row 2h (Q384 reversed A → C): the check compares the model only. In the VS Code extension the
   // picker read High while `CLAUDE_EFFORT` read `medium`, so comparing effort stopped a window that was
   // set correctly, and its remedy named a terminal nobody here uses.
   says("2h: a model mismatch names the picker or /model as the way to switch",
-    offer.context.includes("names both models and how to switch — the model picker or the `/model` command"));
+    offer.context.includes("names both and how to switch — the model picker or the `/model` command"));
   says("2h: a handover's effort is never compared — no CLAUDE_EFFORT read, no claude --effort remedy",
     !offer.context.includes("CLAUDE_EFFORT") && !offer.context.includes("claude --effort"));
   says("2h: the effort on the model: line is a note for the developer to set in the picker",
-    offer.context.includes("The effort on that line is a note for the developer to set in the picker, and nothing compares it."));
-  // N8 row 2l: the agent publishes no page unless the developer asks, and hands over a full path.
-  says("2l: the session note says nothing is published unless the developer asks, and a page is handed over as its full path",
-    offer.context.includes("Publish nothing unless the developer asks") && offer.context.includes("full path") &&
-    offer.context.includes("RD.DEVEX.WORKSPACE.117"));
-  says("2l: the note says this overrides a publishing tool's own default",
-    offer.context.includes("a publishing tool's own default"));
-  says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
-    offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
+    offer.context.includes("Its effort is a note for the picker; nothing compares it."));
+  // The note is cut to its handover lines and two short ones (031 N008): the publish rule overrides a publishing
+  // tool's own default, and the plain-question rule shapes the first reply, so neither waits to be read on asking.
+  says("the note keeps the plain-question rule and the publish rule, one short line each",
+    offer.context.includes("A new goal in the first prompt is asked in one or two plain questions, never lettered options or a `Q<n>` card.")
+    && offer.context.includes("Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any tool's default: hand a page over as its full file path."));
+  says("known-bad: the long forms of those two rules are gone",
+    !offer.context.includes("Publish nothing unless the developer asks") && !offer.context.includes("Something new in the first prompt"));
   says("a row marked in progress is left, its age said, and asked about",
-    offer.context.includes("If that row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark is, and ask before you touch it."));
+    offer.context.includes("If the row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark is, and ask before you touch it."));
 
   // Day zero opens on the same welcome, and its door follows.
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
@@ -581,8 +589,8 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
   const block = at < 0 ? "" : ordinary.context.slice(at);
   const lines = block.split("\n").filter((line) => line.startsWith("- "));
 
-  says("the agent's context holds the short rules, after the ground and its note",
-    at > ordinary.context.indexOf("Ground, read at load") && ordinary.context.indexOf("Ground, read at load") > 0);
+  says("the agent's context holds the short rules, after the note",
+    at > ordinary.context.indexOf("The ground is read on asking") && ordinary.context.indexOf("The ground is read on asking") > 0);
   says("the developer's pane does not show them", !ordinary.message.includes(HEADING) && !ordinary.message.includes("in its own voice"));
   says("they are about ten lines: the heading and no more than ten rules",
     lines.length >= 7 && lines.length <= 10, `got ${lines.length} rule lines`);
@@ -592,27 +600,26 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
   for (const [what, words] of [
     ["views take part in a discussion about a shape, at any moment of a workstream",
       ["take part in a discussion about a shape", "at any moment of a workstream", "in the middle of a run"]],
-    ["the three signs", ["crosses a repository", "changes what a partner builds on", "sets a pattern others will follow"]],
+    ["the three signs", ["crosses a repository", "changes what a partner builds on", "sets a pattern others follow"]],
     ["what each number of signs brings",
-      ["No sign: the one view that owns the question, in one sentence", "One sign: the architect's view and the owning view",
-       "Two signs or more: the starting group with product and partner", "a fresh agent"]],
+      ["No sign: the owning view, in one sentence", "One sign: the architect's and the owning view",
+       "Two or more: the starting group with product and partner", "a fresh agent"]],
     ["a view is shown in its own voice, as a colleague would say it, never a slogan",
-      ["in its own voice", "as a colleague would say them out loud, in short full sentences and everyday words, never a slogan",
-       "Never sum up what \"the views\" thought"]],
+      ["in its own voice", "as a colleague would say it, never a slogan"]],
     ["on a card a view is one or two sentences, and names no option by its letter",
-      ["On a card, a view is one or two sentences", "names no option by its letter"]],
+      ["on a card, one or two sentences", "no option by its letter"]],
     ["a reply reads as one person talking to another",
-      ["Write every reply as one person talking to another", "full sentences", "no clipped one-line verdicts", "Use a table only for facts that are a table"]],
+      ["Write every reply as one person talking to another", "full sentences", "a table only for facts"]],
     ["the moment chooses the register, the icon and the shape, and a failure opens straight",
-      ["The moment chooses the register (teammate, teacher, senior table, straight)", "one meaning-icon opens the reply", "A failure opens straight", "a code preview passes the standards"]],
+      ["one meaning-icon opens it", "a failure opens straight"]],
     ["a shape-setting decision is put to the developer before it is built",
-      ["sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built"]],
+      ["sets a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built"]],
     ["structure before content", ["Structure comes before content"]],
     ["Needs you opens a reply in two cases only",
-      ["**Needs you** opens a reply in two cases only", "in full, once", "each open card in one line", "A progress reply has no such part"]],
+      ["**Needs you** opens a reply in two cases only", "in full, once", "one line per open card"]],
     ["arcs are the agent's to manage, and a workstream is the developer's decision",
-      ["The arcs of a workstream are yours to manage", "A new workstream is always the developer's decision"]],
-    ["no script judges whether a prompt is such a discussion", ["No script tells you that a prompt opens a discussion about a shape"]],
+      ["The arcs of a workstream are yours to manage", "a new workstream is always the developer's decision"]],
+    ["no script judges whether a prompt is such a discussion", ["No script tells you a prompt opens a discussion about a shape"]],
   ]) {
     const missing = words.filter((word) => !block.includes(word));
     says(`a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
@@ -686,7 +693,91 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   says("green: once the ledger records 001, the window's start says nothing of it", !/\*\*001\*\*|- 001[:,]/.test(recorded), recorded.slice(recorded.indexOf(HEADING), recorded.indexOf(HEADING) + 300));
   const current = hook(fixture("migration-nothing", { ...ground, [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n" }));
   says("kept as data and nothing recorded — one line says 001 has nothing to do, and the command that records it",
-    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006`"));
+    current.context.includes(HEADING) && current.context.includes("- 001, 002, 003, 004, 005, 006, 007: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007`"));
+}
+
+
+// ── the session start fetches every member, names a branch behind develop, and stays small (031 N008) ──
+console.log("\n=== orientation — the fetch, the behind-develop clause and the size");
+{
+  const says = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  const git = (dir, ...args) => execFileSync("git", ["-C", dir, "-c", "user.name=t", "-c", "user.email=t@t", ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  const hookIn = (root, env = {}) => {
+    const started = Date.now();
+    const out = execFileSync("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], {
+      input: JSON.stringify({ cwd: root, session_id: "t-orientation-fetch" }), encoding: "utf8", cwd: root,
+      env: { ...process.env, SPN_TELEMETRY: "off", ...env }, maxBuffer: 16 * 1024 * 1024 });
+    const parsed = JSON.parse(out);
+    return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext, ms: Date.now() - started };
+  };
+  const statusOf = (message) => message.split("\n").filter(Boolean).at(-1);
+
+  // A bare origin holding develop, a member cloned from it on a workstream's branch, and a second clone that
+  // moves develop on by one commit: the member is one behind only once the session start has fetched.
+  const root = fixture("fetch-behind", { ".spndevex/README.md": "state\n" });
+  const origin = join(BASE, "fetch-behind-origin.git");
+  const seed = join(BASE, "fetch-behind-seed");
+  const member = join(root, "spn-x");
+  const other = join(BASE, "fetch-behind-other");
+  execFileSync("git", ["init", "-q", "--bare", "-b", "develop", origin]);
+  execFileSync("git", ["init", "-q", "-b", "develop", seed]);
+  writeFileSync(join(seed, "a.txt"), "a\n");
+  git(seed, "add", "-A"); git(seed, "commit", "-q", "-m", "base");
+  git(seed, "remote", "add", "origin", origin); git(seed, "push", "-q", "origin", "develop");
+  execFileSync("git", ["clone", "-q", origin, member]);
+  writeFileSync(join(member, "sprepo.json"), repo("APPS", { stack: "TS" }));
+  git(member, "checkout", "-q", "-b", "feat/031-x");
+  execFileSync("git", ["clone", "-q", origin, other]);
+  writeFileSync(join(other, "b.txt"), "b\n");
+  git(other, "add", "-A"); git(other, "commit", "-q", "-m", "ahead"); git(other, "push", "-q", "origin", "develop");
+  const late = hookIn(root);
+  says("a member's branch behind origin/develop is named in the status line, after a fetch the window made",
+    statusOf(late.message).includes("spn-x  feat/031-x  1 behind origin/develop: rebase before the next push"), statusOf(late.message));
+  says("the status stays one line, and the welcome is whole above it", late.message.split("\n").filter(Boolean).at(-1) === statusOf(late.message) && late.message.includes("🧭 I work with you through"));
+  git(member, "checkout", "-q", "develop");
+  says("a permanent branch is never told to rebase", !statusOf(hookIn(root).message).includes("behind origin"));
+  git(member, "checkout", "-q", "feat/031-x"); git(member, "config", "branch.feat/031-x.spnBase", "main");
+  says("a branch whose git config records another base is measured from that base, which here is not behind",
+    !statusOf(hookIn(root).message).includes("behind origin"));
+
+  // THE FETCH'S BUDGET: a remote that never answers costs the window five seconds and no more.
+  const slow = fixture("fetch-slow", { ".spndevex/README.md": "state\n" });
+  mkdirSync(join(slow, "spn-slow"), { recursive: true });
+  execFileSync("git", ["init", "-q", "-b", "feat/x", join(slow, "spn-slow")]);
+  git(join(slow, "spn-slow"), "remote", "add", "origin", "ssh://example.invalid/x.git");
+  writeFileSync(join(slow, "spn-slow", "sprepo.json"), repo("APPS", { stack: "TS" }));
+  const waited = hookIn(slow, { GIT_SSH_COMMAND: "sh -c 'sleep 30' sh" });
+  says("a remote that never answers is given up on within the five-second budget, and the window still opens",
+    waited.ms < 9000 && waited.ms >= 4000 && waited.message.includes("🧭 I work with you through"), `${waited.ms} ms`);
+  const parallel = fixture("fetch-parallel", { ".spndevex/README.md": "state\n" });
+  for (const name of ["spn-a", "spn-b", "spn-c"]) {
+    mkdirSync(join(parallel, name), { recursive: true });
+    execFileSync("git", ["init", "-q", "-b", "feat/x", join(parallel, name)]);
+    git(join(parallel, name), "remote", "add", "origin", "ssh://example.invalid/x.git");
+    writeFileSync(join(parallel, name, "sprepo.json"), repo("APPS", { stack: "TS" }));
+  }
+  const together = hookIn(parallel, { GIT_SSH_COMMAND: "sh -c 'sleep 30' sh" });
+  says("three members that never answer cost one budget, not three: the fetches run in parallel", together.ms < 9000, `${together.ms} ms`);
+
+  // THE SIZE: the real workspace's session-start output stays under 8,192 bytes, and the welcome is unchanged.
+  if (IN_WORKSPACE) {
+    const real = hookIn(WORKSPACE);
+    const bytes = Buffer.byteLength(real.context, "utf8");
+    console.log(`        session-start additionalContext of this workspace: ${bytes} bytes`);
+    says(`the session-start output is under 8,192 bytes (${bytes})`, bytes < 8192);
+  }
+  const big = hookIn(fixture("size-ordinary", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
+  }));
+  says(`a fixture workspace's session-start output is under 8,192 bytes (${Buffer.byteLength(big.context, "utf8")})`, Buffer.byteLength(big.context, "utf8") < 8192);
+  says("known-bad: the ground and the way's principles are not carried",
+    !big.context.includes("### Repositories") && !big.context.includes("Start from what the thing is for"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

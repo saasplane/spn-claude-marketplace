@@ -1,16 +1,17 @@
-// `checks/commit-tiers.ts` — a `git commit` waits for a whole, green, stamped run of the content it carries
+// `checks/push-tiers.ts` — a `git push` waits for a whole, green, stamped run of the tree at HEAD
 // (the book's RD.DEVEX.WORKSPACE.281).
 //
-// Each case builds a throwaway git repository with a node in it, writes run files and stamps beside them
-// the way spnutils does, and calls the check's own function. The stamp's content hash is computed here
-// from `git ls-files -s`, independently of the check, so a hash the check gets wrong fails a case.
+// Each case builds a throwaway git repository with a node in it, marks `origin/develop` at its first commit,
+// lands changes as commits, writes run files and stamps beside them the way spnutils does, and calls the
+// check's own function. The stamp's content hash is computed here from `git ls-files -s`, independently of
+// the check, so a hash the check gets wrong fails a case.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-const { applies, checkCommitTiers, contentHash, readCommits, tiersTouched } = await import("../../../../src/scripts/checks/commit-tiers.ts");
+const { applies, checkPushTiers, contentHash, readPushes, tiersTouched } = await import("../../../../src/scripts/checks/push-tiers.ts");
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -20,7 +21,7 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
-const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-devex-commit-tiers-")));
+const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-devex-push-tiers-")));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 const git = (repo, ...args) => execFileSync("git", ["-C", repo, "-c", "user.name=t", "-c", "user.email=t@t", ...args], { encoding: "utf8" });
@@ -33,7 +34,13 @@ function repository(name, files) {
   write(repo, files);
   git(repo, "add", "-A");
   git(repo, "commit", "-q", "-m", "base");
+  git(repo, "update-ref", "refs/remotes/origin/develop", "HEAD");
   return repo;
+}
+/** Lands the named paths as one commit on top of origin/develop: a push carries commits, never the index. */
+function land(repo, ...paths) {
+  git(repo, "add", ...paths);
+  git(repo, "commit", "-q", "-m", "change");
 }
 function write(repo, files) {
   for (const [path, body] of Object.entries(files)) {
@@ -62,7 +69,7 @@ function leaveRun(repo, node, tier, { content, narrowed = false, status = "SUCCE
   }
 }
 
-const commit = (repo, command = "git commit -m x") => ({ tool_name: "Bash", cwd: repo, tool_input: { command } });
+const push = (repo, command = "git push", cwd = repo) => ({ tool_name: "Bash", cwd, tool_input: { command } });
 const verdictOf = (verdict) => (verdict?.deny ? "deny" : verdict?.note ? "note" : "silent");
 const denial = (verdict) => verdict?.deny ?? "";
 
@@ -79,19 +86,25 @@ function appsRepo(name, kind = "SUPPORT_WEB") {
   });
   return repo;
 }
-const stageSource = (repo) => { write(repo, { "pkg/src/a.ts": "export const a = 2;\n" }); git(repo, "add", "pkg/src/a.ts"); };
+function appsRepoNoOrigin(name) {
+  const repo = appsRepo(name);
+  git(repo, "update-ref", "-d", "refs/remotes/origin/develop");
+  stageSource(repo);
+  return repo;
+}
+const stageSource = (repo) => { write(repo, { "pkg/src/a.ts": "export const a = 2;\n" }); land(repo, "pkg/src/a.ts"); };
 
-console.log("=== a commit that touches no tier passes");
+console.log("=== a push that touches no tier passes");
 {
   const repo = appsRepo("docs-only");
   write(repo, { "pkg/README.md": "# pkg\n\nmore\n", "pkg/docs/readme.txt": "more docs\n" });
-  git(repo, "add", "pkg/README.md", "pkg/docs/readme.txt");
-  ok("[MKT.HOOKS.63] a commit of a markdown file and a docs folder of a node passes with no run at all", verdictOf(checkCommitTiers(commit(repo))) === "silent");
+  land(repo, "pkg/README.md", "pkg/docs/readme.txt");
+  ok("[MKT.HOOKS.63] a push of a markdown file and a docs folder of a node passes with no run at all", verdictOf(checkPushTiers(push(repo))) === "silent");
   write(repo, { "loose.txt": "changed\n" });
-  git(repo, "add", "loose.txt");
-  ok("[MKT.HOOKS.63] a commit of a file outside every node passes", verdictOf(checkCommitTiers(commit(repo))) === "silent");
-  ok("[MKT.HOOKS.63] a call that is not a commit gets no verdict", checkCommitTiers({ tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } }) === null);
-  ok("[MKT.HOOKS.63] a dry run commits nothing and is left out", readCommits("git commit --dry-run -m x", repo).length === 0);
+  land(repo, "loose.txt");
+  ok("[MKT.HOOKS.63] a push of a file outside every node passes", verdictOf(checkPushTiers(push(repo))) === "silent");
+  ok("[MKT.HOOKS.63] a call that is not a push gets no verdict", checkPushTiers({ tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } }) === null);
+  ok("[MKT.HOOKS.63] a dry run pushes nothing and is left out", readPushes("git push --dry-run", repo).length === 0 && readPushes("git push", repo).length === 1);
 }
 
 console.log("\n=== an app-owned module is part of its app's run");
@@ -103,8 +116,8 @@ console.log("\n=== an app-owned module is part of its app's run");
     "app/src/modules/site/entry/page.ts": "export const page = 1;\n",
   });
   write(repo, { "app/src/modules/site/entry/page.ts": "export const page = 2;\n" });
-  git(repo, "add", "app/src/modules/site/entry/page.ts");
-  const refused = checkCommitTiers(commit(repo));
+  land(repo, "app/src/modules/site/entry/page.ts");
+  const refused = checkPushTiers(push(repo));
   ok("[MKT.HOOKS.64] a change in a module with a manifest and no package.json asks for its app's tiers, by the app's name",
     denial(refused).includes("`app`, component") && denial(refused).includes("spnutils apps test component commit-component app") && !denial(refused).includes("site"), denial(refused));
 }
@@ -113,7 +126,7 @@ console.log("\n=== a touched node without a whole, green run on this content is 
 {
   const none = appsRepo("no-stamp");
   stageSource(none);
-  const refused = checkCommitTiers(commit(none));
+  const refused = checkPushTiers(push(none));
   ok("[MKT.HOOKS.64] a node with no run file is refused", verdictOf(refused) === "deny", JSON.stringify(refused));
   ok("[MKT.HOOKS.64] the refusal names the node, the tier and the command to run",
     denial(refused).includes("`pkg`, unit") && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
@@ -122,24 +135,24 @@ console.log("\n=== a touched node without a whole, green run on this content is 
   const bare = appsRepo("bare-run");
   stageSource(bare);
   leaveRun(bare, "pkg", "unit", { content: "", stamped: false });
-  ok("[MKT.HOOKS.64] a run file with no stamp counts as no proof", denial(checkCommitTiers(commit(bare))).includes("no stamp file beside it"), denial(checkCommitTiers(commit(bare))));
+  ok("[MKT.HOOKS.64] a run file with no stamp counts as no proof", denial(checkPushTiers(push(bare))).includes("no stamp file beside it"), denial(checkPushTiers(push(bare))));
 
   const narrowed = appsRepo("narrowed");
   stageSource(narrowed);
   leaveRun(narrowed, "pkg", "unit", { content: indexHash(narrowed, "pkg"), narrowed: true });
-  ok("[MKT.HOOKS.64] a narrowed run is refused", denial(checkCommitTiers(commit(narrowed))).includes("narrowed"), denial(checkCommitTiers(commit(narrowed))));
+  ok("[MKT.HOOKS.64] a narrowed run is refused", denial(checkPushTiers(push(narrowed))).includes("narrowed"), denial(checkPushTiers(push(narrowed))));
 
   const stale = appsRepo("stale");
   stageSource(stale);
   leaveRun(stale, "pkg", "unit", { content: indexHash(stale, "pkg") });
   write(stale, { "pkg/src/a.ts": "export const a = 3;\n" });
-  git(stale, "add", "pkg/src/a.ts");
-  ok("[MKT.HOOKS.64] a stamp whose content differs from the staged content is refused", denial(checkCommitTiers(commit(stale))).includes("other content"), denial(checkCommitTiers(commit(stale))));
+  land(stale, "pkg/src/a.ts");
+  ok("[MKT.HOOKS.64] a stamp whose content differs from the staged content is refused", denial(checkPushTiers(push(stale))).includes("other content"), denial(checkPushTiers(push(stale))));
 
   const red = appsRepo("red");
   stageSource(red);
   leaveRun(red, "pkg", "unit", { content: indexHash(red, "pkg"), status: "FAILED" });
-  ok("[MKT.HOOKS.64] a run with a failed result is refused", denial(checkCommitTiers(commit(red))).includes("not all green"), denial(checkCommitTiers(commit(red))));
+  ok("[MKT.HOOKS.64] a run with a failed result is refused", denial(checkPushTiers(push(red))).includes("not all green"), denial(checkPushTiers(push(red))));
 }
 
 {
@@ -148,7 +161,7 @@ console.log("\n=== a touched node without a whole, green run on this content is 
   leaveRun(empty, "pkg", "unit", { content: indexHash(empty, "pkg") });
   const runFile = join(empty, "pkg", "tests", ".output", "unit", "runs", "r1.json");
   writeFileSync(runFile, JSON.stringify({ run: "r1", tier: "UNIT", phase: null, ranAt: "2026-10-23T21:00:00Z", env: "local", results: [] }), "utf8");
-  const refused = checkCommitTiers(commit(empty));
+  const refused = checkPushTiers(push(empty));
   ok("[MKT.HOOKS.64] a run with no results is refused like a red one, naming its command",
     denial(refused).includes("proved nothing") && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
 }
@@ -159,24 +172,24 @@ console.log("\n=== a whole green stamped run on exactly this content passes");
   stageSource(repo);
   const content = indexHash(repo, "pkg");
   leaveRun(repo, "pkg", "unit", { content });
-  ok("[MKT.HOOKS.65] with one owed tier still unproven the commit is refused", verdictOf(checkCommitTiers(commit(repo))) === "deny");
+  ok("[MKT.HOOKS.65] with one owed tier still unproven the push is refused", verdictOf(checkPushTiers(push(repo))) === "deny");
   leaveRun(repo, "pkg", "component", { content });
-  ok("[MKT.HOOKS.65] with every owed tier whole, green and stamped on this content it passes", verdictOf(checkCommitTiers(commit(repo))) === "silent", denial(checkCommitTiers(commit(repo))));
+  ok("[MKT.HOOKS.65] with every owed tier whole, green and stamped on this content it passes", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
 
   write(repo, { "pkg/src/a.ts": "export const a = 4;\n" });
-  git(repo, "add", "pkg/src/a.ts");
-  ok("[MKT.HOOKS.65] one byte staged after the runs makes them stale", verdictOf(checkCommitTiers(commit(repo))) === "deny");
+  land(repo, "pkg/src/a.ts");
+  ok("[MKT.HOOKS.65] one byte staged after the runs makes them stale", verdictOf(checkPushTiers(push(repo))) === "deny");
 }
 {
   const repo = appsRepo("case-file");
   write(repo, { "pkg/tests/unit/a.spec.ts": "it('a', () => { expect(1).toBe(1); });\n" });
-  git(repo, "add", "pkg/tests/unit/a.spec.ts");
+  land(repo, "pkg/tests/unit/a.spec.ts");
   leaveRun(repo, "pkg", "unit", { content: indexHash(repo, "pkg") });
-  ok("[MKT.HOOKS.65] a case file touches its own tier alone, so the other owed tier is not asked for", verdictOf(checkCommitTiers(commit(repo))) === "silent", denial(checkCommitTiers(commit(repo))));
+  ok("[MKT.HOOKS.65] a case file touches its own tier alone, so the other owed tier is not asked for", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
   ok("[MKT.HOOKS.65] and a case file of a tier the kind does not owe touches nothing", tiersTouched("tests/journey/x.spec.ts", ["unit", "component"]).length === 0);
   const owesNone = appsRepo("owes-none", "APP_SERVER");
   stageSource(owesNone);
-  ok("[MKT.HOOKS.65] a kind that owes only contract and journey asks for no tier at the commit", verdictOf(checkCommitTiers(commit(owesNone))) === "silent");
+  ok("[MKT.HOOKS.65] a kind that owes only contract and journey asks for no tier at the push", verdictOf(checkPushTiers(push(owesNone))) === "silent");
 }
 
 console.log("\n=== an infra node is found by spinfrapkg.json");
@@ -188,37 +201,40 @@ console.log("\n=== an infra node is found by spinfrapkg.json");
   });
   const repo = infra("infra-red");
   write(repo, { "packages/infra-org/src/main.tf": "# tf changed\n" });
-  git(repo, "add", "packages/infra-org/src/main.tf");
-  const refused = checkCommitTiers(commit(repo));
+  land(repo, "packages/infra-org/src/main.tf");
+  const refused = checkPushTiers(push(repo));
   ok("[MKT.HOOKS.66] a change to an infra node is refused with no run, naming the infra command",
     verdictOf(refused) === "deny" && denial(refused).includes("`packages/infra-org`") && denial(refused).includes("spnutils infra test commit infra-org"), denial(refused));
   ok("[MKT.HOOKS.66] and names the type's tiers", denial(refused).includes("contract") && denial(refused).includes("integration"), denial(refused));
   const content = indexHash(repo, "packages/infra-org");
   leaveRun(repo, "packages/infra-org", "contract", { content });
-  ok("[MKT.HOOKS.66] one of the two tiers proven is not enough", verdictOf(checkCommitTiers(commit(repo))) === "deny");
+  ok("[MKT.HOOKS.66] one of the two tiers proven is not enough", verdictOf(checkPushTiers(push(repo))) === "deny");
   leaveRun(repo, "packages/infra-org", "integration", { content });
-  ok("[MKT.HOOKS.66] both tiers whole, green and stamped pass", verdictOf(checkCommitTiers(commit(repo))) === "silent", denial(checkCommitTiers(commit(repo))));
+  ok("[MKT.HOOKS.66] both tiers whole, green and stamped pass", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
 }
 
-console.log("\n=== a commit by path is read from the working tree of the named paths");
+console.log("\n=== a push is measured from its base, and carries commits only");
 {
-  const repo = appsRepo("by-path");
-  write(repo, { "pkg/src/a.ts": "export const a = 5;\n", "pkg/src/other.ts": "export const other = 1;\n" });
-  git(repo, "add", "pkg/src/other.ts");
-  const call = "git commit -m x -- pkg/src/a.ts";
-  ok("[MKT.HOOKS.67] the paths after `--` are the commit's, and the message is not", JSON.stringify(readCommits(call, repo)[0].pathspecs) === JSON.stringify(["pkg/src/a.ts"]));
-  ok("[MKT.HOOKS.67] a commit by path with no run is refused", verdictOf(checkCommitTiers(commit(repo, call))) === "deny");
-  // The runs saw the committed tree with a.ts changed and nothing else: the node as the commit will hold it.
-  const carried = join(BASE, "by-path-shadow");
-  mkdirSync(carried, { recursive: true });
-  git(carried, "init", "-q");
-  write(carried, { "pkg/spkind.json": JSON.stringify({ kind: "SUPPORT_WEB", name: "Pkg", config: { mtype: "SUPPORT_WEB" } }), "pkg/package.json": JSON.stringify({ name: "pkg", private: true }), "pkg/src/a.ts": "export const a = 5;\n",
-    "pkg/tests/unit/a.spec.ts": "it('a', () => {});\n", "pkg/docs/readme.txt": "docs\n", "pkg/README.md": "# pkg\n" });
-  git(carried, "add", "-A");
-  const content = indexHash(carried, "pkg");
+  const repo = appsRepo("hotfix-base");
+  const branch = git(repo, "branch", "--show-current").trim();
+  // origin/main stays at the first commit; a change is committed, and origin/develop moves up to it.
+  git(repo, "update-ref", "refs/remotes/origin/main", "HEAD");
+  stageSource(repo);
+  git(repo, "update-ref", "refs/remotes/origin/develop", "HEAD");
+  ok("[MKT.HOOKS.67] a branch with nothing since origin/develop carries nothing, so a push of it passes", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
+  git(repo, "config", `branch.${branch}.spnBase`, "main");
+  const refused = checkPushTiers(push(repo));
+  ok("[MKT.HOOKS.67] a branch whose git config records `spnBase` main is measured from origin/main, and is refused without a stamp",
+    verdictOf(refused) === "deny" && denial(refused).includes("spnutils apps test unit commit-unit pkg"), denial(refused));
+  const content = indexHash(repo, "pkg");
   leaveRun(repo, "pkg", "unit", { content });
   leaveRun(repo, "pkg", "component", { content });
-  ok("[MKT.HOOKS.67] runs made on the node as the named paths would leave it pass, whatever else is staged", verdictOf(checkCommitTiers(commit(repo, call))) === "silent", denial(checkCommitTiers(commit(repo, call))));
+  ok("[MKT.HOOKS.67] with the whole stamped runs on the tree at HEAD the hotfix push passes", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
+  write(repo, { "pkg/src/a.ts": "export const a = 99;\n" });
+  git(repo, "add", "pkg/src/a.ts");
+  ok("[MKT.HOOKS.67] a change staged or left in the working tree after the runs is not carried, so the push still passes", verdictOf(checkPushTiers(push(repo))) === "silent", denial(checkPushTiers(push(repo))));
+  ok("[MKT.HOOKS.67] a push in a folder git does not know, or with no origin/develop, gets no verdict",
+    checkPushTiers(push(repo, "git push", join(BASE, "nowhere"))) === null && checkPushTiers(push(appsRepoNoOrigin("no-origin"))) === null);
 }
 
 console.log("\n=== the content hash is pinned");
@@ -236,8 +252,8 @@ console.log("\n=== the content hash is pinned");
 }
 
 console.log("\n=== the fast path");
-ok("[MKT.HOOKS.63] a `git commit`, with options or after a `cd`, applies", applies("", "git commit -m x") && applies("", "cd spn-x && git -C spn-x commit -F msg.txt"));
-ok("[MKT.HOOKS.63] a command that only names the word does not", !applies("", "echo commit") && !applies("", "ls"));
+ok("[MKT.HOOKS.63] a `git push`, with options or after a `cd`, applies", applies("", "git push origin HEAD") && applies("", "cd spn-x && git -C spn-x push -u origin feat/x"));
+ok("[MKT.HOOKS.63] a command that only names the word, and a `git commit`, do not", !applies("", "echo push") && !applies("", "git commit -m x") && !applies("", "ls"));
 
 console.log(`\n${failed ? `${failed} of ${total} FAILED` : `all ${total} passed`}`);
 process.exit(failed ? 1 : 0);

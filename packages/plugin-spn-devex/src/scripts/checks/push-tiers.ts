@@ -1,18 +1,18 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.281 — a check refuses an agent's commit when no whole, green run covers exactly the content staged.
+// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.281 — a check refuses an agent's push when no whole, green run covers exactly the tree it pushes.
 //
-// Refuses a `git commit` to a node whose touched tiers have no whole, green run, stamped by spnutils, on exactly
-// the content the commit carries. The design is in the hooks chapter, § A commit waits for a whole run of its
-// content. It reads files and runs git only.
+// Refuses a `git push` that carries changes to a node whose offline tiers have no whole, green run, stamped by
+// spnutils, on the tree at HEAD. What a push carries is the nodes of `origin/<base>..HEAD`, where `<base>` is
+// `develop` unless the branch's git config records another (`branch.<name>.spnBase`). It reads files and runs git only.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, statSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { emit, read, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 import { segments } from "../lib/command-reader.ts";
 
-/** The tiers a commit asks for: the ones that need nothing running. */
+/** The tiers a push asks for: the ones that need nothing running. */
 type Tier = "unit" | "component" | "integration" | "contract";
 
 /**
@@ -44,27 +44,20 @@ export const INFRA_OWES: Record<string, Tier[]> = {
 const TIERS = ["unit", "component", "integration", "contract", "journey"];
 const MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 
-/** Whether a command could be a `git commit`: a regular expression over the text, so every other call pays that and stops. */
+/** Whether a command could be a `git push`: a regular expression over the text, so every other call pays that and stops. */
 export function applies(_path: string, command: string): boolean {
-  return /\bgit\b[^|;&\n]*\bcommit\b/.test(command);
+  return /\bgit\b[^|;&\n]*\bpush\b/.test(command);
 }
 
-/** One `git commit` as the command typed it. */
-export type CommitCall = { dir: string; all: boolean; pathspecs: string[] };
+/** One `git push` as the command typed it: the folder it runs in, which a `cd` or `git -C` moves. */
+export type PushCall = { dir: string };
 
-/** Options of `git commit` that take the next word as their value. */
-const VALUED_LONG = new Set(["--message", "--file", "--author", "--date", "--reuse-message", "--reedit-message",
-  "--template", "--cleanup", "--fixup", "--squash", "--trailer", "--gpg-sign", "--pathspec-from-file"]);
-const VALUED_SHORT = new Set(["m", "F", "C", "c", "t"]);
 /** Options of `git` itself, before the subcommand, that take the next word. */
 const GIT_VALUED = new Set(["-C", "-c", "--git-dir", "--work-tree", "--namespace"]);
 
-/**
- * Every `git commit` a command runs, each with the folder it runs in (a `cd` or `git -C` moves it), whether
- * it takes every tracked change (`-a`), and the paths it names. A `--dry-run` commits nothing and is left out.
- */
-export function readCommits(command: string, cwd: string): CommitCall[] {
-  const out: CommitCall[] = [];
+/** Every `git push` a command runs, each with the folder it runs in. A `--dry-run` pushes nothing and is left out. */
+export function readPushes(command: string, cwd: string): PushCall[] {
+  const out: PushCall[] = [];
   let dir = cwd;
   for (const words of segments(command)) {
     let at = 0;
@@ -77,31 +70,9 @@ export function readCommits(command: string, cwd: string): CommitCall[] {
       if (words[at] === "-C" && words[at + 1]) where = resolve(where, words[at + 1]);
       at += GIT_VALUED.has(words[at]) ? 2 : 1;
     }
-    if (words[at] !== "commit") continue;
-    const call: CommitCall = { dir: where, all: false, pathspecs: [] };
-    let dryRun = false;
-    let afterDashes = false;
-    for (let index = at + 1; index < words.length; index += 1) {
-      const word = words[index];
-      if (afterDashes) { call.pathspecs.push(word); continue; }
-      if (word === "--") { afterDashes = true; continue; }
-      if (word.startsWith("--")) {
-        if (word === "--all") call.all = true;
-        if (word === "--dry-run") dryRun = true;
-        if (VALUED_LONG.has(word)) index += 1;
-        continue;
-      }
-      if (word.startsWith("-") && word.length > 1) {
-        for (let letter = 1; letter < word.length; letter += 1) {
-          const flag = word[letter];
-          if (flag === "a") call.all = true;
-          if (VALUED_SHORT.has(flag)) { if (letter === word.length - 1) index += 1; break; }
-        }
-        continue;
-      }
-      call.pathspecs.push(word);
-    }
-    if (!dryRun) out.push(call);
+    if (words[at] !== "push") continue;
+    if (words.slice(at + 1).some((word) => word === "--dry-run" || word === "-n")) continue;
+    out.push({ dir: where });
   }
   return out;
 }
@@ -111,65 +82,38 @@ function git(dir: string, args: string[], input?: string): string {
   return execFileSync("git", ["-C", dir, ...args], { encoding: "utf8", input, maxBuffer: 256 * 1024 * 1024, stdio: ["pipe", "pipe", "ignore"] });
 }
 
-/** The blob ids of working-tree files, by `git hash-object --stdin-paths`; a path that is not a file is absent from the answer. */
-function workingBlobs(top: string, paths: string[]): Map<string, string> {
-  const present = paths.filter((path) => { try { return statSync(join(top, path)).isFile(); } catch { return false; } });
-  const out = new Map<string, string>();
-  if (!present.length) return out;
-  const ids = git(top, ["hash-object", "--stdin-paths"], `${present.join("\n")}\n`).split("\n").filter(Boolean);
-  present.forEach((path, index) => out.set(path, ids[index]));
-  return out;
-}
-
-/** What one commit would carry: the paths it changes, and a way to ask the blob ids of any folder. */
+/** What one push carries: the paths it changes, and a way to ask the blob ids of any folder at HEAD. */
 export type Carried = { top: string; changed: string[]; blobsUnder: (folder: string) => Map<string, string> };
 
+/** The branch a push is measured against: `develop`, unless the branch's git config records another in `spnBase`. */
+function pushBase(top: string): string {
+  let base = "";
+  try {
+    const branch = git(top, ["branch", "--show-current"]).trim();
+    if (branch) base = git(top, ["config", "--get", `branch.${branch}.spnBase`]).trim();
+  } catch { /* no branch, or no key: develop */ }
+  return `origin/${base || "develop"}`;
+}
+
 /**
- * The paths a commit changes and the files it carries, both relative to the repository's top. Three
- * shapes: the index (a plain commit), the index with tracked working-tree changes (`-a`), and the last
- * commit with the named paths taken from the working tree (`git commit -- <paths>`).
+ * What one push carries: the paths its commits change since the base, and the blob ids of the committed tree
+ * at HEAD. Nothing staged and nothing in the working tree counts, because a push carries commits only.
  */
-export function carriedBy(call: CommitCall): Carried | null {
+export function carriedBy(call: PushCall): Carried | null {
   const top = git(call.dir, ["rev-parse", "--show-toplevel"]).trim();
   if (!top) return null;
   const nul = (text: string): string[] => text.split("\0").filter(Boolean);
-
-  if (call.pathspecs.length) {
-    const specs = call.pathspecs.map((spec) => (isAbsolute(spec) ? relative(top, spec) : relative(top, resolve(call.dir, spec))) || ".");
-    const changed = nul(git(top, ["diff", "HEAD", "--name-only", "--no-renames", "-z", "--", ...specs]));
-    return {
-      top, changed,
-      blobsUnder: (folder) => {
-        const base = new Map<string, string>();
-        let tree = "";
-        try { tree = git(top, ["ls-tree", "-r", "-z", "HEAD", "--", folder]); } catch { /* no commit yet */ }
-        for (const entry of nul(tree)) {
-          const tab = entry.indexOf("\t");
-          base.set(entry.slice(tab + 1), entry.slice(0, tab).split(" ")[2]);
-        }
-        for (const path of changed) base.delete(path);
-        for (const [path, id] of workingBlobs(top, changed)) base.set(path, id);
-        return filterUnder(base, folder);
-      },
-    };
-  }
-
-  const staged = nul(git(top, ["diff", "--cached", "--name-only", "--no-renames", "-z"]));
-  const tracked = call.all ? nul(git(top, ["ls-files", "-m", "-z"])) : [];
-  const changed = [...new Set([...staged, ...tracked])];
+  // Three dots: the changes since the merge base, which after the rebase is the base itself.
+  const changed = nul(git(top, ["diff", "--name-only", "--no-renames", "-z", `${pushBase(top)}...HEAD`]));
   return {
     top, changed,
     blobsUnder: (folder) => {
-      const index = new Map<string, string>();
-      for (const entry of nul(git(top, ["ls-files", "-s", "-z", "--", folder]))) {
+      const tree = new Map<string, string>();
+      for (const entry of nul(git(top, ["ls-tree", "-r", "-z", "HEAD", "--", folder]))) {
         const tab = entry.indexOf("\t");
-        index.set(entry.slice(tab + 1), entry.slice(0, tab).split(" ")[1]);
+        tree.set(entry.slice(tab + 1), entry.slice(0, tab).split(" ")[2]);
       }
-      if (call.all) {
-        for (const path of tracked) index.delete(path);
-        for (const [path, id] of workingBlobs(top, tracked)) index.set(path, id);
-      }
-      return filterUnder(index, folder);
+      return filterUnder(tree, folder);
     },
   };
 }
@@ -211,7 +155,7 @@ function nodeOf(top: string, path: string): { folder: string; manifest: string }
   }
 }
 
-/** The tiers a node owes that a commit asks for, or none for a kind this check does not know. */
+/** The tiers a node owes that a push asks for, or none for a kind this check does not know. */
 export function owedTiers(top: string, folder: string, manifest: string): Tier[] {
   const node = join(top, folder);
   try {
@@ -256,7 +200,7 @@ function refusalOf(runFile: string, tier: Tier, content: string): string | null 
   try { stamp = JSON.parse(read(runFile.replace(/\.json$/, ".stamp.json"))); } catch { return "no stamp file beside it, so no proof"; }
   if (stamp.tier && stamp.tier.toLowerCase() !== tier) return `its stamp is for the ${stamp.tier} tier`;
   if (stamp.narrowed !== false) return "the run was narrowed by files, names or a phase";
-  if (stamp.content !== content) return "it ran on other content than this commit carries";
+  if (stamp.content !== content) return "it ran on other content than the tree this push carries";
   if (!Array.isArray(run.results) || run.results.length === 0) return "it ran no case, so it proved nothing";
   if (run.results.some((result) => result?.status !== "SUCCESS")) return "its results are not all green";
   return null;
@@ -265,13 +209,14 @@ function refusalOf(runFile: string, tier: Tier, content: string): string | null 
 /** One finding: a node, a tier and why no run covers it. */
 type Gap = { folder: string; manifest: string; tier: Tier; reason: string };
 
-export function checkCommitTiers(payload: Payload): Verdict {
+export function checkPushTiers(payload: Payload): Verdict {
   const command = payload.tool_input?.command ?? "";
   if (!applies("", command)) return null;
   const gaps: Gap[] = [];
   let repo = "";
-  for (const call of readCommits(command, payload.cwd ?? process.cwd())) {
-    const carried = carriedBy(call);
+  for (const call of readPushes(command, payload.cwd ?? process.cwd())) {
+    let carried: Carried | null;
+    try { carried = carriedBy(call); } catch { continue; }
     if (!carried) continue;
     const touched = new Map<string, { manifest: string; tiers: Set<Tier> }>();
     for (const path of carried.changed) {
@@ -308,14 +253,14 @@ export function checkCommitTiers(payload: Payload): Verdict {
   }
   return {
     deny:
-      `Denied: this commit touches a node whose owed tiers have no whole, green run on exactly the content it carries ` +
+      `Denied: this push carries changes to a node whose offline tiers have no whole, green run on the tree at HEAD ` +
       `(RD.DEVEX.WORKSPACE.281).\n${lines.join("\n")}\n` +
-      `Run each command from \`${repo}\`, then commit again. A run narrowed by files, names or a phase, a run with no stamp ` +
+      `Run each command from \`${repo}\`, then push again. A run narrowed by files, names or a phase, a run with no stamp ` +
       `file and a run made on other content do not count; a file another window left in the node changes the content too.`,
   };
 }
 
-if (runAlone("commit-tiers.ts")) {
-  try { emit(checkCommitTiers(readPayload())); } catch { /* when unsure, allow */ }
+if (runAlone("push-tiers.ts")) {
+  try { emit(checkPushTiers(readPayload())); } catch { /* when unsure, allow */ }
   process.exit(0);
 }

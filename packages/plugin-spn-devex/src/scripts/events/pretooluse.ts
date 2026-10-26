@@ -39,7 +39,8 @@ import { applies as commentsApply, checkComments } from "../checks/comment-check
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
 import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
-import { applies as commitTiersApplies, checkCommitTiers } from "../checks/commit-tiers.ts";
+import { applies as permanentBranchApplies, checkPermanentBranch } from "../checks/permanent-branch.ts";
+import { applies as pushTiersApplies, checkPushTiers } from "../checks/push-tiers.ts";
 import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
 import { applies as commandShapeApplies, checkCommandShape } from "../checks/command-shape.ts";
 import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.ts";
@@ -99,10 +100,12 @@ const CHECKS: Check[] = [
   // and stops.
   { name: { group: "release-go", action: "release-go" }, run: checkReleaseGo, needs: ["command"],
     applies: (path, command) => releaseApplies(path, command) },
-  // A refusal, and the one check that asks git, so its fast path is one regular expression over the
-  // command: every call that is not a `git commit` pays that and stops.
-  { name: { group: "commit-tiers", action: "commit-tiers" }, run: checkCommitTiers, needs: ["command"],
-    applies: (path, command) => commitTiersApplies(path, command) },
+  // Two refusals that ask git, so each fast path is one regular expression over the command: every
+  // call that is not a `git commit` or a `git push` pays that and stops.
+  { name: { group: "permanent-branch", action: "permanent-branch" }, run: checkPermanentBranch, needs: ["command"],
+    applies: (path, command) => permanentBranchApplies(path, command) },
+  { name: { group: "push-tiers", action: "push-tiers" }, run: checkPushTiers, needs: ["command"],
+    applies: (path, command) => pushTiersApplies(path, command) },
   // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
   // it and a pass over the text being written.
   { name: { group: "comment-check", action: "comment-check" }, run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },

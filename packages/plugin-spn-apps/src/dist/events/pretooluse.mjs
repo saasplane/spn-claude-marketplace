@@ -17,7 +17,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// ../../spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts
+// packages/plugin-support-lib/src/lib/payload.ts
 async function payload() {
   const chunks = [];
   try {
@@ -50,11 +50,11 @@ function runAlone(name) {
   return Boolean(process.argv[1]) && process.argv[1].endsWith(name);
 }
 var init_payload = __esm({
-  "../../spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts"() {
+  "packages/plugin-support-lib/src/lib/payload.ts"() {
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/lib/source.ts
+// packages/plugin-spn-apps/src/scripts/lib/source.ts
 import { readFileSync as readFileSync2, readdirSync, statSync as statSync2 } from "node:fs";
 import { dirname as dirname2, join as join2, resolve as resolve2 } from "node:path";
 function read(path) {
@@ -211,7 +211,7 @@ function* walkUnsorted(roots) {
 }
 var SKIP, COMMENT, STRING;
 var init_source = __esm({
-  "../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/lib/source.ts"() {
+  "packages/plugin-spn-apps/src/scripts/lib/source.ts"() {
     SKIP = /* @__PURE__ */ new Set([
       "node_modules",
       "dist",
@@ -227,7 +227,7 @@ var init_source = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts
 var await_sequencing_exports = {};
 __export(await_sequencing_exports, {
   CHECK: () => CHECK,
@@ -300,7 +300,7 @@ ${total} finding(s) \u2014 a .then() chain in a server node's source`);
 }
 var SERVER_KINDS, CHAIN, REMEDY, CHECK;
 var init_await_sequencing = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts"() {
     init_payload();
     init_source();
     SERVER_KINDS = /* @__PURE__ */ new Set(["APP_SERVER", "APP_UTILITY", "MODULE_SERVER", "SUPPORT_SERVER"]);
@@ -320,7 +320,7 @@ var init_await_sequencing = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts
 var contract_cycle_exports = {};
 __export(contract_cycle_exports, {
   cycles: () => cycles,
@@ -439,7 +439,7 @@ ${total} contract-state cycle(s)`);
 }
 var STATES_DIR, SIBLING, BLOCK_COMMENT, LINE_COMMENT, SKIP2, slashes, watched2;
 var init_contract_cycle = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts"() {
     init_payload();
     init_source();
     STATES_DIR = "src/contract/states";
@@ -473,7 +473,7 @@ ${fragment}`.trim();
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts
 var enablement_grammar_exports = {};
 __export(enablement_grammar_exports, {
   CHECK: () => CHECK2,
@@ -704,7 +704,7 @@ ${total} enablement-grammar finding(s)`);
 }
 var ORG_TYPES, GENERIC, COMMENT2, REF, slashed, isAuthz, watched3, MODULE_FROM_SOURCE, CODE_LITERAL, FIELD_MULTI, ENABLEMENT_ALIAS, ENABLEMENT_TYPE, ORG_MEMBER, ORG_QUOTED, finding, capitalize, sameSet, CHECK2;
 var init_enablement_grammar = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts"() {
     init_payload();
     init_source();
     ORG_TYPES = /* @__PURE__ */ new Set([
@@ -749,7 +749,7 @@ var init_enablement_grammar = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts
 var read_verb_naming_exports = {};
 __export(read_verb_naming_exports, {
   CHECK: () => CHECK3,
@@ -826,7 +826,7 @@ ${total} finding(s) \u2014 a read verb returning an XList under a plural name`);
 }
 var WATCHED, READ_LIST_DECLARATION, NAMED_FOR_ITS_LIST, REMEDY2, CHECK3;
 var init_read_verb_naming = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts"() {
     init_payload();
     init_source();
     WATCHED = "/src/contract/services/";
@@ -846,7 +846,7 @@ var init_read_verb_naming = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts
 var assertion_message_exports = {};
 __export(assertion_message_exports, {
   CHECK: () => CHECK4,
@@ -944,7 +944,7 @@ ${total} finding(s) \u2014 a journey assertion carrying no message`);
 }
 var SPEC, JOURNEY_TIER, ASSERTION, OPENERS, CLOSERS, REMEDY3, CHECK4;
 var init_assertion_message = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts"() {
     init_payload();
     init_source();
     SPEC = [".spec.ts", ".spec.tsx"];
@@ -967,7 +967,7 @@ var init_assertion_message = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts
 import { basename as basename6 } from "node:path";
 function blockAt(text, from) {
   const open = text.indexOf("{", from);
@@ -1015,12 +1015,12 @@ function excludesOf(text) {
 }
 var isCodeConfig;
 var init_coverage_excludes = __esm({
-  "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts"() {
+  "packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts"() {
     isCodeConfig = (path) => /^(jest\.config(\.[\w-]+)?\.(c|m)?js|vitest\.config(\.[\w-]+)?\.m?[jt]s)$/.test(basename6(path));
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts
 var coverage_excludes_exports = {};
 __export(coverage_excludes_exports, {
   findings: () => findings4,
@@ -1069,7 +1069,7 @@ ${total} finding(s) \u2014 an exclude with no reason`);
 }
 var watched6;
 var init_coverage_excludes2 = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts"() {
     init_payload();
     init_source();
     init_coverage_excludes();
@@ -1086,7 +1086,7 @@ var init_coverage_excludes2 = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts
 var coverage_exports = {};
 __export(coverage_exports, {
   CHECKS: () => CHECKS,
@@ -1310,7 +1310,7 @@ ${total} finding(s) \u2014 ${check3.title}`);
 }
 var CODE, TEST_DIRS, ROUTE, MUTATION, RESTORE, DOUBLE, DECLARES_TESTS, TEST_TEXT, CHECKS;
 var init_coverage = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts"() {
     init_payload();
     init_source();
     CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
@@ -1366,7 +1366,7 @@ var init_coverage = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts
 var host_assertion_exports = {};
 __export(host_assertion_exports, {
   CHECK: () => CHECK5,
@@ -1521,7 +1521,7 @@ function scan8(paths) {
 }
 var CODE2, CONTEXT, HOSTISH, REF2, ALPHANUMERIC, SPACE, CHECK5;
 var init_host_assertion = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts"() {
     init_payload();
     init_source();
     CODE2 = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
@@ -1547,7 +1547,7 @@ var init_host_assertion = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/src.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/src.ts
 var src_exports = {};
 __export(src_exports, {
   RULES: () => RULES,
@@ -1586,7 +1586,7 @@ function validate(input) {
 }
 var RULES;
 var init_src = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/src.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/src.ts"() {
     init_source();
     await init_read_verb_naming();
     await init_enablement_grammar();
@@ -1601,7 +1601,7 @@ var init_src = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/tests.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/tests.ts
 var tests_exports = {};
 __export(tests_exports, {
   RULES: () => RULES2,
@@ -1640,7 +1640,7 @@ function validate2(input) {
 }
 var RULES2;
 var init_tests = __esm({
-  async "../../spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/tests.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/tests.ts"() {
     init_source();
     await init_assertion_message();
     await init_host_assertion();
@@ -1659,11 +1659,11 @@ var init_tests = __esm({
   }
 });
 
-// ../../spn-claude-marketplace/packages/plugin-support-lib/src/lib/timing.ts
+// packages/plugin-support-lib/src/lib/timing.ts
 import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
-// ../../spn-claude-marketplace/packages/plugin-support-lib/src/lib/docs-tree.ts
+// packages/plugin-support-lib/src/lib/docs-tree.ts
 var DEVEX = ".spndevex";
 var DOCS = "docs";
 var SEAT = {
@@ -1694,7 +1694,7 @@ function workstreamPrefixSource(legacy = false) {
   return `${escape(DEVEX)}\\/${container}\\/${STATE_GROUP}\\/`;
 }
 
-// ../../spn-claude-marketplace/packages/plugin-support-lib/src/lib/timing.ts
+// packages/plugin-support-lib/src/lib/timing.ts
 var DEVEX2 = ".spndevex";
 var DEBUG = ".debug";
 var SWITCH = "telemetry.on";
@@ -1903,10 +1903,10 @@ function end(exit = null, always = false) {
   }
 }
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/events/pretooluse.ts
+// packages/plugin-spn-apps/src/scripts/events/pretooluse.ts
 init_payload();
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/lib/stack.ts
+// packages/plugin-spn-apps/src/scripts/lib/stack.ts
 init_source();
 import { readFileSync as readFileSync3 } from "node:fs";
 import { dirname as dirname3, join as join3, resolve as resolve3 } from "node:path";
@@ -1928,7 +1928,7 @@ function stackOf(path) {
   }
 }
 
-// import("../../providers/**/*/scripts/checks/**/*.ts") in ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/checks/subjects.ts
+// import("../../providers/**/*/scripts/checks/**/*.ts") in packages/plugin-spn-apps/src/scripts/checks/subjects.ts
 var globImport_providers_scripts_checks_ts = __glob({
   "../../providers/ts/scripts/checks/_src/await-sequencing.ts": () => init_await_sequencing().then(() => await_sequencing_exports),
   "../../providers/ts/scripts/checks/_src/contract-cycle.ts": () => init_contract_cycle().then(() => contract_cycle_exports),
@@ -1942,7 +1942,7 @@ var globImport_providers_scripts_checks_ts = __glob({
   "../../providers/ts/scripts/checks/tests.ts": () => init_tests().then(() => tests_exports)
 });
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/checks/subjects.ts
+// packages/plugin-spn-apps/src/scripts/checks/subjects.ts
 var SUBJECT_NAMES = ["src", "tests"];
 async function subjectsFor(path) {
   const stack = stackOf(path);
@@ -1959,7 +1959,7 @@ async function subjectsFor(path) {
   return subjects;
 }
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/checks/figma-connector.ts
+// packages/plugin-spn-apps/src/scripts/checks/figma-connector.ts
 init_payload();
 init_source();
 var FIGMA_TOOL = "mcp__figma__use_figma";
@@ -2025,7 +2025,7 @@ if (runAlone("figma-connector.ts")) {
   process.exit(0);
 }
 
-// ../../spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/events/pretooluse.ts
+// packages/plugin-spn-apps/src/scripts/events/pretooluse.ts
 async function dispatch(event2, span2) {
   if (event2.tool_name === FIGMA_TOOL)
     return span2({ group: "figma", action: "connector" }, () => run8(event2));

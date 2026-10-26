@@ -240,21 +240,35 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
     "silent", { cwd: root, parity: false, why: "a new guard" });
 }
 
-console.log("\n=== pretooluse — a commit waits for a whole run of its content");
+console.log("\n=== pretooluse — a push waits for a whole run of its tree, and a permanent branch takes no commit");
 {
-  const root = workspace("dispatch-commit-tiers", {});
+  const root = workspace("dispatch-push-tiers", {});
   const repo = join(root, "spn-x");
   mkdirSync(join(repo, "pkg", "src"), { recursive: true });
   writeFileSync(join(repo, "pkg", "spkind.json"), JSON.stringify({ kind: "SUPPORT_SERVER", name: "Pkg", config: { mtype: "SUPPORT_SERVER" } }));
   writeFileSync(join(repo, "pkg", "package.json"), JSON.stringify({ name: "pkg", private: true }));
   writeFileSync(join(repo, "pkg", "src", "a.ts"), "export const a = 1;\n");
-  for (const args of [["init", "-q"], ["add", "-A"]]) execFileSync("git", ["-C", repo, ...args]);
-  one("[MKT.HOOKS.64] the commit refusal survives the chain, naming the command to run",
-    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+  const git = (...args) => execFileSync("git", ["-C", repo, "-c", "user.name=t", "-c", "user.email=t@t", ...args], { stdio: "ignore" });
+  git("init", "-q", "-b", "feat/001-x");
+  git("add", "-A");
+  git("commit", "-q", "-m", "base");
+  git("update-ref", "refs/remotes/origin/develop", "HEAD");
+  writeFileSync(join(repo, "pkg", "src", "a.ts"), "export const a = 2;\n");
+  git("add", "-A");
+  git("commit", "-q", "-m", "change");
+  one("[MKT.HOOKS.64] the push refusal survives the chain, naming the command to run",
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git push" } },
     "deny", { says: "spnutils apps test unit commit-unit pkg", cwd: root, parity: false, why: "a new guard" });
-  one("[MKT.HOOKS.63] a Bash call that is not a commit passes the same chain",
+  one("[MKT.HOOKS.63] a Bash call that is not a push or a commit passes the same chain",
     { tool_name: "Bash", cwd: repo, tool_input: { command: "git status" } },
     "silent", { cwd: root, parity: false, why: "a new guard" });
+  one("[MKT.HOOKS.70] a commit on the workstream's branch passes the same chain",
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+    "silent", { cwd: root, parity: false, why: "a new guard" });
+  git("checkout", "-q", "-b", "develop");
+  one("[MKT.HOOKS.69] a commit on develop is refused by the chain, naming the pull request",
+    { tool_name: "Bash", cwd: repo, tool_input: { command: "git commit -m x" } },
+    "deny", { says: "pull request", cwd: root, parity: false, why: "a new guard" });
 }
 
 console.log("\n=== pretooluse — a long foreground command is met with a note to run it in the background");
