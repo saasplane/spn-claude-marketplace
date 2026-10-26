@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/14-libraries.md", "seen": "ee6981a8" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/14-libraries.md", "seen": "ee6981a8" }
   ]
 }
 -->
-<!-- spn:generated libraries — do not edit inside these markers; `spn-apps library catalogue` writes it -->
+<!-- spn:generated libraries — do not edit inside these markers; `spn-apps library catalogue write` writes it -->
 # Libraries — the published packages a node may depend on
 
 **Source of truth:** the foundation's `10-providers/ts/14-libraries.md`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.

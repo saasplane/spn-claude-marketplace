@@ -3,10 +3,11 @@
   "id": "estate-plugin",
   "variant": "construct",
   "title": "Plugin — spn-infra as a Delivery Unit",
+  "subtitle": "The one folder that carries this repository's infrastructure rules into a working session.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "The folder that carries the estate standard into a session — the manifest that names it, the description that decides whether a session loads it, and the version rule it shares with its two siblings.",
+  "summary": "This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.",
   "keywords": ["plugin", "manifest", "version", "lockstep", "description", "INFRA"]
 }
 -->
@@ -15,9 +16,11 @@
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
-A rule an agent never loads is a rule nobody follows. `spn-infra` is the folder that carries the estate standard from this repository into a session working on an estate: one manifest, one entry in the marketplace list, and a set of construct folders beneath it. This page names the container; every other page of this domain names something inside it.
+This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. Read this page to see what this plugin claims about itself and when a session loads it. It explains the manifest, the marketplace entry, and the version rule it shares with its two sibling plugins.
 
 ## Overview
+
+A rule an agent never loads is a rule nobody follows. `spn-infra` carries one manifest, one entry in the marketplace list, and a set of construct folders beneath it, and every other page of this domain names something inside that container.
 
 Two things about the manifest pull in opposite directions, and both are deliberate. **The version is the set's and the identity is this plugin's own.** The number moves with its two siblings whether or not anything here changed, so a reader comparing three numbers never has to wonder whether a release half-landed. The description belongs to `spn-infra` alone, and it is what a session matches against when it decides whether to load the plugin at all.
 
@@ -95,4 +98,4 @@ This page answers what carries the estate standard into a session and which byte
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `spn-devex plugin partner check`

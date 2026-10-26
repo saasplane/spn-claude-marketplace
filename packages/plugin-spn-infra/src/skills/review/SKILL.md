@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "2b989141"
     }
   ]
 }
@@ -19,6 +19,8 @@ description: Read an estate plan or a declaration diff back before anything appl
 
 # review — the plan is the review
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Review plans from the checkout — unpublished changes must plan; merge publishes; an apply fetches the published version and applies that, never a checkout.** Treat the plan, therefore, as the one artifact a human judges. A plan comes from `spnutils infra <layer> up --plan` (add `--cloud` for the cloud form, `--json` for a machine-readable one); a teardown's plan comes from `down --plan`. Hold it to both lists below and give a named verdict.
 
 ## Mode: a declaration diff
@@ -28,7 +30,7 @@ Present a manifest change as **one line per choice** — what was chosen, at whi
 ```text
 + environment in-stg (region in, NP, size XS, CLUSTER, deploys from branch develop)
     → derives network spn-dmo-in-stg, namespaces in-stg-*, records in-stg-*.internal.spndemo.app
-+ app grant splt: API (PRD, 9120) + PROCESSOR (PRD)
++ app grant splt: API (PRD, 9101) + PROCESSOR (PRD)
 ```
 
 Never present a raw JSON dump as the review, and never bury a choice inside a reformat. Check each line against the typed/never-typed split in the `implement` skill — a derived name, a discovered identifier, a secret, an ARN, an account id or a provider string outside a cloud entry is a finding, not a detail. The declaration change rides a pull request (`refs/support/infra/laws.md`, plan-is-the-review).
@@ -37,7 +39,7 @@ Never present a raw JSON dump as the review, and never bury a choice inside a re
 
 - **Every resource in grammar form** — `{org}[-{spc}][-{env}]-{noun}` (`refs/support/infra/naming.md`, in this plugin). A name that cannot be composed is a defect, not a style issue.
 - **The full 12-tag set on every creation** — deny-on-missing holds; a resource planned without the set will be refused at apply, so flag it now.
-- **Where each layer's declaration resolved from** — `spnutils infra show`: PINNED @ version, or a path. A cloud plan must show pins.
+- **Where each layer's declaration resolved from** — `spnutils infra show <spc>`: PINNED @ version, or a path. A cloud plan must show pins.
 - **Exactly the declared scope, nothing more.** The organization plan names root + the internal seats (`cc` · `log` · `audit`) + the registry pairs + zones + guardrails — and nothing else. An environment plan builds network → resources → compute, in order. An unexplained extra resource blocks.
 - **The engine records** — `{env}-database` · `{env}-cache` · `{env}-queue` into `internal.{spd}` — on an environment plan, pointing at whatever the hosting rendered.
 

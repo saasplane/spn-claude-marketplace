@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
-      "seen": "3f7ab1f3"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
+      "seen": "55e05ea4"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
-      "seen": "d07d71ba"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
+      "seen": "0836705e"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # Estate modules and config — what `implement` reads when authoring an estate module
 
-**Source of truth:** the foundation book's `docs/02-constructs/02-support/02-infra/06-modules.md` and `docs/04-capabilities/02-support/02-infra/06-modules/`. Read this card as the restatement; the book governs.
+**Source of truth:** the foundation book's `docs/02-constructs/02-support/03-infra/06-modules.md` and `docs/04-capabilities/02-support/03-infra/06-modules/`. Read this card as the restatement; the book governs.
 
 ## A module is the estate's one extension point
 
@@ -98,9 +98,9 @@ src/local/
 | `LI_DOMAIN` | the platform's local domain; the module composes its own host under it |
 | `LI_CERT_DIR` | the machine CA and shared certificates, read-only |
 | `LI_OUT_DIR` | a host directory the module writes `publish.env` into |
-| `LI_PORT_{NAME}` | one per port the row declares, derived by band |
+| `LI_PORT_{NAME}` | one per port the row declares, derived inside the platform's five hundred local ports |
 
-**Ports are declared on the row, not the compose file** — usage lives on the referencing row, so two products may stand the same module at different ports without forking the package. **Readiness is the compose file's own** `healthcheck` plus `--wait`; a module that never becomes healthy fails by its own definition, and neither side writes a probe.
+**Ports are declared on the row, not the compose file** — usage lives on the referencing row, so two products may stand the same module at different ports without forking the package. On a machine, a module's port derives inside the five hundred its platform declares, in the modules' own part of it (`+400`–`449`), in module-row order from `+400`, unless the row overrides it (`RD.SUPPORT.INFRA.062`). **Readiness is the compose file's own** `healthcheck` plus `--wait`; a module that never becomes healthy fails by its own definition, and neither side writes a probe.
 
 **Publishing runs the other way — Docker has no outputs primitive.** A module that mints something a consumer needs writes `KEY=value` into `publish.env` under `LI_OUT_DIR`; each line reaches the config plane as `{SPC}_{CODE}_{KEY}`. It is a file rather than a stream because facts are read far oftener than produced — status and the config plane read them without standing anything up, and a person can open the file directly. **Timing belongs to the module**: it writes when it has the value, not when something asks. A module that publishes nothing writes no file, and an application that needed a key still fails at boot naming it.
 
@@ -142,7 +142,7 @@ Each path exists as a plain half and a secret half. **Identity follows residency
 the standard block
   → /organization/vars
     → /platform/vars
-      → the application's world rung — the platform's, or the bound space's
+      → the application's world rungs — the platform's, the bound space's, or both
         → /environments/{env}/apps/{app}/vars
           → /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
@@ -150,6 +150,18 @@ the standard block
 **Later rungs win — MUST.** A team's value overrides a standard default by construction, and no deployment lists a path anywhere; the coordinate is the whole address. **The sequence can never be declared** (`RD.SUPPORT.INFRA.054`): extending it is a register row, uniformly — a space's own rung entered exactly that way. The sanctioned ways to reach around it are to promote a value up a rung, to write a `${…}` reference, to author in the application plane, or to use a module's own seat. The narrowest rung is the deployment's own, and it is last because two deployments of one application differ in exactly the values that make them different deployments.
 
 **A local environment is the same composition against a different source** — the compose tree stands in for the ledger, so an environment behaves the same on a laptop without a second mechanism, and a missing key is found on a laptop instead of in a pipeline.
+
+Which world rungs a deployment is given follows from its application's row (`RD.SUPPORT.INFRA.113`):
+
+| Path | On the platform | Space only | The platform and a space |
+| --- | --- | --- | --- |
+| `/organization/vars` · `/platform/vars` | yes | yes | yes |
+| `/environments/{env}/vars` | yes | no | yes |
+| `/environments/{env}/spaces/{code}/vars` | no | yes | yes |
+| `/environments/{env}/apps/{app}/vars` | yes | yes | yes |
+| `/environments/{env}/apps/{app}/deployments/{deployment}/vars` | yes | yes | yes |
+
+The secret half is taken from the last three rows only, because the organization's and the platform's facts are plain. A later path wins where two hold the same key, and the two world rungs cannot hold the same key, because every key under a world's rung starts with that world's prefix, which the blueprint refuses otherwise. **Nothing is merged and nothing is given a second name**: the deployment loads both layers as they are, and the application's own settings join them, as a second queue connection that points at the platform's queue by reference.
 
 **A fact is published once, at the path that describes it, and never copied to the consumers that read it.** Many applications on one database read one entry, and rotating it is one write; copying a fact per application turns every rotation into a fan-out and every staleness into a quiet defect nothing connects to the others.
 
@@ -167,11 +179,40 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **Every block exports one credential pair per purpose its engine stands** — `USER_*`/`PASSWORD_*`, full-word purposes. **Which pair a connection opens is the service's own choice at boot; `ADM` stays ledger-held, published to no application.** Provider-specific facts nest under the product that answered, so each variant carries exactly its own; provider tokens come from a closed list, decomposed by matching known values rather than by splitting on a separator.
 
-**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone.
+**The seal publishes a block of the same shape, with less in it** (`RD.SUPPORT.INFRA.109`). The seal is the family a service calls to encrypt a stored secret before it saves the row, and its key is the environment's key for stored secrets. Its block carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER`, which key holder answered, and `{SPC}_RESOURCE_SEAL_APP_{PROVIDER}_KEY_ID`, the id of that key. The id is not a secret, so it sits on the plain half, and nobody types it: the environment apply reads it from the cloud and publishes it. The block exports no credential pair, because the service calls the key holder as its own workload identity, and no endpoints key, because the estate owns no record for a key holder. **The environment's blueprint publishes the seal block when it stands the key.**
 
-**A space's family lands under its own prefix, exactly as the platform resources do.** An application bound to a space composes that space's blocks; bound to none, it composes the platform's. No application reads across a space boundary by composition, because the derivation never offers it those keys.
+**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone. `SEAL` is one of the family tokens: an application whose estate row lists the `SEAL` grant receives the seal block, and its workload role receives the right to use the environment's key for stored secrets (`RD.SUPPORT.INFRA.110`); an application whose row does not list it receives neither.
+
+**A space's family lands under its own prefix, one level further down** (`RD.SUPPORT.INFRA.112`). The platform's prefix is `{SPC}_` and a space's is `{SPC}_{SPACE}_`: `DMO_RESOURCE_DB_APP_POSTGRESQL_HOST` for the platform `dmo`, `DMO_SAS_RESOURCE_DB_APP_POSTGRESQL_HOST` for its space `sas`. **A prefix is one word for a platform and two words for a space — MUST**; the blueprint refuses a key under a world's path that does not start with that world's prefix. The world token in a host name matches the prefix (`{spc}-{space}`), a space's code differs from the other spaces' of its platform, and a service in a space starts its own keys with the two-word code. An application bound to no space composes the platform's blocks; bound to a space, that space's; bound to a space with `"platform": true`, both, each under its own prefix. No other application reads across a world boundary by composition, because the derivation never offers it those keys.
+
+**The remote channel publishes three kinds of key** (`RD.SUPPORT.INFRA.114`). A service that serves its modules' contracts to the other services of its platform listens a second time, on a remote port, and the services that call it need its address:
+
+| Setting | Path | Why there |
+| --- | --- | --- |
+| `{SPC}_API_REMOTE_PORT` | the deployment's own `/vars` | one deployment's own, from `remotePort` on its row |
+| `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | `/environments/{env}/vars` | one for each deployment that declares a remote port; every calling service reads it |
+| `{SPC}_REMOTE_CREDENTIAL_PROVIDER` | `/environments/{env}/vars` | `KUBERNETES` in a cloud; one cluster issues every service's token |
+| `{SPC}_REMOTE_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` · `_NAMESPACES` · `_ISSUER` | `/environments/{env}/vars` | the token's file in the pod, what a token must be for, this platform's namespaces, and the cluster's issuer |
+
+- **`{NAME}` is the application's `kindCode`.** An application has at most one deployment that declares a remote port, so the name is one address.
+- **In a cloud the address is `https://{env}-{app}-remote.internal.{spd}`**, with its scheme. `{app}` is the same `kindCode`, and the host is a route on the private gateway. A pod and an operator's machine read the same value.
+- **The estate publishes two proxy counts beside a deployment's ports.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route (the load balancer, then the gateway) and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3`: the calling service, the internal load balancer, then the private gateway. A value a team authors for either key wins.
+- **A module held remotely reads the address under its own prefix**, `{SPC}_{MODULE}_REMOTE_ENDPOINTS`, and the service's own settings write that key as a reference: `DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`. So moving a module to another service is a change of one settings line.
+- **The namespaces are `prd,plt,vnd`**, and the token's audience is `spn-remote`, so a token issued for anything else is refused.
+- **Locally the provider is `LOCAL`**, written in the service's own environment file with `{SPC}_REMOTE_CREDENTIAL_LOCAL_SERVICE`, the application's `kindCode`. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`.
+
+**The gateway's rate limit store is published beside them** (`RD.SUPPORT.INFRA.120`). A gateway counts a deployment's rate limit once across all its proxy pods, in the environment's own cache. The platform's world publishes three keys in the secret half of `/environments/{env}/vars`: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL` (the cache's address), `{SPC}_GATEWAY_RATE_LIMIT_STORE_AUTH` (the cache user the gateway counts as, with its password) and `{SPC}_GATEWAY_RATE_LIMIT_STORE_TLS` (whether the connection is encrypted). The gateway reads them and no service does. A deployment given the environment's settings receives them with the rest.
 
 **An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. A published key never spells the product a module renders, and never spells an application's token either.
+
+**A published key carries no module of the code that reads it — MUST** (`RD.SUPPORT.INFRA.111`). The estate publishes a fact under a name for the thing the fact is about. A module reads a setting under its own prefix, `{SPC}_{MODULE}_*`, and nothing outside it. The service's own settings join the two: the module's key is written as a `${…}` reference to the published key. The tenant edge is the example, and the job scheduler has the same shape:
+
+| | The estate publishes | The module reads | The service's own settings write |
+| --- | --- | --- | --- |
+| the edge | `{SPC}_PLATFORM_INTEGRATION_EDGE_TYPE` | the identity module: `{SPC}_IAM_EDGE_TYPE` | `DMO_IAM_EDGE_TYPE=${DMO_PLATFORM_INTEGRATION_EDGE_TYPE}` |
+| the job scheduler | `{SPC}_RESOURCE_DB_JOBPGBOSS_POSTGRESQL_HOST` | the job module: `{SPC}_JOB_SCHEDULER_PGBOSS_HOST` | `DMO_JOB_SCHEDULER_PGBOSS_HOST=${DMO_RESOURCE_DB_JOBPGBOSS_POSTGRESQL_HOST}` |
+
+A setting the estate does not publish stays the module's own and is written as a literal. An installed module of the estate is not a module of the code: its boundary facts keep `{SPC}_{MODULE}_{FACT}`, because that module is what the fact is about.
 
 ## The app plane is authored
 
@@ -179,7 +220,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 - **The CORS origin regex is an authored key, never a derived formula** — no formula from the platform domain can say which origins an API admits.
 - **Identity facts (`{SPC}_ORG_*`, `{SPC}_PLATFORM_*`) are SaaS-construct facts** — an independent application adopting no SaaS construct composes an environment without them, and that absence is blessed, not a gap.
-- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), and the identity module's `{SPC}_IAM_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CUSTOM_DOMAINS`. `infra config render` produces the same block locally, plus two keys the cloud never publishes because no cloud edge stands on a machine: `_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
+- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), and the tenant edge's six facts, `{SPC}_PLATFORM_INTEGRATION_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CERTIFICATE_REGION` · `_CUSTOM_DOMAINS`. `infra config render {spc} {env} {app}` produces the routing block locally, with the same spellings. No cloud edge stands on a machine and nothing publishes one there, so the local rendering writes the edge block as the identity module's own keys, `{SPC}_IAM_EDGE_*`, as literals. Two of them are settings the cloud never publishes: `{SPC}_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `{SPC}_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
 - **The health port is `{CODE}_HEALTH_PORT`** — unset or empty means no health server, and local runs opt in. A deployed environment receives a **published default of `8010`, supplied by the deploy render** — a published default, never a code default, so the composed environment states everything true of the running application.
 
 **A dev-authored value may cite a fact; a fact is always a literal.** `${…}` references resolve one pass against the *composed* rungs, so a reference sees exactly what the application would see. An unknown reference refuses by name at the comparison and at the render, never expanding quietly to nothing. An expansion pulling in a credential materializes on the secret path. That is what makes a published endpoint written once: an engine swap flips a record, and every value referencing it follows at the next render.
@@ -192,6 +233,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 | a build instruction inside a local rendering | a laptop asked to build what the cloud pulls |
 | a mount resolving outside the package | a plug-in reaching state it does not own |
 | a product name in a module code, a folder, or a published key | the indirection the purpose code exists for, bypassed |
+| a published key that spells a module of the code that reads it | the estate named a consumer, and the fact changes when that module is renamed or replaced |
 | a credential in a manifest or an environment file | the plane was bypassed, and the value now lives wherever that file went |
 | a machine writing outside the environment rung | the split between writers broke, and a team's value can be replaced by an apply |
 | an application granted read access to the ledger | the boundary that lets the ledger hold credentials is gone |
@@ -200,4 +242,4 @@ Every resource key follows one shape, and the middle token names the **connectio
 | a `{SCHEMA}` block with no declaration behind it | the store claims a world nobody reviewed |
 | a health probe answered on the API's serving port | the dedicated-listener rule was bypassed |
 
-Try it: `spnutils infra config render in-dev api` — it composes and prints one application's environment without reaching a running deployment.
+Try it: `spnutils infra config render dmo in-dev api` — it composes and prints one application's environment without reaching a running deployment.

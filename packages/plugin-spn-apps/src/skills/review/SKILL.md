@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "2b989141"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: Review SaaS Plane TS changes against the standards. Use when the us
 ---
 
 # review — code and contract gates
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 Pick the mode (`code` | `contract`); a change that touched `contract/states/**` or routes gets **both**, contract first. Review the diff, not the whole file; report findings as blocking / should-fix / nit, each with file:line and the rule it breaks. Gates are mechanical before they are human — naming, domain fit, and judgment start where the checklist stops.
 
@@ -36,7 +38,7 @@ Apply `refs/support/apps/module-changes.md`, in this plugin — the change gate,
 
 The TypeScript standards, as this skill carries them. **Treat this restatement as the standard, whoever reads it** — it is what the review is run against. Its provenance is the foundation book's TypeScript provider set — naming, structure, code patterns, errors and logging, service patterns, and database patterns. That set also covers codegen, toolchain, config and environment, plus the kind registry. Where that book is at hand it carries the reasoning behind each rule. Where it is not, nothing here is deferred:
 
-**Naming/structure** — role suffixes (`Service`/`Repository`/`Provider`/`Manager`/`Entity`/`Controller`/`Listener`); module codes FULLY UPPERCASE in class/type/file names (`IAMOrgService`, never `IamOrgService`). Enums are `Type`-suffixed, with keys UPPER_SNAKE matching values; discriminators are `<noun>Type`/`<noun>_type`, never bare `type`; `Id`/`Ids` not `ID`. Acronyms are CAPS in type names; multi-export files are kebab-case, class files PascalCase; tests sit under `tests/`, never `src/`. The `spkind.json` key is present on new projects; `app/services|repositories|entities` are classes-only (helpers → `app/utils/` or `app/support/`); controllers and listeners are classes.
+**Naming/structure** — role suffixes (`Service`/`Repository`/`Provider`/`Manager`/`Entity`/`Controller`/`Listener`); a `Provider` is the class behind a seam's interface, and a `Manager` runs a lifecycle or owns the providers of a seam; module codes FULLY UPPERCASE in class/type/file names (`IAMOrgService`, never `IamOrgService`). Enums are `Type`-suffixed, with keys UPPER_SNAKE matching values; discriminators are `<noun>Type`/`<noun>_type`, never bare `type`; `Id`/`Ids` not `ID`. Acronyms are CAPS in type names; multi-export files are kebab-case, class files PascalCase; tests sit under `tests/`, never `src/`. The `spkind.json` key is present on new projects; `app/services|repositories|entities` are classes-only (helpers → `app/utils/` or `app/support/`); controllers and listeners are classes. Under `app/support/`, a class exists for a lifecycle, or for values it holds through its constructor and uses across its methods. A class with no `constructor`, no `extends` and no `implements`, that holds only functions, is a util module: it belongs in one file under the area's `utils/`, never in a class. A support util may read a file, run a command or read the environment, and it never calls a service or a manager and never builds a provider. A util in either seat may read the shared `app` object, `app.config` and a provider set up at boot such as `app.providers.logger`; a util under the published `app/utils/` still reads no file, runs no command and reaches no resource. A provider is built by a manager or by a service, where the knowledge to pick it is: a service that names a provider is not a finding, and a util that builds one is.
 
 **Code patterns** — named exports only; one root barrel (generated via `gen-barrel`), no sub-barrels, never re-export another package's symbols. No object shorthand (`key: value` explicit); returns built as typed `const result: T = {…}` then returned — never inline literals from `return`. Every contract method takes exactly one `<Method>Command` — a second argument or a bare primitive means the method belongs in the impl, not on the contract. Keep contract fields `| null` never optional, and CDT types only. A contract is JSON on the wire. So a member is a CDT type, a contract enum, a reference to another contract interface, or an array of one of those. It is never a language primitive — `gen-validators` refuses to generate otherwise. Keep contract constants in `contract/constants.ts` at the contract root — never in `contract/states/*`, never imported by a validator, and a states file never imports back from it. The contract carries NO logic: no functions in states or constants — resolvers, predicates and derivations are the app layer's. And no vestigial aliases: `type X = Y` naming the whole of another type says nothing. Utility names follow `verb{Module}{Action}`; imports run in four groups; await or return every promise; never-returning throw helpers stay `function` declarations.
 
@@ -54,7 +56,7 @@ A change to a module's contract surface, schema, permissions, errors, or env wit
 
 ## Lenses
 
-Convene the `partner` lens for contract mode: run it through the `spn-panel` subagent with the core plugin's `refs/lenses/partner.md` over the contract diff. Code mode may additionally convene `trust` when the change touches authorization, audit, or secrets.
+Contract mode is a change to the published surface, a judgment gate: run the `partner` lens through the `spn-panel` subagent with the spn-devex plugin's `refs/devex/agent/lenses/partner.md` over the contract diff. Code mode convenes no lens; wear `trust` yourself when the change touches authorization, audit, or secrets.
 
 ## Verdict
 

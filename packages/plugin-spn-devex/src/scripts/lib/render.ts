@@ -1,20 +1,22 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks · § The shape of a section, on every page kind · § One stylesheet, served in versions
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The page, produced from the seat file. The agent authors the markdown; this writes the HTML —
 // the body from the markdown, each figure drawn from its spec, then the furniture. So a page is
 // never hand-edited, and the header can never disagree with the block it is rendered from.
+// Every class it writes opens with `sds-`, and the furniture is the two lines that load the shared files.
 //
 // It is deliberately a small renderer rather than a markdown library: the seat file's grammar is
 // closed — headings, paragraphs, tables, lists, fenced blocks — and a dependency would have to be
 // installed on a partner's machine to read a document.
 
-import { basename, dirname, relative, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import { draw, type Spec } from "./draw.ts";
-import { colour } from "./figures.ts";
+import { sentenceColumn } from "./item-cells.ts";
+import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Finding = { message: string; line?: number };
 
@@ -22,12 +24,16 @@ const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
   ARCHITECT: "Architect", SERVER_DEV: "Backend developer", WEB_DEV: "Web developer",
   QA: "Quality engineer", INFRA: "DevOps / SRE", TRUST: "DevSecOps / Security",
-  PARTNER: "Partner / integrator", VOICE: "Editor",
+  PARTNER: "Partner / integrator", VOICE: "Editor", UX: "UX designer",
+  STRATEGY: "Chief executive", UI: "UI designer", MARKETING: "Product marketer", SALES: "Sales lead",
+  GROWTH: "Growth lead", SUPPORT: "Customer success lead", FINANCE: "Finance lead", DATA: "Data lead", AI: "AI lead",
 };
 const STATUS_GLYPH: Record<string, string> = { DONE: "&#x2705;", IMPLEMENTING: "&#x1F6A7;", PLANNING: "&#x1F52E;" };
 
 /** The block a section declares, chosen the way the chapter's own order chooses it. */
 const esc = (s: string) => s.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+/** Code is a literal, so every `&` is written as an entity: a block tagged with a language shows each character its author typed. */
+const escapedCode = (code: string) => code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /**
  * Inline markdown, in the order that stops one form eating another. Inline code is held behind a
@@ -65,8 +71,7 @@ export function hrefForPage(seat: string, out: string): (href: string) => string
     const frag = hash < 0 ? "" : href.slice(hash);
     if (!path) return href;
     let target = resolve(seatDir, path);
-    if (/\/02-constructs\/.*\.md$/.test(target) && basename(target) !== "README.md")
-      target = target.replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+    if (isSeatFile(target)) target = producedPageOf(target);
     const rel = relative(outDir, target);
     return (rel.startsWith(".") ? rel : `./${rel}`) + frag;
   };
@@ -92,15 +97,105 @@ function inline(s: string): string {
   });
 }
 
+/** A cell that a dash or nothing fills says nothing, so no level of an item cell is made from it. */
+const isBlank = (cell: string): boolean => /^(?:—|–|-|&mdash;)?$/.test(cell.trim());
+
+/** A level's text in bold, unless its author already set it so. */
+const bold = (html: string): string => /^<strong>[\s\S]*<\/strong>$/.test(html) ? html : `<strong>${html}</strong>`;
+
+/**
+ * An item cell (05-artifacts.md § The shape of a section, on every page kind): the title in the first
+ * paragraph, the line under it, and the facts as `Key: value` pairs in the page's small type. A level
+ * with nothing to say is left out. The stylesheet tones and spaces the levels, so the cell carries no style.
+ */
+function itemCell(title: string, line: string, facts: [string, string][]): string {
+  const said = facts.filter(([, value]) => !isBlank(value)).map(([key, value]) => `${key}: ${inline(value)}`);
+  return [
+    isBlank(title) ? "" : `<p>${title}</p>`,
+    isBlank(line) ? "" : `<p>${inline(line)}</p>`,
+    said.length ? `<span class="sds-small">${said.join(" &middot; ")}</span>` : "",
+  ].join("");
+}
+
+/**
+ * A Terms row's contract term as the page writes it: the seat's code as written, and a note the seat adds after the
+ * code (`` `OrgType` — the closed set … ``) under it in the page's small type. A dash is an empty cell.
+ */
+function contractCell(cell: string): string {
+  const noted = cell.match(/^((?:`[^`]+`(?:\s*[·,]\s*)?)+)\s+[—–]\s+([\s\S]+)$/);
+  return noted ? `${inline(noted[1].trim())}<br><span class="sds-small">${inline(noted[2])}</span>` : inline(cell);
+}
+
+/**
+ * The tables every construct carries, and the two shapes the corpus repeats, each written as item
+ * cells: a column a reader compares down stays a column, and the rest of what a row says about its
+ * item becomes a level of the item's cell. The seat file keeps its markdown columns, because the
+ * glossary is generated from them. Any other table keeps its columns, except one whose cells hold sentences.
+ */
+const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) => string[]; tableClass?: string }[] = [
+  { // Terms: three columns, because a reader compares the person's word with the contract's spelling down the rows.
+    head: [/^Term$/, /^Contract term$/, /^What it means/],
+    columns: ["Term", "Contract term", "Description"],
+    // The shared styles give the three columns fixed shares, and stack a row under 40rem.
+    tableClass: "sds-terms",
+    row: ([term, contract, means]) => [
+      isBlank(term) ? inline(contract) : `<strong>${inline(term)}</strong>`,
+      isBlank(term) || isBlank(contract) ? "" : contractCell(contract),
+      inline(means),
+    ],
+  },
+  { // Binds: the rule and what it decides; the weight is read down the column.
+    head: [/^Rule$/, /^What it decides$/, /^Weight$/],
+    columns: ["Rule", "Weight"],
+    row: ([rule, decides, weight]) => [itemCell(inline(rule), decides, []), inline(weight)],
+  },
+  { // A Model's pieces: the piece, the question it answers, and its terms.
+    head: [/^Piece$/, /^The question it answers$/, /^Its terms$/],
+    columns: ["Piece"],
+    row: ([piece, question, terms]) => [itemCell(bold(inline(piece)), question, [["Terms", terms]])],
+  },
+  { // A Boundary's edges: what this construct owns beside what it refuses, and who owns that instead.
+    head: [/^Owns$/, /^Refuses$/, /^Who owns that instead$/],
+    columns: ["Owns", "Refuses"],
+    // Both sides are lines, read across the row, so neither takes the title's tone.
+    row: ([owns, refuses, instead]) => [inline(owns), inline(refuses) + itemCell("", "", [["Owned by", instead]])],
+  },
+];
+
+/**
+ * Any other table, where a column after the first holds sentences (RD.DEVEX.WORKSPACE.259): that column is a level of
+ * the first column's cell, under its title. One such column is the line; where several are, each is a paragraph led by
+ * its column's name. Every other column stays, as written. A table with no column of sentences has no shape here.
+ */
+function sentenceShape(head: string[], rows: string[][]): (typeof ITEM_SHAPES)[number] | undefined {
+  const folded = head.map((_, at) => at).filter((at) => at > 0 && sentenceColumn(rows.map((r) => inline(r[at] ?? ""))).sentences);
+  if (!folded.length) return undefined;
+  const kept = head.map((_, at) => at).filter((at) => at > 0 && !folded.includes(at));
+  const words = (html: string): boolean => /[a-z]/i.test(html.replace(/<code\b[\s\S]*?<\/code>/gi, "").replace(/<[^>]+>/g, ""));
+  return {
+    head: [],
+    columns: [inline(head[0]), ...kept.map((at) => inline(head[at]))],
+    row: (cells) => {
+      const title = inline(cells[0] ?? "");
+      const lines = folded.map((at) => [head[at], cells[at] ?? ""]).filter(([, cell]) => !isBlank(cell))
+        .map(([name, cell]) => folded.length === 1 ? `<p>${inline(cell)}</p>` : `<p><strong>${inline(name)}:</strong> ${inline(cell)}</p>`);
+      const item = (isBlank(title) ? "" : `<p>${words(title) ? bold(title) : title}</p>`) + lines.join("");
+      return [item, ...kept.map((at) => inline(cells[at] ?? ""))];
+    },
+  };
+}
+
 function table(lines: string[]): string {
   // A `\|` inside a cell is a pipe the author wants shown, not a column break — markdown's own rule,
   // and the one the first pattern table in the corpus needed (`{org}-{family}-public\|-private`).
   const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
-  const th = head.map((c) => `<th>${inline(c)}</th>`).join("");
-  const tb = rows.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("\n      ");
-  return `  <div class="scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
+  const shape = ITEM_SHAPES.find((one) => one.head.length === head.length && one.head.every((name, at) => name.test(head[at])))
+    ?? sentenceShape(head, rows);
+  const th = (shape ? shape.columns : head.map(inline)).map((c) => `<th>${c}</th>`).join("");
+  const tb = rows.map((r) => `<tr>${(shape ? shape.row(r) : r.map(inline)).map((c) => `<td>${c}</td>`).join("")}</tr>`).join("\n      ");
+  return `  <div class="sds-scroll"><table${shape?.tableClass ? ` class="${shape.tableClass}"` : ""}>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
 function anchorOf(text: string): string {
@@ -160,9 +255,9 @@ function renderBody(lines: string[], findings: Finding[]): string {
       } else if (lang === "html") {
         out.push(body.join("\n"));
       } else {
-        // Colour is added when the page is produced, as spans the stylesheet colours in both
-        // themes. No highlighter runs in the reader's browser.
-        out.push(`  <pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? colour(body.join("\n"), lang) : esc(body.join("\n"))}</pre>`);
+        // The page holds plain code, tagged with its language. The shared script colours the block
+        // when the page opens, so no colour is written here.
+        out.push(`  <pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`);
       }
       continue;
     }
@@ -195,7 +290,7 @@ function renderBody(lines: string[], findings: Finding[]): string {
       flush();
       const q: string[] = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) q.push(lines[i++].replace(/^>\s?/, ""));
-      out.push(`  <div class="pull"><p>${inline(q.join(" "))}</p></div>`);
+      out.push(`  <div class="sds-pull"><p>${inline(q.join(" "))}</p></div>`);
       continue;
     }
     if (!l.trim()) { flush(); i++; continue; }
@@ -211,7 +306,8 @@ export function renderPage(opts: {
   markdown: string;
   workspace: string;
   location: string;
-  furniture: { style: string; scripts: string; footer: string };
+  /** The line that links the shared stylesheet, the line that loads the shared script, and the footer. */
+  furniture: { stylesheet: string; script: string; footer: string };
   /** Given a seat file's href, the one the produced page should carry. Identity when omitted. */
   link?: (href: string) => string;
   /**
@@ -248,7 +344,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   // The first lead paragraph is the standfirst — the page's promise in one line — and the ones after it
   // are the summary. Rendering the first with the standfirst class is what gives a construct the same
   // masthead rhythm as an overview (the developer's rule, 2026-09-21).
-  const lead = renderBody(leadLines, findings).replace(/^(\s*)<p>/, "$1<p class=\"standfirst\">");
+  const lead = renderBody(leadLines, findings).replace(/^(\s*)<p>/, "$1<p class=\"sds-standfirst\">");
 
   const sections: string[] = [];
   if (firstSection >= 0) {
@@ -271,25 +367,29 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
         `<section id="s${s}">\n` +
         // A number orders a file in a tree; a heading is a name. The section head carries no number
         // on the page and none in the rail (the developer's rule, 2026-09-21).
-        `  <div class="sec-head"><h2>${inline(heading)}</h2></div>\n` +
+        `  <div class="sds-section-head"><h2>${inline(heading)}</h2></div>\n` +
         renderBody(body, findings) + `\n</section>`);
     }
   }
 
   const lensChips = (block.lenses ?? []).map((l: string) => {
     if (!LENS_LABEL[l]) findings.push({ message: `\`${l}\` is not a lens` });
-    return `<span class="badge lens">${LENS_LABEL[l] ?? l}</span>`;
+    return `<span class="sds-badge sds-lens">${LENS_LABEL[l] ?? l}</span>`;
   }).join("");
   const type = block.variant ? block.variant.charAt(0).toUpperCase() + block.variant.slice(1) : "";
   const statusPart = block.variant === "overview" || !block.status ? "" :
-    `<span class="st"><span class="lbl">Status:</span> <span class="badge status ${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
+    `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
+
+  // The Subtitle is the seat block's `subtitle` field, one plain sentence under the title; the lead's
+  // first paragraph stays the Description (RD.DEVEX.WORKSPACE.187).
+  const subtitle = block.subtitle ? `  <p class="sds-subtitle">${esc(String(block.subtitle))}</p>\n` : "";
 
   const masthead =
-`<header class="masthead">
+`<header class="sds-masthead">
   <!-- Rendered from the spn:doc block by \`docs.ts page\`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="eyebrow"><span class="line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">${type}</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience">${lensChips}</span>${statusPart}</span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
   <h1>${esc(block.title)}</h1>
-${lead}
+${subtitle}${lead}
 </header>`;
 
   const html = [
@@ -297,24 +397,24 @@ ${lead}
     `<title>${esc(block.title)}</title>`,
     `<!-- spn:doc\n${JSON.stringify(block)}\n-->`,
     `<!-- Produced by \`docs.ts page\` from the seat file. Never edit this page: edit the seat file and produce it again. -->`,
-    opts.furniture.style,
-    `<div class="page">`,
+    opts.furniture.stylesheet,
+    `<div class="sds-page">`,
     ``,
-    `<nav class="rail" id="rail">`,
+    `<nav class="sds-rail" id="rail">`,
     // THE WAY BACK NAMES WHERE IT GOES (Q238). Where the caller resolved the page above this one
     // — a construct's domain overview — that page is named. Where it could not, the constructs
     // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link
     // an author would write, re-expressed for the page's folder by the same rewriter the body uses.
     opts.home
-      ? `  <a class="home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
-      : `  <a class="home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
+      ? `  <a class="sds-home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
+      : `  <a class="sds-home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
     // THE RAIL CARRIES THE PAGE'S OWN NAME, NOT THE WORD `Outline` (Q239). A reader already knows a
     // rail is an outline — it is a list of this page's headings sitting beside them. What the label
     // can add is WHOSE, which is the one thing the rail does not say once the masthead has scrolled
     // away. 157 of 157 pages said `Outline`, and `blocks-template.html` already said `Blocks`.
-    `  <div class="rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
+    `  <div class="sds-rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
     `</nav>`,
-    `<div class="wrap">`,
+    `<div class="sds-wrap">`,
     ``,
     masthead,
     ``,
@@ -325,7 +425,7 @@ ${lead}
     `</div>`,
     `</div>`,
     ``,
-    opts.furniture.scripts,
+    opts.furniture.script,
     ``,
   ].join("\n");
 

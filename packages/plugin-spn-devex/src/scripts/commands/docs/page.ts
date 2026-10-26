@@ -1,36 +1,55 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// Produce each construct page from its seat file — written unless `--check` asks only for a report.
+// Each construct page, produced from its seat file.
 //
-//   spn-devex docs page <seat.md…> [--check]
+//   spn-devex docs page check <seat…>   report each page that differs from what its seat file gives
+//   spn-devex docs page write <seat…>   write each page
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `file` PATH. A path names one seat file, or a folder of them, and
+// the command acts on exactly those. Both actions need a path, because a page is produced from the
+// seat file that is named and from no other.
 
-import { basename, join, relative, resolve } from "node:path";
-import { begin, record, end } from "../../lib/timing.ts";
+import { existsSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
+import { type Action, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { bookTemplatesDir, inSeat } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
 
-export const describe = "produce each construct page from its seat file";
+export const describe = "each construct page, produced from its seat file";
 
-function body(args: string[], workspace: string): number {
-  const templates = process.env.SPN_TEMPLATES
-    ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
-  const check = args.includes("--check");
-  const seats = seatPaths(args);
-  const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));
-  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
-  return f.some((x) => x.grade === "RULE") ? 1 : 0;
-}
+const USAGE = "<seat…>";
 
-export function run(args: string[]): number {
+/** Both actions are one production of each page; `write` is the one that puts it on disk. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args);
+  const paths = scopeOf(words.paths, REQUIRED);
   const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
-  const code = body(args, workspace);
-  record("docs-page", performance.now() - startedAt);
-  end();
-  return code;
+  // A NAMED PATH THAT IS NOT THERE IS A FINDING, and a run that read no seat file says so. `pageFor`
+  // passes over what is not a construct seat in silence, which let a mistyped path exit 0 with no output.
+  const missing = paths.filter((path) => !existsSync(path));
+  for (const gone of missing) console.log(`✗ RULE page      ${relative(workspace, resolve(gone))}\n         no such file or folder`);
+  const seats = seatPaths(paths.filter((path) => !missing.includes(path)));
+  if (!seats.some((seat) => inSeat(seat, "constructs")) && !missing.length) {
+    console.log("no construct seat file under that path — a page is produced from a construct seat file only");
+    return 1;
+  }
+  const templates = process.env.SPN_TEMPLATES ?? bookTemplatesDir(join(resolve(workspace), "spn-foundation"));
+  const found = seats.flatMap((seat) => pageFor(seat, resolve(workspace), templates, write));
+  for (const finding of found)
+    console.log(`${finding.grade === "RULE" ? "✗" : "!"} ${finding.grade.padEnd(4)} ${finding.check.padEnd(9)} ${relative(workspace, finding.file)}\n         ${finding.message}`);
+  return missing.length || found.some((finding) => finding.grade === "RULE") ? 1 : 0;
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "page.ts")
-  process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report each page that differs from what its seat file gives, and write nothing",
+    usage: USAGE,
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write each construct page from its seat file",
+    usage: USAGE,
+    run: (args) => run(args, true),
+  },
+};

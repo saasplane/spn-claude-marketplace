@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     }
   ]
 }
@@ -14,6 +14,8 @@ description: Prove or disprove a claim about what a SaaS Plane codebase actually
 ---
 
 # check — prove a claim against the code
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 The ask is a **proposition**, not a target. The job is to find out whether the codebase actually does the thing, and to show the reader where you looked.
 

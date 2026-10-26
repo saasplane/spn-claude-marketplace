@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/03-module.md",
-      "seen": "1caaf0c3"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
+      "seen": "e5dcf7b2"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "f5293a6a"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
+      "seen": "f2386178"
     }
   ]
 }
@@ -68,8 +68,13 @@ You model an entity at escalating richness so a consumer fetches exactly what it
 | `{State}Info` | extends Meta | Meta plus description-class fields — card views, embedded lists |
 | `{State}` | extends Info | Info plus timestamps and resolved audit actors — admin listings, detail reads |
 | `{State}Details` | composed from fields, never extension | a detail page's whole payload: the full state plus its dependent sub-states |
+| `{Anchor}Summary` | composed from fields, never extension | one line of a listing: the anchor plus the related states the line shows |
 
-**Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
+**Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain.
+
+**The published specification keeps the ladder** (`RD.SUPPORT.APPS.219`). It composes each read level from the one below, the reference to its base and its own fields joined by `allOf`, so a client reads `RoleInfo = RoleMeta & {…}` with the fields it had before and no caller changes. Every component stays open, and a place that uses a level, a response, a container or a branch of a union, closes it with `unevaluatedProperties: false`. A level that re-declares a field of its base stays flat, and so does a variant whose base holds only `mtype`.
+
+**A listing line that pairs entities is a `{Anchor}Summary`** (`RD.SUPPORT.APPS.217`). The anchor's read model sits under the anchor's own name and is never null. Each related state sits under its own name, `null` when there is none and an array where there can be many, at the level the line needs. It is returned by `search{Anchor}Summaries` as a `{Anchor}SummarySearchResult`, and it maps to no table: the service builds each line from the bulk readers. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
 
 ### Collection shapes — the plural is keyed, the List is ordered
 
@@ -94,7 +99,7 @@ Every entity, every module, every stack gets the same families. Spell a capabili
 | bulk get | `get{State}s` | the keyed map |
 | Meta / Info reads | `get{State}Meta` · `get{State}Metas` · `get{State}Info` · `get{State}Infos` | that level, single or keyed plural |
 | all | `getAll{State}List` · `get{State}List` · `get{State}ListBy{Scope}` | the ordered list |
-| search | `search{State}s` · `search{State}Infos` | rows plus a total |
+| search | `search{State}s` · `search{State}Infos` · `search{Anchor}Summaries` | rows plus a total |
 | details | `get{State}Details` | the composed payload |
 | key lookup | `get{State}ByCode` · `…ByToken` · `…ByHost` | the full state |
 | create · update | `create{State}` · `update{State}` | the full state |
@@ -143,6 +148,35 @@ When you write a service method, compose the same seven steps, in order, each on
 
 An entity's join keys and a pure function's signature are stable by construction; treat everything else in `app/` as not. Reach the rest through the module's contract services — never reach into this layer directly, whichever module you are working from.
 
+### Support — by area, then by kind of file
+
+`app/support/` is the internal toolkit behind the services. Organize it the same way in a module and in an app. Give each subject of the toolkit one **area**: a folder directly under `support/`, named with a full word. Put no file directly in `support/`, so every file has an area that owns it. An area may hold a sub-area, laid out the same way.
+
+| Kind | What it is | Where it sits in its area |
+| --- | --- | --- |
+| **Manager** | a class that runs a lifecycle, such as create, start, stop and sync, or that owns the providers of a seam | the top of the area |
+| **Provider** | a class that implements a seam's interface for one vendor or one stack | the area's `providers/` folder |
+| **Simple class** | a class that holds values through its constructor and uses them across its methods, and is neither a manager nor a provider | the top of the area |
+| **Util** | an independent function: input in, output out. It works by itself or through other utils | the area's `utils/` folder, in a file named for its subject |
+| **Types** | the area's interfaces and types, a seam's interface included | the area's one types file |
+| **Constants** | the area's constants | the area's one constants file |
+
+A **seam** is one interface with an implementation behind it for each vendor or stack. A service calls a manager or a util. A provider is built by a service or by a manager. A util calls other utils. It never builds a provider, and never calls a service or a manager.
+
+- **Write a util as an independent function: input in, output out.** It is a low-level building block that works by itself or by calling other utils. It may read a file, run a command or read the environment. Never call a service or a manager from a util, and never build a provider in one. A util builds no class of the area and calls none, a simple class included. Keep a helper that only one util file uses private to that file.
+- **Let a util read the app's global object where it needs to**: the app's configuration, and a provider the app set up at boot, such as the logger. The object is a standard every app has, so a util of the module's own `app/utils/` may read it too. That is using what the app already holds, not building a provider. Through that object a util still never reaches a service or a manager.
+- **Do not read a support area's utils as the module's own `app/utils/`.** A util of `app/utils/` reads no file, runs no command and reaches no resource, and that folder is published. A util of a support area is internal, like everything in support.
+- **Make a class only for a lifecycle, or for values held through its constructor and used across its methods.** A simple class is right for the second reason: an object holds values, and several of its methods use them.
+- **Never make a class only to hold functions.** Here is the test. A class that has no constructor, extends no class, implements no interface and holds only functions is a group of static functions. That is a util module. Write it as one file in the area's `utils/` folder that holds those functions, the private ones too, and never as a class.
+- **Make a function a method only where it is part of a manager's or a provider's own job**: a step of its lifecycle, or work on the values or the providers the object holds. A method of a simple class uses the values that class holds. Every other function is a util.
+- **Export one class from a class file, and nothing else.** A file named for a class promises that class to every file that imports it. Move a function a class file would export to the area's utils.
+- **Pick a provider where the knowledge to pick it is**: in a manager that owns the seam, or in the service itself. Think of a service that processes a file. It reads the file's type, and builds the parser for that type. The value that decides arrives with the call, so nothing at boot could have picked the parser. A util never builds a provider. A class that abstracts a vendor follows the provider seam: one interface, an `mtype`-selected implementation per vendor, configuration as data.
+- **Give every class and every exported type its area as a prefix**: the area, then the subject, then the word for its kind, such as manager, store or reader. A provider ends with its vendor or its stack. A sub-area uses its own name, in the singular, and never the parent's before it. A seam's interface carries the area too, and the seam's subject where an area has more than one seam. An area declares its prefix, and it may be a short code where the area's name is long; the app states each area's prefix once. In a module the module's code is the prefix, and the area follows it only where the module's support holds more than one area.
+- **Build a class as an object.** A manager and a provider hold their own state, and a static method never stands in for a function.
+- **Put the tests in the same areas**: one folder for each area, under the area's own name.
+
+How a kind is declared, and what its file is called, belong to the stack. For TypeScript, read `providers/ts/03-structure.md` and `providers/ts/02-naming.md` in this same plugin.
+
 ## How the outside reaches it — entry
 
 Every adapter you write is the same equation: **parse** the transport's input into a Command, **execute** the matching contract service method, **render** the returned State back in the transport's terms. Put nothing else into an adapter — no branching on business conditions, no storage, no composition across services. A guarantee you enforce at an entry is a guarantee the other transports do not have, so put authorization, invariants, audit, transactions and cache on the contract service method, never the adapter.
@@ -151,7 +185,9 @@ Every adapter you write is the same equation: **parse** the transport's input in
 
 Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-entity}][/{suffix}]` — module-prefixed, singular kebab-case nouns, GET for every read, POST for every write and every search, no `:id` path params and no version prefix. Stack read levels as suffixes: `/X` (state) · `/X/meta` · `/X/info` · `/X/details`, each with `/bulk`, `/all` or `/search` where the entity needs it.
 
-A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to declared topics.
+**The API entry also serves a module's contract services to the other services of the platform, on the remote route.** It is the HTTP API and not a fourth entry. The module's manager lists its contract services (name, methods as data, what implements it), boot registers each, and the entry mounts one route for all of them, which reads the module, the service and the method from the request: `POST /remote` with the passport header and the calling service's credential header. The order **MUST** hold: check the calling service first, before the body is read; find the contract service among those registered; find the method among those the methods data lists; validate the command; build the execution context from the passport (a passport that cannot be read or is refused ends the call as unauthenticated, and no passport runs with no caller); run the method; validate the result. The route listens on a port of its own (`{CODE}_API_REMOTE_PORT`; no port, no listener), keeps no list of who may call what (authorization stays on the service method), answers as the public API does, and keeps the passport and the service credential out of logged headers. A contract may hold methods that have no controller, such as one that returns an opened secret to another module, so no public call can reach them. A person's address is counted from the right of the forwarded-address header, by the number of proxies in front of each listener (`{CODE}_API_TRUSTED_PROXIES`, `{CODE}_API_REMOTE_TRUSTED_PROXIES`), and a route's rate limit is counted in the service's shared cache, so it is one limit however many instances serve the route.
+
+A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to topics your module's migrations made. The migration runs first, as it does for a table, because nothing creates a missing topic: a subscribe or a publish to a topic that does not exist is an error that names the topic (RD.SUPPORT.APPS.178).
 
 A CLI controller declares one command per contract service method, its flags derived from the Command contract. Keep the run one-shot: it executes once, and the outcome becomes the process exit code.
 
@@ -161,7 +197,7 @@ Treat `migrations/` as the module's only schema-change path — never run DDL by
 
 ## Config is one namespace the module carries with it
 
-A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it.
+A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it. When your setting is a fact the estate publishes, the estate's key carries no module's name, and the application's own settings write your key as a `${…}` reference to it (`RD.SUPPORT.INFRA.111`).
 
 ## How one module reaches another
 
@@ -182,7 +218,33 @@ Contract names live at two altitudes. **Wire names are identical on every stack,
 
 A web module carries the same three layers, but expect most modules to never earn more than `entry/ui/` — the thin form, and the default. The generated API client is already the contract-derived client of the platform surface, so wrap it in a local service only when the module owns genuine client-side domain logic (offline operation, local persistence, a complex editor evaluating without a round trip). That is the full form, and it brings a local contract with it — states and service interfaces under the same seam discipline the server follows, but carrying **no permission codes**: authorization is decided on the server, so cite the server's permission code rather than declaring a second one.
 
-`entry/ui/` holds `pages` (routes and composition), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule).
+`entry/ui/` holds `pages` (routes and composition), `containers` (the framed parts a page is assembled from), `components` (props in, events out, no data fetching of their own), `hooks` (the only layer that calls the generated client, one hook per concern) and `utils` (pure presentational helpers — label lookups, formatting, never a business rule). It holds `widgets` where the module ships embeddable units.
+
+### A page, its route and its address
+
+A page owns one screen and is the only thing a route lands on. It reads the address, places containers, and carries no business logic. Hold a page to these rules. A rule marked proposed is one the developer has not confirmed.
+
+- **Declare a route once, as data, in the module that owns its page — MUST** (`RD.SUPPORT.APPS.186`). A route is a key and a path. The key names the screen and carries the module's code. The app's router, a link and the app's menu all read that one declaration. A route holds no place in a menu, no older address and no router, so each app keeps its own router.
+- **A route also says which permissions and enablements it needs. Proposed** (`RD.SUPPORT.APPS.187`).
+- **A module ships a default path for each route, and an app may replace a path by its key. Proposed** (`RD.SUPPORT.APPS.188`).
+- **Build an address from a route and its values, by one function, and never write one as text — MUST** (`RD.SUPPORT.APPS.189`). That a missing value is an error, and never an address, is proposed.
+- **The menu is the app's own list, and an entry names a route by its key — MUST** (`RD.SUPPORT.APPS.190`). Its order, groups, labels and icons are the app's.
+- **The entry in view is the one whose address the current address is at or under — MUST** (`RD.SUPPORT.APPS.191`). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
+- **Declare one route name for a web module, beside its code — MUST** (`RD.SUPPORT.APPS.204`). The name is a plain word for the module's subject, in lower case, with a hyphen between words. Every address of the module begins with it. The name is fixed, and an app gives a module no other name.
+- **A route is one of two kinds, and the module declares which — MUST.** A page of work is one a person of the organization uses every day, and its address is `/<name>/<rest>`. A page of setup configures the module, and its address is `/settings/<name>/<rest>`. So a module named `identity` gives `/identity/orgs` and `/settings/identity/users`.
+- **A route gives its kind and the rest of its path, and never a whole address — MUST.** The function that builds an address puts the name in front, and the word `settings` in front of that for a page of setup. `settings` is a fixed word, and no module takes it as its name.
+- **A check compares every address of a module with the name the module declares — MUST.** An app that joins two modules with one name is refused when it starts.
+- **An app's own page, such as Home, takes a plain word of the app's own.** It may not use the name of a module it has mounted, or `settings` followed by such a name.
+- **The first word of an address is the module's, and an address does not carry its place in the menu — MUST** (`RD.SUPPORT.APPS.192`). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
+- **An address that changes answers with a redirect — MUST** (`RD.SUPPORT.APPS.193`). The redirect is the app's own, in the router of the app that had the address.
+- **On a page of groups and their items, the swap of the items for the groups changes the address — MUST** (`RD.SUPPORT.SURFACE.079`).
+- **An address has two parts — MUST** (`RD.SUPPORT.APPS.194`). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
+- **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RD.SUPPORT.APPS.197`).
+- **How a screen is shown is the choice of whoever builds the page, and nothing is configured for it — MUST** (`RD.SUPPORT.APPS.198`). A page places a container on itself, or in a dialog or a sheet.
+- **Show an overlay through the overlay context, and never place one in the page's own tree — MUST** (`RD.SUPPORT.APPS.195`). One host draws every overlay of the app.
+- **An overlay that has an address is shown while the address matches, and removed when it does not. Proposed** (`RD.SUPPORT.APPS.196`). Closing it moves to the address of the page beneath. The app's own router says whether the address matches. Not every overlay needs an address: a confirmation opens by the page's own state.
+
+What a page knows and what a container takes, the four ways a partner builds on the web, and the provider a partner mounts are in `../shape.md` in this plugin.
 
 ## What this does not cover
 

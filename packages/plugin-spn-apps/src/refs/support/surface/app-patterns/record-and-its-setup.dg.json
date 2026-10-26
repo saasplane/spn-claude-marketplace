@@ -1,0 +1,1250 @@
+{
+ "kind": "skeleton",
+ "title": "A record and its setup",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. Every view shows the same record and the same setup; only the arrangement changes. The record is the page level: its picture, its name, and under the name its kind, its code and its owner, with its action at the end. Each part of the setup is a container, its title and its actions in its header; a container whose content is cards lets the cards stand on their own. Each thing set up is a card, with its own action at the end of its title. At a desktop the cards stand two across in the main column and the short part stands beside it; on a tablet and a phone all of it is one column. Each brand of the social sign-in is a tile as tall as a control: a person presses it to set it up, and a small check at its corner says it is set up. Registration closes the card, a line with the switch at its end. Who owns the record is a plain card in the short column under the web addresses, with the action that hands it over.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Customers"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme",
+      "Owner: Dana Lee"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            },
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "width": "1/3"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
+            }
+           ]
+          }
+         ],
+         "width": "1/3"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme",
+      "Owner: Dana Lee"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Acme Corp",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Enterprise"
+      },
+      "acme",
+      "Owner: Dana Lee"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "label": "Sign-in",
+         "note": "Who may register, and the providers, for each app",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Account",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Okta",
+                     "meta": [
+                      "SAML"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 },
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Acme Entra",
+                     "meta": [
+                      "OpenID Connect"
+                     ],
+                     "end": [
+                      {
+                       "icon": "more"
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "Open to anyone"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": true
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSCardWidget",
+              "label": "Platform",
+              "actions": [
+               {
+                "control": "button",
+                "text": "Add directory"
+               }
+              ],
+              "rows": [],
+              "sections": [
+               {
+                "label": "Social sign-in",
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": false
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   },
+                   {
+                    "icon": "default",
+                    "mark": false,
+                    "on": true
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "label": "Directories",
+                "divided": true,
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "note": "None yet"
+                   }
+                  ]
+                 }
+                ]
+               },
+               {
+                "rows": [
+                 {
+                  "items": [
+                   {
+                    "item": {
+                     "title": "Registration",
+                     "meta": [
+                      "By invite only"
+                     ],
+                     "end": [
+                      {
+                       "control": "switch",
+                       "on": false
+                      }
+                     ]
+                    },
+                    "fill": true
+                   }
+                  ]
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Web addresses",
+         "note": "Sites and email domains",
+         "sections": [
+          {
+           "label": "Sites",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Change subdomain"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.spn.io",
+                "meta": [
+                 "Account"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "my.acme.com",
+                "meta": [
+                 "Account",
+                 "Custom domain"
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Email domains",
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add"
+            }
+           ],
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.com",
+                "meta": [
+                 "Verified 2 May"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "acme.io",
+                "meta": [
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 }
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step verification",
+             "text": "Inherited from the default",
+             "info": true
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session length",
+             "text": "480 minutes"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Edit"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSCard",
+         "label": "Owned by Dana Lee",
+         "note": "Hand it to another member",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Transfer ownership"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

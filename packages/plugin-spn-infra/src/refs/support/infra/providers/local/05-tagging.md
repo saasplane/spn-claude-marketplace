@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/05-tagging.md", "seen": "03519486" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/05-tagging.md", "seen": "03519486" }
   ]
 }
 -->
 # Tagging — nothing is tagged on a machine
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/05-tagging.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/05-tagging.md`. Read this as the restatement; that node governs.
 
 **Nothing the local provider stands up carries a tag.** No container, certificate, host record or schema receives the mandatory block a cloud rendering stamps on every resource.
 
@@ -15,7 +15,7 @@
 
 **The coordinates still exist, and they still name every container.** Tags are the one sanctioned duplication in the model: the same coordinates a name composes, restated for the planes that filter but cannot parse. Locally the name itself is the answer, because you can read it.
 
-**When you want the resolved picture rather than a single name, ask the tool.** `spnutils infra show` resolves the declaration reaching the folder you are standing in and says where each layer came from. `spnutils infra logs` reaches the same realization by service.
+**When you want the resolved picture rather than a single name, ask the tool.** `spnutils infra show <spc>` resolves the declaration reaching the folder you are standing in and says where each layer came from. `spnutils infra logs <spc> [service]` reaches the same realization by service.
 
 ## Why this is a ruling rather than an absence
 

@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/01-shape.md",
-      "seen": "51757461"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/01-shape.md",
+      "seen": "7ec10e41"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/",
-      "seen": "331954a0"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
+      "seen": "d3743b40"
     }
   ]
 }
@@ -29,9 +29,9 @@ Before you touch a node's folders, find its kind. A node declares one fact about
 | Kind manifest | `SPKind` | the file `spkind.json` at a node's root, the only file the kind system reads |
 | Kind config | `SPKindConfig` | the per-kind extra the manifest carries — `null` where a kind needs none |
 | Mnemonic | `code` | the 2–4 letter word a module declares, inherited by every class, permission and configuration key it owns |
-| App code | `code` | the word an application declares, naming the claim the estate's own rows grant it |
+| App code | `code` | the word an application declares, naming the code the estate's own rows grant a place to run |
 | Layer | — | one of `contract`, `app`, `entry` — the three standard folders a contract-publishing node is built from |
-| Util | — | a function that takes input and gives output, needing nothing else in order to run |
+| Util | — | a function that takes input and gives output, needing only its input and the app's global object in order to run |
 | App-owned module | — | a module living inside an application's own folder instead of as its own project, carrying the same kind, layers and documents as the packaged form |
 
 ## The ten kinds
@@ -83,6 +83,8 @@ Every node you build from `contract` / `app` / `entry` follows the same three la
 | no — `APP_*` | refused: `release` is the repository's command, never a node's | exists, once built |
 
 If you invoke `release` on a node, expect a refusal — versioning is lockstep within a repository: every publishable project releases at one version, the source carries a placeholder, and the real number is stamped at publish. A node's own release line is the repository's per-package step; do not invoke it alone.
+
+**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RD.SUPPORT.APPS.214`). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
 
 ### Test tiers
 
@@ -145,13 +147,70 @@ Check each level on its own — folders are what is standardized, never the file
 
 ### Kind-fixed skeletons versus a library's own groups
 
-Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, and a `tests/` folder per tier it owes. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RD.SUPPORT.APPS.031`). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/` and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
+Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RD.SUPPORT.APPS.031`). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
 
 Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), the groups belong to the package and you grow them as it grows — a `TOOLCHAIN` publishes one folder per configuration area (`eslint/`, `jest/`, `vite/`, …) and no barrel at all; a `SUPPORT_*` library publishes one folder per capability it offers (`cache/`, `queue/`, `auth/`, …). Read each tree you find here as an example rather than a standard — the groups are the library's own to name.
 
 ### Modules that live inside an application
 
 You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
+
+## The four shapes a platform is built in on the server
+
+A platform's server code takes one of four shapes, and a module is written the same way in all four. The choice is two questions: how many services run, and whose resources each one stands on.
+
+| | Monolith | Microservices, shared platform | Own space, talking with the platform | Independent, space only |
+| --- | --- | --- | --- | --- |
+| Services | one | several | several | several |
+| In the platform's manifest | nothing more | an application row | a row that names a space and keeps the platform | a row that names a space |
+| Its own data lives in | the platform's resources | the platform's resources | the space | the space |
+| Keys it is given | `{SPC}_…` | `{SPC}_…` | `{SPC}_…` and `{SPC}_{SPACE}_…` | `{SPC}_{SPACE}_…` |
+| Reaches a SaaS Plane module by | a direct call in the process | a remote call, or its queue | a remote call, or its queue | it does not |
+
+**A module's data is reached through that module's contract — MUST**, even where a service is given the platform's database settings. A partner's service builds on the SaaS Plane modules and does not repeat them: it asks the identity module whose token this is, calls a module's contract held remotely for an answer now, and publishes to a module's request topic on the platform's queue for work later.
+
+## The four ways a partner builds on the web
+
+On the server the choice is how many services run. On the web it is how much of a SaaS Plane screen a partner takes. A partner builds on the web in one of four ways, and the ways can be mixed in one app, page by page (`RD.SUPPORT.APPS.180`). **The four as a set are proposed**: the developer has not confirmed the set by name.
+
+| The way | What the partner takes from a SaaS Plane web module | What the partner writes |
+| --- | --- | --- |
+| Take the whole page | the page, with every container on it | the address it is mounted on, and its entry in the app's menu |
+| Place a container | one or more framed parts of a screen, each complete | a page of their own: its address, what it reads from the address, and the containers it places |
+| Place a widget or a smaller piece | the widgets a container is built from, and the hooks that load and save | containers of their own, and the page that places them |
+| Build their own | nothing of the module | everything on the page, from the design system and the service's client |
+
+**A web module MUST export its pages, its containers, its widgets, its hooks, and its routes as data** (`RD.SUPPORT.APPS.181`). A module that leaves one out takes that way from a partner. The platform's own web modules export pages, widgets and hooks today, and no container yet.
+
+Hold a web module to these rules when you write or review one. A rule marked proposed is one the developer has not confirmed, so say so when you apply it.
+
+| Rule | Id | State |
+| --- | --- | --- |
+| A page is assembled from one or more containers. The page knows the address: the values in its path, its query, and where to go next. It takes no props | `RD.SUPPORT.APPS.182` | decided |
+| A container takes its data, or an id it loads by, as props, and holds no path. A link to a screen of its own module is built from that screen's route, by its key. A link to any other screen is a prop the page passes | `RD.SUPPORT.APPS.183` | decided |
+| An edit container takes an optional callback that runs after a save. With none, it goes where it goes today | `RD.SUPPORT.APPS.184` | proposed |
+| A SaaS Plane container takes data only. It is handed no unit of a partner's | `RD.SUPPORT.APPS.185` | decided |
+| A route is declared once, as data, by the module that owns its page. It is a key and a path. It holds no place in a menu, no older address and no router | `RD.SUPPORT.APPS.186` | decided |
+| A route says which permissions and enablements it needs | `RD.SUPPORT.APPS.187` | proposed |
+| A module ships a default path for each route, and an app may replace a path by its key | `RD.SUPPORT.APPS.188` | proposed |
+| An address is built from a route and its values, by one function, and never written as text. That a missing value is an error is proposed | `RD.SUPPORT.APPS.189` | decided |
+| The menu is the app's own list, and an entry names a route by its key | `RD.SUPPORT.APPS.190` | decided |
+| The entry of the menu in view is the one whose address the current address is at or under. That the longest address wins among several is proposed | `RD.SUPPORT.APPS.191` | decided |
+| The first word of an address is the module's, and an address does not carry its place in the menu | `RD.SUPPORT.APPS.192` | decided |
+| An address that changes answers with a redirect, which is the app's own | `RD.SUPPORT.APPS.193` | decided |
+| The path names the page, and the part after `#` names an overlay any page can have | `RD.SUPPORT.APPS.194` | decided |
+| An overlay is shown through the overlay context, and never placed in the page's own tree | `RD.SUPPORT.APPS.195` | decided |
+| An overlay that has an address is shown while the address matches, and removed when it does not | `RD.SUPPORT.APPS.196` | proposed |
+| The app's navigation seam changes only the part after `#` where an address begins with `#` | `RD.SUPPORT.APPS.197` | proposed |
+| How a screen is shown is the choice of whoever builds the page, and nothing is configured for it | `RD.SUPPORT.APPS.198` | decided |
+| A partner places a SaaS Plane container by mounting one small provider beside the design system's context. It has no router, no layout and no sign-in screen | `RD.SUPPORT.APPS.199` | decided |
+| The provider finds the signed-in person itself, keeps the answer fresh, and tells its containers when nobody is signed in | `RD.SUPPORT.APPS.200` | decided |
+| A page, a container and a hook reach a service through that service's client. A second service means a second client | `RD.SUPPORT.APPS.201` | decided |
+| A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RD.SUPPORT.APPS.204` | decided |
+
+Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RD.SUPPORT.SURFACE.079`).
+
+The TypeScript names for these are in `providers/ts/08-web.md` and `providers/ts/02-naming.md` in this plugin. The page chapter's rules are restated in `module/README.md`.
 
 ## Boundary
 

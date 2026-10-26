@@ -3,10 +3,11 @@
   "id": "stack-skills",
   "variant": "construct",
   "title": "Skills — The Commands an Apps Repository Answers To",
+  "subtitle": "The commands an apps repository can be asked to run, one folder each.",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "dependsOn": ["skill-set"],
-  "summary": "The skills the apps domain ships — what makes one belong to this domain, why the longest of them divides into ordered steps it does not hold itself, why a mode is an argument rather than a second folder, and the skill that is deliberately absent.",
+  "summary": "A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, designing a page, building a capability, running the suites, proving a package, or publishing the repository.",
   "keywords": ["skill", "steps", "mode", "classification", "stage", "absence"]
 }
 -->
@@ -15,9 +16,11 @@
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
-A skill belongs to this domain when the work it describes is work on an apps node: scaffolding a project, building a capability, running the suites, proving a package, publishing the repository. Each of those is a different walk, and each lives in one folder under this plugin's `skills/`.
+A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, designing a page, building a capability, running the suites, proving a package, or publishing the repository. Read this page before you add a new skill here, or when you want to know why one is missing. It explains why the longest skills read their steps from elsewhere, why a mode is an argument rather than a second folder, and which skill is deliberately absent.
 
 ## Overview
+
+Each of those is a different walk, and each lives in one folder under this plugin's `skills/`.
 
 The thing to check first is that **a skill here names no stack**. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own `sprepo.json` declares. The second thing is the absence: **planning is not a skill of this domain.** The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
 
@@ -43,7 +46,7 @@ The ask is matched to a skill, the skill is narrowed by a mode, and the longest 
 { "kind": "map",
   "caption": "The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.",
   "boxes": [
-    { "id": "a", "label": "the ask", "note": "build, scaffold, run, prove, review, publish — in your own words" },
+    { "id": "a", "label": "the ask", "note": "design, build, scaffold, run, prove, review, publish — in your own words" },
     { "id": "b", "label": "the skill", "note": "one folder under skills/, chosen by its own description" },
     { "id": "c", "label": "the mode", "note": "an argument the description names, never a second skill" },
     { "id": "d", "label": "the steps", "note": "named and ordered here, read from the provider for the declared stack" }
@@ -65,6 +68,14 @@ The contract comes first, and everything downstream is generated from it or writ
 
 A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest `sprepo.json`. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.
 
+### A step that names no stack stays in the skill's own folder
+
+The design skill has two steps, `draw` and `change-library`. `draw` draws the page in Figma from the published libraries, and `change-library` walks a change of a library file through the connector, with the two scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The steps sit in `skills/design/steps/`. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.
+
+### The design skill states a page before its code is written
+
+You ask it to design, lay out or draw a page, a screen or a flow of pages. It picks the layout, decides the containers, chooses the pattern for each task, and then names the blocks. Its result is one tree for each page: every block by the name the book gives it, with its props. It writes no code. Deciding what a feature is stays with the core plugin's `ideate`, and writing the screen stays with the build skill.
+
 ### The router classifies before it sequences
 
 The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.
@@ -75,7 +86,7 @@ Two folders with almost the same description compete for the same match, and the
 
 ### Each skill declares the one stage it serves
 
-A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.
+A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Designing a page answers to the ideate stage, because a page is designed before its code is written. Flattening them derives nothing.
 
 ### A skill carries a stamp, so a chapter it fell behind can say so
 
@@ -106,8 +117,9 @@ This page answers which skills this domain ships and how they are shaped. It doe
 | --- | --- | --- |
 | `RD.DEVEX.AGENT.025` | one folder per skill value and one value per folder, the prefix derived from the shipping plugin's own claim | MUST |
 | `RD.DEVEX.AGENT.017` | each skill declares the one stage it serves, so the standards that apply are derivable from the skill | MUST |
+| `RD.DEVEX.AGENT.080` | the set holds `design`, which serves the ideate stage and gives a page as a tree of named blocks | MUST |
 | `RD.DEVEX.FUNCTION.062` | planning folds into a stack-agnostic skill, which is why this domain ships none | MUST |
 | `RD.DEVEX.WORKSPACE.118` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

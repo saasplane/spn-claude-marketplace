@@ -20,8 +20,9 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | What a run cost | `packages/plugin-support-lib/src/lib/timing.ts` | written only while the developer has asked for it, and never able to fail a gate |
 | The restatement hash | `packages/plugin-spn-apps/src/scripts/lib/stamp.ts` | the `seen` value, spelled once per plugin and required to agree with the other copy |
 | What a register is | `packages/plugin-support-lib/src/lib/register.ts` | the headings a register carries, each column found by its heading, one copy in the shared support folder that every plugin reading a register imports |
-| The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier, which tells a contract case from an integration one |
+| The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier; a contract case is told from an integration one by its folder, `tests/contract/`, and by an `APP_SERVER`'s `tests/integration/` reporting under the tier its kind owes |
 | What a run left behind | `packages/plugin-support-lib/src/lib/runs.ts` | the walk the case reader uses, one copy in the shared support folder |
+| The connector check | `packages/plugin-spn-apps/src/scripts/checks/figma-connector.ts` | a `use_figma` script read before the call: the unsupported APIs, a page assignment, a notice and a close are refused, and the rest is noted |
 | The join check | `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts` | every row against every case title, in both directions |
 | The package table | `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts` | writes the list of published packages a node may depend on |
 
@@ -30,14 +31,14 @@ The folder divides by what calls each file. `events/` holds the one process the 
 - What a check may decide on its own account, and how a tool is graded — [The Check](../../../02-constructs/01-devex/05-scripts.md)
 - The verdict, the composition and the always-zero exit — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 - The behaviour row and the register it lives in — the foundation's `02-docs/02-document.md`
-- The one-entry, `<group> <action>` shape `commands/` dispatches by — the foundation's `04-plugins/02-shape.md`
+- The one-entry, `<group> [<subject>] <action>` shape `commands/` dispatches by — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
 
-### One entry, `<group> <action>`, dispatches under two groups
+### One entry, `<group> [<subject>] <action>`, dispatches under two groups
 
-**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes: one entry, `<group> <action>`, in place of a tool reached by typing its own path.
-**What** — `cli.ts` dispatches to `commands/<group>/<action>.ts`, one file per action. This plugin's two groups: `coverage` (`floor` · `check`, over the TS parts under `providers/ts`) and `library` (`catalogue`).
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes: one entry, `<group> [<subject>] <action>`, in place of a tool reached by typing its own path.
+**What** — `cli.ts` dispatches to a file under `commands/<group>/`. A file is one action of its group, or a subject that names its own actions. This plugin's groups are `coverage` and `library`. `coverage` holds the action `check`, over the TS parts under `providers/ts`. `library` holds the subject `catalogue`, with the actions `check` and `write`.
 **How** — a command is printed as `spn-apps coverage check`, never as a bare path.
 
 ### The gate composes the provider path, and that is why a second stack costs no edit
@@ -85,8 +86,8 @@ The folder divides by what calls each file. `events/` holds the one process the 
 ### One table is written by a command, because nobody could keep it by hand
 
 **Why** — *a published set moves every release*, so a hand-written list is stale the day after it is written and nothing reports that.
-**What** — the tool reads what the support repository publishes and writes the table, leaving out anything a partner could not depend on.
-**How** — the output carries a citation naming the command that produced it, so re-running the command is how a reader checks it. `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts`.
+**What** — `spn-apps library catalogue write <workspace>` reads what the support repository publishes and writes the table, leaving out anything a partner could not depend on. `spn-apps library catalogue check <workspace>` reports what a write would change, and writes nothing.
+**How** — the output carries a citation naming the command that produced it, so running the command again is how a reader checks it. `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts`.
 
 ## Between modules
 

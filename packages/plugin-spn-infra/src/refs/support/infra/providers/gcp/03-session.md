@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/03-session.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/03-session.md",
       "seen": "c5d9e979"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Session — the refusal is written and the credential is not
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/03-session.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/03-session.md`. Read this as the restatement; that node governs.
 
 **Nothing here states which session values a Google Cloud run would read**, because no run reaches a Google Cloud account.
 

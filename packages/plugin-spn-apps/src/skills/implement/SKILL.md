@@ -3,18 +3,30 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "2b989141"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
+      "seen": "3237d17a"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
+      "seen": "ce155a2b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
+      "seen": "87535da6"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.006",
-      "seen": "b4507306"
+      "seen": "35e7b913"
     }
   ]
 }
@@ -25,6 +37,8 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 ---
 
 # implement — classify, then walk the steps in order
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 If the `ideate` skill ran, the design is already in the owning module's docs as `🔮 planned` rows (behaviors + capabilities) — read those rows back as the spec. Otherwise classify from the request directly.
 
@@ -38,7 +52,7 @@ If the `ideate` skill ran, the design is already in the owning module's docs as 
 
 Gates before starting:
 
-- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/permission-vs-enablement.md` in the **spn-devex** plugin carries the question, the grammar and the traps; this plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable ones at write time.
+- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries the question, the grammar and the traps; this plugin's `providers/ts/scripts/checks/_src/enablement-grammar.ts` refuses the checkable ones at write time.
 - **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `ideate` skill (decision + versioning path). Additive by default is the rule, not a preference.
 - **Ownership check.** The change lands in the module that owns the capability (its package, or the app-owned module). Cross-module needs go through the other module's **contract** services — or a request queue for writes — never its internals.
 
@@ -64,24 +78,79 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 | 4 | `queue` | listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency |
 | 5 | `ui` | `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only) |
 | 6 | `test` | how this stack runs each tier. **Which tier a project owes is `DEVEX_TEST`'s**, and that skill carries the ladder |
-| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the glossary are `refs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
+| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the glossary are `refs/devex/workspace/docs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
 
 **A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
-Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step embeds behavior ids in contract-tier test titles, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
+Order never changes; skip only what the classification skips. **Documents lead code** (`RD.DEVEX.WORKSPACE.081`): before the contract step, the owning seat already says what will be true — the `🔮 planned` rows `ideate` wrote, or rows you write first when it did not run. A part runs its documents, then its source, then its tests, then the close's run, never one function at a time. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 
-**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. Contract-tier titles carry their behavior ids, which is what makes coverage readable later.
+**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
+
+## A page is built from the tree of its pattern
+
+The `ui` step follows this section for every page a change adds or rearranges. The rules are in `refs/support/surface/standards-patterns.md` for an app's screen and in `site-patterns.md` for a site's page, in this plugin. Each pattern's spec is in `refs/support/surface/app-patterns/` or `refs/support/surface/site-patterns/`, by the page's kind.
+
+- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
+- **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
+- **Use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
+- **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
+- **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
+- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
+- **Hold each small thing to its rule of content** (`refs/support/surface/standards-core.md`). A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
+- **Style the page with the app's own styles rule** (`refs/support/apps/providers/ts/03-structure.md`, "An app's own styles"). A repeated pattern is a component of the app's own, values come from the design system's tokens, and no selector reaches the design system's insides.
+
+**A few things a pattern asks for are the page's to pass, and the unit then does the rest.** `architecture-components.md`, `architecture-widgets.md` and `architecture-containers.md` state each one.
+
+| The pattern asks | What the page writes |
+| --- | --- |
+| the `LIST` layout on a phone | the page reads the live device, `useDSContext().device`, and lists `LIST` on a phone. `DSDataTable` reads no device type, and follows the layouts its page lists each time it draws |
+| a line of the `LIST` layout | the page gives each record as an item line, `DSItem`, with its title, its description and its facts. The table's rows carry no padding of their own and answer the pointer, so the page writes no padding and no hover. In a list the row carries the link, the chosen fill and the arrow, and the item line inside it carries none; `DSItem` takes no `selected` |
+| the picture and the end of an item line | the page gives the picture to `media` as data of one kind, `ICON`, `MARK`, `AVATAR`, `AVATAR_GROUP` or `CUSTOM`, with no size (`RD.SUPPORT.SURFACE.130`). It gives what stands at the end, which is data, a badge, a count or a status and never an action, to `endNode` (`RD.SUPPORT.SURFACE.131`, `RD.SUPPORT.SURFACE.178`). The actions of a head are the other blocks of its header, and they take their size and look from the place. `DSItem` takes no `startIcon` and no `actions` |
+| the record in view, beside a data table or under it | the page gives the id of that record as `selectedRecordId` in the `data` of the table's config, usually read from the address. The table holds no state for it (`RD.SUPPORT.SURFACE.125`) |
+| a card with a head, drawn from data (a card that shows its own info is a `DSCard`) | the page gives `DSCardWidget` its `header`, its `parts` of the kinds `ITEMS`, `LIST` and `FREE`, and its `footer`. The widget places the head, the rows and the empty words, so the page writes no padding (`RD.SUPPORT.SURFACE.127`). The small head of a part takes `headerActions`, drawn as the head of a group (`RD.SUPPORT.SURFACE.181`) |
+| subjects compared across the same settings | the page gives `DSComparison` its `subjects` (each with `actions` of its own where it has some, such as an Edit, drawn in its head), its `groups` of rows, each a data field's `config` with a value for each subject or a `CUSTOM` row with a `renderer`, and `differencesOnly`. The composite draws every value through `DSDataFieldView` and marks a value that differs from the most common value of its row, or from the subject `baselineKey` names (`RD.SUPPORT.SURFACE.181`, `RD.SUPPORT.SURFACE.184`, `RD.SUPPORT.SURFACE.193`) |
+| a section of a website: one part of a page with a fill of its own | the page uses `DSSectionContainer` and writes no padding, no maximum width and no gutter. The room above and below comes from its `size`, the app's when unset, the sides are the layout's space, `--layout-space`, and the section hands that size to what it holds. A `flush` section draws no room of its own on any side (`RD.SUPPORT.SURFACE.313`). It holds one child and hands down no level; what stands in it sets its own. It reaches the edges of its place and stands straight in it. To paint one section the app gives `className`, which sets `--surface-fill` and nothing else, and `painted` names the mode of that colour where it differs from the page's (`RD.SUPPORT.SURFACE.243`, `RD.SUPPORT.SURFACE.247`, `RD.SUPPORT.SURFACE.254`, `RD.SUPPORT.SURFACE.192`). The section never frames itself; what stands in it is flat, boxed or raised by what it does for the visitor, and a media by its kind (`RD.SUPPORT.SURFACE.293`) |
+| a grid of features under a heading | the page uses `DSFeatureGridSectionContainer` where it writes a section, and gives it `section` (the section's props but its child and `flush`), `heading` (the words, facts and actions of a feature) and `grid` (`IDSGrid`: `desktop`, `tablet` and `mobile` columns, each 1 to 4, and `borderType`), and may take `reveal` (the heading and the cells moving in once as they scroll into view) and, through `section`, `inset`. Each cell is a `DSFeature` that names its own `pageLevel`, `WIDGET` for a thing of its own. The data decides when a section is a grid section, and `site-patterns.md` gives its uses: a set of features that are each a thing of their own under one heading, while a `DSFeature` with items holds its own parts or points under its own heading, with media or without (`RD.SUPPORT.SURFACE.259`, `RD.SUPPORT.SURFACE.271`) |
+| a time shown as how long ago | the page writes `type` as `AGO` on `DSFormatDate` or `DSFormatDateTime`, and no time format where the app's is meant (`RD.SUPPORT.SURFACE.122`, `RD.SUPPORT.SURFACE.123`). A log of what happened shows the date and the time |
+| the paging in the footer of the panel | the page puts an element in `DSPanelContainer.Footer` and gives it to the table as `settings.pagination.footerElement` |
+| a value changed in its cell | the page puts `edit` on one column of the `TABLE` layout, and on the `LIST` layout. The value is text |
+| a way back on the title line | the page gives `DSPanelContainer.Header` the address to go back to, and the header draws the back action before its title, level with the line of the title (`RD.SUPPORT.SURFACE.108`). No core unit places the two parts of a page of groups and their items (`RD.SUPPORT.SURFACE.099`). On the web, the stack's own `DSListDetail` places them, and its `listWidth` is the named choice for a narrow part of groups (`RD.SUPPORT.SURFACE.119`). A page writes no width |
+| the head of a page that holds several panels | the head stands above the panels, outside any frame, as an item line at the level `PAGE` with its way back. The page gives the title and the address to go back to, and writes no row, no back button and no padding (`RD.SUPPORT.SURFACE.120`) |
+| tabs in a `flush` part | the page writes no padding for the tabs or for their panel. The tabs place their first tab and their panel by the inset of their place (`RD.SUPPORT.SURFACE.118`) |
+| the head of a page, or of a part of a page | the title of a header is an item line. A panel that is the whole page says so with `fullPage`, and its header is then the page head (`RD.SUPPORT.SURFACE.179`); any other box gives the level of its kind: `CONTAINER` for a panel or an overlay, `WIDGET` for a card, `GROUP` for the head of a part of a card widget (`RD.SUPPORT.SURFACE.107`). The item line takes no `size`, and the heading element follows the level (`RD.SUPPORT.SURFACE.106`). A page that holds several panels writes `DSPageLevel` with the level `PAGE` and the part `HEADER` for its head (`RD.SUPPORT.SURFACE.178`). The page writes no type step and no heading element |
+| the padding around what a card holds | the page writes none. A part of a card pads itself, from the size of the card. The page writes `flush` on a part whose content reaches the edge of the card, such as a list or a picture. A card hands its size to what it holds (`RD.SUPPORT.SURFACE.114`) |
+| where a title starts | the page writes no prop and no padding. The part that holds an item line at the level `PAGE`, `CONTAINER`, `WIDGET` or `GROUP` gives it no padding at its two sides, and in a `flush` part the inset of its place (`RD.SUPPORT.SURFACE.109`). An item line draws no padding or highlight of its own, and a page writes no `bleed` (`RD.SUPPORT.SURFACE.175`) |
+| a control alone on its line, or an action of a field | the page puts every control a person sets in a `DSForm.Field`, a lone checkbox or switch too, and writes `showBlankLabel={false}` on a field with no label alone on its line in a column. A field's own action, such as *Forgot password?*, goes to `labelEndNode` (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`) |
+| a confirmation before an act | `DSConfirmPopover` for an act a person can undo, such as activate, deactivate or remove from a list, and `DSConfirmDialog` for an act that cannot be undone, such as delete. Both stay open while the act runs |
+| the actions that close the work of an entry | over the page, in a dialog, a sheet, a drawer or a popover, the page puts them at the end of the footer, the action that leaves first and the main action last. In an entry that is a page of its own it puts them at the start of the footer, the main action first, and gives `DSPanelContainer.Footer` `sticky` so they stay in view on a long form (`RD.SUPPORT.SURFACE.367`). A value changed in place keeps its two actions beside the box, the one that saves first. The main action is a solid button and the action that leaves is an outline button |
+| an empty message of the data table | plain text, which the table draws as `DSEmpty` with the text as its title and a default icon. A page that needs a description or an action there gives its own `DSEmpty` |
+| a sheet a person works in while the page stays usable | the page turns `modal` off on `DSSheet`. The sheet then stands beside the page and draws no scrim. On a phone it stays modal |
+| a row or a grid of blocks in a part | the page writes it, with its gap from the scale, or uses a unit for it where its stack provides one. The foundation defines no block for it |
+| a medium entry on the full screen on a phone | nothing. `DSSheet` takes the full screen on a phone by itself |
+| fewer fields in the filter bar at a tablet | nothing. `DSFilterBar` holds fewer by itself, and `moreLimitTablet` sets how many |
+
+**Where a unit does not do a thing yet, report the gap, and never build a private copy.** `architecture-components.md` says plainly what a unit does not do, under *Not there yet*. Today that is:
+
+| The unit | What it does not do yet |
+| --- | --- |
+| `DSDataTable` | it changes a value in its cell only where the value is text. A choice, a date or another kind is not changed in a cell |
+| a strip of steps | the design system has no unit for one, which A record and its steps draws as plain words |
+
+- **Build the page with what the unit does today.** Where a line of the tree waits for the unit, leave it as the unit draws it.
+- **Name each gap in the report**: the unit, what it does not do, and the line of the tree that waits for it. The gap is then proposed to the design system, where one change serves every page.
+- **Never write a second table, a second filter bar, a second sheet or a second header inside a module to close a gap.** A copy built inside a page gets none of the theme, the density, the accessibility or the translation the unit has. It also hides the gap from the stack that has to close it.
+- **Where the page cannot be built at all without the missing part, stop at that line and say so.** The page waits for the unit.
 
 ## 4. Close
 
 - **Run the conformance gates** — the `verify` skill code mode: codegen freshness, `spnutils apps validate`, build, lint, tests. This is what catches a file whose name no longer matches its contents. It also catches a barrel that was never regenerated, or a reach past another module's contract. A passing build reveals none of them.
 - **Run the tests** — the `run` skill tests mode. Typecheck the touched projects first: `npx nx run <project>:typecheck`, and `npx tsc --noEmit -p <project>/tsconfig.json` for a web app, whose `typecheck` target is disabled.
 - **Contract review gate** — if the contract surface changed, run the `review` skill contract mode before calling the work done. Code review (the `review` skill code mode) for everything else.
-- Report what changed per layer, what was regenerated, and test results. Never claim green without having run the commands.
+- Report what changed per layer, what was regenerated, and test results. For a page, name its kind of person, its app or site pattern and each gap of a unit the page met. Never claim green without having run the commands.
 
 ## Lenses
 
-The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the core plugin's `refs/lenses/trust.md` on any mutation and `refs/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `qa` always.
+The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close convenes no lens as a routine, because the lens is worn while you write and the hooks refuse at write time. The `spn-panel` is convened only at a judgment gate: `partner` when the published surface changed, and the lenses `LEAD` picks at the design gate and at a release.
 
 ## Write code the capability generator can read
 

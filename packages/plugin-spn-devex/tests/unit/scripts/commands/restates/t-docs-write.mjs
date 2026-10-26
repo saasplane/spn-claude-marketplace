@@ -1,4 +1,4 @@
-// `restates docs --write <ref>` — restamps one ref's `docs` citations after the developer has
+// `restates docs write <ref>` — restamps one ref's `docs` citations after the developer has
 // re-read each source and fixed any disagreement in the ref's own prose. It never touches the
 // prose itself, and it never touches a file other than the one named on the command line.
 import { execFileSync } from "node:child_process";
@@ -6,6 +6,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { check, parse, sectionText, seenHash } from "../../../../../src/scripts/lib/restates.ts";
+import { SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {
@@ -18,17 +19,17 @@ const one = (label, got, want) => {
 const BASE = mkdtempSync(join(tmpdir(), "t-restates-docs-write-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
-const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "commands", "restates", "docs.ts");
+const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "cli.ts");
 const write = (refPath) => {
-  try { return { out: execFileSync("node", [TOOL, "--write", refPath], { encoding: "utf8" }), code: 0 }; }
-  catch (e) { return { out: String(e.stdout ?? ""), code: e.status ?? 1 }; }
+  try { return { out: execFileSync("node", [TOOL, "restates", "docs", "write", refPath], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } }), code: 0 }; }
+  catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
 };
 
 const workspace = join(BASE, "ws");
 mkdirSync(join(workspace, ".spndevex"), { recursive: true });
-mkdirSync(join(workspace, "spn-foundation", "docs", "02-constructs"), { recursive: true });
+mkdirSync(join(workspace, "spn-foundation", "docs", SEAT.constructs), { recursive: true });
 
-const CHAPTER = join(workspace, "spn-foundation", "docs", "02-constructs", "thing.md");
+const CHAPTER = join(workspace, "spn-foundation", "docs", SEAT.constructs, "thing.md");
 const chapterBody = [
   "# A thing",
   "",
@@ -48,8 +49,8 @@ console.log("=== known-bad first — a citation that cannot resolve is left as f
   const refPath = join(workspace, "bad.md");
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/ghost.md", "seen": "deadbeef" },\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/thing.md", "section": "No Such Heading", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/ghost.md", "seen": "deadbeef" },\n` +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "section": "No Such Heading", "seen": "deadbeef" }\n` +
     "  ]\n}\n-->\n\n# a ref\n");
   const before = readFileSync(refPath, "utf8");
   const result = write(refPath);
@@ -66,7 +67,7 @@ console.log("\n=== a section citation is hashed by its own section, never the wh
   const sectionHash = seenHash(sectionText(chapterBody, "First section"));
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    `    { "path": "spn-foundation/docs/02-constructs/thing.md", "section": "First section", "seen": "${sectionHash}" }\n` +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "section": "First section", "seen": "${sectionHash}" }\n` +
     "  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n");
 
   // KNOWN-BAD FIRST: editing the OTHER section leaves this citation's stamp current — if the hash
@@ -103,7 +104,7 @@ console.log("\n=== the writer touches only the ref named on the command line, ne
   const refB = join(workspace, "citer-b.md");
   const body = (marker) =>
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/thing.md", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "seen": "deadbeef" }\n` +
     `  ]\n}\n-->\n\n# ${marker}\n`;
   writeFileSync(refA, body("citer A"));
   writeFileSync(refB, body("citer B"));
@@ -117,14 +118,14 @@ console.log("\n=== the writer touches only the ref named on the command line, ne
 
 console.log("\n=== a folder citation restamps by its tree hash, exactly as `check()` reads it");
 {
-  const folder = join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "templates");
+  const folder = join(workspace, "spn-foundation", "docs", SEAT.capabilities, "01-devex", "templates");
   mkdirSync(folder, { recursive: true });
   writeFileSync(join(folder, "one.md"), "one\n");
   writeFileSync(join(folder, "two.md"), "two\n");
   const refPath = join(workspace, "folder.md");
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/04-capabilities/01-devex/templates", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.capabilities}/01-devex/${TEMPLATES}", "seen": "deadbeef" }\n` +
     "  ]\n}\n-->\n\n# a ref\n");
   const result = write(refPath);
   one("a folder citation restamps", result.out, (g) => /1 doc\(s\) restamped/.test(g));
@@ -133,5 +134,15 @@ console.log("\n=== a folder citation restamps by its tree hash, exactly as `chec
     check(refPath, workspace, block, ["docs"]).length, 0);
 }
 
-console.log(failed ? `\n  ${failed} of ${n} FAILED — restates docs --write` : `\n  all ${n} passed — restates docs --write`);
+console.log("\n=== a ref outside every workspace is refused with exit 1, and its bytes stay");
+{
+  const refPath = join(BASE, "outside.md");
+  const body = '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/ghost.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# a ref\n';
+  writeFileSync(refPath, body);
+  const result = write(refPath);
+  one("a ref with no `.spndevex` above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("no workspace found")], (g) => g.join() === "1,true");
+  one("and it is left byte-identical", readFileSync(refPath, "utf8"), body);
+}
+
+console.log(failed ? `\n  ${failed} of ${n} FAILED — restates docs write` : `\n  all ${n} passed — restates docs write`);
 process.exit(failed ? 1 : 0);

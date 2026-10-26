@@ -2,20 +2,21 @@
 {
   "id": "estate-skills",
   "variant": "construct",
-  "title": "Skills — The Doors an Estate Is Changed Through",
+  "title": "Skills — The Doors Infrastructure Is Changed Through",
+  "subtitle": "The commands that change what a piece of infrastructure declares itself to be.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["skill-set"],
-  "summary": "The skills an estate repository answers to — changing what the estate is, reading a rendering before it is approved, authoring a module end to end, and publishing a package — and the boundary every one of them restates rather than works around.",
+  "summary": "The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.",
   "keywords": ["skill", "declare", "plan", "module", "release", "door"]
 }
 -->
 
-# Skills — The Doors an Estate Is Changed Through
+# Skills — The Doors Infrastructure Is Changed Through
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
-An estate is changed by editing what it declares itself to be, and then by letting a tool render and apply that declaration. The skills here cover that walk: saying what the estate is, reading what a change would render before anybody approves it, writing a new piece for the estate to run, and publishing a piece that is finished.
+The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. Read this page before you make a change, or when you want to know which skill covers which step. It covers saying what the estate is, reading a rendering before anyone approves it, writing a new piece for it to run, and publishing a finished piece.
 
 ## Overview
 
@@ -100,4 +101,4 @@ This page answers which skills an estate repository answers to and what each one
 | `RD.DEVEX.WORKSPACE.020` | a cloud is changed only through the tool's own doors, and never by hand | MUST |
 | `RD.DEVEX.UTILS.019` | every skill here restates a chapter and adds no rule of its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

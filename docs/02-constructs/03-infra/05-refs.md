@@ -2,22 +2,25 @@
 {
   "id": "estate-refs",
   "variant": "construct",
-  "title": "Refs — The Estate's Vocabulary, Restated as Cards",
+  "title": "Refs — This Domain's Vocabulary, Restated as Cards",
+  "subtitle": "This domain's own words, explained for a reader who has never opened the book.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["ref-set"],
-  "summary": "The estate's own words, restated for a reader who may never open the book — which file declares what, which layer owns which act, how a name is composed from coordinates, the laws a declaration must hold to, and what each cloud's vocabulary is.",
+  "summary": "Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book.",
   "keywords": ["card", "manifest", "layer", "naming", "laws", "grammar"]
 }
 -->
 
-# Refs — The Estate's Vocabulary, Restated as Cards
+# Refs — This Domain's Vocabulary, Restated as Cards
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
-An estate is declared in a small vocabulary, and every one of the words is precise. Which file marks a node, which layer owns which act, how a resource name is composed, what a declaration must never contain: get one of them wrong and the mistake is expensive rather than embarrassing. A card is where each of those subjects is restated, in full, for a reader who may never open the foundation book.
+Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book. Read this page before you write a value into an estate declaration, or when a word in one is unfamiliar. It covers which file marks each part, which layer owns which action, how a resource name is composed, and what a declaration must never contain.
 
 ## Overview
+
+An estate is declared in a small vocabulary, and every one of the words is precise: get one wrong and the mistake is expensive rather than embarrassing.
 
 A card is a ref, so it carries a stamp and adds no rule of its own. What makes these cards their own construct is what they refuse to hold. **Every value in them is grammar, never a real one.** No environment, region or account of any organization appears, and the sample platform in the examples exists to show the shape.
 
@@ -102,4 +105,4 @@ This page answers which subjects the estate's cards cover and what a card may co
 | `RD.SUPPORT.INFRA.026` | which manifest declares which kind of estate node, which the manifest card restates | MUST |
 | `RD.DEVEX.UTILS.019` | a card carries rules it does not own and adds none | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

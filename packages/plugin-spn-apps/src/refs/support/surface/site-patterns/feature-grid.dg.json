@@ -1,0 +1,480 @@
+{
+ "kind": "skeleton",
+ "title": "Feature grid",
+ "caption": "A DSFeatureGridSectionContainer with section color BASE, size MD, its heading with its action under it, and grid by count, 3/2/1. Each cell is a DSFeature at pageLevel WIDGET with media MARK, an eyebrow for the family the cells share and facts for the count. A cell that opens nothing is boxed and flat, frames TEXT, surface bordered; a cell with an anchor is a door, surface raised, elevation MD, on DEFAULT. Shown features, a directory, plans and quotes are uses of this grid. On a phone the heading and its button, then one cell under another.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSFeatureGridSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "head": {
+              "title": "What is in the set",
+              "description": "One line on the set, and what each thing in it is."
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "See the whole set"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            },
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            },
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "section": {
+          "color": "BASE",
+          "size": "MD"
+         },
+         "grid": {
+          "desktop": 3,
+          "tablet": 2,
+          "mobile": 1
+         }
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSFeatureGridSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "head": {
+              "title": "What is in the set",
+              "description": "One line on the set, and what each thing in it is."
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "See the whole set"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            },
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "section": {
+          "color": "BASE",
+          "size": "MD"
+         },
+         "grid": {
+          "desktop": 3,
+          "tablet": 2,
+          "mobile": 1
+         }
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSFeatureGridSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "head": {
+              "title": "What is in the set",
+              "description": "One line on the set, and what each thing in it is."
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "See the whole set"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "media": {
+                    "mtype": "MARK"
+                   },
+                   "eyebrow": "Its family",
+                   "title": "A thing of its own",
+                   "description": "One line on what it does.",
+                   "facts": [
+                    "A count"
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "TEXT"
+              ],
+              "surface": {
+               "bordered": true
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "section": {
+          "color": "BASE",
+          "size": "MD"
+         },
+         "grid": {
+          "desktop": 3,
+          "tablet": 2,
+          "mobile": 1
+         }
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

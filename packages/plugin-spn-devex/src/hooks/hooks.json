@@ -12,9 +12,20 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/prompt.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
-        "matcher": "Read|Write|Edit|Bash|Grep|Glob|NotebookRead",
+        "matcher": "Read|Write|Edit|Bash|Grep|Glob|NotebookRead|Artifact|Agent|Task",
         "hooks": [
           {
             "type": "command",
@@ -31,6 +42,29 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/closed.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/closed.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/subagentstop.mjs",
             "timeout": 10
           }
         ]

@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/03-session.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/03-session.md",
       "seen": "f1c5200d"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Session — one principal, and no credential to discover
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/03-session.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/03-session.md`. Read this as the restatement; that node governs.
 
 **A local run authenticates nobody, because there is nobody to authenticate against.** The provider entry for local carries no `mtype`, so the check that reads the declared provider and expects that provider's own session values finds nothing to expect.
 

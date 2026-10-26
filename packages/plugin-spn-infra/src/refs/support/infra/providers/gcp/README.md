@@ -1,15 +1,18 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/README.md", "seen": "bab08170" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/README.md",
+      "seen": "042d94fa"
+    }
   ]
 }
 -->
-# Google Cloud — the folder exists and the realization does not
+# Google Cloud — planned, and not yet built
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/README.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/README.md`. Read this as the restatement; that node governs.
 
-**No Google Cloud realization exists, and none is being designed.** Say that plainly when somebody asks. There is no partial support, no planned date, and nothing here to read for guidance on standing an estate up on it.
+**Nothing of the Google Cloud realization is built yet; it is planned.** Say that plainly when somebody asks. There is no partial support and no date. Status: 🔮 planning.
 
 **The folder is here because the provider axis is deliberately open**, the same way a second stack sits beside `ts` with nothing in it yet. An axis with exactly one occupant reads as a model that assumes that occupant, and the assumption is what makes the second one expensive.
 
@@ -39,4 +42,4 @@
 
 ## What to tell a partner
 
-**The estate declaration is provider-agnostic, so nothing they write today is wasted.** What is missing is the realization — the code that turns the declaration into accounts, networks and compute on this cloud — and building it is a piece of work nobody has started.
+**The estate declaration is provider-agnostic, so nothing they write today is wasted.** What is missing is the realization — the code that turns the declaration into accounts, networks and compute on this cloud — and building it is planned work that has not started.

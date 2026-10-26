@@ -2,15 +2,15 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/06-organization.md",
-      "seen": "1ebc3392"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/06-organization.md",
+      "seen": "eca62b45"
     }
   ]
 }
 -->
 # Organization — the machine's trust bootstrap
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/06-organization.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/06-organization.md`. Read this as the restatement; that node governs.
 
 **Locally the organization layer is the machine's trust bootstrap.** `spnutils infra organization up` stands the local certificate authority, raises its one trust prompt, installs the local resolver, and starts the shared ingress. Where a cloud rendering stands accounts, guardrails and an output store, this one stands what every platform on the machine will share.
 
@@ -20,7 +20,7 @@
 | --- | --- |
 | the certificate authority pair | one trust root per machine, deliberately unscoped, trusted once |
 | the trust prompt | the single act that puts that root in the machine trust store; `spnutils infra trust-ca` performs it on its own |
-| the local resolver | answers `*.{lc-domain}` for every local domain the platforms on the machine declare, and `*.lc-test`, with `127.0.0.1` — `*.lc-spndemo.app` for SPN Demo — from one configuration written with one privileged prompt and asked again only when it changes, so no host needs an `/etc/hosts` line (macOS: `dnsmasq` plus a file under `/etc/resolver/`) |
+| the local resolver | answers `*.{lc-domain}` for every local domain the platforms on the machine declare, and `*.lc-test`, with `127.0.0.1` — `*.lc-spndemo.app` for SaaS Plane Demo — from one configuration written with one privileged prompt and asked again only when it changes, so no host needs an `/etc/hosts` line (macOS: `dnsmasq` plus a file under `/etc/resolver/`) |
 | the shared ingress | the proxy that binds the one secure port and reads one directory of vhost files whole |
 
 **Those singletons are named for the machine and never for a company.** A trust root and a port binding are genuinely singular on a laptop, so scoping either by organization would mean two of them fighting over the same resource.

@@ -16,9 +16,10 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
-const TOOL = join(HOOKS, "src", "scripts", "commands", "restates", "check.ts");
+const TOOL = join(HOOKS, "src", "scripts", "cli.ts");
 // REALPATH'D, because macOS's tmpdir is `/var/...`, a symlink to `/private/var/...` that
 // `process.cwd()` resolves through but a path built by `join` never does — a fixture built on the
 // unresolved form and compared against `process.cwd()` inside the child agrees on content and
@@ -28,10 +29,12 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let n = 0, failed = 0;
 
-function run(args, cwd) {
-  try { return { out: execFileSync("node", [TOOL, ...args], { encoding: "utf8", cwd }), code: 0 }; }
-  catch (e) { return { out: String(e.stdout ?? ""), code: e.status ?? 1 }; }
+/** One command of the `restates` group through the entry, from the folder given: what it printed, and its exit code. */
+function typed(words, cwd) {
+  try { return { out: execFileSync("node", [TOOL, "restates", ...words], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } }), code: 0 }; }
+  catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
 }
+const run = (args, cwd) => typed(["check", ...args], cwd);
 
 function one(label, ok) {
   n += 1;
@@ -43,14 +46,14 @@ function one(label, ok) {
 const ws = join(BASE, "ws");
 const book = join(ws, "spn-foundation");
 const market = join(ws, "spn-claude-marketplace");
-mkdirSync(join(book, "docs", "registers"), { recursive: true });
-mkdirSync(join(book, "docs", "02-constructs"), { recursive: true });
+mkdirSync(join(book, "docs", POCKET.registers), { recursive: true });
+mkdirSync(join(book, "docs", SEAT.constructs), { recursive: true });
 mkdirSync(join(market, "packages", "plugin-spn-devex", "refs"), { recursive: true });
 writeFileSync(join(book, "CONCEPT.md"), "# concept\n");
-writeFileSync(join(book, "docs", "registers", "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
-writeFileSync(join(book, "docs", "02-constructs", "01-thing.md"), "# A thing\n\nIt is stated here, once.\n");
+writeFileSync(join(book, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+writeFileSync(join(book, "docs", SEAT.constructs, "01-thing.md"), "# A thing\n\nIt is stated here, once.\n");
 writeFileSync(join(market, "packages", "plugin-spn-devex", "refs", "thing.md"),
-  '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/02-constructs/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n');
+  `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
 
 console.log("\n=== it finds the plugins from the workspace, not only from the repository that holds them");
 
@@ -59,8 +62,8 @@ const fromMarket = run([book], market);
 
 one("run from the workspace it does not say there are no plugins",
   !fromWorkspace.out.includes("no plugins here"));
-one("run from the workspace it reports the stale stamp",
-  fromWorkspace.out.includes("01-thing.md") && fromWorkspace.code !== 0);
+one("[MKT.SCRIPTS.167] run from the workspace it reports the stale stamp, and exits 1",
+  fromWorkspace.out.includes("01-thing.md") && fromWorkspace.code === 1);
 one("run from the repository it says the same thing",
   fromMarket.out.includes("01-thing.md") && fromMarket.code === fromWorkspace.code);
 one("and the two summaries agree line for line",
@@ -83,24 +86,62 @@ console.log("\n=== a stamp under packages/plugin-<name>/ is inside a plugin, not
   const ws2 = join(BASE, "ws2");
   const book2 = join(ws2, "spn-foundation");
   const market2 = join(ws2, "spn-claude-marketplace");
-  mkdirSync(join(book2, "docs", "registers"), { recursive: true });
-  mkdirSync(join(book2, "docs", "02-constructs"), { recursive: true });
+  mkdirSync(join(book2, "docs", POCKET.registers), { recursive: true });
+  mkdirSync(join(book2, "docs", SEAT.constructs), { recursive: true });
   mkdirSync(join(market2, "packages", "plugin-spn-devex", "refs"), { recursive: true });
   writeFileSync(join(book2, "CONCEPT.md"), "# concept\n");
-  writeFileSync(join(book2, "docs", "registers", "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+  writeFileSync(join(book2, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
   const thingBody = "# A thing\n\nIt is stated here, once.";
-  writeFileSync(join(book2, "docs", "02-constructs", "01-thing.md"), `${thingBody}\n`);
+  writeFileSync(join(book2, "docs", SEAT.constructs, "01-thing.md"), `${thingBody}\n`);
   // A CURRENT STAMP, so this fixture proves PLACEMENT alone and carries no unrelated DRIFT finding —
   // the same `normalize` + sha256-first-8-hex `seenHash` the library uses, over the cited section's
   // whole file (no trailing blank line, matching what `normalize` strips).
   const seen = createHash("sha256").update(thingBody, "utf8").digest("hex").slice(0, 8);
   writeFileSync(join(market2, "packages", "plugin-spn-devex", "refs", "thing.md"),
-    `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/02-constructs/01-thing.md", "seen": "${seen}" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
+    `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "${seen}" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
 
   const out = run([book2], market2);
   one("a real plugin file under packages/plugin-<name>/ is not read as a stray stamp",
     !out.out.includes("thing.md") || !out.out.includes("outside the plugins"));
   one("and PLACEMENT reports zero misplaced stamps for this fixture", out.out.includes("0 misplaced"));
+}
+
+console.log("\n=== a finding is exit 1, whatever the count, and a typing fault is exit 2");
+{
+  // A second stale citation: two findings, and the exit code stays 1, because 2 is a fault in how the command was typed.
+  writeFileSync(join(market, "packages", "plugin-spn-devex", "refs", "second.md"),
+    `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Second — quick reference\n`);
+  const two = run([book], market);
+  one("[MKT.SCRIPTS.167] known-bad: two drifted stamps are reported, and `restates check` exits 1, never the count",
+    /\b2 drift\b/.test(two.out) && two.code === 1);
+  for (const kind of ["docs", "decisions"]) {
+    const narrow = typed([kind, "check", book], market);
+    one(`[MKT.SCRIPTS.167] \`restates ${kind} check <book>\` reads that kind alone, and exits ${kind === "docs" ? 1 : 0}`,
+      narrow.code === (kind === "docs" ? 1 : 0) && narrow.out.includes(kind === "docs" ? "2 owe a rewrite" : "0 owe a re-read"));
+    const usage = `usage: spn-devex restates ${kind} check [<book>]\n       spn-devex restates ${kind} write <ref>\n`;
+    one(`[MKT.SCRIPTS.111] \`restates ${kind}\` with no action prints each usage line and says an action is owed`,
+      typed([kind], market).out === usage + `\`restates ${kind}\` needs an action.\n` && typed([kind], market).code === 2);
+    one(`[MKT.SCRIPTS.111] \`restates ${kind}\` with \`--write\` where the action belongs is refused, and \`--write\` is named as the action \`write\``,
+      typed([kind, "--write", "x.md"], market).out === usage + `\`restates ${kind}\` needs an action. \`--write\` is the action \`write\`.\n`);
+    one(`[MKT.SCRIPTS.112] \`restates ${kind} write\` with no ref prints its usage line and says a path is owed`,
+      typed([kind, "write"], market).out === `usage: spn-devex restates ${kind} write <ref>\n\`restates ${kind} write\` needs a path.\n` && typed([kind, "write"], market).code === 2);
+    one(`[MKT.SCRIPTS.174] \`restates ${kind} check\` refuses an option it does not take, with exit 2`,
+      typed([kind, "check", "--write"], market).code === 2 && typed([kind, "check", "--write"], market).out.includes("does not take `--write`."));
+    one(`\`restates ${kind} check\` refuses a second book with exit 2`, typed([kind, "check", book, book], market).code === 2);
+  }
+  const option = run(["--json"], market);
+  one("[MKT.SCRIPTS.174] `restates check` refuses an option it does not take, with its usage line and exit 2",
+    option.code === 2 && option.out === "usage: spn-devex restates check [<book>]\n`restates check` does not take `--json`.\n");
+  one("`restates check` refuses a second book with exit 2", run([book, book], market).code === 2 && run([book, book], market).out.includes("takes one book."));
+}
+
+console.log("\n=== a named book that is not there is a finding, not a quiet pass");
+{
+  const gone = join(BASE, "no-such-book");
+  const refused = typed(["docs", "check", gone], market);
+  one("[MKT.SCRIPTS.167] `restates docs check` of a path that is no book says so as a RULE finding",
+    refused.out.includes("✗ RULE restates") && refused.out.includes("no foundation book"));
+  one("[MKT.SCRIPTS.167] and exits 1", refused.code === 1);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

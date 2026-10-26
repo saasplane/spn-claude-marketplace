@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
 // it a MUST in both directions.
 //
@@ -14,16 +13,18 @@
 // A PARTNER NEVER RUNS THIS, AND THAT IS CORRECT. They hold the plugins and not the book. What the
 // Foundation publishes is the corrected restatement, never the checker. You run it here, before you
 // publish — so with no book to compare against it prints one line and exits clean, the property
-// `plugin partner` tests.
+// `plugin partner check` tests.
 //
-//     spn-devex restates check [path/to/spn-foundation]
+//     spn-devex restates check [<book>]
 //
-// With no argument it looks for a sibling checkout carrying the register. Exit code is the number of
-// findings.
+// AN ACTION OF ITS GROUP. Its one path is the book's folder; given none, it looks for a sibling
+// checkout carrying the register. It exits 1 where it reports a finding.
 
 import { lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
+import { UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile } from "../../lib/payload.ts";
+import { capabilitiesDir, decisionsRegister, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
@@ -158,7 +159,7 @@ function headerFindings(root: string, book: string): string[] {
     for (const header of headerSources(readFileSync(path, "utf8"))) {
       for (const token of header.cited) {
         const where = resolveSource(token, [
-          carried, book, join(book, "docs"), join(book, "docs/04-capabilities"),
+          carried, book, docsOf(book), capabilitiesDir(docsOf(book)),
           // `dirname(plugin)` is the plugins root the file was actually found under, and it is
           // what makes the answer the same from the workspace as from the marketplace.
           root, foundPlugins ?? marketRoot, dirname(plugin), plugin, dirname(path),
@@ -181,7 +182,7 @@ function headerFindings(root: string, book: string): string[] {
 export function findBook(argument: string | undefined, root: string): string | null {
   if (argument) {
     const given = resolve(argument);
-    return isFile(join(given, "docs/registers/decisions.md")) ? given : null;
+    return isFile(decisionsRegister(docsOf(given))) ? given : null;
   }
   // A sibling checkout, which only a producer workspace has. Named by what it CARRIES rather than by
   // what it is called, so a differently-named checkout still answers.
@@ -197,7 +198,7 @@ export function findBook(argument: string | undefined, root: string): string | n
     // and reported 77 drifts that were not drift at all. A repository cannot be the book it
     // restates.
     if (resolve(sibling) === here) continue;
-    if (isFile(join(sibling, "docs/registers/decisions.md")) && isFile(join(sibling, "CONCEPT.md")))
+    if (isFile(decisionsRegister(docsOf(sibling))) && isFile(join(sibling, "CONCEPT.md")))
       return sibling;
   }
   return null;
@@ -361,9 +362,10 @@ export function main(argv: string[], root: string): number {
 }
 
 export const describe = "all four spn:restates kinds at once, plugins against the book — the release gate";
-export function run(args: string[]): number {
-  return Math.min(main(args, process.cwd()), 250);
-}
+export const usage = "[<book>]";
 
-if (process.argv[1] && basename(process.argv[1]) === "check.ts")
-  process.exit(run(process.argv.slice(2)));
+export function run(args: string[]): number {
+  const { paths } = readWords(args);
+  if (paths.length > 1) throw new UsageFault("takes one book.");
+  return main(paths, process.cwd()) > 0 ? 1 : 0;
+}

@@ -9,6 +9,8 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linksSharedStyles, sharedStyles } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-page-"));
@@ -36,14 +38,18 @@ const doc = (o, body = "Some prose.\n", tag = null) =>
   block({ summary: `What ${o.title} is.`, ...o }) +
   `\n# ${o.title}\n\n` + (tag === null ? "" : tag + "\n\n") + body;
 
-/** `args` is the action's own argv — `["page", "docs/…"]` — run through `cli.ts docs <args>`. */
+/** `args` is what follows the group — `["page", "write", "docs/…"]` — run through `cli.ts docs <args>`. A refusal's text is handed back with the rest. */
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+/** The pocket's `docs` folder, which holds the hub and one folder for each domain. */
+const POCKET_DOCS = `docs/${POCKET.artifacts}/${ARTIFACT.docs}`;
+/** Where a construct's page sits: the `constructs` folder of its domain's folder in the pocket. */
+const pageOf = (domain, name) => `${POCKET_DOCS}/${domain}/${CONSTRUCT_PAGES}/${name}-construct.html`;
 const absent = (root, p) => !existsSync(join(root, p));
 
 let n = 0, failed = 0;
@@ -57,7 +63,7 @@ const has = (s) => (got) => String(got).includes(s);
 const lacks = (s) => (got) => !String(got).includes(s);
 
   // A PRODUCED PAGE'S LINKS ARE RE-EXPRESSED FOR THE FOLDER IT LANDS IN. The seat writes
-  // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits three
+  // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits four
   // levels from the capabilities seat rather than two. Copying the href across verbatim broke a
   // link on 166 of 166 produced pages in the workspace, and nothing saw it: the audit reads
   // structure and never follows a link.
@@ -67,73 +73,157 @@ const lacks = (s) => (got) => !String(got).includes(s);
         status: "PLANNING", dependsOn: [] },
       body, "`For: Architect` · `Status: 🔮 PLANNING`");
     const ws = repo({
-      "docs/02-constructs/01-core/thing.md": seat("thing",
-        "## Boundary\n\nSee [Other](other.md) and [the cap](../../04-capabilities/x.md).\n"),
-      "docs/02-constructs/01-core/other.md": seat("other", "## Boundary\n\nx\n"),
-      "docs/04-capabilities/x.md": "# X\n",
+      [`docs/${SEAT.constructs}/01-core/thing.md`]: seat("thing",
+        `## Boundary\n\nSee [Other](other.md) and [the cap](../../${SEAT.capabilities}/x.md).\n`),
+      [`docs/${SEAT.constructs}/01-core/other.md`]: seat("other", "## Boundary\n\nx\n"),
+      [`docs/${SEAT.constructs}/README.md`]: "# Constructs\n",
+      [`docs/${SEAT.capabilities}/x.md`]: "# X\n",
     });
     // `page` needs the real construct template for its furniture; the throwaway repo has none.
-    const templates = resolve(PLUGIN, "..", "..", "..",
-                              "spn-foundation", "docs", "04-capabilities", "01-devex",
-                              "04-workspace", "04-docs", "templates");
+    const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
     process.env.SPN_TEMPLATES = templates;
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    run(ws, ["page", "docs/02-constructs/01-core/other.md"]);
-    const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/other.md`]);
+    const page = readAt(ws, pageOf("01-core", "thing"));
 
-    one("a sibling seat link becomes the sibling PAGE", page, has('href="./other-construct.html"'));
-    one("a link out of the seat tree is re-based for the page's depth", page,
-        has('href="../../../04-capabilities/x.md"'));
-    one("the rail's home link is re-based too, not shipped as `../README.md`", page,
-        (g) => /class="home" href="\.\.\/\.\.\/\.\.\/02-constructs\/README\.md"/.test(g));
-    one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
-        (g) => !/produced/.test(g));
-    // Every script of the template ships, in the template's order: the rail builder, the fold,
-    // and whatever the template adds after them (the anchor links, once the templates carry them).
+    one("[MKT.SCRIPTS.110] `docs page` writes a construct page into the constructs folder of its domain's folder, and nowhere else in the pocket",
+        [existsSync(join(ws, pageOf("01-core", "thing"))), existsSync(join(ws, pageOf("01-core", "other"))),
+         absent(ws, `docs/${POCKET.artifacts}/${CONSTRUCT_PAGES}`)].join(" "), "true true true");
+    one("[MKT.SCRIPTS.110] a sibling seat link becomes the sibling PAGE, in the same constructs folder", page, has('href="./other-construct.html"'));
+    one("[MKT.SCRIPTS.110] a link out of the seat tree is expressed against the page's own folder", page,
+        has(`href="../../../../${SEAT.capabilities}/x.md"`));
+    one("[MKT.SCRIPTS.110] the rail's home link is expressed against it too, not shipped as `../README.md`", page,
+        (g) => g.includes(`class="sds-home" href="../../../../${SEAT.constructs}/README.md"`));
+    one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
+        [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
+    // THE AUDIT HAS TO HAVE READ THE PAGES for its silence about them to mean anything, so the case
+    // asserts the count of pages it read as well as the finding it does not report.
+    one("and the page it produced is the page the audit expects: the audit reads both pages and reports no `produced` finding",
+        run(ws, ["audit", "check", POCKET_DOCS]), (g) => /over 2 pages|clean — 2 pages/.test(g) && !/produced/.test(g));
+    // A PRODUCED PAGE CARRIES THE TEMPLATE'S TWO LINES, AND NOTHING ELSE OF ITS FURNITURE. The line
+    // that links the shared stylesheet sits above the page, and the line that loads the shared
+    // script closes it. Both are read from the book's own template, so the version is the book's.
     const bookTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
+    const linkLine = bookTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
+    const scriptLine = bookTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
+    const pagePath = pageOf("01-core", "thing");
+    const seatPath = `docs/${SEAT.constructs}/01-core/thing.md`;
+    one("a section head carries no number — a heading is a name", page, (g) => !/class="sds-number"/.test(g));
+    one("the template's line names a version at the served address", sharedStyles(linkLine),
+        (g) => g !== null && g.served === true && /^\d+\.\d+\.\d+$/.test(g.version ?? ""));
+    one("the page links the shared stylesheet with the template's own line, above the page", page,
+        has(`${linkLine}\n<div class="sds-page">`));
+    one("and the template's line that loads the shared script closes it", page, (g) => g.trimEnd().endsWith(scriptLine));
+    one("a produced page holds no `<style>` block", page, lacks("<style"));
+    one("and no script with code: its one script is the line that loads the shared file", page,
+        (g) => { const scripts = [...g.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)]; return scripts.length === 1 && scripts[0][1].trim() === ""; });
+    one("every class the producer writes opens with `sds-`", page,
+        (g) => { const names = [...g.matchAll(/class="([^"]+)"/g)].flatMap((found) => found[1].split(" ")); return names.length > 10 && names.every((name) => name.startsWith("sds-")); });
+
+    // A template that also holds a style block and a script with code gives the same page: the two
+    // lines are taken, and nothing else.
     const more = mkdtempSync(join(tmpdir(), "spn-templates-"));
     mkdirSync(join(more, "pages"));
     writeFileSync(join(more, "pages", "construct-template.html"),
-                  bookTemplate + "\n<script>/* a third script: the anchor links */</script>\n");
+                  bookTemplate + "\n<style>.mine{color:red}</style>\n<script>/* a script with code */</script>\n");
     process.env.SPN_TEMPLATES = more;
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    const withThree = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    run(ws, ["page", "write", seatPath]);
+    one("a style block and a script with code in the template never reach a produced page", readAt(ws, pagePath), page);
+
+    // KNOWN-BAD: a template with no line that loads the shared stylesheet. A page produced from it
+    // would link no shared file, so the command refuses and the page on disk stays as it is.
+    writeFileSync(join(more, "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
+    const refused = run(ws, ["page", "write", seatPath]);
+    one("known-bad: a template with no line that loads the shared stylesheet is refused, and the finding names the file",
+        refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `sds-docs.css`"));
+    one("and nothing is written: the page on disk is the page it was", readAt(ws, pagePath), page);
     process.env.SPN_TEMPLATES = templates;
-    one("a section head carries no number — a heading is a name", page, (g) => !/class="num"/.test(g));
-    one("the page carries every script the template has, not the first two", withThree,
-        (g) => [...g.matchAll(/<script>[\s\S]*?<\/script>/g)].length ===
-               [...bookTemplate.matchAll(/<script>[\s\S]*?<\/script>/g)].length + 1);
     rmSync(more, { recursive: true, force: true });
+
+    // A PAGE ON DISK THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY OF THE STYLES. `check` names
+    // it once and compares none of its markup; `write` is what moves it.
+    const ownCopy = '<meta charset="utf-8">\n<style>.badge{color:red}</style>\n<div class="page"><span class="badge">x</span></div>\n';
+    writeFileSync(join(ws, pagePath), ownCopy);
+    const named = run(ws, ["page", "check", seatPath]);
+    one("[MKT.SCRIPTS.108] `docs page check` names a page that holds its own copy once, as a RULE, with the text every command uses",
+        named, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
+    one("[MKT.SCRIPTS.108] and it says nothing else about that page: no `page` finding, and no `edited by hand`",
+        named, (g) => !g.includes("RULE page") && !g.includes("edited by hand"));
+    const exitOfCheck = () => {
+      try { execFileSync(process.execPath, [TOOL, "docs", "page", "check", seatPath], { encoding: "utf8", cwd: ws, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: ws } }); return 0; }
+      catch (error) { return error.status; }
+    };
+    one("[MKT.SCRIPTS.108] and `check` exits 1 on it, as on any RULE", exitOfCheck(), 1);
+    one("[MKT.SCRIPTS.108] `check` writes nothing into it", readAt(ws, pagePath), ownCopy);
+    run(ws, ["page", "write", seatPath]);
+    one("[MKT.SCRIPTS.108] `docs page write` moves it: the page produced again links the shared stylesheet",
+        readAt(ws, pagePath), (g) => g === page && linksSharedStyles(g));
+    one("untouched: `check` exits 0 on the page in the shared form", exitOfCheck(), 0);
+    writeFileSync(join(ws, pagePath), page.replace("<h1>", "<h1>Edited "));
+    one("known-bad: a page in the shared form that was edited by hand is still refused by `check`",
+        run(ws, ["page", "check", seatPath]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("RULE styles"));
+    run(ws, ["page", "write", seatPath]);
+
+    // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced
+    // page, readers of 122 construct pages met "A template from workstream 008 · copy it …", and an
+    // edit to the note made every one of them stale at once. The template here carries a marked
+    // footer, so the case fails if any of it reaches the page.
+    const noted = mkdtempSync(join(tmpdir(), "spn-templates-"));
+    mkdirSync(join(noted, "pages"));
+    writeFileSync(join(noted, "pages", "construct-template.html"),
+      bookTemplate.replace(/<footer>[\s\S]*?<\/footer>/, "") +
+      "\n<footer>AUTHOR-NOTE: copy this template, keep the comments</footer>\n");
+    process.env.SPN_TEMPLATES = noted;
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    const footed = readAt(ws, pageOf("01-core", "thing"));
+    process.env.SPN_TEMPLATES = templates;
+    rmSync(noted, { recursive: true, force: true });
+    one("the template's author note never reaches a produced page", footed, (g) => !/AUTHOR-NOTE/.test(g) && !/<footer>/.test(g));
+    one("nor does the book template's own footer", page, (g) => !/A template from workstream/.test(g) && !/<footer>/.test(g));
+
+    // THE SUBTITLE IS THE SEAT BLOCK'S `subtitle` FIELD (RD.DEVEX.WORKSPACE.187). A seat that moved its
+    // promise line into the field lost it from the page while the producer ignored the key, so the
+    // case writes a seat with one and a seat without, and reads both pages.
+    const seatSrc = readAt(ws, `docs/${SEAT.constructs}/01-core/thing.md`);
+    const withSub = seatSrc
+      .replace(/"id":\s*"([^"]+)"/, '"id": "$1-sub"')
+      .replace(/"title":/, '"subtitle": "One plain promise, under the title.",\n  "title":');
+    writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing-sub.md`), withSub);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing-sub.md`]);
+    const subbed = readAt(ws, pageOf("01-core", "thing-sub"));
+    one("a seat's subtitle is rendered under the title", subbed,
+      (g) => /<h1>[^<]*<\/h1>\s*<p class="sds-subtitle">One plain promise, under the title.<\/p>/.test(g));
+    one("a seat without one renders no subtitle line", page, (g) => !/<p class="sds-subtitle">/.test(g));
 
     // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the
     // reader saw a five-column row in a three-column table (N13's sample, 2026-09-21). And a `####`
     // used to fall through to the paragraph path, hashes and all.
-    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+    writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n#### A sub-part\n\n| a | b | c |\n| --- | --- | --- |\n| repos | `{org}-public\\|-private` | x |\n"));
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    const page2 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    const page2 = readAt(ws, pageOf("01-core", "thing"));
     one("an escaped pipe stays inside its cell", page2, has("<code>{org}-public|-private</code></td><td>x</td>"));
     one("a level-four heading is a heading, not a paragraph of hashes", page2, has('<h4 id="a-sub-part">A sub-part</h4>'));
-    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+    writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n<!-- RESTATES: a chapter\n     never add a rule here -->\n\nvisible\n<!-- block: REASONS -->\n"));
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    const page3 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    const page3 = readAt(ws, pageOf("01-core", "thing"));
     one("an author's HTML comment never reaches the page", page3, (g) => !/RESTATES|block: REASONS/.test(g) && /<p>visible<\/p>/.test(g));
-    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+    writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "The promise, in one line.\n\nThe summary paragraph.\n\n## Boundary\n\nx\n"));
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    const page4 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
-    one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    const page4 = readAt(ws, pageOf("01-core", "thing"));
+    one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="sds-standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
 
     // A NUMBERED LIST IS A LIST. There was no case for `1.`, so it fell through to the paragraph path
     // and the reader met one run-on paragraph beginning with the characters `1.` — the order, which is
     // the whole content of such a passage, was gone. Found on the Sign-in construct, whose four
     // organization checks run in a fixed order (N13, 2026-09-22). The bullet case is asserted beside
     // it because the two patterns sit next to each other and must not eat one another.
-    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+    writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n1. **First** the step that comes first.\n2. **Then** the next one.\n3) A closing paren is a list too.\n\n- a bullet after it\n- another\n"));
-    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-    const page5 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    const page5 = readAt(ws, pageOf("01-core", "thing"));
     one("a numbered list is an ordered list, not a paragraph of digits", page5,
         (g) => /<ol>[\s\S]*<li><strong>First<\/strong> the step that comes first\.<\/li>[\s\S]*<\/ol>/.test(g));
     one("every item of it is in the list, `)` included", page5,
@@ -143,62 +233,155 @@ const lacks = (s) => (got) => !String(got).includes(s);
         (g) => /<ul>\s*<li>a bullet after it<\/li>/.test(g));
     delete process.env.SPN_TEMPLATES;
   }
-console.log("\n=== the rail names the page, and the way back names where it goes (Q238, Q239)");
+console.log("\n=== the rail names the page, and the way back opens the overview that names the construct (Q238, Q239)");
 {
-  const templates = resolve(PLUGIN, "..", "..", "..",
-                            "spn-foundation", "docs", "04-capabilities", "01-devex",
-                            "04-workspace", "04-docs", "templates");
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   process.env.SPN_TEMPLATES = templates;
   const seat = (id, title) => doc(
     { id, variant: "construct", parentId: "core", title, lenses: ["ARCHITECT"],
       status: "PLANNING", dependsOn: [] },
     "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+  const overview = (id, title, body) =>
+    `<!-- spn:doc\n{"id":"${id}","variant":"overview","title":"${title}","lenses":["ARCHITECT"],"summary":"s"}\n-->\n${body}\n`;
+  const read = (name) => `<p><a class="sds-more" href="constructs/${name}-construct.html">Read ${name} &rarr;</a></p>`;
 
-  // A DOMAIN AND ITS OVERVIEW JOIN ON THEIR TITLE AND NOTHING ELSE. The overview's file name
-  // carries the area in one repository and not in another, so no path can be computed. Here the
-  // face and the overview both say `Core` and the file is named for neither, which is what makes
-  // the join the only thing under test.
+  // A DOMAIN MAY HOLD SEVERAL OVERVIEWS, and the one whose own links name the construct is its way
+  // back. Three overviews sit in one domain, the first by path names nothing, and each construct goes
+  // to the one that links forward to it. The README title joins none of them.
   const ws = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/thing.md": seat("thing", "The Thing Itself"),
-    "docs/artifacts/overviews/concept-anything-at-all-overview.html":
-      '<!-- spn:doc\n{"id":"ov","variant":"overview","title":"Core","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/thing.md`]: seat("thing", "The Thing Itself"),
+    [`docs/${SEAT.constructs}/01-core/other.md`]: seat("other", "The Other"),
+    [`docs/${SEAT.constructs}/01-core/stray.md`]: seat("stray", "The Stray"),
+    [`${POCKET_DOCS}/concept-overview.html`]: overview("hub", "Hub", "<h1>x</h1>"),
+    [`${POCKET_DOCS}/01-core/a-first-overview.html`]: overview("first", "First Overview", read("other")),
+    [`${POCKET_DOCS}/01-core/b-second-overview.html`]: overview("second", "Second Overview", read("thing")),
+    [`${POCKET_DOCS}/01-core/c-third-overview.html`]: overview("third", "Third Overview", "<h1>x</h1>"),
   });
-  run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-  const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+  for (const name of ["thing", "other", "stray"]) run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/${name}.md`]);
+  const page = readAt(ws, pageOf("01-core", "thing"));
 
   one("the rail carries the page's own name, not the word Outline",
-    page, has('<div class="rail-title">The Thing Itself</div>'));
-  one("and never the word it replaced", page, lacks('<div class="rail-title">Outline</div>'));
-  one("the way back reaches the domain's overview, found by its title alone",
-    page, has('href="../../overviews/concept-anything-at-all-overview.html"'));
-  one("and it names the domain rather than a category", page, has("&larr; Core"));
+    page, has('<div class="sds-rail-title">The Thing Itself</div>'));
+  one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
+  one("[MKT.SCRIPTS.110] the way back opens the overview whose own links name the construct, a page and never a markdown file",
+    page, has(`class="sds-home" href="../b-second-overview.html">&larr; Second Overview`));
+  one("[MKT.SCRIPTS.110] another construct of the domain goes to the overview that names it, not to the first",
+    readAt(ws, pageOf("01-core", "other")), has(`class="sds-home" href="../a-first-overview.html">&larr; First Overview`));
+  one("[MKT.SCRIPTS.110] a construct no overview names goes to the domain's first overview",
+    readAt(ws, pageOf("01-core", "stray")), has(`class="sds-home" href="../a-first-overview.html"`));
   one("so the old category label is gone", page, lacks("&larr; the model"));
+  one("and the audit finds no rail finding on any of the three",
+    run(ws, ["audit", "check", POCKET_DOCS, "--finding", "rail"]), (g) => /clean/.test(g));
 }
 
 {
-  // NO OVERVIEW, NO GUESS. Nine domains have no overview today, and a link that names a page which
-  // is not there is worse than the category label it replaced.
-  const templates = resolve(PLUGIN, "..", "..", "..",
-                            "spn-foundation", "docs", "04-capabilities", "01-devex",
-                            "04-workspace", "04-docs", "templates");
+  // NO OVERVIEW IN THE DOMAIN: the repository's hub. With no hub either, no guess is written.
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   process.env.SPN_TEMPLATES = templates;
-  const ws = repo({
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/thing.md": doc(
+  const files = {
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/thing.md`]: doc(
       { id: "thing", variant: "construct", parentId: "core", title: "Thing", lenses: ["ARCHITECT"],
         status: "PLANNING", dependsOn: [] },
       "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-  });
-  run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
-  const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
-  one("with no overview above it the constructs face stands, rather than a link to nothing",
-    page, has("&larr; the model"));
+  };
+  const withHub = repo({ ...files,
+    [`${POCKET_DOCS}/concept-overview.html`]:
+      '<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n' });
+  run(withHub, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  one("[MKT.SCRIPTS.110] a domain with no overview goes back to the hub page",
+    readAt(withHub, pageOf("01-core", "thing")), has(`class="sds-home" href="../../concept-overview.html">&larr; The Hub`));
+  const bare = repo(files);
+  run(bare, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  one("with no overview and no hub the constructs face stands, rather than a link to nothing",
+    readAt(bare, pageOf("01-core", "thing")), has("&larr; the model"));
 }
 
+// ---------------------------------------------------------------- the grammar: an action, and the seat files it names
+
+/** The exit code of one run, typed after the group, from the folder given. */
+const exitIn = (cwd, args) => {
+  try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
+  catch (error) { return error.status; }
+};
+const USAGE = "usage: spn-devex docs page check <seat…>\n" +
+              "       spn-devex docs page write <seat…>\n";
+
+console.log("\n=== `docs page` needs its action as a word, and both actions need a seat file");
+{
+  process.env.SPN_TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const seat = (id) => doc(
+    { id, variant: "construct", parentId: "concept", title: id, lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: [] },
+    "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+  const CORE = `docs/${SEAT.constructs}/01-core`, EDGE = `docs/${SEAT.constructs}/02-edge`;
+  const ws = repo({
+    [`${CORE}/thing.md`]: seat("thing"),
+    [`${CORE}/other.md`]: seat("other"),
+    [`${EDGE}/gate.md`]: seat("gate"),
+  });
+  const THING = `${CORE}/thing.md`;
+  const pages = () => ["thing", "other"].map((name) => existsSync(join(ws, pageOf("01-core", name))))
+    .concat(existsSync(join(ws, pageOf("02-edge", "gate")))).join(" ");
+
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line and says an action is owed",
+    run(ws, ["page"]), USAGE + "`docs page` needs an action.\n");
+  one("[MKT.SCRIPTS.111] and exits 2", exitIn(ws, ["page"]), 2);
+  one("[MKT.SCRIPTS.111] a seat file where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    run(ws, ["page", THING, "--check"]), USAGE + "`docs page` needs an action. `--check` is the action `check`.\n");
+  one("[MKT.SCRIPTS.111] with exit 2, and a seat file alone is refused with exit 2 too",
+    [exitIn(ws, ["page", THING, "--check"]), exitIn(ws, ["page", THING])].join(), "2,2");
+  one("[MKT.SCRIPTS.111] a word that is no action of the subject is refused the same way",
+    run(ws, ["page", "produce", THING]), USAGE + "`docs page` needs an action.\n");
+  one("[MKT.SCRIPTS.112] `write` with no path prints its usage line and says a path is owed",
+    run(ws, ["page", "write"]), "usage: spn-devex docs page write <seat…>\n`docs page write` needs a path.\n");
+  one("[MKT.SCRIPTS.112] and exits 2", exitIn(ws, ["page", "write"]), 2);
+  one("[MKT.SCRIPTS.130] `check` with no path is refused too, because a page is produced from the seat file that is named",
+    run(ws, ["page", "check"]), "usage: spn-devex docs page check <seat…>\n`docs page check` needs a path.\n");
+  one("[MKT.SCRIPTS.130] with exit 2", exitIn(ws, ["page", "check"]), 2);
+  one("an option the command does not take is refused by its name",
+    run(ws, ["page", "write", THING, "--json"]), "usage: spn-devex docs page write <seat…>\n`docs page write` does not take `--json`.\n");
+  one("with exit 2", exitIn(ws, ["page", "write", THING, "--json"]), 2);
+  one("no refused run wrote a page", pages(), "false false false");
+
+  const said = run(ws, ["page", "check", THING]);
+  one("[MKT.SCRIPTS.130] `check` says that no page has been produced from the seat file yet, as a RULE",
+    said, (got) => got.includes("✗ RULE page") && got.includes("no page has been produced from this seat file yet"));
+  one("[MKT.SCRIPTS.130] and exits 1", exitIn(ws, ["page", "check", THING]), 1);
+  one("[MKT.SCRIPTS.130] `check` writes nothing", pages(), "false false false");
+
+  // KNOWN-BAD, so `check` and the refusals are not the reason no page was written: the same seat, written.
+  one("[MKT.SCRIPTS.130] known-bad: `write` of the same seat file puts its page on disk, and no other page",
+    [run(ws, ["page", "write", THING]).includes("wrote"), pages()].join(" "), "true true false false");
+  one("[MKT.SCRIPTS.130] and after the write a `check` reads the page as current and exits 0",
+    [run(ws, ["page", "check", THING]).includes("current"), exitIn(ws, ["page", "check", THING])].join(), "true,0");
+
+  run(ws, ["page", "write", CORE]);
+  one("a folder names every seat file under it, and no seat file beside it", pages(), "true true false");
+  run(ws, ["page", "write", THING, `${EDGE}/gate.md`]);
+  one("several paths are one run", pages(), "true true true");
+  delete process.env.SPN_TEMPLATES;
+}
+
+// A NAMED PATH THAT IS NOT THERE IS A FINDING (N010-25). `check` once exited 0 and printed nothing for
+// a path that did not exist, so a mistyped path read as a clean run.
+{
+  const root = repo({});
+  const gone = join(root, "no", "such", "page.md");
+  const exitOfRun = (args) => { try { execFileSync(process.execPath, [TOOL, "docs", ...args], { cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; } catch (error) { return error.status; } };
+  one("[MKT.SCRIPTS.130] `check` of a path that does not exist names it as a RULE finding",
+    run(root, ["page", "check", gone]), (got) => got.includes("✗ RULE page") && got.includes("no such file or folder"));
+  one("[MKT.SCRIPTS.130] and exits 1", exitOfRun(["page", "check", gone]), 1);
+  const bare = join(root, "docs", "notes.md");
+  mkdirSync(dirname(bare), { recursive: true });
+  writeFileSync(bare, "# Notes\n");
+  one("a run that read no construct seat says so rather than printing nothing",
+    run(root, ["page", "check", bare]), (got) => got.includes("no construct seat file under that path"));
+  one("and exits 1", exitOfRun(["page", "check", bare]), 1);
+}
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

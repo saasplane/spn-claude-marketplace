@@ -3,10 +3,11 @@
   "id": "plugin-set",
   "variant": "construct",
   "title": "The Plugin — Delivery Unit of the Marketplace",
+  "subtitle": "One folder holds everything a rule needs to reach a running session.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": [],
-  "summary": "The folder that carries a standard from this repository into a running session — its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that says which bytes those are.",
+  "summary": "A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.",
   "keywords": ["plugin", "marketplace", "manifest", "version", "install", "plugin root"]
 }
 -->
@@ -15,9 +16,11 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-A rule an agent cannot load is a rule it cannot follow, however well the rule is written. The plugin is the unit that carries a rule from this repository into a running session: one folder, one small manifest, one entry in a list this repository keeps by hand. Every other construct of this domain is a folder inside one, so this page names the container before the other pages name what sits in it.
+A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. Read this page before you edit a manifest, or when a change does not seem to take effect. It names the three files involved, then walks through what each one holds and how they connect.
 
 ## Overview
+
+A rule an agent cannot load is a rule it cannot follow, however well the rule is written. So this folder is one small manifest and one entry in a list this repository keeps by hand, and every other construct in this domain sits inside it as a folder of its own.
 
 The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.
 
@@ -63,7 +66,7 @@ Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding
 
 ### The version names what is published
 
-This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another.
+This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. The three plugins carry one version and move together: a release moves all three, changed or not (RD.DEVEX.007).
 
 ### The marketplace entry
 
@@ -71,7 +74,7 @@ One file at the repository root, `.claude-plugin/marketplace.json`, carries a `p
 
 ### The installed copy, and what a wired path names
 
-Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed.
+Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`.
 
 ### What a plugin may hold, and what it owes
 
@@ -96,4 +99,4 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | [RD.DEVEX.006](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `spn-devex plugin partner check`

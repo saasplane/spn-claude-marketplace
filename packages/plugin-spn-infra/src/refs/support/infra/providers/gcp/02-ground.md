@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/gcp/02-ground.md", "seen": "bc8cb914" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/02-ground.md", "seen": "bc8cb914" }
   ]
 }
 -->
 # Ground — nothing is brought by hand here
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/gcp/02-ground.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/gcp/02-ground.md`. Read this as the restatement; that node governs.
 
 **There is no manual bootstrap for Google Cloud.** Nothing states which account a company creates first here, which mailbox recovers it, or how a domain is delegated.
 

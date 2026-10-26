@@ -2,8 +2,8 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/05-code.md",
-      "seen": "5898a308"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/05-code.md",
+      "seen": "d5bf8105"
     }
   ]
 }
@@ -76,6 +76,36 @@
 | React types | allowed | not allowed |
 | Dates | `Date` objects | `CDTDate` |
 | Contract data types | not needed | required |
+
+**Many props are grouped by owner** (`RD.SUPPORT.APPS.213`). A component with many props does not list them flat. It groups them in named interfaces, one per owner, built from the owner's props with `Omit` or `Pick`, and its own props that belong together are grouped too. A group is named `I{Component}{Group}Props` and is one attribute of the component, named for the group: `section` or `panel` for the box a container draws, `heading` for a feature it holds, `grid` for the cells. A wrapper then builds on either interface whole, and the `testData` of the component stays on the component.
+
+```ts
+export interface IDSFeatureGridSectionContainerSectionProps
+  extends Omit<IDSSectionContainerProps, 'children' | 'flush' | 'testData'> {}
+
+export interface IDSFeatureGridSectionContainerHeadingProps
+  extends Pick<IDSFeatureProps, 'eyebrow' | 'title' | 'description' | 'facts' | 'factsPlacement' | 'actions' | 'textAlign'> {}
+
+export interface IDSFeatureGridSectionContainerProps extends IDSBaseContainerProps {
+  section?: IDSFeatureGridSectionContainerSectionProps;
+  heading?: IDSFeatureGridSectionContainerHeadingProps;
+  grid: IDSGrid;
+}
+```
+
+**A shared shape that is a unit of its own is an attribute, and is extended only where a unit is that shape plus more** (`RD.SUPPORT.APPS.215`). Some props shapes are shared by many units and mean one thing wherever they appear: the columns at each screen class, the paint of a frame. A page writes such a shape as one value, so a unit holds it as one named attribute, `gridColumns: IDSGridColumns` or `surface: IDSFrameSurface`, and never spreads its keys among its own by `extends`. A unit extends a shared shape only when the unit is that shape and more: every unit is `IDSBaseProps` and more, and a grid is its columns and more, so `IDSGrid` extends `IDSGridColumns` and adds `borderType`. The test is how a page would write it: if the shape is one value, it is an attribute. Such a shape is named for what it is, with no `Props`, since no component owns it.
+
+```ts
+export interface IDSListProps extends IDSBaseProps {
+  gridColumns?: IDSGridColumns; // ✅ a unit of its own, held whole
+}
+
+export interface IDSGrid extends IDSGridColumns {
+  borderType?: DSGridBorderType;
+}
+
+export interface IDSListProps extends IDSBaseProps, IDSGridColumns {} // ❌ a list is not its columns
+```
 
 **A contract field is `| null`, never optional** — a wire contract has no absent key.
 

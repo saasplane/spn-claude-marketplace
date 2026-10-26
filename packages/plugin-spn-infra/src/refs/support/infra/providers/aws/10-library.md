@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/10-library.md", "seen": "c8840176" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/10-library.md", "seen": "c8840176" }
   ]
 }
 -->
 # Library — what the AWS half of the blueprint package ships
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/10-library.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/10-library.md`. Read this as the restatement; that node governs.
 
 **A provider ships a library, not a plugin.** The renderings travel as a versioned package the declaration pins, so an estate is bound to an exact set of blueprints rather than to whatever the library holds today.
 

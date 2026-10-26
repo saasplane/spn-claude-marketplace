@@ -1,5 +1,5 @@
 <!-- spn:doc
-{"id": "spn-apps-capabilities-skills", "variant": "capability", "title": "Skills in spn-apps", "lenses": ["SERVER_DEV", "WEB_DEV"], "status": "DONE", "realizes": ["stack-skills"], "summary": "The skills an apps repository answers to — one folder each, one stage each, the build loop that classifies before it sequences and reads its steps from the provider for the declared stack, and the deliberate absence where deciding what a node is would be.", "keywords": ["skill", "implement", "steps", "mode", "stage", "stamp"]}
+{"id": "spn-apps-capabilities-skills", "variant": "capability", "title": "Skills in spn-apps", "lenses": ["SERVER_DEV", "WEB_DEV"], "status": "DONE", "realizes": ["stack-skills"], "summary": "The skills an apps repository answers to — one folder each, one stage each, the build loop that classifies before it sequences and reads its steps from the provider for the declared stack, the design skill that holds its one step, and the deliberate absence where deciding what a node is would be.", "keywords": ["skill", "implement", "steps", "mode", "stage", "stamp"]}
 -->
 
 # Skills in spn-apps
@@ -18,7 +18,9 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 | Running | `packages/plugin-spn-apps/src/skills/run/SKILL.md` | start the stack locally, or run its suites |
 | Proving | `packages/plugin-spn-apps/src/skills/verify/SKILL.md` | three modes: package, app, and a destructive reset |
 | Publishing | `packages/plugin-spn-apps/src/skills/release/SKILL.md` | the repository's releasable projects, in lockstep, scoped to the repository and never one package |
-| The steps it names | `packages/plugin-spn-apps/src/providers/ts/skills/implement/steps/` | one file per layer, held by the provider for the declared stack |
+| Designing a page | `packages/plugin-spn-apps/src/skills/design/SKILL.md` | the layout, the containers, the pattern of each task and the blocks, stated as a tree of named blocks |
+| The steps the build loop names | `packages/plugin-spn-apps/src/providers/ts/skills/implement/steps/` | one file per layer, held by the provider for the declared stack |
+| The steps the design skill names | `packages/plugin-spn-apps/src/skills/design/steps/draw.md` and `change-library.md` | draw the tree in Figma from the published libraries, and change a library file through the connector, held by the skill because they name no stack |
 | What each one restates | the `spn:restates` block at the top of each `SKILL.md` | the skills chapter, and the chapter of the one stage that skill serves |
 | The absent planning skill's material | `packages/plugin-spn-apps/src/providers/ts/skills/ideate/plan.md` | the part of the core `ideate` walk only this stack can answer, held by the provider rather than under `skills/` |
 
@@ -40,6 +42,12 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 **Why** — *a step file is written in a language*, so a skill that linked to one would have decided which stack it serves.
 **What** — the skill states the step names, their order and what each settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest manifest.
 **How** — the steps are a table rather than a list of links, and a step the declared stack does not ship is a step that stack does not walk. `packages/plugin-spn-apps/src/skills/implement/SKILL.md`.
+
+### One skill holds its own steps, because the steps name no stack
+
+**Why** — *a step is read when the work reaches it*. A window with no Figma connector never reaches the drawing or the change of a library file, so it never loads those files.
+**What** — `design` serves the ideate stage. You ask it to design, lay out or draw a page, and it states the page as a tree of named blocks. Its steps are `draw`, which draws that tree in Figma, and `change-library`, which changes a library file through the connector.
+**How** — the steps are written in no language, so they sit in the skill's own folder and no provider holds them. `packages/plugin-spn-apps/src/skills/design/steps/draw.md`.
 
 ### A mode is an argument, not a second skill
 

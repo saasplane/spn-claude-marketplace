@@ -32,11 +32,11 @@
 //      none today. The reason a tool is outside has to be the SHAPE of what it reports, because
 //      that is the part that stays true until somebody changes the tool.
 //
-// AND THE SCOPE IS THE DOCS TREE, NEVER THE REPOSITORY ROOT. `audit` given a folder means *every
-// document under it*, so a root pulls in every package `README.md` and `CLAUDE.md` — none of which
+// AND THE PATH IS THE DOCS TREE, NEVER THE REPOSITORY ROOT. `audit check` reports every finding
+// under its path, so a root reports every package `README.md` and `CLAUDE.md` — none of which
 // carries an `spn:doc` block, all of which are RULE. Measured over the seven: 954 findings at the
 // root against 25 at the docs trees, and the tool reports both in the same voice. A wrong argument
-// that looks like a corpus collapse is the defect this whole arc is about, so the scope is computed
+// that looks like a corpus collapse is the defect this whole arc is about, so the path is computed
 // here and never taken from a caller.
 
 import { createHash } from "node:crypto";
@@ -44,15 +44,21 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { type Computed, hashFile, hashFiles, prune, type Source, verdictFor } from "../lib/corpus-cache.ts";
+import { bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Warning = { check: string; message: string };
 
-/** The docs commands that are silent on a clean corpus today, so a finding from one means something. */
+/**
+ * The docs commands that are silent on a clean corpus today, so a finding from one means something.
+ * `audit check` and `face check` are handed the docs tree: each finds the repository from it, and
+ * reports only what sits under it. `topics check` and `parity check` are handed the repository:
+ * each compares the seats of its docs tree, and reports every finding in the repository.
+ */
 const WIRED = [
-  { args: (tree: string) => ["docs", "audit", tree], label: "audit" },
-  { args: (tree: string) => ["docs", "face", "--check", dirname(tree)], label: "face --check" },
-  { args: (tree: string) => ["docs", "topics", dirname(tree)], label: "topics" },
-  { args: (tree: string) => ["docs", "coverage", dirname(tree)], label: "coverage" },
+  { args: (tree: string) => ["docs", "audit", "check", tree], label: "audit check" },
+  { args: (tree: string) => ["docs", "face", "check", tree], label: "face check" },
+  { args: (tree: string) => ["docs", "topics", "check", dirname(tree)], label: "topics check" },
+  { args: (tree: string) => ["docs", "parity", "check", dirname(tree)], label: "parity check" },
 ];
 
 /**
@@ -63,9 +69,9 @@ const WIRED = [
  * nobody earned. A silent corpus check that quietly covers four of six tools would be exactly that.
  */
 const REPORTED_ELSEWHERE = [
-  { label: "coherence", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
-  { label: "restate-drift", why: "a drift is a question — does this restatement still hold — and the only answer is reading the diff, which a hook cannot do for you" },
-  { label: "figures check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" },
+  { label: "coherence check", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
+  { label: "restates check", why: "a drift is a question — does this restatement still hold — and the only answer is reading the diff, which a hook cannot do for you" },
+  { label: "figure check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" },
 ];
 
 // THE RUN'S OWN BUDGET, BECAUSE THE HOOK'S TIMEOUT IS NOT A SAFE ONE TO RELY ON. A `Stop` hook that
@@ -203,7 +209,7 @@ export function checkerHash(scripts = SCRIPTS, supportLib = SUPPORT_LIB): string
 /** The foundation's page templates. `audit` renders every produced page with them, in every tree. */
 function templatesDir(root: string): string {
   return process.env.SPN_TEMPLATES
-    ?? join(root, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+    ?? bookTemplatesDir(join(root, "spn-foundation"));
 }
 
 /**
@@ -214,7 +220,7 @@ function templatesDir(root: string): string {
  * foundation's templates (a template edit changes the verdict of trees that did not move).
  *
  * WHAT IS NOT IN IT, SAID HERE SO NOBODY INFERS THE KEY IS COMPLETE: the package sources `audit`
- * indexes for closed values and `coverage` mirrors, and the sibling-repository paths a figure names.
+ * indexes for closed values and `parity` mirrors, and the sibling-repository paths a figure names.
  * A change to those alone replays the stored verdict until the tree or the checker moves.
  *
  * Returns null when the tree holds more than `MAX_FILES` files, which runs it uncached.
@@ -247,8 +253,10 @@ export type SubjectRun = { subject: string; source: Source | "skipped" | "not re
  * it. SKIPPING THE WORK IS THE POINT; skipping the VERDICT never was. The findings are stored with the
  * key and re-reported verbatim until the tree or the checker moves.
  */
-export function runCorpus(root: string): { warnings: Warning[]; runs: SubjectRun[] } {
-  const trees = docsTrees(root);
+export function runCorpus(root: string, repos: Set<string> | null = null): { warnings: Warning[]; runs: SubjectRun[] } {
+  // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RD.DEVEX.WORKSPACE.236).
+  // `null` is every tree, and only the command run by hand asks for it; the Stop hook always passes the set.
+  const trees = docsTrees(root).filter((tree) => !repos || repos.has(basename(dirname(tree))));
   if (!trees.length) return { warnings: [], runs: [] };
 
   const deadline = Date.now() + BUDGET_MS;
@@ -307,19 +315,28 @@ export function runCorpus(root: string): { warnings: Warning[]; runs: SubjectRun
   if (broke.length)
     warnings.push({ check: "corpus", message:
       `A corpus tool failed to run, which is not the same as finding nothing:\n  ${broke.join("\n  ")}\n\n${which}` });
-  if (findings.length)
+  if (findings.length) {
+    // A FINDING IN A FILE THAT IS CHANGED AND NOT COMMITTED IS WORK IN PROGRESS, and it says so: rows added
+    // and not yet stamped, or a seat file edited whose page is not produced yet, clear when the work lands.
+    const marked = findings.map((line) => (isUncommitted(root, line) ? `${line} [uncommitted]` : line));
+    const wip = marked.filter((line) => line.endsWith(" [uncommitted]")).length;
     warnings.push({ check: "corpus", message:
-      `${findings.length} RULE finding(s) in the docs trees:\n` +
-      `  ${findings.slice(0, 12).join("\n  ")}` +
+      `${findings.length} RULE finding(s) in the docs trees of ${[...new Set(trees.map((t) => `\`${basename(dirname(t))}\``))].join(" · ")}, ` +
+      `the repositories this window wrote under:\n` +
+      `  ${marked.slice(0, 12).join("\n  ")}` +
       (findings.length > 12 ? `\n  … and ${findings.length - 12} more` : "") +
+      (wip ? `\n\n${wip} of these sit in files that are changed and not committed: work in progress, to finish before the commit.` : "") +
       // SAYING IT IS A REPLAY IS PART OF BEING HONEST ABOUT IT. A repeated finding that reads as a
       // fresh run invites somebody to think the check keeps re-finding it, when the truth is simpler
       // and more useful: nothing has changed since it was found, including the fault.
       (replayed.length
-        ? `\n\nFrom ${replayed.map((s) => `\`${s}\``).join(" · ")}: nothing there and nothing in the checker has changed since ` +
-          `these were found, so the tools were not re-run — this is the stored verdict.`
+        ? `\n\nFrom ${replayed.map((s) => `\`${s}\``).join(" · ")}: no file under that tree, its repository's \`sprepo.json\` and ` +
+          `\`CONCEPT.md\`, the foundation's templates or the checker has changed since these were found, so the tools were not re-run — ` +
+          `this is the stored verdict. A change to the package sources or to a sibling repository that the tools also read is not part of ` +
+          `that test and would not show here.`
         : "") +
       `\n\n${which}` });
+  }
   return { warnings, runs };
 }
 
@@ -329,13 +346,31 @@ export function runCorpus(root: string): { warnings: Warning[]; runs: SubjectRun
  * Warns, never refuses — the `Stop` contract. A turn is already written by the time this runs, and a
  * refusal would only lose it.
  */
-export function checkCorpus(root: string): Warning[] {
-  return runCorpus(root).warnings;
+export function checkCorpus(root: string, repos: Set<string>): Warning[] {
+  return runCorpus(root, repos).warnings;
+}
+
+/**
+ * Whether the file a finding names is changed and not committed, which makes the finding work in
+ * progress and not a fault of the committed tree. `false` where git cannot say: an unknown file is
+ * read as committed, so a finding is never softened on a guess.
+ */
+export function isUncommitted(root: string, finding: string): boolean {
+  const file = finding.match(/(?:^|\s)((?:[\w.@-]+\/)+[\w.@-]+\.(?:md|html|json|ts))/)?.[1];
+  if (!file) return false;
+  const repo = file.split("/")[0];
+  try {
+    const out = execFileSync("git", ["-C", join(root, repo), "status", "--porcelain", "--", file.slice(repo.length + 1)],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5000 });
+    return out.trim() !== "";
+  } catch { return false; }
 }
 
 if (process.argv[1] && basename(process.argv[1]) === "corpus.ts") {
   const root = process.argv[2] ?? process.cwd();
-  const { warnings, runs } = runCorpus(root);
+  // `--repos=a,b` reads as a window that wrote under those repositories, and `--repos=` as one that wrote under none.
+  const only = process.argv.find((arg) => arg.startsWith("--repos="));
+  const { warnings, runs } = runCorpus(root, only ? new Set(only.slice("--repos=".length).split(",").filter(Boolean)) : null);
   // What each subject did goes first, so a reader can see which trees were re-run and which replayed.
   console.log(`subjects: ${runs.map((r) => `${r.subject} ${r.source}`).join(" · ") || "none"}\n`);
   for (const w of warnings) console.log(`[${w.check}] ${w.message}\n`);

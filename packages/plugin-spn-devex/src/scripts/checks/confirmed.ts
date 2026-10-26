@@ -7,10 +7,18 @@
 // being shown something, and the first they learn otherwise is a diff. The failure is silent on both
 // sides: the agent believes the plan is agreement, and the developer believes the plan is a plan.
 //
-// WHAT A GO LOOKS LIKE, so this can be checked at all. A go is a line in an arc's `## Log`, opening
-// with the date and the word `go`:
+// WHAT A GO LOOKS LIKE, so this can be checked at all. A go is the write that stores `DECIDED` on an
+// arc, and it carries the developer's words (RD.DEVEX.WORKSPACE.278 and .307):
 //
-//     - **2026-09-09 — go.** The developer said finish it.
+//     workstream row write <arc> --status DECIDED --note "<the developer's words>"
+//
+// It leaves two marks, and the hook reads both: the status `arcs/N<nnn>/state.json` stores reads
+// `DECIDED`, or `LANDED` where the close stored it, and its `log.jsonl` holds the status line that moved it out of
+// `PROPOSED`, the words beside the move (`PROPOSED → DECIDED · <their words>`). A status alone is not
+// enough, and neither is a move with no words: a plan the agent wrote must not pass as an agreement.
+// An arc opened straight at `DECIDED` on the developer's words, as the review-fixes arc is
+// (RD.DEVEX.WORKSPACE.261), holds its go in the `opened` line. An arc moved back to `PROPOSED` needs a
+// go again, so only the last move out of it counts.
 //
 // Nothing else counts, because nothing else is written down. A conversation is not a record: the
 // window ends and the go ends with it, which is exactly the state this hook exists to make visible.
@@ -29,26 +37,104 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
-import { DEVEX, emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
+import { windowWorkstreams } from "../lib/window.ts";
+import { arcIdsOf, logLinesOf, moveOf, readArc } from "../lib/workstream.ts";
+import type { LogLine } from "../lib/workstream-schema.ts";
+import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { emit, isDir, listdir, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
 
 const DEBUG = ".debug";
 const CONFIRMED = "confirmed";
 
-// `- **2026-09-09 — go.` — the date, the dash, then the word. The bold is how every other log line
-// in these files opens, so this asks for the shape that is already there rather than a new one.
-const GO = /^\s*-\s*\*\*\d{4}-\d{2}-\d{2}\s*[—-]\s*go\b/im;
+/** The stored statuses an arc holds only after a go: the go itself, and the close's `LANDED`. */
+const PAST_THE_GO: ReadonlySet<string> = new Set(["DECIDED", "LANDED"]);
+const PROPOSED = "PROPOSED";
+
+/** The words a status line carries beside its move: everything after `FROM → TO`, or the whole note where it names none. */
+function wordsOf(note: unknown): string {
+  const text = typeof note === "string" ? note : "";
+  return (moveOf(text) ? text.replace(/^[A-Z][A-Z-]* → [A-Z][A-Z-]*/, "") : text).replace(/^[\s·:—-]+/, "").trim();
+}
+
+/** The note `row write` gives an `opened` line: the status it opened at, then the developer's words where it carries them. */
+const OPENED_BARE = /^opened as ([A-Z][A-Z-]*)$/;
+const OPENED_WITH = /^opened as ([A-Z][A-Z-]*) · ([\s\S]+)$/;
+
+/**
+ * The status an arc was opened at, as the commands record it. With no `--note`, the `opened` line says it
+ * (`opened as DECIDED`). With one, the note replaces those words, so the status is the `from` of the next
+ * status line's move; with no status line after it, the arc never moved and `state.json` still holds it.
+ * A next line that names no move says nothing, and the arc is read as opened at `PROPOSED`, as `newArc` opens it.
+ */
+function openedAt(lines: readonly unknown[], at: number, status: string): string {
+  const note = String((lines[at] as LogLine).note ?? "").trim();
+  const bare = OPENED_BARE.exec(note) ?? OPENED_WITH.exec(note);
+  if (bare) return bare[1];
+  const next = lines.slice(at + 1).find((raw) => (raw as LogLine | undefined)?.kind === "status") as LogLine | undefined;
+  if (!next) return status;
+  return moveOf(next.note)?.from ?? PROPOSED;
+}
+
+/**
+ * The developer's words of the go an arc's log holds, or null where it holds none. The go is the last move out of
+ * `PROPOSED` that carries words: a status line with words beside its move, or an `opened` line whose note carries
+ * them on an arc opened past `PROPOSED`, as the review-fixes arc opens at `DECIDED` (RD.DEVEX.WORKSPACE.261).
+ * The log is read in order, as `statusMoves` reads it; a status line naming no move moves from the status the log
+ * last showed, and a move back to `PROPOSED` needs a go again. `release-go` reads a major release's version in
+ * these words (RD.DEVEX.WORKSPACE.069), so the two checks read one go.
+ */
+export function goWordsOf(lines: readonly unknown[], status: string): string | null {
+  let shown: string | null = PROPOSED;
+  let go: string | null = null;
+  lines.forEach((raw, at) => {
+    const line = raw as LogLine | undefined;
+    if (!line || typeof line !== "object") return;
+    if (line.kind === "opened") {
+      shown = openedAt(lines, at, status);
+      const note = String(line.note ?? "").trim();
+      const words = OPENED_WITH.exec(note)?.[2] ?? (OPENED_BARE.test(note) ? "" : note);
+      go = shown !== PROPOSED && words.length > 0 ? words : null;
+      return;
+    }
+    if (line.kind !== "status") return;
+    const move = moveOf(line.note);
+    const from = move?.from ?? shown;
+    const to = move?.to ?? null;
+    if (from === PROPOSED && to !== PROPOSED) go = wordsOf(line.note) || null;
+    if (to === PROPOSED) go = null;
+    shown = to;
+  });
+  return go;
+}
+
+/** Whether an arc's log holds the go its status needs: its words, read by `goWordsOf`. */
+export function logHoldsGo(lines: readonly unknown[], status: string): boolean {
+  return goWordsOf(lines, status) !== null;
+}
+
+/**
+ * The developer's words of an arc's go, or null where the arc holds none: a status past the go in `state.json`,
+ * and the go's line in `log.jsonl`.
+ */
+export function arcGoWords(status: unknown, lines: readonly unknown[]): string | null {
+  return typeof status === "string" && PAST_THE_GO.has(status) ? goWordsOf(lines, status) : null;
+}
+
+/** Whether an arc holds the developer's go: a status past it in `state.json`, and the go's line in `log.jsonl`. */
+export function arcHoldsGo(status: unknown, lines: readonly unknown[]): boolean {
+  return arcGoWords(status, lines) !== null;
+}
 
 /** Every folder under `workstreams/open/`, which is the state that means available now. */
 function openWorkstreams(root: string): string[] {
-  const folder = join(root, DEVEX, "workstreams", "open");
+  const folder = workstreamsDir(root, "open");
   return listdir(folder).map((name) => join(folder, name)).filter(isDir);
 }
 
-/** Whether any arc under this workstream records one. */
+/** Whether any arc of this workstream holds the developer's go, read from its `state.json` and `log.jsonl`. */
 function hasGo(workstream: string): boolean {
-  const arcs = join(workstream, "arcs");
-  return listdir(arcs).some((name) => name.endsWith(".md") && GO.test(read(join(arcs, name))));
+  return arcIdsOf(workstream).some((arc) => arcHoldsGo(readArc(workstream, arc)?.status, logLinesOf(workstream, arc)));
 }
 
 /**
@@ -64,6 +150,9 @@ function isRepoWrite(root: string, path: string): boolean {
   const head = within.split("/")[0];
   return head !== "" && head !== "." && head !== DEVEX && head !== ".claude";
 }
+
+// The tools whose `file_path` names a file they change.
+const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
 /** One warning per session, remembered where the workspace keeps its own machinery's state. */
 function alreadyWarned(root: string, session: string | undefined): boolean {
@@ -82,24 +171,30 @@ export function checkConfirmed(payload: Payload): Verdict {
   try {
     const written = payload.tool_input?.file_path;
     if (!written) return null;
+    // A `Read` carries a `file_path` too, and reading a repository is not writing to it.
+    if (payload.tool_name && !FILE_WRITERS.has(payload.tool_name)) return null;
     const cwd = payload.cwd ?? process.cwd();
     const root = workspaceRoot(cwd);
     if (!root) return null;
     if (!isRepoWrite(root, resolve(cwd, written))) return null;
-    const workstreams = openWorkstreams(root);
+    // THE GO MUST BE IN A WORKSTREAM THIS WINDOW WORKS ON (RD.DEVEX.WORKSPACE.236). A go in another
+    // window's workstream licenses nothing here. A window that works on none has no workstream to
+    // name, so it is asked about the workspace as a whole and the note names no workstream.
+    const own = new Set(windowWorkstreams(root, payload.session_id));
+    const open = openWorkstreams(root);
+    const workstreams = own.size ? open.filter((folder) => own.has(basename(folder))) : open;
     if (!workstreams.length) return null;
-    // One go covers the window. A developer running two scopes said go to one of them, and warning
-    // about the other would be noise on work they are watching.
     if (workstreams.some(hasGo)) return null;
     if (alreadyWarned(root, payload.session_id)) return null;
-    const names = workstreams.map((w) => basename(w)).join(" · ");
+    const names = own.size ? workstreams.map((w) => basename(w)).join(" · ") : "";
     return {
       note:
-        `This is a repository write and no open workstream records a go — ${names}. ` +
-        `Execution is confirmed rather than assumed: show the plan, ask, and write the ` +
-        `answer down as a log line in the arc, opening \`- **<date> — go.**\`. A go held only ` +
-        `in the conversation ends with the window, and the next session cannot tell a plan ` +
-        `from an agreement (refs/devex/workspace/workstream.md, S3).`,
+        `This is a repository write and ${own.size ? "no workstream of this window records a go — " + names : "no open workstream records a go"}. ` +
+        `Execution is confirmed rather than assumed: show the plan, ask, and record the ` +
+        `developer's answer as the go — \`workstream row write <arc> --status DECIDED --note "<the developer's words>"\`. ` +
+        `An arc holds a go when it reads DECIDED, RUNNING or LANDED and its log holds that line. ` +
+        `A go held only in the conversation ends with the window, and the next session cannot tell ` +
+        `a plan from an agreement (refs/devex/workspace/workstream.md, S3).`,
     };
   } catch {
     return null;                                    // never fail a gate over a warning

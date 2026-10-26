@@ -2,7 +2,7 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/10-library.md",
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/10-library.md",
       "seen": "34dc4529"
     }
   ]
@@ -10,7 +10,7 @@
 -->
 # Library — what the local half ships
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/10-library.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/local/10-library.md`. Read this as the restatement; that node governs.
 
 **A provider ships a library, not a plugin.** The renderings travel as a versioned package the organization's declaration pins, so a new provider is a library rather than a release of the tool ([blueprints](../../blueprints.md)).
 
@@ -20,7 +20,7 @@
 
 **Libraries ship from the Support stage's infra half, one folder per provider instance, pinned by version in the estate declaration.** The package is `@saasplane/infra-blueprints` — by its own manifest, the layer modules the `spnutils infra` driver invokes, per provider category and instance.
 
-**The pin is the delivery.** A change in that package reaches an estate only when the organization is released carrying the new version, and `spnutils infra show` reads the pinned version rather than any working tree ([packages](../../packages.md)).
+**The pin is the delivery.** A change in that package reaches an estate only when the organization is released carrying the new version, and `spnutils infra show {spc}` reads the pinned version rather than any working tree ([packages](../../packages.md)).
 
 ## What the local target reads from it
 

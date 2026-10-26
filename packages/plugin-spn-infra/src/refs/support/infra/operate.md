@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md",
-      "seen": "29be201e"
+      "path": "spn-foundation/docs/02-constructs/02-support/03-infra/08-operate.md",
+      "seen": "226a1dc5"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/",
-      "seen": "05fe92d4"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
+      "seen": "ef9cafc7"
     }
   ]
 }
@@ -46,6 +46,31 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 
 **There is no values file per environment.** A file per environment is a place for two environments to drift apart, so nothing of that shape exists to drift.
 
+## How a deployment is exposed
+
+**An environment has one load balancer and one gateway for each reach, and a deployment is a route on a gateway — MUST** (`RD.SUPPORT.INFRA.115`). A deployment has no load balancer of its own.
+
+| Exposure | Load balancer | Gateway, inside the cluster | Registered as |
+| --- | --- | --- | --- |
+| `PUBLIC` | one, facing the internet | the public gateway | a route for its host |
+| `PRIVATE` | one, internal, admitting `operatorCidrs` and the cluster's own nodes | the private gateway | a route for its internal host |
+| a remote port | the internal one | the private gateway | a route, always, whatever `expose` is |
+| `INTERNAL` | none | none | no route; other workloads use its service address |
+
+- **The two gateways are kept apart**, so a wrong route cannot make a private surface answer on the internet.
+- **HTTPS ends at the load balancer**, with the zone's wildcard certificate, which covers the internal hosts too.
+- **One cluster serves one environment**, with namespaces `prd`, `plt` and `vnd`.
+- **Hosting does not change the pair.** Under `CLUSTER` the storage engine's own address is one more route.
+- **Each gateway has a host of its own**, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`. A route's host is given a record that points at it, so no route names a load balancer, and the label `gateway` is never a deployment's (`RD.SUPPORT.INFRA.119`).
+- **The estate publishes how many proxies stand in front of each listener.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3` for every remote port: the calling service, the internal load balancer and the private gateway.
+- **The book names no gateway product where it states the rule.** The provider's chapter says what is installed (`providers/aws/08-environment.md`).
+
+**A remote port is always `PRIVATE` — MUST** (`RD.SUPPORT.INFRA.114`). `expose` describes the main port only; the remote port's reach is a rule and not a field. Its address is `https://{env}-{app}-remote.internal.{spd}`, where `{app}` is the application's `kindCode`, so no deployment's label may end `-remote`. A calling pod reaches it by the same private HTTPS host an operator's machine uses, which is why the internal load balancer admits the cluster's nodes.
+
+**A deployment may ask three things of its route** (`RD.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address. Its window is `1`, `60`, `3600` or `86400` seconds, and it is one count across every proxy pod, kept in the environment's own cache (`RD.SUPPORT.INFRA.118` · `RD.SUPPORT.INFRA.120`). A route's own limit is declared in code and counts calls to one route from one caller.
+
+**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), covering every public deployment behind it. The blueprint builds it on every cluster's public load balancer, as it builds the two gateways and the two load balancers. It stands in every environment, and no estate file declares it. It holds three rule groups, each counting only. Nothing is attached to the internal load balancer, and a public web application is not covered.
+
 ## Namespace is a blast radius; exposure is declared with the namespace as its ceiling
 
 A namespace is never an organizational boundary — teams do not get namespaces, service namespaces do.
@@ -61,8 +86,8 @@ A namespace is never an organizational boundary — teams do not get namespaces,
 | `SPEstateExposeType` | Answers on |
 | --- | --- |
 | `PUBLIC` | the internet — the product namespace only |
-| `PRIVATE` | the internal zone, reachable by an operator arriving through the platform's own ranges |
-| `INTERNAL` | inside the cluster only, with no ingress standing for it at all |
+| `PRIVATE` | the internal zone, reachable from the cluster and by an operator arriving through the platform's own ranges |
+| `INTERNAL` | inside the cluster only, with no route standing for it at all |
 
 Only `PRD` may declare `PUBLIC` — a `PLT` or `VND` deployment claiming `PUBLIC` **MUST** be refused at resolve, by name, before any plan runs. A `PROCESSOR` has no inbound surface to name, so `INTERNAL` is the only value that describes one; a processor declaring anything else **MUST** likewise be refused. Naming the exposure this way is what makes the old failure unwritable rather than merely checked-against: a service can no longer land on the internet quietly because of where it happened to sit, because `PUBLIC` is a value someone has to type on the one namespace where it is legal.
 
@@ -96,7 +121,7 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 ## The serving contract is dynamic
 
-Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.SUPPORT.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
+Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.SUPPORT.INFRA.084`). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
 
 **A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
 

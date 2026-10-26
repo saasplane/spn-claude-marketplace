@@ -21,7 +21,7 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 ## Follows the pattern
 
 - The moments, the payload, the verdict returned rather than printed, and the always-zero exit — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
-- The plugin that wires four moments across seven tools — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
+- The plugin that wires five moments across eight tools — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 
 ## Special handling
 

@@ -1,13 +1,13 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md", "seen": "874ec303" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md", "seen": "874ec303" }
   ]
 }
 -->
 # Tagging on AWS — the mandatory set, and why nobody types one
 
-**Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md`. Read this as the restatement; that node governs.
+**Source of truth:** the foundation's `docs/04-capabilities/02-support/03-infra/10-providers/aws/05-tagging.md`. Read this as the restatement; that node governs.
 
 **Design of record — nothing is provisioned on AWS yet.**
 

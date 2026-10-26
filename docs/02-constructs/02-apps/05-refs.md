@@ -3,10 +3,11 @@
   "id": "stack-refs",
   "variant": "construct",
   "title": "Refs — The Book, Restated Inside the Plugin",
+  "subtitle": "The foundation book's rules, carried inside this plugin for a reader with no other copy.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["ref-set"],
-  "summary": "What this plugin restates from the foundation book and how the folder is arranged — one folder per book domain mirroring the constructs it names, a leaf that is self-contained because the reader holds no book, the stamp that makes a stale copy visible, and the one file a command writes.",
+  "summary": "Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read.",
   "keywords": ["ref", "restatement", "domain", "stamp", "leaf", "generated"]
 }
 -->
@@ -15,7 +16,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-A plugin is installed on its own. A partner holding it has no checkout of the foundation book beside it, so a rule the plugin needs has to be written out inside the plugin — carried, not cited. This folder is that carrying, and it exists only because of what a reader does not have.
+Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read. Read this page before you write a new ref here, or when you want to know how the folder is arranged. It explains the one folder per book domain, why each leaf stands on its own, and the stamp that shows a copy has fallen behind.
 
 ## Overview
 
@@ -109,4 +110,4 @@ This page answers what this plugin restates and how the folder is arranged. It d
 | `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes a stack a claim rather than something detected | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a ref is readable only after an install, so an edit here is not live in the open session | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

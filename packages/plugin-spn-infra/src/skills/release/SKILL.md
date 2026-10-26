@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "da105e03"
+      "seen": "7025e203"
     }
   ]
 }
@@ -18,6 +18,8 @@ description: Publishing an estate package - bump the version field in spinfrapkg
 ---
 
 # release — bump by review, publish whole, to the org's registry pair
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **A version is published once, then promoted.** The declaration gets the discipline an image already has: built once, promoted by name, recorded in resolved state.
 
@@ -48,7 +50,7 @@ spnutils infra release <package> --local -y    # → the machine store, staged o
 
 ## 4 · After — pins flip at their own pace
 
-Consumers cite `{ package, version }` — the org's `blueprint` pin, a platform's `modules[].source` — and flip from path to pin per package, per the `implement` skill. An apply fetches the published version and applies *that*, never a checkout. `infra show` confirms PINNED @ version per layer.
+Consumers cite `{ package, version }` — the org's `blueprint` pin, a platform's `modules[].source` — and flip from path to pin per package, per the `implement` skill. An apply fetches the published version and applies *that*, never a checkout. `spnutils infra show <spc>` confirms PINNED @ version per layer.
 
 ## The line that holds
 

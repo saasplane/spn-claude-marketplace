@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/README.md", "seen": "3d9f4140" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/", "seen": "32ae5f5d" }
+    {
+      "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/README.md",
+      "seen": "6892e5ab"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/",
+      "seen": "040a2b12"
+    }
   ]
 }
 -->
@@ -56,7 +62,7 @@ The table above compresses each module to one commitment. Here is what actually 
 **Reference Data**
 - Read countries, currencies, languages and base labels from the catalog. Do not declare a second copy anywhere, even a small one.
 - A currency's symbol position and a language's reading direction are properties of the value, not of a screen. Do not hard-code either into a layout.
-- The entity-type registry is open — any module may register a type, naming itself as owner. The capability set a type may opt into is closed. Do not invent a new capability name to describe what a type accepts.
+- The entity-type registry is open — any module may register a type, naming itself as owner. The capability set a type may opt into is closed: `CUSTOM_FIELDS`, `TAGS` and `LOOKUP`, the last making the type a data source a field may pick from. Do not invent a new capability name to describe what a type accepts. Register a type when a feature uses it, and opt it only into what it supports.
 - Reference Data depends on nothing else in the standard library, and nothing in the standard library may become a dependency of it. Do not add one, even a small one — it removes the bottom of every other module's dependency chain.
 
 **Translation**

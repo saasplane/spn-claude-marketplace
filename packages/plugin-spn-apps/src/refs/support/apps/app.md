@@ -2,12 +2,12 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/02-constructs/02-support/01-apps/05-app.md",
-      "seen": "796038fc"
+      "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
+      "seen": "d898aad9"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
-      "seen": "a3f90e6d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
+      "seen": "f74342a1"
     }
   ]
 }
@@ -15,7 +15,7 @@
 
 # The application — what it is, how it boots, and what it ships
 
-Source of truth: the foundation's application-lifecycle construct (`docs/02-constructs/02-support/01-apps/05-app.md`) and its capability chapters (`docs/04-capabilities/02-support/01-apps/05-app/`).
+Source of truth: the foundation's application-lifecycle construct (`docs/02-constructs/02-support/02-apps/05-app.md`) and its capability chapters (`docs/04-capabilities/02-support/02-apps/05-app/`).
 
 An application is the final runtime. Contracts, modules and support packages are all means to an end; the thing a platform actually runs is an application. **An app is `config + providers + modules`.** A module never carries that shape — a module has no providers of its own and boots nothing. Reach for this file when you compose an application, decide what boots before what, or work out what an application owes on release that a module never owes.
 
@@ -33,7 +33,7 @@ interface App {
 
 **Providers are infrastructure; modules are domain.** When you place a capability, follow one rule: app-wide goes in `providers`, domain-specific goes in the owning module. Never put a service, a client or a repository at the app root — if you find one there, beside the process entry, the app manager, the app reference and the interface, it is a module you have not given a folder yet.
 
-A module mirrors the shape one level down: `config` plus `services`, split into `contract` (the public interface) and `impl` (the concrete implementation). A server module adds `clients` (external SDKs that domain alone uses) and `repositories` (its own data access). **A module owns a capability and no seam of its own.** It ships no shell: its services need an application's configuration, resources and entries before they can run, and its components need an application's providers, session and routing. Neither can be stood up alone — which is exactly what an application is for.
+A module mirrors the shape one level down: its `config`, its kind, and `services.contract` (the public interface). A module is one of two kinds in an app. A **mounted** module runs in this app, so it also holds `services.impl` (the concrete implementation), and on a server it adds `repositories` (its own data access). A **remote** module lives in another service, so only its contract is here. A member a module needs of its own, such as a client for an external SDK that domain alone uses, is declared on its own type. **A module owns a capability and no seam of its own.** It ships no shell: its services need an application's configuration, resources and entries before they can run, and its components need an application's providers, session and routing. Neither can be stood up alone — which is exactly what an application is for.
 
 Providers vary by runtime, because a browser provisions no infrastructure at all:
 
@@ -110,22 +110,47 @@ Everything composed into the build is present after the module phase. What diffe
 
 ### The module manager contract
 
-Plug a module into the application through one manager class. Register it as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists:
+Plug a module into the application through a manager class. **A module offers two managers from one base — MUST**: a runtime manager for the service that mounts it, and a remote manager for a service that calls it in another service. Boot starts and stops both the same way, and asks the runtime questions only of a runtime manager, so a remote manager is never asked for tables or routes it does not have. Register the module as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists. The entry pairs a config with a manager: a mounted module's config says where its routes are served, and a remote module's config is its code alone.
+
+```ts
+{ config: { code: 'USER',  entry: { api: { basePath: '/iam' } } }, moduleManager: new UserRuntimeModuleManager() },  // mounted here
+{ config: { code: 'STOCK' }, moduleManager: new StockRemoteModuleManager() },                                      // lives in another service
+```
+
+- **The pairing is typed — MUST.** A remote manager given a base path, or a runtime manager given no entry, does not build.
+- **The line names no service.** A remote module reads its address under its own prefix, and the service's settings write that key as a reference to the address the estate publishes, so moving a module to another service is a change of one settings line and no code.
+- **A service that has more than one address for a remote module refuses to boot**, and names the key.
+
+What every manager answers:
 
 | Method | Returns | When it runs |
 | --- | --- | --- |
-| `initModule` | the module — config, services, clients, repositories | boot phase 2 |
+| `initModule` | the module | boot phase 2 |
+| `shutdownModule` | teardown | shutdown, reverse order |
+
+What a runtime manager also answers:
+
+| Method | Returns | When it runs |
+| --- | --- | --- |
 | `getEntities` | ORM entities the module owns | database init (phase 1) |
 | `getMigrations` | schema migrations the module owns | the `MIGRATE` run mode |
 | `getAPIControllers` | HTTP controllers, mounted under the module's API base path | HTTP entry start |
+| `getAPIRemoteServices` | the module's contract services: each one's name, its methods as data, and what implements it | HTTP entry start, for the remote route |
 | `getCLIControllers` | command surfaces the module contributes | CLI entry start |
 | `getQueueListeners` | queue consumers | queue entry start |
 | `getContractSchemas` | validator namespaces published as named OpenAPI schemas | before HTTP entry start |
-| `shutdownModule` | teardown | shutdown, reverse order |
+
+What a remote manager also answers, which is one thing:
+
+| Method | Returns | When it runs |
+| --- | --- | --- |
+| `getRemoteServices` | each contract service of the module, with its methods as data | boot phase 2, to build one proxy for each |
+
+A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, it states no code because the module's line in the module list gives it, and the base reads where the module lives from the module's own settings and builds the proxies.
 
 The split of ignorance is the point: the boot manager never knows business domains, only the providers it built; the app manager never knows modules, only app-wide concerns; a module manager never knows other modules, only its own slice. Adding a domain costs one folder plus one line; deleting it is the reverse.
 
-**Entries MUST mount only after every module has initialized.** An entry executes contract services, and nothing it invokes may still be assembling. Before the HTTP entry starts, boot collects every module's contract schemas and publishes each Command and State as a named OpenAPI component — the source the generated API clients read.
+**Entries MUST mount only after every module has initialized.** The HTTP entry mounts each mounted module's controllers, and registers its contract services to serve other services on the remote route, on a listener of its own; a remote module contributes no entry. An entry executes contract services, and nothing it invokes may still be assembling. Before the HTTP entry starts, boot collects every module's contract schemas and publishes each Command and State as a named OpenAPI component — the source the generated API clients read.
 
 **Migrations never run beside serving traffic.** They execute in a run mode of their own: boot phases 1 and 2 run identically, no entry starts, the runner merges every module's declared migrations, runs the pending ones over the migration connection — the only DDL-capable credential the application ever holds — then the process exits.
 
@@ -137,7 +162,7 @@ app.modules.order.services.impl.orderService      // never — private implement
 app.modules.order.repositories.order              // never — another domain's data access
 ```
 
-The `contract` slot is deliberately narrower than `impl`, so one module structurally cannot reach another's internals. Every collaboration crosses that seam, so swapping the implementation behind it changes nothing for callers — which is what keeps *where a module runs* a deployment decision rather than a rewrite.
+The `contract` slot is deliberately narrower than `impl`, so one module structurally cannot reach another's internals. Where module A is remote, the other two lines do not exist at all: a remote module has no `impl` and no repositories, so a module's inner services are reachable in the same process only. Every collaboration crosses that seam, so swapping the implementation behind it changes nothing for callers — which is what keeps *where a module runs* a deployment decision rather than a rewrite.
 
 ### Schema ownership is part of what an app decides
 
@@ -234,6 +259,8 @@ internal dep   workspace:*           →   2.4.0
 
 The tag is the only record of the version, so releasing edits no file and a long-lived branch never conflicts over a number nobody typed. A release **MUST** run from a clean tree at the commit it tags; a source manifest still holding a real version stops the run before anything is built.
 
+**A release can be made at any time.** The registry is asked one thing: is the version the release plans free for every package? A free version is released whole. A version a halted release used for some packages is spent, carries no tag, and is named in one sentence and left behind by the next release. What the registry holds as newest never decides whether a release passes, and a scaffolded application is proven against this repository's own packages as built in the same run. A publish the network drops is tried again, three tries in all, and a version the registry already holds for that package is not an error on the retry.
+
 ## The web application
 
 A web application asks the same two questions a server does — how does it come alive, and how does it ship — and each has a short answer. Left undocumented, a web project grows a boot manager because the server has one, and a run mode for the same reason, and a deployment shape for a thing that is a file. **Each of those is a faithful port of machinery whose whole purpose was to solve a problem the browser does not have.**
@@ -252,7 +279,7 @@ A web application asks the same two questions a server does — how does it come
 
 **Presentation is a boot phase, and only here** — style layers resolve by load order, so a correct set loaded in the wrong sequence is wrong in a way no single layer's own test catches. There is no migration step, because a web application owns no schema. There is **no module registration** — a web surface's modules are composed by its router, so composition happens at navigation rather than at startup. And configuration is already resolved when it starts, arriving as build-time values rather than being read — which is why a web surface cannot be reconfigured without rebuilding it.
 
-**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and URL builders, the router mounts module screens lazily, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
+**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and their routes, the router mounts module screens lazily, each at the address its route gives, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
 
 **Teardown is best-effort and cannot be awaited.** The exit signal fires both when a surface is closed and when it is navigated away and cached, so nothing may block on the work it starts. **A web surface never boots into a privileged state** — everything it can do it could do from a reload, so the guard is the server refusing the call, never the boot order.
 

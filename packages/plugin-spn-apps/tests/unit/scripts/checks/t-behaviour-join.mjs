@@ -5,8 +5,11 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { behaviorsDir, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "checks", "behaviour-join.ts");
+// The behaviours seat of a repository's docs tree, relative to the repository root.
+const BEHAVIORS_SEAT = behaviorsDir(docsOf(""));
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 
@@ -24,7 +27,7 @@ const repo = (rows, files = {}, stack = "TS") => {
   const all = {
     "sprepo.json": JSON.stringify({ type: "APPS", config: { mtype: "APPS", ...(stack ? { stack } : {}) } }),
     "apps/api/spkind.json": '{"kind":"APP_SERVER","config":{"mtype":"APP_SERVER","code":"api"}}',
-    "docs/03-behaviors/login.md": [
+    [join(BEHAVIORS_SEAT, "login.md")]: [
       "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
       ...rows.map(([id, status]) => `| ${id} | a person | signs in | in | POSITIVE | CONTRACT | ${status} | — |`),
@@ -72,6 +75,14 @@ console.log("\n=== behaviour-join — what it passes");
 }
 
 {
+  const { out, code } = run(repo([["IAM.LOGIN.01", "SUCCESS"]], {
+    "packages/client-api/spkind.json": '{"kind":"CLIENT_API","config":{"mtype":"CLIENT_API"}}',
+    "packages/client-api/tests/contract/iam/login.contract.spec.ts": spec("[IAM.LOGIN.01] a person signs in"),
+  }));
+  ok("a CLIENT_API's contract case in tests/contract/ cites the row it names", code === 0 && out.includes("1 id(s) cited"), out);
+}
+
+{
   const { code } = run(repo([["IAM.LOGIN.01", "SUCCESS"]], {
     [CASE]: "it.skip('[IAM.LOGIN.01] a person signs in', () => {});\n",
   }));
@@ -80,7 +91,7 @@ console.log("\n=== behaviour-join — what it passes");
 
 {
   const { code } = run(repo([["IAM.LOGIN.01", "PLANNED"]], {
-    "docs/03-behaviors/other.md": "| Id | Behaviour | Status |\n| --- | --- | --- |\n| STK.CLI.01 | scaffold | ✅ |\n",
+    [join(BEHAVIORS_SEAT, "other.md")]: "| Id | Behaviour | Status |\n| --- | --- | --- |\n| STK.CLI.01 | scaffold | ✅ |\n",
     [CASE]: spec("[STK.CLI.01] a scaffolded module validates"),
   }));
   ok("an id declared in a table of another shape still counts as declared", code === 0, `exit ${code}`);

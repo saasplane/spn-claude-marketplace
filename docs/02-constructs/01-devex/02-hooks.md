@@ -3,10 +3,11 @@
   "id": "hook-set",
   "variant": "construct",
   "title": "Hooks — Code the Runtime Calls on Your Behalf",
+  "subtitle": "A hook is how a rule gets asked again, every single time, instead of trusted from memory.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "Code a plugin wires to the moments a session offers — the file that declares the wiring, the four moments and the authority each one carries, the payload a hook is handed, the verdict it returns rather than prints, and the exit code that is always zero.",
+  "summary": "A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.",
   "keywords": ["hook", "hooks.json", "moment", "payload", "verdict", "dispatcher"]
 }
 -->
@@ -15,11 +16,13 @@
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
-A rule that lives only in a document is read once, trusted from memory, and eventually broken by somebody who never opened that document. A hook is the answer this repository ships: code the runtime itself calls, at a moment it chooses, so the rule is asked again on every single call. This page names the whole frame — the moments a session offers, the wiring that claims one, the shapes a hook is handed and gives back, and the promises every hook here keeps.
+A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. Read this page to learn the whole frame a hook works inside: the file that declares the wiring, the moments a session offers, and the shape a hook is handed and hands back. The last section states the two promises every hook keeps.
 
 ## Overview
 
-One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.
+A rule that lives only in a document is read once, trusted from memory, and then broken by somebody who never opened it. A hook is how this repository avoids that: it is code the runtime itself calls, at a moment it chooses, rather than a document somebody might skip.
+
+One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives before any call exists, or after the thing it might have objected to has already happened, so all it can do is speak.
 
 Two more promises come from one failure. A verdict was once printed and parsed back, and a refusal that did not parse was dropped in silence — one check fired a hundred and forty-seven times and changed nothing. So a check now **returns** what it decided, and the dispatcher reads the object. And a hook **always exits zero**, because a hook that crashes takes every other gate beside it down with it.
 
@@ -32,6 +35,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 | a hook | `hooks.json` | a script a plugin wires to a named moment, declared with a matcher, a command and a timeout |
 | a moment | `hooks` | a named point in a session the harness stops at and runs whatever a plugin wired there |
 | the window opening | `SessionStart` | the moment a session begins, resumes or is cleared; its output is the first screen a developer sees |
+| a prompt being sent | `UserPromptSubmit` | the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call |
 | a call about to run | `PreToolUse` | the moment before a tool call is performed, and the only moment that may refuse one |
 | a command that finished | `PostToolUse` | the moment after a shell command has run, when its own text and its result can both be read |
 | a turn about to end | `Stop` | the moment before a reply is handed back, when a warning is still useful and a refusal is not |
@@ -47,21 +51,23 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ```dg
 { "kind": "map",
-  "caption": "Only the call moment sits before the act, so every later moment can speak and never refuse.",
+  "caption": "Only the call moment sits before the act, so every other moment can speak and never refuse.",
   "boxes": [
     { "id": "a", "label": "the window opens", "note": "SessionStart — the ground is read and printed" },
+    { "id": "p", "label": "a prompt is sent", "note": "UserPromptSubmit — the session may be named" },
     { "id": "b", "label": "a call is about to run", "note": "PreToolUse — the one moment a call can be refused" },
     { "id": "c", "label": "a command finished", "note": "PostToolUse — the act has already happened" },
     { "id": "d", "label": "the turn is ending", "note": "Stop — warnings only, because the turn is written" }
   ],
   "links": [
-    { "from": "a", "to": "b", "label": "then" },
+    { "from": "a", "to": "p", "label": "then" },
+    { "from": "p", "to": "b", "label": "then" },
     { "from": "b", "to": "c", "label": "then" },
     { "from": "c", "to": "d", "label": "then" }
   ] }
 ```
 
-`spn-devex` is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way. `spn-apps` and `spn-infra` each wire the call moment alone and put their own gates behind it.
+`spn-devex` is the only plugin here that wires more than one moment. It wires all five, one script each, and none of those scripts is reached any other way. At the prompt moment its script names the session for the workstream and the arc the prompt binds, so a developer finds the window in the session list by its work. It says nothing else there, and it is silent while the name it works out is the one it gave last. `spn-apps` and `spn-infra` each wire the call moment alone and put their own gates behind it.
 
 ## Parts
 
@@ -72,6 +78,8 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 ### The window opening
 
 One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.
+
+The same script puts the short rules in front of the agent, after the ground. They are ten plain lines about how a reply reads and who decides what, and each one ends with the reference and the heading that hold the rule whole. A line is a pointer and never a second copy of the rule. The agent reads the block and the developer's pane does not show it. The script reads no prompt, so no script judges whether a prompt opens a discussion.
 
 ### A call about to run
 
@@ -85,6 +93,12 @@ One script, matched to shell commands alone. It reads the command that just ran,
 
 One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes.
 
+A warning makes the agent reply again, and the developer reads that reply. So the script asks first whether work runs, which it reads from the rows of the window's own arcs: work runs while one of them is marked in progress.
+
+- **A reply owes *Needs you* at its top in two cases.** A reply that raises a card holds the card there in full, once. A reply that waits names every card open from an earlier reply in one line. A progress reply owes no line for an older card.
+- **While work runs, only a finding about the reply sends the agent back.** That is a card not put in full, a decision put with no whole card, a handover block that is missing or not whole, and a first reply with no welcome. Every other finding is held. At the first turn end where no row is in progress, each held finding that is still true is said whole, and one the agent fixed in between is not said.
+- **A handover block is asked for once.** After a reply that holds a whole block, a later reply that names the next window owes no second block while the rows of the window's arcs have not moved. Once they move, the old block no longer says where to start, and a block is owed again.
+
 ### The payload, and what a hook reads from it
 
 The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add.
@@ -92,6 +106,8 @@ The harness writes the event to standard input as JSON. `readPayload` parses it,
 ### The verdict is a return value
 
 A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent.
+
+**The developer is shown a refusal, and advice goes to the agent alone.** A refusal stops a call, so the developer needs to know why the work stopped. Advice lets the call go on, and the agent is the one who can act on it, so nothing of it is put in the developer's pane. A soft finding of the doc standard is advice. The dispatcher says it once for a file in a window, and says it again when the finding changes, because it is then a different finding.
 
 ### One process, and the order inside it
 
@@ -142,7 +158,11 @@ This page answers which moments exist, how a script claims one, what it is hande
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is the one construct read from disk on its next run, with no fresh window owed | MUST |
 | `RD.DEVEX.UTILS.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
 | `RD.DEVEX.WORKSPACE.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
+| `RD.DEVEX.AGENT.089` | the rules a reply must follow reach the agent once, at session start, as short lines that each point at the reference holding the rule | MUST |
+| `RD.DEVEX.AGENT.092` | a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window | MUST |
+| `RD.DEVEX.WORKSPACE.189` | a reply opens with *Needs you* when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on | MUST |
+| `RD.DEVEX.WORKSPACE.244` | while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held | MUST |
 | [RD.DEVEX.002](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `spn-devex plugin partner check`

@@ -3,10 +3,11 @@
   "id": "apps-plugin",
   "variant": "construct",
   "title": "The Plugin — What spn-apps Is, and When a Session Loads It",
+  "subtitle": "The one folder that makes spn-apps its own plugin, separate from every other.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "The delivery unit of the apps domain — the identity its manifest claims, the description that is matched against the work at hand, the world a repository declares to earn it, and the version rule it shares with every other plugin in this marketplace.",
+  "summary": "This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.",
   "keywords": ["plugin", "manifest", "identity", "description", "version", "lockstep"]
 }
 -->
@@ -15,7 +16,7 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-Everything this domain ships sits inside one folder, and that folder is what an install copies. This page names the container: what it claims about itself, who gets it, and what its version number means.
+This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole. Read this page to see what it claims about itself, who is entitled to load it, and what its version number means. It covers the manifest, the world that earns it, and the version rule it shares with the marketplace's other two plugins.
 
 ## Overview
 
@@ -95,4 +96,4 @@ This page answers what this plugin claims about itself and what its version mean
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `spn-devex plugin partner check`

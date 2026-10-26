@@ -3,27 +3,54 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "646a918b"
+      "seen": "50d1dd10"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3487aa0b"
+      "seen": "1ea17ae3"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The masthead, and the opening",
+      "seen": "25162f20"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The outline is fixed for an argument and borrowed for an explanation",
+      "seen": "2c6b68b6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "ac5af87d"
+      "seen": "faf345d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "d82008b3"
+      "seen": "b58b31a1"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "ccae114d"
+      "seen": "f6d38a75"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "a6015043"
+      "seen": "22e786cc"
+    }
+  ],
+  "decisions": [
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.143",
+      "seen": "449130e9"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.182",
+      "seen": "926c1ff2"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.187",
+      "seen": "126e2b90"
     }
   ]
 }
@@ -230,7 +257,7 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.DE
 | `README.md` | identity and orientation | what this repository is, and the map of what sits under it |
 | `01-purpose` | why the repository exists | explains and persuades. Carries **no rules** — normative language here is a defect. It answers four questions — the problem it ends, the payoff of solving that once, what you get, and who it is for — and the check reads for the four answers, never for a file count |
 | `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
-| `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
+| `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. `Updated at` is the instant the run finished, in UTC, then ` · ` and the run's name — `2026-09-30T18:54:19Z · full-1001`. The run's name is a label, and nothing checks the row against that run's file. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
 | `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (RD.DEVEX.WORKSPACE.106), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DEVEX.WORKSPACE.098 · RD.DEVEX.WORKSPACE.133; see the altitude note below) |
 | `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
@@ -251,7 +278,7 @@ named a table in none of 252 rows measured; deleting it repaired the defect that
 the files could. Storage is read in the data model itself, which is grouped by table and says which
 constraint matters and why each index exists.
 
-**A domain's overview is its face in HTML**: it links into `artifacts/constructs/<domain>/` and
+**A domain's overview is its face in HTML**: it sits in `artifacts/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
 
 **The invariants between the seats hold this shape up, and the folders are only where they land.** A
@@ -276,6 +303,8 @@ rather than removing it.
 | **Special handling** | one entry per method, flow or rule the construct forces off the pattern — **why**, then **what**, then **how**, with one place in the code. This is the chapter's substance, and a chapter with nothing here should not have been written |
 | **Between modules** | what this package takes from other modules for this construct, and what it publishes to them |
 
+**The Where table is the only place a chapter declares code** (decision RD.DEVEX.WORKSPACE.191). A path named anywhere else declares nothing. A row names a seat: a file, or a folder that is one seat of its kind, and a seat folder covers its whole tree. `src/` itself declares nothing, and neither does a layer folder that holds many seats, such as `src/app/` or `src/ui/components/`. Each kind reads its Where paths from one folder: a web module from its `entry/ui/` folder, so a path begins `pages/`, `hooks/` or `components/`, and every other kind from its own folder, so a path begins `src/`. The stack states the seats per kind. Generated code is never a seat. A seat no Where row names is *Not written* in the coverage report, and never counted as built.
+
 **Why comes before what**, because a reader given the rule can predict the handling. **Three things are deliberately absent**: no line-by-line walk, which the code's own comments carry; no proof rows, which are the behaviours seat's; and no known gaps, which live in the workstream's split plan and the behaviour row's status. **A chapter stays under 800 words**, and that is a consequence rather than a cap — everything long has a better home above it. The two altitudes bind different people: the book's standard binds everyone building anything, and a chapter binds whoever maintains this package. So the test is one statement at a time: **does it bind someone?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability chapter is normatively dense by design.**
 
 **The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a glossary. The seat's job differs by what is being documented: a chapter of a construct yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — glossaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
@@ -289,18 +318,29 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | Kind | Path | Holds | Earned when |
 | --- | --- | --- | --- |
 | **Concept** | `CONCEPT.md`, the repository root | the whole model, once — shape, never depth | the repo exists |
-| **Overview** | `artifacts/overviews/<source>-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
-| **Construct page** | `artifacts/constructs/<domain>/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
+| **Overview** | `artifacts/docs/<folder>/<name>-overview.html`; the hub is `artifacts/docs/concept-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
+| **Construct page** | `artifacts/docs/<folder>/constructs/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
 
 **A concept is not an artifact.** It sits at the repository root beside `README.md`, a scaffold marker written before `docs/` exists and read by somebody who may never open the tree. It is listed here because it is the first altitude of the progression, not because the pocket holds it.
 
-**`constructs/` mirrors the constructs seat folder for folder**, with `<slug>-construct.html` beside each `<slug>.md` and **no `README.md` anywhere inside it**. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
+**`artifacts/docs/` mirrors the constructs seat folder for folder.** `<folder>` is the seat's folder path under `02-constructs/`, so the seat `02-constructs/<folder>/<slug>.md` gives the page `artifacts/docs/<folder>/constructs/<slug>-construct.html`, and **no folder inside the pocket holds a `README.md`**. An overview is named `<name>-overview.html`, with no `concept-` before the name, because its folder says which domain it belongs to. An overview that no single folder owns sits beside the hub. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
 
 **Four page kinds cover everything somebody writes by hand**, and each answers one reader: an **approach** for the person deciding, a **hub** for the person arriving, an **overview** for the person taking one reading path, and a **construct** for the person building against the model. Only the approach carries cards, and only the approach lives outside the pocket.
 
 **An argument does not live here.** An approach document belongs to **the workstream that argues it**, in the workspace's planning centre, and it closes with that workstream. The pocket holds what the repository *states* and what somebody *measured*; where a design was weighed is the workstream's record. A pocket that also held the arguments made the two impossible to tell apart, which is how a stale argument came to be read as a statement of today.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
+**Two more kinds of page are produced by a command, and nobody writes them by hand** (decisions RD.DEVEX.WORKSPACE.218 and RD.DEVEX.WORKSPACE.219). Each is produced from its source and equals that source, as a construct page does.
+
+| Kind | Path | Produced by | Produced from |
+| --- | --- | --- | --- |
+| **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide write <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
+| **The index of artifacts** | `artifacts/index.html` | `docs index write <repository>` | the pages on disk, and `artifact-index-template.html` |
+
+**Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
+
+**The index opens every page of a repository from one place.** A tree of the pages sits on the left, in the groups Docs, Guides and Reports, and a group that holds nothing is left out. The pages open in tabs on the right. The index has no masthead and no header line, because it is a frame around other pages. `docs index` refuses a repository that has no `docs/artifacts`. The hub stays the page you read first: it explains the model, and the index is where you look for one file among all of them.
+
+**The folder set is fixed, and adding one is a decision**: `docs/`, `guides/`, `reports/` and nothing else, beside the one `index.html` (decision RD.DEVEX.WORKSPACE.221). `docs/` holds the hub, the overviews and the construct pages, and the index reads its groups and its domains from these folders. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
 
 ### A construct page has six sections, in one order
 
@@ -321,7 +361,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **Nothing new is needed to carry the pointer, because `Boundary` already does** — it is the section that says what this page does not answer and where that is answered.
 
-**The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
+**The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is the masthead, and nothing else**: the Title, the Subtitle and the Description the next subsection states. Everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
 **A construct types no proof — MUST** (decision RD.DEVEX.WORKSPACE.132). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
 
@@ -329,22 +369,142 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **There is no length cap on a page and none on a part.** What decides whether a part should become a construct of its own is a judgement about the concept — does a reader meet this on its own, with its own actor? — never a line count.
 
+### Every page opens on a masthead of three levels
+
+**Every page kind has a masthead of three levels — the Title, the Subtitle and the Description, in
+that order — MUST** (decision RD.DEVEX.WORKSPACE.187). The Title names the page. The Subtitle says in
+one sentence what the thing is, or what the page decides. The Description is the opening: one
+paragraph that explains the page in everyday words. **The page's `summary` field is the
+Description's first sentence, word for word**, so search, an index and the agent read the sentence
+a reader meets first.
+
+| Level | Where it sits | Carries |
+| --- | --- | --- |
+| **Title** | the `h1` | what the page is called. A construct's is its own name, in full — *Estate Shape*, never *Shape*. An overview's is its benefit line |
+| **Subtitle** | `p.sds-subtitle`, directly under the `h1`. In a construct seat it is the `subtitle` field of the `spn:doc` block, which `docs page` renders | one sentence, in plain language |
+| **Description** | one `p.sds-standfirst`, directly under the Subtitle, and nothing after it in the masthead. In a construct seat it is the first lead paragraph, which `docs page` renders as the standfirst | the opening, one paragraph, in plain language |
+
+**What each level holds depends on the page kind:**
+
+| Page kind | Title | Subtitle (one plain sentence) | Description (one paragraph) |
+| --- | --- | --- | --- |
+| **hub** (`concept-overview.html`) | the benefit line | the what line | what the plane is · why read this page first · how it is laid out |
+| **repository overview** | the repository's benefit line | the repository's what line | what this repository holds · why read on · how it is laid out |
+| **concept overview** (one reading path, `<name>-overview.html`) | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
+| **construct** | the construct's name | its one-line promise | what it is · why read this page · how the page runs |
+| **report** | its name, such as *Coverage report* | the question it answers, naming the repository by its folder name | what was counted, with no number · when to read it |
+| **approach** | the page's name | the decision it plans | what changes · why read it · how the page runs |
+| **preview** | the preview's name | what you are asked to decide from the page | what the page shows · why look at it · how the page runs |
+
+**Every level is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 and
+RD.DEVEX.WORKSPACE.187). A reader lands on the page without knowing yet whether it is the one they
+need, and reads the Subtitle before the Description.
+
+- **Everyday words, in short sentences with one idea each.**
+- **No numbers, no slogan, and no figure of speech.** A figure of speech cannot be worked out from
+  its words by somebody reading English as a second language.
+- **No book word unless the same sentence explains it**: *behaviour*, *construct*, *lens*, *kind*,
+  *node*, *seat*, *tier*, *arc*, *estate* and *ring*.
+- **The argument goes in the first section**, below the first heading.
+
+**The Description is one paragraph, in the standfirst's place — MUST.** The first sentence says what
+the page is about, in everyday words. The second says why you would read it. At most two short
+sentences follow, on how the page is laid out, and there is no second paragraph. **A report's
+Description carries no number**: the count moves to `Summary` and to the `summary` field.
+
+**The one exception is the foundation's hub, whose Title and Subtitle are
+RD.DEVEX.WORKSPACE.143's, word for word.** No other page copies that pair's style, and the
+Description under it still says in everyday words what SaaS Plane is.
+
+**Write the Title and the Subtitle of every page kind yourself, and keep them current as the page
+grows — MUST** (`RD.DEVEX.WORKSPACE.205`). Read the kind's row, hold your draft against the approved
+example and the poor ones for that kind, run the check below, and name the change to the developer in
+one line. Do not ask them to approve one. A Subtitle that exists today moves into place only if it
+already passes the plain rule; otherwise write it again. A preview page's Title is the preview's name,
+and its Subtitle says what the developer is asked to decide from the page. **A preview's tab names its
+workstream and its arc**: the `<title>` of `notes/N<nnn>/preview.html` reads the workstream's number,
+the arc's number and the arc's subject in title case, such as `025 · N023 - Small Improvements`, as an
+approach page's reads `025 - Partner Web`. Its `h1`, its rail and its block's `title` stay the
+preview's name.
+
+**An approach page's masthead carries no project shorthand either** — an arc number, a question
+number or a release name, such as *N116* or *R2*, that the same sentence does not explain. The
+workstream's number that opens its `h1` comes from the folder's name, and it is not part of the
+Title: the Title is the page's name, the same words as the rail title.
+
+**A page template holds only its structure — MUST** (decision RD.DEVEX.WORKSPACE.182).
+Its sections in order with their ids, the slots an author fills (`{{…}}`), the blocks it may reach
+for, the two lines that load the shared stylesheet and script, and one comment at the top naming the
+chapter sections that govern it. **The
+rules for filling it are stated here and in the chapter, never in the template** — what each level
+holds, the approved mastheads, the poor examples and the check before saving. A rule written into a
+template is a second copy that a reader takes for that kind's rule alone.
+
+**The approved mastheads, one for each page kind.** Hold a new masthead against the one for its
+kind: a good example beside a poor one shows the difference faster than the rule states it.
+
+| Page kind | Title | Subtitle | Description |
+| --- | --- | --- | --- |
+| **construct** — the workstream | *The Workstream* | *Your work stays together in one folder, even after you close the window you started it in.* | *A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it.* |
+| **hub** — the foundation's | *Your team's time belongs to your product.* | *The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.* | *SaaS Plane is a set of standards, tools and code libraries for building software that customers use over the internet. Read this page first to see how the parts fit together before you open any of them. Each area below links to the page that explains it in full.* |
+| **concept overview** — `concept-devex-agent-overview.html` | *The agent is a member of the team, not a tool beside it.* | *The SaaS Plane DevEx Agent: what it is, what you can ask it to do, and how it works in your folder.* | *This page explains the coding agent that works with you in this workspace. Read it before you install the agent or ask it for anything. The pages below cover how a session opens, the skills it runs, and the roles it looks through.* |
+| **repository overview** — `spn-support-ts` | *Every app starts from the same shape.* | *The TypeScript backbone every SaaS Plane app is built on.* | *This repository holds the TypeScript libraries and the command-line tool that every SaaS Plane application is built from. Read this page to find the part you need before you open its code. Each area below links to its own page.* |
+| **approach** — `plain-language-approach.html` | *Plain Language* | *Decides how every page in the book opens, and how the agent talks to you.* | *This page plans a change to how the book's pages open and to what the agent says when you open a new window. Read it before you review the work it lists. Why comes first, then what changes, then how the work runs.* |
+| **report** — the tests report of `spn-support-ts` | *Tests report* | *Which of the things spn-support-ts promises are checked by a test that passed?* | *This report shows which of the things this repository promises to do are checked by a test that passed, and which are not yet. Read it before a release, or when you want to know what is still unproven.* |
+
+**The poor examples, one for each level.** Each fails for the reason beside it.
+
+| Page kind | Level | Poor example | Why it fails |
+| --- | --- | --- | --- |
+| construct | Title | *Work That Outlives the Window* | a slogan in place of the construct's name |
+| construct | Subtitle | *A scope of work, not a window: the log records, and the page decides.* | a figure of speech, and it promises nothing a new reader can use |
+| construct | Description | *Arcs, orders and samples sit together here until the close gate passes.* | it opens with a book word (arc) that nothing explains, and it never says why you would read on |
+| hub | Title | *Ship at warp speed.* | a slogan and a figure of speech, and it names no gain a reader can check |
+| hub | Subtitle | *One plane, zero plumbing, infinite scale.* | figures of speech, and it never says what the thing is |
+| hub | Description | *Four areas and twelve domains, each a node with its own seats.* | it opens with a count, and two book words (node, seat) that nothing explains |
+| overview | Title | *Agents, reimagined.* | a slogan, and it names no gain a reader can check |
+| overview | Subtitle | *The agent wears the lens, and the workspace wears the window.* | a figure of speech, and a book word (lens) that nothing explains |
+| overview | Description | *Seven nodes share one window, and every seat has the same shape.* | it opens with a count, and two book words (node, seat) that nothing explains |
+| approach | Title | *Say It Straight* | a slogan in place of the page's name |
+| approach | Subtitle | *N116 pays one cycle: R2 ships the loop, and every seat follows.* | project shorthand and a figure of speech, and it never names the decision |
+| approach | Description | *Nine arcs rewrite every seat's opening before the release.* | it opens with a count, and two book words (arc, seat) that nothing explains |
+| report | Title | *Proof or It Did Not Happen* | a slogan in place of the report's name and subject |
+| report | Subtitle | *Where the rubber meets the road for every promise.* | a figure of speech, and it asks no question |
+| report | Description | *72 of the 119 behaviours are proven at their tier.* | it opens with a count, and two book words (behaviour, tier) that nothing explains |
+
+**Before you save a masthead, check it in this order.**
+
+1. The Description's first sentence says what the page is about in everyday words. On a report, it
+   says what was counted; on an approach, what changes.
+2. Its second sentence says why, or when, you would read the page.
+3. No book word appears in any level unless the same sentence explains it, and on an approach no
+   project shorthand either.
+4. No level carries a number. A report's counts are in its Summary, and the workstream number that
+   opens an approach's `h1` is not part of its Title.
+5. The Subtitle is one plain sentence. On a report it is a question that names the repository by its
+   folder name, on an approach it names the decision the page plans, on a preview it names what you
+   are asked to decide, and on the foundation's hub it
+   is `RD.DEVEX.WORKSPACE.143`'s, word for word.
+6. Read the three levels aloud once, and rewrite any sentence you stumble on.
+
 ### The templates sit beside the chapters, in `templates/`
 
-Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters whose rules they carry, so a rule change and its restatement are one diff apart. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template declares the chapter it restates**, at the top of the file.
+Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and the two lines that load the shared stylesheet and script — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files check` reports a plugin copy that has fallen behind it.
 
 | Folder | Holds | Shapes |
 | --- | --- | --- |
-| `templates/pages/` | `overview-template.html` · `construct-template.html` · `report-template.html` | the page kinds a repository has — concept, overview, construct — and the report |
+| `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `guide-template.html` · `artifact-index-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct, guide and the index of artifacts — and the report; the blocks template shows every block and figure kind rendered |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
-| `templates/workstream/` | `approach-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
-| `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.py` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
+| `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
+| `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.ts` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
 
 **The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
 
 **A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the glossary are all made that way.
 
-**Seven templates carry the page and seat-file shapes**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path, `construct-template.html` for a produced construct page, `approach-template.html` for a workstream's argument, `construct-seat-template.md` for the seat file an author actually writes, `capability-template.md` for one capability chapter, and `blocks-template.html` for nothing at all — it is the **source** of the sample-block section the four page templates carry.
+**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its two lines that load the shared stylesheet and script into every page it produces), `guide-template.html` for a guide page that `docs guide` produces, `artifact-index-template.html` for the index that `docs index` produces, `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template. **A hub has no link above its rail** (decision RD.DEVEX.WORKSPACE.220): it is the root, so no page sits above it for a link to lead back to.
+
+**The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 
 **They do not share a lifecycle** (decision RD.DEVEX.WORKSPACE.088). Two describe a moment; one renders something live.
 
@@ -354,19 +514,27 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | **Approach** — an argument | on demand, when a design is argued | none is a defect. **Ahead** leads the code as a concept does, **level** means it landed, **behind** is a correct record of then |
 | **Overview** — a face | **maintained.** A workstream changing the model owes it | it **tracks its seat**. Drift from `CONCEPT.md` is a defect, and `coherence.py` reads it |
 
-**A suggestion is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes an arc step or a row on the approach page. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
+**An instruction is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes a step row in the arc that owns it. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
 
-**A row carries its state while the work runs**, so the developer can see what they asked for that has not happened yet:
+**A row's state says what it reached while the work runs**, so the developer can see what they asked for
+that has not happened yet. It is a field of the row in the arc's `state.json`, written only by the
+`spn-devex workstream` commands (`RD.DEVEX.WORKSPACE.249`):
 
-| State | Means |
+| `state` | Means |
 | --- | --- |
-| ⬜ **raised** | it is written down. Nothing has been built |
-| 🚧 **agreed** | the approach is settled and the work is running |
-| ✅ **landed** | the content is in the node that owns it |
+| `waiting` | the row is written down, and what it waits on has not landed |
+| `ready` | nothing it waits on is left, and nobody has started it |
+| `running` | somebody is on it now; the arc's log says since when |
+| `stopped` | somebody began the row and put it down; the log says what was done and what is unsafe to touch |
+| `landed` | the change is in the repository that owns it, with its commits and its proof |
+| `carried` | the work moved to another workstream, which the row names |
+| `deferred` | the work is parked on purpose, with the event that brings it back |
 
-**A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the three above fits: `🚧 agreed` says the work has not begun, and a bare cell says nobody decided it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
+**A row with rows under it takes its state from them**, and never has one written. A row that waits on a
+card names it in `blockedBy` (`q<n>`), and it is not ready while that card is open.
 
-The marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
+The last three are what the close sweep asks of every row, and a waiting, ready, running or stopped row
+refuses the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
@@ -376,7 +544,7 @@ The marks above are for work in flight. `landed` · `carried` · `deferred` are 
 
 | | Outline | Carries `Open` / `Deferred`? |
 | --- | --- | --- |
-| **Approach** | **fixed** — `Terms?` → `Why` → `What` → `How` → `Open` → `Deferred` | yes — they are the argument's organs |
+| **Approach** | **fixed** — an opening paragraph, then `Why` → `What` → `How` → `Open` → `Deferred`, nothing else, in that order. There is no `Terms` section: a word the reader may not know is explained in brackets where it first appears | yes — they are the argument's organs |
 | **Overview** | **borrowed** — the headings of what it expands, in that thing's order | **no** — a question found while writing one is an approach waiting to be offered, or a register row |
 
 **An overview never invents a heading its source does not have.** Lining the two outlines up is what proves it expanded rather than restated. **A settled approach legitimately lacks `Open`** — the design closed — so a missing `Open` is not a routing signal. The skeleton is: **`Why` + `What` + `How` present means it argues.**
@@ -390,14 +558,172 @@ The marks above are for work in flight. `landed` · `carried` · `deferred` are 
 
 A register row records *what* was decided, never the options that lost or what they would have cost. That is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
 
-**The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
+**An approach page is written for the developer who decides** (decision RD.DEVEX.WORKSPACE.225). Your own material stays in the arc and its notes: how you checked a fact, what you first proposed in chat, the names of your scripts and note files, and full lists of files or names. **A fact has one home** (decision RD.DEVEX.WORKSPACE.223): the page states it once, and where a preview holds the detail the page gives two or three sentences and the link. `refs/devex/workspace/workstream.md` § *The approach page stays current* states both rules in full.
 
-- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DEVEX.WORKSPACE.154). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face, linking that domain's construct pages and carrying its generated glossary.
+**The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). It is `-overview.html`, `-construct.html`, `-approach.html`, `-report.html`, `-preview.html` and `-guide.html`, and nothing else. A suffix equals the metadata block's `variant`. The index of artifacts is named `index.html`, with no suffix, and its variant is `index`. The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
+
+- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DEVEX.WORKSPACE.154). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face: it gives each of that domain's topics a section of its own, which summarizes the construct and ends in one door to its construct page, and it carries the domain's generated glossary (§ What an overview and a hub hold, section by section).
 - **Every construct the pocket holds is linked from the hub — MUST.** Prove it by listing both sets and diffing them, never by scanning the page. A hub section standing over no construct is a **declared gap**, which is the honest kind and what the next workstream picks up; a construct the hub does not link is an orphan.
-- **Keep reports under their own name** in `reports/`, as `<kind>-report.html`. **There are four kinds and the set is closed**. `audit` asks whether the repository is wired the way the standard says. `code` finds where the source departs from the stack's standards, and `docs` where the corpus departs from the docs standards. `tests` says what the tests have proved and what nothing has proved yet. Each one is replaced in place by the next report of its kind, so a pocket never holds six audits nobody will re-read. A report kept because the moment mattered — an incident, or what one release carried — is dated in its filename and never overwritten, and a fifth kind is a decision entry rather than a new filename. **A report is written by the agent and not produced by a command**: it reads the repository and fills the template, which is how it can name a fault no check could. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
+- **Keep reports under their own name** in `reports/`, as `<kind>-report.html`. What a report is — its report types, its header, its five sections and who decides what it finds — is the foundation's construct *The Report*, and the `report` skill carries how to write one. **There are five kinds and the set is closed**. `audit` asks whether the repository is set up the way the standard says, and never reports a finding another report owns. `code` finds where the source departs from the stack's standards, and `docs` where the corpus departs from the docs standards. `tests` says what the tests have proved and what nothing has proved yet. `coverage` says how much is written, built and proved, per domain, per app, per package and for the repository, and never lists a row (RD.DEVEX.WORKSPACE.191); its numbers come from `spn-devex coverage measure <repo> --json`. A `MANUAL` row, proved by a person following the repository's browser guide, counts in none of the coverage or tests numbers; both reports list it in one Findings line and a Records group, *Proved by hand*. Each one is replaced in place by the next report of its kind, so a pocket never holds six audits nobody will re-read. A report kept because the moment mattered — an incident, or what one release carried — is dated in its filename and never overwritten, and a new kind is a decision entry rather than a new filename. **A report is written by the agent and not produced by a command**: it reads the repository and fills the template, which is how it can name a fault no check could. **A report is written or refreshed only when somebody asks for it** (RD.DEVEX.WORKSPACE.212): a release, a close or a finished run is not a reason, and stamping the rows stays part of every run. **A report fixes nothing itself**: the agent opens an arc for the records it may close and a question card for each the developer decides. **A report is never published unless the developer asks** (RD.DEVEX.WORKSPACE.117); it is handed over as a full path. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
 
 **An approach document is never kept in step with code.** It argues at a moment, so three relations are all legitimate: **ahead**, **level**, and **behind**. **Ahead** is arguing something not built yet — early iteration, leading the code as a concept does. **Behind** is a correct record of what was argued then. A design can reach an empty `Open` long before a line exists, and is complete at that point. **The defect is a silent rewrite** — editing one to read as though it always argued the current shape destroys the only record of what was weighed and rejected. Flag the contradiction; leave the artifact as the moment it was.
+
+### What an overview and a hub hold, section by section
+
+**An overview is written for somebody new, and that includes the hub.** It assumes no earlier
+reading. It says at the start who it is for and what the reader can do after reading it, explains
+each word on first use in words the reader already has, and tells a first-time reader what to
+unlearn.
+
+**A domain overview runs in one order**:
+
+1. **Overview** — the reading path in a paragraph, and what you can decide after reading it.
+2. **One section per topic, in reading order.** Its heading carries the topic's name in full, never
+   its number. It holds a summary you can decide from — what the topic is, what it fixes, what you
+   would decide there — then a *Decide here* line naming that decision, then one door: a *Read …*
+   line that opens the construct page, named by the words the heading carries. The *Decide here*
+   line is not a door.
+3. **The rules the path shares**, only where a rule is decided on one page and relied on by the
+   others: one item cell per rule — the rule in one sentence, why it holds, and where it is decided
+   and relied on as facts — then the check that enforces it.
+4. **Glossary** — generated on a domain overview. `docs face` writes it between its markers, three
+   columns (`Term` · `Contract term` · `Description`) grouped by construct in the domain's reading order, and nobody types a row
+   inside them.
+5. **Where to go next.**
+
+An overview has no status and no cards.
+
+**The hub is the concept at reading depth.** Its Overview takes each promise the Subtitle makes, one
+subsection each. The concept's narrative sections follow as they are, each with its figure. Then one
+section per area, then Glossary, then Where to go next.
+
+- **An area section explains the area before it hands out any tile** — what the area is, why it
+  divides as it does and who reads it — with a figure where seeing is faster. Tiles alone are not a
+  section.
+- **Each sub-area carries a *How to read it* line for a first-time reader**: the one thing to know or
+  unlearn before choosing, then for each reading path what it covers, when you read it and what you
+  can decide after it. A sub-area with one reading path ends in one door under its text; one with
+  several ends in one tile per path.
+- **A hub's Glossary is written by hand, one item cell per term: the term in bold, then what it
+  means.** The term links to the page that defines it. There is no *Contract term* fact; the generated
+  glossary, with its contract terms, belongs to each domain (decision RD.DEVEX.WORKSPACE.150).
+
+**Every page walks up one step, by the back link at the top of its rail — MUST** (decision RD.DEVEX.WORKSPACE.232).
+The top of a chain has none. A construct page goes back to its overview: where a domain has more than one
+overview, the one that links forward to it, and where it has one, that one. An overview, a guide, a report
+and an index go back to the hub. A preview goes back to its approach page, at the subsection it serves. The
+hub is the top of a repository's chain and an approach page is the top of a workstream's, so neither carries
+a back link. In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a
+page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
+
+**A preview shows, and an approach page argues — MUST** (decision RD.DEVEX.WORKSPACE.233). A preview's
+sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and an *Open* only for the questions it
+raises: the same cards as the approach page's, rendered from the same records by the `open` block
+(`RD.DEVEX.WORKSPACE.253`). An arc has one preview, `notes/N<nnn>/preview.html` (`RD.DEVEX.WORKSPACE.254`). *Overview* says what
+the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
+*Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
+lands* shows the files that change as one folder tree for each repository, with a link to the approach page's
+own `How`. The
+reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
+sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
+folder. Its masthead names its arc, as a badge after the type that links the arc's row, and shows one status,
+labelled *Status*: the arc's, `PROPOSED` until the design is decided, both written by the arc's commands
+(RD.DEVEX.WORKSPACE.266). A sample is the
+work's own file, never a page built with the page template; only a sample of a book page the work produces
+carries a masthead, its `Type` naming the page kind or its name the template it copies (RD.DEVEX.WORKSPACE.267).
+
+**`Where it lands` is one folder tree for each repository — MUST** (decision RD.DEVEX.WORKSPACE.238). The
+section is grouped by repository, in the order the work runs, and it is never a table of file paths. One line
+names the repository and says what happens there. Then the repository is one `TREE` block: one folder or file
+on each line, never two columns of entries, and a note in one column on the right that reads `new` or
+`changed` and then says what the change is. A folder with no note only holds what is under it. A deep path is
+drawn as folders on their own lines, so the note column stays near the names. A preview that is still proposed
+draws the folders and the files that are certain, and says which are not known yet. The tree is always drawn.
+The section is a mix of blocks whose first job is to show the changes. After a repository's tree come the
+blocks that show its changes, such as a diff of one file, code, JSON or a figure. A code block that shows one
+file, or a part of one, stands in a `FILE` frame with the path from the repository's root as its title
+(`RD.DEVEX.WORKSPACE.256`). You add one only where the note beside the entry is not enough to judge the change.
+A table never lists the changes.
+
+**Code shown on a page follows its stack's own standards — MUST** (decision RD.DEVEX.WORKSPACE.235). A code
+block in a preview or on an approach page is read as code and copied as code, so it follows the naming and
+code chapters of the stack it belongs to. Before you write one, load that stack's naming and code references:
+for TypeScript, `refs/support/apps/providers/ts/02-naming.md` and `05-code.md` in the `spn-apps` plugin. A
+page in a workstream belongs to no stack, so nothing else loads them. A support interface in a sample names
+no platform word.
+
+**A code block is written plain, and tagged with its language — MUST** (decision RD.DEVEX.WORKSPACE.237). A
+page's file holds `<pre data-lang="ts">` with the code inside it, and no `<span>` or colour class. The shared
+script colours the block when the page opens, from that tag. A block with no language is `<pre>` with no tag.
+
+**The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
+to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in
+order* is *SEQUENCE* in the rail, and the heading on the page keeps the rest (decision RD.DEVEX.WORKSPACE.231,
+styles `1.2.0`). A heading with no `id` never reaches
+the rail, which is why a template ships every section and subsection with one. **The side gutter is
+`8px` on every page, at every width, except a report at phone width (`40rem` and below), which takes
+`16px`.**
+
+### Every page links one shared stylesheet, in one version
+
+**Every page links one shared stylesheet and one shared script as its base, and holds no copy of
+them — MUST** (decision RD.DEVEX.WORKSPACE.214). The stylesheet is `sds-docs.css`, and the script is
+`sds-docs.js`. Between them they carry the colours in both themes, the outline rail, the fold, the
+badges and the link on each heading. A page that holds a copy of its styles keeps the faults of the
+day it was written. With one shared file, a fault is fixed once, for every page that links the file.
+
+**A stored page links one version by its address, in two lines.** A stored page is one that sits in a
+repository or in a workstream's folder. The stylesheet's line sits at the top of the page, and the
+script's line sits at its end.
+
+```html
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>
+```
+
+- **A page may add a style of its own, for a case the shared stylesheet does not cover.** The shared
+  classes come first. The page's own `<style>` block sits after the stylesheet's line, and a class it
+  defines itself takes no `sds-` prefix, and never a utility's name. What several pages need goes
+  into `sds-docs` in a later version. The check on a page refuses a link to a version that nobody cut.
+- **A callout takes a status class, and it may hold a heading and a table.** The callout is
+  `sds-pull`, and the heading and the table take its status's colour. A declared gap in a hub is such
+  a callout, with `sds-warning`.
+- **The built file holds one standard set of utilities, and no other.** The set covers layout,
+  spacing, size, type, borders, corners and overflow, and the colours of our tokens, such as `flex`,
+  `gap-4`, `mt-2`, `text-sm`, `text-faint` and `bg-accent-soft`. Use a named class first, and a
+  utility only where no class fits. A utility outside the set has no effect on a page.
+- **A version is a folder that never changes.** `docs sds cut <version>` writes it, and it refuses a
+  version that exists. A change to the styles is a new version, and
+  `docs sds repoint <version> <folder>` moves every page under a folder to it.
+- **That address is the one hosted address a page may hold.** Every link from one page to another
+  stays relative.
+- **A stored page needs the network once.** Your browser fetches the shared files the first time you
+  open a page of that version.
+
+**A published page carries its version's styles inside it — MUST** (decision
+RD.DEVEX.WORKSPACE.215). The publishing host does not load a stylesheet from the version's address,
+so a published page that links out arrives with no styling. `docs sds bundle <page>` writes a copy
+beside the page, named `<page>.bundled.html`, with the stylesheet and the script inside it. You
+publish the copy, and the stored page keeps its two lines. The check before a publish refuses a page
+that links a stylesheet from outside, and it names the command. **A page that somebody reads with no
+network is bundled the same way**, so send the bundled copy to a reader who is offline.
+
+**Every class and every token of ours opens with `sds-` — MUST** (decision RD.DEVEX.WORKSPACE.216).
+One search for `sds-` finds every name of ours in a page, and no name of ours meets a Tailwind
+utility. A name is a whole word: `sds-key`, never `sds-k`. A state that a script sets opens with
+`is-` or `has-`, such as `sds-is-current`. A result takes a status word. So the Subtitle is
+`p.sds-subtitle`, the Description is `p.sds-standfirst`, an open card is `div.sds-open`, and a decided
+card is `div.sds-card`. `blocks-template.html` shows every class rendered.
+
+**A status is a set of classes of its own, and never a tone of the palette** (decision
+RD.DEVEX.WORKSPACE.217). The statuses are `sds-info`, `sds-success`, `sds-warning` and `sds-error`,
+and one of them on a badge or a callout says how a thing stands. The palette's tones are blue,
+green, amber, red, violet, cyan, pink, olive, orange and grey. They are for a drawing or a chart,
+each is one class such as `sds-tone-violet`, and a tone carries no meaning. A
+chart takes its series from violet, cyan, pink and olive first, so that a red line is not read as an
+error. **No page declares a token of its own.** A repository that needs other colours asks for a
+version of the stylesheet that has them.
 
 ### Steward, never manufacture
 
@@ -414,11 +740,13 @@ A register row records *what* was decided, never the options that lost or what t
 
 ## Blocks and figures — what a page is made of
 
-**A page is produced, never authored.** You write a **seat file in markdown** and `docs.ts page` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a coloured code block, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+**A page is produced, never authored.** You write a **seat file in markdown** and `docs page write` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a code block tagged with that language, which the shared script colours when the page opens, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+
+**A table cell that holds an item reads in three levels on a hub, an overview, a construct, an approach page and a preview — MUST** (decision RD.DEVEX.WORKSPACE.259). The title is the cell's first paragraph, in bold where it is words; the line that says what it is or does is the paragraph under it; the facts are one line of `Key: value` pairs separated by middots, in `<span class="sds-small">`. A level with nothing to say is left out, and so is a fact whose value is a dash. **A table keeps a column only where a reader compares down it** — a status, a count, a version, a weight, and a contract term beside the word a person uses for it — and what nobody reads down becomes a level of the item's cell; `doc-check` names a column whose cells hold sentences, as a note. A table of one column takes the width it is given and wraps at a phone's width, where a wider table scrolls inside its box. A construct's seat file keeps its markdown columns, and `docs page` writes the cells: `Terms` is three columns, `Term` · `Contract term` · `Description`, with the contract term in code style, taking fixed shares of the width so a term never wraps (the term 22 in a hundred, the contract term 26, the meaning the rest; under `40rem` each row stacks as term, contract term, meaning, with the shared styles from `1.10.0`), `Binds` is `Rule · Weight` with what the rule decides under it, a Model's `Piece · The question it answers · Its terms` is one column with `Terms:` as a fact, and a Boundary's `Owns · Refuses · Who owns that instead` keeps Owns beside Refuses with `Owned by:` as a fact. Any other seat table keeps its columns, except a column after the first whose cells hold sentences, which `docs page` writes under the first column's title: the line where it is the only one, or a paragraph led by its column's name where several are. A column that lists code is never one of sentences. On a hub or an overview, written by hand, you apply the same rule to every table. Every piece of text sits in the element whose tone it reads in — a name in an `h4`, a bold lead or a cell's first paragraph, running text in a paragraph, a fact in `sds-small` — and a page never sets a colour on text. A report's tables follow its own sections.
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
-**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (decision RD.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens. It is much larger than the markdown form, and most of it is markup and inline SVG that the renderer and the drawer produce for you (decision RD.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
 
 ### The figure kinds
 
@@ -430,7 +758,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 | `FLOWCHART` | a path one actor walks, with the shapes a flowchart has — a diamond is a choice |
 | `SEQUENCE` | a path several actors walk together, when *who said it* is the fact |
 | `ENTITIES` | data and how it relates |
-| `TREE` · `STATE` · `CODE` · `DIFF` | a hierarchy · a lifecycle · source · a change |
+| `TREE` · `STATE` · `CODE` · `FILE` · `DIFF` | a hierarchy · a lifecycle · source · source that is one file, framed with its path · a change, in a `FILE` frame |
 | `SYSTEM` | the architecture of something you build — a server module, a web module, an estate package |
 
 ### Drawing a `SYSTEM` figure for a module you are looking at
@@ -474,11 +802,13 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 `For: Architect · Backend developer` · `Status: ✅ DONE`
 ```
 
-- `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
+- `stages` is optional — only where a document belongs to one DevEx stage, such as a guide.
+- **A construct's block keeps eight keys and no more**: `id`, `variant`, `title`, `subtitle`, `lenses`, `status`, `dependsOn` and `summary`. `subtitle` is the one plain sentence under the title, and `summary` is the Description's first sentence.
+- **A report carries no `status`, and adds `reportType`, `repository` and `generatedAt`** (RD.DEVEX.WORKSPACE.192). `reportType` is one `SPDocReportType` value: `COVERAGE` · `TESTS` · `AUDIT` · `CODE` · `DOCS`. `repository` is the repository it measured, by its folder name, and the header shows it as `Repo:`. A report is a snapshot, so neither its block nor its header carries a status, and it makes no comparison with an earlier report. `generatedAt` is the moment the page was generated, a date and a time with its offset, such as `2026-09-30T12:57+05:30`; the header's second line reads `Repo: … | Commit: … | Generated: …`, with Generated in the reader's own time zone and format. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in *Measured* and never in the header. No other report carries `measuredAt`. A `tests` report with no stamped run leaves `measuredAt` out of its block, and says in *Measured* that no run is stamped. It never writes `null`.
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DEVEX.WORKSPACE.096). The seat decides what a document carries, never its temperature.
 - **`lenses` are derived from the kind, not authored per page** (decision RD.DEVEX.WORKSPACE.100) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
-- **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮.
+- **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮. An overview, a construct in a `FOUNDATION` repository and a report carry none.
 
 ## One voice — the warm learning register
 

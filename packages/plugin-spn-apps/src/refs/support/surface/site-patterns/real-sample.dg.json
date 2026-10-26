@@ -1,0 +1,402 @@
+{
+ "kind": "skeleton",
+ "title": "Real sample, the code beside",
+ "caption": "A DSSectionContainer at size MD, color DEFAULT with inset, since code read closely is another kind of reading than its neighbours', holds one DSFeature. Its mediaNode is a DSCodeBlockView titled with its file, flat in its own frame and never raised. Short, tall code stands beside the words, as SPLIT_END does, and verticalAlign TOP stands the words at the top of their column. The lines are the file's own, with … where lines are cut. Size LG is for a sample that is the page's argument. On a phone the words, then the code.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "What the code proves",
+                        "description": "One line on what the reader sees in the file."
+                       }
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // the file's own lines,"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // short, and taller"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // than the words"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: 'one',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  next: 'two',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  last: 'ten',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "verticalAlign": "TOP"
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "What the code proves",
+                        "description": "One line on what the reader sees in the file."
+                       }
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // the file's own lines,"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // short, and taller"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // than the words"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: 'one',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  next: 'two',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  last: 'ten',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "verticalAlign": "TOP"
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What the code proves",
+                   "description": "One line on what the reader sees in the file."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "fill": true,
+                  "frame": {
+                   "unit": "DSCodeBlockView",
+                   "label": "path/to/the-file.ts",
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "note": "export const sample = {"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // the file's own lines,"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // short, and taller"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  // than the words"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  part: 'one',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  next: 'two',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  …"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "  last: 'ten',"
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "note": "};"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 }
+                ]
+               }
+              ],
+              "verticalAlign": "TOP"
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "DEFAULT",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

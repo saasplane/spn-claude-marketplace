@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: plugin-spn-devex/src/refs/devex/workspace/workstream.md S3 — execution is confirmed, never assumed.
-// The ref is the source of truth. A rule change is edited there first, then here, in the same change.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A major release is agreed while the arc is planned (RD.DEVEX.WORKSPACE.069)
+// The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // WHAT IT CATCHES. A release the developer never agreed to, at a version that cannot be taken back.
 //
@@ -16,12 +16,21 @@
 // asks nobody anything. It reads a decision that was taken before the work started, and refuses a
 // version nobody agreed to.
 //
-// WHAT A GO LOOKS LIKE. The same shape `confirmed.ts` already reads, plus the version, because a
-// blanket go for an arc is not a go for an irreversible number:
+// WHAT A GO LOOKS LIKE. The go `confirmed.ts` reads, plus the version, because a blanket go for an arc
+// is not a go for an irreversible number (RD.DEVEX.WORKSPACE.069). The go is the write that moves the arc
+// that needs the release out of `PROPOSED`, and the developer's words in it name the version:
 //
-//     - **2026-09-23 — go.** Release this as 2.0.0.
+//     workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words, naming 2.0.0>"
 //
-// Nothing else counts, for the reason `confirmed.ts` gives: a conversation is not a record.
+// It is read from the arc's data by `confirmed.ts`'s own reader, so the two checks cannot disagree about
+// what a go is: the arc reads `DECIDED`, `RUNNING` or `LANDED`, its `log.jsonl` holds the line that moved
+// it out of `PROPOSED` with words, and here those words must name the version. A `PROPOSED` arc holds no
+// go, whatever its log says. Nothing else counts, for the reason `confirmed.ts` gives: a conversation is
+// not a record.
+//
+// EVERY OPEN WORKSTREAM, NOT THIS WINDOW'S. A version belongs to a repository rather than to a window,
+// so the go may sit in any open workstream (RD.DEVEX.WORKSPACE.236 names this check among those that
+// stay across the workspace).
 //
 // WHY THE FLOOR CANNOT DO THIS. A permission pattern matches a command PREFIX, and
 // `apps release 2.0.0` shares every prefix that matters with `apps release 1.2.68`. The bump size is
@@ -34,14 +43,14 @@
 
 import { execFileSync } from "node:child_process";
 import { isAbsolute, join } from "node:path";
-import { DEVEX, isDir, listdir, read, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { isDir, listdir, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { arcIdsOf, logLinesOf, readArc } from "../lib/workstream.ts";
+import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { arcGoWords } from "./confirmed.ts";
 
 /** `apps release 2.0.0` / `infra release 2.0.0`, however the CLI is spelled to get there. */
 const RELEASE = /\b(apps|infra)\s+release\b([^|;&]*)/;
 const SEMVER = /^(\d+)\.(\d+)\.(\d+)/;
-
-/** `- **2026-09-23 — go.` — the shape `confirmed.ts` reads, and the only shape that counts. */
-const GO_LINE = /^\s*-\s*\*\*\d{4}-\d{2}-\d{2}\s*[—-]\s*go\b.*$/gim;
 
 export function applies(_path: string, command: string): boolean {
   return RELEASE.test(command);
@@ -103,16 +112,21 @@ export function isMajorBump(next: string, current: string): boolean {
   return Number(a[1]) > Number(b[1]);
 }
 
-/** Whether any arc in any open workstream records a dated go naming this version. */
+/** Whether the words name this version as a version of its own: `2.0.0` is not named by `12.0.0` or `2.0.01`. */
+export function namesVersion(words: string, version: string): boolean {
+  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<![\\d.])${escaped}(?!\\d)`).test(words);
+}
+
+/** Whether any arc in any open workstream holds the developer's go, and its words name this version. */
 export function goRecorded(root: string, version: string): boolean {
-  const open = join(root, DEVEX, "workstreams", "open");
+  const open = workstreamsDir(root, "open");
   for (const subject of listdir(open)) {
-    const arcs = join(open, subject, "arcs");
-    if (!isDir(arcs)) continue;
-    for (const name of listdir(arcs)) {
-      if (!name.endsWith(".md")) continue;
-      const text = read(join(arcs, name));
-      for (const line of text.match(GO_LINE) ?? []) if (line.includes(version)) return true;
+    const ws = join(open, subject);
+    if (!isDir(ws)) continue;
+    for (const arc of arcIdsOf(ws)) {
+      const words = arcGoWords(readArc(ws, arc)?.status, logLinesOf(ws, arc));
+      if (words !== null && namesVersion(words, version)) return true;
     }
   }
   return false;
@@ -141,10 +155,11 @@ export function checkReleaseGo(payload: Payload): Verdict {
       `A major release is agreed BEFORE the work starts, as a card on the arc that needs it, so ` +
       `execution never stops to ask for one. Minor and patch releases need none of this — they are ` +
       `the standing authorization in \`N39\`.\n\n` +
-      `What is missing is a line in that arc's \`## Log\`:\n\n` +
-      `    - **YYYY-MM-DD — go.** Release this as ${version}.\n\n` +
-      `Write the card, get it answered, then record the answer in the arc. A go that lives only in ` +
-      `this window ends with this window, which is why nothing else counts.`,
+      `What is missing is the go of the arc that needs it, with the developer's words naming the version:\n\n` +
+      `    spn-devex workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words, naming ${version}>"\n\n` +
+      `It counts once the arc reads DECIDED, RUNNING or LANDED and its log holds that line. Write the card, ` +
+      `get it answered, then record the answer as the arc's go. A go that lives only in this window ends ` +
+      `with this window, which is why nothing else counts (RD.DEVEX.WORKSPACE.069).`,
   };
 }
 
