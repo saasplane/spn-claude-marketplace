@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "6d568c1a"
+      "seen": "b46463d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "2809346a"
+      "seen": "662e0f2d"
     }
   ],
   "decisions": [
@@ -214,7 +214,7 @@ the machine nobody can regenerate. Five regions, one writer each, read top to bo
 | # | Region | Writer | Holds |
 | --- | --- | --- | --- |
 | 1 | `producer` | derived | what only a producer workspace has, `SPN_DEVEX_AGENT_WORKSPACE` — absent from a partner's file |
-| 2 | `devex` | `spnutils` writes each key once, when missing; you supply the value | the DevEx tooling's tokens, `SPN_DEVEX_AGENT_GITHUB_TOKEN` and `SPN_DEVEX_AGENT_FIGMA_TOKEN` |
+| 2 | `devex` | `spnutils` writes each key once, when missing; you supply the value | the DevEx tooling's tokens, `SPN_DEVEX_AGENT_GITHUB_TOKEN` (for `repo create`, `repo promote` and `repo backmerge`) and `SPN_DEVEX_AGENT_FIGMA_TOKEN` |
 | 3 | `managed` | derived | the local dev CA block, the module-facts pattern |
 | 4 | `dev` | **you, entirely** | your own keys — no run writes between these markers |
 | 5 | `keep` | agent writes the key, you supply the value | every key a piece of built work needs |

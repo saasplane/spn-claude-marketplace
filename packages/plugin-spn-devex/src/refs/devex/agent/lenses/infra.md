@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "e034aa49"
+      "seen": "255ae1bc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
@@ -92,7 +92,7 @@
   - **Nothing is named by hand.** Every name, address and identifier is derived from the declared variables and composition rules.
   - **The change runs locally first.** A full platform comes up on a developer's machine from the same manifests; a capability that cannot come up under `infra` is not done.
   - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
-  - **Promotion is the branch map's.** Where a change deploys is manifest data (each environment row's `deploy` trigger), by pull request along a path chosen at each promotion, and a pull request merges only once every check its world requires passes.
+  - **Promotion is the branch map's.** Where a change deploys is manifest data (each environment row's `deploy` trigger), by pull request along a path chosen at each promotion, and a pull request merges only once every check its world requires passes. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`.
   - **A check that cannot fail is not written.** An estate with no modules gets no `lint` and no `cis-scan`, because a check over nothing proves nothing; a tier that needs a running stack joins CI with the job that stands it, never `test`.
   - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RD.DEVEX.FUNCTION.065`).
   - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RD.DEVEX.FUNCTION.060`).

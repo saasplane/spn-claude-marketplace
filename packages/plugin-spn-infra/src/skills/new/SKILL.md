@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "e0f5cfde"
+      "seen": "f3d02f7d"
     }
   ]
 }
@@ -36,7 +36,7 @@ description: Stand up a new estate node or a new estate repository with spnutils
 
 **`SUPPORT` is the fourth type and has no scaffold.** `@saasplane/infra-blueprints` is what SaaS Plane ships; an organization pins it, and nobody mints one here.
 
-A new estate repository is brought to the standard by `spnutils repo create`, which sets up all four permanent branches, `develop`, `qa`, `uat` and `main`, and their rules. Nothing declares which of them a team uses: the path to `main` is chosen at each promotion with `spnutils repo promote`, and a release is cut only from `main`.
+A new estate repository is brought to the standard by `spnutils repo create`, which sets up all four permanent branches, `develop`, `qa`, `uat` and `main`, and their rules. Nothing declares which of them a team uses: the path to `main` is chosen at each promotion with `spnutils repo promote`, a required `promotion-source` job refuses any other head into `qa`, `uat` or `main`, and a release is cut only from `main`.
 
 ## Where it goes
 

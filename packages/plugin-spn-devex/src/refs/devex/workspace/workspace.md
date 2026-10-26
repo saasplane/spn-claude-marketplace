@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "2809346a"
+      "seen": "662e0f2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -114,14 +114,14 @@ The order is not a preference. Read a file top to bottom and this is what you fi
 | # | Region | Writer | What you may do |
 | --- | --- | --- | --- |
 | 1 | `spnutils:producer` | derived | read it. It holds `SPN_DEVEX_AGENT_WORKSPACE`. **A partner's file does not have it** |
-| 2 | `spnutils:devex` | `spnutils` writes each key once, when it is missing; the developer writes the value | test whether a token is set. It holds `SPN_DEVEX_AGENT_GITHUB_TOKEN` (`repo create`) and `SPN_DEVEX_AGENT_FIGMA_TOKEN` (`surface library --figma`) |
+| 2 | `spnutils:devex` | `spnutils` writes each key once, when it is missing; the developer writes the value | test whether a token is set. It holds `SPN_DEVEX_AGENT_GITHUB_TOKEN` (`repo create`, `repo promote` and `repo backmerge`) and `SPN_DEVEX_AGENT_FIGMA_TOKEN` (`surface library --figma`) |
 | 3 | `spnutils:managed` | derived | read it. A run rewrites it whole, so nothing typed inside survives |
 | 4 | `spnutils:dev` | **the developer, entirely** | **nothing.** Never read between these markers, never write, never reorder |
 | 5 | `spnutils:keep` | you write the key; the developer writes the value | add a key here |
 
 **`producer` leads so a partner's file is a truncation.** Theirs starts at `devex` and runs `devex` → `managed` → `dev` → `keep`. A missing `producer` region in a partner's file is correct, never a fault to repair.
 
-**The seat holds only what a partner or a builder configures.** The `devex` region is in every file, because a partner signs in to GitHub and Figma too. A variable only a test sets is not configuration: never add one to the seat or name it in a doc. The tool reads each token through the seat's reader: a value exported for the run wins, as a pipeline exports its own, and the seat answers otherwise. `GITHUB_ACCESS_TOKEN` is read by nothing, so an old one exported in a shell no longer reaches `repo create`.
+**The seat holds only what a partner or a builder configures.** The `devex` region is in every file, because a partner signs in to GitHub and Figma too. A variable only a test sets is not configuration: never add one to the seat or name it in a doc. The tool reads each token through the seat's reader: a value exported for the run wins, as a pipeline exports its own, and the seat answers otherwise. `GITHUB_ACCESS_TOKEN` is read by nothing, so an old one exported in a shell no longer reaches `repo create`, `repo promote` or `repo backmerge`.
 
 **When `spnutils` first writes the `devex` region, it carries a token's value from wherever the key already sits**, the `dev` region included. That is the one time a run reads inside `dev`, and it writes nothing there; it reports the old line by key name, and deleting it is the developer's.
 
@@ -214,7 +214,7 @@ A run writes what it can see, and it stops there. **It never deletes a key becau
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
 
-**While a workstream is open, the folder also carries its worktree set, which is no home and no member (RD.DEVEX.WORKSPACE.315).** A workstream works in a folder of its own, so two workstreams never share a checkout and a main checkout never holds work. The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root — MUST. `spnutils workspace worktree add <NNN>` fetches every member and makes it, and a `--repo` option adds one repository more. A fix that production or one environment needs is cut from that branch: `--from <branch>` cuts the workstream's branch from `main`, `uat` or `qa` in place of `develop`.
+**While a workstream is open, the folder also carries its worktree set, which is no home and no member (RD.DEVEX.WORKSPACE.315).** A workstream works in a folder of its own, so two workstreams never share a checkout and a main checkout never holds work. The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root — MUST. `spnutils workspace worktree add <NNN>` fetches every member and makes it, and a `--repo` option adds one repository more. A fix that production or one environment needs is cut from that branch: `--from <branch>` cuts the workstream's branch from `main`, `uat` or `qa` in place of `develop`, and writes `branch.<name>.spnBase` for it.
 
 | In the set | What it is |
 | --- | --- |

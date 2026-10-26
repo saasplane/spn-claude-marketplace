@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "e0f5cfde"
+      "seen": "f3d02f7d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "e034aa49"
+      "seen": "255ae1bc"
     }
   ]
 }
@@ -96,11 +96,11 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 3. Rebase and push. The branch rebases onto `origin/develop` before every push. The agent's push is checked for the offline test tiers of each node it carries.
 4. Open the pull request into `develop`. The first push opens one pull request for the repository, and it stays open for the workstream. At least one approval is required, and new commits dismiss stale approvals. Every check the repository's world requires runs on the pull request, and it cannot merge while one fails.
 5. Merge, and let the environment that watches `develop` take it. The pull request is rebase-merged each time an arc lands a group of rows, so each row's commit stays as it was written. The environment that watches `develop` is named in the estate's declaration, never in your repository.
-6. Choose the path, and promote with one command. `spnutils repo promote <to> [--from <branch>]` opens one pull request from `<from>` to `<to>` and merges it by a merge commit once its required checks are met. `<to>` is `qa`, `uat` or `main`, and `--from` is `develop` unless you name another permanent branch below `<to>`. So `develop` to `main` is `repo promote main`; `develop` to `qa` to `main` is `repo promote qa`, then `repo promote main --from qa`; the paths through `uat` run the same way. Quality engineering holds the `qa` gate and the business decides at `uat`, for the teams whose path goes through them. A promotion reruns no check, because its head is a commit that passed its checks on `develop`, and the command checks that the files merged equal that tested commit. The agent names the path before it promotes, and asks which branch a change goes to when you have not said, because where a change goes is a release decision and it is the developer's.
+6. Choose the path, and promote with one command. `spnutils repo promote <to> [--from <branch>]` opens one pull request from `<from>` to `<to>` and merges it by a merge commit once its required checks are met. `<to>` is `qa`, `uat` or `main`, and `--from` is `develop` unless you name another permanent branch below `<to>`. So `develop` to `main` is `repo promote main`; `develop` to `qa` to `main` is `repo promote qa`, then `repo promote main --from qa`; the paths through `uat` run the same way. Quality engineering holds the `qa` gate and the business decides at `uat`, for the teams whose path goes through them. A promotion reruns no check, because its head is a commit that passed its checks on `develop`, and the command checks that the files merged equal that tested commit. A job skips on a pull request into `qa`, `uat` or `main` only where the head is a permanent branch of the same repository; any other head runs every job, and `promotion-source` refuses it, so a green check never stands for jobs that did not run. The agent names the path before it promotes, and asks which branch a change goes to when you have not said, because where a change goes is a release decision and it is the developer's.
 7. Cut a release from `main`, and promote the built artifact into production from the environment that proved it. A release is cut only from a clean tree at `origin/main`.
 8. Remove the set. `spnutils workspace worktree remove <NNN>` removes the worktree set once the work is on origin.
 
-**A permanent branch takes a merge only from a permanent branch below it, or from a hotfix, and `main` never from a feature branch — MUST.** The path between them is the team's choice at each promotion, no path skips a check, and there is no exception for urgency: an urgent fix takes its own short path, `hotfix/<subject>`, and never a skipped check.
+**A permanent branch takes a merge only from a permanent branch below it, from the one directly above it in a merge down, or from a hotfix, and `main` never from a feature branch — MUST.** The host holds it, not a habit: a required job, `promotion-source`, refuses any other head on a pull request into `qa`, `uat` or `main`, a fork's included, and names `spnutils repo promote`. The path between them is the team's choice at each promotion, no path skips a check, and there is no exception for urgency: an urgent fix takes its own short path, `hotfix/<subject>`, and never a skipped check.
 
 ### The protection rules
 
@@ -108,7 +108,7 @@ Protection rules are not conventions a team agrees to follow. They are protectio
 
 - Every change **MUST** arrive by pull request, with at least one approval and its code owner's review, and new commits **MUST** dismiss stale approvals. There are no direct pushes.
 - Every check the repository's world requires **MUST** pass before a pull request merges. Each check is bound to GitHub Actions, so only a job can meet it, never a status somebody posts.
-- A permanent branch **MUST** take a merge only from a permanent branch below it or from a hotfix, and each promotion goes by the path chosen for it. Which of `qa` and `uat` a change passes through is the developer's release decision.
+- A permanent branch **MUST** take a merge only from a permanent branch below it, from the one directly above it in a merge down, or from a hotfix, each of the same repository, and each promotion goes by the path chosen for it. A required job, `promotion-source`, holds the rule on every pull request: it reads the head from the event and refuses any other head into `qa`, `uat` or `main`, a fork's included, naming `spnutils repo promote`. Into `develop` it passes every head. Which of `qa` and `uat` a change passes through is the developer's release decision.
 - Each promotion **MUST** merge by a merge commit, and `main` **MUST** take merge commits from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch.
 - A permanent branch **MUST NOT** be deleted or force-pushed.
 - A `hotfix/<subject>` **MUST** be cut from `main` for production, or from `uat` or `qa` where only that environment needs the fix, never from `develop`, because `develop` may hold work still in the pipeline. It **MUST** be tested in its own pull request back into the branch it came from, and merged by a merge commit. `spnutils repo backmerge <branch>` **MUST** then merge the fixed branch into each permanent branch below it, in order, down to `develop`, skipping one that already holds the fix. Skip the merge down and the next change promoted from `develop` quietly removes the fix — the outage returns with no sign of why.
@@ -123,7 +123,7 @@ Every repository carries three files that make its delivery path evidence: what 
 
 | File | Holds |
 | --- | --- |
-| `.github/workflows/checks.yml` | one job for each check the world requires, run on a pull request into `develop`, on a pull request whose head is a `hotfix/*` branch, and on a push to `develop`, and on nothing else |
+| `.github/workflows/checks.yml` | one job for each check the world requires, `promotion-source` among them, run on a pull request into a permanent branch and on a push to `develop`, and on nothing else; on a pull request into `qa`, `uat` or `main` a job skips only where the head is a permanent branch of the same repository |
 | `.github/CODEOWNERS` | `git-dev` owns every path; `git-admin` owns `.github/`, `SECURITY.md` and `sprepo.json`, the files that decide how code is checked, reviewed and reported |
 | `SECURITY.md` | how to report a weakness, what happens next and by when, restating the trust chapter's findings rule |
 
