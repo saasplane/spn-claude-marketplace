@@ -65,6 +65,7 @@ A mock of more than one page carries a flow file, `<flow>.flow.json`, beside the
 
 - **Write the specs and the flow file as files** in the running arc's `notes/N<nnn>/samples/` folder, or where the developer names. Each spec is strict JSON, with no comment.
 - **Draw each spec with `spn-devex docs figure draw <spec>`**, and look at it before you show it.
+- **Read the flow file with `spn-devex docs figure draw <flow>.flow.json`.** It draws nothing, reads the file against the specs beside it, and names each finding above; hand the mock over when it says the file is clean.
 - **Show the mock as the list of its files, in the flow's order**, each with the page it draws and the views it holds. Then give the tree, which the build reads: the mock and the build stand on the same tree.
 
 ## Close

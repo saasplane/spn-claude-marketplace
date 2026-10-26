@@ -224,9 +224,10 @@ export type SkeletonAccordionOption = { header: string; content?: string; expand
  *  A container's content is parts separated by lines, or groups, or both: parts by lines, groups inside a part. */
 export type SkeletonSection = { label?: string; actions?: SkeletonItem[]; rows: SkeletonRow[]; divided?: boolean; unit?: string;
   part?: boolean; sections?: SkeletonSection[] };
-/** One screen at one screen class: a whole frame of its own, never derived from another view. A spec
- *  holds `views` in place of `frame`, and the views are drawn in one figure. `page` is the view's page level. */
-export type SkeletonView = { viewport: "DESKTOP" | "TABLET" | "MOBILE"; page?: SkeletonPage; frame: SkeletonFrame };
+/** One screen at one screen class, and in one task state where it shows one: a whole frame of its own, never derived
+ *  from another view. A spec holds `views` in place of `frame`, and the views are drawn in one figure. `page` is the
+ *  view's page level. */
+export type SkeletonView = { viewport: "DESKTOP" | "TABLET" | "MOBILE"; state?: string; page?: SkeletonPage; frame: SkeletonFrame };
 
 /** The measure the figure check uses, at the drawn scale. */
 const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
@@ -1751,6 +1752,11 @@ const SKEL_INLINE_ICON = 14;
 // THE DESKTOP TAKES THE GRID'S WIDTH, and the tablet and the phone share the next line, three parts to two, with
 // the gap between them: 617 + 24 + 411 is the grid's 1052.
 const SKEL_VIEW_W: Record<string, number> = { DESKTOP: 1052, TABLET: 617, MOBILE: 411 };
+/** The task states a view may show, in `DSTaskStateType`'s own order (RD.DEVEX.WORKSPACE.230). The views of one screen
+ *  class are drawn in this order, after the view with no `state`, and a flow file's `state` names one of them. */
+export const SKEL_TASK_STATES = ["IDLE", "WORKING", "DONE", "FAILED", "EMPTY", "DENIED"];
+/** A view's name in a finding and over its drawing: its class, and the word of its state where it shows one. */
+const skelViewName = (view: Pick<SkeletonView, "viewport" | "state">): string => (view.state ? `${view.viewport} · ${view.state}` : view.viewport);
 const SKEL_STANDINS = ["rows", "cards", "field", "list", "table"];
 /** A table's head row, and the room a body row has above and below its tallest cell. */
 const SKEL_TABLE_HEAD = 24, SKEL_TABLE_ROW_PAD = 8;
@@ -3659,7 +3665,7 @@ function skelLooks(frame: SkeletonFrame | undefined, findings: string[], items?:
  *  what the drawer does anyway; `tone`, `em`, `off` and `warn` on an item or a frame keep the findings that name what replaced them. */
 const SKEL_FIELDS: Record<string, string[]> = {
   spec: ["kind", "title", "caption", "frame", "views", "layout"],
-  view: ["viewport", "page", "frame"],
+  view: ["viewport", "state", "page", "frame"],
   page: ["item", "actions", "back"],
   frame: ["label", "note", "width", "rows", "look", "tag", "height", "fill", "unit", "headed", "frames", "raised", "bordered", "rounded", "size",
     "part", "actions", "footer", "sections", "divided", "marked", "media", "color", "strength", "inset", "items", "surface", "verticalAlign", "section", "grid",
@@ -3837,7 +3843,7 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
   let pageFrame: SkeletonFrame | undefined;
   if (view.page !== undefined) {
     const page = view.page;
-    if (page === null || typeof page !== "object" || !page.item) findings.push(`the \`${view.viewport}\` view's \`page\` carries its \`item\`: the title of the page, with its description, picture and facts`);
+    if (page === null || typeof page !== "object" || !page.item) findings.push(`the \`${skelViewName(view)}\` view's \`page\` carries its \`item\`: the title of the page, with its description, picture and facts`);
     else pageFrame = { size: frame.size, rows: [{ items: [
       ...(page.back ? [{ icon: "previous" as const }] : []),
       { item: page.item, fill: true, page: true },
@@ -3855,8 +3861,8 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
   const needs = Math.max(skelFrameMinWidth(frame, SKEL_DEFAULT_H), pageFrame ? skelFrameMinWidth(pageFrame, SKEL_DEFAULT_H) : 0);
   if (needs > innerW)
     findings.push(type === undefined
-      ? `the \`${view.viewport}\` view needs ${needs} across, and its class stands at ${W}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`
-      : `the \`${view.viewport}\` view needs ${needs} across, and its content in a \`${type}\` with a \`${width}\` body stands at ${r2(innerW)}; an arrangement that does not fit is stacked, or drawn in a wider body`);
+      ? `the \`${skelViewName(view)}\` view needs ${needs} across, and its class stands at ${W}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`
+      : `the \`${skelViewName(view)}\` view needs ${needs} across, and its content in a \`${type}\` with a \`${width}\` body stands at ${r2(innerW)}; an arrangement that does not fit is stacked, or drawn in a wider body`);
 
   out.push(skelRect("sds-box", x, y, W, H));
   // THE NAVIGATION, a surface at its edge.
@@ -3897,12 +3903,13 @@ function skelDrawWindow(view: SkeletonView, layout: SkeletonLayout | undefined, 
 }
 
 /**
- * A SPEC WITH `views` DRAWS ONE SCREEN AT SEVERAL SCREEN CLASSES, IN ONE FIGURE (05-artifacts.md § `SKELETON`).
- * Each view is a whole frame of its own. They are drawn in one order, desktop, then tablet, then phone,
- * each under the name of its class and at the width that stands for it. A view that would pass the
- * grid's content width starts a new line, so a figure never grows wider than its page and its words
- * stay as large as any other figure's. A view stands in the spec's `layout` where it has one, and its
- * `page` stands first in its content.
+ * A SPEC WITH `views` DRAWS ONE SCREEN AT SEVERAL SCREEN CLASSES, AND IN SEVERAL TASK STATES, IN ONE FIGURE
+ * (05-artifacts.md § `SKELETON`, RD.DEVEX.WORKSPACE.230). Each view is a whole frame of its own. They are drawn in one
+ * order, desktop, then tablet, then phone, and the views of one class stand together: the one with no `state` first,
+ * the others in `DSTaskStateType`'s order. Each stands under the name of its class and the word of its state, at the
+ * width that stands for its class. A view that would pass the grid's content width starts a new line, so a figure
+ * never grows wider than its page and its words stay as large as any other figure's. A view stands in the spec's
+ * `layout` where it has one, and its `page` stands first in its content.
  */
 function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined, findings: string[], out: string[]): void {
   const classes = Object.keys(SKEL_VIEW_W);
@@ -3911,12 +3918,23 @@ function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined
   for (const view of views) {
     const viewport = view?.viewport;
     if (!classes.includes(viewport)) { findings.push(`a view's \`viewport\` is \`${viewport}\`, and a skeleton takes ${classes.join(" · ")}`); continue; }
-    if (seen.has(viewport)) { findings.push(`two views are \`${viewport}\`, and a skeleton holds one view for a screen class`); continue; }
-    seen.add(viewport);
-    if (!view.frame) { findings.push(`the \`${viewport}\` view has no \`frame\`; each view is a whole frame of its own`); continue; }
+    if (view.state !== undefined && !SKEL_TASK_STATES.includes(view.state)) {
+      findings.push(`a view's \`state\` is \`${String(view.state)}\`, and a view shows one of \`DSTaskStateType\`: ${SKEL_TASK_STATES.join(" · ")}`);
+      continue;
+    }
+    const name = skelViewName(view);
+    if (seen.has(name)) {
+      findings.push(view.state
+        ? `two views are \`${name}\`, and a skeleton holds one view for a screen class in a task state`
+        : `two views are \`${viewport}\`, and a skeleton holds one view for a screen class`);
+      continue;
+    }
+    seen.add(name);
+    if (!view.frame) { findings.push(`the \`${name}\` view has no \`frame\`; each view is a whole frame of its own`); continue; }
     drawn.push(view);
   }
-  drawn.sort((one, other) => classes.indexOf(one.viewport) - classes.indexOf(other.viewport));
+  const stateAt = (view: SkeletonView) => (view.state === undefined ? -1 : SKEL_TASK_STATES.indexOf(view.state));
+  drawn.sort((one, other) => classes.indexOf(one.viewport) - classes.indexOf(other.viewport) || stateAt(one) - stateAt(other));
   const left = 24;
   let x = left, y = 24, lineH = 0;
   for (const view of drawn) {
@@ -3924,17 +3942,17 @@ function skelDrawViews(views: SkeletonView[], layout: SkeletonLayout | undefined
     // IN A LAYOUT, OR UNDER A PAGE LEVEL, THE WINDOW STANDS AT ITS CLASS'S WIDTH and what it holds is measured against its content.
     if (layout !== undefined || view.page !== undefined) {
       if (x > left && x + stands > left + SKEL_CANVAS) { x = left; y += lineH + SKEL_GAP; lineH = 0; }
-      out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(view.viewport)}</text>`);
+      out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
       lineH = Math.max(lineH, SKEL_TAG_H + skelDrawWindow(view, layout, x, y + SKEL_TAG_H, findings, out));
       x += stands + SKEL_GAP;
       continue;
     }
     const needs = skelFrameMinWidth(view.frame, SKEL_DEFAULT_H);
     if (needs > stands)
-      findings.push(`the \`${view.viewport}\` view needs ${needs} across, and its class stands at ${stands}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`);
+      findings.push(`the \`${skelViewName(view)}\` view needs ${needs} across, and its class stands at ${stands}; an arrangement that does not fit its screen is stacked, or drawn with fewer parts in a row`);
     const w = Math.max(stands, needs);
     if (x > left && x + w > left + SKEL_CANVAS) { x = left; y += lineH + SKEL_GAP; lineH = 0; }
-    out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(view.viewport)}</text>`);
+    out.push(`  <text class="sds-note" x="${x}" y="${y + SKEL_LABEL_H}">${esc(skelViewName(view))}</text>`);
     skelDrawFrame(view.frame, x, y + SKEL_TAG_H, undefined, findings, out, undefined, 0, SKEL_DEFAULT_H, false, stands);
     lineH = Math.max(lineH, SKEL_TAG_H + skelFrameHeight(view.frame, SKEL_DEFAULT_H));
     x += w + SKEL_GAP;
@@ -3954,7 +3972,7 @@ function skelChosenFindings(views: SkeletonView[], layout: SkeletonLayout | unde
   for (const view of views) {
     const title = view?.page?.item?.title;
     if (typeof title === "string" && words.includes(title) && title !== chosen)
-      findings.push(`the \`${view.viewport}\` view's page is \`${title}\`, an entry of the navigation, and the chosen entry is \`${chosen}\`; the chosen entry is the page's own`);
+      findings.push(`the \`${skelViewName(view)}\` view's page is \`${title}\`, an entry of the navigation, and the chosen entry is \`${chosen}\`; the chosen entry is the page's own`);
   }
 }
 
