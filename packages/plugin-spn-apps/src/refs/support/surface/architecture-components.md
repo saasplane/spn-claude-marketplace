@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "fd347f81"
+      "seen": "eeee9ebe"
     }
   ]
 }
@@ -497,7 +497,7 @@ A row states its kind in `mtype`, which takes `DSComparisonRowType`: `FIELD` giv
 
 | Part of DSFeature | Holds | Its prop |
 | --- | --- | --- |
-| An eyebrow | the line over the title: one of the item line's facts, such as a badge or a short phrase. At `PAGE` and `CONTAINER` a `TEXT` eyebrow stands out, semibold in the primary tone where the fact sets no `color`; a state such as Alpha, New or Beta is a `BADGE` eyebrow (`RD.SUPPORT.SURFACE.290`) | `eyebrow` |
+| An eyebrow | the line over the title: one of the item line's facts, such as a badge or a short phrase. At `PAGE` and `CONTAINER` a `TEXT` eyebrow stands out, semibold in the primary tone where the fact sets no `color`; a state such as Alpha, New or Beta is a `BADGE` eyebrow in `PRIMARY` (`RD.SUPPORT.SURFACE.290`); a grid cell's eyebrow is ruled once, in `site-patterns.md` | `eyebrow` |
 | A title and a description | the claim in one colour, and a sentence under it | `title`, `description` |
 | Facts | one quiet line of short facts | `facts`, `factsPlacement` |
 | Items | item lines drawn inside the feature, at a level the feature gives them by its own, given as one group | `items` |
@@ -593,7 +593,8 @@ Each of these but the box of a small media is a token of the level (`architectur
 
 - **A feature MUST fold its form on a phone by its type, and it MUST read no device** (`RD.SUPPORT.SURFACE.237`). `SPLIT_END` becomes `MEDIA_BOTTOM`, `SPLIT_START` becomes `MEDIA_TOP`, `ITEMS_SPLIT_END` becomes one column of the words, the items, then the media, `ITEMS_SPLIT_START` one column of the words, the media, then the items, and every other type keeps its shape. The size of the title on a phone is the phone value of its type step, and a page never chooses a smaller step for a phone.
 - **A feature MAY reveal its parts through `reveal`, and it MUST play once, the words first, then the media, then the items** (`RD.SUPPORT.SURFACE.282`). `reveal` is `IDSFeatureRevealProps`: `text` (`NONE`, `FADE`, `RISE`), `media` (adds `SLIDE`, `ZOOM`) and `items` (`NONE`, `FADE`, `RISE`, `ZOOM`), each a member of `DSMotionType`, and nothing moves when it is left out. Items come in 60 ms apart, and from the sixth on together. The words are in the page before any script runs.
-- **A feature's buttons MUST follow its level** (`RD.SUPPORT.SURFACE.287`). The primary is the only `SOLID` in view, and an arrow stands only on a link that goes somewhere.
+- **A view MUST hold at most one `SOLID` button, its main action** (`RD.SUPPORT.SURFACE.370`). Every other button is `OUTLINE`, or `GHOST` where it stands in a row, a toolbar or a panel's header. A view is a page, a dialog, a drawer or a sheet; a dialog over a page holds its own. A main action that deletes or ends something is `SOLID` `ERROR`, and a view with no main action holds no `SOLID`.
+- **A feature's buttons MUST follow its level, as the case of a feature for that rule** (`RD.SUPPORT.SURFACE.287`). The primary is the only `SOLID` in view, and an arrow stands only on a link that goes somewhere.
 
 | Level | How many | Their look | Their arrows |
 | --- | --- | --- | --- |
@@ -741,7 +742,21 @@ The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Wh
 - **The colour of a badge MUST say a state, and never a kind.** A person learns that a coloured badge asks to be looked at. A colour on every kind would spend that signal on things that need no attention.
 - **A badge with no `variant` MUST draw `SUBTLE`, the light tint** (`RD.SUPPORT.SURFACE.153`). A page asks for a stronger fill by writing `QUIET` or `SOLID`. So the badges of a table or a card stay quiet beside the words around them.
 - **A status badge MUST keep its own colour on a coloured surface.** Only a neutral and a primary badge take the surface's tint; success, warning, error and info stay their hue.
-- **A badge among the facts of an item line MUST take the `variant` the page gives, and else the one its level chooses:** `QUIET` at `PAGE` and `CONTAINER`, so it is seen beside a large title, and `SUBTLE_OUTLINE` at the others, whose line gives a small badge an edge down a list.
+- **A state badge among the facts of an item line MUST take the `variant` the page gives, and else the one its level chooses:** `QUIET` at `PAGE` and `CONTAINER`, so it is seen beside a large title, and `SUBTLE_OUTLINE` at the others, whose line gives a small badge an edge down a list. A badge that names a kind is not a state badge.
+- **A badge that names a kind or a type MUST draw `OUTLINE` in `DEFAULT`, with the icon its enum gives the value where it gives one** (`RD.SUPPORT.SURFACE.368`). Its line gives it an edge with no fill, so it reads as a label and never asks to be looked at. This holds at every level and in a table.
+- **A badge that says a state MUST take the hue its meaning gives, from one table, at the `variant` its place gives** (`RD.SUPPORT.SURFACE.369`). The place gives the page's `variant`, else the level's, else `SUBTLE`.
+
+  | What the state tells a person | Hue | Values in the apps |
+  | --- | --- | --- |
+  | it works, it is done or it is proved | `SUCCESS` | Active, Live, Verified, Published, Sent, Paid, Accepted |
+  | it waits on a person, or is on its way to them | `WARNING` | Pending, Invited, Unverified, Awaiting approval |
+  | it failed, was refused, or stops something working until a person acts | `ERROR` | Failed, Rejected, Blocked, Bounced, a credential Expired |
+  | the system is working on it now | `INFO` | Running, Processing, Syncing, Scheduled |
+  | it is off, ended or not started, and asks nothing | `DEFAULT` | Draft, Disabled, Archived, Revoked, an invite Expired |
+  | it marks the one chosen among its peers, or a stage of release | `PRIMARY` | Current, Default, Primary, Alpha, Beta |
+
+  A value that fits two rows takes the one that says what the person must do: Expired is `ERROR` where something stops working and `DEFAULT` where nothing needs doing.
+- **A badge over a picture MUST be `SOLID`, and it says a state in that state's hue** (`RD.SUPPORT.SURFACE.374`). A kind over a picture is the picture's caption, never a badge.
 
 ### A value of an enum
 
@@ -1055,6 +1070,10 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.071` | the actions of a record stand at the end of its row, its line or its card. How many stand on the row, and what a press on a row does, are proposed |
 | `RD.SUPPORT.SURFACE.072` | a value changed in a table is changed in its cell, one row at a time |
 | `RD.SUPPORT.SURFACE.073` | the one form of the filter bar, at a desktop, at a tablet and on a phone |
+| `RD.SUPPORT.SURFACE.368` | a badge that names a kind or a type draws `OUTLINE` in `DEFAULT`, with the icon its enum gives the value |
+| `RD.SUPPORT.SURFACE.369` | a badge that says a state takes the hue its meaning gives, from one table, at the page's `variant`, else the level's, else `SUBTLE` |
+| `RD.SUPPORT.SURFACE.370` | a view holds at most one `SOLID` button, its main action; the feature's buttons are the case of a feature |
+| `RD.SUPPORT.SURFACE.374` | a badge over a picture is `SOLID`, and says a state in that state's hue |
 
 ## Proof
 

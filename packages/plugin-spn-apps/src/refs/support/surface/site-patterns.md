@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "210b1588"
+      "seen": "a4547331"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
@@ -105,7 +105,7 @@ Each section gives the question it answers, its **For** line, what calls for it,
 
 - **For** Visitor · Learner. For a Learner it is a doc page's head: `size` `MD`, `START`, with no actions.
 - **Calls for it.** The section that says what the page is: its one claim, and what shows it at a glance.
-- **Look.** `DSSectionContainer` `size` `LG`, or `XL` where the hero is the page's emphasis, `color` `BASE`. Inside it, a `DSFeature` at `pageLevel` `PAGE`. The media keeps the frame of its kind: a product is `frames` `MEDIA` with `surface` raised, `elevation` `LG`; a diagram is flat; a mood picture is `type` `BACKDROP`. Use `type` `SPLIT_END` for one picture the title names, and `MEDIA_BOTTOM` for two panes or a wide picture. Centre the words, `textAlign` `CENTER`, only when nothing stands beside or under them. A state such as Alpha is a `BADGE` `eyebrow`. The stack goes in up to four `BADGE` `facts`. The actions are the page's one `SOLID` primary, then one `OUTLINE`. With items, use `actionsPlacement` `BEFORE_ITEMS`. A hero takes no `reveal`.
+- **Look.** `DSSectionContainer` `size` `LG`, or `XL` where the hero is the page's emphasis, `color` `BASE`. Inside it, a `DSFeature` at `pageLevel` `PAGE`. The media keeps the frame of its kind: a product is `frames` `MEDIA` with `surface` raised, `elevation` `LG`; a diagram is flat; a mood picture is `type` `BACKDROP`. Use `type` `SPLIT_END` for one picture the title names, and `MEDIA_BOTTOM` for two panes or a wide picture. Centre the words, `textAlign` `CENTER`, only when nothing stands beside or under them. A state such as Alpha is a `BADGE` `eyebrow` in `PRIMARY`, at the level's `variant`. The stack names kinds, so it goes in up to four `BADGE` `facts`, each `OUTLINE` in `DEFAULT` (`RD.SUPPORT.SURFACE.371`). The actions are the page's one `SOLID` primary, then one `OUTLINE`. With items, use `actionsPlacement` `BEFORE_ITEMS`. A hero takes no `reveal`.
 - **On a phone.** The words, the facts and the buttons, then the picture: the facts are the head's own, and the actions stand after the head.
 - **Not when.** The section is a slideshow of several claims: give each claim its own section. A hero never takes a fill.
 - **Specs.** `hero.dg.json`, the picture beside the words; `hero-under.dg.json`, two panes or a wide picture under them.
@@ -184,10 +184,10 @@ Five doors in a row cannot be drawn: the columns stop at four. Three over two re
 
 - **For** Visitor · Learner. Plans, quotes and a directory are for a Visitor; a showcase's groups for a Learner.
 - **Calls for it.** A set of things, each of its own: a module, an integration, a group of components, a feature shown with a picture of its own, a plan or a quote. Each carries more than a title and a line: its own picture, its own mark, its facts, its own points, or its own page.
-- **Look.** `DSFeatureGridSectionContainer` with `section` (`BASE`, `MD`), `heading` (its actions stand under it) and `grid` by count. Each cell is a `DSFeature` at `pageLevel` `WIDGET`, with `media` `MARK`. Give cells an `eyebrow` when they share a family, and `facts` for the count. A cell with an `anchor` is a door: `frames` `TEXT`, `surface` raised, `elevation` `MD`, on `DEFAULT`. A cell that opens nothing is boxed and flat: `frames` `TEXT`, `surface` bordered.
+- **Look.** `DSFeatureGridSectionContainer` with `section` (`BASE`, `MD`), `heading` (its actions stand under it) and `grid` by count. Each cell is a `DSFeature` at `pageLevel` `WIDGET`, with `media` `MARK`. Give cells an `eyebrow` when they share a family, and `facts` for the count. **A cell's eyebrow MUST be its group or kind as text, the overline the feature draws, and a badge only when it says a state, in that state's hue** (`RD.SUPPORT.SURFACE.372`). A cell with an `anchor` is a door: `frames` `TEXT`, `surface` raised, `elevation` `MD`, on `DEFAULT`. A cell that opens nothing is boxed and flat: `frames` `TEXT`, `surface` bordered.
 - **Shown features.** Two to four features of one product, each with a small picture of the product doing it. Each cell is a `DSFeature` at `WIDGET` with `type` `MEDIA_TOP`; its `mediaNode` is the picture, built from the design system's own units, flat and unframed. The words stand under it at `START`: a title that makes the claim, and one line. The grid draws lines between the cells, `grid.borderType` `GRID`, and no box around any cell, in 2/1/1 or 3/1/1.
 - **Directory.** Many things of one kind, read as a catalogue, such as integrations or data sources. Each cell has `media` `MARK`, the name as its title, `facts` with `factsPlacement` `AFTER_TITLE` for its kind and how it connects (*CRM · OAuth*), and one line. The cells are lined, not boxed, `grid.borderType` `GRID`, in 3/2/1, so the set reads as one table. A cell that opens the thing's page has an `anchor` and is pressed whole.
-- **Plans.** The section is `DEFAULT`, because comparing offers is another kind of reading. Each plan's `eyebrow` is its name. Its `items` is a `LIST` of what it holds, each with a check icon, and it has one action. The recommended plan is raised `MD` and has a `BADGE` eyebrow. A row-by-row comparison under the plans is `DSComparison`.
+- **Plans.** The section is `DEFAULT`, because comparing offers is another kind of reading. Each plan holds one eyebrow, its name; a second word such as Most popular is the plan's highlight, a `BADGE` fact in `PRIMARY` at the level's `variant`, never a second eyebrow (`RD.SUPPORT.SURFACE.373`). Its `items` is a `LIST` of what it holds, each with a check icon, and it has one action. The recommended plan is raised `MD` and carries that highlight. A row-by-row comparison under the plans is `DSComparison`.
 - **Quotes.** Each cell's `description` is the quote, its `media` an `AVATAR`, and its `facts` the role and the team. The cells are bordered and flat.
 - **On a phone.** The heading and its button, then one cell under another.
 - **Not when.** The items are parts or points of one subject, each a title and a line with no picture of its own: they stay a feature's items. Seven modules with one line each stay a list too. There is no price yet: say so in Points.
@@ -319,6 +319,9 @@ This ref states which shape a section of a site's page takes, how it is chosen f
 | `RD.SUPPORT.SURFACE.346` | every section of a site's page that holds items stands at the start |
 | `RD.SUPPORT.SURFACE.347` | a menu's tile panel stands three across at most |
 | `RD.SUPPORT.SURFACE.293` | a section's depth follows what each part holds: a point flat, a door boxed and raised, media framed by its kind, and a section never framed |
+| `RD.SUPPORT.SURFACE.371` | a hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts |
+| `RD.SUPPORT.SURFACE.372` | a grid cell's eyebrow is its group or kind as text, and a badge only when it says a state |
+| `RD.SUPPORT.SURFACE.373` | a plan holds one eyebrow, and a second word is a `PRIMARY` badge fact |
 | `RD.SUPPORT.SURFACE.236` | a feature with an `anchor` is pressed whole and takes no actions, so on the web a door or a grid cell is lit as one target |
 
 ## Proof

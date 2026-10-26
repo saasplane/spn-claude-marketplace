@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "38f8deaa"
+      "seen": "f876d841"
     }
   ],
   "decisions": [

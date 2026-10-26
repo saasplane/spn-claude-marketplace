@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "38f8deaa"
+      "seen": "f876d841"
     }
   ]
 }
@@ -270,7 +270,7 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the tree by layer of the app pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
-- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
+- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. A badge that names a kind draws `OUTLINE` in `DEFAULT`, a state takes the hue its meaning gives from the book's table, and a view holds at most one `SOLID` button (`RD.SUPPORT.SURFACE.368`, `.369`, `.370`). What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **Every control a person sets is a `DSForm.Field`**, a lone checkbox or switch too (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`). A field with no label of its own keeps a blank label line, so it lines up beside labelled fields in a row; alone on its line in a column, write `showBlankLabel={false}`. A field's own action, such as *Forgot password?*, goes to `labelEndNode`, and never under the field. A switch and a checkbox take their own `label`.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
 - **Under the picture an item line holds its title, its description, then its line of facts.** The facts go to `facts`, and they stand under the description, so a line that has both shows both (`RD.SUPPORT.SURFACE.086`). Write each fact as data, in one of four forms: plain words; `TEXT`, with a `label` and icons where it needs them; `BADGE`, with a `color`; or `CUSTOM`, a block of the page's own (`RD.SUPPORT.SURFACE.096`). A fact whose value cannot be read alone, such as a count, a date or a person, carries its label before it, as *Members: 12*. A state is a `BADGE` fact.
