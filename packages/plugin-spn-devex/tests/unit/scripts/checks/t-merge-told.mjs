@@ -33,6 +33,8 @@ const running = [
   { id: "2", parent: "N001", title: "build it", kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: ["1"], touches: [], state: "waiting" },
 ];
 const commit = (git, message) => git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "--allow-empty", "-m", message]);
+// A merge commit needs an identity too, and a CI runner has none of its own.
+const merge = (git, message, branch) => git(["-c", "user.email=t@t", "-c", "user.name=t", "merge", "-q", "--no-ff", "-m", message, branch]);
 
 console.log("=== which commands it reads");
 {
@@ -49,7 +51,7 @@ console.log("\n=== a merge into develop with a running arc in a set that holds t
   git(["checkout", "-q", "-b", "feature"]);
   commit(git, "feature work");
   git(["checkout", "-q", "develop"]);
-  git(["merge", "-q", "--no-ff", "-m", "merge feature", "feature"]);
+  merge(git, "merge feature", "feature");
   const verdict = checkMergeTold(bash("git merge --no-ff feature", repo));
   ok("a local merge that moved develop gives a note", Boolean(verdict?.note) && !verdict?.deny, JSON.stringify(verdict));
   ok("the note names the repository", verdict?.note?.includes("`spn-x`"), verdict?.note);
@@ -76,7 +78,7 @@ console.log("\n=== silent");
   git(["checkout", "-q", "-b", "feature"]);
   commit(git, "feature work");
   git(["checkout", "-q", "develop"]);
-  git(["merge", "-q", "--no-ff", "-m", "merge feature", "feature"]);
+  merge(git, "merge feature", "feature");
   ok("a workstream whose arc is not running is told nothing", checkMergeTold(bash("git merge --no-ff feature", repo)) === null);
 }
 {
@@ -87,7 +89,7 @@ console.log("\n=== silent");
   git(["checkout", "-q", "-b", "other"]);
   commit(git, "two");
   git(["checkout", "-q", "feature"]);
-  git(["merge", "-q", "--no-ff", "-m", "merge other", "other"]);
+  merge(git, "merge other", "other");
   ok("a merge into a branch other than develop says nothing", checkMergeTold(bash("git merge --no-ff other", repo)) === null);
   ok("a call that is not Bash says nothing", checkMergeTold({ ...bash("git merge other", repo), tool_name: "Edit" }) === null);
 }
