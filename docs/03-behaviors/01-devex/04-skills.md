@@ -27,6 +27,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SKILLS.05 | Architect | decide what something IS one agreed block at a time | An interactive skill asks, and runs no act on an answer nobody gave | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.06 | Engineering leader | never receive a report nobody asked for | The reporting skill says in its own description that it is never run unasked | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.07 | Architect | find the rule a skill carries stated somewhere a check can read | A skill names the chapter or card holding the rule and states none of its own | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILLS.08 | Engineering leader | ask in plain words and reach the skill written for it, without typing its name | Every skill of the four plugins opens with its frontmatter, so the session is offered it; one that opens with anything else fails the suite | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

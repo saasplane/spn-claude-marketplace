@@ -1,9 +1,13 @@
+---
+name: bootstrap
+description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring both estate layers up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: bootstrap
-description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring both estate layers up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
----
 
 # bootstrap — an empty folder becomes a working workspace
 

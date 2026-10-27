@@ -15,7 +15,7 @@ The folder under this plugin's `skills/` is named for a command of the Surface g
 | Designing a page | `packages/plugin-spn-surface/src/skills/design/SKILL.md` | the layout, the containers, the pattern of each task and the blocks, stated as a tree of named blocks |
 | The steps the skill names | `packages/plugin-spn-surface/src/skills/design/steps/draw.md` and `change-library.md` | draw the tree in Figma from the published libraries, and change a library file through the connector, held by the skill because they name no stack |
 | The scripts the steps run | `packages/plugin-spn-surface/src/skills/design/scripts/` | the scripts that read a page, lay out a set and check what was drawn, run through the connector |
-| What the skill restates | the `spn:restates` block at the top of `SKILL.md` | the skills chapter, the ideate chapter and the Surface chapters it follows |
+| What the skill restates | the `spn:restates` block right after the frontmatter of `SKILL.md` | the skills chapter, the ideate chapter and the Surface chapters it follows |
 
 ## Follows the pattern
 

@@ -1,9 +1,13 @@
+---
+name: review
+description: Review SaaS Plane TS changes against the standards. Use when the user asks for a code review, a PR review, or when the `implement` skill closes with a contract change. Modes by argument - code (the TS standards restated across naming, structure, patterns, service, database, codegen) and contract (the stack-agnostic contract compatibility and secrets gate).
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "3f944c3b"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: review
-description: Review SaaS Plane TS changes against the standards. Use when the user asks for a code review, a PR review, or when the `implement` skill closes with a contract change. Modes by argument - code (the TS standards restated across naming, structure, patterns, service, database, codegen) and contract (the stack-agnostic contract compatibility and secrets gate).
----
 
 # review — code and contract gates
 

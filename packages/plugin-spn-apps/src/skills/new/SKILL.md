@@ -1,9 +1,13 @@
+---
+name: new
+description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create something new - a workspace root (repo), a project of one of the supported kinds (toolchain, support-universal, support-server, support-web, module-server, module-web, app-server, app-web, app-utility, client-api), or an app-owned module inside an existing app. Takes a kebab-case target naming what to scaffold.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: new
-description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create something new - a workspace root (repo), a project of one of the supported kinds (toolchain, support-universal, support-server, support-web, module-server, module-web, app-server, app-web, app-utility, client-api), or an app-owned module inside an existing app. Takes a kebab-case target naming what to scaffold.
----
 
 # new — scaffold by target
 

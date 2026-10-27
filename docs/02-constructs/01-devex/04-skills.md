@@ -65,6 +65,8 @@ A large skill therefore costs nothing on a turn that never needed it, which is w
 
 A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines.
 
+**The frontmatter is the file's first line, and the stamp comes after it** (RD.DEVEX.AGENT.108). The runtime reads frontmatter only at the start of the file. A skill that opens with anything else, its `spn:restates` stamp included, is still a command a person can type, but the session is never offered it, so no ask in plain words reaches it. A suite case reads every `SKILL.md` of the four plugins and fails on one whose first line is not `---`. It reads no partner's file.
+
 ### A skill that outgrows one file
 
 A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic skill here needs one, and one domain skill does.
