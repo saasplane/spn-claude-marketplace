@@ -28,7 +28,7 @@ Its provenance is the foundation book's docs chapter, on the skeleton and the fl
 
 ## Write the facts first
 
-Before the first skeleton, write the facts of step 0 and step 2 at the head of the mock, each with where you read it: who the app is for, the flow and the page's step in it, and what the data holds. A reader corrects a fact before a drawing. Where the tree already holds them, copy them from the tree.
+Before the first skeleton, write the facts of step 0 and step 2 at the head of the mock, each with where you read it: who the app is for, the flow and the page's step in it, and what the data holds. A reader corrects a fact before a drawing. Where the tree already holds them, copy them from the tree. **Write the facts with the mock's files, in a file beside the specs, and never only in your reply.**
 
 ## One skeleton for each page, in the order a person meets them
 
@@ -36,7 +36,7 @@ Before the first skeleton, write the facts of step 0 and step 2 at the head of t
 - **The spec draws every level of the page, from the tree**: its `layout`, each view's page level as `page`, and the `unit` of each panel, widget and card. Each line of the tree is a frame, a part, an item or a control of the spec.
 - **A view for each screen class where the pattern changes.** A desktop view, and a phone view where the arrangement differs at a phone, as step 3 of the tree says: a data table that becomes a list, two parts that become one with a way back, a dialog that becomes a sheet. A tablet view only where the tablet differs from both.
 - **Each dialog, sheet or drawer is its own view**, a whole frame of its own over the page it opens from. It is a view a person sees as one task, and it holds its own main action.
-- **Each block drawn from data shows its empty, failed and denied pictures as views of their own**, with `state`, a value of `DSTaskStateType`: `EMPTY`, `FAILED`, `DENIED`, and `WORKING` where the wait is long enough to see. A view with no `state` shows the page with its data. A view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. The views of one screen class stand together, the one with no `state` first and the others in the order of `DSTaskStateType`. A state the page's blocks do not show is not drawn. The words of each state are the tree's task lines: what the person sees, and the way back from a failure.
+- **Each block drawn from data shows its empty, failed and denied pictures as views of their own**, with `state`, a value of `DSTaskStateType`: `EMPTY`, `FAILED`, `DENIED`, and `WORKING` where the wait is long enough to see. A view with no `state` shows the page with its data. A page whose action a permission gates draws its `DENIED` view, the page without that action. A view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. The views of one screen class stand together, the one with no `state` first and the others in the order of `DSTaskStateType`. A state the page's blocks do not show is not drawn. The words of each state are the tree's task lines: what the person sees, and the way back from a failure.
 - **Every move names the page it leads to.** An action that opens another page, a dialog or an end of the flow says where it lands, in the tree and in the flow file.
 
 ## A flow file that orders the pages
