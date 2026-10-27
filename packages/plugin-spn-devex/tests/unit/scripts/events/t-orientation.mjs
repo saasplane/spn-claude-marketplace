@@ -114,6 +114,15 @@ compare("day zero resumed: a new-platform workstream is already open",
    "Shall we carry on?", "Read its arc BEFORE you say anything"],
   ["Would you like to start a new platform?", "So — what are we building?"]);
 
+// A `.spndevex/` HOLDING NOTHING BUT `.debug/` IS NO WORKSPACE. A Stop hook once wrote its session notes
+// wherever a window stopped, so `/tmp` grew one, and every partner repository under it was told day 0.
+compare("a partner's repository below a folder whose .spndevex holds only .debug: not day 0",
+  join(fixture("stray-debug", {
+    ".spndevex/.debug/stop/sessions/s1.json": "{}\n",
+    "partner/acme-orders/sprepo.json": repo("APPS", { stack: "TS" }),
+  }), "partner", "acme-orders"),
+  ["1 repo"], ["This folder is empty", "Day-0 mode", "no sprepo.json under"]);
+
 compare("an estate-only workspace, rung 1",
   fixture("estate-only", {
     "spn-infra/sprepo.json": repo("INFRA"),

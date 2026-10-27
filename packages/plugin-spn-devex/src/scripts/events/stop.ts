@@ -1437,8 +1437,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // payload's `cwd` and walked up to `.spndevex/`; this now does the same.
   let start = "";
   try { start = JSON.parse(input || "{}")?.cwd ?? ""; } catch { start = ""; }
-  const root = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd())
-            ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  const inWorkspace = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  const root = inWorkspace ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
 
   let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
   try { event = JSON.parse(input || "{}") ?? {}; } catch { event = {}; }
@@ -1517,8 +1517,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const kept = held.length && baseline ? baseline : null;
   // AFTER the checks, never before: they compare against this and would compare against now. `fired`
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
-  // the first reply's check either.
-  writeBaseline(root, baselineKey, { at: kept ? kept.at : Date.now(),
+  // the first reply's check either. OUTSIDE A WORKSPACE NOTHING IS WRITTEN: the note would make the
+  // `.spndevex/` it sits in, and every session below that folder would take it for a workspace.
+  if (inWorkspace) writeBaseline(root, baselineKey, { at: kept ? kept.at : Date.now(),
                                  steps: kept ? { ...currentSteps(root), ...kept.steps } : currentSteps(root),
                                  fired: [...new Set([...spoken, ...said.map((warning) => warning.check)])],
                                  cards: waiting,
