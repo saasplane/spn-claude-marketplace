@@ -1,9 +1,13 @@
+---
+name: provision
+description: How infrastructure appears for development - the layer order, what each layer owns, what is read from the declarations, and which operations are destructive. Use when bringing up or tearing down a local stack, registering an app, or diagnosing why something will not start. Stack-agnostic; driven by the repo's own manifests and pins.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: provision
-description: How infrastructure appears for development - the layer order, what each layer owns, what is read from the declarations, and which operations are destructive. Use when bringing up or tearing down a local stack, registering an app, or diagnosing why something will not start. Stack-agnostic; driven by the repo's own manifests and pins.
----
 
 # provision — layers, in order, from the declarations
 

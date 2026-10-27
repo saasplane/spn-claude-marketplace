@@ -1,9 +1,13 @@
+---
+name: develop
+description: The contract-first build loop - the order work is done in, what each layer may and may not do, and what must be regenerated before anything is committed. Use when implementing a capability, changing an existing one, or judging whether code sits in the right layer. Stack-agnostic; the domain plugin supplies the per-layer step files and the commands.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -17,10 +21,6 @@
   ]
 }
 -->
----
-name: develop
-description: The contract-first build loop - the order work is done in, what each layer may and may not do, and what must be regenerated before anything is committed. Use when implementing a capability, changing an existing one, or judging whether code sits in the right layer. Stack-agnostic; the domain plugin supplies the per-layer step files and the commands.
----
 
 # develop — contract first, every time
 

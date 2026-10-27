@@ -67,7 +67,7 @@ A ref's path says which part of the book it restates, so `refs/` reads as a map 
 
 ### The block, and what it holds
 
-A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that.
+A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. A skill's `SKILL.md` is the one exception: its frontmatter comes first and the block right after it, because a skill that opens with anything else is never offered to the session ([Skills](04-skills.md)).
 
 ### A stamp is as precise as the sentence it replaces
 

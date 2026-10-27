@@ -30,7 +30,7 @@
 
 **Why** — *the listing is what a session holds in full*, one line per skill, and the body is read only once a description matches. A description written as a catalogue entry never fires.
 **What** — each description states the class of ask the skill answers and gives the phrasing that should trigger it, including the words a developer actually types.
-**How** — the frontmatter carries `name` and `description` and nothing else. Read any `SKILL.md` under `packages/plugin-spn-devex/src/skills/`, the first three lines.
+**How** — the frontmatter opens the file and carries `name` and `description` and nothing else; the `spn:restates` stamp follows it. Read any `SKILL.md` under `packages/plugin-spn-devex/src/skills/`, the first four lines. `packages/plugin-spn-devex/tests/unit/skills/t-frontmatter-first.mjs` fails on any skill of the four plugins that opens with something else.
 
 ### The stage stays here, and the realization supplies its layer
 

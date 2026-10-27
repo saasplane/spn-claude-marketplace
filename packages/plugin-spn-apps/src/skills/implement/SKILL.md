@@ -1,9 +1,13 @@
+---
+name: implement
+description: THE requirement router for SaaS Plane TS repos. Use whenever the user asks to build, add, change, or fix a feature or behavior in an SPN platform - it classifies the requirement (BE-only, FE-only, full-stack) and sequences the golden-path steps in contract-first order, contract, service, entry, ui, test, docs, closing with tests and the contract review gate.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "3f944c3b"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -31,10 +35,6 @@
   ]
 }
 -->
----
-name: implement
-description: THE requirement router for SaaS Plane TS repos. Use whenever the user asks to build, add, change, or fix a feature or behavior in an SPN platform - it classifies the requirement (BE-only, FE-only, full-stack) and sequences the golden-path steps in contract-first order, contract, service, entry, ui, test, docs, closing with tests and the contract review gate.
----
 
 # implement — classify, then walk the steps in order
 

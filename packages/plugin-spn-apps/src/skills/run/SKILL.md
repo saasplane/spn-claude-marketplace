@@ -1,9 +1,13 @@
+---
+name: run
+description: Start a SaaS Plane TS platform locally or run its test suites. Use when the user asks to run, start, bring up, or boot the platform, an app, or the local stack (mode local - start only, no tests), or to run tests (mode tests). Not for health verification or resets - that is the `verify` skill.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: run
-description: Start a SaaS Plane TS platform locally or run its test suites. Use when the user asks to run, start, bring up, or boot the platform, an app, or the local stack (mode local - start only, no tests), or to run tests (mode tests). Not for health verification or resets - that is the `verify` skill.
----
 
 # run — local stack and test suites
 

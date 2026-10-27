@@ -1,9 +1,13 @@
+---
+name: run
+description: Realize the estate - bring a layer up, take it down, read its status, and register an app into the local realization. Use when the ask is to start, stop, restart or check the local stack, to stand a cloud layer up, or to bootstrap an app's schemas, certificates and ingress. Not for reading a plan back before an apply (review skill) and not for the validate and test gates (verify skill).
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: run
-description: Realize the estate - bring a layer up, take it down, read its status, and register an app into the local realization. Use when the ask is to start, stop, restart or check the local stack, to stand a cloud layer up, or to bootstrap an app's schemas, certificates and ingress. Not for reading a plan back before an apply (review skill) and not for the validate and test gates (verify skill).
----
 
 # run — layers as nouns, local by default
 

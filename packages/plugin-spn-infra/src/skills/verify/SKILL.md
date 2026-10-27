@@ -1,9 +1,13 @@
+---
+name: verify
+description: Run the estate's gates - spnutils infra validate for the build, spnutils infra test <run> for the tiers a node's kind owes - stamp the rows a run proved, and say honestly what a green run proves. Use before asking for any review, after a scaffold or a declaration edit, and whenever a claim is made that an estate node is sound. Not for bringing a layer up (run skill) and not for judging a plan's contents (review skill).
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: verify
-description: Run the estate's gates - spnutils infra validate for the build, spnutils infra test <run> for the tiers a node's kind owes - stamp the rows a run proved, and say honestly what a green run proves. Use before asking for any review, after a scaffold or a declaration edit, and whenever a claim is made that an estate node is sound. Not for bringing a layer up (run skill) and not for judging a plan's contents (review skill).
----
 
 # verify — validate the build, test the tiers, stamp what proved them
 

@@ -1,9 +1,13 @@
+---
+name: implement
+description: Author an estate node - locate it, write the choices a person actually makes into its manifest, and build out a lifecycle module package end to end. Use when adding or changing an environment, an app grant row, a module row, a region, a schema, a size, a hosting or a deploy trigger; and when a platform needs a lifecycle plug-in - a vendor you run, a warehouse, a search engine, anything attached at a layer step. Not for scaffolding a node that does not exist yet (new skill), not for reading a plan back (review skill), and not for publishing (release skill).
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: implement
-description: Author an estate node - locate it, write the choices a person actually makes into its manifest, and build out a lifecycle module package end to end. Use when adding or changing an environment, an app grant row, a module row, a region, a schema, a size, a hosting or a deploy trigger; and when a platform needs a lifecycle plug-in - a vendor you run, a warehouse, a search engine, anything attached at a layer step. Not for scaffolding a node that does not exist yet (new skill), not for reading a plan back (review skill), and not for publishing (release skill).
----
 
 # implement — locate the node, write the choices, build the module
 

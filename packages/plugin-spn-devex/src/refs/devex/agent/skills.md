@@ -24,6 +24,8 @@
 
 **So two skills with nearly the same description compete**, and the matching gets worse as the pair grows. A skill answering several close asks keeps one description and routes inside itself.
 
+**A match needs the description in front of the session, so a `SKILL.md` opens with its frontmatter** (`RD.DEVEX.AGENT.108`). Its first line is `---`, then `name` and `description`; the `spn:restates` stamp and anything else come after it. The runtime reads frontmatter only at the start of the file, and a skill that opens with anything else is still a command you can type, but the session is never offered it, so no ask in plain words reaches it.
+
 ## A value spells its owner, and a folder never does
 
 **A skill's value is `{DOMAIN}_{SKILL}`.** The domain is taken from the claim of the plugin that ships it and is never authored a second time. **The folder name stays bare.**
