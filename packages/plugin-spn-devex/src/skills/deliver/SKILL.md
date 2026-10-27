@@ -1,9 +1,13 @@
+---
+name: deliver
+description: How a change reaches a running setup - what must be true before a release, what a version means, and what is never part of the payload. Use when publishing a package, cutting a release, promoting a change, or judging whether work is releasable. Stack-agnostic; the domain plugin supplies the release commands and lifecycle bins.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: deliver
-description: How a change reaches a running setup - what must be true before a release, what a version means, and what is never part of the payload. Use when publishing a package, cutting a release, promoting a change, or judging whether work is releasable. Stack-agnostic; the domain plugin supplies the release commands and lifecycle bins.
----
 
 # deliver — what must be true before it ships
 

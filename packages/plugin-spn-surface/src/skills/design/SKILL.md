@@ -1,9 +1,13 @@
+---
+name: design
+description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words, in Figma, or as a mock with no Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries, and with none it draws the tree as skeletons, a mock, one for each page and each task state, with a flow file that orders the pages (step 8). For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "3f944c3b"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -16,10 +20,6 @@
   ]
 }
 -->
----
-name: design
-description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words, in Figma, or as a mock with no Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries, and with none it draws the tree as skeletons, a mock, one for each page and each task state, with a flow file that orders the pages (step 8). For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
----
 
 # design — a page, from its layout down to its blocks
 

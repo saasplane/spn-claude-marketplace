@@ -1,9 +1,13 @@
+---
+name: verify
+description: Prove SaaS Plane TS work is sound by running gates. Use when the ask names a target to run against - "verify this package", "verify the app", "clean reset and verify". Modes - package (conformance gates and tests, no running stack), app (health checks on what is running), reset (rebuild from a clean state, destructive). If the ask is a claim about what the code does rather than a target to run, hand to the check skill instead.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "3f944c3b"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -16,10 +20,6 @@
   ]
 }
 -->
----
-name: verify
-description: Prove SaaS Plane TS work is sound by running gates. Use when the ask names a target to run against - "verify this package", "verify the app", "clean reset and verify". Modes - package (conformance gates and tests, no running stack), app (health checks on what is running), reset (rebuild from a clean state, destructive). If the ask is a claim about what the code does rather than a target to run, hand to the check skill instead.
----
 
 # verify — run the gates against a target
 

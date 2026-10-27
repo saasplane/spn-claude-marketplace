@@ -1,9 +1,13 @@
+---
+name: review
+description: Read an estate plan or a declaration diff back before anything applies - what a plan must name, what it must never contain, and how a declaration change is presented as one line per choice. Use before any --apply or --approve, when a plan output needs a verdict, or when checking that a declaration change renders exactly what was intended and nothing more.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: review
-description: Read an estate plan or a declaration diff back before anything applies - what a plan must name, what it must never contain, and how a declaration change is presented as one line per choice. Use before any --apply or --approve, when a plan output needs a verdict, or when checking that a declaration change renders exactly what was intended and nothing more.
----
 
 # review — the plan is the review
 

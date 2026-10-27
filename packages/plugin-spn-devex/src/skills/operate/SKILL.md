@@ -1,9 +1,13 @@
+---
+name: operate
+description: How a running platform is observed, responded to, and maintained - what a service must emit to be operable, what an incident owes back to the standards, and what may never be done to a running estate by hand. Use when investigating a live problem, judging whether a change is observable, handling an incident, or planning routine maintenance. Stack-agnostic; the domain plugin supplies the log and metric wiring.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/08-operate.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: operate
-description: How a running platform is observed, responded to, and maintained - what a service must emit to be operable, what an incident owes back to the standards, and what may never be done to a running estate by hand. Use when investigating a live problem, judging whether a change is observable, handling an incident, or planning routine maintenance. Stack-agnostic; the domain plugin supplies the log and metric wiring.
----
 
 # operate — a platform you can see into, and change without fear
 

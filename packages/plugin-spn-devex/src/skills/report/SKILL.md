@@ -1,9 +1,13 @@
+---
+name: report
+description: Write one of the five reports on a repository — coverage (how much is written, built and proved), tests (what the tests have proved), audit (is it set up the way the standard says), code (where the source departs from the stack's standards) or docs (where the documents depart from the docs standards) — into its docs/artifacts/reports/ folder. Use when the user asks where a repository stands, how finished it is, what is proved or unproved, whether it is set up right, or what breaks the standards. Never run unasked, and never publish the page unless asked. Stack-agnostic; the domain plugin supplies the commands a code or audit report runs.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
@@ -32,10 +36,6 @@
   ]
 }
 -->
----
-name: report
-description: Write one of the five reports on a repository — coverage (how much is written, built and proved), tests (what the tests have proved), audit (is it set up the way the standard says), code (where the source departs from the stack's standards) or docs (where the documents depart from the docs standards) — into its docs/artifacts/reports/ folder. Use when the user asks where a repository stands, how finished it is, what is proved or unproved, whether it is set up right, or what breaks the standards. Never run unasked, and never publish the page unless asked. Stack-agnostic; the domain plugin supplies the commands a code or audit report runs.
----
 
 # report — where one repository stands, at one moment
 

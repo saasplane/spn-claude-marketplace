@@ -1,9 +1,13 @@
+---
+name: test
+description: What proves a behaviour, at which tier, and what a passing suite does and does not mean. Use when deciding where a test belongs, judging whether a change is adequately proven, or reading a test result honestly. Stack-agnostic; the domain plugin supplies the runners and the gate commands.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -74,10 +78,6 @@
   ]
 }
 -->
----
-name: test
-description: What proves a behaviour, at which tier, and what a passing suite does and does not mean. Use when deciding where a test belongs, judging whether a change is adequately proven, or reading a test result honestly. Stack-agnostic; the domain plugin supplies the runners and the gate commands.
----
 
 # test — proof, at the tier that means something
 

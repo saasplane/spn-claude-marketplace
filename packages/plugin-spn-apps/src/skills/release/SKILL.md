@@ -1,9 +1,13 @@
+---
+name: release
+description: Publish this repository's releasable projects, in lockstep, through `apps release`. Use when the developer asks to cut, ship, or publish a release, or to preview what one would do before running it. Not for releasing a single package — the scope is always the repository — and not for an estate package, which is the `spn-infra` plugin's own `release` skill.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: release
-description: Publish this repository's releasable projects, in lockstep, through `apps release`. Use when the developer asks to cut, ship, or publish a release, or to preview what one would do before running it. Not for releasing a single package — the scope is always the repository — and not for an estate package, which is the `spn-infra` plugin's own `release` skill.
----
 
 # release — publish the repository, in lockstep
 

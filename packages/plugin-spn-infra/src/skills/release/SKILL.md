@@ -1,9 +1,13 @@
+---
+name: release
+description: Publishing an estate package - bump the version field in spinfrapkg.json by reviewed edit, run spnutils infra release, publish to the organization's registry pair or stage into the machine store with --local. Use when a package version must publish, when a consumer pin should flip to a published version, or when a bespoke build script or workflow needs repointing at infra release.
+---
 <!-- spn:restates
 {
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
@@ -12,10 +16,6 @@
   ]
 }
 -->
----
-name: release
-description: Publishing an estate package - bump the version field in spinfrapkg.json by reviewed edit, run spnutils infra release, publish to the organization's registry pair or stage into the machine store with --local. Use when a package version must publish, when a consumer pin should flip to a published version, or when a bespoke build script or workflow needs repointing at infra release.
----
 
 # release — bump by review, publish whole, to the org's registry pair
 
