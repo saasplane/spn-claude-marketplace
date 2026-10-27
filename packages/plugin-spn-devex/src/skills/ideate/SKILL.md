@@ -160,7 +160,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
 | --- | --- | --- |
 | no sign | the one view that owns the question, in one sentence | you speak from its lens file |
 | one sign | the architect's view and the owning view | you speak from each lens file |
-| two signs or more | the starting group, with product and partner, and a second pass after the developer's answer | each view is a fresh `spn-panel`, handed the proposal's own words and the developer's |
+| two signs or more | the starting group, with partner always and product when the choice touches what a consumer meets, and a second pass after the developer's answer | each view is a fresh `spn-panel`, handed the proposal's own words and the developer's |
 
 - **More views, or more passes, need the developer's word.** The limit keeps a small choice from costing a wait and a long reply.
 - **A view whose word is to count as a review that can block a gate is a fresh `spn-panel`, at any number of signs.** You wrote the proposal, so a lens file you read yourself gives advice and blocks nothing.
