@@ -1,11 +1,15 @@
-// `unit show` — one unit from the snapshot this plugin carries, with its restated choice table.
+// `unit show` — one unit from the snapshot this plugin carries, with its restated choice table, and
+// a unit beyond the core from the symbol index of the repository it runs in.
 //
 // THIS SUITE OWNS THE COMMAND'S READING. Against a fixture of two units and one table it proves the
 // head and the book's release, the props with the library's word, the cases with their rules, a case
 // that sends the reader elsewhere, the limits, the index by value, the line of a unit its place sizes,
-// and the three refusals. Against the plugin's own copy it proves the real snapshot reads whole.
+// and the three refusals. Against a fixture index, laid out as a repository's merged index and as a
+// package's own, it proves a unit beyond the core prints its props and the core block its name points
+// to, and that the snapshot still answers first. Against the plugin's own copy it proves the real
+// snapshot reads whole.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -21,14 +25,39 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
-function run(root, ...args) {
+function runIn(cwd, root, ...args) {
   const env = { ...process.env, SPN_TELEMETRY: "off" };
   if (root) env.SPN_SURFACE_UNIT_ROOT = root; else delete env.SPN_SURFACE_UNIT_ROOT;
   try {
-    return { out: execFileSync("node", [CLI, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env, cwd: tmpdir() }), code: 0 };
+    return { out: execFileSync("node", [CLI, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env, cwd }), code: 0 };
   } catch (error) {
     return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? 1 };
   }
+}
+
+const run = (root, ...args) => runIn(tmpdir(), root, ...args);
+
+/** A repository holding the fixture index as `repo agent-sync` writes it, the merged one under `.claude/saasplane/`. */
+function mergedRepo() {
+  const repo = mkdtempSync(join(tmpdir(), "unit-show-merged-"));
+  mkdirSync(join(repo, ".claude", "saasplane"), { recursive: true });
+  copyFileSync(join(FIXTURE, "spn-symbols.json"), join(repo, ".claude", "saasplane", "spn-symbols.json"));
+  writeFileSync(join(repo, "sprepo.json"), "{}\n");
+  mkdirSync(join(repo, "apps", "web"), { recursive: true });
+  return repo;
+}
+
+/** A repository with no merged index, where each package of the fixture writes its own under `dist/generated/`. */
+function packagesRepo() {
+  const repo = mkdtempSync(join(tmpdir(), "unit-show-packages-"));
+  writeFileSync(join(repo, "sprepo.json"), "{}\n");
+  const index = JSON.parse(readFileSync(join(FIXTURE, "spn-symbols.json"), "utf8"));
+  for (const capability of index.capabilities) {
+    const folder = join(repo, "packages", capability.name.split("/").at(-1), "dist", "generated");
+    mkdirSync(folder, { recursive: true });
+    writeFileSync(join(folder, "spn-symbols.json"), JSON.stringify({ capabilities: [capability] }));
+  }
+  return repo;
 }
 
 console.log("=== unit show — a unit with a table, from the fixture");
@@ -77,6 +106,68 @@ console.log("\n=== unit show — refusals");
   const missing = run(empty, "unit", "show", "DSSheet");
   rmSync(empty, { recursive: true, force: true });
   ok("a release with no snapshot says so, exit 1", missing.code === 1 && missing.out.includes("this release carries no construct.snapshot.json"), missing.out);
+}
+
+console.log("\n=== unit show — a unit beyond the core, from the repository's symbol index");
+{
+  const repo = mergedRepo();
+  const inside = join(repo, "apps", "web");
+  const badge = runIn(inside, FIXTURE, "unit", "show", "IdentityFactorVerificationBadge");
+  const lines = badge.out.split("\n");
+  ok("a module's badge exits clean", badge.code === 0, badge.out);
+  ok("its first line is the unit, its package and its intent line, with no closing stop",
+    lines[0] === "IdentityFactorVerificationBadge · @saasplane/module-web-iam-ts@2.3.0 · Whether a factor has been proven end to end", lines[0]);
+  ok("its second line names the index it was read from, found from the working folder upwards",
+    lines[1] === "the symbol index: .claude/saasplane/spn-symbols.json, of the repository this runs in", lines[1]);
+  ok("its props stand as a table: prop, default, values", /^prop\s+default\s+values$/m.test(badge.out) && /^size\s+XS\s+XS SM MD LG XL$/m.test(badge.out), badge.out);
+  ok("each prop's description stands under it", /^factor\n    The factor: it counts once it has a verification time\.$/m.test(badge.out)
+    && /^size .*\n    The size step of the badge\.$/m.test(badge.out), badge.out);
+  ok("it names the core block its suffix points to",
+    badge.out.includes("beyond the core: its props carry its use; the cases are DSBadge's — run `spn-surface unit show DSBadge`"), badge.out);
+
+  const detail = runIn(inside, FIXTURE, "unit", "show", "DSListDetail");
+  ok("the design system's own unit prints beyond the core with its four props",
+    detail.code === 0 && detail.out.startsWith("DSListDetail · @saasplane/support-web-ds-ts@5.40.0 · A list and the detail of its chosen row\n")
+      && ["list", "detail", "backAnchor"].every((prop) => new RegExp(`^${prop}\\n    `, "m").test(detail.out))
+      && /^listWidth\s+WIDE\s+COMPACT NARROW WIDE$/m.test(detail.out), detail.out);
+  ok("a name that ends in no block's word says no core table decides the rest",
+    detail.out.includes("beyond the core: its props carry its use; its name ends in no block's word, so no core table decides the rest"), detail.out);
+
+  const container = runIn(inside, FIXTURE, "unit", "show", "RoleListContainer");
+  ok("a container is sent to the container patterns, and a unit with none says it has no props",
+    container.code === 0 && container.out.includes("no props") && container.out.includes("the rest is the container patterns'"), container.out);
+  const old = runIn(inside, FIXTURE, "unit", "show", "DSPortal");
+  ok("an index written before the props existed says it carries none, rather than printing an empty table",
+    old.code === 0 && old.out.includes("the index carries no props for it"), old.out);
+
+  const core = runIn(inside, FIXTURE, "unit", "show", "DSSheet");
+  ok("a core unit still prints its cases from the snapshot", core.code === 0 && core.out.includes("not a sheet: a DSDialog") && !core.out.includes("beyond the core"), core.out);
+
+  const unknown = runIn(inside, FIXTURE, "unit", "show", "DSListDetai");
+  ok("an unknown name exits 1 and names the closest from both the snapshot and the index",
+    unknown.code === 1 && unknown.out.includes("no unit `DSListDetai` in the snapshot or the symbol index")
+      && unknown.out.includes("DSListDetail") && /\bDSList(?!Detail)\b/.test(unknown.out), unknown.out);
+  const type = runIn(inside, FIXTURE, "unit", "show", "IDSListDetailProps");
+  ok("a symbol of the index that is not a component is not a unit", type.code === 1 && type.out.includes("no unit `IDSListDetailProps`"), type.out);
+
+  const json = runIn(inside, FIXTURE, "unit", "show", "IdentityFactorVerificationBadge", "--json");
+  let parsed;
+  try { parsed = JSON.parse(json.out); } catch { parsed = null; }
+  ok("--json carries the package, the props and the block", parsed?.package === "@saasplane/module-web-iam-ts" && parsed?.version === "2.3.0"
+    && parsed?.props?.length === 2 && parsed.props[1].default === "XS" && parsed.props[1].values.length === 5
+    && parsed?.block === "DSBadge" && parsed?.pattern === null && parsed?.index === ".claude/saasplane/spn-symbols.json", json.out);
+  rmSync(repo, { recursive: true, force: true });
+
+  const packages = packagesRepo();
+  const fromPackage = runIn(packages, FIXTURE, "unit", "show", "DSListDetail");
+  ok("with no merged index, each package's own dist/generated/spn-symbols.json is read",
+    fromPackage.code === 0 && fromPackage.out.includes("the symbol index: packages/support-web-ds-ts/dist/generated/spn-symbols.json")
+      && /^listWidth\s+WIDE\s+COMPACT NARROW WIDE$/m.test(fromPackage.out), fromPackage.out);
+  rmSync(packages, { recursive: true, force: true });
+
+  const nowhere = run(FIXTURE, "unit", "show", "DSListDetai");
+  ok("outside a repository with an index, the refusal says there is none and names the snapshot's closest",
+    nowhere.code === 1 && nowhere.out.includes("no symbol index here") && nowhere.out.includes("DSList"), nowhere.out);
 }
 
 console.log("\n=== unit show — the plugin's own copy");

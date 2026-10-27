@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/02-naming.md",
-      "seen": "5c3760ab"
+      "seen": "19a23ca9"
     }
   ]
 }
@@ -84,6 +84,10 @@
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
 
+### Decorators
+
+**A decorator is named for the concern it carries, in `SP` + `PascalCase`, never for the check it runs or the word *Require*** (`RD.SUPPORT.APPS.227`): `@SPTransaction`, `@SPReauth`, `@SPCachePurge`. Its documentation says whether it **guards**, refusing the call before the method runs, as `@SPAuthorize` and `@SPReauth` do, or **wraps**, running the method inside something, as `@SPTransaction` and `@SPCachePurge` do, because the name does not say. `@SPAuthorize` keeps its name.
+
 ### Units of a web module
 
 **Every unit of a web module ends in the word for where it is placed or what it is, and only a plain component needs none — MUST** (`RD.SUPPORT.APPS.202`, amended by `RD.SUPPORT.SURFACE.229`). A reader then knows what a unit is from its name, before opening its file.
@@ -96,11 +100,13 @@
 | a dialog | ends in `Dialog` | `RoleInviteDialog` |
 | a form | ends in `Form` | `RoleForm` |
 | a unit that follows a common pattern | ends in the word of the pattern | `UserAutocomplete`, `RoleAutocomplete` |
+| one step of a flow of several | ends in `Step`, and is a `DSForm` | `ForgotPasswordStep` |
+| the content of an entry | ends in `Entry`, drawn with the overlay's parts and opened by `DSEntryOverlay` | `DocFileUploadEntry` |
 | a record's item line | the state's name, then `Item` | `RoleItem` |
 | a hook | starts with `use` | `useRoleList` |
 | a plain component | no suffix and no prefix is needed | `RoleBadge` |
 
-**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker` or `Item` (`RD.SUPPORT.APPS.207`). **A badge shows one enum or one state's record, and a select shows one enum; each takes that enum's or that state's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect`, and `EntTagDefinitionBadge`, which takes an `EntTagDefinition` and draws its name in its colour (`RD.SUPPORT.APPS.206`). A badge that shows a record takes the record whole, never the fields it draws one by one. **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `useNTFManageableChannels`.
+**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker`, `Item`, `Step` or `Entry` (`RD.SUPPORT.APPS.207`). `Step` is one step of a flow of several, such as signing in, and is a `DSForm`: `ForgotPasswordStep`. `Entry` is the content of an entry, drawn with the overlay's parts and opened by `DSEntryOverlay`: `DocFileUploadEntry`, which `DocFileUploadDialog` opens. A word only two components use, such as `Part` or `Value`, stays a plain component's name. **A unit made from a block writes what its data decides and leaves the rest to that block's choice table:** a badge for a state writes its word and its colour, and its place gives its size and variant, as `DSBadge`'s table says; a dialog writes its content, and its extent comes from what it holds. Its comment says what it shows, and never a rule of the block's table. **A badge shows one enum or one state's record, and a select shows one enum; each takes that enum's or that state's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect`, and `EntTagDefinitionBadge`, which takes an `EntTagDefinition` and draws its name in its colour (`RD.SUPPORT.APPS.206`). A badge that shows a record takes the record whole, never the fields it draws one by one. **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `useNTFManageableChannels`.
 
 **A type registered with `LOOKUP` owes its web module two exports — MUST** (`RD.SUPPORT.APPS.223`): its `<State>Autocomplete`, and the option source that Autocomplete uses, as the hook `use<State>OptionSource()`, which returns `IDSDataOptionSource` of the record. A form field, a filter bar and the custom-field form all choose that record through the same two, and the custom-field form turns a field's source code (`IAM_ROLE`) into that hook, so no picker of a record is written twice. The hook is a hook file like any other: one hook in `useRoleOptionSource.ts`, in the module's `hooks/<area>/`, beside the `components/<area>/` folder that holds `RoleAutocomplete.tsx`.
 
