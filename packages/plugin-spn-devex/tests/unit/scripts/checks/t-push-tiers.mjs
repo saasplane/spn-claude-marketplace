@@ -153,6 +153,21 @@ console.log("\n=== a touched node without a whole, green run on this content is 
   stageSource(red);
   leaveRun(red, "pkg", "unit", { content: indexHash(red, "pkg"), status: "FAILED" });
   ok("[MKT.HOOKS.64] a run with a failed result is refused", denial(checkPushTiers(push(red))).includes("not all green"), denial(checkPushTiers(push(red))));
+
+  const live = appsRepo("live-skipped");
+  stageSource(live);
+  leaveRun(live, "pkg", "unit", { content: indexHash(live, "pkg") });
+  leaveRun(live, "pkg", "component", { content: indexHash(live, "pkg") });
+  const liveFile = join(live, "pkg", "tests", ".output", "unit", "runs", "r1.json");
+  writeFileSync(liveFile, JSON.stringify({ run: "r1", tier: "UNIT", phase: null, ranAt: "2026-10-27T00:00:00Z", env: "local", results: [{ id: "X.01", status: "SUCCESS" }, { id: "X.02", status: "PENDING" }] }), "utf8");
+  ok("[MKT.HOOKS.64] a run whose other cases are skipped live cases counts as green", checkPushTiers(push(live)) === null, denial(checkPushTiers(push(live))));
+
+  const skipped = appsRepo("all-skipped");
+  stageSource(skipped);
+  leaveRun(skipped, "pkg", "unit", { content: indexHash(skipped, "pkg") });
+  const skippedFile = join(skipped, "pkg", "tests", ".output", "unit", "runs", "r1.json");
+  writeFileSync(skippedFile, JSON.stringify({ run: "r1", tier: "UNIT", phase: null, ranAt: "2026-10-27T00:00:00Z", env: "local", results: [{ id: "X.02", status: "PENDING" }] }), "utf8");
+  ok("[MKT.HOOKS.64] a run where every case was skipped is refused", denial(checkPushTiers(push(skipped))).includes("every case it ran was skipped"), denial(checkPushTiers(push(skipped))));
 }
 
 {
