@@ -28,6 +28,7 @@ The one way into this plugin's Surface refs. Find your job below, and read its r
 | Your job | Start with | Route |
 | --- | --- | --- |
 | Design a page or a flow | the `design` skill | 1 |
+| Bring your own design, or a page to follow | the `design` skill's given-design mode; in plain words, `guide-bring-a-feature.md` | 1 |
 | Draw a mock without Figma | the `design` skill's mock step | 2 |
 | Build a screen | the page's design tree | 3 |
 | Review or verify a page | the page beside its tree | 4 |
@@ -52,13 +53,15 @@ Run the `design` skill. It reads these refs in its own order, and states each pa
 
 With the Figma connector in the window, the skill draws the tree in Figma (`skills/design/steps/draw.md`).
 
+**Where the partner brings a design of the page, or points at a page to follow**, the skill runs its given-design mode, `skills/design/steps/given-design.md`: it reads what was brought, checks it at each of the steps above, writes the same tree, and shows the rows, the picture of the page and the changes the person would feel before any code. `guide-bring-a-feature.md` says the same to a partner in plain words. It is guidance: the partner's choice stands wherever they keep it.
+
 ## 2. Draw a mock without Figma
 
-Run the `design` skill to its tree, then its mock step, `skills/design/steps/mock.md`. The mock is the tree drawn as skeletons: the facts first, one skeleton for each page in the order a person meets them, a view for each task state, and a flow file that orders the pages. A mock names units and never their props. The skeleton's own rules are in route 1's `standards-patterns.md`, under *The specs a screen starts from*.
+Run the `design` skill to its tree, then its mock step, `skills/design/steps/mock.md`. The mock is the tree drawn as skeletons: the facts first, one skeleton for each page in the order a person meets them, drawn once with its errors in place and its other states in words, and a flow file that orders the pages. A mock names units and never their props. The skeleton's own rules are in route 1's `standards-patterns.md`, under *The specs a screen starts from*.
 
 ## 3. Build a screen
 
-1. **The page's design tree first.** It names the person, the flow, the facts, the pattern and every block by level. A page with no tree runs route 1 up to the tasks before any code is written.
+1. **The page's design tree first.** It names the person, the flow, the facts, the pattern and every block by level. A page with no tree runs route 1 through the tree, shown before any code; with a design or a page to follow, in the design skill's given-design mode. A page is built from its tree, never from a picture, and a kept line is built as kept.
 2. **Then what a page writes for each unit on its stack**, and what a unit does not do yet: `providers.md`, which also says which provider the repository's stack claim picks.
 3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit or among *the other units*, and `architecture-widgets.md` for the card widget. A value is the page's, else the place's, else the level's, else the unit's, and the case says which; a unit whose props all follow its place has no table and stands in that ref's list *Their size from the place*. The cases are a guide: they name where each value fits, and a partner's choice stands. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
 4. **Then the names and the app's contexts**, where the code meets them: `architecture-names.md` for the names and the vocabularies, and `architecture-app.md` for the two contexts and the theme.

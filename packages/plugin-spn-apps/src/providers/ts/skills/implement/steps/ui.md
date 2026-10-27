@@ -32,6 +32,8 @@ The surface has exactly two contexts and they point opposite ways (the foundatio
 
 **If spn-surface's entry ref is not in the session**, the repository's wiring comes from an older spnutils: update spnutils, run `spnutils repo agent-sync`, and open a new window.
 
+**A page is built from its tree, never from a picture.** Where the partner brings a design of the page or a page to follow, the design skill's given-design mode makes the tree first, and the build follows it, kept lines included.
+
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
 - **DS context** — live theme and its setter, device, `navigate`, and image transformation with placeholder/error. Read it with the DS context hook; `DSApp` supplies it.
 - **The default size is the theme's `size`.** A component with no `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. 🚧 Not yet realized: the context holds it as `defaultComponentSize` today, so read the installed package first.
