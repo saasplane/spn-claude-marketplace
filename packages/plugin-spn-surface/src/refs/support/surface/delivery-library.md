@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "7ee58198"
+      "seen": "92053436"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
@@ -76,7 +76,7 @@ The primary ramp comes from one seed by a formula, and the radius of each size s
 
 ## The snapshot
 
-A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the book, from the library and from each stack's code, in one form. The one written from the book is the CONSTRUCT snapshot: the tool reads it from each unit's column, *The library draws*, and from the token pages. It is the plugin's only input and the third side of every comparison: the library is compared with it, and a stack with the library. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface construct` writes the CONSTRUCT snapshot from the book, `spnutils apps surface library` takes in the inventory of each library file and writes the library's snapshot from the five, and `spnutils apps surface snapshot <package>` writes a stack's from its code. The three snapshots are made with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository.
+A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the book, from the library and from each stack's code, in one form. The one written from the book is the CONSTRUCT snapshot: the tool reads it from each unit's column, *The library draws*, and from the token pages. It is the plugin's only input and the third side of every comparison: the library is compared with it, and a stack with the library. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface construct` writes the CONSTRUCT snapshot from the book, `spnutils apps surface library` takes in the inventory of each library file and writes the library's snapshot from the five, and `spnutils apps surface snapshot <package>` writes a stack's from its code. The three snapshots are made with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository, with one exception. The CONSTRUCT snapshot comes from the book alone, so spn-surface carries a copy of it, written from the book of each release, at `refs/support/surface/construct.snapshot.json` beside this ref. Whatever reads it in the plugin reads that copy and nothing else: never the book, a sibling checkout or the machine's home folder (`RD.SUPPORT.SURFACE.392`).
 
 A snapshot has four parts and three levels:
 
@@ -695,6 +695,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |
 | `RD.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
 | `RD.SUPPORT.SURFACE.295` | the plugin builds the library's sets from the CONSTRUCT snapshot alone, and the tool writes the snapshot from the book and writes the plugin out |
+| `RD.SUPPORT.SURFACE.392` | spn-surface carries the CONSTRUCT snapshot of each release's book, the one snapshot a repository holds, and what reads it in the plugin reads that copy alone |
 | `RD.SUPPORT.SURFACE.296` | the page level is a mode of the collection Level, and a form a level changes stays crossed with the allowed pairs only |
 | `RD.SUPPORT.SURFACE.037` | how a library file is organised holds for any library, the builder's and a partner's own, and the division into files is its owner's: the builder's for its design system, a partner's for its own library, which uses the builder's published library and never edits it |
 | `RD.SUPPORT.SURFACE.038` | a set's properties are its size, its states and the shared `variant`, a prop of forms of the block, and a property a named unit keeps crossed, and the unit's column says which |

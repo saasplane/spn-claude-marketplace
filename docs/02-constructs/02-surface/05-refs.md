@@ -33,6 +33,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 | a group | `surface/` | a folder under a domain; a file under it is named for a construct the book states |
 | the stamp | `spn:restates` | the block at the top naming each chapter this file restates and the hash last read from it |
 | a spec copy | `app-patterns/` · `site-patterns/` | a folder of skeleton specs, byte-identical to the book's, which a page starts from |
+| the snapshot | `construct.snapshot.json` | the CONSTRUCT snapshot written from the book of each release, which `unit show` reads |
 | drift | — | the state where a stamped hash no longer matches the chapter, which is what a run reports |
 
 ## Model
@@ -65,6 +66,10 @@ The book is the source. A ref is the copy that travels with the plugin, arranged
 
 The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and `restates files` writes and checks them. A builder changes a spec in the book, and the export carries it.
 
+### The CONSTRUCT snapshot sits beside the refs
+
+`refs/support/surface/construct.snapshot.json` is the CONSTRUCT snapshot, written from the book alone with `spnutils apps surface construct --out` for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its `source.readFrom` names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. `unit show` reads it, with the restated tables beside it, and reads nothing outside the plugin.
+
 ### The stack-specific half is the apps plugin's
 
 How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.
@@ -81,6 +86,7 @@ This page answers what this plugin carries from the book and how it is arranged.
 | --- | --- | --- |
 | which Surface chapters this plugin restates, and the folder they sit in | the stamp's grammar and the drift run | [Refs](../01-devex/06-refs.md) |
 | that the spec folders are copies the book owns | how a stack builds a block | [Refs](../03-apps/05-refs.md) |
+| the CONSTRUCT snapshot the plugin carries, beside the refs | what a snapshot holds, and how it is written | the book's design library chapter |
 
 ## Binds
 

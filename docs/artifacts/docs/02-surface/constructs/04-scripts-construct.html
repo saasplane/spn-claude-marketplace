@@ -4,7 +4,7 @@
 {"id":"surface-scripts","variant":"construct","title":"Scripts — The Code This Plugin Runs","subtitle":"Every file this plugin runs, sorted by what calls it.","lenses":["WEB_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["surface-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder.","keywords":["dispatcher","check","cli","support-lib","mask","bundle"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -24,7 +24,7 @@
 <!-- 00 -->
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
-  <p>Today the plugin runs one check. <strong>The command line ships no command</strong>, so its entry lists none and refuses an unknown group by name; a command added later is a file under <code>commands/</code> and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.</p>
+  <p>Today the plugin runs one check. <strong>The command line ships two commands</strong>: <code>check scan</code>, which reads Surface code whole for every note the check gives, and <code>unit show</code>, which prints one unit from the CONSTRUCT snapshot the plugin carries. The entry refuses an unknown group by name, and a command added later is a file under <code>commands/</code> and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
@@ -39,6 +39,7 @@
       <tr><td><strong>masking</strong></td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
       <tr><td><strong>the resulting text</strong></td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
       <tr><td><strong>the entry</strong></td><td><code>cli.ts</code></td><td>the one command line the plugin ships, dispatching by group and action</td></tr>
+      <tr><td><strong>the unit lookup</strong></td><td><code>unit show</code></td><td>one unit's props, values, defaults, usage, cases with their rules and index by value, read from the snapshot beside the refs</td></tr>
       <tr><td><strong>the bundle</strong></td><td><code>dist/</code></td><td>the committed build a hook runs, kept current by a staleness test</td></tr>
     </tbody>
   </table></div>
@@ -103,7 +104,9 @@
   <h3 id="the-shared-helpers-have-one-copy">The shared helpers have one copy</h3>
   <p>The masker, the resulting text and the stack read are one copy each in the shared support folder, proven there once. This plugin imports them by relative path; the build copies them into its own bundle.</p>
   <h3 id="the-command-line-is-typed-by-its-bare-na">The command line is typed by its bare name</h3>
-  <p>A launcher under <code>bin/</code> puts the plugin's entry on the Bash tool's path while the plugin is enabled, and <code>tiers.json</code> declares the permission tier of each command group. With no group shipped, both declare none.</p>
+  <p>A launcher under <code>bin/</code> puts the plugin's entry on the Bash tool's path while the plugin is enabled, and <code>tiers.json</code> declares the permission tier of each command group: <code>check</code> and <code>unit</code>, both allowed.</p>
+  <h3 id="the-unit-lookup-reads-the-plugin-and-not">The unit lookup reads the plugin and nothing else</h3>
+  <p><code>spn-surface unit show &lt;Unit&gt;</code> prints one unit for the agent that designs or builds a page. Its props, its usage, its index by value and the units their place sizes come from <code>refs/support/surface/construct.snapshot.json</code>, the CONSTRUCT snapshot written from the book of each release. Its cases come from the unit's restated table in <code>architecture-components.md</code> or <code>architecture-widgets.md</code>, because the snapshot keeps only the cases that draw the unit, and a case such as <em>not a sheet: a DSDialog</em> draws nothing. A partner holds the plugin and not the book, so the command never opens the book, a sibling checkout or the machine's home folder. Its second line names the book's release the snapshot was written from. Source and bundle sit three folders under the plugin's <code>src/</code>, so one relative path serves both.</p>
 </section>
 
 <!-- 04 -->
@@ -139,4 +142,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

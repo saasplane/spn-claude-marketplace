@@ -4,7 +4,7 @@
 {"id":"surface-refs","variant":"construct","title":"Refs — The Surface Book, Restated Inside the Plugin","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -39,6 +39,7 @@
       <tr><td><strong>a group</strong></td><td><code>surface/</code></td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
       <tr><td><strong>the stamp</strong></td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
       <tr><td><strong>a spec copy</strong></td><td><code>app-patterns/</code> · <code>site-patterns/</code></td><td>a folder of skeleton specs, byte-identical to the book's, which a page starts from</td></tr>
+      <tr><td><strong>the snapshot</strong></td><td><code>construct.snapshot.json</code></td><td>the CONSTRUCT snapshot written from the book of each release, which <code>unit show</code> reads</td></tr>
       <tr><td><strong>drift</strong></td><td></td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
     </tbody>
   </table></div>
@@ -100,6 +101,8 @@
   <p><code>refs/support/surface/</code> holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.</p>
   <h3 id="the-specs-are-copies-owned-by-the-book">The specs are copies, owned by the book</h3>
   <p>The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and <code>restates files</code> writes and checks them. A builder changes a spec in the book, and the export carries it.</p>
+  <h3 id="the-construct-snapshot-sits-beside-the-r">The CONSTRUCT snapshot sits beside the refs</h3>
+  <p><code>refs/support/surface/construct.snapshot.json</code> is the CONSTRUCT snapshot, written from the book alone with <code>spnutils apps surface construct --out</code> for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its <code>source.readFrom</code> names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. <code>unit show</code> reads it, with the restated tables beside it, and reads nothing outside the plugin.</p>
   <h3 id="the-stack-specific-half-is-the-apps-plug">The stack-specific half is the apps plugin's</h3>
   <p>How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.</p>
   <h3 id="a-ref-that-fell-behind-says-so">A ref that fell behind says so</h3>
@@ -115,6 +118,7 @@
     <tbody>
       <tr><td>which Surface chapters this plugin restates, and the folder they sit in</td><td>the stamp's grammar and the drift run<span class="sds-small">Owned by: <a href="../../01-devex/constructs/06-refs-construct.html">Refs</a></span></td></tr>
       <tr><td>that the spec folders are copies the book owns</td><td>how a stack builds a block<span class="sds-small">Owned by: <a href="../../03-apps/constructs/05-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>the CONSTRUCT snapshot the plugin carries, beside the refs</td><td>what a snapshot holds, and how it is written<span class="sds-small">Owned by: the book's design library chapter</span></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -137,4 +141,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

@@ -20,7 +20,7 @@ Scripts holds everything this plugin executes, divided by what calls each file: 
 
 ## Overview
 
-Today the plugin runs one check. **The command line ships no command**, so its entry lists none and refuses an unknown group by name; a command added later is a file under `commands/` and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.
+Today the plugin runs one check. **The command line ships two commands**: `check scan`, which reads Surface code whole for every note the check gives, and `unit show`, which prints one unit from the CONSTRUCT snapshot the plugin carries. The entry refuses an unknown group by name, and a command added later is a file under `commands/` and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.
 
 This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
@@ -33,6 +33,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 | masking | `mask` | blanking comments and string bodies before searching, so a word inside a quote is never read as code |
 | the resulting text | `resultingText` | the source as the pending write would leave it, which is what a rule actually reads |
 | the entry | `cli.ts` | the one command line the plugin ships, dispatching by group and action |
+| the unit lookup | `unit show` | one unit's props, values, defaults, usage, cases with their rules and index by value, read from the snapshot beside the refs |
 | the bundle | `dist/` | the committed build a hook runs, kept current by a staleness test |
 
 ## Model
@@ -75,7 +76,11 @@ The masker, the resulting text and the stack read are one copy each in the share
 
 ### The command line is typed by its bare name
 
-A launcher under `bin/` puts the plugin's entry on the Bash tool's path while the plugin is enabled, and `tiers.json` declares the permission tier of each command group. With no group shipped, both declare none.
+A launcher under `bin/` puts the plugin's entry on the Bash tool's path while the plugin is enabled, and `tiers.json` declares the permission tier of each command group: `check` and `unit`, both allowed.
+
+### The unit lookup reads the plugin and nothing else
+
+`spn-surface unit show <Unit>` prints one unit for the agent that designs or builds a page. Its props, its usage, its index by value and the units their place sizes come from `refs/support/surface/construct.snapshot.json`, the CONSTRUCT snapshot written from the book of each release. Its cases come from the unit's restated table in `architecture-components.md` or `architecture-widgets.md`, because the snapshot keeps only the cases that draw the unit, and a case such as *not a sheet: a DSDialog* draws nothing. A partner holds the plugin and not the book, so the command never opens the book, a sibling checkout or the machine's home folder. Its second line names the book's release the snapshot was written from. Source and bundle sit three folders under the plugin's `src/`, so one relative path serves both.
 
 ## Boundary
 

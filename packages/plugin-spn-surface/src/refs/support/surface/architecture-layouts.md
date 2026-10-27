@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "3d6d0000"
+      "seen": "fd294da4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "410a6c34"
+      "seen": "2d0ba4f7"
     }
   ]
 }
@@ -48,7 +48,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 **The library draws `DSLayout`:** each `DSLayoutType` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`) once, and on a narrow screen once; `footerNode` as a swap; and, as its usage, an app's page, its rail, its bar and the content.
 
-- **Choose a layout by the job of the app, as the table says, and never by how it looks** (`RD.SUPPORT.SURFACE.206`). One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
+- **A layout is chosen by the job of the app, as the table says, and not by how it looks** (`RD.SUPPORT.SURFACE.206`, advice). The page chooses its layout, and the theme does not. One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
 
 A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
 
@@ -66,7 +66,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 
 - **A layout MUST have three parts, the body, the navigation and the content, and each MUST own only what the table gives it** (`RD.SUPPORT.SURFACE.200`). The width and the fill behind everything are the body's, and the content owns nothing inside its area (`RD.SUPPORT.APPS.146`).
 - **Each part that draws a fill MUST give its surface** (`RD.SUPPORT.SURFACE.199`): the body for what stands straight on it, the navigation for its entries, and the content for the page.
-- **The page's fill is `page-fill`, and the colour of the body sets it** (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. No page and no story sets a fill of its own.
+- **The page's fill is `page-fill`, and the colour of the body sets it** (`RD.SUPPORT.APPS.160`, `RD.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. That no page and no story sets a fill of its own is advice.
 - **A navigation's colour stays in the navigation** (`RD.SUPPORT.SURFACE.226`). The bar, the rail, the dock's column and the phone's bar and drawer carry the navigation's surface; the body and the content each carry their own, `BASE` by default or the theme's colour, so a tile, a card or a text box in the page never takes the navigation's tint. A unit in the navigation, such as an item card in the rail, may take the navigation's tint; a unit in the content takes the content's.
 - **The content MUST fill from its own colour and strength**, `BASE` where the app left it out. Its `bordered` and `raised` are its own: they follow neither the navigation's nor each other's.
 - **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RD.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RD.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `SUBTLE`, and the content flat, at the whole width.
@@ -211,7 +211,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.146` | a layout owns the navigation and the content, and nothing inside that area |
-| `RD.SUPPORT.APPS.160` | the page's fill is the body's colour, and no page sets a fill behind itself |
+| `RD.SUPPORT.APPS.160` | the page's fill is the body's colour; that no page sets a fill behind itself is advice |
 | `RD.SUPPORT.SURFACE.226` | a navigation's colour stays in the navigation; the body and the content carry their own surface |
 | `RD.SUPPORT.APPS.161` | the layout kept a gutter from the content look; superseded by `RD.SUPPORT.SURFACE.200`, which keeps one spacing, `--layout-space`, from the theme's size, with no gutter |
 | `RD.SUPPORT.APPS.163` | an item's actions are reachable without hover, in every layout type |
@@ -230,7 +230,7 @@ This ref states what a layout owns, its types and its places, the units it is bu
 | `RD.SUPPORT.SURFACE.281` | `XWIDE` stands at most 1400 px, the widest step that still leaves a margin on a 1440 laptop |
 | `RD.SUPPORT.SURFACE.300` | the default theme draws the open entry of the navigation as `SUBTLE` |
 | `RD.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; attached and sticky, the one spacing, no overlay, and one drawer on a phone |
-| `RD.SUPPORT.SURFACE.206` | a layout is chosen by the job of the app: an admin app, a profile, a website or a sign-in |
+| `RD.SUPPORT.SURFACE.206` | a layout is chosen by the job of the app: an admin app, a profile, a website or a sign-in. It is advice |
 
 ## Proof
 

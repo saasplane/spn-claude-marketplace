@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md",
-      "seen": "067dfbe4"
+      "seen": "e427edef"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/04-flow-patterns.md",
@@ -187,12 +187,12 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 Each rule below is one the task or app patterns already state for one page, stated here for the join between two pages. So none needs a unit.
 
-- **A flow MUST end where the person can carry on, for the site they came from** (`RD.SUPPORT.SURFACE.361`). It never drops a site it was given, and never ends at a front door when a site was named.
-- **One task MUST be drawn one way** (`RD.SUPPORT.SURFACE.361`). A step that reads shows its own shape, the main action shows its own working state, and a page that only passes the person on draws one line.
-- **Done MUST be said by the place the flow arrives at, in one line, once** (`RD.SUPPORT.SURFACE.361`). A screen that says done stands only where nothing follows, such as a window that may now close.
+- **A flow ends where the person can carry on, for the site they came from** (`RD.SUPPORT.SURFACE.361`). It never drops a site it was given, and never ends at a front door when a site was named.
+- **One task is drawn one way** (`RD.SUPPORT.SURFACE.361`). A step that reads shows its own shape, the main action shows its own working state, and a page that only passes the person on draws one line.
+- **Done is said by the place the flow arrives at, in one line, once** (`RD.SUPPORT.SURFACE.361`). A screen that says done stands only where nothing follows, such as a window that may now close.
 - **Every step MUST draw every task state its task can reach** (`RD.SUPPORT.SURFACE.361`). A read that cannot finish is a failure with Try again, never a spinner that stays, an empty state or a refusal.
-- **Signing in and signing up MUST be one door with two rooms** (`RD.SUPPORT.SURFACE.361`). Each panel's second content offers the other, where the site takes sign-ups.
-- **The first arrival after joining MUST be greeted once, in every app the flow can end in** (`RD.SUPPORT.SURFACE.361`). A person who joined through one app and lands in another is greeted there too.
+- **Signing in and signing up are one door with two rooms** (`RD.SUPPORT.SURFACE.361`). Each panel's second content offers the other, where the site takes sign-ups.
+- **The first arrival after joining is greeted once, in every app the flow can end in** (`RD.SUPPORT.SURFACE.361`). A person who joined through one app and lands in another is greeted there too.
 
 ## On the web: Back, a reload, a link and a closed tab — 🔮
 
@@ -230,7 +230,7 @@ This ref states the paths across pages to one outcome: each flow's steps by the 
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.SURFACE.360` | the ten flow patterns, each a path across pages to one outcome, built from the patterns that exist |
-| `RD.SUPPORT.SURFACE.361` | every flow holds at its joins what the task and app patterns hold on one page |
+| `RD.SUPPORT.SURFACE.361` | every step of a flow draws every task state its task can reach; that a flow holds the rest at its joins is advice |
 | `RD.SUPPORT.SURFACE.362` | on the web a step holding a proof from the server is the page's state, and every other step an address |
 | `RD.SUPPORT.SURFACE.332` | every flow names the kinds of person it is for, with one line where it runs differently for one |
 
