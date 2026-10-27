@@ -29,7 +29,7 @@ const ok = (label, condition, detail = "") => {
 
 console.log("=== bundle parity — the CLI, argv only");
 
-for (const argv of [["help", "--json"], ["help"], ["no-such-group", "no-such-action"]]) {
+for (const argv of [["help", "--json"], ["help"], ["no-such-group", "no-such-action"], ["unit", "show", "DSSheet"], ["unit", "show", "DSNoSuchUnit"]]) {
   const { source, bundle, parity } = compareRun(CLI_SOURCE, CLI_BUNDLE, { argv });
   ok(`cli.mjs agrees with cli.ts on \`${argv.join(" ")}\``, parity,
      `source: ${JSON.stringify(source)}\n        bundle: ${JSON.stringify(bundle)}`);
@@ -67,6 +67,21 @@ console.log("\n=== an installed copy runs every command — the plugin's src/ al
   rmSync(installed, { recursive: true, force: true });
   ok("the entry loads from the installed copy", help.status === 0 && !help.stderr.includes("ERR_MODULE_NOT_FOUND"), `${help.status} ${help.stderr.slice(0, 400)}`);
   ok("the event loads from the installed copy", event.status === 0 && !event.stderr.includes("ERR_MODULE_NOT_FOUND"), `${event.status} ${event.stderr.slice(0, 400)}`);
+}
+{
+  // `unit show` reads the snapshot and the tables the plugin carries, and nothing else: from an installed
+  // copy, with an empty home and a working folder outside any workspace, it still prints the book's release.
+  const installed = mkdtempSync(join(tmpdir(), "installed-plugin-"));
+  const home = mkdtempSync(join(tmpdir(), "empty-home-"));
+  cpSync(join(PLUGIN, "src"), installed, { recursive: true });
+  const env = { ...process.env, HOME: home, SPN_TELEMETRY: "off" };
+  delete env.SPN_SURFACE_UNIT_ROOT;
+  const shown = spawnSync("node", [join(installed, "dist", "cli.mjs"), "unit", "show", "DSSheet"], { encoding: "utf8", cwd: home, env });
+  rmSync(installed, { recursive: true, force: true });
+  rmSync(home, { recursive: true, force: true });
+  ok("`unit show` runs from the installed copy with no book on disk",
+    shown.status === 0 && /^the book: spn-foundation@[0-9a-f]{8}, /m.test(shown.stdout) && shown.stdout.includes("not a sheet: a DSDialog"),
+    `${shown.status} ${shown.stdout.slice(0, 300)} ${shown.stderr.slice(0, 300)}`);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bundle parity` : `\n  all ${total} passed — bundle parity`);

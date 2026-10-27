@@ -49,7 +49,7 @@ Run the `design` skill. It reads these refs in its own order, and states each pa
 | the panels | which parts are framed, a panel's parts, the card and the section | `architecture-containers.md` |
 | the tasks | the six parts of a pattern, the task patterns and the six task states | `standards-interaction.md` |
 | the blocks: widgets | the card widget and what a widget holds | `architecture-widgets.md` |
-| the blocks: units and their props | the choice tables | route 3 |
+| the blocks: units and their props | the choice tables, through `spn-surface unit show <Unit>` | route 3 |
 
 With the Figma connector in the window, the skill draws the tree in Figma (`skills/design/steps/draw.md`).
 
@@ -63,7 +63,7 @@ Run the `design` skill to its tree, then its mock step, `skills/design/steps/moc
 
 1. **The page's design tree first.** It names the person, the flow, the facts, the pattern and every block by level. A page with no tree runs route 1 through the tree, shown before any code; with a design or a page to follow, in the design skill's given-design mode. A page is built from its tree, never from a picture, and a kept line is built as kept.
 2. **Then what a page writes for each unit on its stack**, and what a unit does not do yet: `providers.md`, which also says which provider the repository's stack claim picks.
-3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit or among *the other units*, and `architecture-widgets.md` for the card widget. A value is the page's, else the place's, else the level's, else the unit's, and the case says which; a unit whose props all follow its place has no table and stands in that ref's list *Their size from the place*. The cases are a guide: they name where each value fits, and a partner's choice stands. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
+3. **Then the choice tables**, for every closed prop the page writes. Look a unit up with `spn-surface unit show <Unit>`: one call prints its props, their values and defaults, its usage, its cases with their rules and its index, from the CONSTRUCT snapshot this plugin carries beside these refs. The tables themselves stand in `architecture-components.md`, under each unit or among *the other units*, and in `architecture-widgets.md` for the card widget. A value is the page's, else the place's, else the level's, else the unit's, and the case says which; a unit whose props all follow its place has no table and stands in that ref's list *Their size from the place*. The cases are a guide: they name where each value fits, and a partner's choice stands. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
 4. **Then the names and the app's contexts**, where the code meets them: `architecture-names.md` for the names and the vocabularies, and `architecture-app.md` for the two contexts and the theme.
 
 ## 4. Review or verify a page

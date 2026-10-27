@@ -1,0 +1,42 @@
+{
+  "snapshotVersion": 1,
+  "source": { "kind": "CONSTRUCT", "readAt": "2026-10-27T00:00:00.000Z", "level": 2, "readFrom": ["spn-foundation@0000abcd"], "version": null, "inventoryVersion": 0 },
+  "units": [
+    {
+      "name": "DSSheet",
+      "layer": "COMPONENTS",
+      "group": "Overlays",
+      "line": "a dialog pinned to one edge of the screen.",
+      "link": "docs/04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md#overlays",
+      "props": [
+        { "mtype": "NO", "name": "placement", "kind": "choice", "values": ["LEFT", "RIGHT"], "default": "RIGHT" },
+        { "mtype": "CROSSED", "name": "size", "kind": "choice", "values": ["SM", "MD"], "default": "SM" },
+        { "mtype": "ONCE", "name": "modal", "kind": "flag", "values": null, "default": true, "once": [false] },
+        { "mtype": "NO", "name": "ariaTitle", "kind": "content", "values": null, "default": null }
+      ],
+      "usage": { "caption": "usage · DSSheet, a medium entry at the side of its page", "words": "a medium entry at the side of its page", "places": [] },
+      "cases": []
+    },
+    {
+      "name": "DSList",
+      "layer": "COMPONENTS",
+      "group": "Data display",
+      "line": "a list of rows.",
+      "link": "docs/04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md#data-display",
+      "props": [
+        { "mtype": "CROSSED", "name": "size", "kind": "choice", "values": ["SM", "MD"], "default": "SM" }
+      ],
+      "usage": { "caption": "usage · DSList, a list of settings", "words": "a list of settings", "places": [] },
+      "cases": []
+    }
+  ],
+  "choiceIndex": [
+    { "unit": "DSSheet", "prop": "placement", "values": [
+      { "value": "LEFT", "cases": "no case written yet: the navigation keeps the left" },
+      { "value": "RIGHT", "cases": "every case. It is the unit's own default" } ] },
+    { "unit": "DSSheet", "prop": "size", "values": [
+      { "value": "SM", "cases": "the place's" },
+      { "value": "MD", "cases": "the place's" } ] }
+  ],
+  "placeSized": ["DSList"]
+}

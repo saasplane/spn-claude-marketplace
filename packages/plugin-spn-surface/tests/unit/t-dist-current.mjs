@@ -13,6 +13,8 @@ const SUPPORT_LIB_DIR = resolve(PLUGIN, "..", "plugin-support-lib");
 const BUNDLES = [
   resolve(PLUGIN, "src", "dist", "cli.mjs"),
   resolve(PLUGIN, "src", "dist", "events", "pretooluse.mjs"),
+  resolve(PLUGIN, "src", "dist", "commands", "check", "scan.mjs"),
+  resolve(PLUGIN, "src", "dist", "commands", "unit", "show.mjs"),
 ];
 
 let total = 0, failed = 0;
@@ -27,11 +29,11 @@ const result = staleness(PLUGIN, SUPPORT_LIB_DIR, BUNDLES);
 
 console.log("=== dist — every bundle is current with its sources");
 
-ok("both shipped bundles carry a readable banner",
+ok("every shipped bundle carries a readable banner",
    result.bundles.every((b) => b.found !== null),
    result.bundles.map((b) => `${b.path}: ${b.found ?? "no banner"}`).join("\n        "));
 
-ok("both bundles' banners match the source hash right now",
+ok("every bundle's banner matches the source hash right now",
    result.current,
    `expected ${result.expected}\n        ` +
      result.bundles.map((b) => `${b.path}: ${b.found} ${b.current ? "(current)" : "(STALE)"}`).join("\n        "));

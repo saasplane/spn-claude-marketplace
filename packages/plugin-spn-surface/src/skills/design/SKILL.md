@@ -27,7 +27,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Then read `refs/support/surface/README.md`, in this plugin: the entry ref, and its route 1.** It names each Surface ref this skill reads, in the order the decisions below run: the levels of a page and the rules of content, the flow, the layout, the patterns, the panels, the tasks, then the blocks, whose props come from the choice tables. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field, and under each unit for its choice table.
+**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field; a unit's choice table is one call away with `spn-surface unit show <Unit>`.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -272,7 +272,7 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the tree by layer of the app pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
-- **Give each closed prop the value its unit's choice table gives** (`architecture-components.md`, under the unit, `RD.SUPPORT.SURFACE.375`). Read the cases from the top, and the first that matches wins: it says each prop's value and who writes it, the page, the place, the level or the unit. Write only what the case gives the page; a value it leaves to the place or the level is never written by hand. `DSBadge`, `DSButton` and `DSMark` have their tables.
+- **For each block, run `spn-surface unit show <Unit>`, and give each closed prop the value of the first case that matches, naming the case** (`RD.SUPPORT.SURFACE.375`). It prints the unit's props, their values and defaults, whether the library draws each, its usage, its cases with the rule each rests on, and its index by value, from the snapshot this plugin carries; it opens no source and no book. Read the cases from the top: the first that matches says each prop's value and who writes it, the page, the place, the level or the unit. Write only what the case gives the page; a value it leaves to the place or the level is not written by hand. A unit with no table says where its props come from: its size from its place, and a field's check from its `DSForm.Field`. The cases are a guide: start from the first case that matches, and a partner's choice stands where they keep it, written on the line as a kept line (`steps/given-design.md`).
 - **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. A badge that names a kind draws `OUTLINE` in `DEFAULT`, a state takes the hue its meaning gives from the book's table, and a view holds at most one `SOLID` button (`RD.SUPPORT.SURFACE.368`, `.369`, `.370`). A button with no `variant` draws `OUTLINE` outside a header or a footer, the tints `QUIET`, `SUBTLE` and `SUBTLE_OUTLINE` are the place's and not the page's, and a button's colour says its act: `PRIMARY` the main action, `ERROR` a main action that deletes or ends, `DEFAULT` every other (`RD.SUPPORT.SURFACE.376`, `.379`, `.384`). What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **Every control a person sets is a `DSForm.Field`**, a lone checkbox or switch too (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`). A field with no label of its own keeps a blank label line, so it lines up beside labelled fields in a row; alone on its line in a column, write `showBlankLabel={false}`. A field's own action, such as *Forgot password?*, goes to `labelEndNode`, and never under the field. A switch and a checkbox take their own `label`.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
@@ -321,7 +321,7 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | --- | --- |
 | The page | its route, its purpose in one sentence, its main action, and its app pattern; on a site's page, its kind of page and each section's site pattern |
 | The layout | `DSLayout`, then its type |
-| A block | its name in the book, then each prop as `name=VALUE` |
+| A block | its name in the book, then each prop the page writes as `name=VALUE`, and the case only where the page writes a value or a change or a kept line stands |
 | A part of a block | the name of the part: `DSPanelContainer.Header`, or a named place of the layout. A part of a panel carries `flush` after its name, where the page writes it |
 | Content | the text a person reads, in quotes |
 | A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look. Where the stack provides a unit for it, the tree may name that unit |
@@ -343,12 +343,13 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
     ├── startNode         DSText "Acme"
     ├── nav               items: "Orders" selected · "Customers" · "Reports"      Move
     ├── endNode           DSAvatar
-    ├── actionsNode       DSButton variant=GHOST "Help"
+    ├── actionsNode       DSButton "Help"
     └── content
         └── DSPanelContainer
             ├── DSPanelContainer.Header
             │   ├── DSItem    title="Orders"
             │   └── DSButton  color=PRIMARY "New order"                          Move · leads to /orders/new
+            │       case: the main action, in a header (RD.SUPPORT.SURFACE.390)
             ├── DSPanelContainer.Content
             │   └── DSFilterBar                                                  Find
             └── DSPanelContainer.Content  flush
