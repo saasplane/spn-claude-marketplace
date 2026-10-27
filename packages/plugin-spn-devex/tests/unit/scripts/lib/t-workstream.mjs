@@ -142,7 +142,7 @@ console.log("\n=== the generated blocks — progress and open");
     inside.includes('<nav class="sds-footbar" aria-label="Workstream status">') && inside.indexOf('sds-footbar-chips') < inside.indexOf('sds-footbar-summary')
       && inside.includes('<span>0 of 1 arcs closed</span>') && !inside.includes("sds-footbar-line"), inside);
   ok("progress: a chip is two lines — the number without the N and the name with done/total on the right, then the bar — its status in its class, its tooltip and its accessible name, and no badge",
-    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 probe, RUNNING, 1 of 2 steps landed"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
+    /<a class="sds-chip sds-running sds-step-3" href="#N001" aria-label="N001 probe, RUNNING, 1 of 2 steps landed, in progress: none, next ready: row 2, build it, log last moved: never"><span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">1<\/span><span class="sds-chip-subject"> &middot; probe<\/span><\/span><span class="sds-arc-count">1\/2<\/span><\/span><span class="sds-chip-bar"><i style="width:50%"><\/i><\/span><span class="sds-tip"><span class="sds-badge sds-status sds-running">RUNNING<\/span><strong>the probe arc<\/strong><span>1 of 2 steps landed<\/span><span>in progress: none<\/span><span>next ready: row 2, build it<\/span><span>log last moved: never<\/span><\/span><\/a>/.test(inside) && !/sds-chip-line"><span class="sds-badge[^>]*>RUNNING/.test(inside), inside);
   ok("progress: the summary is a highlighted section of two lines — Overall with steps landed, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
     /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
@@ -167,6 +167,26 @@ console.log("\n=== the generated blocks — progress and open");
     const decided = lib.progressInside("/nowhere", [arc("N001", "PROPOSED", []), arc("N002", "DECIDED", [build("2", "waiting"), build("3", "waiting")])]);
     ok("progress: Overall reads PLANNING until the first step of any arc starts, as the header does",
       summaryOf(decided).includes('class="sds-footbar-summary sds-planning ') && summaryOf(decided).includes('<span class="sds-arc-count">0/2</span>'), summaryOf(decided));
+    {
+      // The running arc's line: the row in progress, the next ready row, and when its log last moved.
+      const folder = mkdtempSync(join(tmpdir(), "running-"));
+      mkdirSync(join(folder, "arcs", "N002"), { recursive: true });
+      writeFileSync(join(folder, "arcs", "N002", "log.jsonl"), [
+        { at: "2026-10-10T09:00+05:30", kind: "added", row: "3", note: null },
+        { at: "2026-10-12T10:30+05:30", kind: "state", row: "4", note: "ready → running" },
+        { at: "2026-10-11T08:00+05:30", kind: "note", row: null, note: "earlier" }].map((line) => JSON.stringify(line)).join("\n") + "\n");
+      const rows = [build("3", "landed"), build("4", "running"), { ...build("5", "waiting"), blockedBy: ["3"] }, { ...build("6", "waiting"), blockedBy: ["4"] }];
+      const live = lib.progressInside(folder, [arc("N002", "DECIDED", rows)]);
+      const chip = chipOf(live, "N002");
+      ok("progress: a running arc names its row in progress, the next ready row and when its log last moved",
+        chip.includes("<span>in progress: row 4, build 4</span>") && chip.includes("<span>next ready: row 5, build 5</span>")
+          && chip.includes("<span>log last moved: 2026-10-12T10:30+05:30</span>"), chip);
+      ok("progress: the same words are in the chip's accessible name", chip.includes("in progress: row 4, build 4, next ready: row 5, build 5, log last moved: 2026-10-12T10:30+05:30\""), chip);
+      const idle = lib.progressInside(folder, [arc("N002", "DECIDED", [build("3", "waiting")]), arc("N003", "PROPOSED", []), arc("N004", "LANDED", [build("1", "landed")])]);
+      ok("progress: an arc that is not running has no line in the block", !idle.includes("in progress:") && !idle.includes("log last moved"), idle);
+      const bare = lib.progressInside(folder, [arc("N002", "DECIDED", [build("4", "running")])]);
+      ok("progress: a running arc with nothing ready says none", chipOf(bare, "N002").includes("<span>next ready: none</span>"), bare);
+    }
     const closed = lib.progressInside("/work/.spndevex/workstreams/closed/031-probe", [arc("N001", "LANDED", [build("1", "landed")])]);
     ok("progress: a closed workstream's Overall reads DONE", summaryOf(closed).includes('class="sds-footbar-summary sds-done '), summaryOf(closed));
     ok("the workstream's word is one function, the header's and Overall's alike",

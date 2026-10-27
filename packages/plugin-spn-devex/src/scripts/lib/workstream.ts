@@ -745,8 +745,35 @@ export function progressStep(done: number, total: number): string {
  * third class, `sds-step-1` to `sds-step-5` by steps landed and `sds-step-done` at the end. An arc with no step yet
  * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Cycles row.
  */
-function arcChip(data: ArcData): string {
+/** The moment an arc's log last moved, as its last line wrote it; "" where the log holds no line. */
+export function lastMoved(ws: string, arc: string): string {
+  const stamped = readJsonl(logFileOf(ws, arc))
+    .filter((line): line is LogLine => !!line && typeof line === "object" && typeof (line as LogLine).at === "string")
+    .map((line) => ({ at: line.at, time: Date.parse(line.at) }))
+    .filter((line) => Number.isFinite(line.time));
+  return stamped.sort((left, right) => left.time - right.time).at(-1)?.at ?? "";
+}
+
+/**
+ * What the progress block says of a running arc: the rows in progress, the next row ready to run, and when its
+ * log last moved. Null for an arc that is not running, which has no line in the block.
+ */
+export function runningLine(ws: string, data: ArcData, questions: readonly Question[] = readQuestions(ws)): { inProgress: ArcRow[]; next: ArcRow | null; moved: string } | null {
+  if (arcStatus(data) !== "RUNNING") return null;
+  const inProgress = leafRows(data).filter((row) => row.state === "running");
+  const next = readyRows(ws, data, questions).find((row) => !inProgress.includes(row)) ?? null;
+  return { inProgress, next, moved: lastMoved(ws, data.arc) };
+}
+
+function arcChip(data: ArcData, ws: string, questions: readonly Question[]): string {
   const status = arcStatus(data);
+  const running = runningLine(ws, data, questions);
+  const rowWords = (row: ArcRow): string => `row ${row.id}, ${row.title}`;
+  const runningWords = running ? [
+    `in progress: ${running.inProgress.length ? running.inProgress.map(rowWords).join("; ") : "none"}`,
+    `next ready: ${running.next ? rowWords(running.next) : "none"}`,
+    `log last moved: ${running.moved || "never"}`,
+  ] : [];
   const word = status.toLowerCase();
   const number = String(Number(data.arc.replace(/^N/, "")));
   const name = escapeHtml(data.subject.replace(/-/g, " "));
@@ -758,8 +785,8 @@ function arcChip(data: ArcData): string {
   const count = building ? `${built.done}/${built.total}` : word;
   const width = building ? share(built.done, built.total) : 0;
   const said = `${built.done} of ${built.total} steps landed`;
-  const label = `${data.arc} ${name}, ${status}, ${said}${reason}`;
-  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}</span>`;
+  const label = `${data.arc} ${name}, ${status}, ${said}${reason}${runningWords.length ? `, ${escapeHtml(runningWords.join(", "))}` : ""}`;
+  const tip = `<span class="sds-tip"><span class="sds-badge sds-status sds-${word}">${escapeHtml(status)}</span><strong>${escapeHtml(data.title)}</strong><span>${said}</span>${why ? `<span>${escapeHtml(why)}</span>` : ""}${runningWords.map((words) => `<span>${escapeHtml(words)}</span>`).join("")}</span>`;
   return `      <a class="sds-chip sds-${word} sds-step-${step}" href="#${data.arc}" aria-label="${label}">`
     + `<span class="sds-chip-line"><span class="sds-chip-name"><span class="sds-mono">${number}</span><span class="sds-chip-subject"> &middot; ${name}</span></span><span class="sds-arc-count">${count}</span></span>`
     + `<span class="sds-chip-bar"><i style="width:${width}%"></i></span>${tip}</a>`;
@@ -776,6 +803,7 @@ function arcChip(data: ArcData): string {
  */
 function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string[] {
   if (!arcs.length) return [];
+  const questions = readQuestions(ws);
   const counts = arcs.map(builtOf);
   const done = counts.reduce((sum, one) => sum + one.done, 0);
   const total = counts.reduce((sum, one) => sum + one.total, 0);
@@ -783,7 +811,7 @@ function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string
   return [
     `  <nav class="sds-footbar" aria-label="Workstream status">`,
     `    <div class="sds-footbar-chips">`,
-    ...arcs.map(arcChip),
+    ...arcs.map((data) => arcChip(data, ws, questions)),
     `    </div>`,
     `    <div class="sds-footbar-summary sds-${word.toLowerCase()} sds-step-${progressStep(done, total)}" tabindex="0" aria-label="Workstream ${word}, ${done} of ${total} steps landed, ${closed} of ${arcs.length} arcs closed">`,
     `      <span class="sds-chip-line"><span class="sds-chip-name">Overall</span><span class="sds-arc-count">${done}/${total}</span></span>`,
