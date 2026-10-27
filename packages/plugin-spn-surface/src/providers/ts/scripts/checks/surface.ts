@@ -3,7 +3,7 @@
 // release every rule is a note. The rows each note restates sit in `_surface/notes.ts`.
 //
 // The TypeScript half of the Surface check: the reader (`_surface/jsx.ts`) over the text a write produces,
-// the eight notes (`_surface/notes.ts`), and the one question the hook asks of them — which notes did
+// the ten notes (`_surface/notes.ts`), and the one question the hook asks of them — which notes did
 // THIS write bring. A note already true of the file before the write is not this write's, so an edit
 // beside an old slip says nothing about it.
 //

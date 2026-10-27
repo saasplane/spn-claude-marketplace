@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "c13d0d25"
+      "seen": "c2b4a14e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "d6d3d11e"
+      "seen": "429acd8b"
     }
   ]
 }
@@ -811,7 +811,7 @@ The badge, `DSBadge`, shows a state or a kind as one of the facts of a thing. Wh
 - **A badge with no `variant` MUST draw `SUBTLE`, the light tint** (`RD.SUPPORT.SURFACE.153`). A page asks for a stronger fill by writing `QUIET`, so the badges of a table or a card stay quiet beside the words around them.
 - **A badge MUST NOT take `GHOST` or `LINK`** (`RD.SUPPORT.SURFACE.377`). A word with no fill is a fact in words, a `TEXT` fact, and a link is a `DSLink`.
 - **A badge MUST be `SOLID` only over a picture** (`RD.SUPPORT.SURFACE.378`). A strong fill is kept for the one place a tint cannot be read, so a page never writes `SOLID` on a badge to make it stand out.
-- **A badge in a table cell or on its own MUST be `SM`, and a badge over a picture MUST take the size of its place** (`RD.SUPPORT.SURFACE.380`). Among the facts of an item line the level gives the size, as the rule below states.
+- **A badge in a table cell MUST be `XS`, a badge on its own MUST be `SM`, and a badge over a picture MUST take the size of its place** (`RD.SUPPORT.SURFACE.380` and `RD.SUPPORT.SURFACE.391`). A person scans a table row by row, so a larger badge weighs on every row and tells them nothing more. Among the facts of an item line the level gives the size, as the rule below states.
 - **Several values of one set MUST each be drawn by their own case, one size step smaller than their place** (`RD.SUPPORT.SURFACE.381`). A row of small badges then reads as one fact with several values, and each keeps the look its own meaning gives. No badge is smaller than `XS`.
 - **A label a person coloured MUST be a `SUBTLE` badge in `CUSTOM`, with that colour in `customColor`** (`RD.SUPPORT.SURFACE.382`). The badge works out its fill, its words and its line from that one colour, so a colour a person picks never draws a badge that cannot be read.
 - **A status badge MUST keep its own colour on a coloured surface.** On a surface other than `BASE` only a neutral and a primary badge take the surface's tint; a success, warning, error or info badge stays its hue, so Live, Syncing and Pending draw apart on a stage as they do on the page.
@@ -843,7 +843,8 @@ A badge is chosen from what its value is and where it stands. Every case rests o
 | a state | an item line from `WIDGET` to `INLINE` | `SUBTLE_OUTLINE` (the level's) | from the hue table | `SM` at `WIDGET` and `GROUP`, `XS` below (the level's) | the word and the colour |
 | a state | an item line at `PAGE` or `CONTAINER` | `QUIET` (the level's) | from the hue table | `MD` (the level's) | the word and the colour |
 | a state | over a picture | `SOLID` | the state's hue, from the hue table | the place's | the word, the colour and the variant |
-| a state | a table cell, or on its own | `SUBTLE` (the unit's) | from the hue table | `SM` | the word and the colour, and `SM` where the place is larger |
+| a state | a table cell | `SUBTLE` (the unit's) | from the hue table | `XS` | the word and the colour, and `XS` where the place is larger |
+| a state | on its own | `SUBTLE` (the unit's) | from the hue table | `SM` | the word and the colour, and `SM` where the place is larger |
 | a release stage, such as Alpha, Beta or New | a feature's eyebrow | the level's | `PRIMARY` | the level's | the word |
 | a plan's highlight, such as Most popular | a plan | the level's | `PRIMARY` | the level's | the word |
 | several values of one set | anywhere | each by its own case | each by its own case | one step smaller than the place's | the words, and the size |
@@ -871,8 +872,8 @@ A badge is chosen from what its value is and where it stands. Every case rests o
 | `color` | `DEFAULT` | ruled: a kind or a type; a state that is off, ended or not started, by the hue table. It is the unit's own default |
 | `color` | `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | ruled: a state, by the hue table; `PRIMARY` also a release stage and a plan's highlight |
 | `color` | `CUSTOM` | ruled: a label a person coloured, with `customColor` (`RD.SUPPORT.SURFACE.382`). Never for a state the system names |
-| `size` | `XS` | ruled: a state in an item line at `CONTENT` and `INLINE`; several values where their place is `SM` or `XS` |
-| `size` | `SM` | ruled: a state in an item line at `WIDGET` and `GROUP`; a state in a table cell or on its own (`RD.SUPPORT.SURFACE.380`); several values where their place is `MD` |
+| `size` | `XS` | ruled: a state in an item line at `CONTENT` and `INLINE`; a state in a table cell (`RD.SUPPORT.SURFACE.391`); several values where their place is `SM` or `XS` |
+| `size` | `SM` | ruled: a state in an item line at `WIDGET` and `GROUP`; a state on its own (`RD.SUPPORT.SURFACE.380`); several values where their place is `MD` |
 | `size` | `MD` | ruled: a state in an item line at `PAGE` and `CONTAINER`; several values where their place is `LG` |
 | `size` | `LG` · `XL` | ruled as the place's alone: a kind, a state over a picture or a label a person coloured, in a place of that size, and several values where their place is `XL`. A page writes neither |
 
@@ -1245,7 +1246,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.377` | a badge never takes `GHOST` or `LINK` |
 | `RD.SUPPORT.SURFACE.378` | a badge is `SOLID` only over a picture |
 | `RD.SUPPORT.SURFACE.379` | a page never writes `QUIET`, `SUBTLE` or `SUBTLE_OUTLINE` on a button |
-| `RD.SUPPORT.SURFACE.380` | a badge in a table cell or on its own is `SM`, and over a picture takes the size of its place |
+| `RD.SUPPORT.SURFACE.380` | a badge on its own is `SM`, and over a picture takes the size of its place |
 | `RD.SUPPORT.SURFACE.381` | several values of one set are each drawn by their own case, one size step smaller than their place |
 | `RD.SUPPORT.SURFACE.382` | a label a person coloured is a `SUBTLE` badge in `CUSTOM` with that colour |
 | `RD.SUPPORT.SURFACE.384` | a button's colour says what its act does: `PRIMARY` the main action, `ERROR` a main action that deletes or ends, `DEFAULT` every other, and never another hue |
@@ -1255,6 +1256,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.388` | a mark draws its icon alone, `GHOST`, only in a run of marks, where it keeps their box |
 | `RD.SUPPORT.SURFACE.389` | a mark never takes `LINK` or `SUBTLE_OUTLINE` |
 | `RD.SUPPORT.SURFACE.390` | a header shows at most one main action and one or two secondaries, the rest behind "⋯"; on a record moving through states the main action is the move its state expects next |
+| `RD.SUPPORT.SURFACE.391` | a badge in a table cell is `XS`, because a person scans a table row by row |
 
 ## Proof
 

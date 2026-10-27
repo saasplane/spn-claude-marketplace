@@ -1,12 +1,12 @@
 <!-- spn:doc
-{"id": "spn-surface-capabilities-scripts", "variant": "capability", "title": "Scripts in spn-surface", "lenses": ["WEB_DEV", "ARCHITECT"], "status": "PLANNING", "realizes": ["surface-scripts"], "summary": "Everything this plugin executes — the process behind the wired entry, the connector check, the command line that ships no command, and the shared helpers it imports.", "keywords": ["dispatcher", "check", "cli", "support-lib"]}
+{"id": "spn-surface-capabilities-scripts", "variant": "capability", "title": "Scripts in spn-surface", "lenses": ["WEB_DEV", "ARCHITECT"], "status": "PLANNING", "realizes": ["surface-scripts"], "summary": "Everything this plugin executes — the process behind the wired entry, the connector check, the Surface check, the command line that scans Surface code, and the shared helpers it imports.", "keywords": ["dispatcher", "check", "cli", "support-lib"]}
 -->
 
 # Scripts in spn-surface
 
 `For: Web developer · Architect` · `Status: 🔮 PLANNING` · `Realizes: Scripts`
 
-Today the plugin runs one check, and the helpers it needs are shared with the apps plugin rather than copied: the masker, the resulting text of a write and the stack read each have one copy in the shared support folder.
+Today the plugin runs two checks, one on a connector script and one on Surface code, and the helpers it needs are shared with the apps plugin rather than copied: the masker, the resulting text of a write and the stack read each have one copy in the shared support folder.
 
 ## Where
 
@@ -14,8 +14,10 @@ Today the plugin runs one check, and the helpers it needs are shared with the ap
 | --- | --- | --- |
 | The dispatcher | `packages/plugin-spn-surface/src/scripts/events/pretooluse.ts` | one process behind the entry: keeps the first refusal, joins the advice |
 | The connector check | `packages/plugin-spn-surface/src/scripts/checks/figma-connector.ts` | a `use_figma` script read before the call: the unsupported APIs, a page assignment, a notice and a close are refused, and the rest is noted |
-| The entry | `packages/plugin-spn-surface/src/scripts/cli.ts` | the one command line, dispatching `<group> [<subject>] <action>` to the files under `commands/`; no group is shipped |
-| The launcher and the tiers | `packages/plugin-spn-surface/src/bin/spn-surface` and `packages/plugin-spn-surface/src/tiers.json` | the plugin's bare name on the Bash path, and the permission tier of each group the entry ships |
+| The Surface check | `packages/plugin-spn-surface/src/scripts/checks/subjects.ts` and `packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts` | a `.tsx` write in a web node's `src/` is read by its stack's reader and answered with the notes this write added; the notes are listed in [Hooks in spn-surface](02-hooks.md) |
+| The entry | `packages/plugin-spn-surface/src/scripts/cli.ts` | the one command line, dispatching `<group> [<subject>] <action>` to the files under `commands/`; one group is shipped, `check` |
+| The scan command | `packages/plugin-spn-surface/src/scripts/commands/check/scan.ts` | `spn-surface check scan [<path>…]` reads whole files, not a write, and prints every Surface note with its line and a count by note; it finds the stack from the first path and calls that stack's reader |
+| The launcher and the tiers | `packages/plugin-spn-surface/src/bin/spn-surface` and `packages/plugin-spn-surface/src/tiers.json` | the plugin's bare name on the Bash path, and the permission tier of each group the entry ships, `check` being allowed |
 | How a source file is read | `packages/plugin-support-lib/src/lib/source.ts` | masking, and the source as the pending write would leave it; one copy in the shared support folder, imported by this plugin and by spn-apps |
 | The stack read | `packages/plugin-support-lib/src/lib/stack.ts` | walks to the nearest `sprepo.json` and returns the declared stack, or nothing; one copy in the shared support folder |
 | The payload and verdict shapes | `packages/plugin-support-lib/src/lib/payload.ts` | one copy in the shared support folder, bundled into every plugin that reads a hook payload |

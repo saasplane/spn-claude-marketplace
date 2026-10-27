@@ -1178,7 +1178,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
 
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
     // The page takes its two lines from the template, so it links the version the template links.
-    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css">/.test(produced)
+    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css" integrity="sha384-[^"]+" crossorigin="anonymous">/.test(produced)
       && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8"))[0])
       && g.includes("clean — 1 page"));
   one("known-bad: the same page edited by hand is not what the seat produces",
