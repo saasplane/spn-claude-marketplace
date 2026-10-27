@@ -79,7 +79,8 @@ export type View = { lens: string; text: string };
 export type Option = { key: string; does: string; costs: string };
 export type Card = { why: string; what: string; viewsLead: string; views: View[]; options: Option[]; recommended: { key: string; reason: string } };
 export type Answer = { key?: string | null; words: string; at: string };
-export type Question = { id: string; arc: string; title: string; state: string; raised: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
+/** `raisedBy` is the session id of the window that raised the card; a card raised before it was recorded has none. */
+export type Question = { id: string; arc: string; title: string; state: string; raised: string; raisedBy?: string; shownIn: string[]; card: Card; answer: Answer | null; [field: string]: unknown };
 
 // ---------------------------------------------------------------------------- the field rules
 
@@ -239,7 +240,7 @@ const SUGGESTION_FIELDS: Record<string, Rule> = {
 const QUESTION_FIELDS: Record<string, Rule> = {
   id: { kind: "string", required: true, pattern: QUESTION_ID }, arc: { kind: "string", required: true, pattern: ARC_ID },
   title: { kind: "string", required: true }, state: { kind: "enum", required: true, values: QUESTION_STATES },
-  raised: { kind: "string", required: true }, shownIn: { kind: "strings", required: true },
+  raised: { kind: "string", required: true }, raisedBy: { kind: "string", required: false }, shownIn: { kind: "strings", required: true },
 };
 
 export const logFaults = (line: unknown, where: string): string[] =>
