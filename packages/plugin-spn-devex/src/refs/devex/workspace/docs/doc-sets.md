@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "1ea17ae3"
+      "seen": "8ca16d82"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "f6d38a75"
+      "seen": "28bca033"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -673,14 +673,22 @@ them — MUST** (decision RD.DEVEX.WORKSPACE.214). The stylesheet is `sds-docs.c
 badges and the link on each heading. A page that holds a copy of its styles keeps the faults of the
 day it was written. With one shared file, a fault is fixed once, for every page that links the file.
 
-**A stored page links one version by its address, in two lines.** A stored page is one that sits in a
-repository or in a workstream's folder. The stylesheet's line sits at the top of the page, and the
-script's line sits at its end.
+**A stored page links one version by its address, in two lines, and each line carries that version's
+hash — MUST** (decision RD.DEVEX.WORKSPACE.319). A stored page is one that sits in a repository or in a
+workstream's folder. The stylesheet's line sits at the top of the page, and the script's line sits at
+its end.
 
 ```html
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css" integrity="sha384-yVin2c2S1m8ldTQTtUJPqJBz8TY812j71qdtCLQqnZxqasj30NzrXSCrlc9+U+2F" crossorigin="anonymous">
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js" integrity="sha384-yckWCAT0ixCn5/9TM1odr+EIGga8NIDh2ybNOXFNW6s4JXUhIjCA/s24ZLhF6jSr" crossorigin="anonymous"></script>
 ```
+
+**The hash is how a browser knows a file is the one that was cut.** `integrity` holds the SHA-384 of
+the file as its version was cut, so a browser refuses a file overwritten under that version, and
+`crossorigin="anonymous"` lets it check a file from another address. `docs sds cut` records each new
+version's hashes in the plugin's `integrity.json`, and a recorded hash never changes. A command that
+writes a page writes the hash beside the version and refuses a version the table lacks; `docs sds
+repoint` moves the hash with the version. A line with no hash still loads, and the code scan reports it.
 
 - **A page may add a style of its own, for a case the shared stylesheet does not cover.** The shared
   classes come first. The page's own `<style>` block sits after the stylesheet's line, and a class it

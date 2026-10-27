@@ -75,7 +75,7 @@ ok("the Terms table carries the class `sds-terms`, which gives the three columns
 ok("a table that is not the Terms table carries no such class",
   !produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])).includes("sds-terms")
   && !produced(table(["Term", "Meaning"], ["Estate", "everything a product runs on"])).includes("sds-terms"));
-const { cutVersions, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
+const { cutVersions, integrityTable, newestVersion, linesFor } = await import(pathToFileURL(resolve(HERE, "..", "plugin-support-lib", "src", "lib", "page-styles.ts")).href);
 const { readFileSync } = await import("node:fs");
 const STYLES_HOME = resolve(HERE, "src", "styles");
 ok("the newest version of the shared styles is 1.10.0, so every page writer links it",
@@ -85,7 +85,8 @@ ok("and 1.10.0 serves the Terms shares: a fixed layout, and the stacked rows und
   && readFileSync(resolve(HERE, "..", "..", "public", "assets", "docs", "1.10.0", "sds-docs.css"), "utf8").includes("max-width:40rem"));
 for (const name of ["construct", "overview", "blocks"]) {
   const template = readFileSync(resolve(HERE, "src", "refs", "devex", "workspace", "docs", "templates", "pages", `${name}-template.html`), "utf8");
-  ok(`the ${name} template links 1.10.0`, template.includes(linesFor("1.10.0").stylesheet) && !template.includes("/1.9.0/"));
+  ok(`the ${name} template links 1.10.0, with its hash`,
+    template.includes(linesFor("1.10.0", undefined, integrityTable(STYLES_HOME)["1.10.0"]).stylesheet) && !template.includes("/1.9.0/"));
 }
 const binds = rowsOf(produced(table(["Rule", "What it decides", "Weight"], ["`RD.X.1`", "what every provider delivers", "MUST"])), "<thead>");
 ok("Binds keeps the Weight a reader compares down, and folds what a rule decides into the rule's cell",
