@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "7ea3b20d"
+      "seen": "c13d0d25"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "93c56596"
+      "seen": "d6d3d11e"
     }
   ]
 }
@@ -211,6 +211,8 @@ A button is chosen by its view, then by whether it is the view's main action, th
 | any view | another action | the content, or no box | `OUTLINE` (the unit's) | `DEFAULT` | the size above | nothing |
 
 **The limits across a view.** A view holds at most one `SOLID` button, its main action, and a view with no main action holds none (`RD.SUPPORT.SURFACE.370`). A dialog, a drawer or a sheet over a page is a view of its own and holds its own. On a site's page the closing call repeats the hero's one act at the page's end, so its `SOLID` and the hero's are one main action said twice, never on screen together. A feature leads with at most one `SOLID` `PRIMARY` (`RD.SUPPORT.SURFACE.234`).
+
+**The limits across a header.** A header shows at most one main action, the one given `PRIMARY`, and one or two secondaries (`RD.SUPPORT.SURFACE.390`). On a record that moves through states, the main action is the move its state expects next, and it changes when the state changes. Every other move open at that state is a secondary, `DEFAULT`, and a record whose state expects no next move has no main action. A move shows only when the state allows it, and is left out, never drawn disabled. The two secondaries that stand are the two a person takes most. A third and every one after it stand behind "⋯", a `DSDropdownMenu` whose trigger is a `DSButton` with the icon `MORE_HORIZONTAL` alone, so the place draws it `GHOST`, or `OUTLINE` in the head of a page. The main action never stands behind "⋯". A menu item has no colour, so a move there that deletes or ends something takes `ERROR` on its confirmation. Every move of a record, every track's included, stands in the record's header. Write no `variant` on a header's buttons: give the main action `color={DSColorType.PRIMARY}` and the place draws the rest.
 
 **The index by value.**
 
@@ -1252,6 +1254,7 @@ This ref states which components exist, in which group, and what every one must 
 | `RD.SUPPORT.SURFACE.387` | a mark is `SOLID` only as the app's own mark beside its name and as the chosen one of a run of marks |
 | `RD.SUPPORT.SURFACE.388` | a mark draws its icon alone, `GHOST`, only in a run of marks, where it keeps their box |
 | `RD.SUPPORT.SURFACE.389` | a mark never takes `LINK` or `SUBTLE_OUTLINE` |
+| `RD.SUPPORT.SURFACE.390` | a header shows at most one main action and one or two secondaries, the rest behind "⋯"; on a record moving through states the main action is the move its state expects next |
 
 ## Proof
 

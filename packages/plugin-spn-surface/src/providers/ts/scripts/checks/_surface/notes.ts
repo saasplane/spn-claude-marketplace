@@ -1,10 +1,10 @@
 // RESTATES: docs/04-capabilities/02-support/01-surface/06-architecture-components/01-common/01-components.md
-// § Actions, § The item line, § The badge and § The choice table of `DSBadge`;
+// § Actions, § The badge, § The choice table of `DSBadge` and § The choice table of `DSButton`;
 // docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md;
 // docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md;
-// RD.SUPPORT.SURFACE.368, .369, .370, .374, .378, .382, .384, .385, .263 and RD.SUPPORT.APPS.147, .150, .218.
+// RD.SUPPORT.SURFACE.368, .369, .370, .374, .378, .382, .384, .385, .390, .263 and RD.SUPPORT.APPS.147, .150.
 //
-// The eight notes of the Surface check, each a soft note to the agent naming its book row and the fix
+// The notes of the Surface check, each a soft note to the agent naming its book row and the fix
 // (RD.DEVEX.AGENT.107: in the first release no rule refuses a write). Each reads what one file shows —
 // named design-system tags and literal enum members — and stays silent where the deciding fact is not
 // written in it: a colour from a lookup, a variant left to the place, props that arrive by a spread.
@@ -21,6 +21,8 @@ const VIEW = /(Dialog|Drawer|Sheet|Step)$/;
 const PICTURE_TAG = /(Image|Picture|Cover|Media|Avatar|Photo|Thumbnail)$|^img$/;
 const PICTURE_ATTR = /^(media|mediaNode|image|imageNode|cover|coverNode|picture|thumbnail)$/;
 const OVERLAY = /(Dialog|Drawer|Sheet|Popover)$/;
+/** What holds the buttons behind "⋯": a button inside one is a menu's trigger, never a secondary standing. */
+const MENU = /(DropdownMenu|Menu)$/;
 
 // The hue table of RD.SUPPORT.SURFACE.369, by the values the book lists. `EXPIRED` fits two rows and is left
 // to the reader of the code, as the book says.
@@ -68,6 +70,7 @@ export function notesOf(source: string, read: Read): Finding[] {
     found.push({ rule, key: `${rule}|${key}`, line: lineOf(source, tag ? tag.start : at), text });
   };
   const solidButtons = new Map<string, Tag[]>();
+  const headerButtons = new Map<string, { header: Tag; buttons: Tag[] }>();
 
   for (const tag of read.tags) {
     const line = lineOf(source, tag.start);
@@ -100,6 +103,20 @@ export function notesOf(source: string, read: Read): Finding[] {
         ?? [tag, ...ancestors(tag)].at(-1) as Tag;
       const key = `${view.start}|${tag.branches.join(",")}`;
       solidButtons.set(key, [...(solidButtons.get(key) ?? []), tag]);
+    }
+
+    if (isUnit(tag, "DSButton")) {
+      let header: Tag | null = null;
+      for (const at of ancestors(tag)) {
+        if (MENU.test(last(at.name))) break;
+        if (last(at.name) === "Header" && isUnit(at)) { header = at; break; }
+      }
+      if (header) {
+        const key = `${header.start}|${tag.branches.join(",")}`;
+        const group = headerButtons.get(key) ?? { header, buttons: [] };
+        group.buttons.push(tag);
+        headerButtons.set(key, group);
+      }
     }
 
     if (CONTAINERS.has(tag.name) && isUnit(tag)) {
@@ -139,6 +156,26 @@ export function notesOf(source: string, read: Read): Finding[] {
     for (const tag of group.slice(1))
       add("button-one-solid", tag, 0, `${signature(tag)}|after|${signature(group[0])}`,
         `\`DSButton\` at line ${lineOf(source, tag.start)} is a second written \`SOLID\` in one view; the first is at line ${lineOf(source, group[0].start)}. A view holds one \`SOLID\`, its main action (RD.SUPPORT.SURFACE.370): leave this one's \`variant\` out so it draws \`OUTLINE\`, or write \`GHOST\` at the end of a row or in a toolbar. If the two stand in two views the file cannot show, nothing need change.`);
+  }
+
+  // A HEADER'S BUTTONS, per header and per branch of a condition (RD.SUPPORT.SURFACE.390): one main action, no
+  // `ERROR` beside it, at most two secondaries standing, a menu's "⋯" trigger not counted. A colour from a list
+  // or a spread may be the main action, so a header with no literal `PRIMARY` counts one such button as it.
+  for (const { header, buttons } of headerButtons.values()) {
+    const colourOf = (tag: Tag): string | null => memberOf(tag, "color", "DSColorType");
+    const mains = buttons.filter((tag) => colourOf(tag) === "PRIMARY");
+    for (const tag of mains.slice(1))
+      add("header-one-main", tag, 0, `${signature(tag)}|after|${signature(mains[0])}`,
+        `\`DSButton\` at line ${lineOf(source, tag.start)} is a second \`PRIMARY\` in the header at line ${lineOf(source, header.start)}; the first is at line ${lineOf(source, mains[0].start)}. A header shows one main action, the move its record's state expects next (RD.SUPPORT.SURFACE.390). Leave this one's \`color\` out so it draws as a secondary.`);
+    if (mains.length)
+      for (const tag of buttons.filter((one) => colourOf(one) === "ERROR"))
+        add("header-error-beside-main", tag, 0, `${signature(tag)}|beside|${signature(mains[0])}`,
+          `\`DSButton\` at line ${lineOf(source, tag.start)} is \`ERROR\` in a header whose main action is the \`PRIMARY\` at line ${lineOf(source, mains[0].start)}. \`ERROR\` is a main action that deletes or ends something, so beside a \`PRIMARY\` it is a secondary and takes \`DEFAULT\` (RD.SUPPORT.SURFACE.384, RD.SUPPORT.SURFACE.390). Leave its \`color\` out, and give its confirmation \`ERROR\`.`);
+    const unread = buttons.some((tag) => spreads(tag) || (attrOf(tag, "color") !== null && colourOf(tag) === null));
+    const secondaries = buttons.filter((tag) => colourOf(tag) !== "PRIMARY").length - (!mains.length && unread ? 1 : 0);
+    if (secondaries > 2)
+      add("header-secondaries", header, 0, `${signature(header)}|${secondaries}`,
+        `The header at line ${lineOf(source, header.start)} shows ${secondaries} secondary buttons. A header shows one or two, the two a person takes most, and the rest stand behind "⋯": a \`DSDropdownMenu\` whose trigger is a \`DSButton\` with \`MORE_HORIZONTAL\` alone (RD.SUPPORT.SURFACE.390). Move the others into it.`);
   }
 
   // THE HUE TABLE, against a map written in this file (RD.SUPPORT.SURFACE.369). A map built in another file,

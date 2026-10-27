@@ -41,8 +41,12 @@ function hook(input, tool = "Write", env = { ...process.env, SPN_TELEMETRY: "off
   return { kind: "note", text: specific.additionalContext ?? "" };
 }
 
-const HEAD = "import { DSBadge, DSButton, DSCard, DSColorType, DSDialog, DSItem, DSMark, DSPageLevelType, DSPanelContainer, " +
-  "DSSectionContainer, DSVariantType } from '@saasplane/support-web-ds-ts';\n\n";
+const HEAD = "import { DSBadge, DSButton, DSCard, DSColorType, DSDialog, DSDropdownMenu, DSIconType, DSItem, DSMark, DSPageLevelType, " +
+  "DSPanelContainer, DSSectionContainer, DSVariantType } from '@saasplane/support-web-ds-ts';\n\n";
+/** A panel's header holding a record's item and the buttons given, as the merchant page writes one. */
+const header = (buttons) =>
+  `    <DSPanelContainer>\n      <DSPanelContainer.Header>\n        <DSItem title="Avery Seller" />\n${buttons.map((one) => `        ${one}`).join("\n")}\n      </DSPanelContainer.Header>\n    </DSPanelContainer>`;
+const MORE = "<DSDropdownMenu nodes={more}>{({ anchor }) => <DSButton anchor={anchor} startIcon={DSIconType.MORE_HORIZONTAL} ariaLabel=\"More actions\" />}</DSDropdownMenu>";
 const page = (body) => `${HEAD}export const Page = () => (\n  <div>\n${body}\n  </div>\n);\n`;
 const rulesOf = (text) => findings(text).map((note) => note.rule);
 
@@ -93,6 +97,15 @@ const PAIRS = [
   ["custom-no-colour", "RD.SUPPORT.SURFACE.382",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} />",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} customColor={tag.color} />"],
+  ["header-one-main", "RD.SUPPORT.SURFACE.390",
+    header(["<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />", "<DSButton label=\"Approve merchant\" color={DSColorType.PRIMARY} />"]),
+    header(["<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />", "<DSButton label=\"Approve merchant\" />"])],
+  ["header-error-beside-main", "RD.SUPPORT.SURFACE.390",
+    header(["<DSButton label=\"Reject\" color={DSColorType.ERROR} />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"]),
+    header(["<DSButton label=\"Reject\" />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"])],
+  ["header-secondaries", "RD.SUPPORT.SURFACE.390",
+    header(["<DSButton label=\"Mark onboarding in progress\" />", "<DSButton label=\"Reject\" />", "<DSButton label=\"Deactivate\" />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"]),
+    header(["<DSButton label=\"Mark onboarding in progress\" />", "<DSButton label=\"Reject\" />", MORE, "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"])],
 ];
 
 console.log("\n=== each note — a seeded wrong file gets it, through the hook, and the same file corrected gets none");

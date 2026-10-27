@@ -60,7 +60,7 @@ Run the `design` skill to its tree, then its mock step, `skills/design/steps/moc
 
 1. **The page's design tree first.** It names the person, the flow, the facts, the pattern and every block by level. A page with no tree runs route 1 up to the tasks before any code is written.
 2. **Then what a page writes for each unit on its stack**, and what a unit does not do yet: `providers.md`, which also says which provider the repository's stack claim picks.
-3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit. A value is the page's, else the place's, else the level's, else the unit's, and the case says which.
+3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit. A value is the page's, else the place's, else the level's, else the unit's, and the case says which. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
 4. **Then the names and the app's contexts**, where the code meets them: `architecture-names.md` for the names and the vocabularies, and `architecture-app.md` for the two contexts and the theme.
 
 ## 4. Review or verify a page

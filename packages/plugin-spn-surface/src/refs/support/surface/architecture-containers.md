@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "c4abeb1d"
+      "seen": "a6eb0e02"
     }
   ]
 }
@@ -75,7 +75,7 @@ What a page puts in each part follows one form. A person then finds the name and
 | Content | one part, or several parts each under its own title. The action of one part stands at the end of that part's title | a person sees which part an action changes, because the action stands on the title of that part and not in the header |
 | Footer | what closes the work of the panel, such as the two actions that save an entry or leave it. It stands inside the outline, under a line | the actions that end the work are met last, after everything they act on |
 
-- **A page MUST put the title and the actions of a panel in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page.
+- **A page MUST put the title and the actions of a panel in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page. Which action is the main one, and how many stand before "⋯", is the button's *limits across a header* in `architecture-components.md` (`RD.SUPPORT.SURFACE.390`).
 - **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole panel.
 - **A page uses one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. `standards-patterns.md` states the rule once, for every pattern.
 - **A panel MUST give the title in its header the level of its box, `CONTAINER` unless the panel is the whole page, and a panel that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A panel takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this panel is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the panel gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
