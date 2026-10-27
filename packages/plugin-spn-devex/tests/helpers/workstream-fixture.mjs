@@ -1,5 +1,5 @@
 // A workstream kept as data, on disk in a throwaway workspace: an approach page in the template's
-// shape (What linking the preview, Cycles with the arc's row and the progress block, Open as the open
+// shape (What holding the arc's entry, N001-what, which links the preview, Cycles with the arc's row and the progress block, Open as the open
 // block), one arc's `state.json` with its name file, its preview and its plan. Each case starts whole
 // and breaks one thing.
 import { execFileSync } from "node:child_process";
@@ -19,7 +19,7 @@ export function approachPage(stamp = "") {
     `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div><h1>031 - Probe</h1></header>`,
     `<section id="s2" data-block="reasons">`,
     `  <div class="sds-section-head"><h2>What</h2></div>`,
-    `  <h4 id="c1">The probe</h4>`,
+    `  <h4 id="N001-what">The probe</h4>`,
     `  <p>Read the preview &rarr; <a href="notes/N001/preview.html">the probe</a></p>`,
     `</section>`,
     `<section id="s3" data-block="sequence">`,

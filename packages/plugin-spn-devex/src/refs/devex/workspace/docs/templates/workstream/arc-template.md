@@ -90,7 +90,7 @@ arcs/N{{nnn}}/{{short-name}}.md   the arc's name, written with its data: the tit
 
 ```text
 notes/N{{nnn}}/
-  preview.html      the arc's one preview, only where something must be seen or worded to decide: each proposal a
+  preview.html      every arc's one preview, written when the arc opens: each proposal a
                     section, its status in the masthead, frozen at the go
   samples/          real files of the kind the work produces, each in its own format, as many as the work needs
   plan.md           optional, written at the go only where the arc has traps, a set or a move table; never while PROPOSED

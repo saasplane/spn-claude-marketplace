@@ -24,7 +24,7 @@ export function applies(_path: string, command: string): boolean {
 }
 
 /** Where the command ran: the payload's directory, moved by a leading `cd <dir> &&`. */
-function ranIn(payload: Payload, command: string): string {
+export function ranIn(payload: Payload, command: string): string {
   const base = payload.cwd ?? process.cwd();
   const dir = CD_PREFIX.exec(command)?.[1]?.replace(/^['"]|['"]$/g, "");
   return dir ? resolve(base, dir) : base;

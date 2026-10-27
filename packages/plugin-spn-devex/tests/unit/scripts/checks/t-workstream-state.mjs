@@ -2,7 +2,7 @@
 // once on a fixture that breaks it, and to pass once the fixture is mended the way the agent would.
 import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { arcData, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
+import { PREVIEW, arcData, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 
 const { checkWorkstream, checkWorkspace, sectionText } = await import("../../../../src/scripts/checks/workstream-state.ts");
@@ -49,7 +49,7 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title an
   writeFileSync(page, text.replace(/<tr id="N001" data-arc="arcs\/N001\/state.json"[^>]*>/, "<tr>"));
   ok("red: an arc with no row in Cycles fails", has(checkWorkstream(ws), "stamp", /has no row in Cycles/), said(checkWorkstream(ws)));
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
-  ok("red: an arc whose preview What does not link fails", has(checkWorkstream(ws), "stamp", /not linked from the page's What/), said(checkWorkstream(ws)));
+  ok("red: an arc whose preview its What entry does not link fails", has(checkWorkstream(ws), "stamp", /N001's preview is not linked from its What entry, `#N001-what`/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
   // The row landed by hand moved the status the steps work out, so the page's views and the name file wait for their command.
   const apart = (findings) => findings.filter((one) => !["status", "views", "name"].includes(one.check));
@@ -157,13 +157,76 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   const page = join(ws, "approach.html");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
-  ok("green: an arc past PROPOSED with no preview is whole, since a preview is made only where one is owed",
-    !has(checkWorkstream(ws), "preview", /no preview/), said(checkWorkstream(ws)));
+  ok("red: an arc with no preview fails, every arc having one from the write that opens it",
+    has(checkWorkstream(ws), "preview", /N001 has no preview — every arc has one, `notes\/N001\/preview\.html`, written when it opens; `spn-devex workstream row write 031\/N001` writes it from the template \(RD\.DEVEX\.WORKSPACE\.254\)/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
   renameSync(join(notes, "draft.html"), join(notes, "preview.html"));
   mkdirSync(join(notes, "samples"), { recursive: true });
   writeFileSync(join(notes, "samples", "badge-dark.png"), "png");
   ok("green: samples stay beside the one preview", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+}
+
+console.log("\n=== RD.DEVEX.WORKSPACE.254 — a What entry of its own, and a link to another arc by its What");
+{
+  const { root, ws } = await dataWorkspace("state-what");
+  const page = join(ws, "approach.html");
+  const whole = readFileSync(page, "utf8");
+  const arcFile = (arc) => join(ws, "arcs", arc, "state.json");
+  const second = { ...arcData(), arc: "N002", subject: "second", title: "the second arc", status: "PROPOSED", rows: [] };
+  const open = (text) => {
+    mkdirSync(join(ws, "arcs", "N002"), { recursive: true });
+    mkdirSync(join(ws, "notes", "N002"), { recursive: true });
+    writeFileSync(arcFile("N002"), JSON.stringify(second, null, 2));
+    writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW);
+    writeFileSync(page, text);
+    cli(root, ["docs", "cycles", "write", "031"]);
+    cli(root, ["workstream", "arc", "stamp", "write", "031/N002"]);
+  };
+  const entry2 = `  <h4 id="N002-what">The second arc</h4>\n  <p>Read the preview &rarr; <a href="notes/N002/preview.html">the second</a></p>\n`;
+  open(whole.replace("</section>\n<section id=\"s3\"", `${entry2}</section>\n<section id="s3"`));
+  const withSecond = readFileSync(page, "utf8");
+  ok("green: two arcs, each with its own preview, its own entry, and links to no other's, pass", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+
+  writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
+  const noEntry = checkWorkstream(ws);
+  ok("red: an arc with no What entry fails, naming the entry and the command that anchors or writes it",
+    has(noEntry, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream row write 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(noEntry));
+
+  writeFileSync(page, withSecond.replace('<a href="notes/N002/preview.html">the second</a>', "the second"));
+  ok("red: an entry that does not link its arc's preview fails", has(checkWorkstream(ws), "stamp", /N002's preview is not linked from its What entry, `#N002-what`/), said(checkWorkstream(ws)));
+
+  writeFileSync(page, withSecond.replace('<a href="notes/N002/preview.html">the second</a>', '<a href="notes/N002/preview.html">the second</a> and <a href="notes/N001/preview.html">the first</a>'));
+  const crossed = checkWorkstream(ws);
+  ok("red: an entry that links another arc's preview fails, naming the What it should link",
+    has(crossed, "stamp", /N002's What entry links `notes\/N001\/preview\.html`, N001's preview — an arc's entry links its own preview only, and names another arc by its What, `approach\.html#N001-what`/), said(crossed));
+  ok("the same link in an entry that is not N001's is no finding of the outside-an-entry kind", !has(crossed, "stamp", /outside N001's entry/), said(crossed));
+
+  writeFileSync(page, withSecond);
+  writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../N001/preview.html">the first</a></p>'));
+  const previewLink = checkWorkstream(ws);
+  ok("red: a preview that links another arc's preview fails, naming the What it should link",
+    has(previewLink, "preview", /N002's preview links `\.\.\/N001\/preview\.html`, N001's preview — a preview names another arc by its What, `\.\.\/\.\.\/approach\.html#N001-what`, and never links its preview/), said(previewLink));
+  writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", '<p>after <a href="../../approach.html#N001-what">the first</a></p>'));
+  ok("green: a preview that names the other arc by its What passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW);
+
+  writeFileSync(page, withSecond.replace(entry2, `  <h4 id="N002-what">The second arc</h4>\n  <p>No link here.</p>\n  <h4 id="c9">Elsewhere</h4>\n  <p><a href="notes/N002/preview.html">the second</a></p>\n`));
+  const outside = checkWorkstream(ws);
+  ok("red: a link to an arc's preview in What outside that arc's entry fails, once, with no arc",
+    outside.filter((one) => one.arc === null && one.check === "stamp" && /^the approach page's What links `notes\/N002\/preview\.html` outside N002's entry — a preview is linked from its own arc's What entry, and from no other place in What$/.test(one.message)).length === 1, said(outside));
+
+  writeFileSync(page, withSecond.replace("<h4 id=\"N002-what\">The second arc</h4>", "<h4 id=\"c3\"><span id=\"N002-what\"></span>The second arc</h4>"));
+  ok("green: the id as an anchor on a subject heading is the arc's entry", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  writeFileSync(page, withSecond);
+
+  const slotted = { ...second, status: "DECIDED" };
+  writeFileSync(arcFile("N002"), JSON.stringify(slotted, null, 2));
+  writeFileSync(join(ws, "notes", "N002", "preview.html"), PREVIEW.replace("<p>the probe</p>", "<p>{{one}}</p>\n<p>{{two}}</p>"));
+  const decided = checkWorkstream(ws);
+  ok("red: a slot left in a decided arc's preview fails, counting them and naming the first line",
+    has(decided, "preview", /N002 is DECIDED and its preview still holds 2 slot\(s\), `\{\{…\}\}`, the first at `notes\/N002\/preview\.html:3` — a decided arc's preview is filled; a slot is expected only while the arc is PROPOSED/), said(decided));
+  writeFileSync(arcFile("N002"), JSON.stringify(second, null, 2));
+  ok("green: the same slots in a PROPOSED arc's preview are expected", !has(checkWorkstream(ws), "preview", /slot/), said(checkWorkstream(ws)));
 }
 
 console.log("\n=== RD.DEVEX.WORKSPACE.267 — a sample is the work's own file, never a page built with the page template");
