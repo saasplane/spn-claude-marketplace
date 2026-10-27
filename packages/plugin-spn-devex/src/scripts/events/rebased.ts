@@ -7,12 +7,16 @@
 
 import { readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 import { checkRebaseMoved } from "../checks/rebase-moved.ts";
+import { checkMergeTold } from "../checks/merge-told.ts";
+import { checkOutputSize } from "../checks/output-size.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 type Check = { name: SpanName; run: (payload: Payload) => Verdict };
 
 const CHECKS: Check[] = [
   { name: { group: "rebase-moved", action: "rebase-moved" }, run: checkRebaseMoved },
+  { name: { group: "merge-told", action: "merge-told" }, run: checkMergeTold },
+  { name: { group: "output-size", action: "output-size" }, run: checkOutputSize },
 ];
 
 /** What the checks have to say about this call, joined, or null. */
