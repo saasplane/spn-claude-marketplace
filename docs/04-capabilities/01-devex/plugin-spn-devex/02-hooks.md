@@ -17,6 +17,7 @@
 | A prompt that was sent | `packages/plugin-spn-devex/src/scripts/events/prompt.ts` | `UserPromptSubmit`, with no matcher |
 | A call about to run | `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `NotebookRead`, `Artifact`, `Agent` and `Task`, and the dispatcher behind it |
 | A shell command that finished | `packages/plugin-spn-devex/src/scripts/events/closed.ts` | `PostToolUse` and `PostToolUseFailure`, matching `Bash` |
+| A branch that took `develop` in | `packages/plugin-spn-devex/src/scripts/events/rebased.ts` | `PostToolUse`, matching `Bash`, beside `closed.ts` in the same entry |
 | A turn about to end | `packages/plugin-spn-devex/src/scripts/events/stop.ts` | `Stop`, with no matcher |
 | A child agent that stopped | `packages/plugin-spn-devex/src/scripts/events/subagentstop.ts` | `SubagentStop`, with no matcher |
 | The verdict and the payload | `packages/plugin-spn-devex/src/scripts/lib/payload.ts` | the `Payload` and `Verdict` types, `readPayload`, `emit`, `runAlone` |
@@ -150,6 +151,12 @@
 **Why** — *the close gate runs before the move and speaks only to refuse*. Congratulating from there would congratulate something that has not happened and might still fail.
 **What** — `PostToolUse` on `Bash` reads the command's own `mv`, and when a workstream folder has actually moved into `closed/` it says what landed, counted from that page's split plan.
 **How** — the subject is taken from the source of the move, because `mv <subject> closed/` is how a close is typed and the destination is then only a structural name. It reads the same parser the close gate refused with, so both count the same table. `packages/plugin-spn-devex/src/scripts/events/closed.ts`.
+
+### A branch that takes develop in is told what moved under it
+
+**Why** — *a rebase, merge or pull from `develop` changes what the branch was built on, and the command's own output does not say what*. The next conflict, or a silent break, sits in a file both sides changed, and an arc's pinned fact may now describe code that has moved.
+**What** — after a `Bash` call running `git rebase`, `git merge` or `git pull` that names `develop`, the agent is handed two lists as `additionalContext`: the files `develop` changed since the branch's old merge base that the branch also changed, and the facts pinned by this window's open arcs whose source has moved, read as `plan stale` reads them. It is a note and never a refusal. It is silent where the window has no workstream, a workstream has no arcs, the arcs pin no facts, or nothing overlaps and nothing moved.
+**How** — the old tip is `ORIG_HEAD`, which git sets before the command moves the branch, and the old merge base is where that tip met `origin/develop` (or `develop`). The facts come from each arc's `facts.jsonl` through `factPinsOf` and `movedFiles` of `plan stale`, over the workstreams the window's note binds. `packages/plugin-spn-devex/src/scripts/checks/rebase-moved.ts`, the one entry in the `CHECKS` list of `packages/plugin-spn-devex/src/scripts/events/rebased.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-rebase-moved.mjs`.
 
 ### A turn that ends warns and never refuses
 
