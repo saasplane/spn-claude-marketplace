@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "75dfa295"
+      "seen": "79345e75"
     }
   ]
 }
@@ -120,6 +120,8 @@ A design and its code agree on a prop only when they agree on what it takes. Wit
 | `DSInputOTP` | `digits` | `FOUR` · `SIX` | `DSInputOTPDigitsType` |
 | `DSIcon` · `DSMark` · `DSAvatar` · `DSAvatarGroup` | `scaleSize` (how large the block is drawn; an icon is 10 to 56 px, and a mark or an avatar is 24 to 96 px) | `XXS` · `XS` · `SM` · `MD` · `LG` · `XL` · `XXL` · `XXL2` to `XXL5`. Unset, the step that fits the block's `size`, and `MD` on `DSIcon` | `DSScaleSizeType` |
 | `DSDrawer` · `DSSheet` | `extent` | `XS` · `SM` · `MD` · `LG` · `XL` · `FIT`, `MD` when unset | `DSOverlayExtentType` |
+| `DSIcon` · `DSMark` · `DSButton` · `DSList.Item` | `motion` · `iconMotion` · `startIconMotion` · `endIconMotion` (how an icon moves when what holds it is hovered, pressed or open; it never moves on its own, and `architecture-components.md` says what each motion means) | `NUDGE_UP` · `NUDGE_DOWN` · `NUDGE_START` · `NUDGE_END` · `NUDGE_UP_START` · `NUDGE_UP_END` · `NUDGE_DOWN_START` · `NUDGE_DOWN_END` · `ZOOM_IN` · `ZOOM_OUT` · `FADE_IN` · `FADE_OUT` · `TURN_90` · `TURN_180` · `SPIN_ONCE` · `WIGGLE` · `LIFT`. Unset, the icon does not move | `DSIconMotionType` |
+| `DSDialog` | `role` (what a screen reader is told the dialog is; it is not drawn) | `'dialog'` · `'alertdialog'`, `'dialog'` when unset | none |
 | `DSItem` · `DSItemFacts` · `DSTabs` · `DSStepper` · `DSFeature` | `pageLevel` (the level of a page the block stands at: the page, a container, a widget, an inner part of a widget, a row, or a value inside another unit. On the item line it alone decides the type of the text, the size of a badge among the facts and the size of the picture. On the tabs it decides the look. On the stepper it decides the size: the indicator and the words. On the feature it decides the size of the title, the gaps, the box of a small picture and the buttons) | `PAGE` · `CONTAINER` · `WIDGET` · `GROUP` · `CONTENT` · `INLINE`. Unset, the level the header of a box gives, else `CONTENT` | `DSPageLevelType` |
 | `DSItem` · `DSFeature` | `eyebrow` (the line over the title: one fact, drawn at the facts step of the level) | an `IDSItemFact`, in any of its forms, a `CUSTOM` fact included | `DSItemFactType` is the vocabulary of its form |
 | `DSItem` · `DSFeature` | `factsPlacement` (where the line of facts stands against the words) | `AFTER_DESCRIPTION` · `AFTER_TITLE`, `AFTER_DESCRIPTION` when unset | `DSItemFactsPlacementType` |

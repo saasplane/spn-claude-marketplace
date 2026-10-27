@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "section": "The choice table",
-      "seen": "558560a5"
+      "seen": "ad0e1742"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
@@ -60,7 +60,7 @@ Run the `design` skill to its tree, then its mock step, `skills/design/steps/moc
 
 1. **The page's design tree first.** It names the person, the flow, the facts, the pattern and every block by level. A page with no tree runs route 1 up to the tasks before any code is written.
 2. **Then what a page writes for each unit on its stack**, and what a unit does not do yet: `providers.md`, which also says which provider the repository's stack claim picks.
-3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit. A value is the page's, else the place's, else the level's, else the unit's, and the case says which. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
+3. **Then the choice tables**, for every closed prop the page writes: `architecture-components.md`, under each unit or among *the other units*, and `architecture-widgets.md` for the card widget. A value is the page's, else the place's, else the level's, else the unit's, and the case says which; a unit whose props all follow its place has no table and stands in that ref's list *Their size from the place*. The cases are a guide: they name where each value fits, and a partner's choice stands. **Before any header is written**, read the header's parts in `architecture-containers.md` and the button's *limits across a header*: one main action, the move the record's state expects next, one or two secondaries, the rest behind "⋯".
 4. **Then the names and the app's contexts**, where the code meets them: `architecture-names.md` for the names and the vocabularies, and `architecture-app.md` for the two contexts and the theme.
 
 ## 4. Review or verify a page
@@ -85,7 +85,7 @@ A partner extends Surface by adding, and never by editing what it installed. Eac
 
 | You add | Read | It says |
 | --- | --- | --- |
-| a unit of your own | `architecture-components.md`, *A new unit weighs every axis the surface offers* | each shared axis your unit takes, with a reason for each it leaves out, shown before the unit is approved |
+| a unit of your own | `architecture-components.md`, *A new unit weighs every axis the surface offers* | each shared axis your unit takes, with a reason for each it leaves out, shown before the unit is approved. Your unit has no choice table: the descriptions of its props say what each value is for, and a unit made from a core block leaves the rest to that block's table |
 | a library of your own | `delivery-library.md`, *The files, by layer* | how your library file is organised, and how it uses ours without editing it |
 | a look of your own | `architecture-app.md`, *The theme* | one theme changes the look of an app, and a page writes no style for a block |
 | a painted panel | `architecture-containers.md`, *The look* | a class of your own sets a panel's paint tokens and nothing else |

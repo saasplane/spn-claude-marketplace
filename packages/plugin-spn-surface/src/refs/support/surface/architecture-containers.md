@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "85b972a4"
+      "seen": "a093bc4d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "a6eb0e02"
+      "seen": "8949f278"
     }
   ]
 }
@@ -75,14 +75,14 @@ What a page puts in each part follows one form. A person then finds the name and
 | Content | one part, or several parts each under its own title. The action of one part stands at the end of that part's title | a person sees which part an action changes, because the action stands on the title of that part and not in the header |
 | Footer | what closes the work of the panel, such as the two actions that save an entry or leave it. It stands inside the outline, under a line | the actions that end the work are met last, after everything they act on |
 
-- **A page MUST put the title and the actions of a panel in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page. Which action is the main one, and how many stand before "⋯", is the button's *limits across a header* in `architecture-components.md` (`RD.SUPPORT.SURFACE.390`).
-- **The action of one part of the content MUST stand at the end of that part's title, and never in the header.** The header holds the actions of the whole panel.
+- **A page puts the title and the actions of a panel in its header, and what closes its work in its footer** (`RD.SUPPORT.SURFACE.074`, advice). The header places its first block, the title, at the start, where it grows, and every other block as one group of actions at the end, in the order written (`RD.SUPPORT.SURFACE.178`), so the title and the actions need no placing by the page. Which action is the main one, and how many stand before "⋯", is the button's *limits across a header* in `architecture-components.md` (`RD.SUPPORT.SURFACE.390`).
+- **The action of one part of the content stands at the end of that part's title, and not in the header.** The header holds the actions of the whole panel.
 - **A page uses one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). The sections of that thing are its content parts, and two things that are read or saved apart are two panels. `standards-patterns.md` states the rule once, for every pattern.
 - **A panel MUST give the title in its header the level of its box, `CONTAINER` unless the panel is the whole page, and a panel that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A panel takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this panel is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the panel gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
-- **A page that holds several panels MUST put its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
+- **A page that holds several panels puts its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`, advice). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
 - **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
-- **The actions that close the work of an entry MUST stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action MUST be a solid button and the action that leaves an outline button, in both places.
+- **The actions that close the work of an entry stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`, advice). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action is a solid button and the action that leaves an outline button, in both places.
 - **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
 Here is how the parts serve the pages most apps have.
@@ -137,7 +137,7 @@ A part insets its content, and the page decides what fills a part.
 | In the frame, with `flush` | none |
 | Not in the frame: the panel is flat, or `frames` does not list the part | none, so `flush` changes nothing |
 
-Write `flush` on a part whose content reaches the edge of the frame, such as a table. Let `flush` describe the content, and never the look. A theme can change the frame from flat to bordered to raised, and no page changes.
+Write `flush` on a part whose content reaches the edge of the frame, such as a table. Let `flush` describe the content, and not the look. Deciding what fills a part is the page's, and it is advice (`RD.SUPPORT.APPS.155`). A theme can change the frame from flat to bordered to raised, and no page changes.
 
 - **A part MUST NOT set the gap between its blocks.** The page writes that gap, from the scale.
 - **The foundation defines no block for a row or a grid. A stack MAY provide one** (`RD.SUPPORT.SURFACE.084`). Such a block is the stack's own unit, made to keep building simple, and its stack states it. A page on a stack that provides none writes the row or the grid itself. Either way the gap comes from the scale, and readings still stand as the rules of content ask.
@@ -175,14 +175,14 @@ A section is one part of a page, set apart from the next by a fill of its own an
 | `LG` | 112px · 64px | 40px · 24px | a section that leads |
 | `XL` | 128px · 72px | 48px · 32px | the hero |
 
-- **A section MUST reach the edges of its place and no further, and MUST stand straight in a place** (`RD.SUPPORT.SURFACE.254`). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and the child of a `flush` section run from one edge of the place to the other, and the section's words stay in the body's box. The child of a `flush` section lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A section never stands inside a panel, a card, an overlay or the nav column.
+- **A section MUST reach the edges of its place and no further** (`RD.SUPPORT.SURFACE.254`). The place is the window in TOPNAV and CANVAS and in the header and the footer of every layout (in TOPNAV the content, where the content draws a frame of its own), and the content part in RAIL and DOCK, as `architecture-layouts.md` marks it. The section's fill, its `mediaNode` and the child of a `flush` section run from one edge of the place to the other, and the section's words stay in the body's box. The child of a `flush` section lines its own words up with the box by `--section-box-inset`. In an app the fill stops at the navigation, and a content drawn bordered, raised or floating keeps its line, its corners and its shadow. Where the browser's scrollbar takes width from the window, the section adds no sideways scroll. A page does not put a section inside a panel, a card, an overlay or the nav column, since a section sets a part of a page apart and frames nothing; that part is advice.
 - **A partner MAY paint one section with a class of their own, through the paint token** (`RD.SUPPORT.SURFACE.192`). The class sets `--surface-fill`, a colour, in light and in `[data-mode='dark']`, and the section draws that colour from edge to edge of its place in place of its `color`. A section that takes a dark colour in a light page, or a light one in a dark page, names the mode of that colour with `painted`, so that what it holds takes that mode's tokens and its text.
 
 **The section stands beside `DSPanelContainer` and takes none of its job.** The panel container frames a part of a page that a person reads or saves as a whole, with a title above it and actions in its header. The section frames nothing: it sets one part of a page apart from the next. A section is for the pages of a website and for a strip that opens an app's page, and an app part with a title and actions is a panel container. The theme holds no look for a section: a page alternates its sections on purpose, and the rhythm is in the stylesheet's tokens.
 
 ### The depth of what a section holds
 
-**A section never frames itself, and what stands in it takes its depth from what it holds and does for the visitor, not from the page's taste** (`RD.SUPPORT.SURFACE.293`). The band's fill gives the rhythm.
+**A section never frames itself, and what stands in it takes its depth from what it holds and does for the visitor, not from the page's taste** (`RD.SUPPORT.SURFACE.293`, advice). The band's fill gives the rhythm.
 
 | An item that is | Depth |
 | --- | --- |
@@ -298,20 +298,20 @@ An entry is a form a person fills in to add or change something. A small or a me
 | Medium: one column with a few groups, up to about a dozen fields | a sheet at the side, `DSSheet`, with the page still in view beside it | the full screen |
 | Large: sections, a part that repeats, or records of its own inside it | a page of its own, as a large form | a page of its own |
 
-- **A page MUST choose what an entry opens as by its size, from the table** (`RD.SUPPORT.SURFACE.075`). A large entry has more to hold than a dialog or a sheet has room for. The two numbers, about five and about a dozen, are proposed and not yet confirmed.
+- **A page chooses what an entry opens as by its size, from the table** (`RD.SUPPORT.SURFACE.075`, advice). A large entry has more to hold than a dialog or a sheet has room for. The two numbers, about five and about a dozen, are proposed and not yet confirmed.
 - **A dialog on a phone MUST become a sheet from the bottom** (`RD.SUPPORT.SURFACE.076`). A phone has no room around a dialog. `DSDialog` already opens this way on a phone: it stands at the bottom of the screen and takes its full width. So a page writes nothing for it.
 - **A medium entry MUST take the full screen on a phone.** No part of the page would stay in view beside it.
-- **An entry MUST be one panel, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`). Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
+- **An entry is one panel, placed inside the dialog or the sheet** (`RD.SUPPORT.SURFACE.077`, advice). Its title and the action that closes it stand in its header. Its fields are its content. Its actions stand in its footer.
 - **That the actions stand in the footer is proposed, and not yet confirmed.** The reason is that the panel already has a footer for the actions that end its work. A person then finds them in the same place in a dialog, in a sheet and on the full screen.
 
 **What the unit does.** `DSSheet` does this by itself. It reads the device, and on a phone it takes the full screen, whatever side and extent the page gave it, with no scrim around it. So a page writes nothing for it. At a tablet and a desktop the sheet stands at its side, and takes at most 95% of the width of the screen.
 
 ### A large form
 
-- **A large form MUST be a page of its own, and the page MUST be one panel** (`RD.SUPPORT.SURFACE.078`). Its title stands in the header. Its sections are the parts of its content, one under another in one column, each under its own title. Its actions stand in its footer.
-- **A section of a large form MUST NOT be a panel of its own.** The sections are parts of one form that is saved once. A frame around each section, with actions under each, would say that each is saved by itself.
-- **A list of the sections MUST NOT stand beside the form.** The app already has its navigation at the side, and a form of a few sections is read from top to bottom.
-- **Fields that are short and belong together MAY share a row at a desktop, and each MUST take a row of its own on a phone.** Each field keeps its title above its control, as the rules of content of `standards-core.md` state.
+- **A large form is a page of its own, and the page is one panel** (`RD.SUPPORT.SURFACE.078`, advice). Its title stands in the header. Its sections are the parts of its content, one under another in one column, each under its own title. Its actions stand in its footer.
+- **A section of a large form is not a panel of its own.** The sections are parts of one form that is saved once. A frame around each section, with actions under each, would say that each is saved by itself.
+- **A list of the sections does not stand beside the form.** The app already has its navigation at the side, and a form of a few sections is read from top to bottom.
+- **Fields that are short and belong together may share a row at a desktop, and each takes a row of its own on a phone.** Each field keeps its title above its control, as the rules of content of `standards-core.md` state.
 
 ### Groups and their items
 
@@ -322,13 +322,13 @@ Some pages hold things in groups: the fields of each record type, or the actions
 | A desktop | both parts. The groups stand at the left and stay in view, and the items of the chosen group stand at the right |
 | A tablet and a phone | one part at a time. A person chooses a group, the items of that group are shown where the groups were, and a back action returns to the groups |
 
-- **Both parts MUST be in view at a desktop only** (`RD.SUPPORT.SURFACE.079`). There a person goes from one group to the next without losing the list.
-- **On a tablet and on a phone the items MUST take the place of the groups.** The two parts do not fit side by side there.
+- **Both parts are in view at a desktop only** (`RD.SUPPORT.SURFACE.079`, advice). There a person goes from one group to the next without losing the list.
+- **On a tablet and on a phone the items take the place of the groups.** The two parts do not fit side by side there.
 - **The part that holds the groups MAY be narrow, and a named choice MUST say so** (`RD.SUPPORT.SURFACE.119`). Where a group is read by its name alone, the items need most of the width. A unit that places the two parts keeps its usual width for the groups where the page chooses none, and it offers a narrower one by name. A page **MUST NOT** write a width of its own. The choice holds at a desktop, where both parts are in view.
 - On the web the swap also changes the address, as `standards-patterns.md` states under *On the web: the address of a screen*.
-- **Each part MUST be shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`). The groups and the items seldom hold data of the same shape.
-- **A set of groups that can be added to MUST be a list, and never a row of tabs** (`RD.SUPPORT.SURFACE.080`). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
-- **Many groups that a person searches MUST be a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, stated in `architecture-components.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
+- **Each part is shown by what its own data asks for: a list, a table, a data table, or a view of one thing** (`RD.SUPPORT.SURFACE.049`, advice). The groups and the items seldom hold data of the same shape.
+- **A set of groups that can be added to is a list, and not a row of tabs** (`RD.SUPPORT.SURFACE.080`, advice). A row of tabs is safe only where the set cannot grow past the width of the page. A list takes any number of groups.
+- **Many groups that a person searches are a data table in its `LIST` layout** (`RD.SUPPORT.SURFACE.069`, advice, stated in `architecture-components.md`). A group is read by its name, as a line, and the groups stand in a narrow part of the page.
 
 Where the groups are few and fixed, the page needs no swap. Each group is a panel of its own, one under another on one page, and nothing is hidden.
 
@@ -350,10 +350,10 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.259` | a grid of features under a heading is `DSFeatureGridSectionContainer`, which draws a section from `section`, takes a `heading` and an optional `grid`, leaves out `flush`, hands the cells no level and follows the screen class for its columns |
 | `RD.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, the columns required and the lines `NONE` where left out, and any unit that draws a grid of cells takes it whole |
 | `RD.SUPPORT.SURFACE.247` | a section takes its room above and below from its size, and hands that size to what it holds |
-| `RD.SUPPORT.SURFACE.254` | a section reaches the edges of its place, and stands straight in a place |
+| `RD.SUPPORT.SURFACE.254` | a section reaches the edges of its place; that a page does not put it in a panel, a card, an overlay or the nav column is advice |
 | `RD.SUPPORT.SURFACE.261` | the paint of a frame is the one prop `surface`, an `IDSFrameSurface`, every frame is drawn by one drawer, and one resolver keeps the theme's value for a key left out |
 | `RD.SUPPORT.SURFACE.282` | a raised frame takes `elevation`, a section takes `inset`, and the grid section takes `reveal`, which plays once |
-| `RD.SUPPORT.SURFACE.293` | what a section holds takes its depth from what it does for the visitor, and a section never frames itself |
+| `RD.SUPPORT.SURFACE.293` | what a section holds takes its depth from what it does for the visitor, and a section never frames itself. It is advice |
 | `RD.SUPPORT.SURFACE.262` | only the panel takes its frames from the theme, a card takes `frames` and defaults to all three parts, and a feature frames nothing by default |
 | `RD.SUPPORT.SURFACE.263` | a card and a panel are told apart by level and purpose, and no card, feature or feature section container exists |
 | `RD.SUPPORT.SURFACE.266` | the three parts of any box are `DSBoxPartType` |
@@ -363,29 +363,29 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.SURFACE.163` | a panel and a card take a `color` and a `strength`, `BASE` by default |
 | `RD.SUPPORT.SURFACE.092` | `unframed` names the parts that take no frame, whatever `frames` and the theme give |
 | `RD.SUPPORT.APPS.162` | inside a bordered frame, a line divides each two parts the frame holds |
-| `RD.SUPPORT.APPS.155` | the page decides what fills a part, with `flush`, and a block never changes by where it sits |
+| `RD.SUPPORT.APPS.155` | a block never changes by where it sits; that the page decides what fills a part, with `flush`, is advice |
 | `RD.SUPPORT.APPS.148` | the card stays a separate block beside the panel, and takes `surface` and `frames` |
 | `RD.SUPPORT.SURFACE.084` | the foundation defines no block for a row or a grid, and a stack may provide one |
 | `RD.SUPPORT.SURFACE.091` | a card may hold a header, content and a footer as parts, and still frames one thing |
 | `RD.SUPPORT.APPS.149` | a frame is drawn once, and which blocks pass a size and the frame setting on |
-| `RD.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a panel |
-| `RD.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order |
+| `RD.SUPPORT.SURFACE.074` | what a page puts in the header, the content and the footer of a panel. It is advice |
+| `RD.SUPPORT.SURFACE.095` | where the actions that close the work of an entry stand, and in what order. It is advice |
 | `RD.SUPPORT.SURFACE.114` | a card hands its size to what it holds, as a panel does |
 | `RD.SUPPORT.SURFACE.116` | a page uses one panel for each thing a person reads or saves as a whole |
 | `RD.SUPPORT.SURFACE.107` | the level a box gives the title in its header: `CONTAINER` for a panel, `PAGE` for a listing that is the page, `WIDGET` for a card |
 | `RD.SUPPORT.SURFACE.179` | a panel that is the whole page says so with the boolean `fullPage`, and its header, content and footer then take the level `PAGE` as their place |
 | `RD.SUPPORT.SURFACE.108` | the back action of a header stands level with the line of the title |
-| `RD.SUPPORT.SURFACE.120` | a page that holds several panels has its head above them, outside any frame, with its way back, and writes nothing by hand for it |
+| `RD.SUPPORT.SURFACE.120` | a page that holds several panels has its head above them, outside any frame, with its way back, and writes nothing by hand for it. It is advice |
 | `RD.SUPPORT.SURFACE.119` | the part that holds the groups may be narrow, by a named choice and never by a width the page writes. It is a MAY |
-| `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed |
+| `RD.SUPPORT.SURFACE.075` | an entry opens as a dialog, a sheet or a page of its own, by its size. The two numbers are proposed. It is advice |
 | `RD.SUPPORT.SURFACE.076` | a dialog on a phone becomes a sheet from the bottom |
-| `RD.SUPPORT.SURFACE.077` | an entry is one panel, placed inside the dialog or the sheet. That its actions stand in the footer is proposed |
-| `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one panel, with no panel for each section |
-| `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the items take the place of the groups on a tablet and a phone |
+| `RD.SUPPORT.SURFACE.077` | an entry is one panel, placed inside the dialog or the sheet. That its actions stand in the footer is proposed. It is advice |
+| `RD.SUPPORT.SURFACE.078` | a large form is a page of its own and one panel, with no panel for each section. It is advice |
+| `RD.SUPPORT.SURFACE.079` | groups and their items are both in view at a desktop only, and the items take the place of the groups on a tablet and a phone. It is advice |
 | `RD.SUPPORT.SURFACE.313` | `flush` on a section means it draws no room of its own on any side, as it means on a card part, a panel part and a list |
-| `RD.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and never a row of tabs |
-| `RD.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for |
-| `RD.SUPPORT.SURFACE.069` | many groups a person searches are a data table in its `LIST` layout |
+| `RD.SUPPORT.SURFACE.080` | a set of groups that can be added to is a list, and not a row of tabs. It is advice |
+| `RD.SUPPORT.SURFACE.049` | each part of a page is shown by what its own data asks for. It is advice |
+| `RD.SUPPORT.SURFACE.069` | many groups a person searches are a data table in its `LIST` layout. It is advice |
 | `RD.SUPPORT.SURFACE.312` | the unit that frames a part of a page is the panel, where the book's container chapter calls it a container |
 | `RD.SUPPORT.SURFACE.178` | every box tells its level, its part and `flush` to what each part holds, and an action takes its size and its look from its place: the main action solid in the head of a page and in a footer, quiet in a panel's header, outline in a card's, subtle in a group's head |
 | `RD.SUPPORT.SURFACE.367` | the footer of a panel takes `sticky`, which keeps it in view |
