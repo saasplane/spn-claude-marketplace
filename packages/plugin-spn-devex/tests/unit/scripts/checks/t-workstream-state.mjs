@@ -204,8 +204,15 @@ console.log("\n=== RD.DEVEX.WORKSPACE.262 — an arc's notes folder holds the fi
   writeFileSync(join(notes, "answered-cards.md"), "# answered\n");
   writeFileSync(join(notes, "inventory.md"), "# what exists\n");
   writeFileSync(join(notes, "orders"), "not a folder");
+  mkdirSync(join(notes, "proofs"), { recursive: true });
+  writeFileSync(join(notes, "row-1.patch"), "diff");
+  mkdirSync(join(notes, "work", "views"), { recursive: true });
+  writeFileSync(join(notes, "work", "views", "ux.md"), "# the UX view\n");
   const red = checkWorkstream(ws);
-  ok("red: a folder of screenshots beside the five is named, and sent to samples/", has(red, "notes", /`notes\/N001\/shots\/` is not one of the five .* belongs in `samples\/`/), said(red));
+  ok("red: a folder of screenshots beside the six is named, and sent to samples/", has(red, "notes", /`notes\/N001\/shots\/` is not one of the six .* belongs in `samples\/`/), said(red));
+  ok("red: a folder of proofs is sent to work/", has(red, "notes", /`notes\/N001\/proofs\/` is not one of the six .* belongs in `work\/`/), said(red));
+  ok("red: a patch is sent to work/", has(red, "notes", /`notes\/N001\/row-1\.patch` is not one of the six .* belongs in `work\/`/), said(red));
+  ok("green: work/ with a folder of its own is one of the six", !has(red, "notes", /notes\/N001\/work/), said(red));
   ok("red: a card file is sent to questions.jsonl, checked for duplicates", has(red, "notes", /answered-cards\.md` .* `questions\.jsonl`.*checked against the records/), said(red));
   ok("red: a note is sent to a section of plan.md", has(red, "notes", /inventory\.md` .* a section of `plan\.md`/), said(red));
   ok("red: one of the five made as the other kind is named", has(red, "notes", /`notes\/N001\/orders` .* `orders` itself, which is a folder and never a file/), said(red));
@@ -217,8 +224,10 @@ console.log("\n=== RD.DEVEX.WORKSPACE.262 — an arc's notes folder holds the fi
   writeFileSync(join(notes, "plan.md"), "# N001 plan\n\n## What exists\n");
   rmSync(join(notes, "inventory.md"));
   rmSync(join(notes, "answered-cards.md"));
+  renameSync(join(notes, "proofs"), join(notes, "work", "proofs"));
+  renameSync(join(notes, "row-1.patch"), join(notes, "work", "row-1.patch"));
   writeFileSync(join(notes, ".DS_Store"), "");
-  ok("green: folded into the five — a folder inside samples/ and a dot-file are no one's finding", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  ok("green: folded into the six — a folder inside samples/ or work/ and a dot-file are no one's finding", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
   mkdirSync(join(notes, "previews"), { recursive: true });
   const previews = checkWorkstream(ws);
   ok("a previews/ folder is named once, by the one-preview check", previews.length === 1 && previews[0].check === "preview", said(previews));

@@ -47,7 +47,7 @@ export function ownedRefusal(path: string): string | null {
 const NOTES_ENTRY = new RegExp(`^(.*/${DEVEX_WORKSTREAMS.replace(/\./g, "\\.")}/(?:open|backlog)/[^/]+/${NOTES}/N\\d+[a-z]?)/([^/]+)(/.*)?$`);
 
 /**
- * Why a write may not make this path, or null: one that would create an entry beside the five in an
+ * Why a write may not make this path, or null: one that would create an entry beside the six in an
  * arc's notes folder (RD.DEVEX.WORKSPACE.262). An entry already on disk is not refused, so the tidy
  * that folds a stray away can still rewrite its links first. A closed workstream is never read.
  */
@@ -62,7 +62,7 @@ export function notesTreeRefusal(path: string, makesFolder = false): string | nu
   const arc = basename(arcDir);
   const home = kind ? wrongKind(entry, kind) : strayHome(entry, folder);
   return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`preview.html\`, ` +
-    `\`samples/\`, \`plan.md\`, \`orders/\` and \`scripts/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
+    `\`samples/\`, \`plan.md\`, \`orders/\`, \`scripts/\` and \`work/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
     `or names the note that holds it; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }
 

@@ -250,12 +250,13 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             facts.jsonl                   each fact read, pinned to its commit
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
-          N<nnn>/                         one arc's work order: at most these five entries, each made when the arc needs it
+          N<nnn>/                         one arc's work order: at most these six entries, each made when the arc needs it
             preview.html                  the arc's one preview, where something must be seen or worded to decide
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       what a row needs beside it: the traps, a set, a move table
             orders/                       one brief per delegated execution, named by its row, and its report
             scripts/                      what a mechanical row runs
+            work/                         what the work leaves behind: a view's whole words, a proof's output, a baseline
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
     state.json                            `lastNumber`: the highest workstream number ever used
