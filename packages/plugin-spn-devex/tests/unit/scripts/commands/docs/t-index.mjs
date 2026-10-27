@@ -26,6 +26,10 @@ const same = (label, got, want) => ok(label, JSON.stringify(got) === JSON.string
 const STYLES = join(BASE, "styles");
 mkdirSync(STYLES);
 writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10.0": {}, "1.2.0": {} }));
+// Each cut version has the hash of each served file, as `docs sds cut` records them.
+const HASHES = Object.fromEntries(["1.0.0", "1.10.0", "1.2.0"].map((version) => [version,
+  { "sds-docs.css": `sha384-css${version}`, "sds-docs.js": `sha384-js${version}`, "sds-index.js": `sha384-index${version}` }]));
+writeFileSync(join(STYLES, "integrity.json"), JSON.stringify(HASHES));
 const NEWEST = "1.10.0";
 
 const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE, SPN_STYLES: STYLES,
@@ -148,7 +152,7 @@ const withAreas = () => repo({
   ok("the run says which construct no overview of its domain links", /SOFT[^\n]*01-kind-construct\.html\n[^\n]*no overview of its domain links/.test(ran.out), ran.out);
 
   ok("the data keeps the path to the pages empty, and the limit of tabs", tree.base === "" && tree.tabs === 8, JSON.stringify([tree.base, tree.tabs]));
-  const lines = linesFor(NEWEST, INDEX_SCRIPT);
+  const lines = linesFor(NEWEST, INDEX_SCRIPT, HASHES[NEWEST]);
   ok("the page links the newest version that was cut, and loads the index's script from it",
     text.includes(lines.stylesheet) && text.includes(lines.script) && !text.includes("/1.0.0/") && !text.includes("/1.2.0/"),
     text.split("\n").filter((line) => line.includes("sds-")).slice(0, 2).join("\n"));
@@ -394,6 +398,12 @@ const withAreas = () => repo({
 
   const none = join(BASE, "styles-none");
   mkdirSync(none);
+  const unpinned = join(BASE, "styles-unpinned");
+  mkdirSync(unpinned);
+  writeFileSync(join(unpinned, "versions.json"), JSON.stringify({ "4.0.0": {} }));
+  const noHash = index(["write", root], { SPN_STYLES: unpinned });
+  ok("[MKT.SCRIPTS.178] a version with no integrity hash is refused by name, and no index is written",
+    noHash.code === 1 && noHash.out.includes("version 4.0.0 has no integrity hash") && !existsSync(join(root, INDEX)), noHash.out);
   const uncut = index(["write", root], { SPN_STYLES: none });
   ok("with no version cut the command stops and writes no index",
     uncut.code === 1 && uncut.out.includes("no version of the shared styles was cut") && !existsSync(join(root, INDEX)), uncut.out);

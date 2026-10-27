@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpath
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { OWN_COPY, STYLES_ADDRESS, cutVersions } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { INTEGRITY_FILE, OWN_COPY, STYLES_ADDRESS, cutVersions, integrityTable, sha384Of } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const SCRATCH = realpathSync(mkdtempSync(join(tmpdir(), "sds-")));
@@ -167,6 +167,12 @@ console.log("=== docs sds cut — a version is a folder and an entry");
     second.code === 0 && JSON.stringify(Object.keys(both)) === JSON.stringify(["1.0.0", "1.1.0"])
       && readFileSync(join(SERVED, "1.1.0", "sds-docs.css"), "utf8") === `${CSS}.sds-tone-blue{color:blue}\n`
       && both["1.1.0"]["sds-docs.css"] === sha(`${CSS}.sds-tone-blue{color:blue}\n`), second.out);
+  const pinned = integrityTable(STYLES);
+  ok("[MKT.SCRIPTS.98] cut records the sha384 of each file, as a browser reads it, in integrity.json",
+    JSON.stringify(pinned["1.0.0"]) === JSON.stringify({ "sds-docs.css": sha384Of(Buffer.from(CSS)), "sds-docs.js": sha384Of(Buffer.from(PAGE_JS)),
+      "sds-index.js": sha384Of(Buffer.from(INDEX_JS)) }) && pinned["1.0.0"]["sds-docs.css"].startsWith("sha384-")
+      && Object.keys(pinned).join() === "1.0.0,1.1.0" && readFileSync(join(STYLES, INTEGRITY_FILE), "utf8") === `${JSON.stringify(pinned, null, 2)}\n`,
+    JSON.stringify(pinned));
   ok("[MKT.SCRIPTS.98] a version that exists keeps its bytes and its entry when the next one is cut",
     readFileSync(join(folder, "sds-docs.css"), "utf8") === CSS && both["1.0.0"]["sds-docs.css"] === sha(CSS));
 }
@@ -371,6 +377,26 @@ console.log("=== docs sds bundle — what it refuses");
   ok("a bundled copy is refused as a page to bundle", copy.code === 1 && copy.out.includes("bundled copy") && !existsSync(join(SITE, "ledger.bundled.bundled.html")), copy.out);
   const absent = sds("bundle", join(SITE, "no-such-page.html"), "--assets", ASSETS);
   ok("a page that is not there is refused", absent.code === 1 && absent.out.includes("not a file"), absent.out);
+}
+
+console.log("=== docs sds repoint — the hash moves with the version");
+{
+  const hashes = integrityTable(STYLES);
+  const tag = (version, hash) => `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/sds-docs.css" integrity="${hash}" crossorigin="anonymous">\n`
+    + `<script src="${STYLES_ADDRESS}${version}/sds-docs.js" integrity="${hashes[version]?.["sds-docs.js"] ?? hash}" crossorigin="anonymous"></script>\n`;
+  const folder = join(SCRATCH, "pinned-site");
+  const file = put(join(folder, "pinned.html"), `<title>p</title>\n${tag("1.0.0", hashes["1.0.0"]["sds-docs.css"])}<p>body</p>\n`);
+  const moved = sds("repoint", "1.1.0", folder, "--root", MARKET);
+  ok("[MKT.SCRIPTS.100] a line that carries an integrity is given the new version's hash with its address",
+    moved.code === 0 && readFileSync(file, "utf8") === `<title>p</title>\n${tag("1.1.0", hashes["1.1.0"]["sds-docs.css"])}<p>body</p>\n`, readFileSync(file, "utf8"));
+
+  const listed = cutVersions(STYLES);
+  writeFileSync(join(STYLES, "versions.json"), `${JSON.stringify({ ...listed, "7.0.0": listed["1.1.0"] }, null, 2)}\n`);
+  const before = tree(folder);
+  const refused = sds("repoint", "7.0.0", folder, "--root", MARKET);
+  ok("[MKT.SCRIPTS.178] a version listed but with no integrity hash is refused by name, and no page changes",
+    refused.code === 1 && refused.out.includes("7.0.0") && refused.out.includes("no integrity hash") && tree(folder) === before, refused.out);
+  writeFileSync(join(STYLES, "versions.json"), `${JSON.stringify(listed, null, 2)}\n`);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-sds` : `\n  all ${total} passed — t-sds`);

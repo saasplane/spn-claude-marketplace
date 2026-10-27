@@ -6,6 +6,7 @@
 // versions that were cut. A command that reads a page asks `sharedStyles` first, because a page that
 // links no shared stylesheet holds its own copy of the styles and the class names that copy used.
 
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -21,6 +22,8 @@ export const INDEX_SCRIPT = "sds-index.js";
 export const SERVED_FILES: readonly string[] = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
 /** What the file name of a page's bundled copy ends in. A bundled copy is not a page of the tree. */
 export const BUNDLED_SUFFIX = ".bundled.html";
+/** The table of each cut version's integrity hash of each file it serves, beside `versions.json`. */
+export const INTEGRITY_FILE = "integrity.json";
 /** The prefix of every class and token of the shared stylesheet. */
 export const PREFIX = "sds-";
 
@@ -56,11 +59,22 @@ export const OWN_COPY = "this page links no shared stylesheet: it holds its own 
   "class names that copy used. Produce it again with `docs page write`, or copy it from its template, so it links " +
   "`sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
 
-/** The two lines a page of one version carries: the stylesheet's, and the script's. */
-export function linesFor(version: string, script: string = PAGE_SCRIPT): { stylesheet: string; script: string } {
+/** One file's integrity hash as a browser reads it: `sha384-` and the base64 of the SHA-384 of its bytes. */
+export function sha384Of(bytes: Uint8Array): string {
+  return `sha384-${createHash("sha384").update(bytes).digest("base64")}`;
+}
+
+/**
+ * The two lines a page of one version carries: the stylesheet's, and the script's. Given the version's
+ * hashes (`integrity`, file name to hash), each line also carries its `integrity` and `crossorigin`, so the
+ * browser refuses a file that changed under a published version. The served address answers a cross-origin
+ * request with `access-control-allow-origin: *`, which is why `crossorigin="anonymous"` loads it.
+ */
+export function linesFor(version: string, script: string = PAGE_SCRIPT, integrity?: Record<string, string>): { stylesheet: string; script: string } {
+  const pinned = (file: string): string => (integrity?.[file] ? ` integrity="${integrity[file]}" crossorigin="anonymous"` : "");
   return {
-    stylesheet: `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/${STYLESHEET}">`,
-    script: `<script src="${STYLES_ADDRESS}${version}/${script}"></script>`,
+    stylesheet: `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/${STYLESHEET}"${pinned(STYLESHEET)}>`,
+    script: `<script src="${STYLES_ADDRESS}${version}/${script}"${pinned(script)}></script>`,
   };
 }
 
@@ -80,6 +94,30 @@ export function cutVersions(styles: string): Record<string, Record<string, strin
   const file = join(styles, "versions.json");
   if (!existsSync(file)) return {};
   return JSON.parse(readFileSync(file, "utf8")) as Record<string, Record<string, string>>;
+}
+
+/** Each version that was cut, with the integrity hash of each file it serves, as `integrity.json` lists them. */
+export function integrityTable(styles: string): Record<string, Record<string, string>> {
+  const file = join(styles, INTEGRITY_FILE);
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, "utf8")) as Record<string, Record<string, string>>;
+}
+
+/**
+ * The hashes of the files a page of `version` loads. Throws a sentence naming the version, or the file, where the table
+ * holds none, because a page written without its hash would load a file the browser cannot check.
+ */
+export function integrityFor(styles: string, version: string, files: readonly string[]): Record<string, string> {
+  const table = integrityTable(styles);
+  const entry = table[version];
+  if (!entry) {
+    const listed = Object.keys(table);
+    throw new Error(`version ${version} has no integrity hash in \`${join(styles, INTEGRITY_FILE)}\`. `
+      + `${listed.length ? `The versions that have one: ${listed.join(", ")}` : "No version has one yet"}`);
+  }
+  const missing = files.filter((file) => !entry[file]);
+  if (missing.length) throw new Error(`version ${version} has no integrity hash for ${missing.join(", ")} in \`${join(styles, INTEGRITY_FILE)}\``);
+  return entry;
 }
 
 /** The newest version that was cut, by its three numbers, or null where none was. */

@@ -11,7 +11,8 @@
 //   runnable   a turn that ends while an arc THIS SESSION wrote still has rows ready to run, and no card
 //              is open; a row waiting on an open card is not ready
 //   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
-//              full there, once, and every card still open from an earlier reply named in one line
+//              full there, once, and every card still open from an earlier reply named in one line; only
+//              cards this window raised, or that no window recorded, count (`raisedBy` in the card's record)
 //   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
@@ -722,6 +723,19 @@ export function carriesCard(reply: string): boolean {
  */
 function cardsWaiting(root: string, mine: Set<string>): string[] {
   return [...new Set([...cardsByWorkstream(root, mine).values()].flat())].sort();
+}
+
+/**
+ * The open cards of this window's workstreams that ANOTHER window raised: a card whose record names a
+ * raiser that is not this session. A card with no raiser recorded is judged as it always was, as this
+ * window's. Numbers are upper case, as a page writes them (`Q42`).
+ */
+export function raisedElsewhere(root: string, mine: Set<string>, session: string): Set<string> {
+  const out = new Set<string>();
+  for (const ws of scoped(openWorkstreamFolders(root), mine))
+    for (const one of readQuestions(ws))
+      if (one.state === "open" && typeof one.raisedBy === "string" && one.raisedBy && one.raisedBy !== session) out.add(one.id.toUpperCase());
+  return out;
 }
 
 /** The open cards of each workstream this window works on, by the workstream's folder name. */
@@ -1456,6 +1470,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ? firstTurnText(event.transcript_path) : "";
   const where = cardsByWorkstream(root, mine);
   const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
+  // THE NEEDS-YOU CHECK READS ONLY THE CARDS THIS WINDOW RAISED, or no window recorded: a card another window
+  // raised is put to that window, and demanding **Needs you** here for it is a demand nobody here can answer.
+  const elsewhere = raisedElsewhere(root, mine, session);
+  const ownCards = waiting.filter((card) => !elsewhere.has(card));
   // THE ARCS THIS WINDOW WROTE THIS TURN, IN ITS OWN WORKSTREAMS.
   const wrote = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc))));
   // A VISITED WORKSTREAM IS READ FOR ONE THING: the notes rule on an arc this window itself changed there.
@@ -1469,8 +1487,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const rowsNow = stepsMark(root, mine);
   const given = baseline?.handover !== undefined && baseline.handover === rowsNow;
   const found = [
-    ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
-      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where, running)),
+    ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, ownCards,
+      baseline?.cards ? ownCards.filter((card) => !baseline.cards!.includes(card)) : [], where, running)),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),

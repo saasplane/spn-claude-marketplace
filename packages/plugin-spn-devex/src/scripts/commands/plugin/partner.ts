@@ -69,6 +69,7 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   // the end of every turn — a crash there would report on work already finished.
   ["spn-devex", "stop.ts", []],
   ["spn-devex", "closed.ts", []],
+  ["spn-devex", "rebased.ts", []],
   // The `spn-surface` half: its dispatcher reads its event from stdin and gets none here, so it must
   // exit clean, the same contract as every other dispatcher.
   ["spn-surface", "pretooluse.ts", []],

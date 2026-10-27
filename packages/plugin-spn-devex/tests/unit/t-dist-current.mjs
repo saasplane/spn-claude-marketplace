@@ -14,6 +14,7 @@ const BUNDLES = [
   join(DIST, "events", "orientation.mjs"),
   join(DIST, "events", "pretooluse.mjs"),
   join(DIST, "events", "closed.mjs"),
+  join(DIST, "events", "rebased.mjs"),
   join(DIST, "events", "stop.mjs"),
 ];
 

@@ -19,7 +19,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVEX_WORKSTREAMS, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
-  BUNDLED_SUFFIX, INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, STYLES_ADDRESS, cutVersions, sharedStyles, stylesDir,
+  BUNDLED_SUFFIX, INDEX_SCRIPT, INTEGRITY_FILE, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, STYLES_ADDRESS, cutVersions, integrityTable,
+  sha384Of, sharedStyles, stylesDir,
 } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { resolveWorkspace } from "./_lib.ts";
@@ -50,6 +51,16 @@ const SERVED_NAMES = SERVED_FILES.map(escaped).join("|");
  */
 const LOADED_ADDRESS = new RegExp(
   `(<(?:link|script)\\b[^>]*?\\b(?:href|src)="${escaped(STYLES_ADDRESS)})(\\d+\\.\\d+\\.\\d+)(\\/(?:${SERVED_NAMES})")`, "gi");
+
+/** A whole element of a page that loads a shared file from the served address, with the version and the file it names. */
+const LOADED_ELEMENT = new RegExp(
+  `<(?:link|script)\\b[^>]*?\\b(?:href|src)="${escaped(STYLES_ADDRESS)}(\\d+\\.\\d+\\.\\d+)\\/(${SERVED_NAMES})"[^>]*>`, "gi");
+
+/** An element with its `integrity` and `crossorigin` set to `hash`, whatever it carried before. */
+function pinnedTo(element: string, hash: string): string {
+  return element.replace(/\s+integrity="[^"]*"/i, "").replace(/\s+crossorigin(?:="[^"]*")?/i, "")
+    .replace(/\s*(\/?)>$/, ` integrity="${hash}" crossorigin="anonymous"$1>`);
+}
 
 /**
  * A line of a page that loads a shared file from anywhere: the stylesheet's link, or a shared
@@ -126,16 +137,20 @@ function cut(version: string, root: string | null): number {
   if (missing.length) return refuse("cut", `\`${styles}\` holds no ${missing.map((name) => `\`${name}\``).join(", ")}. Build the styles first`);
 
   const hashes: Record<string, string> = {};
+  const pinned: Record<string, string> = {};
   const built = SERVED_FILES.map((name) => ({ name, bytes: readFileSync(join(styles, name)) }));
   mkdirSync(folder, { recursive: true });
   for (const { name, bytes } of built) {
     writeFileSync(join(folder, name), bytes);
     hashes[name] = createHash("sha256").update(bytes).digest("hex");
+    pinned[name] = sha384Of(bytes);
   }
   writeFileSync(join(styles, VERSIONS_FILE), `${JSON.stringify({ ...versions, [version]: hashes }, null, 2)}\n`, "utf8");
+  // THE INTEGRITY HASH IS RECORDED WITH THE VERSION AND NEVER CHANGES: a page links it beside the address.
+  writeFileSync(join(styles, INTEGRITY_FILE), `${JSON.stringify({ ...integrityTable(styles), [version]: pinned }, null, 2)}\n`, "utf8");
 
   console.log(`✓ cut version ${version} → ${folder}`);
-  for (const name of SERVED_FILES) console.log(`    ${name.padEnd(14)} sha256 ${hashes[name]}`);
+  for (const name of SERVED_FILES) console.log(`    ${name.padEnd(14)} sha256 ${hashes[name]} · ${pinned[name]}`);
   return 0;
 }
 
@@ -192,6 +207,11 @@ function repoint(version: string, folders: string[], check: boolean, root: strin
       + `${listed.length ? `The versions that exist: ${listed.join(", ")}` : "No version exists yet"}. `
       + `Cut it first with \`docs sds cut ${version}\`, or move the pages to a version that exists`);
   }
+  const hashes = integrityTable(styles)[version];
+  if (!hashes) {
+    return refuse(action, `version \`${version}\` has no integrity hash in \`${join(styles, INTEGRITY_FILE)}\`, so a page moved to it would load files the browser cannot check. `
+      + `Cut it with \`docs sds cut ${version}\`, which records it`);
+  }
   const unreadable = folders.filter((folder) => !isDir(folder) && !(isFile(folder) && folder.endsWith(".html")));
   if (unreadable.length) {
     return refuse(action, `${unreadable.map((folder) => `\`${folder}\``).join(", ")} is not a folder and not a page`);
@@ -202,7 +222,11 @@ function repoint(version: string, folders: string[], check: boolean, root: strin
   for (const page of pages) {
     const text = readFileSync(page, "latin1");
     if (sharedStyles(text)?.served !== true) { elsewhere += 1; continue; }
-    const repointed = text.replace(LOADED_ADDRESS, (_whole, before: string, _from: string, after: string) => `${before}${version}${after}`);
+    // THE VERSION AND ITS HASH MOVE TOGETHER: an element that carries a hash is given the new version's, so the
+    // browser never checks a file against the hash of another.
+    const repointed = text.replace(LOADED_ADDRESS, (_whole, before: string, _from: string, after: string) => `${before}${version}${after}`)
+      .replace(LOADED_ELEMENT, (element: string, _version: string, name: string) =>
+        (/\bintegrity=/i.test(element) ? pinnedTo(element, hashes[name]) : element));
     if (repointed === text) { already += 1; continue; }
     if (!check) writeFileSync(page, repointed, "latin1");
     moved += 1;

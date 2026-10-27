@@ -43,6 +43,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/closed.mjs",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/rebased.mjs",
+            "timeout": 10
           }
         ]
       }
