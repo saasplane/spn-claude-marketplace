@@ -17,8 +17,10 @@ A partner holding this plugin has no checkout of the foundation book beside it, 
 | The patterns | `packages/plugin-spn-surface/src/refs/support/surface/site-patterns.md` and `flow-patterns.md` | the site sections and the flows a page follows |
 | The architecture | `packages/plugin-spn-surface/src/refs/support/surface/architecture-*.md` | the design system's core, app, names, layouts, widgets, components and containers |
 | The delivery | `packages/plugin-spn-surface/src/refs/support/surface/delivery-library.md`, `delivery-showcase.md`, `providers.md` | the Figma library, the showcase, and what a provider owes |
+| A guide for a partner | `packages/plugin-spn-surface/src/refs/support/surface/guide-bring-a-feature.md` | bringing a feature in words, with a design, or with a page to follow, in plain words |
 | The specs | `packages/plugin-spn-surface/src/refs/support/surface/app-patterns/` and `site-patterns/` | skeleton specs, byte-identical to the book's, with an index each |
 | A stamp | the `spn:restates` block at the top of each ref | each chapter restated, and the hash last read from it |
+| The snapshot | `packages/plugin-spn-surface/src/refs/support/surface/construct.snapshot.json` | the CONSTRUCT snapshot of the book each release is cut from, written by `spnutils apps surface construct --out`; `source.readFrom` names the book's commit, and `unit show` reads it |
 
 ## Follows the pattern
 

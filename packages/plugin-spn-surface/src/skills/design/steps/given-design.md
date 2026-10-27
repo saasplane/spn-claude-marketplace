@@ -1,0 +1,107 @@
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
+      "section": "A design a partner brings, and a page they point at",
+      "seen": "37fbe934"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
+      "section": "A design brought, and a page pointed at",
+      "seen": "b179c60c"
+    }
+  ]
+}
+-->
+# Step: given design — a partner's design, a page to follow, both or neither
+
+Read this step when an ask brings a design of the page or points at a page to follow. **It is the same skill, with the same steps and the same tree.** The mode adds one read and two lists, and each of steps 1 to 5 starts from the partner's version instead of from nothing. With nothing brought, the skill runs as written and proposes from the cases.
+
+Its provenance is the foundation book's app patterns chapter, under *A design a partner brings, and a page they point at*, and the rule beside *The data and the person decide* in the patterns construct (`RD.SUPPORT.SURFACE.393`). `refs/support/surface/standards-patterns.md` restates the rule. Apply this step; the chapters are provenance, and not files to open.
+
+**This is guidance.** The cases guide the design and no check forces one. A case is never a reason to refuse a partner's choice: the partner's choice stands wherever they keep it (`RD.SUPPORT.SURFACE.394`).
+
+| The partner brings | What you do |
+| --- | --- |
+| a design of the page | it is the first answer at every step. Read it, check it at each step and keep what fits. A change the person would feel goes back to the partner to decide |
+| a reference: someone else's page, or a style they like | it informs a choice where the facts allow two fitting answers. It is never copied as the tree, and nothing in it is kept, because it is not the partner's page |
+| both | the design comes first. The reference counts only where the design is silent, such as a state it did not draw. Where the two disagree, the design stands, and the read says so |
+| neither | propose from the cases, through the tree, and show it before any code |
+
+## 1. The facts first, before the design is read
+
+A design shows screens, and not what a person gets done. So step 0 and the facts of step 2 come first, from the partner's rows, contract and words: who the page is for, the flow it is a step of, and what the data holds.
+
+- **Where the partner has no behaviour rows, draft them in the partner's words**, one line each, as *Who*, *Does* and *Sees*. They are a draft until the partner accepts them.
+- **Where the words do not say who the person is, ask.** Never read the kind of person off the picture.
+
+## 2. Read the design: your design, as read
+
+Whatever its form, the read gives one thing: **the design, as read**. List the parts in the partner's order, each with its words and the control it seems to be. Mark anything you could not read *not shown*, and never guess it. Put every question in one message, after the read and before any tree. Never ask for a size, a colour or a font: the theme holds those, and the tree writes none.
+
+| The form | How you read it | What it cannot show, and what you ask |
+| --- | --- | --- |
+| a Figma link | through the Figma connector: the frames and their names, the layers and their text, the partner's own components, and a look at each frame. Read only: never write into a partner's file, and never expect it to use the design library | where each action leads, what a field checks, the data behind a list, or which frame is which state, unless the names say so. Ask which frames make up the page and in what order. With no connector, or a file the connector cannot open, ask for an image of each frame |
+| a mock image | as a picture | exact sizes, spacing and colours; which of two look-alike controls a box is; what a menu holds; anything below the fold. Ask what a look-alike control chooses from, and what stands behind a menu |
+| a PDF or slides | each page as a picture, its text taken as the exact words. A note on a slide is the partner's own words, and goes into the draft rows, never onto the page | which slide is the page and which is commentary. Ask which pages show the page |
+| a sketch, on paper or a whiteboard | as a picture: what stands where, and in what order. Proportions mean nothing, and a box is a part of the page, never a unit | words the hand left unreadable. Ask for those labels, typed out |
+| a page of their product as it runs today | from a screenshot of each state, or, for a public page, from its address as markup. Never sign in to a partner's product | anything shown only after sign-in, or only to another role. Ask for a screenshot of each state they have; those count as drawn states |
+| HTML: a prototype, an export, a static page | as markup: the order of the parts, the exact words, each field's type and whether it is required, and where each link goes | the look, because markup is read, not rendered. A class name describes a look, never a unit |
+
+**A reference** comes as a screenshot or the public address of another product's page, and is read the same way. It may be a style in words, such as "dense, like our old tool". For a product named with nothing to read, ask for a screenshot. Mark anything you recall about another product from memory *not verified* wherever you use it, and never state it as that product's fact.
+
+## 3. Steps 1 to 5 check the partner's version
+
+Run the skill's steps 1 to 5, each starting from what the design drew.
+
+| Step | What it checks | It stands when | It goes back to the partner when |
+| --- | --- | --- | --- |
+| 1 · the layout | the navigation they drew | it fits the app's job (`RD.SUPPORT.SURFACE.206`); how the bar looks belongs to the theme | it does not fit the job, such as a rail of many sections for people who come now and then |
+| 2 · the facts and the pattern | how the page is arranged. The pattern is still chosen from the data and the person, never from the pixels (`RD.SUPPORT.SURFACE.047`, `RD.SUPPORT.SURFACE.052`) | the pattern the facts choose holds their arrangement, or the arrangement derives from it | the arrangement would lose something the facts say the person needs, such as a growing list with no search |
+| 3 · the panels | what is framed, and where the actions stand | almost always, because framing is a matter of look | a closing action stands where a person will not find it (`RD.SUPPORT.SURFACE.074`, `RD.SUPPORT.SURFACE.095`) |
+| 4 · the tasks | the states they drew, usually only the done one | every state they drew that fits the task's pattern | a missing state, which goes on list 1; a confirmation with the wrong weight, such as a dialog for an act that can be undone |
+| 5 · the blocks | the controls they drew, each against its unit's cases, read with `spn-surface unit show <Unit>`, which for a unit beyond the core prints its props from the repository's symbol index and the core block whose cases decide the rest | their own unit, always; a core unit whose case gives what they drew; a look the theme gives, which is never a finding | a case that differs in a way the person would feel, such as a record picked from a plain dropdown (`RD.SUPPORT.SURFACE.307`) or two filled buttons in one view (`RD.SUPPORT.SURFACE.370`) |
+
+**A reference informs a choice, and is never copied.** A page is not arranged by how another page looks, and a reference is exactly another page, so it never becomes the tree. It counts only where the facts and the cases leave a choice: which of two fitting patterns to use when the kind of person does not settle it; the layout, when the app has no page yet; how much an entry asks at once, and whether a task runs in place, over the page or in steps; and the tone of the words, within the rules of content. It never sets a unit, a prop or a look, and it never overrides a fact, a case or the partner's own design. To keep something from it, the partner brings it into their own design, and it is then written on the tree as theirs.
+
+## 4. The tree, written for the build
+
+Write the tree as step 6 says. **A partner's own unit keeps its own name** (`RD.SUPPORT.SURFACE.081`). Each block carries the case it follows, read from its unit's table, and each change the person would feel is marked on the line it changes until the partner answers. The tree is what the build reads, so it is always written, in the running arc's notes or in the reply's working; show it in full only when the developer asks.
+
+## 5. The two lists, then a stop
+
+Only something the partner's person would feel goes on either list. Taste never does, and neither does a look the partner's theme gives.
+
+- **List 1: states your design did not show, which we added.** Each task state decided in step 4 that the design did not draw, named by its task and state and written as a change to the frame it comes from, with its words. Draw no skeleton: the partner reviews what is added to their screen, not a redrawing of it. Where a reference shows that state, say whether the tree follows it.
+- **List 2: changes the person would feel.** One row for each change: the gain or the loss first, then where it is, the case or the rule, and where the change comes from. A row from the design is answered *keep yours* or *take the standard*. A row from the reference is either *follows*, where a case agrees with it and nothing needs answering, or *the cases lead elsewhere*, which says what the reference does, what the tree does and why, and is answered *as the tree has it* or *bring it into my design*. The partner answers once.
+
+**The picture of the page is their design**, with each added state in words against the frame it comes from; nothing is drawn by default. With nothing brought, the mock step draws the page once, with its errors in place and its other states in words. A drawing in Figma from the design library is made when asked (step 7), and never into the partner's own file.
+
+**The reply, in this order:** the rows in the partner's words, the design as read with its questions, the picture of the page, list 1, list 2. **Then stop. No code is written until the developer says go.** Write the partner's answers onto the tree; the build follows it.
+
+## 6. Keep yours, written on the tree
+
+Write a *keep yours* answer on the line it keeps, with the rule, the partner's words and the date. The build builds that line as kept, and carries it into the code as one comment on the line it keeps, so the reason moves and ends with the code. A review reads that comment and raises nothing on a kept line. The Surface check stays advice when code is written: where it flags a kept line, answer from the comment, and the code stays as it is.
+
+```text
+            └── DSButton  color=PRIMARY  "Send and add another"          Act · the form empty again
+                keep yours: a second filled button in this view, against RD.SUPPORT.SURFACE.370
+                "Our managers hire a whole shift at once; both must stand out." Harbor Clinics, 27 Oct
+```
+
+```tsx
+{/* Kept: a second SOLID button, against RD.SUPPORT.SURFACE.370.
+    "Our managers hire a whole shift at once; both must stand out." Harbor Clinics, 27 Oct */}
+<DSButton variant="SOLID" color="PRIMARY" label="Send and add another" onClick={sendAndReset} />
+```
+
+## 7. What a partner's repository keeps
+
+Only what the code cannot say. The tree, the states and the two lists are the working of the design: shown in the reply, followed by the build in the same window, and once the page is built the code is the tree. Keeping them in docs as well would give every later change of the page two places to edit.
+
+- **Write the draft rows the partner accepts**, as behaviour rows in the behaviours of the module or app that draws the page.
+- **Write each kept line as one comment in the code**, at the line it keeps.
+- **Write nothing else there**: no tree, no facts, no states and no mock. In a workstream of our own the tree stays in the running arc's notes.
+
+`refs/support/surface/guide-bring-a-feature.md` tells a partner the same in plain words.

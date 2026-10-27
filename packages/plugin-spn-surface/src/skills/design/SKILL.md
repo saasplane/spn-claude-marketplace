@@ -1,6 +1,6 @@
 ---
 name: design
-description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words, in Figma, or as a mock with no Figma; also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries, and with none it draws the tree as skeletons, a mock, one for each page and each task state, with a flow file that orders the pages (step 8). For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
+description: Design a page of a SaaS Plane app from the blocks of the design system, or register a new unit in the design system's own Figma library, or change what a library file already holds. Use when the user asks to design, lay out or draw a page, a screen or a flow of pages, in words, in Figma, or as a mock with no Figma; also when the user brings a design of the page (a Figma link, an image, a PDF or slides, a sketch, a page of their product, or HTML), or points at a page to follow, which the given-design mode reads into the same tree (`steps/given-design.md`); also use it when the ask is to add a component, a widget, a container or a layout to the Figma library, to draw a unit the code already has but the library does not, or to change a set, a version, a token or a value a library file holds. For a page, it first names who the app is for and the flow the page is a step of, then picks the layout, writes down the facts of the data and of the person, chooses the app pattern or each section's site pattern, decides the containers, chooses the pattern for each task, and then the blocks, and states the page as a tree of named blocks with their props; with the Figma connector it draws that tree from the published libraries, and with none it draws the tree as skeletons, a mock, each page drawn once with its errors in place and its other states in words, with a flow file that orders the pages (step 8). For a library change, step 7, "Draw it in Figma", walks `steps/change-library.md` directly — read that step on its own when the ask is about the library and not about a page. Not for deciding what a feature is - that is the `ideate` skill - and not for writing the code of a screen, which is the `implement` skill.
 ---
 <!-- spn:restates
 {
@@ -11,11 +11,11 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "d197bbb5"
+      "seen": "32bc2649"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "77626921"
+      "seen": "f17bec38"
     }
   ]
 }
@@ -27,7 +27,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Then read `refs/support/surface/README.md`, in this plugin: the entry ref, and its route 1.** It names each Surface ref this skill reads, in the order the decisions below run: the levels of a page and the rules of content, the flow, the layout, the patterns, the panels, the tasks, then the blocks, whose props come from the choice tables. This skill holds the order of the decisions, the patterns, and the form of the result.
 
-**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field, and under each unit for its choice table.
+**Read `refs/support/surface/standards-patterns.md` before you choose a pattern.** It holds the four groups of surface patterns, the task patterns, the fourteen app patterns with the kinds of person each serves, the four steps of the choice, and the tree by level of each app pattern. A site's page reads `site-patterns.md` too, for its sections, and a page that is a step of a path reads `flow-patterns.md`. The specs are in `refs/support/surface/app-patterns/` for a screen of an app and in `refs/support/surface/site-patterns/` for a section of a site's page, in this plugin, and a page starts from one. Read `architecture-components.md`, under Composites, where the pattern names a data table, a filter bar, an item line, a badge or a field; a unit's choice table is one call away with `spn-surface unit show <Unit>`, and for a unit beyond the core the same call prints its props from the repository's symbol index and the core block whose table decides the rest.
 
 **This one skill serves the builder of SaaS Plane and a partner alike.** Both design from the refs and the specs this plugin carries, and neither needs the book open.
 
@@ -35,7 +35,9 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 Take the scope from the argument: one page, or a flow of pages. A flow is several pages, and each page gets a tree of its own.
 
-**Your output is one tree for each page**: every block by the name the book gives it, with its props. State it in the reply. Write it to a file only where the developer or the running arc names one. A mock is the same tree drawn as skeletons (step 8). You write no code here.
+**Where the ask brings a design of the page, or points at a page to follow, read `skills/design/steps/given-design.md` before step 1, and run the steps below through it.** It is the same skill and the same tree: the facts come first, the design is read once, each of steps 1 to 5 checks the partner's version instead of starting from nothing, and the reply ends on two lists and a stop before any code. It is guidance: the cases guide, and the partner's choice stands wherever they keep it.
+
+**Your output is one tree for each page**: every block by the name the book gives it, with its props and the case each follows. The build reads it; the reply shows the picture of the page, and the tree in full only when the developer asks. In a partner's repository, write only the draft rows the partner accepts, in its behaviours, and each kept line as a comment in the code at the line it keeps; the tree itself is not written there. In a workstream, write it where the running arc names. A mock is the same tree drawn as skeletons (step 8). You write no code here.
 
 The decisions run in one order. Each level of a page owns one thing, and the level above it decides first. Who the app is for comes before all of them, and a block is the last thing chosen.
 
@@ -91,7 +93,7 @@ A layout frames the page. It draws the navigation, and it hands the page the con
 
 ## 2. Write the facts down, and choose the pattern
 
-**How a page is shown MUST follow from its data and from the person who uses it** (`RD.SUPPORT.SURFACE.047`). Never arrange a page by how another page looks, or by which block is at hand. So you write the facts down first, and you choose from them.
+**How a page is shown follows from its data and from the person who uses it** (`RD.SUPPORT.SURFACE.047`). Do not arrange a page by how another page looks, or by which block is at hand; a page a partner points at counts only where the facts and the cases leave a choice (`steps/given-design.md`). So you write the facts down first, and you choose from them.
 
 ### Write the facts down
 
@@ -270,8 +272,8 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the tree by layer of the app pattern, and from the list its task pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **Go down the layers of the pattern's tree: the widgets, then the components.** Use the unit that step 2 chose for each part that holds many of one thing. Use the units the tree names for the rest.
-- **Give each closed prop the value its unit's choice table gives** (`architecture-components.md`, under the unit, `RD.SUPPORT.SURFACE.375`). Read the cases from the top, and the first that matches wins: it says each prop's value and who writes it, the page, the place, the level or the unit. Write only what the case gives the page; a value it leaves to the place or the level is never written by hand. `DSBadge`, `DSButton` and `DSMark` have their tables.
-- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. A badge that names a kind draws `OUTLINE` in `DEFAULT`, a state takes the hue its meaning gives from the book's table, and a view holds at most one `SOLID` button (`RD.SUPPORT.SURFACE.368`, `.369`, `.370`). A button with no `variant` draws `OUTLINE` outside a header or a footer, a page never writes `QUIET`, `SUBTLE` or `SUBTLE_OUTLINE` on a button, and a button's colour says its act: `PRIMARY` the main action, `ERROR` a main action that deletes or ends, `DEFAULT` every other (`RD.SUPPORT.SURFACE.376`, `.379`, `.384`). What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
+- **For each block, run `spn-surface unit show <Unit>`, and give each closed prop the value of the first case that matches, naming the case** (`RD.SUPPORT.SURFACE.375`). It prints the unit's props, their values and defaults, whether the library draws each, its usage, its cases with the rule each rests on, and its index by value, from the snapshot this plugin carries; it opens no source and no book. The same lookup serves every unit: a core unit prints its cases, and any other, the design system's own or a module's, prints its props from the symbol index of the repository it runs in, each with its values, its default and its description, and names the core block its name's last word points to, whose table decides what its props do not (`RD.SUPPORT.APPS.207`); run `unit show` on that block too. Read the cases from the top: the first that matches says each prop's value and who writes it, the page, the place, the level or the unit. Write only what the case gives the page; a value it leaves to the place or the level is not written by hand. A unit with no table says where its props come from: its size from its place, and a field's check from its `DSForm.Field`. The cases are a guide: start from the first case that matches, and a partner's choice stands where they keep it, written on the line as a kept line (`steps/given-design.md`).
+- **Hold each small thing to its rule of content** (`standards-core.md`). A state is a badge on the line of facts, before the other facts, or at the end of the line, and the normal state shows none. A badge that names a kind draws `OUTLINE` in `DEFAULT`, a state takes the hue its meaning gives from the book's table, and a view holds at most one `SOLID` button (`RD.SUPPORT.SURFACE.368`, `.369`, `.370`). A button with no `variant` draws `OUTLINE` outside a header or a footer, the tints `QUIET`, `SUBTLE` and `SUBTLE_OUTLINE` are the place's and not the page's, and a button's colour says its act: `PRIMARY` the main action, `ERROR` a main action that deletes or ends, `DEFAULT` every other (`RD.SUPPORT.SURFACE.376`, `.379`, `.384`). What stands at the end of a line is the page's own: its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action, and a line that has an action shows no arrow (`RD.SUPPORT.SURFACE.059`, `RD.SUPPORT.SURFACE.087`). A field a person enters is a `DSForm.Field`, and a field a person reads is a `DSDataUnit`, each with its title above. Readings stand in a grid. The choices of one set stand in columns.
 - **Every control a person sets is a `DSForm.Field`**, a lone checkbox or switch too (`RD.SUPPORT.SURFACE.169`, `RD.SUPPORT.SURFACE.171`). A field with no label of its own keeps a blank label line, so it lines up beside labelled fields in a row; alone on its line in a column, write `showBlankLabel={false}`. A field's own action, such as *Forgot password?*, goes to `labelEndNode`, and never under the field. A switch and a checkbox take their own `label`.
 - **A line of a list is an item line, `DSItem`**: a picture, a title, a line under it, and actions at its end. The header of a record has the same shape (`RD.SUPPORT.SURFACE.064`).
 - **Under the picture an item line holds its title, its description, then its line of facts.** The facts go to `facts`, and they stand under the description, so a line that has both shows both (`RD.SUPPORT.SURFACE.086`). Write each fact as data, in one of four forms: plain words; `TEXT`, with a `label` and icons where it needs them; `BADGE`, with a `color`; or `CUSTOM`, a block of the page's own (`RD.SUPPORT.SURFACE.096`). A fact whose value cannot be read alone, such as a count, a date or a person, carries its label before it, as *Members: 12*. A state is a `BADGE` fact.
@@ -319,7 +321,7 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | --- | --- |
 | The page | its route, its purpose in one sentence, its main action, and its app pattern; on a site's page, its kind of page and each section's site pattern |
 | The layout | `DSLayout`, then its type |
-| A block | its name in the book, then each prop as `name=VALUE` |
+| A block | its name in the book, then each prop the page writes as `name=VALUE`, and the case only where the page writes a value or a change or a kept line stands |
 | A part of a block | the name of the part: `DSPanelContainer.Header`, or a named place of the layout. A part of a panel carries `flush` after its name, where the page writes it |
 | Content | the text a person reads, in quotes |
 | A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look. Where the stack provides a unit for it, the tree may name that unit |
@@ -341,12 +343,13 @@ page  /orders · purpose: find an order · main action: New order · pattern: Fi
     ├── startNode         DSText "Acme"
     ├── nav               items: "Orders" selected · "Customers" · "Reports"      Move
     ├── endNode           DSAvatar
-    ├── actionsNode       DSButton variant=GHOST "Help"
+    ├── actionsNode       DSButton "Help"
     └── content
         └── DSPanelContainer
             ├── DSPanelContainer.Header
             │   ├── DSItem    title="Orders"
             │   └── DSButton  color=PRIMARY "New order"                          Move · leads to /orders/new
+            │       case: the main action, in a header (RD.SUPPORT.SURFACE.390)
             ├── DSPanelContainer.Content
             │   └── DSFilterBar                                                  Find
             └── DSPanelContainer.Content  flush
@@ -380,12 +383,12 @@ The page is a use case, composed from the published library in a file that is no
 
 ## 8. Draw it as skeletons — a mock, with no Figma
 
-A mock is the tree drawn as skeletons, and it needs no connector. Draw it where the developer asks for a mock, or asks to see a page or a flow and the window holds no Figma connector. Read `skills/design/steps/mock.md` then, and follow it: the facts first, then one skeleton for each page in the order a person meets them, each move naming its page; a desktop and a phone view where the pattern changes; each dialog or sheet as its own view; each block drawn from data with its empty, failed and denied pictures as views of their own; and a flow file that orders the pages. It reads the tree the steps above wrote, and decides nothing of its own.
+A mock is the tree drawn as skeletons, and it needs no connector. Draw it where the developer asks for a mock, or asks to see a page or a flow and the window holds no Figma connector. Read `skills/design/steps/mock.md` then, and follow it: the facts first, then one skeleton for each page in the order a person meets them, each move naming its page; each page drawn once, with its errors in place and its other states in words; a phone view only where the arrangement changes; each dialog or sheet as its own view; and a flow file that orders the pages. It reads the tree the steps above wrote, and decides nothing of its own.
 
 ## Close
 
 - **Convene the `ux` and `ui` lenses over the tree at the design gate**, and over the drawing where one exists, and `marketing` as well on a marketing page. Run each through the `spn-panel` subagent, with the spn-devex plugin's `refs/devex/agent/lenses/ux.md`, `ui.md` and `marketing.md`. The context that designed the page does not review it.
-- **Report** the kind of person and where it was read, the flow, the purpose, the facts, the pattern with its *For* line and its spec (or the patterns a page no pattern fits is derived from), the tree of each page, the tasks with their task states, and what is missing. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. For a mock, add its files in the flow's order, each with its views. Then give the findings of each lens.
+- **Report** the kind of person and where it was read, the flow, the purpose, the facts, the pattern with its *For* line and its spec (or the patterns a page no pattern fits is derived from), the picture of each page, the tasks with their task states, and what is missing; the tree of each page is written for the build and shown in full when the developer asks. In the given-design mode, the reply is the one `steps/given-design.md` orders, and it stops before any code. Say which rule a choice rests on where that rule is proposed. For a drawing, add the read-back and each difference from the tree. For a mock, add its files in the flow's order, each with its views. Then give the findings of each lens.
 - **Hand off by name.** The `implement` skill builds the page, in its `ui` step.
 
 ## Lenses

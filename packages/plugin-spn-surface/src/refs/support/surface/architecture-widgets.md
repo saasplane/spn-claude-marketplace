@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "ce155a2b"
+      "seen": "06a4c7c3"
     }
   ]
 }
@@ -71,6 +71,28 @@ A part states its kind in `mtype`, which takes `DSCardWidgetPartType`. Every par
 - **The widget MUST NOT fold rows away.** A row that a page wants hidden, or shown in another way, is the page's to place, usually in a `FREE` part or in the footer.
 - **The widget has no paging, no search, and no working or failed state.** A set that needs them is a `DSDataTable`.
 - **The widget takes no `anchor` around the whole card, and no `style` or `minWidth`; its `className` and `opacity` paint the card and nothing else** (`RD.SUPPORT.SURFACE.192`). A class of the app on the widget sets the card's paint tokens and the widget hands it to the card it draws. A card that is one link, or that needs a style of its own, is a `DSCard` that the page writes.
+
+### The choice table of `DSCardWidget`
+
+A card widget is chosen the way a card is, by what it holds: a head, and a body it draws from data. It takes its size from its place, and it stays opaque unless the page behind it is meant to show through.
+
+**The cases**, read from the top; the first that matches wins.
+
+| It holds | Where it stands | `opacity` | `size` | The page writes | Rule |
+| --- | --- | --- | --- | --- | --- |
+| a head over parts it draws from data: recent orders, a record's activity | a column or a grid of a page | `OPAQUE` (the unit's) | the place's | the parts | `RD.SUPPORT.SURFACE.221` |
+| the same, over a picture or a band the app paints | over the picture or the band | `TRANSLUCENT` | the place's | the opacity | `RD.SUPPORT.SURFACE.192` |
+| a block of content of its own with no head | — | not this unit: a `DSCard` | — | — | `RD.SUPPORT.SURFACE.221` |
+
+**The limits across a view.** The widget holds none of its own.
+
+**The index by value.**
+
+| Prop | Value | Its cases |
+| --- | --- | --- |
+| `opacity` | `OPAQUE` | every widget not over a picture or a band. It is the unit's own default |
+| `opacity` | `TRANSLUCENT` | a widget over a picture or a band (`RD.SUPPORT.SURFACE.192`) |
+| `size` | `XS` to `XL` | the place's |
 
 ## Boundary
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/01-standards-core.md",
-      "seen": "bfcee00d"
+      "seen": "1546a699"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "66812030"
+      "seen": "74d14315"
     }
   ]
 }
@@ -160,8 +160,8 @@ An application and a site are built from the same units, and one theme gives bot
 
 A page is read in one of three ways, and its words follow the way it is read. In **a doc** — a guide, a reference, a help article — the reader came to learn or to follow steps. On **an app's screen** — an admin, a profile, a sign-in — the person is in the middle of a task. On **a marketing page** — a product site, a landing page, the design system's public landing — the reader is deciding whether to care. This is not a kind of surface: all three can run on the web.
 
-- The writer **MUST** decide what a page is for, from its purpose, before writing a word of it — the question § A page has one purpose asks: what did the person come here to do?
-- A page **MUST** be one of the three, and never two at once. A product site's sign-in is an app's screen; a help article opened from a screen is a doc. A sign-in that argues for the product, a landing page holding a form of settings, and a guide that sells are each a finding.
+- The writer decides what a page is for, from its purpose, before writing a word of it — the question § A page has one purpose asks: what did the person come here to do?
+- A page is one of the three, and not two at once. A product site's sign-in is an app's screen; a help article opened from a screen is a doc. A sign-in that argues for the product, a landing page holding a form of settings, and a guide that sells are each a finding.
 - `VOICE` writes the words in all three modes, and `MARKETING` owns what a marketing page says and to whom (the spn-devex plugin's `refs/devex/agent/lenses/`).
 
 **A doc** follows the readability bar (the spn-devex plugin's `refs/devex/workspace/docs/doc-sets.md`), holds no persuasion, and each step names the real command, the real path and what the reader will see.
@@ -171,8 +171,8 @@ A page is read in one of three ways, and its words follow the way it is read. In
 | Its words | Their rule |
 | --- | --- |
 | A label | short, in the product's own words, and held to the rule of a label above |
-| An action | **MUST** start with a verb that says what happens, and name its object where the verb alone does not, such as *Save changes* or *Invite a member*. It is 1 to 3 words, and 4 at most, and never a sentence or a question. An arrow is the button's icon, never a character typed in its words. *OK* or *Submit* alone is a finding. The number guides the labels an agent writes; a label a person asks for in their own words is written as they asked (`RD.SUPPORT.SURFACE.335`) |
-| An error | **MUST** say what went wrong and how to fix it, on the line under the field it belongs to |
+| An action | starts with a verb that says what happens, and name its object where the verb alone does not, such as *Save changes* or *Invite a member*. It is 1 to 3 words, and 4 at most, and never a sentence or a question. An arrow is the button's icon, never a character typed in its words. *OK* or *Submit* alone is a finding. The number guides the labels an agent writes; a label a person asks for in their own words is written as they asked (`RD.SUPPORT.SURFACE.335`) |
+| An error | says what went wrong and how to fix it, on the line under the field it belongs to |
 | A number | is data the person acts on, never there to impress |
 | What it never holds | persuasion, a slogan or a marketing claim |
 
@@ -180,11 +180,11 @@ A page is read in one of three ways, and its words follow the way it is read. In
 
 - Name the personas first, and what each one needs to hear: a buyer the outcome and the cost of going without it, a builder that it works and how to start.
 - Lead with the problem and the outcome; the how comes lower down, as the proof.
-- Each section **MUST** answer one question a reader asks: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
+- Each section answers one question a reader asks: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
 - A headline states the outcome, and the line under it gives the proof. A headline that describes the system is a finding.
-- The words **MUST** be a buyer's and a builder's. A word of the system's own — a layer, a task intent, a unit, a seat, a pattern's name — **MUST NOT** stand on the page unless the same sentence explains it.
-- A number **MUST** stand in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear.
-- **The words MUST fit the length of their level** (`RD.SUPPORT.SURFACE.286`, `RD.SUPPORT.SURFACE.287`), measured at 1440. The `MARKETING` lens writes to this table.
+- The words are a buyer's and a builder's. A word of the system's own — a layer, a task intent, a unit, a seat, a pattern's name — does not stand on the page unless the same sentence explains it.
+- A number stands in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear.
+- **The words fit the length of their level** (`RD.SUPPORT.SURFACE.286`, `RD.SUPPORT.SURFACE.287`, both advice), measured at 1440. The `MARKETING` lens writes to this table.
 
 | Level | Eyebrow | Title | Description | Item title and description | Actions |
 | --- | --- | --- | --- | --- | --- |
@@ -196,7 +196,7 @@ A page is read in one of three ways, and its words follow the way it is read. In
 
 A feature adds facts at its level: 0 to 4 at `PAGE`, 0 to 3 at `CONTAINER` and `WIDGET`, 0 to 2 below, of 1 to 3 words each at the top. Its items follow their form: a `GRID` title of 2 to 4 words, a `LIST` title of 1 to 3 words as the step's name, `STATS` a value of 6 characters at most and a label of 2 to 5 words that says what it counts. The buttons and the count of items are in `architecture-components.md`.
 
-- **Siblings MUST match.** The items of one group share one grammatical form, and no description runs more than about a third longer than its shortest sibling's.
+- **Siblings match.** The items of one group share one grammatical form, and no description runs more than about a third longer than its shortest sibling's.
 - **One idea MUST stand in each element.** A title carries one claim, the description its reason, the items the evidence and the action the next step. A second clause in a title belongs in the description.
 
 ## Motion — ✅

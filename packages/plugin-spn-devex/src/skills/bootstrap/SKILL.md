@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring both estate layers up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
+description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that bring the organization up, make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring the platform layer up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
 ---
 <!-- spn:restates
 {
@@ -23,7 +23,7 @@ description: Walk an empty folder to a platform running locally - the door first
 
 Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
 
-**Nothing in this walk is hand-made except the estate repository itself.** Every other file arrives from a command. If you find yourself opening an editor to create a manifest, stop. A command owns that file, and hand-writing it starts a workspace out of standard on day one.
+**Nothing in this walk is hand-made except the folders and the git remotes.** Every other file arrives from a command. If you find yourself opening an editor to create a manifest, stop. A command owns that file, and hand-writing it starts a workspace out of standard on day one.
 
 ## Act 0 is a door, and a no is a real answer
 
@@ -54,14 +54,14 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | 2 | Open the workstream | `mkdir`, then `spn-devex workstream row write` | The answers need a home on disk before the first one is given |
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
-| 5 | Make the estate repository | — a ground act | `repo create` refuses by name until the organization layer has run. This is the one hand-made repository |
+| 5 | Bring the organization up, then make the estate folder and mint it | `spnutils infra organization up`, then `mkdir <org>-infra`, `git init` and `spnutils infra scaffold repo` inside it | The book's utils chapter runs the organization layer once, before any `repo create`, and `repo create` refuses by name until it has. The estate repository exists only as a folder until act 7 has written its organization node |
 | 6 | Wire it | `spnutils repo agent-sync` | Without it the session has no `implement`, no `review`, no `release` |
-| 7 | The two estate packages, organization first | `spnutils infra scaffold`, then `implement` | The platform package names the organization it belongs to |
+| 7 | The two estate packages, organization first, then the estate repository created and pushed | `spnutils infra scaffold`, then `implement` to fill `providers.scm.org` and the rest, then `spnutils repo create <org>-infra` from inside the folder, `git remote add origin`, `git push` | The platform package names the organization it belongs to. `repo create` reads the GitHub organization from the organization node that reaches the folder, refuses before the node exists or while `providers.scm.org` is empty, and refuses when that GitHub organization does not exist. It opens no checkout, so the folder is the repository and `origin` is added by hand |
 | 8 | Release them and stage the pins | `spnutils infra release --local` | The platform repo pins a version, and it cannot pin a working tree |
-| 9 | The platform repository | `repo create`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened |
+| 9 | The platform repository | a new folder and `git init`, then `repo create <org>-<spc>-<stack> --from <organization package>@<version>`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened. The pin it writes does not exist yet when `repo create` runs, so the command takes `--from`, the estate node answering which organization's SCM (`package@version` or a path) |
 | 10 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
 | 11 | The provider keys | — you name them, they fill `~/.spnenv` | The provider registry fails fast at boot when a type or key is missing. A walk that ends in a running stack cannot defer this |
-| 12 | Bring the estate up | `spnutils infra organization up`, then `infra platform up <spc>` | The platform layer reads what the organization layer wrote |
+| 12 | Bring the platform up | `spnutils infra platform up <spc>` | The platform layer reads what the organization layer wrote at act 5 |
 | 13 | Run the stack, and say what they should see | the domain plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
 | 14 | Close the workstream | — move the folder to `closed/` | Both repositories exist and the concept is agreed, so the folder is a receipt |
 
@@ -70,7 +70,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 - **Act 1 also writes the machine seat, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The machine seat carries the rule.
 - **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
-- **Acts 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
+- **Acts 5, 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
 
 ## Act 2 — the workstream that holds the answers
@@ -128,11 +128,11 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
    | Row | Title | Acceptance | Lands at |
    | --- | --- | --- | --- |
    | 13 | The coordinates and what derives from them, read back and agreed | the log carries the go | act 4, just before the go, with the read-back as its note |
-   | 14 | The estate repository, wired, with both packages released and pinned | `spnutils workspace status` lists an INFRA member | act 8 |
+   | 14 | The organization up, then the estate repository, wired, with both packages released and pinned | `spnutils workspace status` lists an INFRA member | act 8 |
    | 15 | The platform repository, scaffolded against both pins | `workspace status` lists an APPS member | act 9 |
    | 16 | Its concept, agreed one block at a time | `CONCEPT.md` exists at its root and carries the coordinates | act 10 |
    | 17 | The provider keys named, and the machine seat filled | `workspace status` reports each key as set | act 11 |
-   | 18 | The estate up, both layers | the organization and platform layers report their state | act 12 |
+   | 18 | The platform up, on the organization already up | the platform layer reports its state | act 12 |
    | 19 | The stack running, and the platform answering | they open the surface and it responds | act 13 |
 
 5. **The preview's first draft.** This arc has a preview because the developer decides the go from the read-back. Copy `refs/devex/workspace/docs/templates/workstream/approach-preview-template.html` to `notes/N001/preview.html`. Its Today says nothing exists yet. Its Proposed holds the coordinates table (the question, `— not yet asked`, and what the answer decides) and the table of what derives from them, each value `— not yet derived`. Its Where it lands names the estate and platform repositories as not known yet. Take out every block and slot it does not fill, its Open among them.
@@ -257,16 +257,15 @@ Then say which act runs next, and run it.
 - **Confirm presence, never content.** The status command answers *is it set* without answering *what is it*, which is the only question you need.
 - **A key they choose to skip is an answer.** Say which family will refuse to boot, and let them decide. Do not fill one in, and do not invent a test value.
 
-## Act 12 — bring the estate up
+## Act 12 — bring the platform up
 
-Two commands, in order, because the platform layer reads what the organization layer wrote.
+The organization layer is already up from act 5, and the platform layer reads what it wrote.
 
 ```
-spnutils infra organization up
 spnutils infra platform up <spc>
 ```
 
-`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RD.DEVEX.UTILS.072`). The organization layer takes none, because a repository has at most one organization. No environment entry selects a platform.
+`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RD.DEVEX.UTILS.072`). No environment entry selects a platform.
 
 - **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either. This is the same rule act 9's `repo create` already follows, so nothing new is being excused here.
 - **Stop after each and say what it produced.** A partner watching an estate appear has no way to tell a slow layer from a stuck one unless you say.

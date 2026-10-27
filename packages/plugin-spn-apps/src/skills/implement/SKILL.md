@@ -15,15 +15,15 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "aa82da09"
+      "seen": "ebea3c2a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "ce155a2b"
+      "seen": "06a4c7c3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "a6eb0e02"
+      "seen": "8949f278"
     }
   ],
   "decisions": [
@@ -88,11 +88,12 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 ## A page is built from the tree of its pattern
 
-The `ui` step follows this section for every page a change adds or rearranges. **The Surface rules are the spn-surface plugin's, and its entry ref, `refs/support/surface/README.md`, is the one way in: follow its route 3, *Build a screen*.** It reads the page's design tree first; with no tree, the design steps up to the tasks; then what a page writes for each unit on its stack, and what a unit does not do yet; then the choice tables, for every closed prop the page writes.
+The `ui` step follows this section for every page a change adds or rearranges. **The Surface rules are the spn-surface plugin's, and its entry ref, `refs/support/surface/README.md`, is the one way in: follow its route 3, *Build a screen*.** It reads the page's design tree first; with no tree, the design steps through the tree, shown before any code, and where the partner brings a design of the page or a page to follow, the design skill's given-design mode; then what a page writes for each unit on its stack, and what a unit does not do yet; then the choice tables, for every closed prop the page writes.
 
-- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level. Where a page has no tree, run the `design` skill first. Never arrange a page while you write it.
+- **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level, with the case each block follows. Where a page has no tree, run the `design` skill first, and show its result before any code. Never arrange a page while you write it, and never build it from a picture: a design the partner brings goes through the given-design mode into the tree first.
+- **Build a kept line as kept.** Where the partner answered *keep yours*, the tree marks the line with the rule, their words and the date. Build it as they chose, and carry the reason into the code as one comment on that line. A review raises nothing on a kept line, and where the Surface check notes one, answer from the comment and leave the code as it is.
 - **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
-- **Use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
+- **Use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`, advice, as the tree has it). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
 - **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
 - **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.

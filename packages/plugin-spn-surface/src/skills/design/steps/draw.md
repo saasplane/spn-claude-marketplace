@@ -7,15 +7,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "75dfa295"
+      "seen": "79345e75"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "a6eb0e02"
+      "seen": "8949f278"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "410a6c34"
+      "seen": "2d0ba4f7"
     }
   ]
 }
