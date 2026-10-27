@@ -19,6 +19,16 @@
 // spn-symbols.json`, found from the working folder upwards, else each package's own
 // `dist/generated/spn-symbols.json` under `packages/*` and `apps/*`. Its name's last word then names
 // the core block whose table decides what its props do not.
+//
+// THAT SECOND SOURCE REACHES A WORKSPACE'S MEMBERS, because a fresh window starts at the workspace
+// root, which is no repository and holds no index of its own: there the command would see nothing,
+// and the agent would read the unit's source instead. So where no `sprepo.json` stands above the
+// working folder and `.spndevex/` does, each child folder that holds a `sprepo.json` is a member,
+// and the merged index of each is read in name order. A name one member carries prints from it. A
+// name several carry prints from the first whose entry carries props, else the first: a member may
+// pin a release of a package whose index was written before props were read from the code, and the
+// member that built the package holds them. The line printed names the member, and inside a
+// repository nothing changes.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -51,8 +61,14 @@ type Table = { cases: Case[]; limits: string[] };
 type IndexProp = { name: string; values: string[] | null; default: string | null; description: string | null };
 type IndexSymbol = { name: string; role: string; intent: string | null; roleMeta: { mtype: string; props?: IndexProp[] } | null };
 type IndexPackage = { name: string; version: string; symbols: IndexSymbol[] };
-/** The packages of a repository's symbol index, each with the file it was read from, as the reader is shown it. */
-type Index = { packages: { pkg: IndexPackage; file: string }[] };
+/**
+ * The packages of a symbol index, each with the file it was read from and, across a workspace, the
+ * member repository that holds it. `workspace` says the read was across a workspace's members.
+ */
+type IndexEntry = { pkg: IndexPackage; file: string; repository: string | null };
+type Index = { packages: IndexEntry[]; workspace: boolean };
+/** One component found in an index: its symbol, its package, the file, and the member it came from. */
+type Found = { symbol: IndexSymbol; pkg: IndexPackage; file: string; repository: string | null };
 
 // RESTATES: RD.SUPPORT.APPS.207 — a unit that is one design-system block made specific ends in that
 // block's word, and leaves to that block's choice table everything its data does not decide. A badge
@@ -72,6 +88,7 @@ const CONTAINER_PATTERNS = "the container patterns";
 const CONTAINERS_REF = "refs/support/surface/architecture-containers.md";
 const MERGED_INDEX = join(".claude", "saasplane", "spn-symbols.json");
 const PACKAGE_INDEX = join("dist", "generated", "spn-symbols.json");
+const WORKSPACE_STATE = ".spndevex";
 
 /**
  * The folder the snapshot and the two refs sit in: the plugin's own, three folders above both
@@ -186,37 +203,79 @@ function packagesOf(path: string): IndexPackage[] {
   } catch { return []; }
 }
 
+/** The workspace a folder sits in: the nearest folder upwards that holds `.spndevex/`, the workspace's own state. */
+function workspaceOf(start: string): string | null {
+  for (let here = resolve(start); ; here = dirname(here)) {
+    if (existsSync(join(here, WORKSPACE_STATE))) return here;
+    if (dirname(here) === here) return null;
+  }
+}
+
 /**
- * The symbol index of the repository the command runs in: the merged one, found from the working
- * folder upwards and no higher than the repository, else each package's own under `packages/*` and
- * `apps/*`. Null where the repository has neither.
+ * The merged index of every member of a workspace, in name order: a member is a child folder that
+ * holds a `sprepo.json`. Each entry keeps its member, so what is printed can name the repository.
  */
-function symbolIndex(start: string): Index | null {
+function membersIndex(workspace: string): IndexEntry[] {
+  const entries: IndexEntry[] = [];
+  let names: string[];
+  try { names = readdirSync(workspace).sort(); } catch { return entries; }
+  for (const name of names) {
+    if (!existsSync(join(workspace, name, "sprepo.json"))) continue;
+    const merged = join(workspace, name, MERGED_INDEX);
+    if (!existsSync(merged)) continue;
+    entries.push(...packagesOf(merged).map((pkg) => ({ pkg, file: join(name, MERGED_INDEX), repository: name })));
+  }
+  return entries;
+}
+
+/**
+ * The symbol index the command reads: of the repository it runs in — the merged one, found from the
+ * working folder upwards and no higher than the repository, else each package's own under
+ * `packages/*` and `apps/*` — or, from a workspace's root, of each member repository. `packages` is
+ * empty where there is none to read.
+ */
+function symbolIndex(start: string): Index {
   const repository = repositoryOf(start);
+  if (!repository) {
+    const workspace = workspaceOf(start);
+    if (workspace) return { packages: membersIndex(workspace), workspace: true };
+  }
   for (let here = resolve(start); ; here = dirname(here)) {
     const merged = join(here, MERGED_INDEX);
-    if (existsSync(merged)) return { packages: packagesOf(merged).map((pkg) => ({ pkg, file: MERGED_INDEX })) };
+    if (existsSync(merged)) {
+      return { packages: packagesOf(merged).map((pkg) => ({ pkg, file: MERGED_INDEX, repository: null })), workspace: false };
+    }
     if (here === repository || dirname(here) === here) break;
   }
   const base = repository ?? resolve(start);
-  const packages: Index["packages"] = [];
+  const packages: IndexEntry[] = [];
   for (const group of ["packages", "apps"]) {
     let names: string[];
     try { names = readdirSync(join(base, group)).sort(); } catch { continue; }
     for (const name of names) {
       const path = join(base, group, name, PACKAGE_INDEX);
-      if (existsSync(path)) packages.push(...packagesOf(path).map((pkg) => ({ pkg, file: relative(base, path) })));
+      if (existsSync(path)) packages.push(...packagesOf(path).map((pkg) => ({ pkg, file: relative(base, path), repository: null })));
     }
   }
-  return packages.length ? { packages } : null;
+  return { packages, workspace: false };
 }
 
-/** Every component an index holds, by name, with the package and the file it came from; the first of a name wins. */
-function componentsOf(index: Index | null): Map<string, { symbol: IndexSymbol; pkg: IndexPackage; file: string }> {
-  const found = new Map<string, { symbol: IndexSymbol; pkg: IndexPackage; file: string }>();
-  for (const { pkg, file } of index?.packages ?? []) {
+/** Whether an index's entry for a component carries its props at all: an older build wrote none. */
+const hasProps = (symbol: IndexSymbol): boolean => Boolean(symbol.roleMeta?.props);
+
+/**
+ * Every component an index holds, by name, with the package, the file and the member it came from.
+ * Within one repository the first of a name wins; across a workspace's members the first whose entry
+ * carries props wins, so a member's pin of an older build never hides the member that built it.
+ */
+function componentsOf(index: Index): Map<string, Found> {
+  const found = new Map<string, Found>();
+  for (const { pkg, file, repository } of index.packages) {
     for (const symbol of pkg.symbols ?? []) {
-      if (symbol.role === "COMPONENT" && !found.has(symbol.name)) found.set(symbol.name, { symbol, pkg, file });
+      if (symbol.role !== "COMPONENT") continue;
+      const standing = found.get(symbol.name);
+      if (standing && !(index.workspace && !hasProps(standing.symbol) && hasProps(symbol))) continue;
+      found.set(symbol.name, { symbol, pkg, file, repository });
     }
   }
   return found;
@@ -242,19 +301,21 @@ function beyondLine(block: string | null, pattern: string | null): string {
 }
 
 /** A unit beyond the core, printed from the symbol index: its package, its intent line, its props, and the block its name points to. */
-function showFromIndex(found: { symbol: IndexSymbol; pkg: IndexPackage; file: string }, json: boolean): number {
-  const { symbol, pkg, file } = found;
+function showFromIndex(found: Found, json: boolean): number {
+  const { symbol, pkg, file, repository } = found;
   const props = symbol.roleMeta?.props ?? null;
   const line = plain((symbol.intent ?? "").replace(/\.$/, ""));
   const { block, pattern } = blockOf(symbol.name);
   if (json) {
     console.log(JSON.stringify({ unit: symbol.name, package: pkg.name, version: pkg.version, line, index: file,
-      props: props ?? [], block, pattern, beyondCore: true }, null, 2));
+      repository, props: props ?? [], block, pattern, beyondCore: true }, null, 2));
     return 0;
   }
   const out: string[] = [];
   out.push([`${symbol.name}`, `${pkg.name}@${pkg.version}`, ...(line ? [line] : [])].join(" · "));
-  out.push(`the symbol index: ${file}, of the repository this runs in`);
+  out.push(repository
+    ? `the symbol index: ${file}, of the repository ${repository} in this workspace`
+    : `the symbol index: ${file}, of the repository this runs in`);
   out.push("");
   if (props === null) {
     out.push("the index carries no props for it: it was written before spnutils 5.40.0, which reads them from the code");
@@ -296,7 +357,9 @@ export function run(args: string[]): number {
     const closest = [...new Set([...snapshot.units.map((candidate) => candidate.name), ...components.keys()])]
       .sort((a, b) => distance(name.toLowerCase(), a.toLowerCase()) - distance(name.toLowerCase(), b.toLowerCase()) || a.localeCompare(b))
       .slice(0, 3);
-    const where = index ? "in the snapshot or the symbol index" : "in the snapshot, and no symbol index here,";
+    const where = index.packages.length ? "in the snapshot or the symbol index"
+      : index.workspace ? "in the snapshot, and no symbol index in this workspace's repositories,"
+      : "in the snapshot, and no symbol index here,";
     process.stderr.write(`unit show: no unit \`${name}\` ${where} — the closest: ${closest.join(" · ")}\n`);
     return 1;
   }
