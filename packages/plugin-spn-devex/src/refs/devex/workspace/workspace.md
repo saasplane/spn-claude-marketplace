@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "daabf061"
+      "seen": "988c276e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
@@ -266,6 +266,8 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 ```
 
 **`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery says about itself. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+
+**A hook keeps its notes in `.debug/` only inside a workspace it found, and a `.spndevex/` holding nothing but `.debug/` is no workspace — MUST.** A hook that made `.spndevex/` to hold its notes would make a workspace out of wherever the window stood, root every later session below it there, and tell a partner's repository under it that it is day 0. So a hook with no workspace writes nothing, and every walk up to the root passes over a `.spndevex/` such a hook left before.
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 

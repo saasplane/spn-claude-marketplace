@@ -26,6 +26,17 @@ import { join, sep } from "node:path";
 
 /** The workspace's working-state folder, at the workspace root. */
 export const DEVEX = ".spndevex";
+/** What the machinery records about itself, inside `.spndevex/`: the telemetry and the Stop hook's session notes. */
+export const DEVEX_DEBUG = ".debug";
+
+/**
+ * Whether a `.spndevex/` holding these entries is a workspace's. One holding nothing but `.debug/` is not:
+ * a hook wrote its own notes where no workspace was, and taking it for one roots every session below it
+ * there, so a partner's repository is told it is day 0.
+ */
+export function isWorkspaceDevex(entries: string[]): boolean {
+  return !(entries.length === 1 && entries[0] === DEVEX_DEBUG);
+}
 
 // ---------------------------------------------------------------------------- the docs tree
 

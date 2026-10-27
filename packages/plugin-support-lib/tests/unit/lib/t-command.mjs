@@ -6,8 +6,8 @@
 // the usage text, and the one telemetry line `runCommand` writes. What a command does with its words
 // is that command's own suite.
 //
-// The cases that write telemetry point a temporary workspace (with `.spndevex/.debug/telemetry.on`)
-// at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real
+// The cases that write telemetry point a temporary workspace (with `.spndevex/README.md` and
+// `.spndevex/.debug/telemetry.on`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real
 // workspace.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
@@ -159,7 +159,9 @@ console.log("\n=== runCommand records a command once, with its words as the leve
   const logOf = (root) => readFileSync(join(root, DEVEX, ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((line) => JSON.parse(line));
   const levels = (line) => [line.script, line.group, line.subgroup, line.action, line.args, line.exit];
 
-  const root = folder("recorded", { [`${DEVEX}/.debug/telemetry.on`]: "on\n" });
+  // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
+  const RECORDING = { [`${DEVEX}/README.md`]: "# .spndevex\n", [`${DEVEX}/.debug/telemetry.on`]: "on\n" };
+  const root = folder("recorded", RECORDING);
   const ran = child(root, `
     const code = await runCommand({ plugin: "spn-devex", group: "docs", subject: "face", action: "check", usage: "[<path>]",
       run: (args) => { console.log("ran with " + args.join(",")); return 1; } }, ["docs", "--block", "tags"]);
@@ -170,14 +172,14 @@ console.log("\n=== runCommand records a command once, with its words as the leve
     lines.filter((line) => line.group === "docs").map(levels), [["spn-devex", "docs", "face", "check", "docs --block tags", 1]]);
   same("and the whole run is one more line, `cli` › `cli`", lines.filter((line) => line.group === "cli").map((line) => [line.action, line.exit]), [["cli", 1]]);
 
-  const two = folder("recorded-two", { [`${DEVEX}/.debug/telemetry.on`]: "on\n" });
+  const two = folder("recorded-two", RECORDING);
   child(two, `
     process.exit(await runCommand({ plugin: "spn-apps", group: "coverage", subject: null, action: "check", usage: "[<path>…]",
       run: async () => 0 }, []));`);
   same("[MKT.SCRIPTS.116] a command of two words leaves `subgroup` empty, and `args` too where nothing followed",
     logOf(two).filter((line) => line.group === "coverage").map(levels), [["spn-apps", "coverage", null, "check", null, 0]]);
 
-  const refused = folder("recorded-fault", { [`${DEVEX}/.debug/telemetry.on`]: "on\n" });
+  const refused = folder("recorded-fault", RECORDING);
   const fault = child(refused, `
     process.exit(await runCommand({ plugin: "spn-devex", group: "docs", subject: "face", action: "write", usage: "<path> [--block glossary|tags]",
       run: () => { throw new UsageFault("needs a path."); } }, []));`);
@@ -186,7 +188,7 @@ console.log("\n=== runCommand records a command once, with its words as the leve
   same("and the refused run is recorded with exit 2", logOf(refused).filter((line) => line.group === "docs").map(levels),
     [["spn-devex", "docs", "face", "write", null, 2]]);
 
-  const broken = child(folder("recorded-error", { [`${DEVEX}/.debug/telemetry.on`]: "on\n" }), `
+  const broken = child(folder("recorded-error", RECORDING), `
     process.exit(await runCommand({ plugin: "spn-devex", group: "docs", subject: null, action: "audit", usage: "",
       run: () => { throw new TypeError("the command's own error"); } }, []));`);
   same("untouched: an error that is no usage fault is thrown on, never read as one",

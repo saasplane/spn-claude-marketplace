@@ -5,7 +5,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // incumbent. This check is new, so the fixtures are the whole proof and they carry the cases the
 // corpus cannot: two rows that could both claim a folder (no Map overlaps today), and a second edit
 // in a folder already named.
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -25,7 +25,9 @@ function tree(files) {
     mkdirSync(dirname(full), { recursive: true });
     writeFileSync(full, text, "utf8");
   }
+  // A workspace as `workspace init` leaves it: a `.spndevex/` holding only `.debug/` is no workspace.
   mkdirSync(join(root, ".spndevex"), { recursive: true });
+  writeFileSync(join(root, ".spndevex", "README.md"), "state\n", "utf8");
   // A node carries `README.md` and no docs tree, and that README is what links into the seats it
   // realizes. It is the only thing that knows which domain and layer this node's mirrors sit under,
   // so every fixture with a face gets the node README that reaches it.
@@ -123,6 +125,21 @@ console.log("\n=== mirror — once per mirror per session");
     { expect: "names it", says: "entry.md" });
   one("the same folder in another session speaks again", said(root, "pkg/src/app/A.ts", "other"),
     { expect: "names it", says: "app.md" });
+}
+
+{
+  // OUTSIDE A WORKSPACE THERE IS NOWHERE TO REMEMBER: the nudge comes each time, and no `.spndevex/` is
+  // made in the folder the session stands in, which would root every later session below it there.
+  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "pkg/src/app/A.ts": "x\n" });
+  rmSync(join(root, ".spndevex"), { recursive: true, force: true });
+  one("outside a workspace the first edit names it", said(root, "pkg/src/app/A.ts", "nows"),
+    { expect: "names it", says: "app.md" });
+  one("and the second does too, since nothing was written", said(root, "pkg/src/app/A.ts", "nows"),
+    { expect: "names it", says: "app.md" });
+  n += 1;
+  const made = existsSync(join(root, ".spndevex"));
+  if (made) failed += 1;
+  console.log(`  ${made ? "FAIL" : "PASS"}  and no .spndevex was made in the session's folder`);
 }
 
 {

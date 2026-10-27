@@ -2,7 +2,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // `stop` — the Stop hook's checks. An arc is read from its data (`arcs/N<nnn>/state.json`, `log.jsonl`)
 // and the cards from `questions.jsonl`, so every case that is about an arc builds one kept as data.
 import { execFileSync } from "node:child_process";
-import { bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.mjs";
+import { BASE, bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { CARD as DATA_CARD, PREVIEW, cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
@@ -1584,5 +1584,31 @@ console.log("\n=== stop — the needs-you check judges only the cards this windo
   }
 }
 
-console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
+console.log("\n=== stop — outside a workspace it writes nothing, so it makes no `.spndevex/`");
+// A STOP OUTSIDE A WORKSPACE ONCE WROTE ITS SESSION NOTE THERE, and the `.spndevex/.debug/` that made
+// rooted every later session below that folder in it: `/tmp` became a workspace, and a partner's
+// repository under it was told day 0.
+{
+  const check = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const outside = join(BASE, "no-workspace", "acme-orders");
+  mkdirSync(outside, { recursive: true });
+  run("node", [HOOK], { cwd: outside, session_id: "outside", last_assistant_message: "done" }, outside);
+  check("a Stop in a folder with no workspace above it creates no .spndevex",
+    !existsSync(join(outside, ".spndevex")) && !existsSync(join(BASE, "no-workspace", ".spndevex")));
+
+  const stray = join(BASE, "stray-debug");
+  const below = join(stray, "partner", "acme-orders");
+  mkdirSync(join(stray, ".spndevex", ".debug", "stop", "sessions"), { recursive: true });
+  mkdirSync(below, { recursive: true });
+  run("node", [HOOK], { cwd: below, session_id: "below-stray", last_assistant_message: "done" }, below);
+  check("a .spndevex holding only .debug is no workspace: the Stop writes no note into it",
+    readdirSync(join(stray, ".spndevex", ".debug", "stop", "sessions")).length === 0);
+}
+
+console.log(failed ?`\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

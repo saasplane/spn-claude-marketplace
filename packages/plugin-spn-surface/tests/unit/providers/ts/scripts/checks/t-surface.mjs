@@ -165,7 +165,9 @@ console.log("\n=== only what this write adds");
 console.log("\n=== the frame — any other path leaves before the check is loaded");
 {
   const telemetry = realpathSync(mkdtempSync(join(tmpdir(), "spn-surface-frame-")));
+  // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
   mkdirSync(join(telemetry, ".spndevex", ".debug"), { recursive: true });
+  writeFileSync(join(telemetry, ".spndevex", "README.md"), "# .spndevex\n");
   writeFileSync(join(telemetry, ".spndevex", ".debug", "telemetry.on"), "on\n");
   const env = { ...process.env };
   delete env.SPN_TELEMETRY;
