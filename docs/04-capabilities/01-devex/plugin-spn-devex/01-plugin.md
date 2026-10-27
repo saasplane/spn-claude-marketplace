@@ -1,12 +1,12 @@
 <!-- spn:doc
-{"id": "spn-devex-capabilities-plugin-set", "variant": "capability", "title": "Plugin in spn-devex", "lenses": ["ARCHITECT", "LEAD"], "status": "DONE", "realizes": ["plugin-set"], "summary": "One manifest, one marketplace row, and the widest of the three folders — with a version field that names what is published rather than what is being worked on.", "keywords": ["plugin", "manifest", "marketplace", "version", "cache", "install"]}
+{"id": "spn-devex-capabilities-plugin-set", "variant": "capability", "title": "Plugin in spn-devex", "lenses": ["ARCHITECT", "LEAD"], "status": "DONE", "realizes": ["plugin-set"], "summary": "One manifest, one marketplace row, and the widest of the four folders — with a version field that names what is published rather than what is being worked on.", "keywords": ["plugin", "manifest", "marketplace", "version", "cache", "install"]}
 -->
 
 # Plugin in spn-devex
 
 `For: Architect · Engineering leader` · `Status: ✅ DONE` · `Realizes: Plugin`
 
-`spn-devex` realizes every part of the construct: the manifest, the marketplace row that names its folder, and the install that copies it into a session's cache. It is also the widest of the three plugins, holding every construct of this domain except `providers/`, so the folder is where a reader learns what a full plugin looks like. Two things are worth knowing before you open it. **The version field names what is published**, so the number you read is the last release rather than the working tree. And **the description in the manifest is matched, not browsed**: it is long on purpose, because a session decides from those words whether to load the plugin at all.
+`spn-devex` realizes every part of the construct: the manifest, the marketplace row that names its folder, and the install that copies it into a session's cache. It is also the widest of the four plugins, holding every construct of this domain except `providers/`, so the folder is where a reader learns what a full plugin looks like. Two things are worth knowing before you open it. **The version field names what is published**, so the number you read is the last release rather than the working tree. And **the description in the manifest is matched, not browsed**: it is long on purpose, because a session decides from those words whether to load the plugin at all.
 
 ## Where
 
@@ -47,7 +47,7 @@
 
 **Why** — *`RD.SUPPORT.APPS.034` rules lockstep versioning inside an `APPS` repository, and this repository declares `GENERAL`*. Read the wrong rule here and three different numbers look like a defect to be fixed.
 **What** — each plugin folder counts on its own, following the Claude marketplace's convention of one version per plugin. `spn-devex` moves when `spn-devex` changes, and the other two do not move with it.
-**How** — there is no shared version file and nothing derives one number from another. The three manifests are the three answers: `packages/plugin-spn-devex/src/.claude-plugin/plugin.json`, and the same path under `packages/plugin-spn-apps/` and `packages/plugin-spn-infra/`.
+**How** — there is no shared version file and nothing derives one number from another. The four manifests are the four answers: `packages/plugin-spn-devex/src/.claude-plugin/plugin.json`, and the same path under `packages/plugin-spn-surface/`, `packages/plugin-spn-apps/` and `packages/plugin-spn-infra/`.
 
 ### The marketplace file is written by hand and by nothing else
 

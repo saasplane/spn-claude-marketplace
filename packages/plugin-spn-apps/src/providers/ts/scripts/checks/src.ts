@@ -20,7 +20,7 @@
 // four denials for one edit read as a broken gate rather than as four problems. Notes are collected
 // only when nothing denied.
 import type { ToolInput, Verdict } from "../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { resultingText } from "../../../../scripts/lib/source.ts";
+import { resultingText } from "../../../../../../plugin-support-lib/src/lib/source.ts";
 import { verdict as readVerbNaming, watched as readVerbWatched } from "./_src/read-verb-naming.ts";
 import { verdict as enablementGrammar, watched as enablementWatched } from "./_src/enablement-grammar.ts";
 import { verdict as awaitSequencing, watched as awaitWatched } from "./_src/await-sequencing.ts";

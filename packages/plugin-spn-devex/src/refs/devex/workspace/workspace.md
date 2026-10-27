@@ -250,12 +250,13 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             facts.jsonl                   each fact read, pinned to its commit
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
-          N<nnn>/                         one arc's work order: at most these five entries, each made when the arc needs it
+          N<nnn>/                         one arc's work order: at most these six entries, each made when the arc needs it
             preview.html                  the arc's one preview, where something must be seen or worded to decide
             samples/                      real files of the kind the work produces, each in its own format
             plan.md                       what a row needs beside it: the traps, a set, a move table
             orders/                       one brief per delegated execution, named by its row, and its report
             scripts/                      what a mechanical row runs
+            work/                         what the work leaves behind: a view's whole words, a proof's output, a baseline
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
     state.json                            `lastNumber`: the highest workstream number ever used
@@ -410,7 +411,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **Step 5 comes first because the plugins restate a tool the session runs.** A plugin naming a command the installed CLI does not carry is a rule nobody can follow, and the CLI reports the last **release** rather than the checkout — so unreleased commits leave every window silently behind. Where step 3 changed only a comment and the generated output is byte-identical, there is nothing to release and saying so is the answer.
 
-**Step 6 is one verb and not two.** `workspace agent-sync` refreshes every plugin whose installed copy differs from the marketplace checkout — uninstall and install at project scope, in the right order — and then re-mints each repo's generated rules, its managed `CLAUDE.md` block, and the floor's permission tiers. It reports one line per plugin: `installed`, `refreshed`, `current` or `unverified`.
+**Step 6 is one verb and not two.** `workspace agent-sync` refreshes every plugin whose installed copy differs from the marketplace checkout — uninstall and install at project scope, in the right order — and then re-mints each repo's generated rules, its managed `CLAUDE.md` block, and the floor's permission tiers. It reports one line per plugin: `installed`, `refreshed`, `current`, `unverified` or `unpublished`. A plugin the marketplace does not list yet is `unpublished`, with a note to sync again once it is published, and the rest still install.
 
 **Do not run `claude plugin uninstall` and `install` by hand first.** It is not merely the same thing twice. The installer compares the installed copy against the checkout **before** replacing it, because at that moment the installed copy is what the live window actually loaded — which is the only way to answer *did this window's hooks, agents and skills change*. Uninstalling by hand throws that moment away, and the sync that follows can then only report `current`: true, and useless. Reach for the raw CLI only where `spnutils` itself cannot run.
 

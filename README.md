@@ -13,7 +13,8 @@ Then enable what your repository needs (or let `spnutils repo agent-sync` derive
 | Plugin | Serves | Enable in |
 | --- | --- | --- |
 | `spn-devex` | the stage skills including `plan`, the day-zero walk, the SPN engineer persona, the review panel and its lenses, contract and comment rules, the cross-repo protocol, the session orientation and its two split-plan gates | every repo |
-| `spn-apps` | the apps skills — new · implement · review · run · verify · release · design — their step files, and the write-time guards over enablement grammar, host assertions and what proves a change | `APPS` repos claiming `TS` |
+| `spn-surface` | the design skill, the Surface refs (standards, patterns, names, the design system's architecture, library and delivery) with the specs a page starts from, and the guard over the Figma connector's scripts | `APPS` repos |
+| `spn-apps` | the apps skills — new · implement · review · run · verify · release — their step files, and the write-time guards over enablement grammar, host assertions and what proves a change | `APPS` repos claiming `TS` |
 | `spn-infra` | the estate skills, manifest and naming references, the estate laws, the secrets/ARN deny hook | `INFRA` repos |
 
 The plugins carry the standards in full — they restate the SaaS Plane foundation book and add no rule of their own. What *runs* — the `@saasplane` packages, the platform modules, the blueprint library — is delivered separately through granted registries.
@@ -27,6 +28,7 @@ scripts/build-plugins.mjs          # bundles each plugin's cli.ts and events/*.t
 scripts/build-styles.mjs           # builds the shared page stylesheet from its Tailwind source
 public/assets/docs/<version>/      # the page styles as served by GitHub Pages; a version never changes
 packages/plugin-spn-devex/         # source, edited in place
+packages/plugin-spn-surface/
 packages/plugin-spn-apps/
 packages/plugin-spn-infra/
 packages/plugin-support-lib/       # helpers two or more plugins share — a plain folder, never installed

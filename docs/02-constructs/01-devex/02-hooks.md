@@ -147,7 +147,7 @@ This page answers which moments exist, how a script claims one, what it is hande
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the moments this marketplace wires, the authority each one carries, and the wiring that claims one | what any individual check looks for, and what it says when it finds it | [Scripts](05-scripts.md), and the scripts chapter of [the apps domain](../02-apps/README.md) or [the infra domain](../03-infra/README.md) |
+| the moments this marketplace wires, the authority each one carries, and the wiring that claims one | what any individual check looks for, and what it says when it finds it | [Scripts](05-scripts.md), and the scripts chapter of [the surface domain](../02-surface/README.md), [the apps domain](../03-apps/README.md) or [the infra domain](../04-infra/README.md) |
 | the payload, the verdict, the composition of many checks into one answer, and the always-zero exit | a file run by its own path rather than by a moment | [Scripts](05-scripts.md) |
 | that a guard the dispatcher runs before the list is still the dispatcher's own refusal | what a split plan is, and which rows a close gate counts | the foundation's workspace construct |
 

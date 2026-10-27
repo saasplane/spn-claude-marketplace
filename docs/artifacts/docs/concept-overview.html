@@ -38,7 +38,7 @@
 <!-- ─────────────────────────────────────────── 00 -->
 <section id="s0">
   <h2>Overview</h2>
-  <p>The foundation book states the rules; this repository delivers them. Every rule here restates a chapter written somewhere else, and a rule invented here is a defect. It ships three plugins carrying five kinds of instrument in all.</p>
+  <p>The foundation book states the rules; this repository delivers them. Every rule here restates a chapter written somewhere else, and a rule invented here is a defect. It ships four plugins carrying five kinds of instrument in all.</p>
   <p>A SaaS Plane workspace loads its agent instruments from here. They are
   hooks that fire on an event, tools somebody runs by name, skills that carry a stage's steps,
   refs that restate a chapter of the foundation book, and the agent briefs a session
@@ -149,6 +149,7 @@
       <thead><tr><th>Domain</th></tr></thead>
       <tbody>
         <tr><td><p><strong><code>spn-devex</code></strong></p><p>the stack-agnostic plugin, loaded by every repository whatever world it declares</p><span class="sds-small">Instruments: all five kinds — plugins, hooks, skills, refs and agents</span></td></tr>
+        <tr><td><p><strong><code>spn-surface</code></strong></p><p>the surface plugin, stack-agnostic</p><span class="sds-small">Instruments: the Surface refs, the design skill and the guard over the Figma connector's scripts</span></td></tr>
         <tr><td><p><strong><code>spn-apps</code></strong></p><p>the TypeScript stack plugin</p><span class="sds-small">Instruments: checks, tools, skills and refs, each true of that stack and nowhere else</span></td></tr>
         <tr><td><p><strong><code>spn-infra</code></strong></p><p>the estate plugin</p><span class="sds-small">Instruments: one guard, plus the skills and refs that change an estate</span></td></tr>
       </tbody>
@@ -161,7 +162,7 @@
   read one folder at a time in <a href="01-devex/devex-overview.html">the devex overview</a>.</p>
 
   <p>The risk in dividing by delivery is that somebody with a general question has to guess which
-  plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
+  plugin answers it. <strong>It does not arise, because a grammar shared by all four lives in
   <code>spn-devex</code> and the stack plugins restate none of it.</strong> The same hook grammar
   governs a check here and a check in <code>spn-apps</code>, so <em>what a hook is</em> has one
   answer in one place — <code>spn-devex</code>'s hook set. A stack plugin's chapter says what its
@@ -169,24 +170,32 @@
 
   <p><strong>The five instrument kinds are a shape, not a seat.</strong> Plugin, hook, skill, ref
   and agent are what an instrument can be, each defined once, in <code>spn-devex</code>. They are
-  the vocabulary the three domains are written in rather than a division of the tree — which is
+  the vocabulary the four domains are written in rather than a division of the tree — which is
   why you find <em>the hook set</em> as a chapter under <code>spn-devex</code> and never as a
   folder of its own.</p>
 
-  <h3 id="d2">apps &mdash; <code>spn-apps</code></h3>
+  <h3 id="d2">surface &mdash; <code>spn-surface</code></h3>
+  <p>The stack-agnostic plugin for what a person sees and touches. It holds the Surface refs, the
+  specs a page starts from, the <code>design</code> skill that states a page as a tree of named
+  blocks, and the one guard that reads a script before the Figma connector runs it. It names no
+  stack: how a block is built in TypeScript stays in <code>spn-apps</code>. Its constructs are in
+  <a href="../../02-constructs/02-surface/README.md"><code>02-constructs/02-surface/</code></a>, and
+  read one folder at a time in <a href="02-surface/surface-overview.html">the surface overview</a>.</p>
+
+  <h3 id="d3">apps &mdash; <code>spn-apps</code></h3>
   <p>The TypeScript domain plugin. It holds what only a stack can say: a check whose rule is true
   of one stack and nowhere else, a tool over that stack's own register, and the skills that can
   only be said in its own words. A skill that is stack-agnostic stays in <code>spn-devex</code>
   and reaches a concrete step through a ref here, rather than being copied. Its constructs are in
-  <a href="../../02-constructs/02-apps/README.md"><code>02-constructs/02-apps/</code></a>, and
-  read one folder at a time in <a href="02-apps/apps-overview.html">the apps overview</a>.</p>
+  <a href="../../02-constructs/03-apps/README.md"><code>02-constructs/03-apps/</code></a>, and
+  read one folder at a time in <a href="03-apps/apps-overview.html">the apps overview</a>.</p>
 
-  <h3 id="d3">infra &mdash; <code>spn-infra</code></h3>
+  <h3 id="d4">infra &mdash; <code>spn-infra</code></h3>
   <p>The estate plugin. It holds what changes an estate: one shell script standing between an
   estate edit and the file it would write, the skills that change what an estate is, and the
   estate's own vocabulary restated for a reader who may never open the book. Its constructs are in
-  <a href="../../02-constructs/03-infra/README.md"><code>02-constructs/03-infra/</code></a>, and
-  read one folder at a time in <a href="03-infra/infra-overview.html">the infra overview</a>.</p>
+  <a href="../../02-constructs/04-infra/README.md"><code>02-constructs/04-infra/</code></a>, and
+  read one folder at a time in <a href="04-infra/infra-overview.html">the infra overview</a>.</p>
 </section>
 
 <!-- ─────────────────────────────────────────── 04 -->
@@ -267,7 +276,7 @@
   full. Where the two differ, the concept is right — this page trades completeness for your
   first read. It carries no open list of its own: the concept holds that, and the sections here
   that have no argument behind them say so with a declared gap instead. Sources:
-  <code>CONCEPT.md</code>, the five docs seats, and the three plugin trees under
+  <code>CONCEPT.md</code>, the five docs seats, and the four plugin trees under
   <code>plugins/</code> — read 2026-09-22. Replaced in place as the concept moves.
 </footer>
 

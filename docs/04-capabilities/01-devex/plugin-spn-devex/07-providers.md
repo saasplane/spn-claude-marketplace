@@ -1,12 +1,12 @@
 <!-- spn:doc
-{"id": "spn-devex-capabilities-provider-set", "variant": "capability", "title": "Provider in spn-devex", "lenses": ["ARCHITECT", "LEAD"], "status": "PLANNING", "realizes": ["provider-set"], "summary": "How the provider shape is realized across the three plugins — which of them carry provider folders, which halves each carries, and why spn-devex itself carries none.", "keywords": ["provider", "instance", "gate", "stack", "cloud"]}
+{"id": "spn-devex-capabilities-provider-set", "variant": "capability", "title": "Provider in spn-devex", "lenses": ["ARCHITECT", "LEAD"], "status": "PLANNING", "realizes": ["provider-set"], "summary": "How the provider shape is realized across the four plugins — which of them carry provider folders, which halves each carries, and why spn-devex itself carries none.", "keywords": ["provider", "instance", "gate", "stack", "cloud"]}
 -->
 
 # Provider in spn-devex
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING` · `Realizes: Provider`
 
-`spn-devex` defines the shape and carries no provider folder of its own, because it answers to no stack and no cloud. The two domain plugins carry one folder per realization they serve, and each carries only the halves it has something to put in.
+`spn-devex` defines the shape and carries no provider folder of its own, because it answers to no stack and no cloud. Two of the three domain plugins carry one folder per realization they serve, and each carries only the halves it has something to put in. `spn-surface` carries none, because it holds no file that names a stack.
 
 ## Where
 

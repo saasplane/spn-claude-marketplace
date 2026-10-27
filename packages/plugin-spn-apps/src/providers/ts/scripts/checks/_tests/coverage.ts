@@ -39,7 +39,8 @@
 import { basename, dirname, join, resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, isDir, isFile, lineOf, read, resultingText, SKIP } from "../../../../../scripts/lib/source.ts";
+import { read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder, isDir, isFile, lineOf, SKIP } from "../../../../../scripts/lib/source.ts";
 import { readdirSync } from "node:fs";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];

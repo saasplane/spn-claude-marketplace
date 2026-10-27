@@ -11,7 +11,7 @@
 // **COVERAGE IS SEVERAL RULES BEHIND ONE MODULE**, so it is expanded here rather than counted as
 // one. A reader of this list sees what actually runs.
 import type { ToolInput, Verdict } from "../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { resultingText } from "../../../../scripts/lib/source.ts";
+import { resultingText } from "../../../../../../plugin-support-lib/src/lib/source.ts";
 import { verdict as assertionMessage, watched as assertionWatched } from "./_tests/assertion-message.ts";
 import { verdict as hostAssertion, watched as hostWatched } from "./_tests/host-assertion.ts";
 import { CHECKS as COVERAGE, verdict as coverage, watched as coverageWatched } from "./_tests/coverage.ts";

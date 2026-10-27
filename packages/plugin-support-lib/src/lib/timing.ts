@@ -3,9 +3,9 @@
 // 01-spnutils/01-utils.md` § the `timings` paragraph).
 //
 // What a plugin's checks, its commands and the agent's Bash commands cost, written only while the
-// developer has asked for it. ONE LIBRARY, IN THE SHARED SUPPORT FOLDER: spn-devex, spn-apps and
-// spn-infra each import it by relative path, so the build copies it into each installed plugin's own
-// bundle and no plugin reaches into another. All three write the one log `workspace timings` reads.
+// developer has asked for it. ONE LIBRARY, IN THE SHARED SUPPORT FOLDER: spn-devex, spn-surface, spn-apps
+// and spn-infra each import it by relative path, so the build copies it into each installed plugin's own
+// bundle and no plugin reaches into another. All four write the one log `workspace timings` reads.
 //
 // ONE LINE SHAPE, WHOEVER WRITES IT (`LINE_KEYS`, in this order): `script` (the plugin, or the program
 // a Bash command ran), `group`, `subgroup`, `action` (up to three levels below it, null where unused),

@@ -7,7 +7,7 @@
      `state.json`, `log.jsonl`, `facts.jsonl` and `<subject>.md`, the arc's name file. Nobody types in it, and the
      PreToolUse hook refuses an edit there. The arc's address is its row on the approach page, `approach.html#N<nnn>`,
      and every link to the arc points there, never at `state.json`.
-     `notes/N<nnn>/` holds what the agent writes: `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`.
+     `notes/N<nnn>/` holds what the agent writes: `preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/`.
      This file is not copied into a workstream. It shows the commands that write the arc's data and what each field
      holds, then the agent's own files, so an arc is opened and run the same way every time. No card lives in an arc:
      a question is a record in `questions.jsonl`, raised with `workstream question raise`. -->

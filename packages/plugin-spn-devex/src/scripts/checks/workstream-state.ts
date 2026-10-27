@@ -87,13 +87,13 @@ export function sampleFindings(ws: string, arc: string): string[] {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`
- * and `scripts/`, and nothing else. Each other entry is named with where it belongs. The `previews/`
+ * RD.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`,
+ * `scripts/` and `work/`, and nothing else. Each other entry is named with where it belongs. The `previews/`
  * folder and a second preview are left to the one-preview check, which names them in its own words.
  */
 export function notesTreeFindings(ws: string, arc: string): string[] {
   return strayNotes(notesDirOf(ws, arc), true)
-    .map(([entry, home]) => `\`${NOTES}/${arc}/${entry}\` is not one of the five entries of an arc's notes folder — it belongs in ${home}`);
+    .map(([entry, home]) => `\`${NOTES}/${arc}/${entry}\` is not one of the six entries of an arc's notes folder — it belongs in ${home}`);
 }
 
 /**

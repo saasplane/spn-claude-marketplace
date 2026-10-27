@@ -1,6 +1,6 @@
 // The event a check is handed, the verdict it gives back, and the two functions that carry each
-// across the process boundary. This file lives once, in the shared support-lib folder; spn-apps
-// and spn-infra each import it by relative path. spn-devex keeps its own `payload.ts` beside its
+// across the process boundary. This file lives once, in the shared support-lib folder; spn-apps,
+// spn-surface and spn-infra each import it by relative path. spn-devex keeps its own `payload.ts` beside its
 // checks — its shape diverged (sync stdin reading, file-walking helpers a hook check needs) rather
 // than staying identical in purpose, so it was not folded in here.
 //

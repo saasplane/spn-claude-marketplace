@@ -102,7 +102,7 @@ conflicts are declared once.
 
 | Owner | Files |
 | --- | --- |
-| **you, by hand** | `approach.html`; each arc's `notes/N<nnn>/preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/` |
+| **you, by hand** | `approach.html`; each arc's `notes/N<nnn>/preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/` |
 | **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl`, `facts.jsonl` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
 
 **A file a command owns is never edited by hand**: the PreToolUse hook refuses a direct write to it, an
@@ -722,11 +722,12 @@ section, with no report file.
 
 **Where the set is too large for the step, it goes to a section of that arc's `plan.md`, and the step names it by path and heading**, such as `notes/N007/plan.md#the-move-table`. A set a script reads sits beside the script, in `scripts/`. `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
 
-**An arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/` and `scripts/`, and nothing else — MUST** (`RD.DEVEX.WORKSPACE.262`). None of the five is owed by every arc: make each when the arc has something to put in it. Never create a sixth entry there; each kind of thing you keep already has its place. One level up the same holds: `notes/` and `arcs/` hold only `N<nnn>/` folders, and a note loose at `notes/` is a section of the plan of the arc it belongs to, or of the workstream's first open arc where it names none. The hook refuses a write that would make one, and `state check` names one already there.
+**An arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/`, and nothing else — MUST** (`RD.DEVEX.WORKSPACE.262`). None of the six is owed by every arc: make each when the arc has something to put in it. Never create a seventh entry there; each kind of thing you keep already has its place. **A sample is for the developer to review, and the work's own record is not**: the approach page links every sample, so a view's whole words, a proof's output or a baseline put in `samples/` reads as something they were asked to look at. Those go in `work/`, which the page does not list. One level up the same holds: `notes/` and `arcs/` hold only `N<nnn>/` folders, and a note loose at `notes/` is a section of the plan of the arc it belongs to, or of the workstream's first open arc where it names none. The hook refuses a write that would make one, and `state check` names one already there.
 
 | What you have in hand | Where it goes |
 | --- | --- |
 | a screenshot, a rendered page, any real file of the kind the work produces | `samples/`, which may hold sub-folders of its own |
+| a view's whole words, a proof's output, a scan or a baseline taken before a change, a patch set aside | `work/`, which may hold sub-folders of its own |
 | a fact, a how-to, an inventory, a measurement, an ideation note | a section of `plan.md` |
 | a fact pinned to the commit it was read at | a record in the arc's `facts.jsonl`, by `workstream fact write` |
 | a question card, open, answered or parked | a record in `questions.jsonl`, by the `workstream question` commands |

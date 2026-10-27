@@ -15,7 +15,7 @@ import { resolve } from "node:path";
 import { declaredIds, declaredRows } from "../../../../plugin-support-lib/src/lib/register.ts";
 import type { DeclaredRow } from "../../../../plugin-support-lib/src/lib/register.ts";
 import { runAlone } from "../../../../plugin-support-lib/src/lib/payload.ts";
-import { stackOf } from "../lib/stack.ts";
+import { stackOf } from "../../../../plugin-support-lib/src/lib/stack.ts";
 
 export type Case = { id: string; title: string; file: string; tier: string };
 

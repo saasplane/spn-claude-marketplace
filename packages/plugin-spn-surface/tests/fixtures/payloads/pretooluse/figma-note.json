@@ -1,0 +1,8 @@
+{
+  "tool_name": "mcp__figma__use_figma",
+  "tool_input": {
+    "fileKey": "abc",
+    "description": "read the pages",
+    "code": "return figma.root.children.map((page) => page.name);"
+  }
+}

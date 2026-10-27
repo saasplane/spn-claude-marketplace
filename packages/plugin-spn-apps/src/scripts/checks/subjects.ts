@@ -17,7 +17,7 @@
 // stack this plugin ships no folder for is left alone: a gate that refused what it cannot classify
 // would refuse far more than it was asked to, and a stub that answered would teach a reader it works.
 import type { ToolInput, Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
-import { stackOf } from "../lib/stack.ts";
+import { stackOf } from "../../../../plugin-support-lib/src/lib/stack.ts";
 
 /** One subject, parsed once by the stack's own validator. */
 export type Subject = {

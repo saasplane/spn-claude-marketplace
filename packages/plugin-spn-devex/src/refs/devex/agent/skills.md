@@ -30,11 +30,12 @@
 
 ```text
 packages/plugin-spn-devex/src/skills/bootstrap/   →  DEVEX_BOOTSTRAP
+packages/plugin-spn-surface/src/skills/design/    →  SURFACE_DESIGN
 packages/plugin-spn-apps/src/skills/implement/    →  APPS_IMPLEMENT
 packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 ```
 
-**Three plugins shipping into one flat vocabulary would collide**, and nothing in a bare value would say who answers for it. Deriving the prefix keeps the fact in one place; bare folders keep each plugin's tree readable on its own terms.
+**Four plugins shipping into one flat vocabulary would collide**, and nothing in a bare value would say who answers for it. Deriving the prefix keeps the fact in one place; bare folders keep each plugin's tree readable on its own terms.
 
 **Conformance is a three-way check: the folder, the value derived from it, and the plugin that ships it must agree.** A value with no folder, or a folder with no value, is a defect a listing finds — and it has been found in a plugin every repository installs.
 

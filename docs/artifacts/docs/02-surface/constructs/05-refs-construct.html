@@ -1,0 +1,140 @@
+<meta charset="utf-8">
+<title>Refs — The Surface Book, Restated Inside the Plugin</title>
+<!-- spn:doc
+{"id":"surface-refs","variant":"construct","title":"Refs — The Surface Book, Restated Inside the Plugin","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
+  <div class="sds-rail-title">Refs — The Surface Book, Restated Inside the Plugin</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs — The Surface Book, Restated Inside the Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">UX designer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Refs — The Surface Book, Restated Inside the Plugin</h1>
+  <p class="sds-subtitle">The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.</p>
+  <p class="sds-standfirst">Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read. Read this page to see what the folder holds, how it is arranged, and how a copy that has fallen behind the book is reported. It explains the folder and leaves each rule to the ref that states it.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Two rules keep the folder honest. <strong>A ref states and never executes</strong>: it says what is true of a surface, and anything a skill performs lives elsewhere. And <strong>a ref restates and adds nothing</strong>: the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>a ref</strong></td><td><code>refs/</code></td><td>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</td></tr>
+      <tr><td><strong>a domain folder</strong></td><td><code>support/</code></td><td>one folder per book domain, and the only kind of folder this tree holds at its top</td></tr>
+      <tr><td><strong>a group</strong></td><td><code>surface/</code></td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
+      <tr><td><strong>the stamp</strong></td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
+      <tr><td><strong>a spec copy</strong></td><td><code>app-patterns/</code> · <code>site-patterns/</code></td><td>a folder of skeleton specs, byte-identical to the book's, which a page starts from</td></tr>
+      <tr><td><strong>drift</strong></td><td></td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="426 22 248 428" style="max-width:248px" role="img" aria-label="The reader holds the plugin and not the book, so the copy is complete and says which version it copied.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="50">the book</text>
+    <text class="sds-note" x="444" y="69">the foundation's own chapters —</text>
+    <text class="sds-note" x="444" y="88">the source that governs</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">restated as</text>
+    <rect class="sds-box" x="428" y="140" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="166">a ref</text>
+    <text class="sds-note" x="444" y="185">a self-contained leaf, complete</text>
+    <text class="sds-note" x="444" y="204">without the book beside it</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">carries</text>
+    <rect class="sds-box" x="428" y="256" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="282">the stamp</text>
+    <text class="sds-note" x="444" y="301">each chapter it restates, and the</text>
+    <text class="sds-note" x="444" y="320">hash last read there</text>
+    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="356">read by</text>
+    <rect class="sds-box" x="428" y="372" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="398">a drift run</text>
+    <text class="sds-note" x="444" y="417">compares the hash and reports a</text>
+    <text class="sds-note" x="444" y="436">copy that fell behind</text>
+  </svg>
+    <figcaption>The reader holds the plugin and not the book, so the copy is complete and says which version it copied.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The reader holds the plugin and not the book, so the copy is complete and says which version it copied.",
+  "boxes": [
+    { "id": "a", "label": "the book", "note": "the foundation's own chapters — the source that governs" },
+    { "id": "b", "label": "a ref", "note": "a self-contained leaf, complete without the book beside it" },
+    { "id": "c", "label": "the stamp", "note": "each chapter it restates, and the hash last read there" },
+    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "restated as" },
+    { "from": "b", "to": "c", "label": "carries" },
+    { "from": "c", "to": "d", "label": "read by" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="one-folder-holds-the-whole-domain-one-fi">One folder holds the whole domain, one file to a construct</h3>
+  <p><code>refs/support/surface/</code> holds the standards of content and interaction, the patterns, the architecture of the design system with its names, layouts and widgets, the providers a design system needs, and the library and showcase deliveries. The path is the one the book's domain has, so a reader who knows the book finds the ref.</p>
+  <h3 id="the-specs-are-copies-owned-by-the-book">The specs are copies, owned by the book</h3>
+  <p>The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and <code>restates files</code> writes and checks them. A builder changes a spec in the book, and the export carries it.</p>
+  <h3 id="the-stack-specific-half-is-the-apps-plug">The stack-specific half is the apps plugin's</h3>
+  <p>How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.</p>
+  <h3 id="a-ref-that-fell-behind-says-so">A ref that fell behind says so</h3>
+  <p>Every ref carries the chapters it restates and the hash last read from each. A drift run compares them and reports a ref whose chapter has moved.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin carries from the book and how it is arranged. It does not answer what a ref is — the stamp, the drift run and the rule that a ref restates and adds nothing are <a href="../../01-devex/constructs/06-refs-construct.html">Refs</a>. It does not answer what any Surface rule says.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
+    <tbody>
+      <tr><td>which Surface chapters this plugin restates, and the folder they sit in</td><td>the stamp's grammar and the drift run<span class="sds-small">Owned by: <a href="../../01-devex/constructs/06-refs-construct.html">Refs</a></span></td></tr>
+      <tr><td>that the spec folders are copies the book owns</td><td>how a stack builds a block<span class="sds-small">Owned by: <a href="../../03-apps/constructs/05-refs-construct.html">Refs</a></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>RD.DEVEX.WORKSPACE.118</code></p><p>a ref that carries a rule it does not own is a restatement, and says so under a stamp</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p><code>refs/</code> holds one folder per book domain</p></td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>spn-devex restates check</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>

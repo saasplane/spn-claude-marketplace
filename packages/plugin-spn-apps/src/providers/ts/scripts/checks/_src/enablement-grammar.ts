@@ -40,7 +40,8 @@
 import { basename, resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, inComment, introduced, mask, read, resultingText } from "../../../../../scripts/lib/source.ts";
+import { inComment, mask, read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder, introduced } from "../../../../../scripts/lib/source.ts";
 
 const ORG_TYPES = new Set([
   "PLATFORM", "ACCOUNT",

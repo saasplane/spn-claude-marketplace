@@ -164,8 +164,8 @@ try {
 // new plugin is scanned the day it lands.
 const PLUGINS = readdirSync(PACKAGES).sort()
   .filter((name) => name.startsWith("plugin-spn-") && existsSync(join(PACKAGES, name, "src", "scripts")));
-same("the check scans spn-devex, spn-apps and spn-infra",
-  ["plugin-spn-devex", "plugin-spn-apps", "plugin-spn-infra"].every((name) => PLUGINS.includes(name)), true);
+same("the check scans spn-devex, spn-surface, spn-apps and spn-infra",
+  ["plugin-spn-devex", "plugin-spn-surface", "plugin-spn-apps", "plugin-spn-infra"].every((name) => PLUGINS.includes(name)), true);
 for (const plugin of PLUGINS) {
   const found = await scanTree(join(PACKAGES, plugin, "src", "scripts"), NAMES);
   same(`no file under ${plugin}/src/scripts spells a layout folder`,

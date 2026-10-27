@@ -14,7 +14,7 @@
 // `--stdin` (the PreToolUse hook mode) stays the hook's own door, through `events/pretooluse.ts`.
 import { join } from "node:path";
 import { OPTIONAL, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { stackOf } from "../../lib/stack.ts";
+import { stackOf } from "../../../../../plugin-support-lib/src/lib/stack.ts";
 
 export const describe = "Scan for a coverage exclude with no comment giving its reason";
 export const usage = "[<path>…]";

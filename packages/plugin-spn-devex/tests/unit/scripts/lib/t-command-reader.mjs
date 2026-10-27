@@ -89,7 +89,7 @@ same("untouched: a three-level spnutils command typed in full reads as it did", 
     }
     return found;
   };
-  for (const plugin of ["spn-devex", "spn-apps"])
+  for (const plugin of ["spn-devex", "spn-surface", "spn-apps"])
     same(`[MKT.SCRIPTS.175] the subjects the reader names for ${plugin} are the command files that export \`actions\``, PLUGIN_SUBJECTS[plugin], fromSource(plugin));
 }
 

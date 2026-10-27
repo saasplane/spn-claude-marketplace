@@ -41,7 +41,7 @@
 
 <section id="s0">
   <div class="sds-section-head"><h2>Overview</h2></div>
-  <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the three plugins, so it is the place to learn what a plugin can hold at all.</p>
+  <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the four plugins, so it is the place to learn what a plugin can hold at all.</p>
   <p>This page is for anyone about to change a plugin in this repository, or to read one: an architect deciding where a new rule should run, or a backend developer about to write a check. It assumes no earlier reading. After it you know which folder a piece of plugin code belongs in, what that folder promises, and which construct page to open next.</p>
   <p><strong>The one thing to unlearn is that a plugin makes rules.</strong> None of them does. Every rule is stated once, in a chapter of the foundation book, and a plugin carries instruments that read that rule and apply it at the moment somebody works. So each folder below is one kind of instrument, and each is defined once, here in <code>spn-devex</code>. The other two plugins use the same folder names and add what only their own domain can say. That is why a general question, such as <em>what is a hook?</em>, always has its answer in this domain.</p>
   <p><strong>What you can decide after this page.</strong> Which folder a new piece of plugin code belongs in; whether a rule you want to enforce should run at the moment a file is written, or only when somebody asks for a sweep; and what has to happen before an edit to a plugin is the code a session actually runs.</p>
@@ -188,8 +188,9 @@
 <section id="s10" data-block="next">
   <div class="sds-section-head"><h2>Where to go next</h2></div>
   <ul>
-    <li>The stack plugin, which adds what only a stack can say &rarr; <a href="../02-apps/apps-overview.html">spn-apps</a></li>
-    <li>The estate plugin, which adds what only an estate can say &rarr; <a href="../03-infra/infra-overview.html">spn-infra</a></li>
+    <li>The surface plugin, which adds what a person sees and touches &rarr; <a href="../02-surface/surface-overview.html">spn-surface</a></li>
+    <li>The stack plugin, which adds what only a stack can say &rarr; <a href="../03-apps/apps-overview.html">spn-apps</a></li>
+    <li>The estate plugin, which adds what only an estate can say &rarr; <a href="../04-infra/infra-overview.html">spn-infra</a></li>
     <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/01-devex/plugin-spn-devex/README.md">capabilities: spn-devex</a></li>
     <li>What a developer using this plugin is promised &rarr; <a href="../../../03-behaviors/01-devex/README.md">behaviours: devex</a></li>
     <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/01-devex/README.md">constructs: devex</a></li>

@@ -3,7 +3,7 @@
   "owner": {
     "name": "SaaS Plane"
   },
-  "description": "The SaaS Plane agent plugin marketplace \u2014 three plugins, one per domain and the set is closed. spn-devex installs in every repository; spn-apps acts on the nodes an apps repository declares; spn-infra acts on the estate. A stack or a cloud is a folder inside the plugin that owns its domain, never a plugin of its own.",
+  "description": "The SaaS Plane agent plugin marketplace \u2014 four plugins, one per domain and the set is closed. spn-devex installs in every repository; spn-surface carries what a person sees and touches, for the repositories that build a page; spn-apps acts on the nodes an apps repository declares; spn-infra acts on the estate. A stack or a cloud is a folder inside the plugin that owns its domain, never a plugin of its own.",
   "plugins": [
     {
       "name": "spn-devex",
@@ -14,9 +14,17 @@
       }
     },
     {
+      "name": "spn-surface",
+      "source": "./packages/plugin-spn-surface/src",
+      "description": "SaaS Plane surface domain \u2014 what a person sees and touches, stack-agnostic. One skill, design: it states a page, a flow or a mock as a tree of named blocks, and draws it in Figma where the window holds the connector. The surface standards (content, interaction, patterns, names), the architecture of the design system, its library and its delivery, and the app, site and flow patterns a page starts from, with the specs each pattern is drawn from. A hook that reads a script before the Figma connector runs it, refusing what the connector does not support and noting what the text cannot settle.",
+      "author": {
+        "name": "SaaS Plane"
+      }
+    },
+    {
       "name": "spn-apps",
       "source": "./packages/plugin-spn-apps/src",
-      "description": "SaaS Plane apps domain \u2014 one plugin for every APPS repository, stack-agnostic with its stacks inside it. Seven skills: new, implement, review, run, verify, release, design. The apps model a node is built from, the platform model a partner adopts rather than rebuilds \u2014 tenancy, identity, surfaces, data and trust, lifecycle, and the seven modules that ship \u2014 and the rules a change must obey, with each stack's parser kept apart from the rule it serves.",
+      "description": "SaaS Plane apps domain \u2014 one plugin for every APPS repository, stack-agnostic with its stacks inside it. Six skills: new, implement, review, run, verify, release. The apps model a node is built from, the platform model a partner adopts rather than rebuilds \u2014 tenancy, identity, surfaces, data and trust, lifecycle, and the seven modules that ship \u2014 and the rules a change must obey, with each stack's parser kept apart from the rule it serves.",
       "author": {
         "name": "SaaS Plane"
       }

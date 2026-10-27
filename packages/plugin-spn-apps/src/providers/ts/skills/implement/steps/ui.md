@@ -28,7 +28,9 @@ App-local modules (a feature owned by one app) live under `apps/<app>/src/module
 
 ## The two contexts — read them, never re-derive them
 
-The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/01-contexts.md`). The restatement is `refs/support/surface/architecture-app.md`, in this plugin; read `standards-core.md` for the levels of a page, `architecture-names.md` for the names, and `architecture-containers.md` for the container.
+The surface has exactly two contexts and they point opposite ways (the foundation book's Surface app chapter, *The contexts*). Every Surface rule this step meets, the contexts, the levels of a page, the names, the containers, what a page writes for each unit and the choice tables, is reached through one file: `refs/support/surface/README.md`, the entry ref of the spn-surface plugin, by its route 3, *Build a screen*.
+
+**If spn-surface's entry ref is not in the session**, the repository's wiring comes from an older spnutils: update spnutils, run `spnutils repo agent-sync`, and open a new window.
 
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
 - **DS context** — live theme and its setter, device, `navigate`, and image transformation with placeholder/error. Read it with the DS context hook; `DSApp` supplies it.

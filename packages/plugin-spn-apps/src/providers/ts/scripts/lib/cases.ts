@@ -9,7 +9,7 @@
 import { dirname, join, relative } from "node:path";
 import { idsIn } from "../../../../../../plugin-support-lib/src/lib/register.ts";
 import { walk } from "../../../../../../plugin-support-lib/src/lib/runs.ts";
-import { read } from "../../../../scripts/lib/source.ts";
+import { read } from "../../../../../../plugin-support-lib/src/lib/source.ts";
 
 /** One case title citing one behaviour id. */
 export type ProvingCase = { id: string; title: string; file: string; tier: string };

@@ -4,7 +4,7 @@
   "title": "What You Get",
   "lenses": ["LEAD", "ARCHITECT", "SERVER_DEV", "WEB_DEV", "QA", "INFRA", "TRUST", "PARTNER"],
   "status": "DONE",
-  "summary": "What installing the marketplace puts into a session — three plugins, five kinds of instrument, and the checkers that read a repository — and the four things this repository declines to be.",
+  "summary": "What installing the marketplace puts into a session — four plugins, five kinds of instrument, and the checkers that read a repository — and the four things this repository declines to be.",
   "keywords": ["what", "plugins", "instruments", "hooks", "skills", "refs", "agents", "scope"]
 }
 -->
@@ -17,12 +17,13 @@
 
 ## Three plugins, and the set your repository loads
 
-The marketplace ships three plugins. Which of them a repository loads follows from what that repository declares about itself, so you pick nothing by hand.
+The marketplace ships four plugins. Which of them a repository loads follows from what that repository declares about itself, so you pick nothing by hand.
 
 | Plugin | Carries | Loaded by |
 | --- | --- | --- |
 | `spn-devex` | the stage skills, the day-zero walk, the engineer persona, the review panel and its lenses, the document checks, the cross-repo protocol, and the orientation a window opens with | every repository |
-| `spn-apps` | the apps skills — new, implement, review, run, verify, release, design — their step files, and the write-time guards over enablement grammar, naming and what proves a change | an `APPS` repository claiming `TS` |
+| `spn-surface` | the design skill, the Surface refs with the specs a page starts from, and the guard over the Figma connector's scripts | an `APPS` repository |
+| `spn-apps` | the apps skills — new, implement, review, run, verify, release — their step files, and the write-time guards over enablement grammar, naming and what proves a change | an `APPS` repository claiming `TS` |
 | `spn-infra` | the estate skills, the manifest and naming cards, the estate laws, and the guard over secrets and account identifiers | an `INFRA` repository |
 
 **A plugin is how delivery is divided, and it is not how understanding is divided.** The same hook grammar governs a check in `spn-devex` and a check in `spn-apps`. This repository's own documents do divide by plugin, one folder per plugin. But a general question — *what is a hook?* — is always answered in `spn-devex`, the plugin every repository loads, so you never have to work out which plugin answers a question before you can ask it.

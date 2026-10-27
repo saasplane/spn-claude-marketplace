@@ -33,7 +33,7 @@ export type PluginHome = { name: string; root: string; installed: boolean };
 const HERE = resolve(import.meta.dirname);
 
 const FIXTURE: Record<string, string> = {
-  "sprepo.json": '{"world":"APPS","stacks":["spn-devex","spn-apps"]}\n',
+  "sprepo.json": '{"world":"APPS","stacks":["spn-devex","spn-surface","spn-apps"]}\n',
   "spkind.json": '{"kind":"APP_WEB","config":null}\n',
   "CONCEPT.md": "# Partner Platform — Concept\n\n## What this is\n\n" +
     "A partner platform built on SaaS Plane. You read this to learn its shape.\n\n" +
@@ -69,6 +69,9 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   // the end of every turn — a crash there would report on work already finished.
   ["spn-devex", "stop.ts", []],
   ["spn-devex", "closed.ts", []],
+  // The `spn-surface` half: its dispatcher reads its event from stdin and gets none here, so it must
+  // exit clean, the same contract as every other dispatcher.
+  ["spn-surface", "pretooluse.ts", []],
   // The `spn-apps` half. Its dispatcher reads its event from stdin and gets none here, so it must
   // exit clean; the six checks behind it are swept the way the core tools are.
   ["spn-apps", "pretooluse.ts", []],

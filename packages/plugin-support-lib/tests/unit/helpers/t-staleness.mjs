@@ -124,5 +124,30 @@ console.log("\n=== staleness — the hash follows an import inside the shared fo
   }
 }
 
+console.log("\n=== staleness — a provider's scripts are bundled, so the hash reads them; its refs are not");
+{
+  // A reader under `src/providers/<stack>/scripts/` reaches every bundle through an import from `scripts/`,
+  // as spn-surface's `surface.ts` does. A provider's skill or ref is no part of a bundle.
+  const { root, pluginDir, supportLibDir } = fixture();
+  try {
+    const reader = join(pluginDir, "src", "providers", "ts", "scripts", "checks");
+    const refs = join(pluginDir, "src", "providers", "ts", "refs");
+    mkdirSync(reader, { recursive: true });
+    mkdirSync(refs, { recursive: true });
+    writeFileSync(join(reader, "reader.ts"), "export const notes = 1;\n", "utf8");
+    writeFileSync(join(refs, "web.md"), "# web\n", "utf8");
+    const before = pluginSourceHash(pluginDir, supportLibDir);
+
+    writeFileSync(join(reader, "reader.ts"), "export const notes = 2;\n", "utf8");
+    const afterReader = pluginSourceHash(pluginDir, supportLibDir);
+    ok("known-bad: an edit to a provider's script moves the plugin's hash", afterReader !== before, `${before.slice(0, 12)} → ${afterReader.slice(0, 12)}`);
+
+    writeFileSync(join(refs, "web.md"), "# web, edited\n", "utf8");
+    ok("an edit to a provider's ref leaves the hash as it was", pluginSourceHash(pluginDir, supportLibDir) === afterReader);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — staleness` : `\n  all ${total} passed — staleness`);
 process.exit(failed ? 1 : 0);
