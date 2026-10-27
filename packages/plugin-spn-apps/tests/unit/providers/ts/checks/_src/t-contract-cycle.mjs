@@ -3,7 +3,8 @@ import { PLUGIN } from "../../../../../helpers/harness.mjs";
 // sessions. A guard nobody has ever seen work is a guard nobody has evidence for, so the known-bad
 // here is a real cycle written into a real seat on disk.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { existsSync } from "node:fs";
@@ -26,7 +27,8 @@ const WORKSPACE = resolve(HOOKS, "..", "..", "..");
 // — which is the half that outlives the port.
 const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
 
-const BASE = "/private/tmp/claude-501/-opt-work-saasplane-code/ca4d9391-8043-477a-926d-fabfa4253bdf/scratchpad/fixtures/cycle";
+const BASE = mkdtempSync(join(tmpdir(), "t-contract-cycle-"));
+process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let n = 0, failed = 0;
 
