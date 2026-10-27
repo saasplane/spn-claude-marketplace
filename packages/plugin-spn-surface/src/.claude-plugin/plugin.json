@@ -1,6 +1,6 @@
 {
   "name": "spn-surface",
-  "version": "0.76.0",
+  "version": "0.77.0",
   "description": "SaaS Plane surface domain, stack-agnostic — what a person sees and touches, stated before any stack is chosen: the standards of content, interaction, patterns and names, the architecture of the design system, its library and its delivery, and the app, site and flow patterns a page starts from. Its skill is design, which states a page, a flow or a mock as a tree of named blocks and draws it in Figma where the window holds the connector. A ref reaches a session only when something names it.",
   "author": {
     "name": "SaaS Plane"
