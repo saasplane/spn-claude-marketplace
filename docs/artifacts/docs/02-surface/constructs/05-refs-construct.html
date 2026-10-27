@@ -4,7 +4,7 @@
 {"id":"surface-refs","variant":"construct","title":"Refs — The Surface Book, Restated Inside the Plugin","subtitle":"The foundation book's Surface rules, carried inside this plugin for a reader with no other copy.","lenses":["UX","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the Surface rules a partner needs but has no checkout to read: the standards, the patterns, the architecture of the design system, its library and its delivery, and the specs a page starts from.","keywords":["ref","restatement","surface","stamp","patterns","specs"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -102,7 +102,7 @@
   <h3 id="the-specs-are-copies-owned-by-the-book">The specs are copies, owned by the book</h3>
   <p>The app patterns and the site patterns each have a folder of skeleton specs. They are byte-identical to the book's, an index in each folder lists them with the hash of their contents, and <code>restates files</code> writes and checks them. A builder changes a spec in the book, and the export carries it.</p>
   <h3 id="the-construct-snapshot-sits-beside-the-r">The CONSTRUCT snapshot sits beside the refs</h3>
-  <p><code>refs/support/surface/construct.snapshot.json</code> is the CONSTRUCT snapshot, written from the book alone with <code>spnutils apps surface construct --out</code> for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its <code>source.readFrom</code> names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. <code>unit show</code> reads it, with the restated tables beside it, and reads nothing outside the plugin.</p>
+  <p><code>refs/support/surface/construct.snapshot.json</code> is the CONSTRUCT snapshot, written from the book alone with <code>spnutils apps surface construct --out</code> for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its <code>source.readFrom</code> names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. <code>unit show</code> reads it, with the restated tables beside it, and reads nothing else outside the plugin but the repository's symbol index, for a unit the snapshot does not hold.</p>
   <h3 id="the-stack-specific-half-is-the-apps-plug">The stack-specific half is the apps plugin's</h3>
   <p>How a block is built in TypeScript, and the layout of a web module, belong to the stack, so those refs sit in the apps plugin and a ref here points at them by name rather than by link.</p>
   <h3 id="a-ref-that-fell-behind-says-so">A ref that fell behind says so</h3>
@@ -141,4 +141,4 @@
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
