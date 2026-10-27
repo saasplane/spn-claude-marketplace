@@ -1,6 +1,7 @@
 // The shared reader under `scripts/lib/plugin-versions.mjs` — what the release command and the
 // plugins' own tests both use to say the four plugins carry one version (RD.DEVEX.AGENT.110).
-import { compareVersions, agreedVersion, newestReleaseNumber, releaseTags, versionIn, withVersion }
+import { fileURLToPath } from "node:url";
+import { compareVersions, agreedVersion, newestReleaseNumber, readVersions, releaseTags, versionIn, withVersion }
   from "../../../../../scripts/lib/plugin-versions.mjs";
 
 let total = 0, failed = 0;
@@ -58,6 +59,15 @@ console.log("\n=== the five tags and their messages");
   ok("the marketplace tag names each plugin", tags[0].name === "v0.76.0"
     && tags[0].message === "SaaS Plane marketplace 0.76.0: spn-devex 0.76.0, spn-apps 0.76.0, spn-infra 0.76.0, spn-surface 0.76.0", tags[0].message);
   ok("one tag per plugin", tags[1].name === "spn-devex--v0.76.0" && tags[1].message === "spn-devex 0.76.0");
+}
+
+console.log("\n=== this repository's own four plugins carry one version");
+{
+  const root = fileURLToPath(new URL("../../../../../", import.meta.url));
+  const plugins = readVersions(root);
+  ok("four plugins are listed", plugins.length === 4, plugins.map((plugin) => plugin.name).join(", "));
+  const said = refusal(() => agreedVersion(plugins));
+  ok("their versions agree", said === null, said);
 }
 
 console.log(`\n${failed ? `${failed} of ${total} FAILED` : `all ${total} passed`}`);
