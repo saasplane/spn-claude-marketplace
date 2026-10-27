@@ -56,10 +56,11 @@ console.log("\n=== an empty ledger, and 001's check finding old shapes → pendi
 console.log("\n=== applied → recorded, and never pending again");
 {
   const root = unmigrated("applied");
-  const entry = record(root, m001, "agent", new Date(2026, 9, 18, 10, 20));
+  const when = new Date(2026, 9, 18, 10, 20);
+  const entry = record(root, m001, "agent", when);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());
   ok("the ledger gains one line: plugin, id, version, when, who and how",
-    line.plugin === "spn-devex" && line.id === "001" && line.version === m001.version && line.at === "2026-10-18T10:20+05:30" && line.by && line.how === "agent", JSON.stringify(line));
+    line.plugin === "spn-devex" && line.id === "001" && line.version === m001.version && /^2026-10-18T10:20[+-]\d\d:\d\d$/.test(line.at) && Date.parse(line.at) === when.getTime() && line.by && line.how === "agent", JSON.stringify(line));
   ok("recording hands back the same line", entry.id === line.id && entry.at === line.at);
   const [one] = standings(root, MIGRATIONS);
   ok("001 stands applied, though its old shapes are still on disk: a recorded migration is not checked again", one.state === "applied" && one.found.length === 0);

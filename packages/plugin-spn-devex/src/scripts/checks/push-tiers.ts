@@ -213,7 +213,9 @@ function refusalOf(runFile: string, tier: Tier, content: string): string | null 
   if (stamp.narrowed !== false) return "the run was narrowed by files, names or a phase";
   if (stamp.content !== content) return "it ran on other content than the tree this push carries";
   if (!Array.isArray(run.results) || run.results.length === 0) return "it ran no case, so it proved nothing";
-  if (run.results.some((result) => result?.status !== "SUCCESS")) return "its results are not all green";
+  // A skipped case reports PENDING: an opt-in live case, which the offline tier does not owe (02-scm.md § Push).
+  if (run.results.some((result) => result?.status !== "SUCCESS" && result?.status !== "PENDING")) return "its results are not all green";
+  if (!run.results.some((result) => result?.status === "SUCCESS")) return "every case it ran was skipped, so it proved nothing";
   return null;
 }
 
