@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "3f944c3b"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -47,6 +47,8 @@ The TypeScript standards, as this skill carries them. **Treat this restatement a
 **Service layer** — the one-screen rule summary: one terminal cached bulk reader per (entity, level); `_prepare*` pure, reached only via cached readers. Mutations return via `get<X>ById`, never `_prepare(saved)`; create takes no purge, update an exact-key purge; search hydrates repo ids in order. `@SPAuthorize` sits on every contract method at the right tier, and pre-auth methods stay bare; decorator order is Authorize → Reauth → Cache → Transactional. Cross-module writes go via request queues with requestKey; audit lands after the fresh read; active toggle not delete; null-skip updates; wholesale junction replacement. Repos take tenant scope first, throw on missing ids, never call services; secrets are masked at the mapper; 404 anti-enumeration.
 
 **Database** — org_id leads indexes; ulid CHAR(26) service-assigned; column order (audit tail last); `active` flag, no `deleted_at`. Migrations pure, epoch-ms versioned, DDL/seed split; jsonb required-field additions handled across every literal/builder/fixture.
+
+**Surface** — a change to a page's code, a `.tsx` file of a web module, is read against the Surface rules through the spn-surface plugin's entry ref, `refs/support/surface/README.md`, by its route 4, *Review or verify a page*: the page beside its design tree, its pattern, its panels and its task states, and each closed prop it writes against its unit's choice table. A value the case leaves to the place or the level written by hand, a value the index marks never, and a second `SOLID` button in one view are each a finding, with the rule's id.
 
 **Codegen/config** — no hand edits to `contract/validators/**`, barrels, `src/generated/**`, label manifests. `gen-validators`/`gen-barrel` run **in the same step as the edit**, for every package touched — not batched before a commit, because a stale validator is what the API enforces at runtime and takes the server down at boot, naming the schema rather than the edit that outdated it. Pass the FOLDER name, never the scoped one, which crashes on `reading 'path'`. A `gen-validators` REFUSAL is a contract defect to fix at the source, never worked around. It reports either *kindly use CDT Types* or *a contract state expresses absence as `| null`, never `?`*; `gen-symbols` emits the published surface for every installable kind; env via `getEnv*` under the `{CODE}_*` grammar, never raw `process.env`, no hardcoded prefixes, no secrets in committed env files.
 

@@ -37,7 +37,7 @@
 import { readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve, sep } from "node:path";
 import { emit, payload as readPayload, runAlone, type Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { read } from "../../../../../scripts/lib/source.ts";
+import { read } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
 
 const STATES_DIR = "src/contract/states";
 const SIBLING = /from\s+'\.\/([\w-]+)'/g;

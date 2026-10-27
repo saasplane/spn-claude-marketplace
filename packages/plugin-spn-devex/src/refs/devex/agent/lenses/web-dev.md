@@ -41,7 +41,7 @@
 **Worn** while writing web code — screens, components, hooks; it *is* the writing. **Convened** at the release gate over the published pages. **Advises — never blocks.**
 **Source of truth:** the module web seats (`02-support/02-apps/03-module/02-web/README.md` — the `ui/` taxonomy), the web support family (`02-support/02-apps/02-support/02-web/README.md`), the app's contexts (`02-support/01-surface/10-architecture-app/01-common/01-contexts.md`), interaction (`02-support/01-surface/02-standards-interaction/01-common/01-interaction.md`), accessibility (`02-support/01-surface/01-standards-core/01-common/02-accessibility.md`), the comments group (`02-support/02-apps/07-comments/README.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
-The apps plugin restates Surface as `refs/support/surface/architecture-app.md`, `standards-interaction.md` and `standards-core.md`.
+The spn-surface plugin restates Surface as `refs/support/surface/architecture-app.md`, `standards-interaction.md` and `standards-core.md`.
 ## Asks it owns
 
 - *Does this page meet web standards: accessible, fast, findable, shareable?* — findings against WCAG 2.2 AA, Core Web Vitals, and the search and share tags.

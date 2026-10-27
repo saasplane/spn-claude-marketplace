@@ -18,11 +18,11 @@
 
 **No file under `_shadcn/` is edited by hand.** The shadcn CLI emits or copies every file there: the primitives, and the hooks and helpers beside them. The rule covers the whole folder. Make the change a component needs in its `DS*` wrapper. Run the CLI again to refresh a file. Re-point the tokens to change a look, because an edited primitive loses the edit at the next regeneration.
 
-**Three prop names are shared, and each one means one thing.** `variant` is the surface treatment, `color` is the hue, and `size` is the density step. A component takes `variant` and `color` independently, and never folds the two into one prop. The Surface ref, [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md), states the three names with their values.
+**Three prop names are shared, and each one means one thing.** `variant` is the surface treatment, `color` is the hue, and `size` is the density step. A component takes `variant` and `color` independently, and never folds the two into one prop. The spn-surface plugin's entry ref, `refs/support/surface/README.md`, routes to the three names with their values.
 
 **A name is the book's, and TypeScript adds only its form.** The Surface construct states the name of a component, of a prop and of a closed value. This stack adds the form and nothing else: `DS` + PascalCase for a component, `I` + that name + `Props` for its props, a `Type` suffix for an enum, and `DS_` + UPPER_SNAKE for a constant map. A prop the book renames takes the book's name.
 
-**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSSize` and `useDSOverlayConfirm`. [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md) states the rule. The two contexts realized — the app context, the design-system context, the size context and the page-level context, the default size and the tokens a component may consume — are [`../../../surface/providers.md`](../../../surface/providers.md)'s, which this package's own interior realizes.
+**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSSize` and `useDSOverlayConfirm`. The spn-surface plugin's entry ref, `refs/support/surface/README.md`, routes to the rule and to the contexts realized — the app context, the design-system context, the size context and the page-level context, the default size and the tokens a component may consume — which this package's own interior realizes.
 
 **Every web app declares the same scripts, and a separate preview script is not among them** — it was the start script under another name and is retired. **The test bundle is a flavour of the build, never a second script.**
 

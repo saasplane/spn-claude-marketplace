@@ -3,7 +3,7 @@
 // a session commits. The chapter is the source of truth; a rule change is edited there first, then
 // here, in the same change.
 //
-// The one command that bundles every entry of all three plugins — `N101` step 2.
+// The one command that bundles every entry of all four plugins — `N101` step 2.
 //
 //     node scripts/build-plugins.mjs            build once
 //     node scripts/build-plugins.mjs --watch    rebuild on every source edit, and keep running
@@ -44,7 +44,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = dirname(HERE);
 const PACKAGES = join(ROOT, "packages");
 const SUPPORT_LIB_DIR = join(PACKAGES, "plugin-support-lib");
-const ALL_PLUGINS = ["plugin-spn-devex", "plugin-spn-apps", "plugin-spn-infra"];
+const ALL_PLUGINS = ["plugin-spn-devex", "plugin-spn-surface", "plugin-spn-apps", "plugin-spn-infra"];
 // Naming plugins on the command line builds only those, so a change to one plugin rebuilds (and
 // cleans) that plugin's `dist/` alone, never a neighbour's that another run may be reading.
 const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));

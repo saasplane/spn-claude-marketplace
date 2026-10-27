@@ -140,7 +140,7 @@ This page answers what a script is, how each kind is reached, and what it answer
 | the four folders, the shape of one check, the shape of one tool, and the grade a finding carries | the composition, the payload, the dispatcher's own guard, and the exit code a moment's script ends on | [Hooks](02-hooks.md) |
 | the line between refusing a call and only speaking about it | which rule a given script enforces, and what that rule says | the foundation chapter each header names |
 | that a page is produced from its seat file and compared against it | what a page is made of — the blocks, the figure grammar and the furniture | the foundation's `05-artifacts.md` |
-| that a stack-agnostic question belongs here | a question true only of one stack, or only of an estate | the scripts chapter of [the apps domain](../02-apps/README.md) or [the infra domain](../03-infra/README.md) |
+| that a stack-agnostic question belongs here | a question true only of one stack, or only of an estate | the scripts chapter of [the surface domain](../02-surface/README.md), [the apps domain](../03-apps/README.md) or [the infra domain](../04-infra/README.md) |
 
 ## Binds
 

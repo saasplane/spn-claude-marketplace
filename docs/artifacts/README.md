@@ -25,8 +25,9 @@ The hub gives [`CONCEPT.md`](../../CONCEPT.md) a readable face. It borrows the c
 | --- | --- | --- |
 | [concept-overview](docs/concept-overview.html) | the whole model — what the repository owns and what it refuses, the partner and the builder who hold different halves of it, the five instrument kinds it divides by, and why it declares `GENERAL` | 🚧 |
 | [devex-overview](docs/01-devex/devex-overview.html) | `spn-devex`, one folder at a time — what each folder a plugin can ship is for | — |
-| [apps-overview](docs/02-apps/apps-overview.html) | `spn-apps`, one folder at a time — and the one folder allowed to name a language | — |
-| [infra-overview](docs/03-infra/infra-overview.html) | `spn-infra`, one folder at a time — and the boundary that no folder changes a cloud | — |
+| [surface-overview](docs/02-surface/surface-overview.html) | `spn-surface`, one folder at a time — and the one guard that reads a script before the Figma connector runs it | — |
+| [apps-overview](docs/03-apps/apps-overview.html) | `spn-apps`, one folder at a time — and the one folder allowed to name a language | — |
+| [infra-overview](docs/04-infra/infra-overview.html) | `spn-infra`, one folder at a time — and the boundary that no folder changes a cloud | — |
 
 There is **one hub per repository**, and it is replaced in place as the concept moves. A hub section with no argument behind it carries a declared gap rather than reading as settled; when one is argued, the argument lands in the workstream that argued it and the section links to it.
 
@@ -39,8 +40,9 @@ The pages sit in one folder per domain, mirroring the constructs seat, and each 
 | Folder | Holds the pages for |
 | --- | --- |
 | [`docs/01-devex/constructs/`](docs/01-devex/constructs/) | `spn-devex` — plugin, hooks, agents, skills, scripts, refs, providers, tests |
-| [`docs/02-apps/constructs/`](docs/02-apps/constructs/) | `spn-apps` — plugin, hooks, skills, scripts, refs, providers, tests |
-| [`docs/03-infra/constructs/`](docs/03-infra/constructs/) | `spn-infra` — plugin, hooks, skills, scripts, refs, providers, tests |
+| [`docs/02-surface/constructs/`](docs/02-surface/constructs/) | `spn-surface` — plugin, hooks, skills, scripts, refs, tests |
+| [`docs/03-apps/constructs/`](docs/03-apps/constructs/) | `spn-apps` — plugin, hooks, skills, scripts, refs, providers, tests |
+| [`docs/04-infra/constructs/`](docs/04-infra/constructs/) | `spn-infra` — plugin, hooks, skills, scripts, refs, providers, tests |
 
 ## Reports
 

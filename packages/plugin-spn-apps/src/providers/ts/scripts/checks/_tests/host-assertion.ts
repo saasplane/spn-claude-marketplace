@@ -27,7 +27,8 @@
 import { basename, resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, lineOf, read, resultingText } from "../../../../../scripts/lib/source.ts";
+import { read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder, lineOf } from "../../../../../scripts/lib/source.ts";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
 

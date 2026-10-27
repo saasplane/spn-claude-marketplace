@@ -48,7 +48,8 @@
 import { basename, resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../../../plugin-support-lib/src/lib/payload.ts";
-import { filesUnder, introduced, lineOf, mask, nodeKind, read, resultingText } from "../../../../../scripts/lib/source.ts";
+import { mask, read, resultingText } from "../../../../../../../plugin-support-lib/src/lib/source.ts";
+import { filesUnder, introduced, lineOf, nodeKind } from "../../../../../scripts/lib/source.ts";
 
 // The runtime is implied by the kind (the TypeScript kinds registry). These four name the server.
 const SERVER_KINDS = new Set(["APP_SERVER", "APP_UTILITY", "MODULE_SERVER", "SUPPORT_SERVER"]);

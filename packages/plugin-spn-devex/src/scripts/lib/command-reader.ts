@@ -72,6 +72,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
     workspace: ["tokens"],
     workstream: ["arc", "fact", "progress", "question", "report", "row", "rows", "state", "suggestion"],
   },
+  "spn-surface": {},
   "spn-apps": { library: ["catalogue"] },
   "spn-infra": {},
 };
@@ -84,6 +85,7 @@ export const DEFAULT_PROGRAMS: Program[] = [
              "platform", "env", "e", "app", "a", "port", "p", "deployment", "unit", "ports", "dist", "from", "timeout"] },
   { script: "spn-devex", matches: pluginCli("spn-devex"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-devex"],
     valued: ["block", "finding", "name", "out", "projects", "reach", "root", "variant"] },
+  { script: "spn-surface", matches: pluginCli("spn-surface"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-surface"] },
   { script: "spn-apps", matches: pluginCli("spn-apps"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-apps"] },
   { script: "spn-infra", matches: pluginCli("spn-infra"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-infra"] },
   { script: "nx", matches: named("nx"), levels: 1 },

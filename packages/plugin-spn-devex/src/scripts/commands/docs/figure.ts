@@ -8,7 +8,8 @@
 //   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join, and every spec draws
 //   spn-devex docs figure colour <path…> [--variant <name>]   a code block's file holds plain code, and carries no colour span
 //   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
-//   spn-devex docs figure draw <spec.json…>                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks
+//   spn-devex docs figure draw <spec.json…>                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks;
+//                                                             a `.flow.json` is read against the specs it names, and draws nothing
 //
 // A SUBJECT WITH FOUR ACTIONS. `check`, `colour` and `render` take a `file` path, one or a folder of
 // them, and `--variant` narrows the first two; `draw` takes one or more spec files directly.
@@ -21,6 +22,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
 import { checkFigures, colouredBlocks } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
+import { readFlow } from "../../lib/flow.ts";
 import { type Action, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, cutVersions, linesFor, newestVersion } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -270,7 +272,8 @@ async function render(args: string[]): Promise<number> {
 /**
  * A HAND-WRITTEN PAGE ASKS THE SAME HELPER a seat file's build step calls on its own: no author
  * places a coordinate either way. A `.json` file is one spec; a `.md` file's own ```` ```dg ```` blocks
- * are drawn in the order they appear, as the page itself would hold them.
+ * are drawn in the order they appear, as the page itself would hold them. A `.flow.json` file draws
+ * nothing: it is read against the specs it names, beside it, and a clean one says so.
  */
 function drawSpecs(args: string[]): number {
   const files = scopeOf(readWords(args).paths, REQUIRED);
@@ -278,6 +281,19 @@ function drawSpecs(args: string[]): number {
   let total = 0;
   for (const file of files) {
     const src = readFileSync(file, "utf8");
+    if (file.endsWith(".flow.json")) {
+      let flow: unknown;
+      try { flow = JSON.parse(src); }
+      catch (e) { total += 1; console.log(`✗ RULE flow      ${relative(workspace, file)}\n         not valid JSON — ${(e as Error).message}`); continue; }
+      const specOf = (spec: string): unknown | null => {
+        try { return JSON.parse(readFileSync(join(dirname(file), spec), "utf8")); }
+        catch (e) { return existsSync(join(dirname(file), spec)) ? `not valid JSON — ${(e as Error).message}` : null; }
+      };
+      const findings = readFlow(flow, specOf);
+      for (const f of findings) { total += 1; console.log(`✗ RULE flow      ${relative(workspace, file)}\n         ${f}`); }
+      if (!findings.length) console.log(`clean — ${relative(workspace, file)}`);
+      continue;
+    }
     const texts = file.endsWith(".md") ? [...src.matchAll(/```dg\n([\s\S]*?)```/g)].map((m) => m[1]) : [src];
     texts.forEach((text, i) => {
       let spec: { caption?: string; [k: string]: unknown };
@@ -310,7 +326,7 @@ export const actions: Record<string, Action> = {
     run: render,
   },
   draw: {
-    describe: "print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks",
+    describe: "print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks; a `.flow.json` is read against its specs",
     usage: "<spec.json…>",
     run: drawSpecs,
   },

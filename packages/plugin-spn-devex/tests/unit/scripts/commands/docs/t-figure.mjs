@@ -161,6 +161,28 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
     noPath2.code === 2 && noPath2.out === "usage: spn-devex docs figure draw <spec.json…>\n`docs figure draw` needs a path.\n");
 }
 
+console.log("\n=== `draw` reads a flow file against the specs beside it, and draws nothing");
+{
+  const dir = join(BASE, "flow");
+  mkdirSync(dir, { recursive: true });
+  const frame = { rows: [{ items: [{ text: "x" }] }] };
+  writeFileSync(join(dir, "members.dg.json"), JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame }] }));
+  writeFileSync(join(dir, "invite.dg.json"), JSON.stringify({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame }, { viewport: "DESKTOP", state: "FAILED", frame }] }));
+  const flow = (moves) => JSON.stringify({ flow: "Invite a member", pages: [
+    { page: "members", spec: "members.dg.json", moves: [{ on: "Invite a member", to: "invite" }] },
+    { page: "invite", spec: "invite.dg.json", moves } ] });
+  const clean = join(dir, "invite.flow.json");
+  writeFileSync(clean, flow([{ on: "Send invite", to: "members" }, { on: "Send invite", to: "invite", state: "FAILED" }]));
+  const good = run(["draw", clean]);
+  one("a clean flow file prints no `<figure>`, says it is clean, and exits 0",
+    !good.out.includes("<figure>") && good.out.includes("clean — ") && good.code === 0);
+  const bad = join(dir, "bad.flow.json");
+  writeFileSync(bad, flow([{ on: "Send invite", to: "members", state: "EMPTY" }]));
+  const refused = run(["draw", bad]);
+  one("known-bad: a move that lands on a state its page's spec does not draw is a RULE, and exits 1",
+    refused.out.includes("✗ RULE flow") && refused.out.includes("draws no view in that state") && refused.code === 1);
+}
+
 console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
 {
   const block = (variant) => `<!-- spn:doc\n${JSON.stringify({ id: variant, variant, title: "Probe" })}\n-->\n`;

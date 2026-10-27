@@ -95,7 +95,7 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the frontmatter a skill declares, the matching, the step folder, and the mode argument | the list of skills a given world offers, and what each one does | the skills chapter of [the apps domain](../02-apps/README.md) or [the infra domain](../03-infra/README.md) |
+| the frontmatter a skill declares, the matching, the step folder, and the mode argument | the list of skills a given world offers, and what each one does | the skills chapter of [the surface domain](../02-surface/README.md), [the apps domain](../03-apps/README.md) or [the infra domain](../04-infra/README.md) |
 | that a skill carries steps and never a rule of its own | where the rule a skill carries actually lives | [Refs](06-refs.md) |
 | that a skill is loaded and followed rather than executed | a persona convened by name, which is selected the same way and is a different thing | [Agents](03-agents.md) |
 | that a concrete step belongs to the realization that changes it | the folder shape a realization contributes, and how a gate resolves into it | [Providers](07-providers.md) |

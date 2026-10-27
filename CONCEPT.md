@@ -38,6 +38,7 @@ domain, with a subsection here and one folder of the same name in every *What* s
 | Domain | Ships | Instruments it carries |
 | --- | --- | --- |
 | **`spn-devex`** | the stack-agnostic plugin, loaded by every repository | all five kinds — plugins, hooks, skills, refs and agents |
+| **`spn-surface`** | the surface domain, stack-agnostic | what a person sees and touches: the Surface refs, the design skill and the guard over the Figma connector |
 | **`spn-apps`** | the apps domain, stack-agnostic with its stacks inside it | the model an application is built from, the platform a partner adopts, the rules a change must obey, and a parser per stack under `providers/` |
 | **`spn-infra`** | the estate plugin | one guard, plus the skills and refs that change an estate |
 
@@ -45,12 +46,12 @@ domain, with a subsection here and one folder of the same name in every *What* s
 
 **The stack-agnostic plugin, and the one every repository loads.** It holds what is true of every plugin: what an instrument of each of the five kinds is, the events a hook may run on, the grades it may return, and how the set a workspace loads is derived from that workspace's own claim.
 
-**A grammar shared by all three lives here, and the domain plugins restate none of it.**
+**A grammar shared by all four lives here, and the domain plugins restate none of it.**
 The same hook grammar governs a check here and one in `spn-apps`, so a question about *what a
 hook is* has one answer and one place: `spn-devex`'s hook set. A domain plugin's chapter says what its
 own checks decide, never what a check is.
 
-**That is what keeps the division by plugin from splitting one concept across three plugins.**
+**That is what keeps the division by plugin from splitting one concept across four plugins.**
 Dividing by delivery has one risk: a reader with a general question, such as *what is a hook?*, might
 have to guess which plugin answers it. That risk does not arise here. A general answer is never in a
 domain plugin; it is in the one every repository loads — for the hook, in
@@ -59,9 +60,15 @@ domain plugin; it is in the one every repository loads — for the hook, in
 #### The five instrument kinds are a shape, not a seat
 
 **Plugin · hook · skill · ref · agent are what an instrument can be**, and every one of them is
-defined once, in `spn-devex`. They are a vocabulary the three domains are written in rather than a
+defined once, in `spn-devex`. They are a vocabulary the four domains are written in rather than a
 division of the tree — which is why you will find *the hook set* as a chapter under `spn-devex` and
 never as a folder of its own.
+
+### surface
+
+**The stack-agnostic plugin for what a person sees and touches.** It holds the Surface refs (the standards of content and interaction, the patterns, the names, and the design system with its library and its delivery), the specs a page starts from, the `design` skill that states a page as a tree of named blocks, and the one guard that reads a script before the Figma connector runs it. A different act needs different instructions, and drawing a page is not wiring a web module, so it is a plugin of its own beside `spn-apps`.
+
+**It names no stack.** What only a stack can say, how a block is built in TypeScript and where a web module's files sit, stays in `spn-apps`, and a Surface ref points at it by name.
 
 ### apps
 
@@ -90,7 +97,7 @@ the `docs/` folder on disk, never by what a manifest declares** (`Q107`, 2026-09
 ## `packages/` is source   `DRAFT`
 
 The capabilities seat is one chapter per construct, inside the one folder named for the plugin that
-ships it — `01-devex/plugin-spn-devex/`, `02-apps/plugin-spn-apps/`, `03-infra/plugin-spn-infra/`. Here the package **is**
+ships it — `01-devex/plugin-spn-devex/`, `02-surface/plugin-spn-surface/`, `03-apps/plugin-spn-apps/`, `04-infra/plugin-spn-infra/`. Here the package **is**
 the plugin, so the domain holds exactly one such folder rather than one document per source folder.
 When you add a checker and write no chapter for it, you have added a surface nobody documented, and
 invariant 4 is what tells you so.

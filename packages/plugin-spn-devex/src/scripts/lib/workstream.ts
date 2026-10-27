@@ -33,11 +33,15 @@ export const HELD_STATES: readonly WorkstreamState[] = ["open", "backlog"];
 
 /**
  * What an arc's notes folder holds, and nothing else (RD.DEVEX.WORKSPACE.262): each entry's name and
- * whether it is a file or a folder. `samples/` may hold folders of its own; the others are flat.
+ * whether it is a file or a folder. `samples/` and `work/` may hold folders of their own; the others are flat.
  */
 export const NOTES_ENTRIES: ReadonlyMap<string, "file" | "folder"> = new Map([
   [PREVIEW_FILE, "file"], ["samples", "folder"], ["plan.md", "file"], ["orders", "folder"], ["scripts", "folder"],
+  ["work", "folder"],
 ]);
+
+/** What the work leaves behind for itself: a proof's output, a patch, a log. Never a sample to review. */
+const WORK_KINDS = /\.(?:patch|diff|log)$/i;
 
 const SAMPLE_KINDS = /\.(?:png|jpe?g|gif|webp|svg|avif|mp4|mov|webm|pdf)$/i;
 const SCRIPT_KINDS = /\.(?:mjs|cjs|js|ts|py|sh)$/i;
@@ -45,7 +49,7 @@ const DATA_KINDS = /\.(?:json|csv|tsv|ya?ml)$/i;
 const ORDER_NAME = /(?:^\d+[a-z]?(?:[-.][^/]*)?\.md$|\.(?:report|ledger)\.md$)/i;
 
 /**
- * Where an entry found beside the five in an arc's notes folder belongs, by its name and kind, as the
+ * Where an entry found beside the six in an arc's notes folder belongs, by its name and kind, as the
  * words a finding or a refusal ends with. One that names a second preview belongs in the one preview.
  */
 export function strayHome(name: string, folder: boolean): string {
@@ -60,10 +64,12 @@ export function strayHome(name: string, folder: boolean): string {
     if (named(/shots?|screens?|images?|img|looks?|views?|captures?|renders?|pages?/)) return "`samples/`, as a folder of its own there if it helps";
     if (named(/orders?|briefs?|reports?/)) return "`orders/`, each brief named by its row";
     if (named(/scripts?|bin|tools?/)) return "`scripts/`";
+    if (named(/(?:^|[-_.])(?:proofs?|evidence|baselines?|scans?|asks?|patch(?:es)?|logs?|outputs?|runs?)(?:[-_.]|$)/)) return "`work/`, as a folder of its own there if it helps";
     return `its screenshots and real files in \`samples/${name}/\`, and each note in it a section of \`plan.md\``;
   }
   if (SAMPLE_KINDS.test(lower)) return "`samples/`";
   if (SCRIPT_KINDS.test(lower)) return "`scripts/`";
+  if (WORK_KINDS.test(lower)) return "`work/`";
   if (named(/cards?|questions?/)) return cards;
   if (named(/(?:^|[-_.])facts?(?:[-_.]|$)/)) return facts;
   if (ORDER_NAME.test(lower)) return "`orders/`, named by its row";

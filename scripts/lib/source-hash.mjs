@@ -79,7 +79,21 @@ function importedSupportLibFiles(scriptsFiles, supportLibDir) {
 }
 
 /**
- * One plugin's source hash: every file under its own `src/scripts/`, plus the
+ * The code a plugin's bundles are built from: every file under its own `src/scripts/`, then every file under each
+ * `src/providers/<stack>/scripts/`, which `scripts/` imports. A provider's skills and refs are no part of a bundle.
+ */
+function bundledSourceFiles(pluginDir) {
+  const providersDir = join(pluginDir, "src", "providers");
+  let stacks = [];
+  try { stacks = readdirSync(providersDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort(); } catch { /* no providers */ }
+  return [
+    ...walkFiles(join(pluginDir, "src", "scripts")),
+    ...stacks.flatMap((stack) => walkFiles(join(providersDir, stack, "scripts"))),
+  ];
+}
+
+/**
+ * One plugin's source hash: every file its bundles are built from (`bundledSourceFiles`), plus the
  * `plugin-support-lib/src/lib/*.ts` files that source imports, and the shared files those import.
  *
  * @param pluginDir     a plugin's package folder, e.g. `packages/plugin-spn-devex`
@@ -88,8 +102,7 @@ function importedSupportLibFiles(scriptsFiles, supportLibDir) {
  */
 export function pluginSourceHash(pluginDir, supportLibDir) {
   const hash = createHash("sha256");
-  const scriptsDir = join(pluginDir, "src", "scripts");
-  const scriptsFiles = walkFiles(scriptsDir);
+  const scriptsFiles = bundledSourceFiles(pluginDir);
   for (const file of scriptsFiles) {
     const bytes = readFileSync(file);
     hash.update(relative(pluginDir, file));

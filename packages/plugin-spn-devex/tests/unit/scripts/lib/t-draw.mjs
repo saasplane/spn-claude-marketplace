@@ -840,6 +840,21 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a view measures a share exactly: a third beside the rest fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", beside) }] }).findings, none);
   one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
 
+  // 13b · a view for each task state its blocks show (RD.DEVEX.WORKSPACE.230)
+  const stated = draw({ kind: "skeleton", views: [
+    { viewport: "MOBILE", state: "EMPTY", frame: frameOf("Phone empty") }, { viewport: "DESKTOP", state: "DENIED", frame: frameOf("Desk denied") },
+    { viewport: "MOBILE", frame: frameOf("Phone") }, { viewport: "DESKTOP", state: "EMPTY", frame: frameOf("Desk empty") }, { viewport: "DESKTOP", frame: frameOf("Desk") }] });
+  one("a view takes `state`, and views of one class in several states draw without a finding", stated.findings, none);
+  one("the views of one class stand together, the one with no state first and the rest in `DSTaskStateType`'s order, each under its class and its state",
+    [...stated.svg.matchAll(/<text class="sds-note"[^>]*>([A-Z]+(?: · [A-Z]+)?)</g)].map((m) => m[1]).join(), "DESKTOP,DESKTOP · EMPTY,DESKTOP · DENIED,MOBILE,MOBILE · EMPTY");
+  one("a state that is no value of `DSTaskStateType` is a finding that names the values",
+    draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", state: "LOADING", frame: frameOf("x") }] }).findings, says("`LOADING`"));
+  one("two views of one class in one state are a finding",
+    draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", state: "EMPTY", frame: frameOf("x") }, { viewport: "DESKTOP", state: "EMPTY", frame: frameOf("y") }] }).findings,
+    says("one view for a screen class in a task state"));
+  one("a stated view with no frame is named by its class and its state",
+    draw({ kind: "skeleton", views: [{ viewport: "MOBILE", state: "FAILED" }] }).findings, says("`MOBILE · FAILED` view has no `frame`"));
+
   // 14 · a table that takes sample cells
   const texts = (g, cls) => [...g.matchAll(new RegExp(`<text class="${cls}" x="([\\d.]+)" y="([\\d.]+)"(?: style="[^"]*")?>([^<]*)<`, "g"))].map((m) => [Number(m[1]), Number(m[2]), m[3]]);
   const table = (extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: "table", fill: true, columns: ["Name", "Email", "State", ""],

@@ -136,7 +136,7 @@ const one = compare("exactly one workstream open: the standing offer appears",
   fixture("one-open", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-surface@saasplane": true, "spn-apps@saasplane": true } }),
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/widget-pricing-approach.html`]: "<html></html>",
     [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1/state.json`]: "{}\n",
@@ -365,7 +365,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
       return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
     } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
   };
-  const wired = JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } });
+  const wired = JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-surface@saasplane": true, "spn-apps@saasplane": true } });
 
   // A first visit is a workspace with no workstream in any state, and nothing else decides it.
   const first = fixture("first-visit", {
@@ -460,8 +460,15 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   const unwiredOut = hook(unwired, null);
   says("an unwired repository adds a clause to the same line",
     statusOf(unwiredOut.message) === "1 repo · 1 unwired" && isWelcome(unwiredOut.message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
-  says("the stack claim selects no plugin: an APPS repo loading spn-apps is wired",
+  says("the stack claim selects no plugin: an APPS repo loading spn-surface and spn-apps is wired",
     !statusOf(hook(ordinary, null).message).includes("unwired"));
+  const appsAlone = fixture("status-apps-without-surface", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
+    ".spndevex/README.md": "state\n",
+  });
+  says("an APPS repo loading spn-apps without spn-surface is unwired (RD.DEVEX.AGENT.039)",
+    statusOf(hook(appsAlone, null).message).includes("1 unwired"));
 
   const lower = fixture("status-lower-rung", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),

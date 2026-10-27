@@ -1,0 +1,142 @@
+<meta charset="utf-8">
+<title>Scripts — The Code This Plugin Runs</title>
+<!-- spn:doc
+{"id":"surface-scripts","variant":"construct","title":"Scripts — The Code This Plugin Runs","subtitle":"Every file this plugin runs, sorted by what calls it.","lenses":["WEB_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["surface-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder.","keywords":["dispatcher","check","cli","support-lib","mask","bundle"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
+  <div class="sds-rail-title">Scripts — The Code This Plugin Runs</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Code This Plugin Runs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Scripts — The Code This Plugin Runs</h1>
+  <p class="sds-subtitle">Every file this plugin runs, sorted by what calls it.</p>
+  <p class="sds-standfirst">Scripts holds everything this plugin executes, divided by what calls each file: the entry the wiring names, the check it asks, the command line a person types, and the libraries the others read from the shared support folder. Read this page to see what runs, what reads what, and which files this plugin does not own.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Today the plugin runs one check. <strong>The command line ships no command</strong>, so its entry lists none and refuses an unknown group by name; a command added later is a file under <code>commands/</code> and reachable as soon as it exists. The helpers a check needs, the masker that blanks comments and strings, the text a pending write would leave, and the stack of the repository that owns a path, live in the shared support folder and are bundled into each plugin that reads them, so no plugin reads a neighbour's file.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>the dispatcher</strong></td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
+      <tr><td><strong>a check</strong></td><td><code>figma-connector.ts</code></td><td>one rule, in its own file, that returns a verdict and can also run alone</td></tr>
+      <tr><td><strong>masking</strong></td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
+      <tr><td><strong>the resulting text</strong></td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
+      <tr><td><strong>the entry</strong></td><td><code>cli.ts</code></td><td>the one command line the plugin ships, dispatching by group and action</td></tr>
+      <tr><td><strong>the bundle</strong></td><td><code>dist/</code></td><td>the committed build a hook runs, kept current by a staleness test</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>A call reaches the dispatcher through the wiring; the dispatcher asks the check; the check reads the library; the library is copied into the bundle.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="82 22 935 80" style="max-width:935px" role="img" aria-label="The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="84" y="24" width="199" height="76" rx="3"/>
+    <text class="sds-label" x="100" y="50">the wiring</text>
+    <text class="sds-note" x="100" y="69">hooks.json names</text>
+    <text class="sds-note" x="100" y="88">dist/events/pretooluse.mjs</text>
+    <path class="sds-connector" d="M283 62 H339" marker-end="url(#ar)"/>
+    <text class="sds-note" x="298" y="54">runs</text>
+    <rect class="sds-box" x="339" y="33.5" width="160" height="57" rx="3"/>
+    <text class="sds-label" x="355" y="59.5">the dispatcher</text>
+    <text class="sds-note" x="355" y="78.5">events/pretooluse.ts</text>
+    <path class="sds-connector" d="M499 62 H555" marker-end="url(#ar)"/>
+    <text class="sds-note" x="514" y="54">asks</text>
+    <rect class="sds-box" x="555" y="33.5" width="192" height="57" rx="3"/>
+    <text class="sds-label" x="571" y="59.5">a check</text>
+    <text class="sds-note" x="571" y="78.5">checks/figma-connector.ts</text>
+    <path class="sds-connector" d="M747 62 H803" marker-end="url(#ar)"/>
+    <text class="sds-note" x="759" y="54">reads</text>
+    <rect class="sds-box" x="803" y="24" width="212" height="76" rx="3"/>
+    <text class="sds-label" x="819" y="50">the shared library</text>
+    <text class="sds-note" x="819" y="69">plugin-support-lib: payload,</text>
+    <text class="sds-note" x="819" y="88">timing, source</text>
+  </svg>
+    <figcaption>The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The shared helpers are imported by relative path and bundled in, so an installed plugin needs nothing outside its own folder.",
+  "boxes": [
+    { "id": "a", "label": "the wiring", "note": "hooks.json names dist/events/pretooluse.mjs" },
+    { "id": "b", "label": "the dispatcher", "note": "events/pretooluse.ts" },
+    { "id": "c", "label": "a check", "note": "checks/figma-connector.ts" },
+    { "id": "d", "label": "the shared library", "note": "plugin-support-lib: payload, timing, source" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "runs" },
+    { "from": "b", "to": "c", "label": "asks" },
+    { "from": "c", "to": "d", "label": "reads" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-dispatcher-runs-the-chain-and-never-">The dispatcher runs the chain and never takes it down</h3>
+  <p>The first refusal wins and stops the chain, because a refusal is an answer. Warnings accumulate, because two pieces of advice are better than one. A check that throws is skipped, never fatal.</p>
+  <h3 id="a-check-keeps-its-own-file-and-can-run-a">A check keeps its own file and can run alone</h3>
+  <p>Each check exports a verdict function and can be run by hand against a payload on stdin, so a verdict from the dispatcher is the verdict the check gives alone.</p>
+  <h3 id="the-timer-is-the-shared-one-bundled-in">The timer is the shared one, bundled in</h3>
+  <p>The dispatcher records its run through the shared timing library, which writes only while the developer has asked for it and can never fail a gate.</p>
+  <h3 id="the-shared-helpers-have-one-copy">The shared helpers have one copy</h3>
+  <p>The masker, the resulting text and the stack read are one copy each in the shared support folder, proven there once. This plugin imports them by relative path; the build copies them into its own bundle.</p>
+  <h3 id="the-command-line-is-typed-by-its-bare-na">The command line is typed by its bare name</h3>
+  <p>A launcher under <code>bin/</code> puts the plugin's entry on the Bash tool's path while the plugin is enabled, and <code>tiers.json</code> declares the permission tier of each command group. With no group shipped, both declare none.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin runs and what it reads from the shared folder. It does not answer what a script is — the kinds, the bundle and the staleness case are <a href="../../01-devex/constructs/05-scripts-construct.html">Scripts</a>. It does not answer what the connector accepts.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
+    <tbody>
+      <tr><td>the dispatcher, the checks it asks and the entry this plugin ships</td><td>the kinds of script, the bundle rule and the entry's grammar<span class="sds-small">Owned by: <a href="../../01-devex/constructs/05-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>which shared helpers this plugin imports</td><td>the helpers' own proof, which sits with the shared folder<span class="sds-small">Owned by: <a href="../../01-devex/constructs/05-scripts-construct.html">Scripts</a></span></td></tr>
+      <tr><td>the connector check's refusals and notes</td><td>which APIs the connector supports<span class="sds-small">Owned by: <a href="./02-hooks-construct.html">Hooks</a></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>RD.DEVEX.FUNCTION.035</code></p><p>a rule reaches a write-time hook only where review would be too late</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RD.DEVEX.AGENT.066</code></p><p>a gate never names an instance</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>source beside a committed build, one command entry, a shared folder never installed on its own</p></td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node scripts/build-plugins.mjs plugin-spn-surface</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js"></script>
