@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "110aa054"
+      "seen": "9fc0e7b8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "c72435d3"
+      "seen": "e83fbba1"
     }
   ]
 }
@@ -163,7 +163,9 @@ Two files name a plugin, and they answer different questions.
 
 The listing is the only file that knows all four plugins exist, and nothing generates it. The manifest is a plugin's own claim about itself, read at install time.
 
-**A version names what is published, never what you are working on — MUST.** The marketplace releases at the version its plugins carry, and only then moves the number. **That is what makes a stale cache findable** — a cache directory is keyed by name and version, so a plugin edited without moving the number installs over its own published bytes, and nothing tells you which copy you are running.
+**A version names what is published, never what you are working on — MUST.** The number moves only when a release begins, written by the marketplace's release command, and stays put while work lands between releases. **That is what makes a stale cache findable** — a cache directory is keyed by name and version, so a plugin edited without moving the number installs over its own published bytes, and nothing tells you which copy you are running.
+
+**The four plugins carry one version, and release together — MUST** (`RD.DEVEX.AGENT.110`). They share code compiled into every one of them, one test run proves them together, and one tag ships them, so a number that moved for one plugin and not another would claim a difference nobody built. The current number is the one the four manifests carry; the released number is the marketplace's newest `vX.Y.Z` tag, and only the release command writes either.
 
 ## Two install modes, and the place you are standing decides
 
@@ -174,7 +176,16 @@ The listing is the only file that knows all four plugins exist, and nothing gene
 
 **Unset means PARTNER, and that is the point.** It is the answer somebody gets by doing nothing, so nothing has to be set on anybody's behalf.
 
-**A partner's marketplace is pinned to a release tag, never a branch — MUST.** The wiring command writes the published repository's source with a `ref` naming the marketplace's own release tag, `vX.Y.Z` on `main`, and a source that names a branch, or none, is rewritten to the tag on the next sync. The tag is never typed: a Support release reads the marketplace's newest `vX.Y.Z` tag once, proves its install against it and stamps it into what it publishes, and the wiring command writes the tag it was released with. Run from source with no stamp, it refuses to write a partner's source, by name. A plugin release tags `main` with the marketplace's next `vX.Y.Z` and with `<plugin>--v<version>` for each plugin it releases, Claude Code's own convention for tagging a plugin (`RD.DEVEX.AGENT.109`). Without a `ref`, Claude Code reads the repository's default branch, which is `develop`, so a partner would run plugins nobody released. A builder's directory source names no `ref`: it is the checkout, read as it stands.
+**A partner's marketplace is pinned to a release tag, never a branch — MUST.** The wiring command writes the published repository's source with a `ref` naming the marketplace's own release tag, `vX.Y.Z` on `main`, and a source that names a branch, or none, is rewritten to the tag on the next sync. The tag is never typed: a Support release reads the marketplace's newest `vX.Y.Z` tag once, proves its install against it and stamps it into what it publishes, and the wiring command writes the tag it was released with. Run from source with no stamp, it refuses to write a partner's source, by name. Without a `ref`, Claude Code reads the repository's default branch, which is `develop`, so a partner would run plugins nobody released. A builder's directory source names no `ref`: it is the checkout, read as it is on disk.
+
+**The plugins release in lockstep, through one command — MUST.** The four are released together at the one version they all carry, and the marketplace tag is that version. A release tags `main` with `v<version>`, and with `<plugin>--v<version>` for each plugin, Claude Code's own convention for tagging a plugin (`RD.DEVEX.AGENT.109`, `RD.DEVEX.AGENT.110`). The tag action refuses off `main`, on a dirty tree, on versions that disagree and on a tag that already exists, so a release can neither skip its tag nor cut one twice. In the marketplace, the release runs in four steps:
+
+| Step | What it does |
+| --- | --- |
+| `npm run release:plugins -- prepare <version>` | on a branch from `develop`: refuses a dirty tree, a version that is not `X.Y.Z` and one not above the newest `vX.Y.Z` tag; writes the version into the four manifests, builds and tests the plugins, and commits `chore(release): plugins <version>`. It pushes nothing |
+| the PRs | the commit goes to `develop`, then `develop` goes to `main` |
+| `npm run release:plugins -- tag` | on `main`, once `HEAD` is `origin/main`: prints the five tags and their messages, and cuts nothing |
+| `npm run release:plugins -- tag --push` | cuts the five tags annotated, pushes those five refs only, and reads them back from `origin`, failing by name on any that did not land |
 
 **The two modes differ in what you may edit and in nothing else.** A partner's workspace is a full workspace, worked the same way — its repositories carry their own concept, their own documents, their own code and their own tests. What it does not hold is the book and the marketplace, so the book is cited by name and the plugins arrive installed.
 
