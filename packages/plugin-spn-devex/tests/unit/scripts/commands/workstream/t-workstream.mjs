@@ -1,7 +1,7 @@
 // `commands/workstream/` — the only writers of what a script owns, run as the agent types them, in a
 // throwaway workspace. Each command is shown answering in its line, writing its file, and refusing what
 // it is typed with wrongly.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -31,12 +31,12 @@ console.log("=== help lists the group");
 
 console.log("\n=== row write — opens an arc, changes its header, adds and moves rows");
 {
-  const opened = cli(root, ["workstream", "row", "write", "031/N002", "--title", "the second arc", "--subject", "second"]);
+  const opened = cli(root, ["workstream", "row", "write", "031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome"]);
   ok("an arc is opened as PROPOSED", opened.code === 0 && /ok · N002 0\/0 · N002 opened · PROPOSED/.test(opened.out), opened.out);
   const second = json(join(ws, "arcs", "N002", "state.json"));
   ok("its data holds the schema's header", second.schemaVersion === 2 && second.status === "PROPOSED" && second.preview === "preview.html" && second.rows.length === 0);
   const bare = cli(root, ["workstream", "row", "write", "031/N003"]);
-  ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title` and `--subject`."), bare.out);
+  ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254)."), bare.out);
   const added = cli(root, ["workstream", "row", "write", "031/N001", "3", "--title", "check it", "--kind", "fix", "--blocked-by", "2", "--touches", "marketplace:b,foundation:c"]);
   ok("a row is added", added.code === 0 && /row 3 added/.test(added.out), added.out);
   const three = json(arcFile).rows.find((row) => row.id === "3");
@@ -132,7 +132,9 @@ console.log("\n=== progress write, and arc stamp write");
   ok("it reads the rows done and the arcs", /<span>0 of 2 arcs closed<\/span>/.test(readFileSync(join(ws, "approach.html"), "utf8")));
   const wrong = cli(root, ["workstream", "arc", "stamp", "031/N001"]);
   ok("red: `arc stamp` with no `write` is refused in the chapter's words", wrong.code === 2 && wrong.out.includes("is typed `arc stamp write <arc>`."), wrong.out);
-  cli(root, ["workstream", "row", "write", "031/N009", "--title", "an arc the page does not list", "--subject", "unlisted", "--note", "the developer: open it beside N002"]);
+  cli(root, ["workstream", "row", "write", "031/N009", "--title", "an arc the page does not list", "--subject", "unlisted", "--goal", "the unlisted outcome", "--note", "the developer: open it beside N002"]);
+  // The opening write puts the arc's row on the page; this arc is the one whose row was taken off by hand.
+  put(ws, "approach.html", readFileSync(join(ws, "approach.html"), "utf8").replace(/\s*<tr id="N009"[^\n]*<\/tr>/, ""));
   const noRow = cli(root, ["workstream", "arc", "stamp", "write", "031/N009"]);
   ok("red: an arc with no Cycles row is not stamped, and names `docs cycles write`", noRow.code === 1 && noRow.out.includes("docs cycles write"), noRow.out);
   const stamped = cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
@@ -147,7 +149,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   const half = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "half.json"]);
   ok("red: a card with a part missing is refused", half.code === 2 && half.out.includes("refuses a card with a part missing") && half.out.includes("no `views`"), half.out);
   const text = readFileSync(page, "utf8");
-  put(ws, "approach.html", text.replace('<h4 id="c1">', '<li id="q7">an answer folded earlier</li>\n  <h4 id="c1">'));
+  put(ws, "approach.html", text.replace('<h4 id="N001-what">', '<li id="q7">an answer folded earlier</li>\n  <h4 id="N001-what">'));
   const raised = cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
   ok("the next number is past every anchor the page carries", raised.code === 0 && raised.out.startsWith("q8 · open · approach.html Open — Q8"), raised.out);
   ok("the card stands in the approach page's Open, under its heading", /<h2>Open &mdash; Q8<\/h2>/.test(readFileSync(page, "utf8")) && readFileSync(page, "utf8").includes('<h4 id="q8">'));
@@ -263,7 +265,7 @@ console.log("\n=== row write — steps may be written before the go, and none st
   const write = (...words) => cli(plan.root, ["workstream", "row", "write", ...words]);
   const second = join(plan.ws, "arcs", "N002", "state.json");
   const secondLog = join(plan.ws, "arcs", "N002", "log.jsonl");
-  write("031/N002", "--title", "the second arc", "--subject", "second");
+  write("031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome");
   const given = write("031/N002", "1", "--title", "build the bar", "--kind", "change");
   ok("a step written on a PROPOSED arc keeps the kind typed, a build step", given.code === 0 && json(second).rows[0].kind === "change", given.out);
   const bare = write("031/N002", "2", "--title", "draw the preview");
@@ -305,8 +307,8 @@ console.log("\n=== row write and arc delete — several arcs PROPOSED at once; o
 {
   const many = await dataWorkspace("commands-many");
   const write = (...words) => cli(many.root, ["workstream", "row", "write", ...words]);
-  write("031/N002", "--title", "the second arc", "--subject", "second");
-  const third = write("031/N003", "--title", "the third arc", "--subject", "third");
+  write("031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome");
+  const third = write("031/N003", "--title", "the third arc", "--subject", "third", "--goal", "the third outcome");
   ok("a second arc opens while one is PROPOSED, with no words needed", third.code === 0 && json(join(many.ws, "arcs", "N003", "state.json")).status === "PROPOSED", third.out);
   const dropNew = write("031/N003", "--status", "DROPPED", "--reason", "x", "--note", "the developer: drop N003");
   ok("red: an arc never decided is not dropped: it is deleted", dropNew.code === 2 && dropNew.out.includes("`workstream arc delete N003"), dropNew.out);
@@ -323,17 +325,107 @@ console.log("\n=== row write --review-fixes — one arc takes every fix to a lan
   const fixes = await dataWorkspace("commands-review-fixes");
   const write = (...words) => cli(fixes.root, ["workstream", "row", "write", ...words]);
   const file = join(fixes.ws, "arcs", "N009", "state.json");
-  const silent = write("031/N009", "--title", "review fixes", "--subject", "review-fixes", "--review-fixes");
+  const silent = write("031/N009", "--title", "review fixes", "--subject", "review-fixes", "--goal", "every fix to a landed arc", "--review-fixes");
   ok("red: the review-fixes arc opens on the developer's words", silent.code === 2 && silent.out.includes("on the developer's words"), silent.out);
-  const opened = write("031/N009", "--title", "review fixes", "--subject", "review-fixes", "--review-fixes", "--note", "the developer: fix the footer's gap");
+  const opened = write("031/N009", "--title", "review fixes", "--subject", "review-fixes", "--goal", "every fix to a landed arc", "--review-fixes", "--note", "the developer: fix the footer's gap");
   ok("it opens DECIDED on those words, marked as the review-fixes arc", opened.code === 0 && json(file).status === "DECIDED" && json(file).reviewFixes === true, opened.out);
   write("031/N009", "1", "--title", "N001: the footer's gap", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE");
   const fixed = write("031/N009", "1", "--state", "landed");
   ok("its steps all landed, it still reads RUNNING until the close", fixed.code === 0 && fixed.out.includes("N009 reads RUNNING"), fixed.out);
-  const second = write("031/N010", "--title", "more fixes", "--subject", "more-fixes", "--review-fixes", "--note", "the developer: fix it");
+  const second = write("031/N010", "--title", "more fixes", "--subject", "more-fixes", "--goal", "more fixes", "--review-fixes", "--note", "the developer: fix it");
   ok("red: a workstream keeps one review-fixes arc", second.code === 2 && second.out.includes("keeps one review-fixes arc: N009"), second.out);
   const closed = write("031/N009", "--status", "LANDED", "--note", "the developer: close it");
   ok("the developer's word to close stores its LANDED", closed.code === 0 && json(file).status === "LANDED", closed.out);
+}
+
+console.log("\n=== row write — an arc opens whole: its data, its preview, its What entry and its stamped Cycles row (RD.DEVEX.WORKSPACE.254)");
+{
+  const whole = await dataWorkspace("commands-opening");
+  const page = join(whole.ws, "approach.html");
+  const domains = readFileSync(page, "utf8")
+    .replace('  <h4 id="N001-what">The probe</h4>', '  <h3 id="d1">Platform &middot; Data and trust</h3>\n  <h4 id="N001-what">The probe</h4>')
+    .replace('</section>\n<section id="s3"', '  <h3 id="d2">Second domain</h3>\n  <h4 id="c5">A subject heading</h4>\n  <p>its words</p>\n</section>\n<section id="s3"');
+  writeFileSync(page, domains);
+  const write = (...words) => cli(whole.root, ["workstream", "row", "write", ...words]);
+  const goal = "Each control's evidence leaves as one file an auditor can read, named for the control.";
+  const arcOf = (id) => join(whole.ws, "arcs", id);
+  const noteOf = (id) => join(whole.ws, "notes", id, "preview.html");
+
+  const noGoal = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--under", "d1");
+  ok("red: an opening without --goal is refused in the chapter's words, exit 2", noGoal.code === 2
+    && noGoal.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254)."), noGoal.out);
+  ok("red: and nothing is written: no data, no preview, the page as it was", !existsSync(arcOf("N003")) && !existsSync(noteOf("N003")) && readFileSync(page, "utf8") === domains);
+
+  const unknown = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d9");
+  ok("red: an --under id What does not hold is refused, naming it", unknown.code === 2 && unknown.out.includes("finds no domain or subject heading `d9`"), unknown.out);
+  ok("red: and nothing is written", !existsSync(arcOf("N003")) && !existsSync(noteOf("N003")) && readFileSync(page, "utf8") === domains);
+
+  const opened = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d1");
+  ok("the line names the four pieces", opened.code === 0 && opened.out.startsWith("ok · N003 0/0 · N003 opened · PROPOSED · preview · What entry · Cycles row\n"), opened.out);
+  ok("and each piece's place, as drawn", opened.out.includes("  arcs/N003/state.json       written, with its log line and its name file, evidence-export.md\n")
+    && opened.out.includes("  notes/N003/preview.html    written from the template: the masthead, the PROPOSED badge, the back link to #N003-what, four sections to fill\n")
+    && opened.out.includes("  approach.html · What       #N003-what written under d1, Platform · Data and trust: the title, the goal, and the link to notes/N003/preview.html\n")
+    && opened.out.includes("  approach.html · Cycles     row N003 written and stamped, its preview linked\n"), opened.out);
+  ok("the data holds the goal, PROPOSED, and the fixed preview", json(join(arcOf("N003"), "state.json")).goal === goal && json(join(arcOf("N003"), "state.json")).status === "PROPOSED");
+  const preview = readFileSync(noteOf("N003"), "utf8");
+  ok("the preview is the template with its masthead filled: title, back link, title, arc, badge",
+    preview.includes("<title>031 · N003 - Evidence Export</title>") && preview.includes('href="../../approach.html#N003-what">&larr; 031 - Probe</a>')
+      && preview.includes("<h1>Evidence export</h1>") && preview.includes('href="../../approach.html#N003">N003</a>') && preview.includes("sds-status sds-proposed")
+      && !preview.includes("{{NNN}}") && !preview.includes("{{nnn}}") && !preview.includes("{{THE PREVIEW NAME}}") && !preview.includes("RESTATES"), preview.slice(0, 1500));
+  ok("the subtitle and the description stay slots for the agent", preview.includes("{{THE SUBTITLE") && preview.includes("{{THE DESCRIPTION"));
+  const after = readFileSync(page, "utf8");
+  const entry = '  <h4 id="N003-what">Evidence export</h4>\n  <p>Each control\'s evidence leaves as one file an auditor can read, named for the control.</p>\n  <p>Read the preview &rarr; <a href="notes/N003/preview.html">Evidence export</a></p>\n  <h3 id="d2">';
+  ok("the What entry stands at the end of d1's part, before d2, with the title, the goal and the link", after.includes(entry), after);
+  ok("the Cycles row is there, stamped", /<tr id="N003" data-arc="arcs\/N003\/state.json" data-arc-stamp="[0-9a-f]{12}">/.test(after) && after.includes('href="notes/N003/preview.html"'));
+  const check = cli(whole.root, ["workstream", "state", "check", "031"]);
+  ok("the workstream passes its own check at once", check.code === 0 && /whole/.test(check.out), check.out);
+
+  const atEnd = write("031/N004", "--title", "Second export", "--subject", "second-export", "--goal", "A second outcome.");
+  const endPage = readFileSync(page, "utf8");
+  ok("with no --under the entry is written at the end of What", atEnd.code === 0 && atEnd.out.includes("#N004-what written at the end of What") && /<p>its words<\/p>\n  <h4 id="N004-what">Second export<\/h4>\n[^]*<\/section>\n<section id="s3"/.test(endPage), atEnd.out);
+
+  // A bare write repairs what is missing, and changes nothing that is there.
+  writeFileSync(noteOf("N003"), "<meta charset=\"utf-8\">\n<p>edited by the agent</p>\n");
+  const kept = write("031/N003");
+  ok("a bare write on a whole arc writes nothing", kept.code === 0 && kept.out.startsWith("ok · N003 · whole: nothing written"), kept.out);
+  ok("a preview that is there is kept as the agent left it", readFileSync(noteOf("N003"), "utf8") === "<meta charset=\"utf-8\">\n<p>edited by the agent</p>\n");
+  const bytes = readFileSync(page, "utf8");
+  rmSync(noteOf("N004"));
+  const filled = write("031/N004");
+  ok("a bare write fills the preview it finds missing and keeps the entry and the row", filled.code === 0 && filled.out.startsWith("ok · N004 · preview written from the template · What entry kept · Cycles row kept"), filled.out);
+  ok("the fresh preview is the template again, and the page is as it was", readFileSync(noteOf("N004"), "utf8").includes("<title>031 · N004 - Second Export</title>") && readFileSync(page, "utf8") === bytes);
+  const twice = write("031/N004");
+  ok("and a second bare write finds it whole", twice.out.startsWith("ok · N004 · whole: nothing written") && readFileSync(page, "utf8") === bytes, twice.out);
+
+  writeFileSync(page, bytes.replace(/\s*<h4 id="N004-what">[^]*?<\/p>\n  <p>Read the preview[^\n]*N004[^\n]*<\/p>/, "").replace(/\s*<tr id="N004"[^\n]*<\/tr>/, ""));
+  const both = write("031/N004");
+  ok("a bare write writes the entry and the row it finds missing, and keeps the preview",
+    both.code === 0 && both.out.includes("What entry: #N004-what written at the end of What") && both.out.includes("Cycles row written and stamped") && both.out.includes("preview kept"), both.out);
+  ok("and the workstream passes its check again", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
+
+  // An existing arc takes the anchor on a subject heading.
+  writeFileSync(page, readFileSync(page, "utf8").replace('<h4 id="N001-what">The probe</h4>', '<h4 id="c1">The probe</h4>'));
+  const anchored = write("031/N001", "--under", "c1");
+  ok("--under on a subject heading anchors an arc that already exists", anchored.code === 0
+    && anchored.out.startsWith("ok · N001 · What entry: #N001-what anchored on c1 · preview kept · Cycles row kept"), anchored.out);
+  ok("the anchor is a span on the heading, and the heading is as it was", readFileSync(page, "utf8").includes('<h4 id="c1"><span id="N001-what"></span>The probe</h4>'));
+  ok("and the workstream passes its check", cli(whole.root, ["workstream", "state", "check", "031"]).code === 0);
+  const noHeading = write("031/N001", "--under", "zz");
+  ok("red: an anchor on a heading What does not hold is refused", noHeading.code === 2 && noHeading.out.includes("finds no domain or subject heading `zz`"), noHeading.out);
+  const onRow = write("031/N001", "1", "--under", "c1");
+  ok("red: --under belongs to the arc, never to a row", onRow.code === 2 && onRow.out.includes("`--under`"), onRow.out);
+
+  // A carried arc keeps its preview where its preview field names it, and its entry links it there.
+  const carried = await dataWorkspace("commands-opening-carried");
+  const elsewhere = "../032-next/notes/N002/preview.html";
+  put(carried.root, ".spndevex/workstreams/open/032-next/notes/N002/preview.html", "<meta charset=\"utf-8\">\n<section id=\"s1\"><h2>Overview</h2></section>\n");
+  const moved = cli(carried.root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--preview", elsewhere, "--note", "the developer: move N001 to 032"]);
+  ok("a carried arc's What entry follows the preview to where its field names it", moved.code === 0
+    && readFileSync(join(carried.ws, "approach.html"), "utf8").includes(`<a href="${elsewhere}">the probe</a>`) && !/has no preview|not linked from its What entry/.test(moved.out), moved.out);
+  const carriedBare = cli(carried.root, ["workstream", "row", "write", "031/N001"]);
+  ok("a bare write on it writes no preview at notes/N001/ and says the arc is whole", carriedBare.out.startsWith("ok · N001 · whole: nothing written") && !existsSync(join(carried.ws, "notes", "N001", "preview.html.new")) && readFileSync(join(carried.ws, "notes", "N001", "preview.html"), "utf8").length > 0, carriedBare.out);
+  const reopened = cli(carried.root, ["workstream", "state", "check", "031"]);
+  ok("and the check finds the carried preview", !/has no preview/.test(reopened.out), reopened.out);
 }
 
 console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RD.DEVEX.WORKSPACE.279)");

@@ -260,7 +260,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
   }
   {
     const { root } = await dataWorkspace("d17-carried");
-    cli(root, ["workstream", "row", "write", "031/N002", "--title", "the next arc", "--subject", "next", "--note", "the developer: open it"]);
+    cli(root, ["workstream", "row", "write", "031/N002", "--title", "the next arc", "--subject", "next", "--goal", "the next outcome", "--note", "the developer: open it"]);
     stopAt(root, "d17-carried");
     command(root, "d17-carried", ["workstream", "row", "write", "031/N002", "--note", "two review points are carried to row 2"]);
     check("known-bad: a PROPOSED arc whose log carries a point to a later row of itself is named", /\[carried\]/.test(stopAt(root, "d17-carried")));

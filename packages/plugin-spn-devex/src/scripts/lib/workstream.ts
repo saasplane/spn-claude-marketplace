@@ -9,10 +9,11 @@
 import { createHash } from "node:crypto";
 import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { STATUSES, TERMINAL, type Status } from "../checks/arc-status.ts";
 import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
-import { APPROACH_PAGE, ARCS, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
   type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
@@ -1081,4 +1082,181 @@ export function writeOpenBlocks(ws: string, questions: readonly Question[] = rea
     if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(rel); }
   }
   return { wrote, skipped };
+}
+
+// ---------------------------------------------------------------------------- an arc's preview and its What entry
+
+/** The id an arc's entry in the approach page's What carries, on its heading or as an anchor on a subject heading. */
+export const whatId = (arc: string): string => `${arc}-what`;
+
+/** Where the plugin keeps the book's templates for a workstream: the nearest folder above this file, or the bundle that holds it, that has them. */
+function workstreamTemplates(): string | null {
+  let dir = dirname(fileURLToPath(import.meta.url));
+  for (;;) {
+    const found = join(dir, PLUGIN_TEMPLATES, "workstream");
+    if (isDir(found)) return found;
+    const up = dirname(dir);
+    if (up === dir) return null;
+    dir = up;
+  }
+}
+
+/** A slug as words in title case: `evidence-export` reads `Evidence Export`. */
+export const titleCase = (slug: string): string => slug.split("-").filter(Boolean).map((word) => word[0].toUpperCase() + word.slice(1)).join(" ");
+
+/** The workstream's number and its title as the approach page names it: `031 - Compliance Certification`. */
+export function workstreamName(ws: string): { number: string; title: string } {
+  const found = /^(\d+)-(.+)$/.exec(basename(ws));
+  const number = found ? found[1] : basename(ws);
+  return { number, title: `${number} - ${found ? titleCase(found[2]) : basename(ws)}` };
+}
+
+/**
+ * A new arc's preview from the book's template: the masthead filled from the arc and its workstream, the back link
+ * naming the arc's What entry, the badge reading the arc's status, and the template's own header comment left out.
+ * The subtitle, the description and each section's standfirst stay slots for the agent.
+ */
+export function previewFromTemplate(ws: string, data: Pick<ArcData, "arc" | "subject" | "title" | "status">): string {
+  const dir = workstreamTemplates();
+  if (!dir) throw new Error("finds no approach-preview-template.html among the plugin's references");
+  let text = readFileSync(join(dir, "approach-preview-template.html"), "utf8");
+  const start = text.indexOf("<meta charset");
+  if (start > 0) text = text.slice(start);
+  const { number, title } = workstreamName(ws);
+  const page = approachOf(ws);
+  const workspace = page ? /<span class="sds-line1">([^<&]*?)\s*&nbsp;\|&nbsp;/.exec(readFileSync(page, "utf8"))?.[1] : undefined;
+  const json = (value: string): string => JSON.stringify(value).slice(1, -1);
+  text = text.replace(/<!-- spn:doc[\s\S]*?-->/, (block) => block
+    .replace("ws-{{NNN}}-{{slug}}-{{preview-slug}}", json(`ws-${basename(ws)}-${data.subject}`))
+    .replace("{{THE PREVIEW NAME}}", json(data.title)));
+  const slots: Array<[string, string]> = [
+    ["{{THE ARC'S SUBJECT, IN TITLE CASE}}", titleCase(data.subject)],
+    ["{{THE PREVIEW NAME}}", escapeHtml(data.title)],
+    ["{{NNN}} - {{TITLE}}", title],
+    ["{{NNN}}", number],
+    ["{{nnn}}", data.arc.slice(1)],
+    ["{{arc status}}", data.status.toLowerCase()],
+    ["{{THE ARC'S STATUS}}", data.status],
+    ["{{date}}", now().slice(0, 10)],
+  ];
+  if (workspace) slots.push(["{{WORKSPACE}}", workspace]);
+  for (const [slot, value] of slots) text = text.split(slot).join(value);
+  return previewWithStatus(text, data.arc, data.status);
+}
+
+/** The parts of an HTML text that are slots, `{{…}}`, each with its line, in order. */
+export function slotsIn(text: string): Array<{ line: number; slot: string }> {
+  const out: Array<{ line: number; slot: string }> = [];
+  for (const found of text.matchAll(/\{\{(?:(?!\{\{|\}\})[\s\S])*\}\}/g))
+    out.push({ line: text.slice(0, found.index!).split("\n").length, slot: found[0] });
+  return out;
+}
+
+/** The span of the approach page's What: from just past its `h2` to the next `h2` or the section's close. */
+export function whatRange(text: string): { from: number; to: number } | null {
+  const heading = /<h2\b[^>]*>\s*What\b[\s\S]*?<\/h2>/i.exec(text);
+  if (!heading) return null;
+  const from = heading.index + heading[0].length;
+  const next = text.slice(from).search(/<h2\b|<\/section>/i);
+  return { from, to: next < 0 ? text.length : from + next };
+}
+
+type Heading = { at: number; end: number; level: number; id: string | null };
+
+/** Every heading that opens inside a span of the page, with where its tag sits and its id. */
+function headingsIn(text: string, range: { from: number; to: number }): Heading[] {
+  const out: Heading[] = [];
+  for (const found of text.slice(range.from, range.to).matchAll(/<h([1-6])\b([^>]*)>/gi))
+    out.push({ at: range.from + found.index!, end: range.from + found.index! + found[0].length, level: Number(found[1]), id: /\bid="([^"]*)"/.exec(found[2])?.[1] ?? null });
+  return out;
+}
+
+/** A heading's words as a person reads them, tags gone. */
+function headingWords(text: string, head: Heading): string {
+  const close = text.indexOf(`</h${head.level}>`, head.end);
+  return text.slice(head.end, close < 0 ? head.end : close).replace(/<[^>]*>/g, "").replace(/&middot;/g, "·").replace(/&amp;/g, "&").replace(/&mdash;/g, "—").replace(/\s+/g, " ").trim();
+}
+
+/**
+ * An arc's entry in What (RD.DEVEX.WORKSPACE.254): the heading carrying its id, or the subject heading that holds the id as
+ * an anchor, to the next heading of the same level or higher. Null where What holds neither.
+ */
+export function whatEntryOf(text: string, arc: string): { from: number; to: number; kind: "entry" | "anchor" } | null {
+  const range = whatRange(text);
+  if (!range) return null;
+  const heads = headingsIn(text, range);
+  const id = whatId(arc);
+  let at = heads.findIndex((head) => head.id === id);
+  let kind: "entry" | "anchor" = "entry";
+  if (at < 0) {
+    const span = new RegExp(`<span\\b[^>]*\\bid="${id}"[^>]*>\\s*</span>`).exec(text.slice(range.from, range.to));
+    if (!span) return null;
+    at = heads.filter((head) => head.at < range.from + span.index).length - 1;
+    kind = "anchor";
+  }
+  if (at < 0) return null;
+  const next = heads.slice(at + 1).find((head) => head.level <= heads[at].level);
+  return { from: heads[at].at, to: next ? next.at : range.to, kind };
+}
+
+/** Every link of an HTML text that points inside the workspace's files, as written and as a path from `base`, fragment left off. */
+export function localLinks(html: string, base: string): Array<{ href: string; path: string }> {
+  const out: Array<{ href: string; path: string }> = [];
+  for (const found of html.matchAll(/<a\b[^>]*\bhref="([^"]*)"/gi)) {
+    const href = found[1].replace(/&amp;/g, "&");
+    if (!href || href.startsWith("#") || href.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(href)) continue;
+    out.push({ href, path: resolve(base, href.replace(/[#?].*$/, "")) });
+  }
+  return out;
+}
+
+/** Where each arc's preview sits, as a path, and whose it is: the fixed place, or the path an arc carried elsewhere names. */
+export function previewOwners(ws: string): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const arc of arcIdsOf(ws)) {
+    const data = readArc(ws, arc);
+    if (data) out.set(resolve(ws, previewHrefOf(arc, data)), arc);
+  }
+  return out;
+}
+
+const entryHtml = (data: Pick<ArcData, "arc" | "title" | "goal" | "preview">): string => [
+  `  <h4 id="${whatId(data.arc)}">${inline(data.title)}</h4>`,
+  `  <p>${inline(typeof data.goal === "string" ? data.goal : "")}</p>`,
+  `  <p>Read the preview &rarr; <a href="${previewHrefOf(data.arc, data)}">${inline(data.title)}</a></p>`,
+].join("\n");
+
+/**
+ * The approach page with an arc's What entry written (RD.DEVEX.WORKSPACE.254), and how: under a domain heading, `h3`,
+ * `under` names, at the end of that heading's part; as an anchor, `<span id="N<nnn>-what"></span>`, on a subject heading,
+ * `h4` or lower, that `under` names; or at the end of What where `under` is null. Throws where What holds no such heading.
+ */
+export function withWhatEntry(text: string, data: Pick<ArcData, "arc" | "title" | "goal" | "preview">, under: string | null): { text: string; how: "entry" | "anchor"; where: string } {
+  const range = whatRange(text);
+  if (!range) throw new Error("finds no What on the approach page to write the entry in");
+  const heads = headingsIn(text, range);
+  let insertAt = range.to;
+  let where = "at the end of What";
+  if (under !== null) {
+    const at = heads.findIndex((head) => head.id === under);
+    if (at < 0 || heads[at].level < 3)
+      throw new Error(`finds no domain or subject heading \`${under}\` in the approach page's What — \`--under\` takes the id of an \`h3\` domain heading to write the entry under, or of an \`h4\` subject heading to anchor it on`);
+    const head = heads[at];
+    if (head.level >= 4)
+      return { text: `${text.slice(0, head.end)}<span id="${whatId(data.arc)}"></span>${text.slice(head.end)}`, how: "anchor", where: `anchored on ${under}` };
+    const next = heads.slice(at + 1).find((one) => one.level <= head.level);
+    insertAt = next ? next.at : range.to;
+    where = `under ${under}, ${headingWords(text, head)}`;
+  }
+  let cut = insertAt;
+  while (cut > 0 && /\s/.test(text[cut - 1])) cut -= 1;
+  return { text: `${text.slice(0, cut)}\n${entryHtml(data)}${text.slice(cut)}`, how: "entry", where };
+}
+
+/** The page with the preview link inside an arc's What entry pointed at `to`; the page as it was where there is no entry or no such link. */
+export function withEntryLink(text: string, arc: string, from: string, to: string): string {
+  const entry = whatEntryOf(text, arc);
+  if (!entry) return text;
+  const inside = text.slice(entry.from, entry.to).split(`href="${from}"`).join(`href="${to}"`);
+  return text.slice(0, entry.from) + inside + text.slice(entry.to);
 }

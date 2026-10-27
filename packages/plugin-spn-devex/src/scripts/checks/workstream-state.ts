@@ -7,7 +7,7 @@
 
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
@@ -16,6 +16,7 @@ import {
   DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
+  localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
 import { ALTITUDES, DONE_STATES, arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
@@ -39,8 +40,8 @@ function filesUnder(dir: string, base = dir): string[] {
 }
 
 /**
- * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. An arc with no preview is whole:
- * one is made only where something must be seen or worded to decide (RD.DEVEX.WORKSPACE.254).
+ * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. That every arc has its one
+ * is `arcPreviewFindings`' (RD.DEVEX.WORKSPACE.254).
  */
 export function previewFindings(ws: string, arc: string): string[] {
   const out: string[] = [];
@@ -120,8 +121,42 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
   return out;
 }
 
-/** S7: the arc's row in Cycles under its address, its stamp against its goal, title and repositories, and its preview linked from `What`. */
-export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string): string[] {
+/** The path a preview named by the arc sits at: the fixed place, or where a carried arc's `preview` field names it. */
+const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data));
+
+/**
+ * RD.DEVEX.WORKSPACE.254: every arc has one preview, written when it opens; an arc's preview names another arc by its What,
+ * never by its preview; and once the arc is decided, no slot of the template is left in it.
+ */
+export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owners: ReadonlyMap<string, string>): string[] {
+  const out: string[] = [];
+  const path = previewPathOf(ws, arc, data);
+  const href = previewHrefOf(arc, data);
+  const number = workstreamName(ws).number;
+  if (!isFile(path)) {
+    out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream row write ${number}/${arc}\` writes it from the template (RD.DEVEX.WORKSPACE.254)`);
+    return out;
+  }
+  const text = readFileSync(path, "utf8");
+  const seen = new Set<string>();
+  for (const link of localLinks(text, dirname(path))) {
+    const other = owners.get(link.path);
+    if (!other || other === arc || seen.has(other)) continue;
+    seen.add(other);
+    out.push(`${arc}'s preview links \`${link.href}\`, ${other}'s preview — a preview names another arc by its What, \`../../approach.html#${whatId(other)}\`, and never links its preview`);
+  }
+  const status = arcStatus(data);
+  const slots = slotsIn(text);
+  if (slots.length && !["PROPOSED", "CARRIED", "DROPPED"].includes(status))
+    out.push(`${arc} is ${status} and its preview still holds ${slots.length} slot(s), \`{{…}}\`, the first at \`${href}:${slots[0].line}\` — a decided arc's preview is filled; a slot is expected only while the arc is PROPOSED`);
+  return out;
+}
+
+/**
+ * S7: the arc's row in Cycles under its address, its stamp against its goal, title and repositories, and its own What
+ * entry, `N<nnn>-what`, which links its preview and no other arc's (RD.DEVEX.WORKSPACE.254).
+ */
+export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
   const out: string[] = [];
   const row = stampsOn(text).get(arc);
@@ -130,8 +165,39 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     out.push(`${arc}'s row in Cycles carries no \`id="${arc}"\`, so \`approach.html#${arc}\` opens nothing — \`spn-devex docs cycles write\` writes it`);
   else if (row.stamp !== arcStamp(data))
     out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
-  if (isFile(previewOf(ws, arc)) && !sectionText(text, "What").includes(`${NOTES}/${arc}/${PREVIEW_FILE}`))
-    out.push(`${arc}'s preview is not linked from the page's What`);
+  const entry = whatEntryOf(text, arc);
+  if (!entry) {
+    out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream row write ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
+    return out;
+  }
+  const own = previewPathOf(ws, arc, data);
+  const links = localLinks(text.slice(entry.from, entry.to), dirname(page));
+  const crossed = new Set<string>();
+  for (const link of links) {
+    const other = owners.get(link.path);
+    if (!other || other === arc || crossed.has(other)) continue;
+    crossed.add(other);
+    out.push(`${arc}'s What entry links \`${link.href}\`, ${other}'s preview — an arc's entry links its own preview only, and names another arc by its What, \`approach.html#${whatId(other)}\``);
+  }
+  if (!links.some((link) => link.path === own)) out.push(`${arc}'s preview is not linked from its What entry, \`#${whatId(arc)}\``);
+  return out;
+}
+
+/** RD.DEVEX.WORKSPACE.254: a preview is linked from its own arc's What entry, and from no other place in What. One finding for each arc whose preview is so linked. */
+export function whatLinkFindings(ws: string, page: string | null, text: string, owners: ReadonlyMap<string, string>): string[] {
+  const range = whatRange(text);
+  if (!page || !range) return [];
+  const inside = [...new Set(owners.values())].flatMap((arc) => { const entry = whatEntryOf(text, arc); return entry ? [entry] : []; });
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const found of text.slice(range.from, range.to).matchAll(/<a\b[^>]*\bhref="([^"]*)"/gi)) {
+    const at = range.from + found.index!;
+    const [link] = localLinks(found[0], dirname(page));
+    const arc = link ? owners.get(link.path) : undefined;
+    if (!link || !arc || seen.has(arc) || inside.some((entry) => at >= entry.from && at < entry.to)) continue;
+    seen.add(arc);
+    out.push(`the approach page's What links \`${link.href}\` outside ${arc}'s entry — a preview is linked from its own arc's What entry, and from no other place in What`);
+  }
   return out;
 }
 
@@ -267,6 +333,7 @@ export function checkWorkstream(ws: string): Finding[] {
   const out: Finding[] = [];
   const page = approachOf(ws);
   const text = page ? readFileSync(page, "utf8") : "";
+  const owners = previewOwners(ws);
   for (const arc of arcIdsOf(ws)) {
     const raw = readJson(stateFileOf(ws, arc));
     const faults = raw === null ? [`arcs/${arc}/state.json is not JSON`] : arcFaults(raw, `arcs/${arc}/state.json`);
@@ -277,12 +344,15 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));
     if (!data) continue;
-    out.push(...pageFindings(ws, arc, data, page, text).map(say(arc, "stamp")));
+    out.push(...arcPreviewFindings(ws, arc, data, owners).map(say(arc, "preview")));
+    out.push(...pageFindings(ws, arc, data, page, text, owners).map(say(arc, "stamp")));
     out.push(...viewFindings(ws, arc, data, text).map(say(arc, "views")));
     out.push(...nameFindings(ws, arc, data).map(say(arc, "name")));
     out.push(...stepFindings(ws, arc, data).map(say(arc, "steps")));
     out.push(...statusFindings(arc, data).map(say(arc, "status")));
   }
+  // A preview linked from What outside its arc's entry belongs to no arc's check.
+  out.push(...whatLinkFindings(ws, page, text, owners).map(say(null, "stamp")));
   // The status card is read from every arc together, so it belongs to none of them.
   const card = page ? headerStatusRule(ws, text, cyclesOf(ws)) : null;
   if (card)
