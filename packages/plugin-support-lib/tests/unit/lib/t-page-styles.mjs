@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..");
-const { OWN_COPY, STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion } =
+const { OWN_COPY, STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion, integrityFor, sha384Of } =
   await import(pathToFileURL(resolve(HERE, "src", "lib", "page-styles.ts")).href);
 
 let total = 0, failed = 0;
@@ -54,6 +54,28 @@ try {
 ok("the sentence about a page that holds its own copy names the action that produces a page, `docs page write`",
   OWN_COPY.includes("Produce it again with `docs page write`, or copy it from its template"), OWN_COPY);
 ok("a version serves the stylesheet and the two scripts", JSON.stringify(SERVED_FILES) === JSON.stringify(["sds-docs.css", "sds-docs.js", "sds-index.js"]));
+
+console.log("=== page styles — the integrity of each file");
+{
+  const pinned = linesFor("1.0.0", "sds-docs.js", { "sds-docs.css": "sha384-aaa", "sds-docs.js": "sha384-bbb" });
+  ok("a line given its hash carries integrity and crossorigin anonymous, after the address",
+    pinned.stylesheet === `<link rel="stylesheet" href="${STYLES_ADDRESS}1.0.0/sds-docs.css" integrity="sha384-aaa" crossorigin="anonymous">`
+      && pinned.script === `<script src="${STYLES_ADDRESS}1.0.0/sds-docs.js" integrity="sha384-bbb" crossorigin="anonymous"></script>`, JSON.stringify(pinned));
+  ok("a page with the hashes is still read as a link to the served version", sharedStyles(pinned.stylesheet)?.version === "1.0.0");
+  ok("sha384Of is sha384- and the base64 of the digest", sha384Of(Buffer.from("abc")) ===
+    "sha384-ywB1P0WjXou1oD1pmsZQBycsMqsO3tFjGotgWkP/W+2AhgcroefMI1i67KE0yCWn");
+  const folder = mkdtempSync(join(tmpdir(), "integrity-"));
+  try {
+    writeFileSync(join(folder, "integrity.json"), JSON.stringify({ "1.0.0": { "sds-docs.css": "sha384-aaa" } }));
+    ok("a version in the table gives its hashes", integrityFor(folder, "1.0.0", ["sds-docs.css"])["sds-docs.css"] === "sha384-aaa");
+    let said = "";
+    try { integrityFor(folder, "2.0.0", ["sds-docs.css"]); } catch (error) { said = error.message; }
+    ok("a version missing from the table is refused by name, with the versions that have one", said.includes("version 2.0.0") && said.includes("1.0.0"), said);
+    said = "";
+    try { integrityFor(folder, "1.0.0", ["sds-docs.css", "sds-docs.js"]); } catch (error) { said = error.message; }
+    ok("a file missing from a version's row is refused by name", said.includes("sds-docs.js"), said);
+  } finally { rmSync(folder, { recursive: true, force: true }); }
+}
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — page-styles` : `\n  all ${total} passed — page-styles`);
 process.exit(failed ? 1 : 0);

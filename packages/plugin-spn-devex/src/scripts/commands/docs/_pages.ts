@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { bookTemplatesDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, STYLESHEET, cutVersions, linesFor, linksSharedStyles, newestVersion,
+import { INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, STYLESHEET, cutVersions, integrityFor, linesFor, linksSharedStyles, newestVersion,
   stylesDir } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 /** The folder of the templates that holds the page templates. */
@@ -97,7 +97,14 @@ export type Head = {
  * opens a template, and the footer that closes one, are left out: a reader of a page is not its author.
  */
 export function withHead(template: string, head: Head): string {
-  const lines = linesFor(head.version, head.script);
+  // THE HASH IS READ FROM THE TABLE, NEVER FROM THE NETWORK: a version missing from it is refused by name.
+  const styles = process.env.SPN_STYLES ?? stylesDir(fileURLToPath(import.meta.url));
+  let hashes: Record<string, string>;
+  try {
+    if (styles === null) throw new Error(`version ${head.version} has no integrity hash: no \`styles/\` folder was found`);
+    hashes = integrityFor(styles, head.version, [STYLESHEET, head.script]);
+  } catch (error) { throw new Refusal(`${(error as Error).message}, so a page cannot link it`); }
+  const lines = linesFor(head.version, head.script, hashes);
   let page = template.replace(/^\s*<!--(?!\s*spn:doc)[\s\S]*?-->\s*/, "");
   page = page.replace(/\n*<footer>[\s\S]*?<\/footer>\n*/, "\n\n");
   page = swap(page, /<title>[\s\S]*?<\/title>/, `<title>${escaped(head.tab)}</title>`, "`<title>`");

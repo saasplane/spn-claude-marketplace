@@ -46,5 +46,14 @@ for (const [version, files] of Object.entries(versions)) {
     ok(`${version}/${name} holds the bytes it was cut with`, sha(join(SERVED, version, name)) === hash);
 }
 
+console.log("=== styles integrity — every version carries the hash a browser checks its files against");
+const integrity = JSON.parse(readFileSync(join(STYLES, "integrity.json"), "utf8"));
+ok("the integrity table holds exactly the versions that were cut",
+  JSON.stringify(Object.keys(integrity).sort()) === JSON.stringify(Object.keys(versions).sort()));
+for (const version of Object.keys(versions))
+  for (const name of FILES)
+    ok(`${version}/${name} holds the sha384 the table records`,
+      integrity[version]?.[name] === `sha384-${createHash("sha384").update(readFileSync(join(SERVED, version, name))).digest("base64")}`);
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-styles-current` : `\n  all ${total} passed — t-styles-current`);
 process.exit(failed ? 1 : 0);

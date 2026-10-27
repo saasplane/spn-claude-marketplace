@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { PLUGIN, TEMPLATES_DIR } from "../../../../helpers/harness.mjs";
 import { ARTIFACT, CONSTRUCT_PAGES, DOCS, GUIDE_PAGE_SUFFIX, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { OWN_COPY, STYLES_ADDRESS, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-guide-"));
@@ -26,6 +26,10 @@ const same = (label, got, want) => ok(label, JSON.stringify(got) === JSON.string
 const STYLES = join(BASE, "styles");
 mkdirSync(STYLES);
 writeFileSync(join(STYLES, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.10.0": {}, "1.2.0": {} }));
+// Each cut version has the hash of each served file, as `docs sds cut` records them.
+const HASHES = Object.fromEntries(["1.0.0", "1.10.0", "1.2.0"].map((version) => [version,
+  { "sds-docs.css": `sha384-css${version}`, "sds-docs.js": `sha384-js${version}`, "sds-index.js": `sha384-index${version}` }]));
+writeFileSync(join(STYLES, "integrity.json"), JSON.stringify(HASHES));
 const NEWEST = "1.10.0";
 
 const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE, SPN_STYLES: STYLES,
@@ -158,9 +162,12 @@ After the last step the service is down again.
     text.includes('<a href="../../README.md#the-map">the face</a>') && text.includes(`<a href="../../${SEAT.guides}/02-build.md">Build</a>`));
   ok("a repository with no hub gives the page no way back, and not a link to the index",
     !text.includes("sds-home") && !text.includes("../index.html"), each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
-  const lines = linesFor(NEWEST);
+  const lines = linesFor(NEWEST, undefined, HASHES[NEWEST]);
   ok("the page links the newest version that was cut, and loads the page script from it",
     text.includes(lines.stylesheet) && text.includes(lines.script) && !text.includes("/1.0.0/") && !text.includes("/1.2.0/"));
+  ok("[MKT.SCRIPTS.177] each shared line carries its version's integrity hash and crossorigin, read from the table",
+    text.includes(`href="${STYLES_ADDRESS}${NEWEST}/sds-docs.css" integrity="${HASHES[NEWEST]["sds-docs.css"]}" crossorigin="anonymous"`)
+      && text.includes(`src="${STYLES_ADDRESS}${NEWEST}/sds-docs.js" integrity="${HASHES[NEWEST]["sds-docs.js"]}" crossorigin="anonymous"`));
   ok("the header says the workspace, the repository's declared name and the guide, then the type and the audience",
     text.includes('<span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Sample &nbsp;|&nbsp; Getting Started</span>')
       && text.includes('<span class="sds-badge sds-type">Guide</span>')
