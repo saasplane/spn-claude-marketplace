@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "69c821d3"
+      "seen": "110aa054"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "88bc459d"
+      "seen": "c72435d3"
     }
   ]
 }
@@ -173,6 +173,8 @@ The listing is the only file that knows all four plugins exist, and nothing gene
 | a repository reference | a **PARTNER** | the marketplace is the published repository, installed rather than authored |
 
 **Unset means PARTNER, and that is the point.** It is the answer somebody gets by doing nothing, so nothing has to be set on anybody's behalf.
+
+**A partner's marketplace is pinned to a release tag, never a branch — MUST.** The wiring command writes the published repository's source with a `ref` naming the marketplace's own release tag, `vX.Y.Z` on `main`, and a source that names a branch, or none, is rewritten to the tag on the next sync. The tag is never typed: a Support release reads the marketplace's newest `vX.Y.Z` tag once, proves its install against it and stamps it into what it publishes, and the wiring command writes the tag it was released with. Run from source with no stamp, it refuses to write a partner's source, by name. A plugin release tags `main` with the marketplace's next `vX.Y.Z` and with `<plugin>--v<version>` for each plugin it releases, Claude Code's own convention for tagging a plugin (`RD.DEVEX.AGENT.109`). Without a `ref`, Claude Code reads the repository's default branch, which is `develop`, so a partner would run plugins nobody released. A builder's directory source names no `ref`: it is the checkout, read as it stands.
 
 **The two modes differ in what you may edit and in nothing else.** A partner's workspace is a full workspace, worked the same way — its repositories carry their own concept, their own documents, their own code and their own tests. What it does not hold is the book and the marketplace, so the book is cited by name and the plugins arrive installed.
 
