@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "f876d841"
+      "seen": "77626921"
     }
   ],
   "decisions": [
@@ -112,6 +112,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **A pitch is one `DSFeature`, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a section painted by hand, is a finding (`RD.SUPPORT.SURFACE.233`, `.243`, `.259`).
   - **Each part's depth says what a visitor can do with it.** A point to read, a step and a statistic stand flat; a door to another page and a choice that changes what is shown are boxed and raised, so they read as pressable; a thing of its own is boxed; a media is framed, flat or flush by its kind. A flat part that opens a page, or a raised one that does nothing, is a finding (`RD.SUPPORT.SURFACE.293`).
   - **A panel holds its title and actions in its header, and what closes its work in its footer.** Over the page the closing actions stand at the end of the footer, leaving first and the main action last; on a page of its own at the start, main action first. A small entry is a dialog, a medium one a side sheet, a large form a page of one panel (`RD.SUPPORT.SURFACE.074`–`.078`, `.095`).
+  - **A record that moves through states leads with the move its state expects next.** That move is the header's one main action, and it changes when the state does. A move the state does not allow is left out, never drawn disabled. One or two other moves stand beside it and the rest wait behind "⋯". A record with nothing expected next has no main action, and every move of a record, each track's included, stands in its header (`RD.SUPPORT.SURFACE.390`).
   - **A sign-in is one compact panel on a canvas**: providers as one centred row of icons, every control a form field, alternatives as equals under a separator (`RD.SUPPORT.SURFACE.205`).
   - **One panel for each thing a person reads or saves as a whole**; the page that reads a record and the page that changes it hold the same parts in the same order (`RD.SUPPORT.SURFACE.115`–`.117`).
   - **Groups and their items are both in view at a desktop only**; on a tablet and a phone the items replace the groups, with a back action and a changed address (`RD.SUPPORT.SURFACE.079`, `.080`, `.099`).
