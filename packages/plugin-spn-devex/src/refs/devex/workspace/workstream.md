@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "c4fd5e5f"
+      "seen": "0f2cb848"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "0666b148"
+      "seen": "210a5dc0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -228,7 +228,13 @@ in one gate:** the whole test tiers, one restart of the showcase or the app, the
 once, in the arc's final re-check row before a release, and the look of each batch is shown to the
 developer as soon as the batch lands.
 
-**A tool's output stays short, because every later turn reads it again — MUST** (`RD.DEVEX.AGENT.106`). A file over 20 KB is read in parts: search it first, then read the lines needed. A command whose output may pass 10 KB writes to a file, and the agent reads the part it needs. A child's hand-back stays at 15 lines.
+**A tool's output stays short, because every later turn reads it again — MUST** (`RD.DEVEX.AGENT.106`). A file over 20 KB is read in parts: search it first, then read the lines needed. A command whose output may pass 10 KB writes to a file, and the agent reads the part it needs. A child's hand-back stays at 15 lines. A hook refuses a `Read` over 20 KB and a command whose output passes 10 KB, each with the form to use instead (`RD.DEVEX.AGENT.111`).
+
+### Once an arc is decided, it runs in three passes per repository
+
+**Once an arc is decided, each repository it touches runs one docs pass, then one code-and-test pass, then the owed tiers once — MUST** (`RD.DEVEX.WORKSPACE.320`). The docs pass writes the book and the node documents. The code-and-test pass writes the source and the specs that prove it. The tiers pass runs, once, the whole tiers the arc owes that repository. Each repository's whole tiers run once as a baseline before its code pass, so a surprise that would have shown at the gate shows first, while the fix is still cheap.
+
+**An order is cut per repository and pass, from the preview's file list, never per row, and it is never researched again.** The preview already names every file the arc changes, so an order is that list for one repository and one pass. A row the preview does not pin is a gap in the ideation: it is fixed in the preview first, and the order is cut after. The alternative is an order per row, which reads the same files again for each row and runs a gate for each.
 
 ### A workstream works on one branch per repository
 
@@ -236,7 +242,8 @@ developer as soon as the batch lands.
 
 - **One pull request per repository, opened at the first push — MUST.** It stays open for the workstream and targets `develop`. The checks workflow runs on it.
 - **The pull request is rebase-merged into `develop` each time an arc lands a group of rows — MUST.** Each row's commit stays as it was written. The branch is not deleted then, because the workstream goes on using it.
-- **The branch rebases onto `origin/develop` before every push — MUST.** Git drops the commits already upstream, so the push carries only what `develop` does not hold.
+- **The branch takes `develop` at three moments, and in each repository the moment touches — MUST** (`RD.DEVEX.FUNCTION.071`). At the start of each pass (§ *Once an arc is decided, it runs in three passes per repository*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
+- **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream row write <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
 - **After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs — MUST** (`RD.DEVEX.WORKSPACE.317`). Two things count and no more: a file that `develop` changed since the old merge base and the branch also changed, and an open arc's pinned fact whose source moved, as `plan stale` names it. The agent re-checks both and tells the developer in one line what moved and what it re-checked. A window with no open arcs and no pinned facts says nothing. The push check keeps owning only stamped runs and is not widened to this, because a re-read is judgement and a stamp is not.
