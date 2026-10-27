@@ -100,7 +100,7 @@
 | a hook | starts with `use` | `useRoleList` |
 | a plain component | no suffix and no prefix is needed | `RoleBadge` |
 
-**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker` or `Item` (`RD.SUPPORT.APPS.207`). **A badge or a select shows one enum and takes the enum's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect` (`RD.SUPPORT.APPS.206`). **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `ENTTagChip`, `useNTFManageableChannels`.
+**A unit that chooses records ends in `Autocomplete`, and a record never takes a `Select`, which is an enum's alone** (`RD.SUPPORT.SURFACE.307`). `Picker` is for a value of one kind with a control of its own: a colour, a date, a time, an image. A unit that is one design-system block made specific ends in that block's word: `Dialog`, `Sheet`, `Drawer`, `Popover`, `Menu`, `Select`, `Autocomplete`, `Card`, `Picker` or `Item` (`RD.SUPPORT.APPS.207`). **A badge shows one enum or one state's record, and a select shows one enum; each takes that enum's or that state's name exactly,** with `Badge` or `Select` after it: `JobRunStatusTypeBadge`, `OrgTypeBadge`, `NtfBlacklistReasonTypeSelect`, and `EntTagDefinitionBadge`, which takes an `EntTagDefinition` and draws its name in its colour (`RD.SUPPORT.APPS.206`). A badge that shows a record takes the record whole, never the fields it draws one by one. **A unit that takes a state as its data takes the state's name:** `NtfTemplateForm`, `EntTagAssignmentsWidget`, `Captcha` (which takes `CaptchaConfig`). Any other unit is named freely, and a module code in it is in capitals: `useNTFManageableChannels`.
 
 **A type registered with `LOOKUP` owes its web module two exports — MUST** (`RD.SUPPORT.APPS.223`): its `<State>Autocomplete`, and the option source that Autocomplete uses, as the hook `use<State>OptionSource()`, which returns `IDSDataOptionSource` of the record. A form field, a filter bar and the custom-field form all choose that record through the same two, and the custom-field form turns a field's source code (`IAM_ROLE`) into that hook, so no picker of a record is written twice. The hook is a hook file like any other: one hook in `useRoleOptionSource.ts`, in the module's `hooks/<area>/`, beside the `components/<area>/` folder that holds `RoleAutocomplete.tsx`.
 
@@ -222,6 +222,26 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 **There is no `bulk` verb.** A many-read is the plural of the read level, and a read returning an `<X>List` is named for that type.
 
 **Every contract interface gets one validator named `<Interface>Schema`**, written into `contract/validators/<entity>.ts` by `spnutils apps gen-validators`. The name is derived rather than chosen, which makes `Schema` a reserved interface suffix — a contract interface ending in it fails generation instead of emitting a collision. A state that extends exactly one interface also gets `<Interface>SchemaBase` beside its schema, which names the base its schema was merged from.
+
+### Personal name forms
+
+A field's name says whether it holds a person's data, as `_id` and `_at` say what a field is. A key is personal when it is one of these forms or ends with one, and it is ordinary everywhere else. The set is closed: it grows by a register row, never by one field (`RD.SUPPORT.APPS.225`).
+
+| Form | Ends a key such as | Holds |
+| --- | --- | --- |
+| `Email` | `email`, `toEmail`, `externalEmail` | an email address |
+| `Phone` | `phone`, `toPhone`, `maskedPhone` | a phone number |
+| `Address` | `address`, `ipAddress`, `recipientAddress` | an address that reaches or locates a person: postal, network or contact |
+| `BirthDate` | `birthDate` | a date of birth |
+| `firstName` · `lastName` · `displayName` | `firstName`, `actorDisplayName` | a person's names |
+| `person…`, a prefix | `personCountryCode`, `personTimezone` | a person's own settings |
+
+- **A form ends the key.** `emailVerifiedAt` is a time and `phoneNumberId` an id: a form inside a name says nothing. A plural counts (`toEmails`, `handleAddresses`), and so does the same form in `snake_case` (`ip_address`, `person_country_code`), so a column follows its field.
+- **The prefix needs a word after it.** `personTimezone` is personal; a key named `person` is not.
+- **A value of a form's kind is personal wherever it sits.** A sender's `fromEmail` and a site's `supportPhone` are hidden from a log line too: hiding an organization's address costs a debugging line, and missing a person's costs a breach notice.
+- **`spnutils apps gen-validators` refuses a contract field that ends with a personal word outside the forms**: `surname`, `familyName`, `forename`, `givenName`, `fullName`, `nickname`, `birthday`, `dob`, `dateOfBirth`, `mobile`, `mobileNumber`, `phoneNumber`, `telephone`, `mail`. The refusal names the form to use instead.
+
+**One matcher tests a key against the forms.** It is `isPersonalFieldName`, in `support-ts` (the universal core) in a file of its own, `utils/personal.ts`, so a service, a web app and the generator call the same function. The log redactor, the export, the erasure and `gen-validators` are the four callers. There is no tag, no generated list and no merge at boot.
 
 ## Packages
 

@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "827691e6"
+      "seen": "c4fd5e5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "b640e52f"
+      "seen": "0666b148"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -239,6 +239,8 @@ developer as soon as the batch lands.
 - **The branch rebases onto `origin/develop` before every push — MUST.** Git drops the commits already upstream, so the push carries only what `develop` does not hold.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
+- **After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs — MUST** (`RD.DEVEX.WORKSPACE.317`). Two things count and no more: a file that `develop` changed since the old merge base and the branch also changed, and an open arc's pinned fact whose source moved, as `plan stale` names it. The agent re-checks both and tells the developer in one line what moved and what it re-checked. A window with no open arcs and no pinned facts says nothing. The push check keeps owning only stamped runs and is not widened to this, because a re-read is judgement and a stamp is not.
+- **One worktree set serves the whole workstream, and its lanes take turns by repository — MUST** (`RD.DEVEX.WORKSPACE.316`). Lanes that touch the same repository run one after another, because they share one branch in one checkout. Lanes in different repositories run side by side. An order names the repository it touches, and two orders that name the same one are not started together.
 
 **A page is checked by its computed values, once, in the arc's final re-check row, and a picture is
 taken only where the developer asked to see a look — MUST** (`RD.DEVEX.WORKSPACE.277`). An order runs

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "f3d02f7d"
+      "seen": "8af62169"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "255ae1bc"
+      "seen": "6f482086"
     }
   ]
 }
@@ -92,7 +92,7 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 ### How a change moves up
 
 1. Open the worktree set. `spnutils workspace worktree add <NNN>` cuts the workstream's branch, `feat/<NNN>-<subject>`, from a fresh `origin/develop` in each repository the workstream's rows name. The set lives at `.worktrees/<NNN>-<subject>/` in the workspace, and the main checkouts stay on `develop`.
-2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused.
+2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RD.DEVEX.FUNCTION.069`): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 3. Rebase and push. The branch rebases onto `origin/develop` before every push. The agent's push is checked for the offline test tiers of each node it carries.
 4. Open the pull request into `develop`. The first push opens one pull request for the repository, and it stays open for the workstream. At least one approval is required, and new commits dismiss stale approvals. Every check the repository's world requires runs on the pull request, and it cannot merge while one fails.
 5. Merge, and let the environment that watches `develop` take it. The pull request is rebase-merged each time an arc lands a group of rows, so each row's commit stays as it was written. The environment that watches `develop` is named in the estate's declaration, never in your repository.
