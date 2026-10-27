@@ -26,6 +26,7 @@ The plugins carry the standards in full — they restate the SaaS Plane foundati
 package.json                       # the root build: esbuild and Tailwind, dev-only, never installed
 scripts/build-plugins.mjs          # bundles each plugin's cli.ts and events/*.ts into dist/
 scripts/build-styles.mjs           # builds the shared page stylesheet from its Tailwind source
+scripts/release-plugins.mjs        # the plugins' one release: prepare <version> writes and commits, tag cuts the five tags
 public/assets/docs/<version>/      # the page styles as served by GitHub Pages; a version never changes
 packages/plugin-spn-devex/         # source, edited in place
 packages/plugin-spn-surface/

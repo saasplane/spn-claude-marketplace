@@ -8,6 +8,7 @@
   "scripts": {
     "build:plugins": "node scripts/build-plugins.mjs",
     "build:plugins:watch": "node scripts/build-plugins.mjs --watch",
+    "release:plugins": "node scripts/release-plugins.mjs",
     "test": "node scripts/test-all.mjs"
   },
   "devDependencies": {
