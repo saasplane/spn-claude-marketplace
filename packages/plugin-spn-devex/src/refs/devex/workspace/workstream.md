@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "0f2cb848"
+      "seen": "51ee6619"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "210a5dc0"
+      "seen": "e21ff4f5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "55032195"
+      "seen": "4d7f1f7a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "1ea17ae3"
+      "seen": "81cb46d8"
     }
   ]
 }
@@ -153,8 +153,10 @@ An arc is typed `<workstream>/N<nnn>`, or `N<nnn>` alone from inside its workstr
 backlog workstream holds it.
 
 **`state check` reads every open and backlog workstream, and never a closed one.** It validates each
-arc's data; no second preview beside the one by its fixed name; the stamp of each arc's *Cycles* row,
-a hash of the arc's goal, title and repositories, and the preview its `What` links; the cards against
+arc's data; an arc with no preview, and no second preview beside the one by its fixed name; the stamp of
+each arc's *Cycles* row, a hash of the arc's goal, title and repositories; the arc's own `What` entry,
+`N<nnn>-what`, which links its preview, and a `What` entry or a preview that links another arc's preview;
+a `{{…}}` slot left in the preview of a decided arc; the cards against
 their records; the report of each landed row with an order; and each status against
 its steps: a step running on an arc not `DECIDED`, or holding a wait, and a stored `LANDED` arc with a step
 not landed. The status it reads is the one owner's, `arcStatus` in the plugin's workstream library, as every
@@ -170,7 +172,7 @@ files it writes, and a file a command owns is written only by that command.
 | Step | Files it writes |
 | --- | --- |
 | shape | `suggestions.jsonl`, by command; nothing else moves |
-| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`row write <arc> --title … --subject … --goal …`); the preview's first section, where one is owed; one line in `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
+| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`row write <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `N<nnn>-what`; one line in `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
 | preview and cards | the preview, filled by planning jobs, which record no step, while the arc reads `PROPOSED`; the cards in `Open`, by `question raise`; each fact read, by `fact write` |
 | decide | the developer's go on the preview, written with their words: `row write <arc> --status DECIDED --note "<the developer's words>"`, with `--wait` where they said wait; the answers folded into `What` and the preview, and each line the write lists as still saying proposed brought current; the register rows owed |
 | plan | the rows, by `row write`, each with its kind, model, `blockedBy` and `touches`; `plan.md` where the arc has traps, a set or a move table; the one line of each new place in the page's `How` |
@@ -712,8 +714,9 @@ work does. Arcs with the developer's go are built in parallel, each in any windo
    Merge arcs that turn out to be reviewed together or that release the same package, and rewrite an arc's
    goal when the discussion moves it. A preview section already written moves with the arc that takes it.
 2. An arc never decided is reshaped freely: renumbered, merged or deleted (`arc delete`), with no history.
-3. Several arcs can be `PROPOSED` at once, and none is a placeholder: an arc opens only with a goal and a
-   preview section the developer can read, or with its steps when there is nothing to look at.
+3. Several arcs can be `PROPOSED` at once, and none is a placeholder: an arc opens only when its title,
+   subject and goal are known, and the write that opens it writes its preview and its `What` entry. A line
+   whose arc is not known yet stays a line in `How`.
 4. Steps may be written before the go, as the plan of the build; none starts until the arc is `DECIDED`.
 5. Planning jobs fill the preview and the arc's facts, and the arc stays `PROPOSED` the whole time. Write no
    `plan.md` while an arc is `PROPOSED`; at the go, write one only where there are traps or a move table.
@@ -1003,13 +1006,13 @@ so the coordinator reads a tree that is still moving. Every order says so under 
 | --- | --- |
 | **preview** | build only enough to show the thing — real output, a sample entry, a before and after. Say plainly that nothing is committed to |
 | **confirm** | the choices in a table, each with a recommendation. They decide from the thing rather than from a description |
-| **record** | the row in the arc that owns it. An approved preview that is a file is a section of the arc's one preview, `notes/N<nnn>/preview.html`, linked from the approach page. One that was shown in chat is written into the arc with the answer, and gets no file |
+| **record** | the row in the arc that owns it. An approved preview is a section of the arc's one preview, `notes/N<nnn>/preview.html`, linked from the arc's `What` entry. One that was shown in chat is written into that preview with the answer |
 | **code** | only now, and against the row |
 
 **A preview explains a change, and a sample is the thing itself — MUST** (`RD.DEVEX.WORKSPACE.200`).
-**An arc has a preview only where something must be seen or worded for the developer to decide** — a
-look, a rule's wording, a tree — and a pin move, a rename or a change its rows can list has none. It has
-at most one, by a fixed name, `notes/N<nnn>/preview.html`, copied from
+**Every arc has its preview from the write that opens it, and it holds what must be seen or worded for
+the developer to decide** — a look, a rule's wording, a tree; for a pin move, a rename or a change its
+rows can list, that is the list. It has one, by a fixed name, `notes/N<nnn>/preview.html`, copied from
 `approach-preview-template.html` (`RD.DEVEX.WORKSPACE.254`). There is no `previews/` folder: each
 proposal the arc makes is a section of its one page, and a `*preview*.html` anywhere else under an arc
 fails `workstream state check`. A sample is a real file of the kind
@@ -1019,21 +1022,22 @@ in `notes/N<nnn>/samples/`, and is never written in the preview layout or built 
 work produces such a file. Each one reads `PROPOSED` until the developer answers: the preview in its
 masthead, whose one status is the arc's, written by the arc's commands (`RD.DEVEX.WORKSPACE.266`), and a
 sample with the section of the preview that links it. Before the go, rewrite a proposal a later one
-replaces in place, and say so in the arc's log. The approach page links the preview and every sample.
-Writing the first section of a preview or the first sample opens the arc as `PROPOSED`; an arc with no
-preview is whole. A preview belongs to its arc: a later arc that needs an earlier arc's
-preview or sample links it, and never copies it, says it again or edits it
-(`RD.DEVEX.WORKSPACE.224`). A copy is a second version, and nothing keeps the two in step.
+replaces in place, and say so in the arc's log. The approach page links the preview and every sample:
+its `What` holds one entry per arc, `<h4 id="N<nnn>-what">` or that id as an anchor on a subject heading,
+which links that arc's preview and no other.
+The write that opens the arc as `PROPOSED` writes its preview, so a preview always has its arc and a first
+sample has a folder to go to. A preview belongs to its arc: a later arc that needs an earlier arc's work
+links that arc's `What` entry, `approach.html#N<nnn>-what`, and never links, copies, says again or edits
+its preview or sample (`RD.DEVEX.WORKSPACE.224`). A copy is a second version, and nothing keeps the two in step.
 **A change to how something looks is made in the preview first, as often as the developer likes, with no
 test** (`RD.DEVEX.WORKSPACE.274`). It reaches code only through a preview the developer said go on, and is
 built once, in one order, with its tests once.
 
 **You pick the form of a preview, and the developer's word overrides it — MUST**
-(`RD.DEVEX.WORKSPACE.201`). Whether one is owed is already settled: only where something must be seen
-or worded to decide. The book lists no fixed kinds: show lines that change, a layout, a diagram,
-a whole file, or what a command prints. **A preview becomes a file only in four cases**
-(`RD.DEVEX.WORKSPACE.224`): they ask for one, or one of the three rows below that write it. Text
-that is only long is not one of them.
+(`RD.DEVEX.WORKSPACE.201`). Every arc has its preview. The book lists no fixed kinds: show lines that
+change, a layout, a diagram, a whole file, or what a command prints. **Four cases decide how deep a
+preview goes** (`RD.DEVEX.WORKSPACE.224`): they ask for a page, or one of the three rows below that take
+it past a few lines. Text that is only long is not one of them.
 
 | The situation | You |
 | --- | --- |
@@ -1042,9 +1046,9 @@ that is only long is not one of them.
 | they say neither, and it must be seen to be judged, such as a drawing, a layout or a rendered page | write it, and link it from the approach page |
 | they say neither, and it is a long list that they answer row by row | write it, and link it from the approach page |
 | they say neither, and the ask is big and is only one subsection of the approach, so its detail does not belong on the page | write it, and link it from the approach page |
-| they say neither, and it is none of those three | show it in chat, or state it on the approach page |
-| they approve a preview that was shown in chat | write it into the arc with their answer, and write no file |
-| nobody asked, and no rule owes a preview | write nothing |
+| they say neither, and it is none of those three | show it as a line in the arc's preview, or state it on the approach page |
+| they approve a preview that was shown in chat | write it into the arc's preview with their answer |
+| nobody asked, and it is not one of the cases above | keep it to the arc's preview as it stands |
 
 **A fact has one home — MUST** (`RD.DEVEX.WORKSPACE.223`). When a preview holds the detail of a
 change, the approach page gives two or three sentences and the link to go through it. When the page
@@ -1451,7 +1455,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | every row accounted for, and the page stamped, before a close — a row still waiting, ready, running or stopped refuses | `split-plan.ts --gate close` |
 | a file a script owns, a `progress` or `open` block, and an arc's stamp written only by its command | `workstream-owner.ts`, on every write |
 | a card on a page that is its record rendered, and never typed | `questions.ts`, on every write to a page |
-| each open and backlog workstream whole: its data, at most one preview per arc, each arc's row in Cycles and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
+| each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Cycles and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
 | a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream row write` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
 | an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `row write`, which name the other |
 | a close while an arc is `PROPOSED` or `DECIDED` | `split-plan.ts --gate close` |
