@@ -12,7 +12,7 @@
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { DEVEX } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DEVEX, isWorkspaceDevex } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type ToolInput = {
   file_path?: string;
@@ -76,12 +76,13 @@ export function read(path: string): string {
   try { return readFileSync(path, "utf8"); } catch { return ""; }
 }
 
-/** The folder holding `.spndevex`, walked up from where the caller stood. */
+/** The folder holding a workspace's `.spndevex`, walked up from where the caller stood. */
 export function workspaceRoot(start: string): string | null {
   try {
     let path = resolve(start);
     for (;;) {
-      if (existsSync(join(path, DEVEX)) && statSync(join(path, DEVEX)).isDirectory()) return path;
+      const devex = join(path, DEVEX);
+      if (existsSync(devex) && statSync(devex).isDirectory() && isWorkspaceDevex(readdirSync(devex))) return path;
       const up = dirname(path);
       if (up === path) return null;
       path = up;

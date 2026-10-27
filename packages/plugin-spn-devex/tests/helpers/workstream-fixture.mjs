@@ -92,10 +92,10 @@ export async function dataWorkspace(name, { stamp = null, rows = undefined } = {
 }
 
 /** Runs the plugin's command line in a workspace: its exit code and everything it printed. */
-export function cli(root, args) {
+export function cli(root, args, env = {}) {
   try {
     const out = execFileSync(process.execPath, [CLI, ...args], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: root } });
+      env: { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: root, CLAUDE_CODE_SESSION_ID: "", ...env } });
     return { code: 0, out };
   } catch (error) {
     return { code: error.status ?? 1, out: `${error.stdout ?? ""}${error.stderr ?? ""}` };

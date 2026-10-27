@@ -52,7 +52,7 @@ import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { ARCS, SESSIONS, WORKSTREAM_STATES, isApproachPage, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { arcIdsOf } from "../lib/workstream.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { windowStartLines } from "../lib/migration.ts";
@@ -142,15 +142,15 @@ function hasLaw(path: string): boolean {
 
 /**
  * The folder the sibling checkouts sit in. A child session is rooted in one member, so the walk goes
- * up: the first ancestor carrying `.spndevex/`, else the first with a member under it, else where
- * you started.
+ * up: the first ancestor carrying a workspace's `.spndevex/`, else the first with a member under it,
+ * else where you started.
  */
 export function workspaceRootOf(start: string): string {
   let path = resolve(start);
   const seen: string[] = [];
   for (;;) {
     seen.push(path);
-    if (isDir(join(path, ".spndevex"))) return path;
+    if (isDir(join(path, DEVEX)) && isWorkspaceDevex(readdirSync(join(path, DEVEX)))) return path;
     const up = resolve(path, "..");
     if (up === path) break;
     path = up;

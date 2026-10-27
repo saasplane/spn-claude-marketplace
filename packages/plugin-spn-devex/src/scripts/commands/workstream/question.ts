@@ -63,7 +63,10 @@ function raise(args: string[]): number {
   const page = approachOf(ws);
   const id = nextQuestionId(records, page ? readFileSync(page, "utf8") : "");
   const { title, ...rest } = card;
-  const record: Question = { id, arc, title: title!, state: "open", raised: now(), shownIn: [],
+  // THE WINDOW THAT RAISES A CARD IS RECORDED, so the Stop hook puts the card to that window and no other.
+  // Claude Code gives every command its window's session id; run by hand, there is none and nothing is recorded.
+  const raiser = (process.env.CLAUDE_CODE_SESSION_ID ?? "").trim();
+  const record: Question = { id, arc, title: title!, state: "open", raised: now(), ...(raiser ? { raisedBy: raiser } : {}), shownIn: [],
     card: { why: rest.why, what: rest.what, viewsLead: rest.viewsLead, views: rest.views, options: rest.options, recommended: rest.recommended }, answer: null };
   records.push(record);
   const lines = finish(ws, records);

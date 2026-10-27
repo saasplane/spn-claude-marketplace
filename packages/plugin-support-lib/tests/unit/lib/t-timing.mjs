@@ -5,8 +5,8 @@
 // each says which work it belongs to: `workstream`, `arc` and `order` from the paths the tool call
 // touches, `agent` from the hook input, carried forward per session and agent.
 //
-// The cases that write point a temporary workspace (with `.spndevex/.debug/telemetry.on`) at the
-// recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
+// The cases that write point a temporary workspace (with `.spndevex/README.md` and
+// `.spndevex/.debug/telemetry.on`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -38,7 +38,8 @@ const same = (label, got, expected) => {
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        got ${JSON.stringify(got)}\n        expected ${JSON.stringify(expected)}`}`);
 };
 
-const ON = { ".spndevex/.debug/telemetry.on": "on\n" };
+// A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
+const ON = { ".spndevex/README.md": "# .spndevex\n", ".spndevex/.debug/telemetry.on": "on\n" };
 const env = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
 /** Run a module snippet against the library in a child, the way a hook process does. */
 const child = (body) => execFileSync("node", ["--input-type=module", "-e",

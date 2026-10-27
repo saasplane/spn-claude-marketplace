@@ -31,7 +31,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import type { Payload, Verdict } from "../lib/payload.ts";
-import { read } from "../lib/payload.ts";
+import { read, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, SEAT } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const DEBUG = ".debug";
@@ -122,10 +122,11 @@ export function governing(rows: Row[], within: string): Row | null {
  *
  * ONE FILE PER SESSION, LISTING THE MIRRORS — not one file per pair. A sitting touches many folders,
  * so a file each would grow this folder by a multiple of what `confirmed` leaves beside it, and
- * nothing ever sweeps it.
+ * nothing ever sweeps it. Outside a workspace there is nowhere to remember, so the nudge is given each
+ * time rather than written into a `.spndevex/` it would create.
  */
-function alreadySaid(root: string, session: string | undefined, mirror: string): boolean {
-  if (!session) return false;
+function alreadySaid(root: string | null, session: string | undefined, mirror: string): boolean {
+  if (!session || !root) return false;
   const marker = join(root, DEVEX, DEBUG, MIRROR, session);
   try {
     const said = (read(marker) ?? "").split("\n").filter(Boolean);
@@ -155,10 +156,10 @@ export function checkMirror(payload: Payload): Verdict {
   if (!row) return null;                           // invariant 4's finding, and the audit owns it
 
   const mirror = resolve(dirname(face), row.file);
-  const root = payload.cwd ?? process.cwd();
-  if (alreadySaid(root, payload.session_id, mirror)) return null;
+  const cwd = payload.cwd ?? process.cwd();
+  if (alreadySaid(workspaceRoot(cwd), payload.session_id, mirror)) return null;
 
-  const shown = relative(root, mirror).startsWith("..") ? mirror : relative(root, mirror);
+  const shown = relative(cwd, mirror).startsWith("..") ? mirror : relative(cwd, mirror);
   const status = row.status ? ` ${row.status}` : "";
   return { note: `${shown}${status} is the mirror of \`${row.governs}/\` — if this edit changes a seam's guarantee, its placement, what it takes from context or what it does not do, that page says so and is updated in the same sitting.` };
 }

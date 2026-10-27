@@ -31,9 +31,9 @@
 // A TOOL MUST NEVER FAIL BECAUSE TIMING FAILED. Every path here swallows its own errors: a gate that
 // refuses to run is infinitely more expensive than a number nobody recorded.
 
-import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { workstreamPrefixSource } from "./docs-tree.ts";
+import { isWorkspaceDevex, workstreamPrefixSource } from "./docs-tree.ts";
 
 const DEVEX = ".spndevex", DEBUG = ".debug", SWITCH = "telemetry.on", FOLDER = "telemetry", LOG = "hooks.jsonl";
 const CARRIED = "tags.json";
@@ -74,12 +74,12 @@ export type Facts = {
 const state: { root: string | null; cwd: string | null; facts: Facts | null; spans: Entry[] } =
   { root: null, cwd: null, facts: null, spans: [] };
 
-/** The folder holding `.spndevex`, walked up from where the caller stood. */
+/** The folder holding a workspace's `.spndevex`, walked up from where the caller stood. */
 export function workspaceRoot(start: string): string | null {
   try {
     let path = resolve(start);
     for (;;) {
-      if (existsSync(join(path, DEVEX))) return path;
+      if (existsSync(join(path, DEVEX)) && isWorkspaceDevex(readdirSync(join(path, DEVEX)))) return path;
       const up = dirname(path);
       if (up === path) return null;
       path = up;
