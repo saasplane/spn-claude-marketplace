@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "seen": "7905545a"
+      "seen": "5cfdc001"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
@@ -36,7 +36,7 @@
 3. Use typed separators: `-` joins coordinates, `_` joins data-plane tokens, `/` nests. The substrate picks the rendering; coordinates and order never change.
 4. A coordinate drops **only inside a sealed substrate** (namespace, broker, database interior). A cloud account is not sealed — cloud resources always carry full coordinates.
 
-Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-docs` (every bucket composes `…-s3-{name}`) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-mgmt` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
+Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-storage` (every bucket composes `…-s3-{name}`: the default store's word is `storage`, a named store takes its own, such as `docs`; the word is derived, never typed) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-mgmt` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
 
 **A namespace is the sealed substrate rule 4 names, so it drops `{env}` entirely — plain `{ns}`, never `{env}-{ns}`.** One cluster per environment already seals it, so the coordinate would be redundant rather than merely dropped: `prd` · `plt` · `vnd`, never `in-dev-prd`. A `CLUSTER`-hosted engine inside that namespace is one `StatefulSet` and one `Service`, named `{world}-{family}` — `dmo-database` · `sas-cache` · `dmo-storage` — because a world holds its own engines and the name already carries it.
 
@@ -72,8 +72,9 @@ Written by blueprints into each **resource world's own seat**. **Every configura
 ```text
 {SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _ENV · _APPS_{APP}_SUBDOMAIN · _OWNER_*
 {SPC}_RESOURCE_{FAM}_{WORLD}_ENDPOINTS              per connection block (RD.SUPPORT.INFRA.055): DB_APP · DB_MIGRATION ·
-                                                    DB_{SCHEMA} · CACHE_APP · QUEUE_APP · STORAGE_APP (+ _PUBLIC_ENDPOINTS)
-{SPC}_RESOURCE_{FAM}_{WORLD}_PROVIDER               connection worlds: APP everywhere; db adds MIGRATION + one {SCHEMA} block per custom schema
+                                                    DB_{SCHEMA} · CACHE_{NAME} · QUEUE_{NAME} · STORAGE_{NAME}
+                                                    (one block per engine, `APP` the default; a `PUBLIC` store adds _PUBLIC_ENDPOINTS)
+{SPC}_RESOURCE_{FAM}_{WORLD}_PROVIDER               connection worlds: APP everywhere (`app` is the one reserved engine name); db adds MIGRATION + one {SCHEMA} block per custom schema
 {SPC}_RESOURCE_{FAM}_{WORLD}_{PROVIDER}_{FACT}      e.g. DMO_RESOURCE_DB_APP_POSTGRESQL_HOST · _SCHEMAS · _USER_RW
 {SPC}_{MODULE}_{FACT}                               module boundary fact, plain half — DMO_IDP_URL
 {SPC}_{MODULE}_{APP}_{FACT}                         per-consumer minted pair, secret half — DMO_IDP_SPLT_CLIENT_ID (RD.SUPPORT.INFRA.057)

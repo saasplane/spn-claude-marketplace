@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "0fd32a41"
+      "seen": "220b4c01"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "a1bcca91"
+      "seen": "4a6bae32"
     }
   ]
 }
@@ -28,7 +28,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 | `DATABASE` | the server; the platform, product and migration schemas; the default role groups | a role set at its own coordinate; its migrations own its DDL |
 | `CACHE` | one instance, one logical database, read-write and read-only groups | a key prefix at its own coordinate |
 | `QUEUE` | a broker, auto-create off | topics `{owner}-{noun}`, created by its own migrations |
-| `STORAGE` | one store for the environment, private with no exception | access through the one document system, never a key prefix |
+| `STORAGE` | the default store `app`, a bucket private with no exception | an area of the default store for each module code; documents through the one document system, never a key prefix |
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
@@ -76,7 +76,7 @@ export interface SPEstateSpace {
 }
 ```
 
-**A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. A row that names a space may also keep the platform, and its deployment is then given both sets of settings. An application still declares no demand — selecting a space is passing a code.
+**A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space's storage is the default store alone unless it names more, as `"storage": { "mtype": "OBJECT" }`. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. A row that names a space may also keep the platform, and its deployment is then given both sets of settings. An application still declares no demand — selecting a space is passing a code.
 
 **A space carries its platform's code** (`RD.SUPPORT.INFRA.112`). Every name the estate publishes for a space starts with the platform's code and then the space's code.
 
@@ -109,6 +109,31 @@ A module's resources are its own engine instances, in its own world, under the m
 
 **A `CLUSTER` engine runs the local realization's own image, at that image's own tag, and the declared version is the managed service's.** The database's tag agrees with the declared version; the cache's and the queue's need not — the cache's image carries the newest release of its major because no `7.1` is published upstream, and the queue's image is the one the local stack pins, which may lag the declared line. So a `CLUSTER` environment proves the engine family, and the managed version is proven only where it runs — the first apply against an account, never a plan.
 
+## Every family has one default engine, and a declaration lists the rest
+
+**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RD.SUPPORT.INFRA.124`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
+
+| Family | Default (`app`) | Named entries | `dedicated` gives | `need`, a closed set | Created by code |
+| --- | --- | --- | --- | --- | --- |
+| database | the baseline schemas | `schemas` | its own role group | none | tables |
+| storage | the bucket `{code}-storage` | `stores` | its own access pair | `PUBLIC` · `OBJECT_LOCK` · `REGION` | folders |
+| cache | the world's cache | `caches` | its own user | `PERSISTENT` · `ISOLATED` | keys |
+| queue | the world's broker | `brokers` | its own user | `ISOLATED` · `REGION` | topics |
+
+**A named engine is the same four fields in every family:** `name` (lowercase, never `app`, unique in its family); `dedicated` (always written — true gives its own credentials the default group cannot reach, false shares the app's pair); `need` (from the family's set); `region` (an organization `regions[]` code, only with `REGION`, else null). Storage adds `lifecycle`. A named engine is added only for what the default cannot give — a need an area, a key prefix or a topic can meet gets no engine.
+
+**A lifecycle rule** covers one key prefix and is off unless written: `prefix` (ends in `/`), `expiryDays` (null never expires), `isDeleteRefused` (binds every group, the app's included), `isAccessRecorded` (reads and writes go to the estate's trail). The storage block carries the default store's rules at its root; each named store carries its own. A prefix not named keeps every object.
+
+**A `users` entry is a group beyond the app's own, scoped by engine:** its group, purposes (`RO`/`RW`), the engines of its family it reaches (`app` is the default) and, for storage, the key prefixes. It gets its own credentials inside the blocks it reaches; people never receive them.
+
+**One config block per engine:** `{SPC}_RESOURCE_{FAM}_{NAME}_…`, read in code as `providers.storages.{name}` (and `caches`, `queues`). Only a `PUBLIC` store adds the public endpoints and stands the documents host. A platform composing DOC registers a `docs` store, dedicated, need `PUBLIC`; a world with no DOC has the default store alone.
+
+**Never declared:** what code creates at runtime — tables, folders, keys, topics — and a bucket's name, which is derived from the world's code and the store (`spn-dmo-storage`; in a cloud `…-s3-storage`, `…-s3-docs`).
+
+**Caches and brokers are stated and built at first need.** Storage and the database are built now: contract, validators, a config block per store, the local realization.
+
+**`infra validate` refuses by name:** a named engine called `app` or two with one name in a family; a `need` outside its family's set; `REGION` without a region, a region that is not an organization row, or a region on any other need; a prefix without its closing `/`, or an `expiryDays` of zero or less; a `users` entry naming an engine the world does not declare; the earlier store list naming `DOCS` and `APP`, with the new form in the refusal.
+
 ## Storage declares a capability; its provider is derived
 
 Storage is the one engine whose *provider* is derived rather than declared — a platform declares the capability `OBJECT`, and which product answers falls out of where the environment runs.
@@ -123,9 +148,9 @@ Storage is the one engine whose *provider* is derived rather than declared — a
 
 **A cluster-hosted engine a browser must reach is exposed by a route on a gateway of the environment, and never by another product.** Storage is the one engine with that need, because a presigned link is signed against a host the browser resolves — so a cluster-hosted environment carries a storage host of its own, a route to the engine's interface with transport security from the zone's wildcard certificate. Under managed hosting no such row exists, because the provider's own endpoint already answers. An environment is containers throughout or managed services throughout, never a mixture.
 
-## Storage's key grammar
+## A public store's key grammar
 
-**Every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RD.SUPPORT.INFRA.080`). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
+**In a public store, every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RD.SUPPORT.INFRA.080`). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
 
 **A stored file cannot be reclassified — MUST NOT.** Its class is stamped at creation, and because the class *is* the file's location, changing it would mean moving bytes and invalidating every link already handed out. A file needing a different class is a different file, uploaded as one — the store's contract carries no move and no copy. **A key is derived, never authored.** What a person sees is a logical folder path of bounded slugs, so traversal is excluded by shape rather than by a check; the display name is a row, not part of the key.
 
