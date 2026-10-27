@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "4347dbe5"
+      "seen": "f31cc588"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "7d41aa38"
+      "seen": "9e929bd1"
     }
   ]
 }
@@ -109,7 +109,9 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | --- | --- | --- |
 | no sign | the one view that owns the question | one sentence |
 | one sign | the architect's view and the owning view | one |
-| two signs or more | the starting group for what is being decided, with product and partner among them | one, and a second after the developer's answer |
+| two signs or more | the starting group for what is being decided, with partner always among them, and product when the choice touches what a consumer meets | one, and a second after the developer's answer |
+
+**Product joins when the choice touches what a consumer meets — for SaaS Plane, a partner's engineering team.** That is a feature they use (a plugin behaviour, a `spnutils` command, a stack API, the scaffold), its UX, a release that changes what they get, or the behaviour rows and their acceptance: what a person sees when it works, and the tests that prove it. Product sits out of a choice about only how we do our own work, or a mechanic no consumer sees. Partner is always among them.
 
 **More views, or more passes, need the developer's word.** A choice inside one place that brings every view costs the developer a wait and a long reply for a decision one sentence settles. **The agent says which views it brought, and why those.** One line is enough, and each view then speaks in its own voice (§ *A view is shown in its own voice*). On a card, that line and the views under it are the card's *Views* part.
 
