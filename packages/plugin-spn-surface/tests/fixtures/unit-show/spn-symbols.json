@@ -1,0 +1,102 @@
+{
+  "capabilities": [
+    {
+      "name": "@saasplane/support-web-ds-ts",
+      "version": "5.40.0",
+      "kind": "SUPPORT_WEB",
+      "stack": "TS",
+      "code": null,
+      "intent": "The React design system.",
+      "dependsOn": [],
+      "authz": {},
+      "symbols": [
+        {
+          "name": "DSListDetail",
+          "group": "UI",
+          "role": "COMPONENT",
+          "internal": false,
+          "deprecated": false,
+          "intent": "A list and the detail of its chosen row.",
+          "description": null,
+          "signature": "(props: IDSListDetailProps)",
+          "roleMeta": {
+            "mtype": "COMPONENT",
+            "props": [
+              { "name": "list", "values": null, "default": null, "description": "The list." },
+              { "name": "detail", "values": null, "default": null, "description": "The detail of the chosen row. With none, the list alone is shown on every screen." },
+              { "name": "backAnchor", "values": null, "default": null, "description": "The address of the list. Below a desktop, while the detail is shown, a container header in the detail draws it as its way back." },
+              { "name": "listWidth", "values": ["COMPACT", "NARROW", "WIDE"], "default": "WIDE", "description": "How wide the list's column is at a desktop. WIDE, 320 px, when unset; NARROW is 256 px, for a list of short rows beside a detail that needs the room, and COMPACT is 224 px, for rows of a few words." }
+            ]
+          },
+          "seam": null
+        },
+        {
+          "name": "IDSListDetailProps",
+          "group": "UI",
+          "role": "TYPE",
+          "internal": false,
+          "deprecated": false,
+          "intent": null,
+          "description": null,
+          "signature": null,
+          "roleMeta": null,
+          "seam": null
+        },
+        {
+          "name": "DSPortal",
+          "group": "UI",
+          "role": "COMPONENT",
+          "internal": false,
+          "deprecated": false,
+          "intent": "Draws its children at the end of the document.",
+          "description": null,
+          "signature": "(props: IDSPortalProps)",
+          "roleMeta": null,
+          "seam": null
+        }
+      ]
+    },
+    {
+      "name": "@saasplane/module-web-iam-ts",
+      "version": "2.3.0",
+      "kind": "MODULE_WEB",
+      "stack": "TS",
+      "code": "IAM",
+      "intent": "IAM frontend module.",
+      "dependsOn": ["@saasplane/support-web-ds-ts"],
+      "authz": {},
+      "symbols": [
+        {
+          "name": "IdentityFactorVerificationBadge",
+          "group": "ENTRY",
+          "role": "COMPONENT",
+          "internal": false,
+          "deprecated": false,
+          "intent": "Whether a factor has been proven end to end.",
+          "description": null,
+          "signature": "(props: IIdentityFactorVerificationBadgeProps)",
+          "roleMeta": {
+            "mtype": "COMPONENT",
+            "props": [
+              { "name": "factor", "values": null, "default": null, "description": "The factor: it counts once it has a verification time." },
+              { "name": "size", "values": ["XS", "SM", "MD", "LG", "XL"], "default": "XS", "description": "The size step of the badge." }
+            ]
+          },
+          "seam": null
+        },
+        {
+          "name": "RoleListContainer",
+          "group": "ENTRY",
+          "role": "COMPONENT",
+          "internal": false,
+          "deprecated": false,
+          "intent": "The org's roles, as a table.",
+          "description": null,
+          "signature": "(props: IRoleListContainerProps)",
+          "roleMeta": { "mtype": "COMPONENT", "props": [] },
+          "seam": null
+        }
+      ]
+    }
+  ]
+}

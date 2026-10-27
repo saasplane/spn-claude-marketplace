@@ -68,7 +68,7 @@ The app patterns and the site patterns each have a folder of skeleton specs. The
 
 ### The CONSTRUCT snapshot sits beside the refs
 
-`refs/support/surface/construct.snapshot.json` is the CONSTRUCT snapshot, written from the book alone with `spnutils apps surface construct --out` for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its `source.readFrom` names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. `unit show` reads it, with the restated tables beside it, and reads nothing outside the plugin.
+`refs/support/surface/construct.snapshot.json` is the CONSTRUCT snapshot, written from the book alone with `spnutils apps surface construct --out` for each release of the plugin. It holds every unit's props, its usage, its cases, the index by value of each choice table and the units their place sizes, and its `source.readFrom` names the book's release it was written from. It is the one snapshot a repository holds, because it carries nothing of a machine. `unit show` reads it, with the restated tables beside it, and reads nothing else outside the plugin but the repository's symbol index, for a unit the snapshot does not hold.
 
 ### The stack-specific half is the apps plugin's
 
