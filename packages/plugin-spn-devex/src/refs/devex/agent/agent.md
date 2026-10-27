@@ -34,12 +34,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "95f02946"
+      "seen": "10c658c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
       "seen": "0849c8cc"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The four token levers are hooks that refuse, not lines of prose",
+      "seen": "d26905a7"
     }
   ]
 }
@@ -354,8 +359,25 @@ work. This rule orders all the pieces of an arc against each other.
 **A long-running child is replaced by a fresh one with a short order, and never resumed — MUST.** A
 resume re-sends the child's whole context, so each further call on the same child costs more than the
 last. Long means 150,000 tokens of context or 100 turns, whichever comes first (`RD.DEVEX.AGENT.081`). A child
-stops at that size at the next whole step: it finishes the step it is on, writes its report and stops, and
-the rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
+stops at the line its order names, and a hook holds it there (§ *The four token levers are hooks that refuse*
+below). The refusal names the report the order says the child owes, so the child writes it and stops, and the
+rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
 `SendMessage` to a child past 150,000: it becomes the first line of a fresh child's order. An order is cut
 so that each child can stop between rows. A child's stop records the child's turns in telemetry, tagged with
 its `agent`, so the cost of a child is read from telemetry as a window's is (`RD.DEVEX.AGENT.082`).
+
+### The four token levers are hooks that refuse, not lines of prose
+
+**Each lever that keeps a window's tokens down is a hook that refuses the call at its line — MUST**
+(`RD.DEVEX.AGENT.111`). A line written in a brief or a chapter was read once and forgotten a hundred turns
+later, and the child that ran past it spent the tokens before anyone saw. A hook is read by the harness on
+every call, so the line holds whether or not the agent remembers it.
+
+| Lever | The line | What the hook does at it |
+| --- | --- | --- |
+| a child's size | the context or the turns its order names | a `PreToolUse` check reads the last usage in the child's transcript and refuses the next tool call past the line, pointing at the report the order says the child owes |
+| a file read | 20 KB | a `Read` of a file over 20 KB without a range is refused, and the refusal gives the ranged form to use: search first, then read the lines needed |
+| a command's output | 10 KB | a command whose output passes 10 KB is refused, and the refusal gives the form that writes to a file so the agent reads the part it needs |
+| the session-start output | 8 KB | unchanged: it holds under 8 KB (`RD.DEVEX.AGENT.105`, § *What every window carries before its first word is kept small*) |
+
+A refusal that names the form to use costs one turn, where a read past the line cost every turn after it.

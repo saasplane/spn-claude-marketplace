@@ -152,11 +152,33 @@
 **What** — `PostToolUse` on `Bash` reads the command's own `mv`, and when a workstream folder has actually moved into `closed/` it says what landed, counted from that page's split plan.
 **How** — the subject is taken from the source of the move, because `mv <subject> closed/` is how a close is typed and the destination is then only a structural name. It reads the same parser the close gate refused with, so both count the same table. `packages/plugin-spn-devex/src/scripts/events/closed.ts`.
 
+### A window's tokens are held by hooks that refuse at the line
+
+**Why** — *each lever that keeps a window's tokens down is a hook that refuses the call at its line* (the book's RD.DEVEX.AGENT.111). A line written in an order or a chapter is read once and forgotten a hundred turns later, and a child that ran past it spent the tokens before anyone saw. A hook is read on every call.
+**What** — four levers, each with its line and what the hook does there. The refusal always names the form to use instead, so it costs one turn where reading past the line cost every turn after it.
+
+| Lever | The line | What the hook does at it |
+| --- | --- | --- |
+| a child's size | the context or the turns its order names | `PreToolUse` reads the last usage in the child's own transcript and the child's turns so far, and refuses the next tool call once either passes the line. The refusal points at the report the order says the child owes, and the call that saves that report is let through, so the child writes it and stops |
+| a file read | 20 KB | a `Read` of a file over 20 KB, with no range given, is refused. The refusal names the ranged form: search the file first, then read the lines needed |
+| a command's output | 10 KB | a command whose output passed 10 KB is answered with the narrowed form: the command again with its output written to a file, and the part needed read from there |
+| the session-start output | 8 KB | unchanged: the text of the opening screen stays under 8,192 bytes, held by a test (§ *The session's first screen is read from the ground*) |
+
+**How** — the child-size check reads the size from the last usage line in the child's own transcript, the file `SubagentStop` already reads (§ *A child agent's turns are logged when it stops*), and the line from the order the child was given. The Read check needs only the file's size, which is known before the call, so it refuses before anything is read.
+**The gap the hook model leaves.** A command's output size is known only after the call has run, and a `PreToolUse` check sees only the command text. So the output check cannot refuse that first call; after the call it can only tell the agent that the output passed 10 KB and which narrowed form to use next. The book's output line is therefore held after the first overrun and not before it. The child check has a smaller gap of the same kind: it reads the last turn that finished, so its refusal lands on the call after the line is crossed.
+
 ### A branch that takes develop in is told what moved under it
 
 **Why** — *a rebase, merge or pull from `develop` changes what the branch was built on, and the command's own output does not say what*. The next conflict, or a silent break, sits in a file both sides changed, and an arc's pinned fact may now describe code that has moved.
 **What** — after a `Bash` call running `git rebase`, `git merge` or `git pull` that names `develop`, the agent is handed two lists as `additionalContext`: the files `develop` changed since the branch's old merge base that the branch also changed, and the facts pinned by this window's open arcs whose source has moved, read as `plan stale` reads them. It is a note and never a refusal. It is silent where the window has no workstream, a workstream has no arcs, the arcs pin no facts, or nothing overlaps and nothing moved.
-**How** — the old tip is `ORIG_HEAD`, which git sets before the command moves the branch, and the old merge base is where that tip met `origin/develop` (or `develop`). The facts come from each arc's `facts.jsonl` through `factPinsOf` and `movedFiles` of `plan stale`, over the workstreams the window's note binds. `packages/plugin-spn-devex/src/scripts/checks/rebase-moved.ts`, the one entry in the `CHECKS` list of `packages/plugin-spn-devex/src/scripts/events/rebased.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-rebase-moved.mjs`.
+**How** — the old tip is `ORIG_HEAD`, which git sets before the command moves the branch, and the old merge base is where that tip met `origin/develop` (or `develop`). The facts come from each arc's `facts.jsonl` through `factPinsOf` and `movedFiles` of `plan stale`, over the workstreams the window's note binds. `packages/plugin-spn-devex/src/scripts/checks/rebase-moved.ts`, the first of the three entries in the `CHECKS` list of `packages/plugin-spn-devex/src/scripts/events/rebased.ts` (the rebase reader, the merge reminder and the output-size note), proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-rebase-moved.mjs`.
+
+### A merge into develop is followed by a reminder to tell the open workstreams
+
+**Why** — *a merge into `develop` is told to every open workstream whose set holds that repository* (the book's RD.DEVEX.FUNCTION.071). A window that has not fetched learns of a breaking change at its next conflict. The line is for that window, and the merging window is the only one that knows what it changed.
+**What** — after a `Bash` call that merges into `develop`, the agent is handed a reminder as `additionalContext`, once, naming each open workstream whose worktree set holds the merged repository. The reminder asks for one line: what changed, a dependency the merge added, and, for a breaking change, its cutover: what must land with it and in what order. It is a note and never a refusal, and it is silent where no open workstream holds the repository.
+**Where the line lands.** The agent writes it, with the plugin's own workstream command, as one `note` line on the log of each running arc of those workstreams: `spn-devex workstream row write <arc> --note "…"`, which is the only writer of a log line. A workstream with no running arc is told nothing, because no arc is working on anything the merge could move. The hook only reminds, and the agent writes, because what changed is judgement and a script reads no diff.
+**How** — the reminder is a check of the same shape as the one above: it reads the workspace's open workstream folders, their worktree sets and each arc's status, which `arcs/N<nnn>/state.json` already carries.
 
 ### A turn that ends warns and never refuses
 

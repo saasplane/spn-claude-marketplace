@@ -797,6 +797,22 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
   }));
   says(`a fixture workspace's session-start output is under 8,192 bytes (${Buffer.byteLength(big.context, "utf8")})`, Buffer.byteLength(big.context, "utf8") < 8192);
+  // SEVERAL OPEN WORKSTREAMS: the listing grows with every folder, and the text still stays under the line.
+  const crowd = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-web-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+  };
+  for (let at = 1; at <= 12; at += 1) {
+    const name = `${String(40 + at).padStart(3, "0")}-a-long-workstream-subject-number-${at}`;
+    crowd[`.spndevex/${WORKSTREAMS}/open/${name}/arcs/N001/state.json`] = "{}\n";
+    crowd[`.spndevex/${WORKSTREAMS}/open/${name}/approach.html`] = "<h1>x</h1>\n";
+  }
+  for (let at = 1; at <= 4; at += 1) crowd[`.spndevex/${WORKSTREAMS}/backlog/${String(60 + at).padStart(3, "0")}-waiting-subject-${at}/approach.html`] = "<h1>x</h1>\n";
+  const many = hookIn(fixture("size-many-workstreams", crowd));
+  says(`a workspace with twelve open workstreams opens under 8,192 bytes (${Buffer.byteLength(many.context, "utf8")})`, Buffer.byteLength(many.context, "utf8") < 8192);
+  says("and still carries the welcome lead and the status line in its first 2,000 bytes",
+    Buffer.byteLength(many.context.slice(0, many.context.indexOf(" workstream")), "utf8") < 2000 && many.context.includes("12 workstreams open"), many.context.slice(0, 600));
   says("known-bad: the ground and the way's principles are not carried",
     !big.context.includes("### Repositories") && !big.context.includes("Start from what the thing is for"));
 }

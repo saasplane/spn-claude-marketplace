@@ -3,9 +3,13 @@
 //
 //   spn-devex workstream row write <arc> [<row>] [--field value …] [--position <n>] [--note "…"]
 //
-// Given the arc alone, it opens the arc as PROPOSED (`--title` and `--subject` needed), or changes its
-// header and its status; `--goal` sets the outcome the arc's name file leads with, and `--subject` takes
-// one to three words of at most 24 characters. `--preview` takes the path from the workstream folder to the
+// Given the arc alone, it opens the arc as PROPOSED (`--title`, `--subject` and `--goal` all needed: an arc opens only
+// when all three are known), or changes its header and its status; `--goal` is the outcome the arc's name file leads
+// with, and `--subject` takes one to three words of at most 24 characters. The opening is one write that leaves the page
+// whole (RD.DEVEX.WORKSPACE.254): the arc's data, its preview `notes/N<nnn>/preview.html` from the template, its What entry
+// `N<nnn>-what` (at the end of the part of the domain heading `--under` names, as an anchor on the subject heading `--under`
+// names, or at the end of What) and its stamped Cycles row. Given the arc alone again, it writes whatever of the four is
+// missing and changes nothing that is there; `--under` with the id of a subject heading anchors an arc that already exists. `--preview` takes the path from the workstream folder to the
 // arc's preview where its notes live in another workstream, as a carried arc's do, and the arc's Cycles row
 // links it; `--preview preview.html` gives the fixed place back. Every write of the data writes the arc's name file too. Given a row, it adds the row (`--title` and `--kind` needed) or changes its
 // fields and its state. A list option takes values separated by commas, and `none` empties it.
@@ -34,13 +38,16 @@
 // `discarded` line with the words and the row's What; no state is written. Only a row that never reached
 // its node goes: waiting, ready or deferred, with no rows under it and no row waiting on it.
 
-import { readFileSync } from "node:fs";
-import { basename } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { basename, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STORED_STATUSES } from "../../checks/arc-status.ts";
 import {
-  NOTES, PREVIEW_FILE, arcIdsOf, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, previewOf, previewPathFault, proposedLines, readArc, stateOfRow, stepsMayStart, writeArc,
+  NOTES, PREVIEW_FILE, approachOf, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, previewFromTemplate, previewHrefOf, previewOf, previewPathFault, proposedLines, readArc,
+  restamped, stampsOn, stateOfRow, stepsMayStart, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
 } from "../../lib/workstream.ts";
+import { isFile } from "../../lib/payload.ts";
+import { refreshViews } from "../docs/cycles.ts";
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, subjectFault, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, typed } from "./_shared.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
@@ -55,11 +62,11 @@ const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
   model: VALUE, parent: VALUE, kind: ROW_KINDS, repo: VALUE, altitude: ALTITUDES, mechanism: VALUE, acceptance: VALUE,
   "blocked-by": VALUE, touches: VALUE, decisions: VALUE, facts: VALUE, state: ROW_STATES, proof: VALUE, order: VALUE, note: VALUE, position: VALUE,
-  preview: VALUE,
+  preview: VALUE, under: VALUE,
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-const HEADER_ONLY = ["subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "position", "preview"];
+const HEADER_ONLY = ["under", "subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "position", "preview"];
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -141,6 +148,84 @@ function wordsGuard(arc: string, data: ArcData | null, decidedBefore: boolean, w
     throw new UsageFault(`finds no wait on ${arc} to clear: it starts as soon as a step does (RD.DEVEX.WORKSPACE.311).`);
 }
 
+/** What one run of the page pieces did: each piece of an arc's opening, written or kept. */
+type Pieces = { preview: "written" | "kept" | "elsewhere"; entry: "written" | "anchored" | "kept"; where: string; cycles: "written" | "stamped" | "kept" };
+
+/** What a repair did, in the words the line carries: the pieces written first, then the ones kept; one word where nothing was missing. */
+function repairedWords(pieces: Pieces, arc: string): string[] {
+  const entry = `What entry: #${whatId(arc)} ${pieces.entry === "anchored" ? pieces.where : `written ${pieces.where}`}`;
+  const done: string[] = [];
+  const kept: string[] = [];
+  (pieces.preview === "written" ? done : kept).push(pieces.preview === "written" ? "preview written from the template"
+    : pieces.preview === "elsewhere" ? "preview not found where its field names it" : "preview kept");
+  (pieces.entry === "kept" ? kept : done).push(pieces.entry === "kept" ? "What entry kept" : entry);
+  (pieces.cycles === "kept" ? kept : done).push(`Cycles row ${pieces.cycles === "kept" ? "kept" : pieces.cycles === "written" ? "written and stamped" : "stamped"}`);
+  return done.length ? [...done, ...kept] : ["whole: nothing written"];
+}
+
+/** The detail lines under an opening's one line: where each piece went, as the preview draws them. */
+function openingLines(ws: string, data: ArcData, pieces: Pieces): string[] {
+  const arc = data.arc;
+  const href = previewHrefOf(arc, data);
+  const rows: Array<[string, string]> = [
+    [`arcs/${arc}/state.json`, `written, with its log line and its name file, ${data.subject}.md`],
+    [href, pieces.preview === "written" ? `written from the template: the masthead, the ${arcStatus(data)} badge, the back link to #${whatId(arc)}, four sections to fill`
+      : pieces.preview === "kept" ? "kept" : "not found where the arc's preview field names it"],
+    ["approach.html · What", pieces.entry === "kept" ? `#${whatId(arc)} kept`
+      : pieces.entry === "anchored" ? `#${whatId(arc)} ${pieces.where}`
+      : `#${whatId(arc)} written ${pieces.where}: the title, the goal, and the link to ${href}`],
+    ["approach.html · Cycles", `row ${arc} ${pieces.cycles === "kept" ? "kept" : "written and stamped"}, its preview linked`],
+  ];
+  return rows.map(([label, text]) => `  ${label.padEnd(27)}${text}`);
+}
+
+/** Throws, before anything is written, where the approach page cannot take the arc's What entry: no page, no What, or no such heading. */
+function foresee(ws: string, data: ArcData, under: string | null): void {
+  const page = approachOf(ws);
+  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Cycles row in.`);
+  const text = readFileSync(page, "utf8");
+  if (under !== null || whatEntryOf(text, data.arc) === null) typed(() => withWhatEntry(text, data, under));
+}
+
+/**
+ * RD.DEVEX.WORKSPACE.254: the three pieces an arc owes beside its data, each written only where it is missing, in the
+ * order the page needs them: the preview from the template at its fixed place, the What entry `N<nnn>-what`, and the
+ * Cycles row with its stamp. Nothing that is there is changed. An arc carried elsewhere keeps its preview where its
+ * `preview` field names it, and its What entry links it there. Throws, before it writes anything, where `under` names
+ * no heading of What.
+ */
+function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces {
+  const page = approachOf(ws);
+  if (!page) throw new UsageFault(`finds no approach page beside ${data.arc}'s workstream to write its What entry and its Cycles row in.`);
+  const arc = data.arc;
+  let text = readFileSync(page, "utf8");
+  const needsEntry = whatEntryOf(text, arc) === null;
+  const entry = needsEntry ? typed(() => withWhatEntry(text, data, under)) : null;
+  const pieces: Pieces = { preview: "kept", entry: "kept", where: "", cycles: "kept" };
+  const previewPath = resolve(ws, previewHrefOf(arc, data));
+  if (!isFile(previewPath)) {
+    if (previewHrefOf(arc, data) === `${NOTES}/${arc}/${PREVIEW_FILE}`) {
+      typed(() => writeWhole(previewPath, previewFromTemplate(ws, { arc, subject: data.subject, title: data.title, status: arcStatus(data) })));
+      pieces.preview = "written";
+    } else pieces.preview = "elsewhere";
+  }
+  if (entry) {
+    text = entry.text;
+    pieces.entry = entry.how === "anchor" ? "anchored" : "written";
+    pieces.where = entry.where;
+  }
+  const hadRow = stampsOn(text).get(arc);
+  if (pieces.entry !== "kept") writeFileSync(page, text, "utf8");
+  if (pieces.entry !== "kept" || pieces.preview === "written" || !hadRow) refreshViews(ws);
+  const row = stampsOn(readFileSync(page, "utf8")).get(arc);
+  if (row && !row.stamp) {
+    const stamped = restamped(readFileSync(page, "utf8"), arc, arcStamp(data));
+    if (stamped !== null) writeFileSync(page, stamped, "utf8");
+    pieces.cycles = hadRow ? "stamped" : "written";
+  }
+  return pieces;
+}
+
 function write(args: string[]): number {
   const words = readWords(args, OPTIONS);
   const [ref, rowId, ...more] = words.paths;
@@ -156,13 +241,18 @@ function write(args: string[]): number {
   const statusBefore = data ? arcStatus(data) : null;
   let goes = false;
   let previewMoved = false;
+  let opened: Pieces | null = null;
+  let repaired: Pieces | null = null;
+  let bare = false;
+  const under = words.value("under");
 
   if (rowId === undefined) {
     const stray = ROW_ONLY.filter((name) => words.given(name));
     if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")} — name the row after the arc.`);
     if (!data) {
       const title = words.value("title");
-      if (!title || !subject) throw new UsageFault(`opens ${arc} with \`--title\` and \`--subject\`.`);
+      if (!title || !subject || !words.value("goal")?.trim())
+        throw new UsageFault(`opens ${arc} with \`--title\`, \`--subject\` and \`--goal\`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254).`);
       const reviewFixes = words.given("review-fixes");
       if (reviewFixes) {
         const other = arcIdsOf(ws).find((one) => readArc(ws, one)?.reviewFixes === true);
@@ -173,26 +263,43 @@ function write(args: string[]): number {
       if (reviewFixes) { data.reviewFixes = true; data.status = "DECIDED"; }
       wordsGuard(arc, null, reviewFixes, words);
       header(data, words);
+      foresee(ws, data, under);
       typed(() => writeArc(ws, data!));
       logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
       said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
+      opened = leavePageWhole(ws, data, under);
+      said.push("preview", "What entry", "Cycles row");
     } else {
       const was = data.status;
       wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
+      const oldHref = previewHrefOf(arc, data);
       const changed = header(data, words);
-      if (!changed.length && !note) throw new UsageFault("changes nothing: name a field, or `--note`.");
+      // A bare write, or one with `--under`, leaves the page whole: whatever of the preview, the What entry and the Cycles row is missing.
+      const repairs = (!changed.length && !note) || under !== null;
       // A stored PROPOSED wins over the steps: a changed goal stops what the arc was building.
       const stopped = changed.includes("status") && data.status === "PROPOSED"
         ? data.rows.filter((row) => row.state === "running").map((row) => { row.state = "stopped"; return row.id; }) : [];
       previewMoved = changed.includes("preview");
+      if (repairs) foresee(ws, data, under);
       if (changed.length) typed(() => writeArc(ws, data!));
+      // A preview carried elsewhere is linked there by the arc's What entry.
+      const page = approachOf(ws);
+      if (previewMoved && page) {
+        const text = readFileSync(page, "utf8");
+        const linked = withEntryLink(text, arc, oldHref, previewHrefOf(arc, data));
+        if (linked !== text) writeFileSync(page, linked, "utf8");
+      }
+      if (repairs) repaired = leavePageWhole(ws, data, under);
       // A status line leads with the move, so the log says where the arc went, and the developer's words sit beside it.
       const move = changed.includes("status") ? `${was} → ${data.status}${data.reason ? ` · ${data.reason}` : ""}`
         : changed.includes("wait") ? `${data.status} · wait: ${data.wait}` : changed.includes("start") ? `${data.status} · started` : "";
-      logEvent(ws, arc, move ? "status" : changed.length ? "header" : "note", null,
-        move ? (note ? `${move} · ${note}` : move) : note ?? `changed ${changed.join(", ")}`);
+      const wrote = repaired ? [repaired.preview === "written" ? "preview" : "", repaired.entry !== "kept" ? "What entry" : "", repaired.cycles !== "kept" ? "Cycles row" : ""].filter(Boolean) : [];
+      if (move || changed.length || note || wrote.length)
+        logEvent(ws, arc, move ? "status" : changed.length || wrote.length ? "header" : "note", null,
+          move ? (note ? `${move} · ${note}` : move) : note ?? (changed.length ? `changed ${changed.join(", ")}` : `wrote ${wrote.join(", ")}`));
       for (const id of stopped) logEvent(ws, arc, "stopped", id, "the goal changed: stopped until the developer's next go");
-      said.push(changed.length ? `${arc} · ${changed.join(", ")}` : `${arc} · log line written`);
+      if (repaired && !changed.length && !note) { said.push(...repairedWords(repaired, arc)); bare = true; }
+      else said.push(changed.length ? `${arc} · ${changed.join(", ")}` : `${arc} · log line written`);
       if (stopped.length) said.push(`stopped until the next go: ${stopped.length} step(s)`);
       if (was === "PROPOSED" && data.status === "DECIDED") goes = true;
     }
@@ -242,7 +349,8 @@ function write(args: string[]): number {
   // A preview that moved is a view moved: the Cycles row links it in the same write.
   const refreshed = refreshIfMoved(ws, before, previewMoved);
   const { done, total } = doneOf(data);
-  console.log(`ok · ${arc} ${done}/${total} · ${[...said, ...refreshed.said].join(" · ")}`);
+  console.log(`ok · ${bare ? arc : `${arc} ${done}/${total}`} · ${[...said, ...refreshed.said].join(" · ")}`);
+  if (opened) for (const line of openingLines(ws, data, opened)) console.log(line);
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
@@ -302,7 +410,7 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
+    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--under …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
     run: write,
   },
   discard: {

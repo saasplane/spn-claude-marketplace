@@ -121,7 +121,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 ## Branches, promotion and releases
 
-- **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch rebases onto `origin/develop` before every push.
+- **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch takes `origin/develop` at the start of each pass and again before each push and each pull request, rebasing where `develop` moved.
 - **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RD.DEVEX.FUNCTION.069`). They say what changed for someone using the code, in the words of the approach page and the preview, and name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 - **Each check runs at the first step that can run it.** The push check runs the offline tiers; the stack tiers run on the pull request into `develop`; a promotion reruns nothing.
 - **The path to `main` is chosen at each promotion** with `spnutils repo promote <to> [--from <branch>]`, a merge commit each time. `main` takes merges from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`, a fork's included, and names `spnutils repo promote`. The agent names the path and asks which branch a change goes to when the developer has not said.

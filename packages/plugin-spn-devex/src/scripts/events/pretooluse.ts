@@ -47,6 +47,8 @@ import { applies as ownerApplies, checkOwner } from "../checks/workstream-owner.
 import { applies as questionsApply, checkQuestions } from "../checks/questions.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { startCommand } from "../lib/bash-timing.ts";
+import { checkChildSize } from "../checks/child-size.ts";
+import { checkReadSize } from "../checks/read-size.ts";
 
 type Check = {
   /** The check file, and the check inside it: `split-plan` › `close`. A file with one check names it twice. */
@@ -54,8 +56,8 @@ type Check = {
   run: (payload: Payload) => Verdict;
   /** What this check could possibly have an opinion about, decided from the path or command alone. */
   applies: (path: string, command: string) => boolean;
-  /** Which fields it needs. A check reading neither has nothing to read. */
-  needs: Array<"command" | "file_path">;
+  /** Which fields it needs. A check reading neither has nothing to read; `any` is for a check that judges the call whatever it is. */
+  needs: Array<"command" | "file_path" | "any">;
 };
 
 const PROSE_SUFFIXES = [".md", ".html"];
@@ -67,6 +69,10 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
   { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
+  // The token levers (RD.DEVEX.AGENT.111): refusals, so they run before the checks that only advise. A call
+  // from the main window pays one test of `agent_id`; a `Read` pays one `stat`.
+  { name: { group: "child-size", action: "child-size" }, run: checkChildSize, needs: ["any"], applies: () => true },
+  { name: { group: "read-size", action: "read-size" }, run: checkReadSize, needs: ["file_path"], applies: (path) => Boolean(path) },
   // ONE OWNER PER FILE, BY FORCE: a file the `workstream` commands own, a generated block, an arc's
   // stamp. Its fast path is one pattern over the path or the command.
   { name: { group: "workstream-owner", action: "workstream-owner" }, run: checkOwner, needs: ["command", "file_path"],
@@ -400,7 +406,7 @@ export function dispatch(payload: Payload): Verdict {
   const notes: string[] = [];
   for (const check of CHECKS) {
     if (!check.applies(path, command)) continue;
-    if (!check.needs.some((key) => supplied[key])) continue;
+    if (!check.needs.some((key) => key === "any" || supplied[key])) continue;
     // Named file › check so the two `split-plan` gates are told apart — one sweeps the workspace and
     // one reads a path, and an optimisation needs to know which is costing.
     let verdict: Verdict = null;

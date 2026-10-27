@@ -61,7 +61,7 @@ console.log("\n=== a generated block is written only by its command");
   ok("red: an Edit inside the open block is refused", open === "deny");
   const [whole] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: text.replace(overall, "<p>typed</p>") } }, root);
   ok("red: a Write that changes a block is refused", whole === "deny");
-  const [outside] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"c1\">The probe</h4>", new_string: "<h4 id=\"c1\">The probe, renamed</h4>" } }, root);
+  const [outside] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"N001-what\">The probe</h4>", new_string: "<h4 id=\"c1\">The probe, renamed</h4>" } }, root);
   ok("green: an Edit outside the blocks goes through", outside !== "deny");
   const [rewrite] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: text.replace("The probe</h4>", "The probe, renamed</h4>") } }, root);
   ok("green: a Write that keeps every block as it is goes through", rewrite !== "deny");
@@ -82,7 +82,7 @@ console.log("\n=== a card is raised, never typed");
   cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card.json"]);
   const text = readFileSync(page, "utf8");
   const forged = '<div class="sds-open">\n<h4 id="q42">Q42 &middot; typed by hand</h4>\n</div>\n';
-  const [typed, why] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"c1\">The probe</h4>", new_string: `<h4 id="c1">The probe</h4>\n${forged}` } }, root);
+  const [typed, why] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"N001-what\">The probe</h4>", new_string: `<h4 id="c1">The probe</h4>\n${forged}` } }, root);
   ok("red: a card typed by hand is refused in the hook's words", typed === "deny" && why.includes("q42 has no record: raise it with `workstream question raise`"), why.slice(0, 240));
   ok("green: the raised card stands on the page", /<h4 id="q1">Q1 &middot; Which way the <code>probe<\/code> goes<\/h4>/.test(text));
 }
