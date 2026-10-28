@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "a093bc4d"
+      "seen": "919017a1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "8949f278"
+      "seen": "b3e5c65c"
     }
   ]
 }
@@ -81,7 +81,7 @@ What a page puts in each part follows one form. A person then finds the name and
 - **A panel MUST give the title in its header the level of its box, `CONTAINER` unless the panel is the whole page, and a panel that is the whole page MUST say so with `fullPage`** (`RD.SUPPORT.SURFACE.107`, `RD.SUPPORT.SURFACE.179`). The title of a header is an item line. A panel takes `fullPage`, a boolean that is `false` where the page gives none and that is not a size: it says that this panel is the page. The level of its box is `CONTAINER`, or `PAGE` with `fullPage`, and the panel gives it to its header, its content and its footer as their place. With `fullPage` the header is the page head: the title is the `h1` with no level of its own, the main action is solid one step above the size, and every other action is an outline. A data table panel container takes `fullPage` in its `panel` and gives it to its box, and it takes no level from its title: the `pageLevel` of a title styles the title alone, as on any item line. A title the page gives no level takes the level of its box: `WIDGET` in a card, `GROUP` in the head of a part of a card widget, and `CONTAINER` in a dialog, a sheet or a drawer, as `architecture-components.md` states for each box. So every page of an app opens with the same head, and only its body differs.
 - **The back action of a header MUST stand level with the line of the title** (`RD.SUPPORT.SURFACE.108`). `DSPanelContainer.Header` draws a back action before its title where the page gives it an address to go back to. That action does not stand level with the middle of the title and the lines under it together. A person then reads the way back and the name of the page on one line.
 - **A page that holds several panels puts its head above them, outside any frame, with its way back** (`RD.SUPPORT.SURFACE.120`, advice). A page with one panel puts its head in the header of that panel. A page with several has no one panel that its head belongs to, so the head stands alone above them all. It is an item line at the level `PAGE`, with the way back before its title, level with the line of the title.
-- **The design system MUST draw that head and its way back, and a page MUST write nothing by hand for them.** A page gives the title and the address to go back to. It writes no row, no back button and no padding of its own.
+- **The design system MUST draw that head and its way back.** A page gives the title and the address to go back to, and writes no row, no back button and no padding of its own. So the head of a page looks the same whether the page has one panel or several.
 - **The actions that close the work of an entry stand in one place and in one order** (`RD.SUPPORT.SURFACE.095`, advice). Over the page, in a dialog, a sheet, a drawer or a popover, they stand at the end of the footer: the action that leaves the work first, and the main action last, at the very end. In an entry that is a page of its own they stand at the start of the footer, the main action first, because the fields of a page line up at its start. A value changed in place, as in a row of a data table, keeps its two actions beside the box, the one that saves first, because a person reaches them in the order of reading. The main action is a solid button and the action that leaves an outline button, in both places.
 - **A header above the outline is the value of `frames` that lists `CONTENT` and `FOOTER` and leaves `HEADER` out.** The app patterns are drawn in that form. The look is still the theme's to choose: a theme that lists the header too moves the outline, and no page changes.
 
@@ -347,7 +347,7 @@ This ref states what frames a part of a page, what that frame looks like, and wh
 | `RD.SUPPORT.APPS.147` | the parts of a panel, the props of its look, and what it refuses |
 | `RD.SUPPORT.SURFACE.231` | the framing unit is `DSPanelContainer`, `DSDataTablePanelContainer` is built on it, and a level is a position and not a unit |
 | `RD.SUPPORT.SURFACE.243` | a section of a page is `DSSectionContainer`, the one unit that gives a part of a page its fill and its room, and it frames nothing |
-| `RD.SUPPORT.SURFACE.259` | a grid of features under a heading is `DSFeatureGridSectionContainer`, which draws a section from `section`, takes a `heading` and an optional `grid`, leaves out `flush`, hands the cells no level and follows the screen class for its columns |
+| `RD.SUPPORT.SURFACE.259` | a grid of features under a heading is `DSFeatureGridSectionContainer`, which draws a section from `section`, takes a `heading` and an optional `grid`, leaves out `flush`, hands the cells no level and follows the screen class for its columns (that a grid section is for things of their own is advice) |
 | `RD.SUPPORT.SURFACE.260` | how the cells of a grid stand is `IDSGrid`, the columns required and the lines `NONE` where left out, and any unit that draws a grid of cells takes it whole |
 | `RD.SUPPORT.SURFACE.247` | a section takes its room above and below from its size, and hands that size to what it holds |
 | `RD.SUPPORT.SURFACE.254` | a section reaches the edges of its place; that a page does not put it in a panel, a card, an overlay or the nav column is advice |

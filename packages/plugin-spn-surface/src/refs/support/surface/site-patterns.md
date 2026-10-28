@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
-      "seen": "e0a44974"
+      "seen": "df8a8948"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/03-site-patterns.md",
@@ -240,7 +240,7 @@ Every site pattern answers the same questions about its look, in this order (`RD
 - **Words stand on their section, not in a frame** (`RD.SUPPORT.SURFACE.293`). A statement, a hero's words and a closing call stand on their section, and only a picture or an item takes a frame.
 - **Media is framed by its kind** (`RD.SUPPORT.SURFACE.293`): the product framed and raised, an illustration or a diagram flat, a photo flush and rounded, code in its code frame and flat.
 - **Points stand flat, and doors stand boxed and raised** (`RD.SUPPORT.SURFACE.293`). A point is read and a door is pressed, so the look says which before a reader tries.
-- **A grid section MUST be used only where each item is a thing of its own** (`RD.SUPPORT.SURFACE.259`). The parts or points of one subject are a feature's items.
+- **A grid section is for items that are each a thing of their own** (`RD.SUPPORT.SURFACE.259`). The parts or points of one subject are a feature's items, because the data decides which, and media alone decides neither.
 - **Every section with items stands at the start, and words are centred only where there is nothing to scan** (`RD.SUPPORT.SURFACE.346`). A Statement, a Closing call and a hero with no picture are centred. Points, Steps, Doors, a Feature grid and Questions stand at `START`, also where they state the problem the page ends: the fill already says so.
 - **Lines that stand side by side are one sentence each, of about one length** (`RD.SUPPORT.SURFACE.342`). The items of a grid, the cells of a grid section and the options of Choose to see are read across. The budget of each line is the length of the words by level, in `standards-core.md`.
 

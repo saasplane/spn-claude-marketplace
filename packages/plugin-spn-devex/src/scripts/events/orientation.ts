@@ -768,7 +768,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     unwired: repos.filter((r) => !r.wired).length,
     stale: cache?.startsWith("cache stale") ? cache : null,
     behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
-    late: repos.flatMap((r) => lateBranch(r.name, r.path) ?? []),
+    late: lateClauses(repos.flatMap((r) => lateBranch(r.name, r.path) ?? [])),
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
   });
@@ -812,18 +812,47 @@ function gitIn(path: string, args: string[]): string | null {
 /** The branches a pull request promotes to: a checkout on one of these is never told to rebase. */
 const PERMANENT = ["develop", "qa", "uat", "main"];
 
+/** A member whose branch is behind its base: the repository, the branch, how many commits, and the base. */
+export type LateBranch = { name: string; branch: string; count: number; base: string };
+
 /**
- * A member's branch that is behind its base, as one clause of the status line, or null. The base is
- * `origin/develop` unless the branch's git config records another in `spnBase`. A permanent branch, a
- * detached HEAD and a branch that is not behind say nothing.
+ * A member's branch that is behind its base, or null. The base is `origin/develop` unless the branch's
+ * git config records another in `spnBase`. A permanent branch, a detached HEAD and a branch that is not
+ * behind say nothing.
  */
-export function lateBranch(name: string, path: string): string | null {
+export function lateBranch(name: string, path: string): LateBranch | null {
   if (!isCheckout(path)) return null;
   const branch = gitIn(path, ["branch", "--show-current"]);
   if (!branch || PERMANENT.includes(branch)) return null;
   const base = `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
   const count = Number(gitIn(path, ["rev-list", "--count", `HEAD..${base}`]));
-  return count > 0 ? `${name}  ${branch}  ${count} behind ${base}: rebase before the next push` : null;
+  return count > 0 ? { name, branch, count, base } : null;
+}
+
+/** How many late branches each base names in full. The rest are counted, and `spnutils workspace status` lists them. */
+export const LATE_NAMED = 3;
+
+/**
+ * The late branches as clauses of the status line, one for each base: how many branches are behind it,
+ * that a rebase comes before the next push, and the most-behind branches by name with their counts.
+ *
+ * THE LIST IS CAPPED BECAUSE IT GROWS WITH THE WORKSPACE, AND THE SESSION-START TEXT MAY NOT. Every
+ * member on a branch behind its base used to add its own clause of about a hundred bytes, the rebase
+ * sentence repeated in each. A worktree set holds a member for every worktree, and sixteen of them
+ * behind took this text past the 8 KB every window pays for on every turn (RD.DEVEX.AGENT.105). So the
+ * sentence is said once for each base, and past the first few the branches are a count and the command
+ * that lists them all, which is where the ground is read on asking.
+ */
+export function lateClauses(late: LateBranch[]): string[] {
+  const bases = [...new Set(late.map((l) => l.base))].sort();
+  return bases.map((base) => {
+    const behind = late.filter((l) => l.base === base)
+      .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    const named = behind.slice(0, LATE_NAMED).map((l) => `${l.name} ${l.branch} by ${l.count}`).join(", ");
+    const more = behind.length - LATE_NAMED;
+    return `${behind.length} ${behind.length === 1 ? "branch" : "branches"} behind ${base}, rebase before the next push: ${named}`
+      + (more > 0 ? ` and ${more} more, listed by \`spnutils workspace status\`` : "");
+  });
 }
 
 /** The longest the session start waits for the members' remotes. */

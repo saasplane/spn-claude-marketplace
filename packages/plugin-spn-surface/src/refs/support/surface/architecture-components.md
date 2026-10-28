@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
-      "seen": "4c66eac6"
+      "seen": "13238159"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/06-architecture-components/",
-      "seen": "4feb80c5"
+      "seen": "c6becfaa"
     }
   ]
 }
@@ -1515,6 +1515,29 @@ A card is chosen by what it holds. Its size is the size of its place, and it is 
 | `opacity` | `TRANSLUCENT` | a card over a picture or a band the app paints (`RD.SUPPORT.SURFACE.192`) |
 | `size` | `XS` to `XL` | the place's. A page writes one only to keep a size of its own, such as a small card of a sign-in step |
 
+#### The choice table of `DSItemCard`
+
+A tile is chosen by where it stands. With no `card.color` it wears the tint of the surface under it, so in a rail it takes the navigation's tint and in the content the content's. A colour makes it a card of its own, as `DSCard` is. Its size is the size of its place.
+
+**The cases**, read from the top; the first that matches wins.
+
+| What it holds | Where it stands | `card.color` | The page writes | Rule |
+| --- | --- | --- | --- | --- |
+| a switcher or an account row, which a menu wraps | the navigation: a rail, a dock's column, a phone's drawer | left out: the navigation's tint, from the surface it stands on | the item and the menu | `RD.SUPPORT.SURFACE.226` |
+| a linked tile, a connected account, a chosen plan | the content: a settings list, a detail page's side column | left out: the content's tint, from the surface it stands on | the item, and `selected` on the chosen tile | `RD.SUPPORT.SURFACE.226` |
+| a boxed item of a feature, on a `GRID` or a `LIST` | a feature whose `items.surface` is set | the feature's: its `items.surface`, else the card look of the theme | the feature's `items`, as data | `RD.SUPPORT.SURFACE.269` |
+| a tile that stands apart from the surface under it, as a card of its own | the content | the page's: `BASE`, `DEFAULT` or `PRIMARY`, as `DSCard` takes it | the colour | this table |
+
+**The limits across a view.** A navigation's colour stays in the navigation: a tile in the content never takes it (`RD.SUPPORT.SURFACE.226`).
+
+**The index by value.**
+
+| Prop | Value | Its cases |
+| --- | --- | --- |
+| `card.color` | `BASE` | a tile as a card of its own on a tinted surface, bordered; or a feature's boxed items whose `items.surface` gives it |
+| `card.color` | `DEFAULT` | a tile as a card of its own in the quiet tint; or a feature's boxed items whose `items.surface` gives it |
+| `card.color` | `PRIMARY` | a tile as a card of its own in the brand's colour; or a feature's boxed items whose `items.surface` gives it. Left out in a `PRIMARY` rail, the tile takes the rail's tint, which is the place's and no colour of its own |
+
 #### The choice table of `DSCodeBlockView`
 
 A sample of code is chosen by the language it is written in, which is the sample's own, and it follows the app's mode.
@@ -2695,7 +2718,7 @@ A sticky part is chosen by a bar a person needs while the page scrolls past it.
 
 ## Composing, never restyling — 🔮
 
-A page composes these blocks, and never restyles a copy of one. A control that is missing is proposed to the design system. One that every stack should build is named and grouped here first. One that helps a single stack may be that stack's own unit. **A block takes data and props, and a class on one is a missing prop or a place's room** (`RD.SUPPORT.SURFACE.177`). Where a block has a prop for what a class would say, such as the tone and the weight of a text, the colour of a card, or where a table cell holds its content, the page gives the prop. Where the class is the room the block stands in, the parent gives it: a row, a grid or a part, or a plain element with the width around the block. Where no prop exists and three or more calls need it, the block gains the prop. A list or an item is never given a `flex` and a gap to lay a row of things: a plain row holds blocks, and an item holds its content in its own slots. A class stays on a block only on a page that shows how a primitive is styled, and in the showcase's own chrome.
+A page composes these blocks, and never restyles a copy of one. A control that is missing is proposed to the design system. One that every stack should build is named and grouped here first. One that helps a single stack may be that stack's own unit. **A block takes data and props, and a class on one is a missing prop or a place's room** (`RD.SUPPORT.SURFACE.177`). Where a block has a prop for what a class would say, such as the tone and the weight of a text, the colour of a card, or where a table cell holds its content, the page gives the prop. Where the class is the room the block stands in, the parent gives it: a row, a grid or a part, or a plain element with the width around the block. Where no prop exists and three or more calls need it, the block gains the prop, and that the design system builds. A list or an item is not given a `flex` and a gap to lay a row of things: a plain row holds blocks, and an item holds its content in its own slots. A class stays on a block only on a page that shows how a primitive is styled, and in the showcase's own chrome. What a page writes here is advice. The reason is that a class on a block is copied by the next page, and the theme and the density never reach it.
 
 An overlay a block opens — a popover, a tooltip, a dropdown menu — is a private part of that block, shown by a switch such as `open`, and never a block a designer places on its own.
 
