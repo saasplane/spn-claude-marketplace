@@ -27,14 +27,17 @@
 // and the merged index of each is read in name order. A name one member carries prints from it. A
 // name several carry prints from the first whose entry carries props, else the first: a member may
 // pin a release of a package whose index was written before props were read from the code, and the
-// member that built the package holds them. The line printed names the member, and inside a
-// repository nothing changes.
+// member that built the package holds them. The line printed names the member, a line under it names
+// every other member that carries the name, and inside a repository nothing changes.
+//
+// `--repo <name or path>` READS ONE REPOSITORY, from anywhere: a member's name, found in the
+// workspace above the working folder, or a path inside a repository (RD.DEVEX.AGENT.112).
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
 export const describe = "Print one unit's props, values, defaults, usage and cases from the snapshot this plugin carries";
-export const usage = "<Unit> [--json]";
+export const usage = "<Unit> [--repo <name or path>] [--json]";
 
 export const SNAPSHOT = "construct.snapshot.json";
 const REFS = ["architecture-components.md", "architecture-widgets.md"];
@@ -66,7 +69,8 @@ type IndexPackage = { name: string; version: string; symbols: IndexSymbol[] };
  * member repository that holds it. `workspace` says the read was across a workspace's members.
  */
 type IndexEntry = { pkg: IndexPackage; file: string; repository: string | null };
-type Index = { packages: IndexEntry[]; workspace: boolean };
+/** `named` is the repository `--repo` named, whose index alone was read. */
+type Index = { packages: IndexEntry[]; workspace: boolean; named?: string };
 /** One component found in an index: its symbol, its package, the file, and the member it came from. */
 type Found = { symbol: IndexSymbol; pkg: IndexPackage; file: string; repository: string | null };
 
@@ -261,6 +265,51 @@ export function symbolIndex(start: string): Index {
   return { packages, workspace: false };
 }
 
+/** The members of a workspace: its child folders that hold a `sprepo.json`, in name order. */
+function membersOf(workspace: string): string[] {
+  try { return readdirSync(workspace).sort().filter((name) => existsSync(join(workspace, name, "sprepo.json"))); } catch { return []; }
+}
+
+/**
+ * The repository `--repo` names, from the folder the command runs in: a path inside a repository,
+ * else a member's name in the workspace above. A value that is neither is a usage fault that lists
+ * the members, so a wrong name never passes as an empty index.
+ */
+function namedRepository(value: string, from: string): string {
+  const path = resolve(from, value);
+  if (existsSync(path)) {
+    const repository = repositoryOf(path);
+    if (repository) return repository;
+    throw new UsageFault(`\`--repo ${value}\` is in no repository: no sprepo.json stands at or above it.`);
+  }
+  const workspace = workspaceOf(from);
+  if (workspace && existsSync(join(workspace, value, "sprepo.json"))) return join(workspace, value);
+  const members = workspace ? membersOf(workspace) : [];
+  throw new UsageFault(`\`--repo ${value}\` names no repository${members.length ? ` — this workspace's members: ${members.join(" · ")}` : ""}.`);
+}
+
+/**
+ * The symbol index a lookup reads: the one repository `--repo` names, else what `symbolIndex` finds
+ * from the working folder — the repository's own, or each member's from a workspace's root.
+ */
+export function indexFor(repo: string | null, from: string): Index {
+  if (repo === null) return symbolIndex(from);
+  const repository = namedRepository(repo, from);
+  const named = basename(repository);
+  const index = symbolIndex(repository);
+  return { packages: index.packages.map((entry) => ({ ...entry, repository: named })), workspace: false, named };
+}
+
+/** The other members of a workspace's read that carry a component of this name, besides the one printed. */
+function othersHolding(index: Index, name: string, printed: string | null): string[] {
+  if (!index.workspace) return [];
+  const holding = index.packages
+    .filter(({ pkg }) => (pkg.symbols ?? []).some((symbol) => symbol.role === "COMPONENT" && symbol.name === name))
+    .map(({ repository }) => repository)
+    .filter((repository): repository is string => repository !== null && repository !== printed);
+  return [...new Set(holding)];
+}
+
 /** Whether an index's entry for a component carries its props at all: an older build wrote none. */
 const hasProps = (symbol: IndexSymbol): boolean => Boolean(symbol.roleMeta?.props);
 
@@ -302,21 +351,23 @@ function beyondLine(block: string | null, pattern: string | null): string {
 }
 
 /** A unit beyond the core, printed from the symbol index: its package, its intent line, its props, and the block its name points to. */
-function showFromIndex(found: Found, json: boolean): number {
+function showFromIndex(found: Found, index: Index, json: boolean): number {
   const { symbol, pkg, file, repository } = found;
   const props = symbol.roleMeta?.props ?? null;
   const line = plain((symbol.intent ?? "").replace(/\.$/, ""));
   const { block, pattern } = blockOf(symbol.name);
+  const alsoIn = othersHolding(index, symbol.name, repository);
   if (json) {
     console.log(JSON.stringify({ unit: symbol.name, package: pkg.name, version: pkg.version, line, index: file,
-      repository, props: props ?? [], block, pattern, beyondCore: true }, null, 2));
+      repository, alsoIn, props: props ?? [], block, pattern, beyondCore: true }, null, 2));
     return 0;
   }
   const out: string[] = [];
   out.push([`${symbol.name}`, `${pkg.name}@${pkg.version}`, ...(line ? [line] : [])].join(" · "));
-  out.push(repository
-    ? `the symbol index: ${file}, of the repository ${repository} in this workspace`
+  out.push(index.named ? `the symbol index: ${file}, of the repository ${index.named}, which --repo names`
+    : repository ? `the symbol index: ${file}, of the repository ${repository} in this workspace`
     : `the symbol index: ${file}, of the repository this runs in`);
+  if (alsoIn.length) out.push(`also in ${alsoIn.join(" · ")} — \`--repo <name>\` reads one alone`);
   out.push("");
   if (props === null) {
     out.push("the index carries no props for it: it was written before spnutils 5.40.0, which reads them from the code");
@@ -338,9 +389,10 @@ function showFromIndex(found: Found, json: boolean): number {
 }
 
 export function run(args: string[]): number {
-  const words = readWords(args, { json: FLAG });
+  const words = readWords(args, { json: FLAG, repo: VALUE });
   if (words.paths.length !== 1) throw new UsageFault("needs one unit's name, such as `DSSheet`.");
   const name = words.paths[0];
+  const repo = words.value("repo");
 
   const folder = root();
   const snapshotPath = join(folder, SNAPSHOT);
@@ -351,14 +403,15 @@ export function run(args: string[]): number {
   const snapshot = JSON.parse(readFileSync(snapshotPath, "utf8")) as Snapshot;
   const unit = snapshot.units.find((candidate) => candidate.name === name);
   if (!unit) {
-    const index = symbolIndex(process.cwd());
+    const index = indexFor(repo, process.cwd());
     const components = componentsOf(index);
     const found = components.get(name);
-    if (found) return showFromIndex(found, words.given("json"));
+    if (found) return showFromIndex(found, index, words.given("json"));
     const closest = [...new Set([...snapshot.units.map((candidate) => candidate.name), ...components.keys()])]
       .sort((a, b) => distance(name.toLowerCase(), a.toLowerCase()) - distance(name.toLowerCase(), b.toLowerCase()) || a.localeCompare(b))
       .slice(0, 3);
-    const where = index.packages.length ? "in the snapshot or the symbol index"
+    const where = index.named ? `in the snapshot or the symbol index of ${index.named}`
+      : index.packages.length ? "in the snapshot or the symbol index"
       : index.workspace ? "in the snapshot, and no symbol index in this workspace's repositories,"
       : "in the snapshot, and no symbol index here,";
     process.stderr.write(`unit show: no unit \`${name}\` ${where} — the closest: ${closest.join(" · ")}\n`);

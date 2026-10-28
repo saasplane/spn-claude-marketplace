@@ -18,6 +18,7 @@ import type { Payload, Verdict } from "../../../../plugin-support-lib/src/lib/pa
 import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { FIGMA_TOOL, run as runFigmaConnector } from "../checks/figma-connector.ts";
+import { run as runUnitRead } from "../checks/unit-read.ts";
 import { isTsxSource } from "../lib/node.ts";
 
 export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
@@ -25,6 +26,8 @@ export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () 
   // knows no stack.
   if (event.tool_name === FIGMA_TOOL)
     return span({ group: "figma", action: "connector" }, () => runFigmaConnector(event));
+  // A READ OF A UNIT'S FILE GETS ADVICE, on a test of the path's text alone: it reads no file.
+  if (event.tool_name === "Read") return span({ group: "unit", action: "read" }, () => runUnitRead(event));
   // THE SURFACE CHECK (RD.DEVEX.AGENT.107). Every other path leaves here, on a test of the path's own
   // text, before a file is read or the check is loaded: start-up and loading were nine tenths of a
   // hook's cost, and most writes are not Surface code.

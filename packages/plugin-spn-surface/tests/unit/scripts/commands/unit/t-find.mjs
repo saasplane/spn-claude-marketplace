@@ -4,7 +4,8 @@
 // THIS SUITE OWNS THE COMMAND'S SEARCH. Against the `unit show` fixture it proves a word finds a core
 // unit by its line, a module's unit by its name from a workspace's root with its member named, a word
 // matched by its first five letters, the unit named for the words ranked before one whose line carries
-// them, a name the snapshot holds listed once, the JSON form, and the two refusals.
+// them, a name the snapshot holds listed once, the JSON form, `--repo` reading one member, and the
+// refusals.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -80,6 +81,21 @@ console.log("\n=== unit find — matching");
   ok("a word matches by its first five letters", first(stem.out).startsWith("IdentityFactorVerificationBadge"), stem.out);
   const short = runIn(root, "unit", "find", "a", "of", "the", "factor");
   ok("a word of three letters or fewer is dropped", first(short.out).startsWith("IdentityFactorVerificationBadge"), short.out);
+}
+
+console.log("\n=== unit find — one repository, by --repo");
+{
+  const root = workspaceRoot();
+  mkdirSync(join(root, "spn-other", ".claude", "saasplane"), { recursive: true });
+  writeFileSync(join(root, "spn-other", "sprepo.json"), "{}\n");
+  writeFileSync(join(root, "spn-other", ".claude", "saasplane", "spn-symbols.json"), JSON.stringify({ capabilities: [] }));
+  const named = runIn(root, "unit", "find", "factor", "verified", "--repo", "spn-platform");
+  ok("--repo with the member that holds the unit finds it", named.code === 0 && first(named.out).startsWith("IdentityFactorVerificationBadge"), named.out);
+  const other = runIn(root, "unit", "find", "factor", "verified", "--repo", "spn-other");
+  ok("--repo with a member that lacks it finds none of its units", !other.out.includes("IdentityFactorVerificationBadge"), other.out);
+  const wrong = runIn(root, "unit", "find", "factor", "--repo", "spn-nothing");
+  ok("--repo naming no repository is a usage fault that lists the members", wrong.code === 2
+    && wrong.out.includes("names no repository") && wrong.out.includes("spn-other · spn-platform"), wrong.out);
 }
 
 console.log("\n=== unit find — refusals");
