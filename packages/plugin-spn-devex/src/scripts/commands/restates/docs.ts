@@ -9,8 +9,8 @@
 //     spn-devex restates docs check [<book>]      is every citation current?
 //     spn-devex restates docs write <ref>         restamp one ref's docs citations
 //
-// A SUBJECT WITH TWO ACTIONS. `check` takes the book's folder, and finds a sibling checkout where it
-// is given none. `write` takes one ref and restamps that file alone. `check` exits 1 where it
+// A SUBJECT WITH TWO ACTIONS. `check` takes the book's folder, and reads `spn-foundation` of the workspace it
+// runs in where it is given none. `write` takes one ref and restamps that file alone. `check` exits 1 where it
 // reports a finding, and `write` exits 1 where the ref cannot be read.
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -21,7 +21,7 @@ import {
   BLOCK_COMMENT, DECISION_ID_SRC, type Citation, check as checkKind, isDir, parse,
   sectionText, seenHash, treeHash, undeclared,
 } from "../../lib/restates.ts";
-import { findBook, pluginDocuments } from "./check.ts";
+import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
 const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
 
@@ -37,6 +37,8 @@ function writeOne(refPath: string): number {
     console.error(`${refPath}: no workspace found walking up from this file (no .spndevex)`);
     return 1;
   }
+  const own = findBook(undefined, workspace);
+  if (own !== null) console.log(bookLine(own, false, workspace));
   const [block, broken] = parse(refPath);
   if (broken) { console.error(`${refPath}: ${broken}`); return 1; }
   const citations: Citation[] = block?.docs ?? [];
@@ -80,12 +82,15 @@ export function main(argv: string[], root: string): number {
     console.log("no plugins here — nothing restates the book in this repo");
     return 0;
   }
-  const book = findBook(argv.find((a) => !a.startsWith("-")), root);
+  const given = argv.find((a) => !a.startsWith("-"));
+  const book = findBook(given, root);
   if (book === null) {
     console.log(`${documents.length} plugin document(s) · no foundation book to compare against — quiet`);
+    console.log(given ? `  ${given} is not a book: it carries no decisions register.` : `  ${noBookReason(root)}.`);
     console.log("  Pass the book's path to run it: restates docs check path/to/spn-foundation");
     return 0;
   }
+  console.log(bookLine(book, Boolean(given), root));
   const findings: string[] = [];
   const unrewritten: string[] = [];
   let stamped = 0;

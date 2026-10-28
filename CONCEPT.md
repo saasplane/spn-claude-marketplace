@@ -26,8 +26,8 @@ If you are a **partner**, you hold this repository and not the book, so every ci
 names a chapter rather than linking to one. If you are a **builder**, you hold both, and the drift
 checker is yours: it is the only thing in the workspace that reads across the two trees, and you run
 it here, before you publish — `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or
-`spn-devex restates check`, once installed), which finds a sibling `spn-foundation` checkout by
-itself or takes its path as the one argument.
+`spn-devex restates check`, once installed), which reads the `spn-foundation` of the workspace it runs in
+and names it on its first line, or takes a book's path as the one argument.
 
 ## The domains it holds   `DRAFT`
 
