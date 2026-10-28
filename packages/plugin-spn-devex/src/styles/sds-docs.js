@@ -174,7 +174,7 @@
     out=esc(out);
     out=out.replace(/\b\d+(?:\.\d+)?\b/g,function(match){return keep('sds-tk-n',match);});
     if(spec.keywords&&spec.keywords.length){
-      var words=new RegExp('\\b('+spec.keywords.join('|')+')\\b','g');
+      var words=new RegExp('\\b('+spec.keywords.map(function(word){return word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')\\b','g');
       out=out.replace(words,function(match){return keep('sds-tk-k',match);});
     }
     if(spec.type)out=out.replace(spec.type,function(match){return keep('sds-tk-t',match);});

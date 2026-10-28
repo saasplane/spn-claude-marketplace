@@ -1,0 +1,20 @@
+# Semgrep reads this file instead of its built-in ignore list once it exists, so the built-in list is kept here first.
+node_modules/
+build/
+dist/
+vendor/
+.env/
+.venv/
+.tox/
+*.min.js
+.npm/
+.yarn/
+test/
+tests/
+*_test.go
+.semgrep
+.semgrep_logs/
+
+# The published documentation copies are frozen: each version folder is the file as it was released,
+# never edited in place, so a finding in one cannot be fixed there. The live source is scanned.
+public/assets/docs/
