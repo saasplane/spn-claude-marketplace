@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "b93f0932"
+      "seen": "14d06850"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "827691e6"
+      "seen": "51ee6619"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "662e0f2d"
+      "seen": "945e9c18"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
