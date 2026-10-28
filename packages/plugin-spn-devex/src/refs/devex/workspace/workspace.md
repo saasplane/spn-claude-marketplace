@@ -503,9 +503,9 @@ steps work out; `HELD` is `DECIDED` with the developer's words as its wait. The 
 **stage** rather than a word for a **state**.
 
 **No step starts before the go, and reading is never a step — MUST** (`RD.DEVEX.WORKSPACE.278`). Reading and
-drafting are planning jobs, which record no step. Steps may be written before the go; `row write` refuses
+drafting are planning jobs, which record no step. Steps may be written before the go; `row add` and `row state` refuse
 one written `running` or `landed` on an arc not `DECIDED`, or holding a wait. **The go is its own write, and
-it carries the developer's words**: `row write <ws>/<arc> --status DECIDED --note "<the developer's words>"`,
+it carries the developer's words**: `arc edit <ws>/<arc> --status DECIDED --note "<the developer's words>"`,
 logged beside the move. A stored `PROPOSED` wins over the steps: a changed goal stops what was building until
 the next go. The review-fixes arc reads `RUNNING` until the word to close stores its `LANDED`.
 
@@ -514,8 +514,8 @@ business. It does not describe a **workstream**, whose state is the folder it si
 describe the **approach document**, which carries the document status vocabulary instead. Three
 altitudes, three vocabularies, and no word shared between them.
 
-**The stored status is written by `row write --status`, into the arc's `state.json`.** The plugin's schema
-holds the stored set, so `row write` refuses a word outside it, `RUNNING` among them, and `workstream state
+**The stored status is written by `arc edit --status`, into the arc's `state.json`.** The plugin's schema
+holds the stored set, so `row add` and `row state` refuse a word outside it, `RUNNING` among them, and `workstream state
 check` names a `state.json` that holds one. A file at `schemaVersion` 1 is brought to 2 by plugin migration 006.
 
 **A terminal status means the arc is finished, so its unlanded steps are history rather than work.**
@@ -532,7 +532,7 @@ check` names a `state.json` that holds one. A file at `schemaVersion` 1 is broug
 | The developer agrees an open arc's goal changed | the arc back to `PROPOSED`; its running steps stop until their go |
 | The workstream is closed | nothing reopens; new scope is a new workstream |
 
-**A step is never added to an arc that reads `LANDED`**: `row write` refuses it, and names the review-fixes
+**A step is never added to an arc that reads `LANDED`**: `row add` and `row state` refuse it, and names the review-fixes
 arc. A stored `LANDED` arc with a step not landed is named by `workstream state check`, which the Stop hook
 runs for this window's workstreams.
 

@@ -110,6 +110,8 @@ spn-devex restates files write <book> — copy the book's templates into this pl
 
 spn-devex workspace tokens show [<workstream>] [--json] [--root <workspace>] [--projects <folder>] — print tokens and the model's own time per workstream, arc and order; with --json, as data
 
+spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
+
 spn-devex workstream arc stamp write <workstream>/N<nnn> — write: restamp an arc's Cycles row once its part of the page is current
 
 spn-devex workstream arc delete <workstream>/N<nnn> --note "…" — delete an arc never decided, on the developer's words
@@ -128,7 +130,13 @@ spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in
 
 spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, cost, commits, follow-ups
 
-spn-devex workstream row write <workstream>/N<nnn> [<row>] [--title …] [--subject …] [--goal …] [--under …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] … — open an arc or change its header and status; add a row or change its fields and state; --note writes a log line
+spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
+
+spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note …] — move a row to a state; --note carries the words beside the move
+
+spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
+
+spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--position …] — change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named
 
 spn-devex workstream row discard <workstream>/N<nnn> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 

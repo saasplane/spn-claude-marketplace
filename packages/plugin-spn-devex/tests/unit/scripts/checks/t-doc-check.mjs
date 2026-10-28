@@ -547,7 +547,7 @@ try {
 
   console.log("\n=== doc-check — an arc is data, and a Markdown arc file is no document it reads");
 
-  // THE RETIRED FORM COUNTS FOR NOTHING. The arc's rows are written by `workstream row write`, which
+  // THE RETIRED FORM COUNTS FOR NOTHING. The arc's rows are written by `workstream row add`, which
   // names a row out of chain order itself; a Markdown arc written by hand is read by no check here.
   one("a Markdown arc file under arcs/ with rows out of chain order draws nothing",
     write(join(home, ARCS, "N4-late-docs.md"), "# N4 — late docs\n\nStatus: **DECIDED.**\n\n## Steps\n\n" +

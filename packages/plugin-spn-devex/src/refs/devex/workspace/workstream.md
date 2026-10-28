@@ -78,8 +78,8 @@ context ends with the session and the files do not.
 | **S0** | **orient** | a session opens, or a subject is named | nothing yet — it reports the workstream, its state, its open cards, and what it is about to do | you and the developer look at the same workstream |
 | **S1** | **shape** | there is no page, or the page does not cover the work | the approach page in its fixed shape, each arc it plans `PROPOSED` with a goal and a preview section the developer can read, and one line in `How` for each arc still expected. Every unknown is a `Q<n>` card with options, the views that spoke, and a recommendation. **Never a blank page, never a card without a recommendation** | the page exists and every question the agent cannot answer alone is a card |
 | **S2** | **iterate** | a card is open, or the developer says anything that adds clarity | an answer **folds into the section that then states it** and leaves `Open`. A new question is the next `Q<n>`. Anything new is placed as § *Placing something new* says | `Open` is empty and the split plan covers the scope |
-| **S3** | **confirm** | an arc's preview shows what the developer decides, and `Open` holds no card its build rests on | nothing new — the preview is shown, and a go is asked for on the arcs it names | the developer says go, **and the go is its own write, carrying their words**: `workstream row write <arc> --status DECIDED --note "<the developer's words>"` (`RD.DEVEX.WORKSPACE.278`) |
-| **S4** | **execute** | the developer said go | `workstream rows show <workstream> --ready --parallel` names the rows that can run; a row you start is set `running` with `workstream row write <arc> <row> --state running`, and its log line says since when. A row already running under somebody else is left alone: ask the developer, saying how old its log line is. A child's report is folded in with `workstream report write`, and a row lands only when its acceptance holds and is proven. A question hit mid-work becomes a card (`workstream question raise`), and the rows its answer can change wait on it in `blockedBy`; everything the answer cannot touch keeps moving. A row you started and put down is set `stopped`, its log line carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
+| **S3** | **confirm** | an arc's preview shows what the developer decides, and `Open` holds no card its build rests on | nothing new — the preview is shown, and a go is asked for on the arcs it names | the developer says go, **and the go is its own write, carrying their words**: `workstream arc edit <arc> --status DECIDED --note "<the developer's words>"` (`RD.DEVEX.WORKSPACE.278`) |
+| **S4** | **execute** | the developer said go | `workstream rows show <workstream> --ready --parallel` names the rows that can run; a row you start is set `running` with `workstream row state <arc> <row> running`, and its log line says since when. A row already running under somebody else is left alone: ask the developer, saying how old its log line is. A child's report is folded in with `workstream report write`, and a row lands only when its acceptance holds and is proven. A question hit mid-work becomes a card (`workstream question raise`), and the rows its answer can change wait on it in `blockedBy`; everything the answer cannot touch keeps moving. A row you started and put down is set `stopped`, its log line carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
 | **S5** | **sweep** | the rows are done | what the work owes the standards: a contradiction as a register row, a convention in its owning chapter | nothing the work owes the standards is left in the conversation |
 | **S6** | **close** | every row is landed, carried or deferred | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row waiting, ready, running or stopped refuses the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. Then **the page is stamped closed**, then the folder moves, then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
 
@@ -123,7 +123,7 @@ reached), and what its report
 folded in: `proof`, `cost`, `commits`, `order`. **Every row is a build step**: reading and drafting are
 planning jobs, which record no step (`RD.DEVEX.WORKSPACE.278`). A step's `state` is `waiting`, `ready`,
 `running`, `stopped`, `replaced`, `landed`, `deferred` or `carried`. Steps run in chain order, by repository with the foundation first, then by altitude. After each
-write `row write` names, in a `note:` line, a build row with no `repo` or no `altitude` and a row out of
+write the `row` commands name, in a `note:` line, a build row with no `repo` or no `altitude` and a row out of
 chain order; it reports and never refuses (`RD.DEVEX.WORKSPACE.183`).
 
 ### The commands
@@ -139,7 +139,11 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `state show [<workstream>]` | where everything stands, in a line: `025 · N007 18/19 · 57b running · N010 proposed · 0 open cards · 1 suggestion shaped` |
 | `state check [<workstream>] [--facts]` | whether each open and backlog workstream is whole; exits 1 on a finding. `--facts` also names each pinned fact whose source moved, as a note |
 | `rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree]` | the rows; the ready ones; of those, the ones whose `touches` do not overlap |
-| `row write <arc> [<row>] [--field value …] [--note "…"]` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), as many as the plan needs, or changes its header and its stored status, writing the arc's name file with its data; a `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; adds a row (`--title`, `--kind`) or changes its fields and its state; `--note` writes a log line, which has no other writer. `--status` stores the developer's words, `PROPOSED`, `DECIDED`, `CARRIED` or `DROPPED`, and `LANDED` only on the review-fixes arc at the close; every move needs `--note` with their words. The go, `--status DECIDED`, lists each line of the preview that still says proposed. `--wait "<their words>"` holds a decided arc and `--start --note "…"` clears it; `--review-fixes` opens the review-fixes arc, `DECIDED` on their words. A step written `running` or `landed` on an arc not `DECIDED`, or holding a wait, is refused, and a step is never added to an arc that reads `LANDED`. A move back to `PROPOSED` stops the arc's running steps. `DROPPED` is refused on an arc never decided |
+| `arc edit <arc> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] …` | opens an arc as `PROPOSED` (`--title`, `--subject`, and `--goal`), as many as the plan needs, or changes any field of its header and its stored status, writing the arc's name file with its data; an arc field is written nowhere else. A `--subject` over three words or 24 characters is refused; `--position <n>` sets the arc's place in the planned sequence, which orders the arcs still `DECIDED` or `PROPOSED` on the approach page's sticky card; `--note` writes a log line. `--status` stores the developer's words, `PROPOSED`, `DECIDED`, `CARRIED` or `DROPPED`, and `LANDED` only on the review-fixes arc at the close; every move needs `--note` with their words. The go, `--status DECIDED`, lists each line of the preview that still says proposed. `--wait "<their words>"` holds a decided arc and `--start --note "…"` clears it; `--review-fixes` opens the review-fixes arc, `DECIDED` on their words. A move back to `PROPOSED` stops the arc's running steps. `DROPPED` is refused on an arc never decided. A row's field is refused, and `row edit` is named |
+| `row add <arc> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …]` | adds a row, takes the arc's next number and prints it; refused without `--repo` or `--altitude`. A step written `running` or `landed` on an arc not `DECIDED`, or holding a wait, is refused, and a step is never added to an arc that reads `LANDED` |
+| `row state <arc> <row> <state> [--note …]` | the everyday call: moves a row to a state, and the log line says from where; a row the arc does not hold is refused, and `row add` is named |
+| `row note <arc> <row> "<text>"` | writes one line on a row's log and changes nothing else |
+| `row edit <arc> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--position …]` | changes the fields of a row the arc holds; a row it does not hold is refused, and `row add` is named |
 | `row discard <arc> <row> --note "…"` | takes a waiting, ready or deferred row found invalid or not needed out of `state.json`; its `discarded` log line carries the developer's words and the row's *What* |
 | `arc stamp write <arc>` | restamps the arc's *Cycles* row, once its part of the page is current |
 | `arc delete <arc> --note "…"` | deletes an arc never decided, both its folders, on the developer's words; an arc ever decided is refused, and becomes `DROPPED` instead |
@@ -172,15 +176,15 @@ files it writes, and a file a command owns is written only by that command.
 | Step | Files it writes |
 | --- | --- |
 | shape | `suggestions.jsonl`, by command; nothing else moves |
-| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`row write <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `N<nnn>-what`; one line in `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
+| open the arc, as the plan becomes clear | `state.json`, `log.jsonl` and `<subject>.md`, by command (`arc edit <arc> --title … --subject … --goal …`); the preview from the template and its `What` entry, `N<nnn>-what`; one line in `How`; the *Cycles* row (`docs cycles write`), then `arc stamp write` |
 | preview and cards | the preview, filled by planning jobs, which record no step, while the arc reads `PROPOSED`; the cards in `Open`, by `question raise`; each fact read, by `fact write` |
-| decide | the developer's go on the preview, written with their words: `row write <arc> --status DECIDED --note "<the developer's words>"`, with `--wait` where they said wait; the answers folded into `What` and the preview, and each line the write lists as still saying proposed brought current; the register rows owed |
-| plan | the rows, by `row write`, each with its kind, model, `blockedBy` and `touches`; `plan.md` where the arc has traps, a set or a move table; the one line of each new place in the page's `How` |
+| decide | the developer's go on the preview, written with their words: `arc edit <arc> --status DECIDED --note "<the developer's words>"`, with `--wait` where they said wait; the answers folded into `What` and the preview, and each line the write lists as still saying proposed brought current; the register rows owed |
+| plan | the rows, by `row add`, each with its kind, model, `blockedBy` and `touches`; `plan.md` where the arc has traps, a set or a move table; the one line of each new place in the page's `How` |
 | run | `orders/<row>.md`, by reference; the reports, folded in by `report write`; samples and shots |
 | a comment mid-run | a row, by command; a card if it is a question; when the arc moves, its rows, its log and the page's parts |
 | gate | the arc's final re-check row: the whole tiers once; one restart; the walks and the look; the review list |
 | release and land | the steps, by command, which work out `LANDED`; the book's rows; the references restated; *Cycles* |
-| review fixes | `row write <ws>/<arc> --review-fixes --note "<their words>"` at the first fix after a landing; one step per fix, naming the arc it fixes |
+| review fixes | `arc edit <ws>/<arc> --review-fixes --note "<their words>"` at the first fix after a landing; one step per fix, naming the arc it fixes |
 | carry, drop, delete | `CARRIED` or `DROPPED` and its reason, by command; an arc never decided, by `arc delete` |
 | close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate, which refuses an arc `PROPOSED` or `DECIDED`; the folder moves to `closed/` |
 
@@ -245,7 +249,7 @@ developer as soon as the batch lands.
 - **One pull request per repository, opened at the first push — MUST.** It stays open for the workstream and targets `develop`. The checks workflow runs on it.
 - **The pull request is rebase-merged into `develop` each time an arc lands a group of rows — MUST.** Each row's commit stays as it was written. The branch is not deleted then, because the workstream goes on using it.
 - **The branch takes `develop` at three moments, and in each repository the moment touches — MUST** (`RD.DEVEX.FUNCTION.071`). At the start of each pass (§ *Once an arc is decided, it runs in three passes per repository*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
-- **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream row write <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
+- **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream arc edit <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
 - **After a rebase, a merge or a pull from `develop`, the agent re-reads what moved underneath its arcs — MUST** (`RD.DEVEX.WORKSPACE.317`). Two things count and no more: a file that `develop` changed since the old merge base and the branch also changed, and an open arc's pinned fact whose source moved, as `plan stale` names it. The agent re-checks both and tells the developer in one line what moved and what it re-checked. A window with no open arcs and no pinned facts says nothing. The push check keeps owning only stamped runs and is not widened to this, because a re-read is judgement and a stamp is not.
@@ -349,7 +353,7 @@ and the choice is the developer's. When the answer can
 change an order that is running or still to run, you:
 
 1. let the tool call in flight finish, then stop the rows the answer can change;
-2. make each of those rows wait on the card: `workstream row write <arc> <row> --blocked-by q<n>`;
+2. make each of those rows wait on the card: `workstream row edit <arc> <row> --blocked-by q<n>`;
 3. write the card, and **help the developer think it through to an answer, instead of choosing one**;
 4. record the answer, then resume the held rows.
 
@@ -584,7 +588,7 @@ lists the workstream folders the window has worked on, the time it last wrote ea
 finding of each note it was told. No person reads it, and it never says which state a workstream is
 in: the folder tree says that. A window writes an arc when a write goes inside the arc's
 `arcs/N<nnn>/` or `notes/N<nnn>/`, or when it runs a `workstream` command that writes the arc's data:
-`row write` or `row discard` on the arc, `fact write`, `arc stamp write`, `question raise` on it,
+`arc edit`, `row add`, `row state`, `row note`, `row edit` or `row discard` on the arc, `fact write`, `arc stamp write`, `question raise` on it,
 `question show`, `answer` or `withdraw` on one of its cards, and `report write` with a report under its
 notes.
 
@@ -797,7 +801,7 @@ of work against each other.** `refs/devex/agent/lenses.md` states both, and
 ## The state a row carries
 
 **A row's `state` says where it stands, and each word means one thing** (`RD.DEVEX.WORKSPACE.249`). It
-is a field of the row in the arc's `state.json`, written only by `workstream row write` and `workstream
+is a field of the row in the arc's `state.json`, written only by `workstream row add`, `row state`, `row edit` and `workstream
 report write`. The close reads it, and so does `workstream rows show`.
 
 | `state` | Means | The close |
@@ -838,7 +842,7 @@ a fact, a preview edit, a card's answer or a step added inside the arc's goal ne
 | `DROPPED` | stored, with the reason | not wanted, once it had been decided |
 
 **One owner works it out, and every reader asks it**: `arcStatus` in the plugin's workstream library, which
-the page's status, the *Cycles* table, the progress block, a preview's badge, `row write`, `state check`, the
+the page's status, the *Cycles* table, the progress block, a preview's badge, `arc edit`, the `row` commands, `state check`, the
 go check and the Stop hook all read. **A stored `PROPOSED` wins over the steps**: when the developer agrees
 an arc's goal changed, it goes back to `PROPOSED`, and any step it was building stops until their next go.
 **A wait keeps a decided arc from starting**, in this window or the next, until their *start*. `HELD` and
@@ -1167,7 +1171,7 @@ the rows already say.
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
 
-**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.WORKSPACE.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and the answer is the arc's go, the developer's words in it naming the version (`row write <ws>/<arc> --status DECIDED --note "<their words, naming the version>"`), so execution reads the record instead of stopping to ask. `release-go` reads that go as the check of a repository write reads one (§ A go is written down, below), in every open workstream, and the words of the line that moved the arc out of `PROPOSED` must name the version. It refuses a major release no such arc names.
+**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.WORKSPACE.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and the answer is the arc's go, the developer's words in it naming the version (`arc edit <ws>/<arc> --status DECIDED --note "<their words, naming the version>"`), so execution reads the record instead of stopping to ask. `release-go` reads that go as the check of a repository write reads one (§ A go is written down, below), in every open workstream, and the words of the line that moved the arc out of `PROPOSED` must name the version. It refuses a major release no such arc names.
 
 ## A go is written down, or it did not happen
 
@@ -1175,7 +1179,7 @@ A go is the write that stores `DECIDED` on an arc, and it carries the developer'
 (`RD.DEVEX.WORKSPACE.278`):
 
 ```sh
-spn-devex workstream row write N004 --status DECIDED --note "the developer, 24 Oct: 'good to go'"
+spn-devex workstream arc edit N004 --status DECIDED --note "the developer, 24 Oct: 'good to go'"
 ```
 
 It appends the status line `PROPOSED → DECIDED · the developer, 24 Oct: 'good to go'` to the arc's
@@ -1299,7 +1303,7 @@ of the page never repeats another (`RD.DEVEX.WORKSPACE.223`).
 
 **A write that changes an arc's status, or a row's state, refreshes every view of it in the same command —
 MUST** (`RD.DEVEX.WORKSPACE.273`). The views are the approach page's status card, its Cycles table and
-headings, and the arc preview's Status badge. `workstream row write` (and `report write`) rewrites them across
+headings, and the arc preview's Status badge. `workstream arc edit` and the `row` commands (and `report write`) rewrite them across
 all the workstream's arcs when `status` or a row's `state` moved, and says each view in its line:
 `ok · N015 · status · approach: card, cycles · preview badge`. A `question` write does the same when an answer
 moves a status. Never run `docs cycles write` by hand to catch up after a status write. The go's write lists
@@ -1349,14 +1353,14 @@ data. One number names its two folders, `arcs/N<nnn>/` and `notes/N<nnn>/`.
 
 **An arc's subject is one to three words, at most 24 characters, in kebab-case — MUST**
 (`RD.DEVEX.WORKSPACE.265`). A noun phrase a reader recognises, such as `layout-model` or `web-stack`,
-never a sentence. `row write --subject` refuses a longer one and `state check` names one. A long subject
+never a sentence. `arc edit --subject` refuses a longer one and `state check` names one. A long subject
 in another workspace is a finding for that workstream's own window, never renamed by guessing.
 
 **Each arc's data folder holds one name file, `arcs/N<nnn>/<subject>.md`, leading with the arc's goal —
 MUST** (`RD.DEVEX.WORKSPACE.264`). `goal` is one or two sentences of the outcome once the arc is done, in a
-reader's words; set it with `row write <arc> --goal "…"`, and `state check` names an arc without one. The
+reader's words; set it with `arc edit <arc> --goal "…"`, and `state check` names an arc without one. The
 file holds, in order, the title, the goal, the status with its reason, what the arc decides, its repos, and
-links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no rows, no log. `row write`,
+links to `../../approach.html#N<nnn>`, the preview, the plan and the samples; no rows, no log. `arc edit`,
 `report write` and `docs cycles write` write it, and rename it with the subject. Never write it by hand:
 the hook refuses it, and `state check` names a hand edit and a second `.md` in the folder.
 
@@ -1456,8 +1460,8 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a file a script owns, a `progress` or `open` block, and an arc's stamp written only by its command | `workstream-owner.ts`, on every write |
 | a card on a page that is its record rendered, and never typed | `questions.ts`, on every write to a page |
 | each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Cycles and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
-| a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream row write` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
-| an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `row write`, which name the other |
+| a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream arc edit`, `row add` and `row state` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
+| an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `arc edit`, which name the other |
 | a close while an arc is `PROPOSED` or `DECIDED` | `split-plan.ts --gate close` |
 | a running row of an arc the window wrote named with the age of its log line, never called runnable | `stop.ts`, when a turn ends |
 | a row waiting on a card open in `questions.jsonl` never called runnable | `stop.ts`, when a turn ends |

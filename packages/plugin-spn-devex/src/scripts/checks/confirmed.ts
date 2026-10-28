@@ -10,7 +10,7 @@
 // WHAT A GO LOOKS LIKE, so this can be checked at all. A go is the write that stores `DECIDED` on an
 // arc, and it carries the developer's words (RD.DEVEX.WORKSPACE.278 and .307):
 //
-//     workstream row write <arc> --status DECIDED --note "<the developer's words>"
+//     workstream arc edit <arc> --status DECIDED --note "<the developer's words>"
 //
 // It leaves two marks, and the hook reads both: the status `arcs/N<nnn>/state.json` stores reads
 // `DECIDED`, or `LANDED` where the close stored it, and its `log.jsonl` holds the status line that moved it out of
@@ -57,7 +57,7 @@ function wordsOf(note: unknown): string {
   return (moveOf(text) ? text.replace(/^[A-Z][A-Z-]* → [A-Z][A-Z-]*/, "") : text).replace(/^[\s·:—-]+/, "").trim();
 }
 
-/** The note `row write` gives an `opened` line: the status it opened at, then the developer's words where it carries them. */
+/** The note `arc edit` gives an `opened` line: the status it opened at, then the developer's words where it carries them. */
 const OPENED_BARE = /^opened as ([A-Z][A-Z-]*)$/;
 const OPENED_WITH = /^opened as ([A-Z][A-Z-]*) · ([\s\S]+)$/;
 
@@ -191,7 +191,7 @@ export function checkConfirmed(payload: Payload): Verdict {
       note:
         `This is a repository write and ${own.size ? "no workstream of this window records a go — " + names : "no open workstream records a go"}. ` +
         `Execution is confirmed rather than assumed: show the plan, ask, and record the ` +
-        `developer's answer as the go — \`workstream row write <arc> --status DECIDED --note "<the developer's words>"\`. ` +
+        `developer's answer as the go — \`workstream arc edit <arc> --status DECIDED --note "<the developer's words>"\`. ` +
         `An arc holds a go when it reads DECIDED, RUNNING or LANDED and its log holds that line. ` +
         `A go held only in the conversation ends with the window, and the next session cannot tell ` +
         `a plan from an agreement (refs/devex/workspace/workstream.md, S3).`,

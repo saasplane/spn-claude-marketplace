@@ -508,7 +508,7 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
         `A note, not a refusal: \`${fromWorkspace(root, arc)}\` logged an answer this turn to a card a preview shows, and its ` +
         `notes did not move — ${where}. A preview changes only where it shows the card that was answered ` +
         `(RD.DEVEX.WORKSPACE.193). If the answer changed what that preview shows, bring the section current and name it ` +
-        `in a log line: \`spn-devex workstream row write ${arcRef(arc)} --note "…"\`; if it did not, nothing is owed.`, tie(arc)) });
+        `in a log line: \`spn-devex workstream arc edit ${arcRef(arc)} --note "…"\`; if it did not, nothing is owed.`, tie(arc)) });
     }
     const status = statusOf(arc);
     if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(String(line.note ?? ""))))
@@ -583,7 +583,7 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
           check: "runnable",
           message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} running: ` +
             `${claimed.join(" · ")}. If this sitting is on it, finish it and land it with its commit ` +
-            `(\`spn-devex workstream row write ${arcRef(arc)} <row> --state landed\`), or write it \`--state stopped\` with what was ` +
+            `(\`spn-devex workstream row state ${arcRef(arc)} <row> landed\`), or write it \`stopped\` with what was ` +
             `done. If another window is on it, leave it and ask the developer, saying how long it has run ` +
             `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`),
         });

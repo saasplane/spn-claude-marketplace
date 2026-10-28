@@ -144,8 +144,8 @@ console.log("\n=== window — the arc a write records: a path inside its data or
   check("a write inside an arc's data folder records it the same way", wrote("by-data").join() === arcOf(A, "N001"), wrote("by-data").join());
   pre(root, "loose", { file_path: join(root, open(A), "approach.html"), content: "x" });
   check("a write to the page records no arc, and still binds the workstream", wrote("loose").length === 0 && windowWorkstreams(root, "loose").join() === A);
-  pre(root, "row-write", { command: "spn-devex workstream row write 002/N002 1 --state landed --note \"the developer: go\"" });
-  check("known-bad: `row write` records the arc it names, and binds its workstream",
+  pre(root, "row-write", { command: "spn-devex workstream row state 002/N002 1 landed --note \"the developer: go\"" });
+  check("known-bad: `row state` records the arc it names, and binds its workstream",
     wrote("row-write").join() === arcOf(B, "N002") && windowWorkstreams(root, "row-write").join() === B, `${wrote("row-write")} · ${windowWorkstreams(root, "row-write")}`);
   pre(root, "built-cli", { command: "node packages/plugin-spn-devex/src/dist/cli.mjs workstream arc stamp write 001/N001" });
   check("the plugin's built command line counts as the command, and `arc stamp write` records its arc", wrote("built-cli").join() === arcOf(A, "N001"), wrote("built-cli").join());
@@ -157,7 +157,7 @@ console.log("\n=== window — the arc a write records: a path inside its data or
   check("a bare arc is read in the workstream the command stands in", wrote("around").join() === arcOf(A, "N001"), wrote("around").join());
   pre(root, "reads", { command: "spn-devex workstream state check && spn-devex workstream rows show 002 --ready" });
   check("a command that only reads records nothing and binds nothing", wrote("reads").length === 0 && windowWorkstreams(root, "reads").length === 0);
-  pre(root, "nowhere", { command: "spn-devex workstream row write N009 --note \"x\"" });
+  pre(root, "nowhere", { command: "spn-devex workstream arc edit N009 --note \"x\"" });
   check("an arc no workstream holds records nothing", wrote("nowhere").length === 0);
 }
 

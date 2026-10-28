@@ -101,9 +101,9 @@ console.log("\n=== RD.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, 
   const data = arcData();
   writeFileSync(file, JSON.stringify({ ...data, goal: null }, null, 2));
   const noGoal = checkWorkstream(ws);
-  ok("red: an arc with no goal is named, with the command that sets it", has(noGoal, "name", /N001 has no goal — `spn-devex workstream row write N001 --goal/), said(noGoal));
-  const set = cli(root, ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered"]);
-  ok("green: `row write --goal` sets it and writes the name file with it", set.code === 0 && checkWorkstream(ws).length === 0 &&
+  ok("red: an arc with no goal is named, with the command that sets it", has(noGoal, "name", /N001 has no goal — `spn-devex workstream arc edit N001 --goal/), said(noGoal));
+  const set = cli(root, ["workstream", "arc", "edit", "031/N001", "--goal", "the probe is answered"]);
+  ok("green: `arc edit --goal` sets it and writes the name file with it", set.code === 0 && checkWorkstream(ws).length === 0 &&
     readFileSync(name, "utf8").includes("**Goal.** the probe is answered"), set.out + said(checkWorkstream(ws)));
   const good = readFileSync(name, "utf8");
   writeFileSync(name, good.replace("**Status.** DECIDED", "**Status.** LANDED"));
@@ -116,11 +116,11 @@ console.log("\n=== RD.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, 
   ok("red: a missing name file is named", has(checkWorkstream(ws), "name", /has no name file `arcs\/N001\/probe.md`/), said(checkWorkstream(ws)));
   cli(root, ["docs", "cycles", "write", "031"]);
   ok("green: `docs cycles write` writes it back", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
-  const long = cli(root, ["workstream", "row", "write", "031/N001", "--subject", "web-stack-and-partner-choices"]);
-  ok("red: `row write --subject` refuses a subject of more than three words", long.code !== 0 && /is 5 words, and a subject is one to three/.test(long.out), long.out);
+  const long = cli(root, ["workstream", "arc", "edit", "031/N001", "--subject", "web-stack-and-partner-choices"]);
+  ok("red: `arc edit --subject` refuses a subject of more than three words", long.code !== 0 && /is 5 words, and a subject is one to three/.test(long.out), long.out);
   writeFileSync(file, JSON.stringify({ ...data, subject: "the-probe-of-everything" }, null, 2));
   ok("red: the check names a long subject already in the data", has(checkWorkstream(ws), "name", /subject `the-probe-of-everything` is 4 words/), said(checkWorkstream(ws)));
-  const short = cli(root, ["workstream", "row", "write", "031/N001", "--subject", "probe"]);
+  const short = cli(root, ["workstream", "arc", "edit", "031/N001", "--subject", "probe"]);
   ok("green: a short subject written, the file renamed with it", short.code === 0 && checkWorkstream(ws).length === 0, short.out + said(checkWorkstream(ws)));
 }
 
@@ -158,7 +158,7 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc with no preview fails, every arc having one from the write that opens it",
-    has(checkWorkstream(ws), "preview", /N001 has no preview — every arc has one, `notes\/N001\/preview\.html`, written when it opens; `spn-devex workstream row write 031\/N001` writes it from the template \(RD\.DEVEX\.WORKSPACE\.254\)/), said(checkWorkstream(ws)));
+    has(checkWorkstream(ws), "preview", /N001 has no preview — every arc has one, `notes\/N001\/preview\.html`, written when it opens; `spn-devex workstream arc edit 031\/N001` writes it from the template \(RD\.DEVEX\.WORKSPACE\.254\)/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
   renameSync(join(notes, "draft.html"), join(notes, "preview.html"));
   mkdirSync(join(notes, "samples"), { recursive: true });
@@ -190,7 +190,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.254 — a What entry of its own, and a lin
   writeFileSync(page, withSecond.replace(entry2, `  <h4 id="c2">The second arc</h4>\n  <p>No entry id.</p>\n`));
   const noEntry = checkWorkstream(ws);
   ok("red: an arc with no What entry fails, naming the entry and the command that anchors or writes it",
-    has(noEntry, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream row write 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(noEntry));
+    has(noEntry, "stamp", /N002 has no What entry, `N002-what`, on the approach page — `spn-devex workstream arc edit 031\/N002 --under <heading id>` anchors it on its subject heading, or writes it under a domain heading/), said(noEntry));
 
   writeFileSync(page, withSecond.replace('<a href="notes/N002/preview.html">the second</a>', "the second"));
   ok("red: an entry that does not link its arc's preview fails", has(checkWorkstream(ws), "stamp", /N002's preview is not linked from its What entry, `#N002-what`/), said(checkWorkstream(ws)));
@@ -365,7 +365,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 and .307 — no step runs on an arc no
   data.status = "PROPOSED";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("red: a step running on a PROPOSED arc is named, with the command that stops it",
-    has(checkWorkstream(ws), "status", /N001 is PROPOSED and step 1 is running .*--state stopped/), said(statusOnly()));
+    has(checkWorkstream(ws), "status", /N001 is PROPOSED and step 1 is running .*row state N001 1 stopped/), said(statusOnly()));
   data.status = "DECIDED";
   data.wait = "the developer: approved, but wait";
   writeFileSync(file, JSON.stringify(data, null, 2));
@@ -415,8 +415,8 @@ console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a reposi
     rows(["1", "spn-foundation", null], ["2", null, "DOCS"]).some((line) => /row\(s\) 1, 2 carry no repo, or no altitude from DOCS · CODE/.test(line)));
   ok("a step that changes no repository, `—`, takes no place in the chain", rows(["1", "spn-foundation", "DOCS"], ["2", "—", "PROOF"]).length === 0);
   const { root, ws } = await dataWorkspace("state-chain");
-  const wrote = cli(root, ["workstream", "row", "write", "031/N001", "3", "--title", "the book again", "--kind", "change", "--repo", "spn-foundation", "--altitude", "DOCS"]);
-  ok("known-bad: `row write` prints the finding in a note line after the write, and still writes",
+  const wrote = cli(root, ["workstream", "row", "add", "031/N001", "the book again", "--kind", "change", "--repo", "spn-foundation", "--altitude", "DOCS"]);
+  ok("known-bad: `row add` prints the finding in a note line after the write, and still writes",
     wrote.code === 0 && /note: N001 rows out of chain order: row 3 is spn-foundation after spn-x — the foundation comes first/.test(wrote.out)
       && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
 }

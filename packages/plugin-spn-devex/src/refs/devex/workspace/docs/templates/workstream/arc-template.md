@@ -18,32 +18,37 @@
 ```sh
 # open the arc as PROPOSED, as many as the plan needs: its title says what it delivers in its domain, its subject is
 # one to three words of at most 24 characters, and its goal is the outcome once it is done, in a sentence or two
-spn-devex workstream row write N{{nnn}} --title "{{the domain and what lands there: Surface: the patterns standard and the design system}}" --subject {{short-name}} --goal "{{what is true once the arc is done}}"
+spn-devex workstream arc edit N{{nnn}} --title "{{the domain and what lands there: Surface: the patterns standard and the design system}}" --subject {{short-name}} --goal "{{what is true once the arc is done}}"
 
 # its header: what it decides, the repositories in chain order, the package it releases, what it follows, the coordinator's model
-spn-devex workstream row write N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{the package it releases, after the last step that changes it, or none}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
+spn-devex workstream arc edit N{{nnn}} --decides "{{what this arc decides, in one phrase}}" --repos {{repo}},{{repo}} --cycle "{{the package it releases, after the last step that changes it, or none}}" --follows "{{N<m> — why it lands first, or nothing}}" --model "{{Opus 5.5}}"
 
 # each fact read while ideating, the source's commit pinned
 spn-devex workstream fact write N{{nnn}} --source {{repository/path:line}} --fact "{{what the source says, in one line}}" --used-by {{q<n> or row}}
 
 # a row: its kind, where, at what altitude, how, and its acceptance; the rows are the steps, so none writes a plan
-spn-devex workstream row write N{{nnn}} {{row}} --title "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
+spn-devex workstream row add N{{nnn}} "{{the step's What: the files, or plan § k}}" --kind {{fix · change · question}} --repo {{repo or —}} --altitude {{DOCS · CODE · GENERATED · RELEASE · PROOF}} --mechanism "{{by hand · script · command · agents}}" --acceptance "{{`command` → before → after}}" --model {{the row's model}} --blocked-by {{row or q<n>, or none}} --touches {{repository:place}} --decisions {{q<n>}} --facts {{f<n>}}
+
+# a row's state, its note, and its fields: one command each, the row after the arc
+spn-devex workstream row state N{{nnn}} {{row}} {{ready · running · landed · stopped · deferred}} --note "{{what landed, or why it stopped}}"
+spn-devex workstream row note N{{nnn}} {{row}} "{{a line on the row's log}}"
+spn-devex workstream row edit N{{nnn}} {{row}} --title "{{the step's What}}" --blocked-by {{row or q<n>, or none}}
 
 # the go, the one write that stores DECIDED, with your words beside it; no step starts before it
-spn-devex workstream row write N{{nnn}} --status DECIDED --note "<the developer's words>"
+spn-devex workstream arc edit N{{nnn}} --status DECIDED --note "<the developer's words>"
 
 # a wait, then a start, each in your words; nothing starts while the wait holds
-spn-devex workstream row write N{{nnn}} --wait "<the developer's words>"
-spn-devex workstream row write N{{nnn}} --start --note "<the developer's words>"
+spn-devex workstream arc edit N{{nnn}} --wait "<the developer's words>"
+spn-devex workstream arc edit N{{nnn}} --start --note "<the developer's words>"
 
 # your other words: CARRIED or DROPPED, with where it went or why; RUNNING and LANDED are worked out from the steps
-spn-devex workstream row write N{{nnn}} --status {{CARRIED · DROPPED}} --reason "{{where it went · why}}" --note "<the developer's words>"
+spn-devex workstream arc edit N{{nnn}} --status {{CARRIED · DROPPED}} --reason "{{where it went · why}}" --note "<the developer's words>"
 
 # an arc never decided is deleted, never dropped
 spn-devex workstream arc delete N{{nnn}} --note "<the developer's words>"
 
 # a line on the log, which has no other writer: a decision, a correction, your words
-spn-devex workstream row write N{{nnn}} --note "{{what was decided or corrected, by whom, and why; the notes it changed}}"
+spn-devex workstream arc edit N{{nnn}} --note "{{what was decided or corrected, by whom, and why; the notes it changed}}"
 
 # once the approach page's part for this arc is current with its goal, its title and its repositories; adding a row never needs it
 spn-devex workstream arc stamp write N{{nnn}}

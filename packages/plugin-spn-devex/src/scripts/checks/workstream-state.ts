@@ -105,9 +105,9 @@ export function notesTreeFindings(ws: string, arc: string): string[] {
 export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
   const out: string[] = [];
   if (!(typeof data.goal === "string" && data.goal.trim()))
-    out.push(`${arc} has no goal — \`spn-devex workstream row write ${arc} --goal "…"\`, the outcome once it is done, in a sentence or two`);
+    out.push(`${arc} has no goal — \`spn-devex workstream arc edit ${arc} --goal "…"\`, the outcome once it is done, in a sentence or two`);
   const short = subjectFault(data.subject);
-  if (short) out.push(`${arc}'s subject \`${data.subject}\` ${short} — \`spn-devex workstream row write ${arc} --subject <short-name>\``);
+  if (short) out.push(`${arc}'s subject \`${data.subject}\` ${short} — \`spn-devex workstream arc edit ${arc} --subject <short-name>\``);
   const name = `${data.subject}.md`;
   const markdown = markdownIn(ws, arc);
   for (const other of markdown.filter((one) => one !== name))
@@ -135,7 +135,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
   const href = previewHrefOf(arc, data);
   const number = workstreamName(ws).number;
   if (!isFile(path)) {
-    out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream row write ${number}/${arc}\` writes it from the template (RD.DEVEX.WORKSPACE.254)`);
+    out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream arc edit ${number}/${arc}\` writes it from the template (RD.DEVEX.WORKSPACE.254)`);
     return out;
   }
   const text = readFileSync(path, "utf8");
@@ -168,7 +168,7 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
     out.push(`${arc}'s part on the approach page is behind its goal, title or repositories — bring Why, What and How current, then \`workstream arc stamp write ${arc}\``);
   const entry = whatEntryOf(text, arc);
   if (!entry) {
-    out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream row write ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
+    out.push(`${arc} has no What entry, \`${whatId(arc)}\`, on the approach page — \`spn-devex workstream arc edit ${workstreamName(ws).number}/${arc} --under <heading id>\` anchors it on its subject heading, or writes it under a domain heading`);
     return out;
   }
   const own = previewPathOf(ws, arc, data);
@@ -237,7 +237,7 @@ export function statusFindings(arc: string, data: ArcData): string[] {
   if (running.length && !stepsMayStart(data) && !["LANDED", "CARRIED", "DROPPED"].includes(data.status)) {
     const why = data.status === "DECIDED" ? `holds the developer's wait, "${data.wait}"` : `is ${data.status}`;
     out.push(`${arc} ${why} and step ${running[0].id} is running — a step runs only on a decided arc with no wait: ` +
-      `\`spn-devex workstream row write ${arc} ${running[0].id} --state stopped\` until the developer's word (RD.DEVEX.WORKSPACE.278)`);
+      `\`spn-devex workstream row state ${arc} ${running[0].id} stopped\` until the developer's word (RD.DEVEX.WORKSPACE.278)`);
   }
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
   if (data.status === "LANDED" && open.length)
@@ -252,7 +252,7 @@ const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
 /**
  * RD.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and an altitude, in chain order by repository,
  * the foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each, read in the order the arc keeps
- * them. A row whose repository is `—` changes none and takes no place in the chain. `row write` prints what this finds and never refuses on it: the chain between two
+ * them. A row whose repository is `—` changes none and takes no place in the chain. `arc edit` prints what this finds and never refuses on it: the chain between two
  * stack repositories is judgement.
  */
 export function stepRowFindings(data: ArcData): string[] {

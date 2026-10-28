@@ -151,34 +151,34 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
   {
     const { root } = await dataWorkspace("d17-runnable");
     stopAt(root, "d17-r");                                    // the session's first Stop: its baseline
-    command(root, "d17-r", ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+    command(root, "d17-r", ["workstream", "row", "state", "031/N001", "1", "landed"]);
     const out = stopAt(root, "d17-r");
-    check("known-bad: a row landed by this window's `row write`, the next row ready and no card open, is runnable work",
+    check("known-bad: a row landed by this window's `row state`, the next row ready and no card open, is runnable work",
       /\[runnable\].*stopped with runnable work/.test(out) && out.includes("row 2 — build it") && out.includes("031-probe/arcs/N001"), out);
   }
   {
     const { root } = await dataWorkspace("d17-runnable-other");
     stopAt(root, "d17-other");
-    cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);   // another window's command
+    cli(root, ["workstream", "row", "state", "031/N001", "1", "landed"]);   // another window's command
     check("the same write by another window, which this window's note does not record, is not its work",
       !/\[runnable\]/.test(stopAt(root, "d17-other")));
   }
   {
     const { root } = await dataWorkspace("d17-runnable-header");
     stopAt(root, "d17-header");
-    command(root, "d17-header", ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered, in full"]);
+    command(root, "d17-header", ["workstream", "arc", "edit", "031/N001", "--goal", "the probe is answered, in full"]);
     check("a header write that moves no row is writing about the arc, not executing it", !/\[runnable\]/.test(stopAt(root, "d17-header")));
   }
   {
     const { root } = await dataWorkspace("d17-runnable-first");
-    command(root, "d17-first", ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+    command(root, "d17-first", ["workstream", "row", "state", "031/N001", "1", "landed"]);
     check("a session's first Stop has no baseline of its own, so it stays quiet", !/\[runnable\]/.test(stopAt(root, "d17-first")));
   }
   {
     const { root } = await dataWorkspace("d17-runnable-card");
     stopAt(root, "d17-card");
     raise(root);
-    command(root, "d17-card", ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+    command(root, "d17-card", ["workstream", "row", "state", "031/N001", "1", "landed"]);
     check("a card open in questions.jsonl holds the turn, so the rows are not called runnable", !/\[runnable\]/.test(stopAt(root, "d17-card")));
   }
   {
@@ -191,7 +191,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
   }
   {
     const { root, ws } = await dataWorkspace("d17-running-row");
-    cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+    cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
     const arc = arcAt(ws);
     const found = checkRunnable(root, Date.now() - 60_000, { [arc]: "a-different-mark" }, new Set([arc]), everyone(root));
     check("known-bad: a running row is named with how long it has run (RD.DEVEX.WORKSPACE.184)",
@@ -214,9 +214,9 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const { root, ws } = await dataWorkspace("d17-marks");
     const before = rowsMark(JSON.parse(readFileSync(join(arcAt(ws), "state.json"), "utf8")));
     const mark = stepsMark(root, everyone(root));
-    cli(root, ["workstream", "row", "write", "031/N001", "--goal", "a goal written again"]);
+    cli(root, ["workstream", "arc", "edit", "031/N001", "--goal", "a goal written again"]);
     check("the rows mark does not move on a header write", stepsMark(root, everyone(root)) === mark);
-    cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "landed"]);
+    cli(root, ["workstream", "row", "state", "031/N001", "1", "landed"]);
     check("known-bad: it moves when a row's state moves",
       stepsMark(root, everyone(root)) !== mark && rowsMark(JSON.parse(readFileSync(join(arcAt(ws), "state.json"), "utf8"))) !== before);
   }
@@ -251,20 +251,20 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
   {
     const { root } = await dataWorkspace("d17-notes-plain");
     stopAt(root, "d17-plain");
-    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "the book chapter is read"]);
+    command(root, "d17-plain", ["workstream", "arc", "edit", "031/N001", "--note", "the book chapter is read"]);
     check("a log line that records no answer owes the notes nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
-    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--note", "a review point: the probe answers in one line"]);
+    command(root, "d17-plain", ["workstream", "arc", "edit", "031/N001", "--note", "a review point: the probe answers in one line"]);
     check("a review point in a log line names no card a preview shows, so it owes the preview nothing", !/\[notes\]/.test(stopAt(root, "d17-plain")));
-    command(root, "d17-plain", ["workstream", "row", "write", "031/N001", "--wait", "waits on N002", "--note", "(the developer: hold it)"]);
+    command(root, "d17-plain", ["workstream", "arc", "edit", "031/N001", "--wait", "waits on N002", "--note", "(the developer: hold it)"]);
     check("a status line carrying the developer's words is a move, not an answer", !/\[notes\]/.test(stopAt(root, "d17-plain")));
   }
   {
     const { root } = await dataWorkspace("d17-carried");
-    cli(root, ["workstream", "row", "write", "031/N002", "--title", "the next arc", "--subject", "next", "--goal", "the next outcome", "--note", "the developer: open it"]);
+    cli(root, ["workstream", "arc", "edit", "031/N002", "--title", "the next arc", "--subject", "next", "--goal", "the next outcome", "--note", "the developer: open it"]);
     stopAt(root, "d17-carried");
-    command(root, "d17-carried", ["workstream", "row", "write", "031/N002", "--note", "two review points are carried to row 2"]);
+    command(root, "d17-carried", ["workstream", "arc", "edit", "031/N002", "--note", "two review points are carried to row 2"]);
     check("known-bad: a PROPOSED arc whose log carries a point to a later row of itself is named", /\[carried\]/.test(stopAt(root, "d17-carried")));
-    command(root, "d17-carried", ["workstream", "row", "write", "031/N001", "--note", "two review points are carried to row 2"]);
+    command(root, "d17-carried", ["workstream", "arc", "edit", "031/N001", "--note", "two review points are carried to row 2"]);
     check("a DECIDED arc carrying a point to a later row is not", !/\[carried\]/.test(stopAt(root, "d17-carried")));
   }
 
@@ -777,7 +777,7 @@ console.log("\n=== stop — the hook reads this window's arc rows to tell a prog
     const { root } = await dataWorkspace(name);
     writeFileSync(join(root, "card.json"), JSON.stringify(DATA_CARD));
     cli(root, ["workstream", "question", "raise", "031/N001", "--file", join(root, "card.json")]);
-    cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+    cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
     return root;
   };
   one("a progress reply over an older card, while a row is running, is silent",
@@ -1301,7 +1301,7 @@ ${tableOf(cyclesOf(folder))}
     return run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: reply, ...extra }, root);
   };
   const W = `.spndevex/${WORKSTREAMS}/open/031-probe`;
-  const write = (root, session, args) => { cli(root, ["workstream", "row", "write", "031/N001", ...args]); wroteArcs(root, session); };
+  const write = (root, session, args) => { cli(root, ["workstream", "row", "state", "031/N001", ...args]); wroteArcs(root, session); };
   // A card the preview shows, raised before the session's first turn end; its answer is what the notes check reads.
   const showCard = (root) => {
     writeFileSync(join(root, "card.json"), JSON.stringify(DATA_CARD));
@@ -1442,7 +1442,7 @@ ${tableOf(cyclesOf(folder))}
     const second = stop(root, "ho-once", PASS_ON);
     check("the hook: the reply that gives the whole block is silent", first === "", first);
     check("the hook: a later reply in the same window that passes the work on again is not asked for a second block", !/\[handover\]/.test(second), second);
-    write(root, "ho-once", ["2", "--state", "running"]);
+    write(root, "ho-once", ["2", "running"]);
     const moved = stop(root, "ho-once", PASS_ON);
     check("known-bad: once the rows have moved, the old block no longer says where to start, and a block is owed", /\[handover\]/.test(moved), moved);
   }

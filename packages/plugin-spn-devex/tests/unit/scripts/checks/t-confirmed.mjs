@@ -16,7 +16,7 @@ const HOOKS = PLUGIN;
 const OWN = "001-a-subject";
 const OTHER = "002-another-subject";
 
-// The log lines the commands write, by the words `row write` puts in each.
+// The log lines the commands write, by the words `arc edit` puts in each.
 const AT = "2026-10-24T20:05+05:30";
 const opened = { at: AT, kind: "opened", row: null, note: "opened as PROPOSED" };
 const go = { at: AT, kind: "status", row: null, note: "PROPOSED → DECIDED · the developer, 24 Oct: 'good to go'" };
@@ -64,7 +64,7 @@ const noteOf = (out) => {
 };
 
 // A warning names the command that records a go, and never the line form the arcs left at N002.
-const RECORDS_A_GO = "workstream row write <arc> --status DECIDED --note";
+const RECORDS_A_GO = "workstream arc edit <arc> --status DECIDED --note";
 const RETIRED_LINE = "— go.**";
 const asksForTheCommand = (note) => note.includes(RECORDS_A_GO) && !note.includes(RETIRED_LINE);
 

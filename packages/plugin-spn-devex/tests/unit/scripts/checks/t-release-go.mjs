@@ -63,7 +63,7 @@ const support = repo("spn-support-ts", "v1.2.67");
 const platform = repo("spn-platform-ts", "v0.1.0");
 const open = join(BASE, "ws", ".spndevex", WORKSTREAMS, "open");
 
-// The log lines the commands write, by the words `row write` puts in each.
+// The log lines the commands write, by the words `arc edit` puts in each.
 const AT = "2026-10-24T20:05+05:30";
 const opened = { at: AT, kind: "opened", row: null, note: "opened as PROPOSED" };
 const goFor = (version) => ({ at: AT, kind: "status", row: null, note: `PROPOSED → DECIDED · the developer, 24 Oct: 'go, and release it as ${version}'` });
@@ -97,7 +97,7 @@ writeFileSync(join(open, "009-old", "arcs", "N1-x.md"), "# N1\n\n## Log\n\n- **2
 const verdict = (command, cwd) => checkReleaseGo({ tool_name: "Bash", cwd: cwd, tool_input: { command: command } });
 const denied = (v) => typeof v?.deny === "string";
 // A refusal names the command that records a go, and never the line form the arcs left at N002.
-const RECORDS_A_GO = "workstream row write <ws>/<arc> --status DECIDED --note";
+const RECORDS_A_GO = "workstream arc edit <ws>/<arc> --status DECIDED --note";
 const asksForTheCommand = (v) => denied(v) && v.deny.includes(RECORDS_A_GO) && !v.deny.includes("— go.**") && !v.deny.includes("## Log");
 
 // ── the bump rule, which is what the check is for ──
