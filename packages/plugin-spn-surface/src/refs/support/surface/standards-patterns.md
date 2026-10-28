@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "098d805f"
+      "seen": "7869a2ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
@@ -53,7 +53,7 @@ Read this to build a page from patterns a person already knows, or to review a p
 
 Task and flow patterns hold on every kind of app. App and site patterns are chosen by the kind of app, as the book already chooses a layout by an app's job: an app's screens take app patterns, and a site's pages take site patterns. A page follows one app or site pattern, and each task on that page follows its task pattern. A listing page follows the app pattern Find in a list, and the search inside it runs by the task pattern Find.
 
-**A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RD.SUPPORT.SURFACE.394`). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for three things: what the design system and a stack must build, the floor a person is owed whatever the design, and the process of the library and the showcase. A bold rule below with no MUST is advice, and a partner's choice against it stands.
+**A rule about how a page is designed and uses a unit is guidance, and it says its reason** (`RD.SUPPORT.SURFACE.394`). So the rules here read as advice wherever they say which pattern or unit a page picks, where a part stands, which value, variant, colour or size a page writes, how many of a thing a view shows, and the words a page uses. MUST is kept for four things: what the design system and a stack must build, the floor a person is owed whatever the design, the process of the library and the showcase, and true claims. A true claim is a number on a marketing page, read from the real system and never made up. A bold rule below with no MUST is advice, and a partner's choice against it stands.
 
 **Each group is stated in two folders.** `01-common/` holds what every kind of surface follows. `02-web/` holds what a browser alone has: each intent's keys and pointer, hover, and the address an app pattern changes. A rule sits in common only when it holds on every kind of surface; this ref gives the web's lines under their own headings, *On the web*.
 
@@ -632,7 +632,7 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RD.SUPPORT.SURFACE.372` | a grid cell's eyebrow is its group or kind as text, and a badge only when it says a state. It is advice |
 | `RD.SUPPORT.SURFACE.373` | a plan holds one eyebrow. It is advice |
 | `RD.SUPPORT.SURFACE.393` | a partner's design, a page to follow, both or neither are read into one design tree, checked at each step and shown before any code, and a kept choice stands. It is advice |
-| `RD.SUPPORT.SURFACE.394` | a rule about how a page is designed and uses a unit is guidance and says its reason; MUST stays for what the design system and a stack build, the floor a person is owed, and the library and showcase process |
+| `RD.SUPPORT.SURFACE.394` | a rule about how a page is designed and uses a unit is guidance and says its reason; MUST stays for what the design system and a stack build, the floor a person is owed, the library and showcase process, and true claims |
 | `RD.DEVEX.WORKSPACE.230` | a mock draws each page once, its errors in place and its other task states in words, and a flow file orders a flow's pages with where each move leads |
 
 ## Proof
