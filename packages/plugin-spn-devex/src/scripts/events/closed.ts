@@ -113,9 +113,10 @@ if (runAlone("closed.ts")) {
   if (!failed) {
     try { message = span({ group: "closed", action: "closed" }, () => closingMessage(payload)); } catch { message = null; }
   }
-  finishCommand(payload, failed);
+  const responded = finishCommand(payload, failed);
   // A failed call runs no check, so no span asks for the whole-run line: this run asks for it itself.
-  end(null, failed);
+  // Its `out` is the bytes the tool's response put into the context.
+  end(null, failed, { out: responded });
   if (message) console.log(JSON.stringify({ systemMessage: message }));
   process.exit(0);
 }

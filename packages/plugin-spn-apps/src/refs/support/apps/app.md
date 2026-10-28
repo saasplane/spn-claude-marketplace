@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "f74342a1"
+      "seen": "7ca53f0a"
     }
   ]
 }
@@ -138,6 +138,7 @@ What a runtime manager also answers:
 | `getAPIRemoteServices` | the module's contract services: each one's name, its methods as data, and what implements it | HTTP entry start, for the remote route |
 | `getCLIControllers` | command surfaces the module contributes | CLI entry start |
 | `getQueueListeners` | queue consumers | queue entry start |
+| `getTransactionHandlers` | the handlers the module registers for every transaction the framework closes; an empty list for none | boot phase 2, once; the framework calls each handler before every commit |
 | `getContractSchemas` | validator namespaces published as named OpenAPI schemas | before HTTP entry start |
 
 What a remote manager also answers, which is one thing:
@@ -145,6 +146,8 @@ What a remote manager also answers, which is one thing:
 | Method | Returns | When it runs |
 | --- | --- | --- |
 | `getRemoteServices` | each contract service of the module, with its methods as data | boot phase 2, to build one proxy for each |
+
+**The app manager answers `getTransactionHandlers` too — MUST.** Boot hands every handler to the framework once: each module's, in boot order, then the app's. A manager with nothing to handle answers an empty list, so no manager leaves one out by accident.
 
 A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, it states no code because the module's line in the module list gives it, and the base reads where the module lives from the module's own settings and builds the proxies.
 

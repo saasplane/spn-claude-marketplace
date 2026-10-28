@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6f182673"
+      "seen": "6943024a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
-      "seen": "04090396"
+      "seen": "78df223c"
     }
   ]
 }
@@ -43,7 +43,7 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 ## The vocabulary is the inventory
 
-**The values are one fixed list, and the set is closed.** Devex reads in stage order with the two stage-less ones last. Apps and infra share six words, so a reader who has learned one domain's surface has learned the other's. Apps holds one more word, `design`, because only an app has a page.
+**The values are one fixed list, and the set is closed.** Devex reads in stage order with the two stage-less ones last. Apps and infra share six words, so a reader who has learned one domain's surface has learned the other's. The surface plugin ships one more, `SURFACE_DESIGN` (folder `design`), because what a person sees and touches is the same for every stack: it designs a page or a flow from the blocks of the design system and draws it in Figma or as skeletons, so it serves `IDEATE`.
 
 **A skill is mapped to a stage, never named after one.** Proving a claim against the code is something every phase does, so `DEVEX_CHECK` belongs to no single phase — and naming every skill after a phase leaves that one nowhere to sit. The gain is that each list changes on its own clock.
 

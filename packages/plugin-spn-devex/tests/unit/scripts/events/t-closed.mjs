@@ -200,7 +200,7 @@ one("a loose file moved into closed/ is not a scope finishing",
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        got ${JSON.stringify(got)}\n        expected ${JSON.stringify(expected)}`}`);
   };
   const files = {
-    ".spndevex/.debug/telemetry.on": "on\n",
+    ".spndevex/.debug/switches.json": "{\"telemetry\": true}\n",
     [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: page([["a", "spn-foundation", "&#x2705; landed"]]),
   };
   const move = `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`;

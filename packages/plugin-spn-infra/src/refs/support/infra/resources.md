@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "220b4c01"
+      "seen": "c79262b3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "4a6bae32"
+      "seen": "a546311f"
     }
   ]
 }
@@ -28,7 +28,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 | `DATABASE` | the server; the platform, product and migration schemas; the default role groups | a role set at its own coordinate; its migrations own its DDL |
 | `CACHE` | one instance, one logical database, read-write and read-only groups | a key prefix at its own coordinate |
 | `QUEUE` | a broker, auto-create off | topics `{owner}-{noun}`, created by its own migrations |
-| `STORAGE` | the default store `app`, a bucket private with no exception | an area of the default store for each module code, under the `private/` root (`private/<module>/…`); documents through the one document system, never a key prefix |
+| `STORAGE` | the default store `app`, a bucket private with no exception | an area for each module code under a root of the default store (`private/<module>/…`); documents through the one document system, never a key prefix |
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
@@ -111,7 +111,7 @@ A module's resources are its own engine instances, in its own world, under the m
 
 ## Every family has one default engine, and a declaration lists the rest
 
-**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RD.SUPPORT.INFRA.125`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
+**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RD.SUPPORT.INFRA.124`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
 
 | Family | Default (`app`) | Named entries | `dedicated` gives | `need`, a closed set | Created by code |
 | --- | --- | --- | --- | --- | --- |
@@ -119,6 +119,8 @@ A module's resources are its own engine instances, in its own world, under the m
 | storage | the bucket `{code}-storage` | `stores` | its own access pair | `PUBLIC` · `OBJECT_LOCK` · `REGION` | folders |
 | cache | the world's cache | `caches` | its own user | `PERSISTENT` · `ISOLATED` | keys |
 | queue | the world's broker | `brokers` | its own user | `ISOLATED` · `REGION` | topics |
+
+**Both stores take the two roots `private/` and `public/`** (`RD.SUPPORT.INFRA.125`). A module's area in the default store sits under a root (`private/<module>/…`) and is formed only by Support's `prepareStorageModuleAreaKey(root, moduleCode, areaKey)` over `prepareStorageKey(root, segments)`; a module writes only in its own area and composes no key in another's. The default store's `public/` is not served until a public endpoint is declared, so enabling it moves no data. The platform's default `STORAGE` provider row is seeded from its own keys, and the document module reaches the docs store through it.
 
 **A named engine is the same four fields in every family:** `name` (lowercase, never `app`, unique in its family); `dedicated` (always written — true gives its own credentials the default group cannot reach, false shares the app's pair); `need` (from the family's set); `region` (an organization `regions[]` code, only with `REGION`, else null). Storage adds `lifecycle`. A named engine is added only for what the default cannot give — a need an area, a key prefix or a topic can meet gets no engine.
 

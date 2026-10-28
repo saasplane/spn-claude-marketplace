@@ -27,7 +27,7 @@
 // writing the plan is how a session earns the go. One workstream open with no go, one warning.
 //
 // AND IT DOES NOT NAG. A warning repeated on every write is a warning nobody reads, and it would fire
-// several times inside one turn. The session is remembered under `.spndevex/.debug/`, the container
+// several times inside one turn. The session is remembered in its own folder under `.spndevex/.debug/sessions/`, the container
 // the workspace already keeps for what its machinery says about itself, so a second write is silent.
 //
 // PORTED FROM `hooks/scripts/confirmed.py`, WHICH HAD NEVER SPOKEN. The Python printed its warning as
@@ -36,16 +36,15 @@
 // mistake cannot be made again — there is no round trip to lose it in. Finding F9 in this arc.
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { windowWorkstreams } from "../lib/window.ts";
 import { arcIdsOf, logLinesOf, moveOf, readArc } from "../lib/workstream.ts";
 import type { LogLine } from "../lib/workstream-schema.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { emit, isDir, listdir, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
 
-const DEBUG = ".debug";
-const CONFIRMED = "confirmed";
 
 /** The stored statuses an arc holds only after a go: the go itself, and the close's `LANDED`. */
 const PAST_THE_GO: ReadonlySet<string> = new Set(["DECIDED", "LANDED"]);
@@ -157,11 +156,11 @@ const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 /** One warning per session, remembered where the workspace keeps its own machinery's state. */
 function alreadyWarned(root: string, session: string | undefined): boolean {
   if (!session) return false;
-  const marker = join(root, DEVEX, DEBUG, CONFIRMED, session);
+  const marker = join(sessionDir(root, session), "confirmed.json");
   try {
     if (existsSync(marker)) return true;
-    mkdirSync(join(root, DEVEX, DEBUG, CONFIRMED), { recursive: true });
-    writeFileSync(marker, "warned\n", "utf8");
+    mkdirSync(dirname(marker), { recursive: true });
+    writeFileSync(marker, "{\"warned\":true}\n", "utf8");
     return false;
   } catch { return false; }
 }

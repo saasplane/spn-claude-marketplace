@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "92134f7d"
+      "seen": "e30d7f40"
     }
   ]
 }
@@ -226,7 +226,7 @@ label: a sequence shows who says **what** to whom.
 
 ### `skeleton` — a mock of a layout, and nothing about how it looks
 
-A skeleton is drawn for **one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component**. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest. It draws a surface's views only, never a system, a flow or a data shape (`system`, `flowchart` and `entities` draw those). It may show an arrangement no block has yet, so a tag names a place in
+A skeleton is drawn for **one level: the app, a layout with its body, navigation and content, the page level, a container, a widget or a card, or a component**. It shows where that level's primary sub-components are placed, each with its own component's name, and sample values fill the rest. It draws a surface's views only, never a system, the path of a flow or a data shape (`system`, `flowchart` and `entities` draw those). Each page of a flow is a skeleton of its own, and a flow file puts them in order. It may show an arrangement no block has yet, so a tag names a place in
 plain words, or by a block's prop where the block exists. Draw one wherever a reader must picture an
 arrangement, in a construct page or an overview: a layout's types and named places, a container's parts, each widget, a showcase section, and the few components that frame others: the table, the form, the dialog. Never one for every component. A hand-written page (an approach page, a
 preview) takes the same drawing from `docs figure draw <spec.json>`.
@@ -280,7 +280,7 @@ shares.
 | `slot` | one block whose text is its own name, with nothing drawn inside it |
 | `tag` | the name on a component, a part or a slot's dotted boundary |
 | `control` | `button` · `field` · `select` · `checkbox` · `switch` · `tabs` · `badge` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group. A `switch` takes `on`; `tabs` takes the words as `tabs`, the place of the chosen one as `chosen`, counted from 0, and its look as `type`, `LINE` · `PILL`; a `badge` and `tabs` may take an `icon` |
-| `views` | one screen at several screen classes, in place of `frame`: a list of views, each with a `viewport` of `DESKTOP`, `TABLET` or `MOBILE` and a whole `frame` of its own |
+| `views` | one screen at several screen classes, or in several task states, in place of `frame`: a list of views, each with a `viewport` of `DESKTOP`, `TABLET` or `MOBILE`, a `state` of `DSTaskStateType` where it shows one, and a whole `frame` of its own |
 | `layout` | the layout the views stand in: `type`, one of `RAIL` · `DOCK` · `TOPNAV` · `CANVAS`; `body`, with its `width`, one of `FULL` · `XWIDE` · `WIDE` · `MEDIUM` · `NARROW`, and `FULL` where it is left out; `navigation`, with `attached`, the words of its entries as `nav` and the page's own entry as `chosen`, by its word; and `content`, with `attached`. Each part is attached where `attached` is left out. Left out, a view is the inside of a page alone |
 | `page` | on a view, the page level: its `item`, the title with its description, picture and facts; its `actions`, at the end; and `back`, the way back before the title. It stands first in the content, with no boundary |
 | `unit` | on a frame or a part, the unit of the design system it is. Its name gives its level: a container, a widget, a card, or a component. Its name is drawn at the boundary's corner, a card's as well, and a widget is a dotted boundary |
@@ -388,6 +388,10 @@ A skeleton takes neither `tone` nor `em`; a `map` takes both.
 ```
 
 **A skeleton may hold a view of one screen for each screen class.** The classes are the surface's own, `DESKTOP`, `TABLET` and `MOBILE`, so a skeleton makes no second set of names. What changes between two classes is the arrangement: parts stack, a table becomes a list, and a list at the side becomes a step of its own. So each view is a whole frame of its own, and none is derived from another. The views are drawn in one figure in one order, desktop, then tablet, then phone, each under the name of its class, whatever order the spec lists them in. The desktop stands on a line of its own at the full width, and the tablet and the phone stand side by side under it. A view's width stands for its class and is never a size on a screen; a view whose frame needs more room than its class has is a finding. One sentence before the figure and one caption after it serve all the views.
+
+**A mock draws each page once** (`RD.DEVEX.WORKSPACE.230`). The page is drawn with its data, and the errors a person meets on it are drawn where they appear, such as a form's alert and a field's message. The other task states, working, empty and denied, are the tree's task lines, in words, because drawing every state cost many tokens and the words of a state already carry it. A view takes `state`, a value of `DSTaskStateType`, for the page that needs a state drawn to be understood, and that is the exception. A view with no `state` shows the page with its data and its errors in place; a view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. A phone gets a view of its own only where its arrangement differs, such as a table that becomes a list. The views of one screen class stand together, the view with no `state` first and the others in the order of `DSTaskStateType`, each under the name of its class and the word of its state. A `state` that is not a value of `DSTaskStateType` is a finding.
+
+**A flow's pages are listed in a flow file, in the order a person meets them, each with where its moves lead** (`RD.DEVEX.WORKSPACE.230`). A skeleton draws one page and no path, so a flow drawn as loose skeletons leaves its reader to guess which page follows which. The file is `<flow>.flow.json`, beside the specs of its pages: `flow` is its name, the name of the flow pattern where it follows one, and `pages` lists the pages in order, each with its `page`, a word the file is unique by, its `spec`, the skeleton that draws it, and its `moves`. A move names what a person does and where it leads: `on` is the words of the action or the event, `to` is a page of the file, or `end` where the flow is done, and `state` is the task state of the view it lands on, where it lands on one. The flow file draws nothing; it is read against the specs, and a `to` that names no page of the file, a page that no move reaches but the first, a `spec` that is not there and a `state` that the page's spec does not draw are each a finding.
 
 ```dg
 { "kind": "skeleton",

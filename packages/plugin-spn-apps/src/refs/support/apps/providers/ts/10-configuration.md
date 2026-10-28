@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
-      "seen": "eb2336c9"
+      "seen": "4eca2759"
     }
   ]
 }
@@ -37,11 +37,13 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `APP_ENV` | `local` | which `envs/<APP_ENV>.env` file to load, and the environment stamped into the config |
+| `APP_ENV` | `local` | which `envs/<APP_ENV>.env` file to load, and the environment stamped into the config as `env`, a label for the logger's env tag; no behaviour branches on it |
 | `APP_MODE` | `ALL` | what the process runs — everything, the API, the queue, one CLI command, or the migration runner. Normalized on read, so lowercase reaches the same branch |
-| `NODE_ENV` | — | `production` disables debug |
+| `NODE_ENV` | — | `production` disables debug. It is the runtime's and the bundler's build mode, never an environment's name, so comparing it is allowed |
 
 **Set these on the command line or by the deployment, never in an environment file** — the file has not been loaded when `APP_ENV` is read.
+
+**Code never branches on an environment's name — MUST** (`RD.SUPPORT.APPS.226`). It never compares `env` or `APP_ENV` with a string, because an environment's name is a dynamic value and a new environment would silently take the wrong branch. `NODE_ENV` is the build mode, the same in every environment a release runs in, so `isDebug = NODE_ENV !== 'production'` is correct. A behaviour that differs by environment is a setting with a meaning-named key, such as `{CODE}_API_COOKIE_SECURE`, valued by the `envs/` file or the deployment, and code reads the setting. The environment's name selects which `envs/` file loads and labels a log line, and does nothing else; TLS strictness never derives from it.
 
 ## The `envs/` convention
 
@@ -107,7 +109,8 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **The database block's schema list is the grant published as data.** The first entry is the primary schema and the rest are appended to the search path, so unqualified reads resolve. An empty list fails boot with an explicit error.
 - **The application cache block also backs the lock provider.**
 - **The queue's client id derives from the declared code, and a queue connection lists no topics** — no environment variable names either. Each module makes its topics by its own `*-queue-topics` migration, and each topic the migration makes gets a paired error topic. No setting turns automatic topic creation on: the service app's boot builds the provider with it off, so publishing or subscribing to a topic that does not exist is an error that names the topic (RD.SUPPORT.APPS.178).
-- **No bucket fact publishes for storage.** The bucket is the world's derived store name, and a key never names one.
+- **Each store has its own storage block**: `{CODE}_RESOURCE_STORAGE_{NAME}_ENDPOINTS` is the signed path, browser-reachable under every hosting, and `APP` is the default store; `{CODE}_RESOURCE_STORAGE_{NAME}_PUBLIC_ENDPOINTS` is the public read base, and only a PUBLIC store, such as `DOCS`, has one.
+- **No bucket fact publishes for storage.** The bucket is the store's derived name, and a key never names one.
 
 **The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved.
 

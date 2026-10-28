@@ -6,8 +6,7 @@ touches: ["{{repository:place}}"]       # what the row writes, so two orders nev
 decisions: [{{q<n>}}]                   # the cards the row rests on, by id
 facts: [{{f<n>}}]                       # the facts it rests on, by id, from the arc's facts.jsonl
 ---
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A workstream works on one branch per repository · § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules · § The formats · § Orders name what they need by id, and a workflow runs the ready rows · § Work is sized by its kind, and fixes gather into a round · § Once an arc is decided, it runs in three passes per repository
-     and docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The four token levers are hooks that refuse, not lines of prose
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A workstream works on one branch per repository · § Once an arc is decided, it runs in three passes per repository · § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules · § The formats · § Orders name what they need by id, and a workflow runs the ready rows · § Work is sized by its kind, and fixes gather into a round
      and docs/04-capabilities/02-support/02-apps/06-tests/README.md § The selective loop — what runs while work is under way
      and docs/04-capabilities/01-devex/01-function/02-scm.md § A workstream's branch, and its promotion
      This file carries rules it does not own. The chapters above are the source of truth.
@@ -16,13 +15,10 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 <!-- AN ORDER IS ONE DELEGATED EXECUTION: a child session in this workspace, or a window of its own in another
      repository. Every path is absolute, so either can resolve it. It is saved as `notes/N<nnn>/orders/<row>.md`, and
      the front matter above comes first, because the commands read it and never the prose below it. -->
+<!-- AN ORDER IS CUT PER REPOSITORY AND PASS (docs, code and tests, or the owed tiers), from the preview's file list, never per
+     row. A row the preview does not pin is fixed in the preview first. -->
 <!-- ONE WORKTREE SET SERVES THE WORKSTREAM: orders whose `touches` name the same repository run one after another, and
      orders in different repositories may run side by side. -->
-<!-- AN ORDER IS CUT PER REPOSITORY AND PASS: one order carries the preview's file list for one repository and one pass (docs,
-     code and tests, or the owed tiers), never one row. A row the preview does not pin is sent back to the preview, and the
-     order is cut after. The order is never researched again. -->
-<!-- THE ORDER NAMES ITS LINE, AND A HOOK HOLDS IT: the context and turns at which the child stops are written in the order,
-     a PreToolUse check refuses the next tool call past them, and the child still saves the report the order owes. -->
 <!-- AN ORDER IS FOR JUDGEMENT WORK LONGER THAN ABOUT 15 MINUTES. A mechanical row (a pin move, a rename, a prop swap
      the brief could list) is the coordinator's own, done directly, with no order, brief or report. -->
 <!-- THE LIGHT FORM IS THE DEFAULT: the files, the one rule, the acceptance, and nothing else to read first. Work that adds
@@ -33,10 +29,10 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 | | |
 | --- | --- |
 | **Repo** | `{{repo}}` · **Run from:** `{{absolute path}}` |
-| **Arc** | `{{NNN-subject}}` [`N{{nnn}}`](../../../approach.html#N{{nnn}}), row {{row}} · **Pass:** {{docs · code and tests · tiers}} |
+| **Arc** | `{{NNN-subject}}` [`N{{nnn}}`](../../../approach.html#N{{nnn}}), row {{row}} |
 
-**Launch no agent.** Stop at {{150k of context or 100 turns}}, at the next whole step, save the report with what is left and
-hand back; a hook refuses the call past that line, and still lets you save the report. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
+**Launch no agent.** Stop at 150k of context or 100 turns, at the next whole step, save the report with what is left and
+hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
 parts. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{row}}.report.md` beside this order, its front matter first.
 
 ## The files

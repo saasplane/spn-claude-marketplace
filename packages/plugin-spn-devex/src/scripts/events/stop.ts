@@ -69,6 +69,7 @@ import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
@@ -220,8 +221,6 @@ const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((on
 const arcRef = (arc: string): string => `${basename(homeOf(arc)).slice(0, 3)}/${idOf(arc)}`;
 
 
-const DEBUG = ".debug";
-
 /**
  * A short hash of an arc's rows: each row's id, *What* and state, in the order the arc keeps them. A
  * sitting working ON the arc changes it; a header write, a log line or a status alone does not.
@@ -363,13 +362,12 @@ export type Baseline = { at: number; steps: Record<string, string>; fired?: stri
  */
 export type ArcMark = { log: number; notes: string; status: string };
 
-const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80) || "_";
-const sessionsDir = (root: string): string => join(root, DEVEX, DEBUG, "stop", "sessions");
-// A session file older than this belongs to a window long closed, and is removed when a Stop writes.
-const KEEP_MS = 14 * 24 * 3600 * 1000;
+/** The window's baseline, `sessions/<id>/stop.json`; a child agent keeps its own beside it, `stop.<agent>.json`. */
+const baselineFile = (root: string, session: string, agent: string | null): string =>
+  join(sessionDir(root, session), agent ? `stop.${agent.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80)}.json` : "stop.json");
 
-export function readBaseline(root: string, session: string): Baseline | null {
-  try { return JSON.parse(readFileSync(join(sessionsDir(root), `${sessionKey(session)}.json`), "utf8")); }
+export function readBaseline(root: string, session: string, agent: string | null = null): Baseline | null {
+  try { return JSON.parse(readFileSync(baselineFile(root, session, agent), "utf8")); }
   catch { return null; }
 }
 
@@ -380,14 +378,11 @@ function currentSteps(root: string): Record<string, string> {
   return seen;
 }
 
-export function writeBaseline(root: string, session: string, baseline: Baseline): void {
+export function writeBaseline(root: string, session: string, baseline: Baseline, agent: string | null = null): void {
   try {
-    const dir = sessionsDir(root);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, `${sessionKey(session)}.json`), JSON.stringify(baseline), "utf8");
-    const cutoff = Date.now() - KEEP_MS;
-    for (const name of readdirSync(dir))
-      try { if (statSync(join(dir, name)).mtimeMs < cutoff) rmSync(join(dir, name), { force: true }); } catch { /* next */ }
+    const file = baselineFile(root, session, agent);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, JSON.stringify(baseline), "utf8");
   } catch { /* the check must never fail because it could not write its own note */ }
 }
 
@@ -1447,7 +1442,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const facts = { script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
                   process: { group: "events", action: "stop" } };
   begin(facts, root);
-  // WHAT THE TURNS COST, written beside the timing log while recording is on, for `plugin cost show`.
+  // WHAT THE TURNS COST, written beside the timing log while recording is on, for `debug cost show`.
   recordUsage(root, facts, event.transcript_path);
   // THIS SESSION'S OWN BASELINE, and the workstreams and arcs its own writes bound it to. Both come from
   // the window's note (`lib/window.ts`), which PreToolUse and the prompt hook write from the PATH of a
@@ -1457,8 +1452,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // an arc or a row (RD.DEVEX.WORKSPACE.236).
   // A CHILD AGENT SHARES THE WINDOW'S session_id, so it keeps its own baseline file and never reads or
   // writes the window's: its view (no steps, no arcs) must not stand for the window's last turn.
-  const baselineKey = event.agent_id ? `${session}_${event.agent_id}` : session;
-  const baseline = readBaseline(root, baselineKey);
+  const baseline = readBaseline(root, session, event.agent_id ?? null);
   const mine = windowSet(root, session);
   const touched = baseline ? arcsWrittenSince(root, session, baseline.at) : new Set<string>();
   // A CHECK THAT SPOKE AT THIS SESSION'S LAST STOP HAS HAD ITS ANSWER. `stop_hook_active` says this
@@ -1520,13 +1514,13 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
   // the first reply's check either. OUTSIDE A WORKSPACE NOTHING IS WRITTEN: the note would make the
   // `.spndevex/` it sits in, and every session below that folder would take it for a workspace.
-  if (inWorkspace) writeBaseline(root, baselineKey, { at: kept ? kept.at : Date.now(),
+  if (inWorkspace) writeBaseline(root, session, { at: kept ? kept.at : Date.now(),
                                  steps: kept ? { ...currentSteps(root), ...kept.steps } : currentSteps(root),
                                  fired: [...new Set([...spoken, ...said.map((warning) => warning.check)])],
                                  cards: waiting,
                                  arcs: kept ? { ...arcMarks(root), ...(kept.arcs ?? {}) } : arcMarks(root),
                                  ownCopy: ownCopyTold,
-                                 handover: givesHandover(reply) ? rowsNow : given ? baseline?.handover : undefined });
+                                 handover: givesHandover(reply) ? rowsNow : given ? baseline?.handover : undefined }, event.agent_id ?? null);
   if (said.length) {
     console.error(said.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

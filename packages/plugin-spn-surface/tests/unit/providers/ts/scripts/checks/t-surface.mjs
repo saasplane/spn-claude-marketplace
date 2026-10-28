@@ -168,7 +168,7 @@ console.log("\n=== the frame — any other path leaves before the check is loade
   // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
   mkdirSync(join(telemetry, ".spndevex", ".debug"), { recursive: true });
   writeFileSync(join(telemetry, ".spndevex", "README.md"), "# .spndevex\n");
-  writeFileSync(join(telemetry, ".spndevex", ".debug", "telemetry.on"), "on\n");
+  writeFileSync(join(telemetry, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}\n');
   const env = { ...process.env };
   delete env.SPN_TELEMETRY;
   const spans = (input, tool = "Write") => {

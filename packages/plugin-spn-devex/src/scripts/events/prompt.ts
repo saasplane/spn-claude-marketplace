@@ -29,6 +29,7 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { ARC_NAME, WORKSTREAM_NAME, handoverLines } from "./stop.ts";
 import { bindNamed, bindVisited, readWindow } from "../lib/window.ts";
@@ -36,9 +37,6 @@ import { bindNamed, bindVisited, readWindow } from "../lib/window.ts";
 /** What a session is called, and which of the two forms the name has. */
 export type SessionName = { name: string; form: "workstream" | "arc" };
 
-// The folder under `.spndevex/` where the plugin records what it did, and the folder of names in it.
-const DEBUG = ".debug";
-const NAMES = "names";
 const STATE_FILE = "state.json";
 
 const everyWorkstreamName = (): RegExp => new RegExp(WORKSTREAM_NAME.source, "g");
@@ -203,7 +201,7 @@ export function nameToGive(worked: SessionName | null, recorded: SessionName | n
 /** The file that holds a session's last given name, or null for a session with no usable id. */
 export function recordFile(root: string, session: string): string | null {
   const key = session.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
-  return key ? join(root, DEVEX, DEBUG, NAMES, `${key}.json`) : null;
+  return key ? join(sessionDir(root, key), "name.json") : null;
 }
 
 /** The name a record file holds, or null where the file is absent or holds something else. */

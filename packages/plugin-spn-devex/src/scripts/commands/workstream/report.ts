@@ -5,7 +5,7 @@
 //
 // Folds a child's hand-back into its row from the report's front matter alone: the outcome as the
 // row's state, the proof, the commits and the cost, and each follow-up as a new row. Where the report
-// carries no cost, the cost is read from `workspace tokens` for the arc and the order.
+// carries no cost, the cost is read from the telemetry (`debug cost show`) for the arc and the order.
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
@@ -14,16 +14,16 @@ import { frontMatter } from "../../lib/front-matter.ts";
 import { doneOf, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
-import { projectFolder, report as tokensReport } from "../workspace/tokens.ts";
+import { readCost } from "../../lib/cost.ts";
 
 export const describe = "a child's hand-back, folded into its row from the report's front matter";
 
-/** The cost of one order as `workspace tokens` reads it, or null where the log holds none. */
+/** The cost of one order as `debug cost show <workstream>/<arc>` reads it, or null where the telemetry holds none. */
 function measuredCost(ws: string, arc: string, order: string): Cost | null {
   try {
     const root = workspaceOf(ws);
     if (!root) return null;
-    const found = tokensReport(root, projectFolder(root), basename(ws)).rows.filter((row) => row.arc === arc && row.order === order);
+    const found = readCost(root, `${basename(ws)}/${arc}`).rows.filter((row) => row.key.split(" · ").includes(`order ${order}`));
     if (!found.length) return null;
     const tokens = found.reduce((sum, row) => sum + row.input + row.cacheWrite + row.cacheRead + row.output, 0);
     const minutes = Math.round(found.reduce((sum, row) => sum + row.modelMs, 0) / 60000);

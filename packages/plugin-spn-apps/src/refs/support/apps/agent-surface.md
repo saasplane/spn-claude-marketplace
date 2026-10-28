@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/08-agent-surface.md",
-      "seen": "eff4fe73"
+      "seen": "29c9d1d3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/",
-      "seen": "440a12f3"
+      "seen": "37e4814e"
     }
   ]
 }
@@ -68,7 +68,7 @@ export interface SPKindSymbol {
 | `deprecated` | still published, no longer the way | `false` |
 | `intent` · `description` | harvested from the declaration's own doc comment — the opening sentence, and the same comment at full length | `null` |
 | `signature` | the stack-rendered shape — the only field a stack spells its own way | `null` |
-| `roleMeta` | what the role owes beyond the common facts, polymorphic by the role itself | `null` |
+| `roleMeta` | what the role owes beyond the common facts, polymorphic by the role itself; a component's carries its props, each with its values, default and description | `null` |
 | `seam` | how to compose it correctly, present only where a real choice sits behind the capability | `null` |
 
 **Every key is always present.** JSON has no `undefined`; absence is `null` for a value and empty for a collection, never a key that sometimes goes missing.
@@ -112,6 +112,7 @@ Four signals classify a symbol, each deciding a different thing: **shape** decid
 | `ENUM` · `ERROR` · `PERMISSION` | `values`: member name → its value and, where the name is not the meaning, its description |
 | `ENTITY` | `joinKeys` — enough for a declared cross-schema read, never enough to rebuild the table |
 | `OPERATION` | `errors` it can raise, the `authz` reference that gates it (`null` if ungated), and `http` as method-and-path in one string (`null` off the API transport) |
+| `COMPONENT` | `props`, read from its code at build: each prop's `name`, its `values` (the closed list from its enum or a flag, `null` for an open prop), its `default` (the value the parameter list gives it, `null` where it comes from the place or there is none) and its `description` (the prop's own doc comment). No case and no table enter the index: the agent works out a unit's case from the book and from these props |
 
 A future role's needs arrive as one more `roleMeta` variant, never as a key every other symbol's row carries empty.
 

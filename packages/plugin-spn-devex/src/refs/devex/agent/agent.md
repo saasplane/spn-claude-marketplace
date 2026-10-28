@@ -39,12 +39,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
-      "seen": "0849c8cc"
+      "seen": "9c4b01b6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "d26905a7"
+      "seen": "e7069100"
     }
   ]
 }
@@ -161,9 +161,18 @@ middle of an arc calls no skill, so these lines are what carries the rules into 
 Every turn of every window reads the same fixed base again, so each byte in it is paid for on every
 reply of every session.
 
-- **The session-start output holds what a first reply needs, under 8 KB:** the welcome word for word,
-  the status line, the ask router's one-line index and the short rules, one line each. The ground
-  tables are read on asking, with `spnutils workspace status`.
+- **The session-start output holds what a first reply needs, in order of need, and stays inline:** the
+  welcome word for word, the status line, the ask router's one-line index, the short rules, one line each,
+  and the commands of the `debug` group, each with its arguments. Claude Code saves a hook's output past
+  10,000 characters to a file and shows the model only its first 2,000, so the session start holds under
+  9,500 characters, counted as Claude Code counts. What goes in is chosen by need, not by size: what makes a
+  first reply correct (the welcome, the status line and the first-reply note), then the short rules, then
+  the debug commands, then the router, and a line that changes no behaviour stays out. Past the ceiling the
+  router is left out first, then the debug lines, and one line names where to read them. Past 8,000
+  characters it still loads whole, and its test asks why the new text earns its place. The command lines are
+  generated from the command tree, the way a repository's `rules.md` lists the commands of `spnutils`
+  (`RD.DEVEX.WORKSPACE.180`), so you find them without a search. The ground tables are read on asking, with
+  `spnutils workspace status`.
 - **The memory index holds one short line per memory, under 8 KB.** The detail stays in each
   memory's own file, and the line's name says what the memory is for. When you write a memory, its
   index line is its link and a name that carries its meaning, and nothing more.
@@ -378,6 +387,6 @@ every call, so the line holds whether or not the agent remembers it.
 | a child's size | the context or the turns its order names | a `PreToolUse` check reads the last usage in the child's transcript and refuses the next tool call past the line, pointing at the report the order says the child owes |
 | a file read | 20 KB | a `Read` of a file over 20 KB without a range is refused, and the refusal gives the ranged form to use: search first, then read the lines needed |
 | a command's output | 10 KB | a command whose output passes 10 KB is refused, and the refusal gives the form that writes to a file so the agent reads the part it needs |
-| the session-start output | 8 KB | unchanged: it holds under 8 KB (`RD.DEVEX.AGENT.105`, § *What every window carries before its first word is kept small*) |
+| the session-start output | 9,500 characters | the harness's inline ceiling, chosen by need under it (`RD.DEVEX.AGENT.105`, § *What every window carries before its first word is kept small*) |
 
 A refusal that names the form to use costs one turn, where a read past the line cost every turn after it.
