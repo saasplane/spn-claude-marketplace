@@ -533,19 +533,19 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
  * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to
  * judge, and the last line says so.
  */
-export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply, and each line names the reference that holds its rule whole";
+export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply; each line points at its rule in full";
 
 export const SHORT_RULES: string[] = [
-  "Your lenses take part in a discussion about a shape, at any moment of a workstream, also in the middle of a run. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
-  "Three signs say how many views speak: the choice crosses a repository, changes what a partner builds on, or sets a pattern others follow. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
-  "No sign: the owning view, in one sentence. One sign: the architect's and the owning view. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
-  "Show each view in its own voice, as a colleague would say it, never a slogan; on a card, one or two sentences, no option by its letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
-  "Write every reply as one person talking to another: full sentences, a table only for facts; one meaning-icon opens it; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-  "A decision that sets a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
-  "Structure comes before content: design the units, names and grouping, and show them first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
-  "**Needs you** opens a reply in two cases only: it raises a card, in full, once; or it ends or stops the work, one line per open card. → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
-  "The arcs of a workstream are yours to manage; a new workstream is always the developer's decision. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
-  "No script tells you a prompt opens a discussion about a shape; you decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
+  "Lenses take part in any discussion about a shape, mid-run too. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
+  "Three signs set how many views speak: it crosses a repository, changes what a partner builds on, or sets a pattern. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
+  "No sign: the owning view, one sentence. One: the architect's and the owner's. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
+  "Each view speaks in its own voice, as a colleague, never a slogan; on a card, one or two sentences, no option by letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
+  "Reply as one person to another: full sentences, tables only for facts, one meaning-icon first; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+  "A decision setting a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
+  "Structure before content: show the units, names and grouping first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
+  "**Needs you** opens a reply only to raise a card (in full, once) or to end or stop the work (a line per open card). → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
+  "Arcs are yours to manage; a new workstream is the developer's call. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
+  "No script flags a discussion about a shape; you judge. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
 ];
 
 /**
