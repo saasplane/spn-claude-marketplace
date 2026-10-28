@@ -354,7 +354,7 @@ console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266"
   ok("and a second run writes nothing", lib.writePreviewStatus(ws).length === 0);
   const { cli } = await import("../../../helpers/workstream-fixture.mjs");
   // A step started: the arc reads RUNNING, worked out from its steps, and the preview shows it.
-  const moved = cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+  const moved = cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
   ok("a command that writes the arc writes the preview's status with it",
     moved.code === 0 && readFileSync(preview, "utf8").includes(`${status("RUNNING")}</span></div>`), `${moved.out}\n${readFileSync(preview, "utf8")}`);
 }

@@ -98,8 +98,8 @@ console.log("\n=== the Stop hook refuses a turn while state check fails for this
   cli(root, ["workstream", "arc", "stamp", "write", "031/N001"]);
   ok("green: restamped, the turn may end", checkWorkstreamState(root, new Set(["031-probe"])).length === 0, JSON.stringify(checkWorkstreamState(root, new Set(["031-probe"]))));
   ok("no row running, so work does not run in this window", workRuns(root, new Set(["031-probe"])) === false);
-  cli(root, ["workstream", "row", "write", "031/N001", "--status", "RUNNING"]);
-  cli(root, ["workstream", "row", "write", "031/N001", "2", "--state", "running"]);
+  cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "RUNNING"]);
+  cli(root, ["workstream", "row", "state", "031/N001", "2", "running"]);
   ok("a row of an arc kept as data set running is work that runs", workRuns(root, new Set(["031-probe"])) === true);
   ok("and only for this window's workstream", workRuns(root, new Set(["099-other"])) === false);
   put(root, ".spndevex/workstreams/open/026-old/arcs/N001-old.md", "# N001 — old\n\nStatus: **RUNNING**\n");

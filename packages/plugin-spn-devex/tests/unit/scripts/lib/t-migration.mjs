@@ -187,7 +187,7 @@ console.log("\n=== 002 — each arc's address, goal and name file, and the level
   writeFileSync(page, readFileSync(page, "utf8").replace(' &middot; <a href="arcs/N001/state.json">the arc</a>', ""));
   writeFileSync(join(ws, "notes", "N001", "preview.html"), '<p><a href="../../approach.html#N001">approach.html#N001</a></p>\n');
   rmSync(join(ws, "notes", "ideation.md"));
-  cli(root, ["workstream", "row", "write", "031/N001", "--goal", "the probe is answered", "--subject", "probe"]);
+  cli(root, ["workstream", "arc", "edit", "031/N001", "--goal", "the probe is answered", "--subject", "probe"]);
   cli(root, ["docs", "cycles", "write", "031"]);
   ok("green: links rewritten, goal and short subject written, cycles write run — 002 finds nothing", m002.check(root).length === 0, m002.check(root).join(" | "));
 }

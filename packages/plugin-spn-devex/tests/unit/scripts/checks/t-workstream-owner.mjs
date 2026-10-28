@@ -39,7 +39,7 @@ console.log("=== a file a script owns is written only by its command");
     ok(`red: a Write to ${file} is refused`, verdict === "deny" && why.includes(`\`${file}\` is written only by`), `${verdict}: ${why.slice(0, 200)}`);
   }
   const [edit, why] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: state, old_string: '"DECIDED"', new_string: '"RUNNING"' } }, root);
-  ok("red: an Edit to state.json is refused, and names its command", edit === "deny" && why.includes("`workstream row write`"), why.slice(0, 200));
+  ok("red: an Edit to state.json is refused, and names its command", edit === "deny" && why.includes("`workstream arc edit`"), why.slice(0, 200));
   const [bash] = hook({ tool_name: "Bash", cwd: root, tool_input: { command: `echo '{}' > ${join(ws, "questions.jsonl")}` } }, root);
   ok("red: a shell redirect into questions.jsonl is refused", bash === "deny");
   const [read] = hook({ tool_name: "Read", cwd: root, tool_input: { file_path: state } }, root);
@@ -47,7 +47,7 @@ console.log("=== a file a script owns is written only by its command");
   const [notes] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "notes", "N001", "plan.md"), content: "# plan\n" } }, root);
   ok("green: the agent's plan is the agent's to write", notes !== "deny");
   ok("the workspace's own workstreams/state.json is spnutils', not refused here", ownedRefusal(join(root, ".spndevex", "workstreams", "state.json")) === null);
-  const command = cli(root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
+  const command = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
   ok("green: the command writes state.json itself", command.code === 0 && JSON.parse(readFileSync(state, "utf8")).status === "CARRIED", command.out);
 }
 

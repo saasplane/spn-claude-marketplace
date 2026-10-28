@@ -20,7 +20,7 @@
 // is not a go for an irreversible number (RD.DEVEX.WORKSPACE.069). The go is the write that moves the arc
 // that needs the release out of `PROPOSED`, and the developer's words in it name the version:
 //
-//     workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words, naming 2.0.0>"
+//     workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming 2.0.0>"
 //
 // It is read from the arc's data by `confirmed.ts`'s own reader, so the two checks cannot disagree about
 // what a go is: the arc reads `DECIDED`, `RUNNING` or `LANDED`, its `log.jsonl` holds the line that moved
@@ -157,7 +157,7 @@ export function checkReleaseGo(payload: Payload): Verdict {
       `execution never stops to ask for one. Minor and patch releases need none of this — they are ` +
       `the standing authorization in \`N39\`.\n\n` +
       `What is missing is the go of the arc that needs it, with the developer's words naming the version:\n\n` +
-      `    spn-devex workstream row write <ws>/<arc> --status DECIDED --note "<the developer's words, naming ${version}>"\n\n` +
+      `    spn-devex workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming ${version}>"\n\n` +
       `It counts once the arc reads DECIDED, RUNNING or LANDED and its log holds that line. Write the card, ` +
       `get it answered, then record the answer as the arc's go. A go that lives only in this window ends ` +
       `with this window, which is why nothing else counts (RD.DEVEX.WORKSPACE.069).`,

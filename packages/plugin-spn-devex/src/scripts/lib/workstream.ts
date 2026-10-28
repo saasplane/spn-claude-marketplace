@@ -143,7 +143,7 @@ export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, a
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
 /**
  * Where an arc's preview is linked from its workstream folder: the arc's `preview` field where it is a
- * path, as an arc carried to another workstream keeps it (`workstream row write <arc> --preview <path>`),
+ * path, as an arc carried to another workstream keeps it (`workstream arc edit <arc> --preview <path>`),
  * and `notes/N<nnn>/preview.html` where it is the fixed name alone.
  */
 export function previewHrefOf(arc: string, data: Pick<ArcData, "preview"> | null): string {
@@ -363,9 +363,9 @@ export const markdownIn = (ws: string, arc: string): string[] =>
  */
 export function nameFileText(ws: string, data: ArcData): string {
   const goal = typeof data.goal === "string" && data.goal.trim() ? data.goal.trim()
-    : `(none yet: \`spn-devex workstream row write ${data.arc} --goal "…"\`)`;
+    : `(none yet: \`spn-devex workstream arc edit ${data.arc} --goal "…"\`)`;
   const lines = [
-    `<!-- ${data.arc}'s name. \`spn-devex workstream row write\` and \`docs cycles write\` write it from state.json; never by hand. -->`,
+    `<!-- ${data.arc}'s name. \`spn-devex workstream arc edit\` and \`docs cycles write\` write it from state.json; never by hand. -->`,
     `# ${data.arc} — ${data.title}`,
     "",
     `**Goal.** ${goal}`,
@@ -510,7 +510,7 @@ export function stepsMayStart(data: Pick<ArcData, "status" | "wait">): boolean {
 
 // ---------------------------------------------------------------------------- an arc's moves, from its log
 
-/** A status line's move, read from the head of its note: `FROM → TO`, as `row write` writes it. Null where the note names none. */
+/** A status line's move, read from the head of its note: `FROM → TO`, as `arc edit` writes it. Null where the note names none. */
 export function moveOf(note: unknown): { from: string; to: string } | null {
   const found = typeof note === "string" ? /^([A-Z][A-Z-]*) → ([A-Z][A-Z-]*)(?![A-Z-])/.exec(note) : null;
   return found ? { from: found[1], to: found[2] } : null;

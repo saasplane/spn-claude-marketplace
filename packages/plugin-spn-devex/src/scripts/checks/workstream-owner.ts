@@ -20,7 +20,7 @@ import { DEVEX, DEVEX_WORKSTREAMS } from "../../../../plugin-support-lib/src/lib
 import { LEDGER } from "../lib/migration.ts";
 
 const WRITERS: Record<string, string> = {
-  "state.json": "`workstream row write` (and `report write`)",
+  "state.json": "`workstream arc edit` and the `workstream row` commands (and `report write`)",
   "log.jsonl": "every `workstream` write, which appends its event",
   "facts.jsonl": "`workstream fact write`",
   "questions.jsonl": "the `workstream question` commands",
@@ -37,7 +37,7 @@ export function ownedRefusal(path: string): string | null {
   if (!owned) return null;
   const name = owned.file.split("/").pop()!;
   const writer = WRITERS[name] ?? (name.endsWith(".md")
-    ? "`workstream row write` and `docs cycles write`, from the arc's `state.json` — it is the arc's name file"
+    ? "`workstream arc edit` and `docs cycles write`, from the arc's `state.json` — it is the arc's name file"
     : "the `workstream` commands");
   return `Denied: \`${owned.file}\` is written only by ${writer}, and never by hand ` +
     `(01-workstream.md § A script or an agent writes each file, never both). Run \`spn-devex workstream\` for the change, ` +

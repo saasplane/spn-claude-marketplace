@@ -75,3 +75,20 @@ export function refreshIfMoved(ws: string, before: ReturnType<typeof arcSignatur
   const { views, skipped } = refreshViews(ws);
   return { said: views, lines: skipped.map((reason) => `! ${reason}`) };
 }
+
+/** The options that describe a row, and no arc: `arc edit` refuses them and names `row edit`. */
+export const ROW_FLAGS = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
+/** The options that describe an arc's header, and no row: `row add` and `row edit` refuse them and name `arc edit`. */
+export const ARC_FLAGS = ["under", "subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "preview"];
+
+/**
+ * Throws, before the words are read, where one of `names` was typed as an option: the option belongs to another command,
+ * and the refusal says which. `say` completes the sentence that opens with the command's words.
+ */
+export function refuseFlags(args: string[], names: readonly string[], say: (name: string) => string): void {
+  for (const word of args) {
+    if (!word.startsWith("--")) continue;
+    const name = word.slice(2).split("=")[0];
+    if (names.includes(name)) throw new UsageFault(say(name));
+  }
+}

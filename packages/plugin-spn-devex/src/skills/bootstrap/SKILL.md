@@ -51,7 +51,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | --- | --- | --- | --- |
 | 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
 | 1 | Mint the workspace | `spnutils workspace init` | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
-| 2 | Open the workstream | `mkdir`, then `spn-devex workstream row write` | The answers need a home on disk before the first one is given |
+| 2 | Open the workstream | `mkdir`, then `spn-devex workstream arc edit` | The answers need a home on disk before the first one is given |
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
 | 5 | Bring the organization up, then make the estate folder and mint it | `spnutils infra organization up`, then `mkdir <org>-infra`, `git init` and `spnutils infra scaffold repo` inside it | The book's utils chapter runs the organization layer once, before any `repo create`, and `repo create` refuses by name until it has. The estate repository exists only as a folder until act 7 has written its organization node |
@@ -98,7 +98,7 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 ### The answers go in the arc, and the arc commands write it
 
-**An arc is data, and only the arc commands write it.** `spn-devex workstream row write` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
+**An arc is data, and only the arc commands write it.** `spn-devex workstream arc edit` writes `arcs/N001/`, and the hook that runs before every edit refuses a hand edit there. So you never type a file into `arcs/`. The arc a command opens is the arc the page, the hooks and `spn-devex workstream state check` all read. `refs/devex/workspace/workstream.md` carries the commands and what each field holds.
 
 **The page argues nothing, and it is still needed.** An approach page usually argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two, so the coordinates are a record, and a record belongs in the arc. But an arc stands on its workstream's page: its row in Cycles is its address, `approach.html#N001`, and the state check reads the arc against that row. So the page holds a masthead, one paragraph of Why, one line of What, and the Cycles table.
 
@@ -112,14 +112,14 @@ Write these at act 2, in this order, before the first question is asked. `{NNN}`
 2. **The arc**, opened as `PROPOSED`:
 
    ```sh
-   spn-devex workstream row write {NNN}/N001 --title "The estate coordinates" --subject estate-coordinates \
+   spn-devex workstream arc edit {NNN}/N001 --title "The estate coordinates" --subject estate-coordinates \
      --goal "The answers that name every account address, package scope, repository name and code prefix in this estate, kept here until the platform's CONCEPT.md carries them."
    ```
 
-3. **One row per question**, rows 1 to 12, in the order of act 3's *What you ask*. The title is the question, and the acceptance is what its answer decides:
+3. **One row per question**, rows 1 to 12, in the order of act 3's *What you ask*; the command takes each row's number and prints it. The title is the question, and the acceptance is what its answer decides:
 
    ```sh
-   spn-devex workstream row write {NNN}/N001 1 --title "The organization's code, its name, and the mail domain" \
+   spn-devex workstream row add {NNN}/N001 "The organization's code, its name, and the mail domain" --kind question --repo "—" --altitude DOCS \
      --acceptance "Every account address, the package scope, the repository names, the estate's root"
    ```
 
@@ -205,7 +205,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 ### How to ask
 
 - **Ask one question and stop.** A numbered list of all of them arrives as a form, and a form gets one careless pass.
-- **Write each answer down before you ask the next one.** Land that question's row with their answer as its note, `spn-devex workstream row write {NNN}/N001 <row> --state landed --note "<their answer, as they gave it>"`. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
+- **Write each answer down before you ask the next one.** Land that question's row with their answer as its note, `spn-devex workstream row state {NNN}/N001 <row> landed --note "<their answer, as they gave it>"`. Answers written at the end are the same lost window as answers written nowhere, because the window can close partway through.
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back. The legal entity, the owner's name and the cloud region are the ones an agent is most tempted to guess.
 - **The cloud region mapping is a choice, not a derivation.** `ap-south-1` does not follow from `in` by any rule this estate states. Somebody decided it, so somebody has to say it.
 - **The closest twin is the one people skip, and it earns the most.** A twin tells you which mechanisms transfer wholesale. Where this is their first platform there is no twin, and saying so beats inventing one.
@@ -230,8 +230,8 @@ Show every answered row as it now stands, and then show what you derived from it
 **A go is written down or it did not happen.** Record it with the command that moves the arc out of `PROPOSED`, carrying their words as they gave them, as `refs/devex/workspace/workstream.md` shows:
 
 ```sh
-spn-devex workstream row write {NNN}/N001 13 --state landed --note "<the read-back: the repository names, the tiers, the surfaces>"
-spn-devex workstream row write {NNN}/N001 --status DECIDED --note "<the developer's words>"
+spn-devex workstream row state {NNN}/N001 13 landed --note "<the read-back: the repository names, the tiers, the surfaces>"
+spn-devex workstream arc edit {NNN}/N001 --status DECIDED --note "<the developer's words>"
 ```
 
 The log then holds `PROPOSED → DECIDED · <their words>`, and rows 14 to 19 are build work.

@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "cae3f363"
+      "seen": "952d71b3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -129,7 +129,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 
 **What an answer means stays yours to write.** After `question answer`, write the decision into the
 page's `What`, with the `q<n>` anchor on the statement and no Q number on view, and into the preview
-section it settles; then write the arc's log line through `workstream row write <arc> --note "…"`.
+section it settles; then write the arc's log line through `workstream arc edit <arc> --note "…"`.
 `question answer` names both in its own line. The PreToolUse hook refuses a card written by hand and
 an edit inside an `open` block, and `workstream state check` fails an open record whose card is not on
 the approach page, or a preview's card that differs from its record.
