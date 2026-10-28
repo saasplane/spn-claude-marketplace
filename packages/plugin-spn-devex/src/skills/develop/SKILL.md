@@ -1,0 +1,84 @@
+---
+name: develop
+description: The contract-first build loop - the order work is done in, what each layer may and may not do, and what must be regenerated before anything is committed. Use when implementing a capability, changing an existing one, or judging whether code sits in the right layer. Stack-agnostic; the domain plugin supplies the per-layer step files and the commands.
+---
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
+      "seen": "6943024a"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
+      "seen": "2b989141"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
+      "section": "Model",
+      "seen": "23122108"
+    }
+  ]
+}
+-->
+
+# develop — contract first, every time
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
+**Write the contract before the code implementing it.** Not as ceremony: the contract is what generates the validators, the specification, the client, and the tool definitions, so writing it first is what makes those derivations possible at all. Code written before its contract has to be retrofitted into one, and the retrofit is where shapes go wrong.
+
+## The loop
+
+**The loop runs in four stages — documents, source, tests, run — and each part of a change runs all four before the next part starts.** Source is the contract, the regeneration, the implementation and the entry, in that order.
+
+1. **Documents** — update the seat the change touches so it says what will be true, before any code. Documents lead code (`RD.DEVEX.WORKSPACE.081`), so the code is written against a page rather than a page written to match the code.
+2. **Contract** — the states, then the service interface. One method: one command in, one state out. Write the **intent** as you create each published declaration; it is harvested into what agents read, and an intent added later is an intent nobody wrote.
+3. **Regenerate** — the validators derive from the contract states. They are never hand-written and never hand-edited.
+4. **Implementation** — the service behind the contract, plus its storage access. Policy, authorization, and transactional integrity live at this boundary and nowhere else.
+5. **Entry** — the transport adapter. Parse input into the command, invoke the service, render the state.
+6. **Tests** — at the tier that proves the behavior, never the tier that is easiest to write.
+7. **Run** — the cases of what the part touched run until they pass, under one working run name. Then one freshly named run goes over every touched case, and the rows are stamped from it (`RD.DEVEX.WORKSPACE.207`). The part's acceptance is its named behaviour ids, read as `SUCCESS` from that run's file. No whole tier runs here: the `test` skill, § When a whole tier runs, names the release step and the five cases that call for one. A fresh regeneration finds no diff. A finding goes back to the step that owns it. A case written to fail first is one narrow run on the unchanged code, and no source or test file changes while a test run for that repository is in flight.
+
+Steps 2–4 are ordered by dependency and cannot be reordered: the validators derive from the states, and the service is written against the interface the contract declares. **A part runs all its documents, then all its source, then all its tests, then the run — never one function at a time.** Going function by function leaves you, at every moment, with code nobody has described and tests for half a shape.
+
+**This phase never provisions and never releases.** Bringing infrastructure up is `provision`, and publishing is `deliver`. What this phase owes them is code whose generated artifacts are fresh and whose behavior is instrumented.
+
+## What each layer may do
+
+| Layer | Owns | Must never |
+| --- | --- | --- |
+| **contract** | the public surface — commands, states, events, enums, the service interface | contain logic, or reference the implementation |
+| **app** | the behavior — services, storage access, internal helpers | be reached by another module, directly or through its storage |
+| **entry** | adapting one transport | hold business logic of any kind |
+
+**An entry that cannot be rewritten for a different transport without touching a service is a defect.** That is the test — not whether the code looks thin.
+
+**Cross-module calls go through the other module's contract services, never its implementation and never its storage.** Code that reaches around a contract is a defect regardless of how well it works today, because it is the coupling that makes a module impossible to change later.
+
+## Generated artifacts
+
+**Everything derived is regenerated, never edited.** Validators, export indexes, label manifests, symbol indexes, API clients — the source plus a re-run is the only edit path.
+
+**Regenerate before committing**, and before restarting anything that loads the code. A repo whose generated artifacts disagree with their source fails at runtime rather than at review, which is the most expensive place to find it.
+
+Edit the generator or its source when a generated file needs to be different. An edited generated file is overwritten by the next regeneration.
+
+## The lines that hold
+
+- **A gate carries a permission and an enablement, so classify before you declare one.** A permission says which person may act. An enablement says what the caller's organization type is offered at all. Read the `spn-apps` plugin's `refs/platform/core/tenancy/permission-vs-enablement.md` before you write the gate. It settles the code's grammar, whether the term sits on the gate or in the service body, and why you never gate a read.
+- **Contracts are additive.** A published field is never removed, retyped, or repurposed; new optional fields may be added at any time. A breaking change is a planned, versioned event with a migration path.
+- **Errors are contracts too.** Namespaced codes, each mapped once to a response class, retryability classified rather than guessed. A failure never discloses the existence of something the caller could not otherwise see.
+- **Reuse the shared primitives** — get, bulk get, key lookup, active toggle — before minting a bespoke command for a single identifier.
+- **Read the interface before using it.** Exact values, exact parameter order, optional versus required, nullable versus absent. Never invent an API; if unsure a symbol exists, look it up in the symbol index or the source.
+- **Match the code beside you.** New code is written by pattern-matching its neighbors — same layering, same ordering, same naming, same comment density. A one-off that reads better in isolation reads worse in the codebase.
+- **Name things so they need no explanation.** A name that requires a comment saying *what* it is, is the wrong name. Rename before annotating; the only comments worth keeping state a constraint the code cannot show.
+- **A doc comment on a published declaration is an interface.** It is harvested into the symbol index, the interface document, the API client and the tool definitions an agent calls — one comment, several surfaces, none written by hand. The full rules are in the `spn-apps` plugin's `refs/support/apps/comments.md`. Four of them matter every day. Write **one sentence** as the opening line. Write it **once on the contract**, so implementations and transport adapters inherit rather than restate. **Never name what the package does not depend on** — no table names, no codes from other packages. And write **constraints as tags** in the same comment, never re-described in prose.
+
+## Lenses
+
+Wear per layer: `refs/devex/agent/lenses/server-dev.md` on contract, service, and entry; `refs/devex/agent/lenses/web-dev.md` on ui; `refs/devex/agent/lenses/trust.md` on any mutation; `refs/devex/agent/lenses/partner.md` while writing contract states. Convene no lens over the code as a routine; the hooks refuse at write time. A fresh `spn-panel` reading is held only at a judgment gate: `partner` when the published surface changed, and the lenses `LEAD` picks at the design gate and at a release.
+
+## Finish
+
+A change is not done when it compiles. It is done when three things hold. The doc seat the change touched says what is now true, the derived artifacts are fresh, and the behavior is proven at a tier that means something. Hand to the test and verify skills for the proving.

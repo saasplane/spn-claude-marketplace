@@ -1,0 +1,390 @@
+{
+ "kind": "skeleton",
+ "title": "Choose many, where the data has no groups",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A permission is a code and a name and nothing else, so no heading is made up: the page level holds the way back and the title, then one list in one container, with a search and a count, and the actions in the footer. The choices stand in columns that start at the same place in every row: three at a desktop and on a tablet, and one on a phone. Every screen shows every choice, with its search and its count.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Team"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            },
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config view",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            },
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Audit view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config admin",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config manage",
+             "fill": true
+            },
+            {
+             "control": "checkbox",
+             "text": "Config view",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Permissions of the role"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "field",
+             "text": "Search permissions",
+             "fill": true
+            },
+            {
+             "note": "5 of 14 chosen"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access admin",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access manage",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Access view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit admin",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit manage",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Audit view",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config admin",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config manage",
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "control": "checkbox",
+             "text": "Config view",
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

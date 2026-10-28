@@ -1,0 +1,24 @@
+{
+  "name": "spn-claude-marketplace-build",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Dev-only build for the four plugins under packages/ — never installed, never shipped (N101 step 2).",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "build:plugins": "node scripts/build-plugins.mjs",
+    "build:plugins:watch": "node scripts/build-plugins.mjs --watch",
+    "release:plugins": "node scripts/release-plugins.mjs",
+    "test": "node scripts/test-all.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "4.3.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

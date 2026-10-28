@@ -1,0 +1,466 @@
+{
+ "kind": "skeleton",
+ "title": "Find in a list",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title, a line under it and the main action: it is the header of the one container, which is the page. The container's content is two parts: the filter bar widget, and the data table widget, whose records reach the outline with no room around them. Its footer holds the paging. The records are one data table on every screen: in its TABLE layout at a desktop and a tablet, and in its LIST layout on a phone, where each record is a line in the style of an item: its number, and under the number the customer, the state and the total. The filter bar is drawn as the filter bar widget draws it: the filter icon, which is a mark and so a circle; the boxes that share its width equally; the action that shows the filters that are hidden; and, after a line that sets them apart, the two actions that search and clear. A tablet's filter bar holds fewer boxes, and on a phone it is one button that says how many filters are on; the main action keeps its words. The lines of the LIST layout have a line between each two. A state that is normal shows no badge. A press on a row opens the record, and the actions of a row are behind one action at its end. A tablet shows fewer columns, with the state left out; on a phone every column stands in the line of a record.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Orders"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Orders",
+     "description": "Every order placed in Lumen Labs"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New order",
+      "main": true
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBar",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "control": "select",
+               "text": "Status",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTable",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Order",
+                "Customer",
+                "Status",
+                "Total",
+                ""
+               ],
+               "cells": [
+                [
+                 "#1042",
+                 "Acme Corp",
+                 "",
+                 "$1,240.00",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1041",
+                 "Blue Bakery",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 "$86.50",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1040",
+                 "Dana Lee",
+                 "",
+                 "$412.00",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1039",
+                 "Omar Haddad",
+                 {
+                  "control": "badge",
+                  "text": "Refunded"
+                 },
+                 "$59.90",
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "note": "1 to 20 of 312"
+            },
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Orders",
+     "description": "Every order placed in Lumen Labs"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New order",
+      "main": true
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBar",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTable",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Order",
+                "Customer",
+                "Total",
+                ""
+               ],
+               "cells": [
+                [
+                 "#1042",
+                 "Acme Corp",
+                 "$1,240.00",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1041",
+                 "Blue Bakery",
+                 "$86.50",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1040",
+                 "Dana Lee",
+                 "$412.00",
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "#1039",
+                 "Omar Haddad",
+                 "$59.90",
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "note": "1 to 20 of 312"
+            },
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Orders",
+     "description": "Every order placed in Lumen Labs"
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "New order",
+      "main": true
+     }
+    ]
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBar",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "button",
+               "text": "1 filter on",
+               "fill": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTable",
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "#1042",
+                "meta": [
+                 "Acme Corp",
+                 "$1,240.00"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "#1041",
+                "meta": [
+                 "Blue Bakery",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 "$86.50"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "#1040",
+                "meta": [
+                 "Dana Lee",
+                 "$412.00"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "#1039",
+                "meta": [
+                 "Omar Haddad",
+                 {
+                  "control": "badge",
+                  "text": "Refunded"
+                 },
+                 "$59.90"
+                ],
+                "end": [
+                 {
+                  "icon": "more"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ],
+           "divided": true
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "note": "1 to 20 of 312"
+            },
+            {
+             "spacer": true
+            },
+            {
+             "control": "pager"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

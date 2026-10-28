@@ -1,0 +1,490 @@
+{
+ "kind": "skeleton",
+ "title": "A record and its steps",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the record: the way back, its picture, its name, and on the line under the name its state, its kind and its code. The end of the page level holds only the actions open at that step. The step the record is at is the heavy word. The checks stand in a grid: two across at a desktop, where two parts share the width, and on a tablet, where each part takes the width, and one under another on a phone. Each is read as a title with its value under it, and only the value that is not normal is a badge. Every screen shows every step and every check; on a phone the steps stand one under another. On a phone the page level folds its actions into one *more* icon when they do not fit beside the way back, the picture and the title: here two buttons do not.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Customers"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant",
+      "bluebakery"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Reject"
+     },
+     {
+      "control": "button",
+      "text": "Approve",
+      "main": true
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "note": "Submitted"
+            },
+            {
+             "text": "In review"
+            },
+            {
+             "note": "Approved"
+            },
+            {
+             "note": "Live"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Identity",
+             "text": "Verified"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Bank",
+             "text": "Waiting",
+             "control": "badge"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Tax number",
+             "text": "Verified"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Verification"
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Profile",
+             "text": "Done"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Catalogue",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Payouts",
+             "text": "Not started"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Onboarding"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant",
+      "bluebakery"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Reject"
+     },
+     {
+      "control": "button",
+      "text": "Approve",
+      "main": true
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "note": "Submitted"
+            },
+            {
+             "text": "In review"
+            },
+            {
+             "note": "Approved"
+            },
+            {
+             "note": "Live"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Identity",
+             "text": "Verified"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Bank",
+             "text": "Waiting",
+             "control": "badge"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Tax number",
+             "text": "Verified"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Verification"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Profile",
+             "text": "Done"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Catalogue",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Payouts",
+             "text": "Not started"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Onboarding"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "default",
+     "title": "Blue Bakery",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "In review"
+      },
+      "Merchant",
+      "bluebakery"
+     ]
+    },
+    "actions": [
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "note": "Submitted"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "text": "In review"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "note": "Approved"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "note": "Live"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Identity",
+             "text": "Verified"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Bank",
+             "text": "Waiting",
+             "control": "badge"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Tax number",
+             "text": "Verified"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Verification"
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Profile",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Catalogue",
+             "text": "Done"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Payouts",
+             "text": "Not started"
+            },
+            {
+             "spacer": true
+            }
+           ]
+          }
+         ],
+         "label": "Onboarding"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

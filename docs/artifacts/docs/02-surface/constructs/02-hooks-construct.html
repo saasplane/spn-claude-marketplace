@@ -1,0 +1,142 @@
+<meta charset="utf-8">
+<title>Hooks — One Moment, For the Connector's Script</title>
+<!-- spn:doc
+{"id":"surface-hooks","variant":"construct","title":"Hooks — One Moment, For the Connector's Script","subtitle":"One moment wired, because the one rule here is about a script about to run.","lenses":["ARCHITECT","UX"],"status":"PLANNING","dependsOn":["surface-plugin","hook-set"],"summary":"This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says.","keywords":["hook","hooks.json","PreToolUse","matcher","entry","connector"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
+  <div class="sds-rail-title">Hooks — One Moment, For the Connector's Script</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks — One Moment, For the Connector's Script</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">UX designer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Hooks — One Moment, For the Connector's Script</h1>
+  <p class="sds-subtitle">One moment wired, because the one rule here is about a script about to run.</p>
+  <p class="sds-standfirst">This plugin wires exactly one moment of a session, the point where the Figma connector is about to run a script, and one tool, because its one rule is about what that script says. Read this page to see why one moment and one tool are enough here, and what the entry does with a call. It explains the single wired entry and its dispatcher.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>A script handed to the connector runs against a person's design file. The connector refuses some of what it is given and throws on the rest, and either answer arrives after the call. <strong>A rule that reads the script before the call is the only one that can save the call</strong>, so this plugin claims that moment, narrowed to the connector's script runner, and nothing else. Reading a file, running a command or ending a turn cannot put a bad script into the connector.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>the wiring</strong></td><td><code>hooks.json</code></td><td>the single file declaring what this plugin claims, at which moment, with which command and which timeout</td></tr>
+      <tr><td><strong>a call about to run</strong></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
+      <tr><td><strong>the matcher</strong></td><td><code>mcp__figma__use_figma</code></td><td>the one tool name this entry narrows to, so nothing else in a session reaches the chain at all</td></tr>
+      <tr><td><strong>the entry</strong></td><td></td><td>one declaration behind which every rule runs, rather than one declaration per rule</td></tr>
+      <tr><td><strong>the dispatcher</strong></td><td><code>pretooluse.ts</code></td><td>the single process the entry names, which hands the call to the check that reads it and returns the verdict</td></tr>
+      <tr><td><strong>the connector check</strong></td><td><code>figma-connector.ts</code></td><td>the rule that reads a <code>use_figma</code> script before the connector runs it</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>One moment, narrowed to one tool name, behind one command.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="430 22 239 409" style="max-width:239px" role="img" aria-label="The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="432" y="24" width="235" height="76" rx="3"/>
+    <text class="sds-label" x="448" y="50">a connector call about to run</text>
+    <text class="sds-note" x="448" y="69">mcp__figma__use_figma, and no</text>
+    <text class="sds-note" x="448" y="88">other tool</text>
+    <path class="sds-connector" d="M549.5 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="124">matched by</text>
+    <rect class="sds-box" x="432" y="140" width="235" height="76" rx="3"/>
+    <text class="sds-label" x="448" y="166">the one entry</text>
+    <text class="sds-note" x="448" y="185">hooks.json — one command, one</text>
+    <text class="sds-note" x="448" y="204">timeout</text>
+    <path class="sds-connector" d="M549.5 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="240">runs</text>
+    <rect class="sds-box" x="432" y="256" width="235" height="76" rx="3"/>
+    <text class="sds-label" x="448" y="282">the dispatcher</text>
+    <text class="sds-note" x="448" y="301">hands the call to the connector</text>
+    <text class="sds-note" x="448" y="320">check</text>
+    <path class="sds-connector" d="M549.5 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="356">returns</text>
+    <rect class="sds-box" x="432" y="372" width="235" height="57" rx="3"/>
+    <text class="sds-label" x="448" y="398">a verdict</text>
+    <text class="sds-note" x="448" y="417">a refusal, advice, or silence</text>
+  </svg>
+    <figcaption>The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The matcher is applied by the harness first, so a session that never draws in Figma never starts this plugin's process.",
+  "boxes": [
+    { "id": "a", "label": "a connector call about to run", "note": "mcp__figma__use_figma, and no other tool" },
+    { "id": "b", "label": "the one entry", "note": "hooks.json — one command, one timeout" },
+    { "id": "c", "label": "the dispatcher", "note": "hands the call to the connector check" },
+    { "id": "d", "label": "a verdict", "note": "a refusal, advice, or silence" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "matched by" },
+    { "from": "b", "to": "c", "label": "runs" },
+    { "from": "c", "to": "d", "label": "returns" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="one-moment-and-why-the-others-are-not-cl">One moment, and why the others are not claimed</h3>
+  <p>The moment a call is about to run is the only one that can still stop it, and a rule about a script's text has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.</p>
+  <h3 id="the-matcher-is-the-first-and-cheapest-fi">The matcher is the first and cheapest filter</h3>
+  <p>The entry narrows to the connector's script runner. Every other call a session makes never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.</p>
+  <h3 id="the-check-refuses-only-what-the-text-sho">The check refuses only what the text shows</h3>
+  <p>The connector check blanks comment and string bodies, then refuses a script that calls an API the connector does not support or one that throws there. It notes, and lets the call go, what the text cannot settle: a second page switch, and a call that passes no <code>skillNames</code>. It reads no file, calls no network and runs no command.</p>
+  <h3 id="a-check-that-throws-is-skipped-never-fat">A check that throws is skipped, never fatal</h3>
+  <p>A gate that crashes the chain removes every other gate with it, which is worse than any single miss. The dispatcher treats a check that throws as silence.</p>
+  <h3 id="the-wiring-names-the-plugin-root-never-a">The wiring names the plugin root, never a checkout</h3>
+  <p>The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin wires and why it wires one moment. It does not answer what a hook is — the moments a session offers, the payload a hook is handed, the verdict it returns rather than prints, and the rule that a hook always exits zero are <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a>. It does not answer what the connector accepts either.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
+    <tbody>
+      <tr><td>which moment this plugin claims, the tool it narrows to, and the single entry behind it</td><td>the payload, the verdict, the always-zero exit and the moments themselves<span class="sds-small">Owned by: <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a></span></td></tr>
+      <tr><td>that a connector script is read before the call</td><td>which APIs the connector supports, and how its work is carried out<span class="sds-small">Owned by: the foundation's Figma connector chapter</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><p><code>RD.DEVEX.FUNCTION.035</code></p><p>a rule reaches a write-time hook only where review would be too late</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a hook script is live on its next run, and the wiring file is not</p></td><td>MUST</td></tr>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-surface/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>

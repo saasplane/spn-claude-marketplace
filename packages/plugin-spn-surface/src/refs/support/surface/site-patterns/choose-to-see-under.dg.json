@@ -1,0 +1,258 @@
+{
+ "kind": "skeleton",
+ "title": "Choose to see, under",
+ "caption": "A DSSectionContainer, color BASE, holds one DSFeature at MEDIA_BOTTOM. Its mediaNode is a DSTabs at pageLevel CONTAINER with type PILL, grouped on its track, its names one or two words. The tabs only choose which panel is open, and the open tab's panel is the page's own node: the tab's line, one description that says what only this part says, then its picture at the feature's full width, every panel's picture one shape. On a phone the words, then the pills, which keep one row and scroll sideways, then the open tab's line, its description and its picture, which scrolls sideways in its own frame.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Which one is the reader's",
+                   "description": "Choose an option to see what it changes."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "tabs",
+                  "tabs": [
+                   "Part one",
+                   "Part two",
+                   "Part three",
+                   "Part four"
+                  ],
+                  "chosen": 0,
+                  "type": "PILL"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "title": "The open tab's line",
+                   "description": "One description that says what only this part says."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "the open tab's picture · full width",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Which one is the reader's",
+                   "description": "Choose an option to see what it changes."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "tabs",
+                  "tabs": [
+                   "Part one",
+                   "Part two",
+                   "Part three",
+                   "Part four"
+                  ],
+                  "chosen": 0,
+                  "type": "PILL"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "title": "The open tab's line",
+                   "description": "One description that says what only this part says."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "the open tab's picture · full width",
+                  "fill": true,
+                  "height": 8
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Which one is the reader's",
+                   "description": "Choose an option to see what it changes."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "tabs",
+                  "tabs": [
+                   "Part one",
+                   "Part two",
+                   "Part three",
+                   "Part four"
+                  ],
+                  "chosen": 0,
+                  "type": "PILL"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "head": {
+                   "pageLevel": "WIDGET",
+                   "title": "The open tab's line",
+                   "description": "One description that says what only this part says."
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "the open tab's picture · scrolls sideways",
+                  "fill": true,
+                  "height": 5
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

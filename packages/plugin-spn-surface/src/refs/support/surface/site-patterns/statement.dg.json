@@ -1,0 +1,174 @@
+{
+ "kind": "skeleton",
+ "title": "Statement",
+ "caption": "A DSSectionContainer at size MD, color BASE, holds one DSFeature at CONTAINER with textAlign CENTER: a title, a description and at most three text facts, read whole, with no items and no media. Where it states the problem the page ends, the section takes color DEFAULT with inset, because the kind of reading changes from its neighbours. On a phone it stands as it is.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Why this matters, in one sentence",
+                   "description": "The words a reader reads whole: the claim, with no items and no picture beside it.",
+                   "facts": [
+                    "First fact",
+                    "Second fact",
+                    "Third fact"
+                   ],
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Why this matters, in one sentence",
+                   "description": "The words a reader reads whole: the claim, with no items and no picture beside it.",
+                   "facts": [
+                    "First fact",
+                    "Second fact",
+                    "Third fact"
+                   ],
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "Why this matters, in one sentence",
+                   "description": "The words a reader reads whole: the claim, with no items and no picture beside it.",
+                   "facts": [
+                    "First fact",
+                    "Second fact",
+                    "Third fact"
+                   ],
+                   "textAlign": "CENTER"
+                  }
+                 }
+                ]
+               }
+              ]
+             }
+            }
+           ]
+          }
+         ],
+         "size": "MD",
+         "color": "BASE"
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

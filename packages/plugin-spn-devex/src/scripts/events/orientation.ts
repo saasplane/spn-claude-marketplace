@@ -1,0 +1,928 @@
+#!/usr/bin/env node
+// RESTATES: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and RD.DEVEX.WORKSPACE.020, and the
+// workspace-level argument that decided this shape. A change is made there first, then here.
+//
+// The orientation a session opens with — read from the ground, never from a typed list.
+//
+// A workspace file naming its members in prose goes stale the first time somebody clones an eighth
+// repo, so nothing here is typed: the script walks the root, reads each `sprepo.json` for the world
+// and the stack claim, checks each repo's wiring against what that claim implies, and lists the
+// workstreams in all three states.
+//
+//   SessionStart :  node orientation.ts --stdin   (the hook, from the event JSON on stdin)
+//   by hand      :  node orientation.ts [path]    (the same text on stdout, so you can read it)
+//
+// The first reply opens with the welcome, word for word, and one status line, whatever the prompt —
+// a question and a pasted handover included, since a prompt that carries work is exactly when an
+// agent cuts the welcome short. A session that opens with a status dump reads like a build log.
+// Three parts, in this order:
+//
+//   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
+//      stages and every role. The heading has two forms: a returning visit, and a first visit, which
+//      is a workspace with no workstream in any state.
+//   2. ONE status line — the repositories, the open workstreams, the backlog, and the other windows
+//      open here, each part dropped when it is zero. Unwired repositories, a stale plugin or a rung
+//      below an ordinary session add a clause to the same line, never a second line.
+//   3. the tables, for when you ask — the members, the law each carries, the wiring, and every
+//      workstream — then ONE open question, never a typed list of options. Beside it, and only when
+//      exactly one workstream is open and no second session is live under this root, a standing
+//      offer to carry that one on. Two offers is not a menu; three would be.
+//
+// `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
+// reads, carries all three, the note that says how to use them, and the short rules a reply must
+// follow (RD.DEVEX.AGENT.089), each with the reference that holds it whole.
+//
+// A workstream carries its state in its parent folder, so the three are read and shown together:
+// `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
+// folder name is assigned once in creation order and never reused, so it is an identity rather than
+// a priority — a workstream keeps it when it moves state.
+//
+// Day zero is the special case. No `sprepo.json` anywhere means there is no code to read, so the
+// agent asks instead of reading and the rung points at the `bootstrap` skill.
+//
+// Exit code is always 0 and every read is wrapped: a broken orientation must never cost a window.
+//
+// PORTED FROM `hooks/scripts/orientation.py`. Its output IS the session's first screen, so the port's
+// test is a byte-for-byte diff of the two against this workspace and against fixtures for the states
+// it is not in.
+
+import { execFileSync, spawn } from "node:child_process";
+import { readdirSync, realpathSync, statSync } from "node:fs";
+import { homedir } from "node:os";
+import { basename, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { arcIdsOf } from "../lib/workstream.ts";
+import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { windowStartLines } from "../lib/migration.ts";
+import { MIGRATIONS } from "../lib/migrations/index.ts";
+
+const MARKETPLACE = "saasplane";
+const CORE = "spn-devex";
+// The derivation `repo agent-sync` already performs, from the manifest and nothing else. A repo with
+// no claim at all — the marketplace itself is one — falls back to the core plugin alone. A stack is a
+// folder inside the domain plugin, so the stack claim selects no plugin (RD.DEVEX.AGENT.015). `APPS`
+// loads `spn-surface` with `spn-apps`, because apps' steps point at Surface's entry ref (RD.DEVEX.AGENT.039).
+// Each set reads in domain order: devex, surface, apps, infra.
+const WORLD_PLUGINS: Record<string, string[]> = {
+  FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"], APPS: [CORE, "spn-surface", "spn-apps"] };
+const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
+  "tool-results", "__pycache__", ".venv"]);
+const NODE_MANIFEST: Record<string, string> = { APPS: "spkind.json", INFRA: "spinfrapkg.json" };
+// The lifecycle, in the order a window reads it: what you can pick up, what is parked, what is done.
+// A workstream's state is its parent folder and nothing else.
+const STATES = WORKSTREAM_STATES;
+const NUMBERED = /^(\d{1,4})-(.+)$/;
+
+function readJson(path: string): Record<string, any> | null {
+  try { return JSON.parse(read(path)); } catch { return null; }
+}
+
+const LETTER = /[\p{L}_]/u;
+
+/**
+ * Where a hyphenated word may be broken, the way Python's `textwrap` breaks one.
+ *
+ * THIS IS NOT A DETAIL. `textwrap.wrap` defaults to `break_on_hyphens=True`, so it splits
+ * `011-coverage-proof` after `coverage-` and puts `proof` on the next line. A wrapper that keeps
+ * words whole produces different output from the incumbent on the one line a reader scans for a
+ * workstream number, and the diff that proves this port faithful would fail on it.
+ *
+ * The rule, restated from `wordsep_re`: break after a hyphen when two letters precede it, or a
+ * letter-hyphen-letter does, AND a letter follows. So `011-` never breaks — a digit is not a letter.
+ */
+function hyphenChunks(word: string): string[] {
+  const out: string[] = [];
+  let start = 0;
+  for (let i = 0; i < word.length; i += 1) {
+    if (word[i] !== "-") continue;
+    const before = word.slice(0, i);
+    const okBefore = new RegExp(`${LETTER.source}{2}$`, "u").test(before)
+                  || new RegExp(`${LETTER.source}-${LETTER.source}$`, "u").test(before);
+    const okAfter = new RegExp(`^${LETTER.source}-?${LETTER.source}`, "u").test(word.slice(i + 1));
+    if (okBefore && okAfter) { out.push(word.slice(start, i + 1)); start = i + 1; }
+  }
+  out.push(word.slice(start));
+  return out.filter(Boolean);
+}
+
+/** Greedy word wrap, the way Python's `textwrap.wrap` does it — hyphen breaks included. */
+function wrap(text: string, width: number): string[] {
+  const chunks: string[] = [];
+  for (const piece of text.split(/(\s+)/)) {
+    if (!piece) continue;
+    if (/^\s+$/.test(piece)) chunks.push(piece.replace(/\s/g, " "));
+    else chunks.push(...hyphenChunks(piece));
+  }
+  const out: string[] = [];
+  let line: string[] = [];
+  let length = 0;
+  const flush = () => {
+    while (line.length && /^\s+$/.test(line[line.length - 1])) length -= line.pop()!.length;
+    if (line.length) out.push(line.join(""));
+    line = [];
+    length = 0;
+  };
+  for (const chunk of chunks) {
+    if (!line.length && /^\s+$/.test(chunk)) continue;    // whitespace never opens a line
+    if (length + chunk.length <= width) { line.push(chunk); length += chunk.length; continue; }
+    flush();
+    if (/^\s+$/.test(chunk)) continue;
+    line.push(chunk);
+    length = chunk.length;
+  }
+  flush();
+  return out;
+}
+
+function hasLaw(path: string): boolean {
+  return isFile(join(path, "sprepo.json"));
+}
+
+/**
+ * The folder the sibling checkouts sit in. A child session is rooted in one member, so the walk goes
+ * up: the first ancestor carrying a workspace's `.spndevex/`, else the first with a member under it,
+ * else where you started.
+ */
+export function workspaceRootOf(start: string): string {
+  let path = resolve(start);
+  const seen: string[] = [];
+  for (;;) {
+    seen.push(path);
+    if (isDir(join(path, DEVEX)) && isWorkspaceDevex(readdirSync(join(path, DEVEX)))) return path;
+    const up = resolve(path, "..");
+    if (up === path) break;
+    path = up;
+  }
+  for (const candidate of seen)
+    if (listdir(candidate).some((d) => hasLaw(join(candidate, d)))) return candidate;
+  return resolve(start);
+}
+
+/**
+ * A member is a checkout sitting beside the others. Its law is `sprepo.json`; a member without one is
+ * an artifact surface rather than a governed repo, and says so.
+ */
+function members(root: string): Array<[string, string]> {
+  const out: Array<[string, string]> = [];
+  for (const name of listdir(root)) {
+    const path = join(root, name);
+    if (!isDir(path)) continue;
+    if (hasLaw(path) || isDir(join(path, ".git"))) out.push([name, path]);
+  }
+  return out;
+}
+
+/** World, stack claim and infra pins — from the manifest, never from the folder name. */
+function lawOf(path: string): { world: string | null; stack: string | null; pins: string[] } {
+  const manifest = readJson(join(path, "sprepo.json")) ?? {};
+  const config = manifest.config ?? {};
+  const pins: string[] = [];
+  for (const [role, key] of [["org", "organization"], ["plt", "platform"]]) {
+    const entry = (config.infra ?? {})[key] ?? {};
+    if (!entry.package) continue;
+    pins.push(`${role} ${basename(entry.package)}@${entry.version || "path"}`);
+  }
+  return { world: manifest.type ?? null, stack: config.stack ?? null, pins };
+}
+
+function expectedPlugins(world: string | null): string[] {
+  return WORLD_PLUGINS[world ?? ""] ?? [CORE];
+}
+
+function enabledPlugins(path: string): Set<string> {
+  const settings = readJson(join(path, ".claude", "settings.json")) ?? {};
+  return new Set(Object.entries(settings.enabledPlugins ?? {})
+    .filter(([, on]) => on).map(([key]) => key.split("@")[0]));
+}
+
+/**
+ * A node declares itself. `spkind.json` for an apps node, `spinfrapkg.json` for an estate one — a
+ * per-world question, never a per-stack one.
+ */
+function countNodes(path: string, world: string | null): number | null {
+  const manifest = NODE_MANIFEST[world ?? ""];
+  if (!manifest) return null;
+  const base = resolve(path);
+  const baseDepth = base.split(sep).length;
+  let found = 0;
+  const stack = [base];
+  while (stack.length) {
+    const dir = stack.pop()!;
+    let entries: string[];
+    try { entries = readdirSync(dir); } catch { continue; }
+    if (dir.split(sep).length - baseDepth > 3) continue;
+    if (entries.includes(manifest)) found += 1;
+    for (const entry of entries) {
+      if (SKIP.has(entry) || entry.startsWith(".")) continue;
+      const next = join(dir, entry);
+      if (isDir(next)) stack.push(next);
+    }
+  }
+  return found;
+}
+
+function newest(paths: string[]): number {
+  const stamps: number[] = [];
+  for (const path of paths) {
+    try { stamps.push(statSync(path).mtimeMs / 1000); } catch { continue; }
+  }
+  return stamps.length ? Math.max(...stamps) : 0;
+}
+
+function treeFiles(path: string): string[] {
+  const out: string[] = [];
+  const stack = [path];
+  while (stack.length) {
+    const dir = stack.pop()!;
+    let entries: string[];
+    try { entries = readdirSync(dir); } catch { continue; }
+    for (const entry of entries) {
+      const full = join(dir, entry);
+      if (isDir(full)) { if (!SKIP.has(entry)) stack.push(full); }
+      else out.push(full);
+    }
+  }
+  return out;
+}
+
+/**
+ * `042-widget-pricing` reads as number `042`, subject `widget-pricing`. A folder carrying no number
+ * is still a workstream — the older shapes have none.
+ *
+ * The example is deliberately not a real workstream. This file discovers them by reading
+ * `.spndevex/`, so naming one here would be a second answer competing with the folders.
+ */
+function numbered(folder: string): [string, string] {
+  const match = NUMBERED.exec(folder);
+  return match ? [match[1], match[2]] : ["", folder];
+}
+
+type Workstream = { folder: string; number: string; subject: string; state: string;
+                    page: string; arcs: number; when: number; legacy: string };
+
+/**
+ * Every workstream and the state it sits in, with the count of its arcs kept as data.
+ *
+ * One window restructures `.spndevex/` and another may open before it lands, so
+ * `sessions/{state}/{subject}/`, the container's older name, is read the same way and marked as legacy.
+ */
+export function workstreams(root: string): Workstream[] {
+  const found = new Map<string, Workstream>();
+  for (const state of STATES)
+    for (const [base, legacy] of [[workstreamsDir(root, state), ""],
+                                  [legacyWorkstreamsDir(root, state), `${SESSIONS}/`]] as const)
+      for (const folder of listdir(base)) {
+        const path = join(base, folder);
+        if (!isDir(path) || found.has(folder)) continue;
+        const files = treeFiles(path);
+        const [number, subject] = numbered(folder);
+        found.set(folder, {
+          folder, number, subject, state,
+          // BOTH OF THESE READ ONE LEVEL, NOT THE TREE. `treeFiles` walks everything under the
+          // folder, and a workstream's `notes/retired/` holds whole pockets that other repositories
+          // gave up — 51 approach pages in one case, every one of them sorting before the
+          // workstream's own. A recursive `find` therefore linked a retired page belonging to
+          // another repo, and the arc count matched a template rather than the arcs.
+          page: (() => {
+            const own = listdir(path).filter(isApproachPage).sort()[0];
+            return own ? join(path, own) : "";
+          })(),
+          arcs: arcIdsOf(path).length,
+          when: newest(files) || newest([path]),
+          legacy,
+        });
+      }
+  return [...found.values()].sort((a, b) => {
+    const left = a.number || "zzz", right = b.number || "zzz";
+    if (left !== right) return left < right ? -1 : 1;
+    return a.subject < b.subject ? -1 : a.subject > b.subject ? 1 : 0;
+  });
+}
+
+/** `0.10.0` sorts above `0.2.0`, which a string comparison gets backwards. */
+function versionKey(name: string): number[] {
+  return name.split(".").map((part) => (/^\d+$/.test(part) ? Number(part) : -1));
+}
+
+function compareVersions(a: string, b: string): number {
+  const left = versionKey(a), right = versionKey(b);
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    const l = left[i] ?? -Infinity, r = right[i] ?? -Infinity;
+    if (l !== r) return l < r ? -1 : 1;
+  }
+  return 0;
+}
+
+/**
+ * A tree's content, ignoring what a copy legitimately changes: byte-compiled caches, and the
+ * timestamps a copy rewrites. Sizes and names are enough to catch an edit that has not been
+ * installed yet, which is the whole question.
+ */
+function digest(path: string): string {
+  const base = resolve(path);
+  const out: string[] = [];
+  const stack = [base];
+  while (stack.length) {
+    const dir = stack.pop()!;
+    let entries: string[];
+    try { entries = readdirSync(dir).sort(); } catch { continue; }
+    for (const entry of entries) {
+      const full = join(dir, entry);
+      let stat;
+      try { stat = statSync(full); } catch { continue; }
+      if (stat.isDirectory()) { if (!SKIP.has(entry)) stack.push(full); }
+      else out.push(`${relative(base, full)}\u0000${stat.size}`);
+    }
+  }
+  return out.sort().join("\n");
+}
+
+/**
+ * The wiring this window is running, when it is older than what is installed.
+ *
+ * `cacheState` above answers a different question — whether the cache was built from current source
+ * — and it carries the assumption this one tests: *only the newest cache directory is the one a
+ * window loads*. That is true of the NEXT window. A window loads whatever was installed the moment
+ * it started, and it keeps that copy for its whole life, so a session running while somebody else
+ * installs is reading a directory that is no longer the newest.
+ *
+ * THE VERSION IS READ OFF THIS FILE'S OWN PATH, because that is the one thing a running hook knows
+ * for certain about itself. An installed copy lives at `…/cache/<marketplace>/<plugin>/<version>/`,
+ * so the path names the version that answered. Running from source there is no such segment, and
+ * this returns null rather than guessing — a checkout is not behind an install, it IS the source.
+ *
+ * `RD.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
+ * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
+ */
+function loadedBehind(): { plugin: string; loaded: string; newest: string } | null {
+  let here: string;
+  try { here = fileURLToPath(import.meta.url).replace(/\\/g, "/"); }
+  catch { return null; }
+  // THE CACHE ROOT COMES FROM THE PATH TOO, rather than from `homedir()`. The copy that answered
+  // knows where it lives, and deriving the root removes an assumption about where installs are kept.
+  const at = /^(.*\/plugins\/cache)\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(here);
+  if (!at) return null;                                  // running from source
+  const [, cacheRoot, , plugin, loaded] = at;
+  const cached = join(cacheRoot, at[2], plugin);
+  // A directory carrying `.orphaned_at` is a previous install nothing loads, and reading one is how
+  // a clock came to report a window behind a version that had been retired.
+  const versions = listdir(cached).filter((v) => !isFile(join(cached, v, ".orphaned_at")));
+  if (!versions.length) return null;
+  const newest = versions.reduce((a, b) => (compareVersions(a, b) >= 0 ? a : b));
+  if (compareVersions(newest, loaded) <= 0) return null;
+  return { plugin, loaded, newest };
+}
+
+/**
+ * Whether the cache a live window is judged by matches the source it was built from.
+ *
+ * The install directory is shared across the machine and the version moves, so the version is
+ * globbed rather than named, and a directory carrying `.orphaned_at` is skipped — it is a previous
+ * install nothing loads. Any surprise reads as unknown rather than as current.
+ */
+export function cacheState(root: string, pluginNames: string[]): string {
+  // The marketplace is registered in `settings.local.json` on this machine and could be in either
+  // file, so both are read and the local one wins — it is the per-developer override.
+  const sources: Record<string, any> = {};
+  for (const name of ["settings.json", "settings.local.json"])
+    Object.assign(sources, (readJson(join(root, ".claude", name)) ?? {}).extraKnownMarketplaces ?? {});
+  let pairs: Array<[string, string | null]> = Object.entries(sources)
+    .map(([market, entry]) => [market, ((entry ?? {}).source ?? {}).path ?? null]);
+  if (!pairs.length) {
+    // A marketplace registered at user scope is invisible to this file, and an empty loop below
+    // would return `cache current` having compared nothing. The workspace still holds the source as
+    // a member, so find the repo carrying these plugins and use that. Failing that, say so — a green
+    // nobody earned is worse than an unknown.
+    const holds = listdir(root)
+      .map((name) => join(root, name))
+      .filter((path) => pluginNames.every((plugin) => isDir(join(path, "plugins", plugin))));
+    pairs = holds.length ? [[MARKETPLACE, holds[0]]] : [];
+  }
+  if (!pairs.length) return "cache unknown — no marketplace source";
+  const stale: string[] = [];
+  for (const [market, source] of pairs) {
+    if (!source || !isDir(source)) return "cache unknown";
+    // THE MANIFEST SAYS WHERE A PLUGIN'S BYTES ARE, AND GUESSING THE LAYOUT IS WHAT BROKE THIS.
+    // `marketplace.json` declares `./plugins/<name>/src`, and this compared the cache against
+    // `plugins/<name>` — a folder holding `src/` AND `tests/`, which the cache never contains. The
+    // two could not match, so every run reported every plugin stale whatever their real state,
+    // and a stop hook told each sitting to reinstall work that was already installed. A check that
+    // is always red is read as noise and then obeyed anyway. Read the declared source instead.
+    const declared: Record<string, string> = {};
+    for (const entry of ((readJson(join(source, ".claude-plugin", "marketplace.json")) ?? {}).plugins ?? []))
+      if (entry?.name && typeof entry.source === "string") declared[entry.name] = entry.source;
+
+    for (const plugin of pluginNames) {
+      const live = join(source, declared[plugin] ?? join("plugins", plugin));
+      const cached = join(homedir(), ".claude", "plugins", "cache", market, plugin);
+      const versions = listdir(cached).filter((v) => !isFile(join(cached, v, ".orphaned_at")));
+      if (!isDir(live) || !versions.length) return "cache unknown";
+      // Only the newest cache directory is the one a window loads. Comparing every retained version
+      // reported stale forever, because an older version differs from source by definition — which is
+      // the same useless answer as always reporting current.
+      const latest = versions.reduce((a, b) => (compareVersions(a, b) >= 0 ? a : b));
+      if (digest(join(cached, latest)) !== digest(live)) stale.push(plugin);
+    }
+  }
+  if (stale.length) return "cache stale — " + [...new Set(stale)].sort().join(" ");
+  return "cache current";
+}
+
+type Repo = { name: string; path: string; world: string | null; stack: string | null;
+              pins: string[]; want: string[]; have: Set<string>; wired: boolean; nodes: number | null };
+
+/**
+ * Which rung of the ladder the ground says you are on. The offer depends on it, so a partner in week
+ * one and a partner in month six get different sessions. Rungs past building need the machine store
+ * and the network, so this stops where the workspace can answer.
+ */
+function rung(repos: Repo[]): [number, string] {
+  if (!repos.length) return [0, "empty — no sprepo.json anywhere"];
+  const apps = repos.filter((r) => r.world === "APPS");
+  if (!apps.length) return [1, "estate only — no APPS repo yet"];
+  const withoutConcept = apps.filter((r) => !isFile(join(r.path, "CONCEPT.md")));
+  if (withoutConcept.length)
+    return [2, "an APPS repo carries no CONCEPT.md — " + withoutConcept.map((r) => r.name).join(" ")];
+  if (apps.every((r) => (r.nodes ?? 0) < 3)) return [3, "concept present, very few nodes below it"];
+  return [4, "building — apps and packages present"];
+}
+
+/**
+ * Your Claude registration, so the session greets you rather than an empty chair.
+ *
+ * A greeting is chat, and this is the one place the name belongs — it is never written into a
+ * document, a workstream page or any file the repo keeps. Read-only, one field, and a failure of any
+ * kind just means the session says hello without it.
+ */
+function developerName(): string | null {
+  try {
+    const name = String(((readJson(join(homedir(), ".claude.json")) ?? {}).oauthAccount ?? {}).displayName ?? "");
+    const first = name.trim().split(/\s+/)[0] ?? "";
+    return first.length > 1 && first.length <= 20 && /^[a-z]+$/i.test(first.replace(/-/g, "")) ? first : null;
+  } catch { return null; }
+}
+
+/**
+ * The welcome, word for word as it was approved. Only the heading varies: a first visit is a
+ * workspace with no workstream in any state, which the ground already says, so the plugin keeps no
+ * state of its own to tell the two apart. With no name, the name's clause drops and nothing else.
+ *
+ * The parts under the tagline are held apart by a spacer paragraph, not a blank line: VS Code's chat
+ * panel draws a blank line between paragraphs as almost no gap, so the four lines read as one block.
+ * The array keeps its shape — a part at every even index — because the stop hook reads the parts by
+ * position.
+ *
+ * The roles line has two variants. Every workspace hears the team's roles grouped by function. Only a
+ * builder's workspace — the one `SPN_DEVEX_AGENT_WORKSPACE` names — also hears the partner view, by what
+ * it guards: that view speaks for the people who build on what the builders publish, and it is no seat
+ * on a partner's team (RD.DEVEX.WORKSPACE.283).
+ */
+export const WELCOME_SPACER = "\n&nbsp;\n";
+
+/**
+ * The line the agent reads first, above the welcome. THE INSTRUCTION STANDS BEFORE WHAT IT GOVERNS:
+ * this text runs past twelve thousand characters, and Claude Code keeps a session-start text that long
+ * in a file and shows the agent only its first 2 KB. Placed after the tables, the instruction fell
+ * outside that preview, and the agent printed a welcome it had been told nothing about.
+ */
+export const WELCOME_LEAD =
+  "Your first reply opens with the welcome below, word for word and whole, before any tool call and before " +
+  "any other text, whatever the prompt — a question and a pasted handover included: the heading, the italic " +
+  "line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after " +
+  "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
+
+/** Whether `SPN_DEVEX_AGENT_WORKSPACE` is set and names this workspace, both resolved to their real paths. */
+export function isBuilderWorkspace(root: string): boolean {
+  const named = process.env.SPN_DEVEX_AGENT_WORKSPACE;
+  if (!named) return false;
+  try { return realpathSync(named) === realpathSync(root); } catch { return false; }
+}
+
+export function welcome(who: string | null, firstVisit: boolean, builder = false): string[] {
+  const name = who ? `, ${who}` : "";
+  return [
+    firstVisit
+      ? `# 👋 Welcome to SaaS Plane${name}. Glad you're here!`
+      : `# 👋 Good to see you again${name}. Welcome back to SaaS Plane!`,
+    "",
+    "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
+    WELCOME_SPACER,
+    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    WELCOME_SPACER,
+    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    WELCOME_SPACER,
+    `👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). ${builder ? "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. " : ""}Tell me whose view you need, and I'll bring it.`,
+  ];
+}
+
+/**
+ * The rules a reply must follow, in short form (RD.DEVEX.AGENT.089). They go into what the agent reads
+ * and never into the developer's pane.
+ *
+ * A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So a
+ * rule held only in a reference does not reach that reply. These lines are what carries it there.
+ *
+ * EACH LINE IS A POINTER, NEVER A SECOND COPY. It says what to do in one or two sentences and ends with
+ * `→`, the path of its reference from the plugin's root, `§`, and the heading that holds the rule whole.
+ * The test opens every file and looks for every heading, so a renamed section fails there.
+ *
+ * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to
+ * judge, and the last line says so.
+ */
+export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply, and each line names the reference that holds its rule whole";
+
+export const SHORT_RULES: string[] = [
+  "Your lenses take part in a discussion about a shape, at any moment of a workstream, also in the middle of a run. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
+  "Three signs say how many views speak: the choice crosses a repository, changes what a partner builds on, or sets a pattern others follow. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
+  "No sign: the owning view, in one sentence. One sign: the architect's and the owning view. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
+  "Show each view in its own voice, as a colleague would say it, never a slogan; on a card, one or two sentences, no option by its letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
+  "Write every reply as one person talking to another: full sentences, a table only for facts; one meaning-icon opens it; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
+  "A decision that sets a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
+  "Structure comes before content: design the units, names and grouping, and show them first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
+  "**Needs you** opens a reply in two cases only: it raises a card, in full, once; or it ends or stops the work, one line per open card. → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
+  "The arcs of a workstream are yours to manage; a new workstream is always the developer's decision. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
+  "No script tells you a prompt opens a discussion about a shape; you decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
+];
+
+/** The short rules as the block the agent reads: the heading, then one list line for each rule. */
+export function shortRules(): string {
+  return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
+}
+
+/**
+ * The always-loaded index: the ask router, one line for each kind of ask (RD.DEVEX.AGENT.102).
+ *
+ * IT IS READ FROM THE REF, NEVER TYPED HERE. `refs/devex/agent/way.md` restates the way chapter and the
+ * router, and `restates check` holds it to the book; a copy in this file would be a second home that
+ * drifts. The ref sits two folders above this script both in `scripts/events/` and in `dist/events/`,
+ * because the installed plugin IS `src/`.
+ *
+ * EVERYTHING ELSE IS READ ON DEMAND. A lens file is loaded only for the task that calls for it, so a
+ * window starts with this index and nothing more. A missing ref costs the index and never the window:
+ * the block is dropped and orientation carries on.
+ */
+export function wayIndex(): string {
+  let text: string;
+  try { text = read(fileURLToPath(new URL("../../refs/devex/agent/way.md", import.meta.url))); }
+  catch { return ""; }
+  if (!text) return "";
+  const body = text.replace(/<!--[\s\S]*?-->\s*/g, "").trim();
+  // THE ROUTER ONLY. The way's seventeen principles are read on asking, so the index carries the one line
+  // per kind of ask and says where the rest is.
+  const router = body.indexOf("## The ask router");
+  if (router < 0) return "";
+  return "## The SaaS Plane way, and the ask router\n\n"
+    + "The way's seventeen principles are read on asking: `refs/devex/agent/way.md`. A lens is at `refs/devex/agent/lenses/<lens>.md`.\n\n"
+    // One level down, so the router sits under the context's own headings rather than beside its title.
+    + body.slice(router).replace(/^(#{1,5}) /gm, "#$1 ") + "\n\n";
+}
+
+/**
+ * Where a plugin's own commands are written down, in one line: each plugin's `refs/commands.md`, which the build
+ * generates from its commands. spn-devex's own is printed whole only where it is under 3 KB, since a window
+ * carries what the first reply needs and nothing else; a longer one is read on asking.
+ */
+function commandsRefBlock(): string {
+  const line = "Each plugin writes its commands in `refs/commands.md` (spn-devex, spn-apps, spn-surface) — read it before a window's first write of a command.\n\n";
+  let own = "";
+  try { own = read(fileURLToPath(new URL("../../refs/commands.md", import.meta.url))); } catch { return line; }
+  return Buffer.byteLength(own) < 3072 ? line + own.trim() + "\n\n" : line;
+}
+
+type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
+                unwired: number; stale: string | null; behind: string | null; late: string[]; rung: string | null };
+
+/**
+ * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
+ * adds a clause to the same line — a second line is how a status line turns back into a dump.
+ */
+export function statusLine(s: Status): string {
+  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  const parts = [plural(s.repos, "repo", "repos")];
+  if (s.open.length)
+    parts.push(`${plural(s.open.length, "workstream")} open `
+      + `(${s.open.map((w) => w.number || w.subject).join(", ")})`);
+  if (s.backlog) parts.push(`${s.backlog} in backlog`);
+  if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
+  if (s.unwired) parts.push(`${s.unwired} unwired`);
+  if (s.stale) parts.push(s.stale);
+  if (s.behind) parts.push(s.behind);
+  parts.push(...s.late);
+  if (s.rung) parts.push(s.rung);
+  return parts.join(" · ");
+}
+
+/**
+ * Every ancestor of this process. The hook runs UNDER a session, so without this the session asking
+ * the question counts itself as somebody else working here.
+ */
+function ownChain(): Set<number> {
+  const chain = new Set<number>();
+  let pid = process.pid;
+  for (let i = 0; i < 12; i += 1) {
+    chain.add(pid);
+    let out: string;
+    try { out = execFileSync("ps", ["-o", "ppid=", "-p", String(pid)], { encoding: "utf8", timeout: 2000 }).trim(); }
+    catch { break; }
+    if (!/^\d+$/.test(out) || Number(out) <= 1) break;
+    pid = Number(out);
+  }
+  return chain;
+}
+
+/**
+ * How many other Claude sessions are live under this workspace right now.
+ *
+ * A session announces itself nowhere on disk, so the honest check is the running one: which `claude`
+ * processes are alive, and which of those are working below this root. It answers for the workspace
+ * rather than for one workstream — the conservative direction, since it withholds the offer to resume
+ * more often than it should and never less.
+ *
+ * `comm` rather than the full command line, deliberately: a process listing that prints arguments
+ * prints whatever a developer typed beside them.
+ */
+function sessionsHere(root: string): number {
+  try {
+    const mine = ownChain();
+    const listing = execFileSync("ps", ["-eo", "pid=,comm="], { encoding: "utf8", timeout: 3000 });
+    let others = 0;
+    for (const line of listing.split("\n")) {
+      const parts = line.trim().split(/\s+(.+)/);
+      if (parts.length < 2 || !/^\d+$/.test(parts[0])) continue;
+      const pid = Number(parts[0]);
+      if (mine.has(pid) || basename(parts[1].trim()) !== "claude") continue;
+      let cwd: string;
+      try { cwd = execFileSync("lsof", ["-a", "-p", String(pid), "-d", "cwd", "-Fn"], { encoding: "utf8", timeout: 3000 }); }
+      catch { continue; }
+      for (const entry of cwd.split("\n"))
+        if (entry.startsWith("n")) {
+          let real: string;
+          try { real = realpathSync(entry.slice(1)); } catch { real = entry.slice(1); }
+          if (real.startsWith(root)) { others += 1; break; }
+        }
+    }
+    return others;
+  } catch { return 0; }                             // never cost a window
+}
+
+/**
+ * The last thing a session says before you type.
+ *
+ * Two offers and no menu: the open question you arrived with, and — only when exactly one workstream
+ * is open — the standing one, by name. Two open workstreams would make naming one a choice on your
+ * behalf, which is the thing this script refuses to do.
+ *
+ * The standing offer is withheld the moment another session is live under this root. Two windows on
+ * one workstream is how an approach page grows two authors, and a cheap check is worth more than the
+ * convenience it costs.
+ */
+function closingLines(streams: Workstream[], others: number): string[] {
+  const ask = "So — what are we building?";
+  const openNow = streams.filter((w) => w.state === "open");
+  if (openNow.length !== 1) return ["", ask, ""];
+  const only = openNow[0];
+  const name = [only.number, only.subject].filter(Boolean).join(" ");
+  const offer = others
+    ? `${name} is open, but ${others} other session${others > 1 ? "s are" : " is"} open in this ` +
+      `workspace. I will not touch it unless you ask me to.`
+    : `Or ask me to continue ${name}, and I will start where we stopped.`;
+  return ["", ask, "", ...wrap(offer, 84), ""];
+}
+
+export const MIGRATIONS_HEADING = "### Plugin migrations — before any other work";
+
+/**
+ * The plugin's migrations the workspace's ledger does not hold, for the agent alone and once: a
+ * window's start is where they are compared, and what is pending runs before anything the prompt
+ * asks (01-plugins.md § A release carries its migration, and a window runs what is pending first).
+ * Nothing where nothing waits, and nothing a broken read could cost the window.
+ */
+export function migrationLines(root: string): string[] {
+  let found: string[] = [];
+  try { found = windowStartLines(root, MIGRATIONS); } catch { return []; }
+  if (!found.length) return [];
+  return [MIGRATIONS_HEADING, "",
+    "Each one runs before anything the prompt asks, in id order. Say so in one line under the status line, then apply it.", "",
+    ...found, ""];
+}
+
+/**
+ * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
+ * status line — and `context` is what the agent reads — the same, then the tables, the closing
+ * question and the note.
+ */
+export function orient(root: string, cwd: string): [message: string, context: string] {
+  const repos: Repo[] = members(root).map(([name, path]) => {
+    const { world, stack, pins } = lawOf(path);
+    const want = expectedPlugins(world);
+    const have = enabledPlugins(path);
+    return { name, path, world, stack, pins, want, have,
+             wired: want.every((p) => have.has(p)), nodes: countNodes(path, world) };
+  });
+  const who = developerName();
+  const governed = repos.filter((r) => r.world);
+  const streams = workstreams(root);
+  const [level, why] = rung(governed);
+  // THE WELCOME IS THE AGENT'S OWN, AND IT IS TYPED HERE ON PURPOSE. Do not read it from a repo. This
+  // plugin runs in a partner's workspace, where the foundation book is not a member and absence is
+  // how access control works — so a banner sourced from that book would render empty for the reader
+  // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
+  const greeting = welcome(who, streams.length === 0, isBuilderWorkspace(root));
+  const clean = (lines: string[]) => lines.map((line) => line.replace(/[ \t]+$/, "")).join("\n");
+
+  if (!governed.length) {
+    // A DAY-0 WALK IS RESUMED, NEVER RESTARTED. The answers land in a workstream before the first
+    // repository exists, so a window lost mid-walk reopens on this same screen with three answers
+    // already on disk. Offering the door again would ask somebody to name their organization twice
+    // — and the second answer is the one that reaches the manifests.
+    const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
+    const message = clean(greeting) + "\n" + WELCOME_SPACER + "\n" +
+      (started
+        ? "You started a platform here and we did not finish. No repository exists yet, and " +
+          "your answers are on disk where you left them — `" + relative(root, join(workstreamsDir(root, "open"), started.folder, ARCS)) +
+          "/`.\n\n" +
+          "I will read what you already answered, tell you where we stopped, and pick up at the " +
+          "next question. Nothing you decided is asked again.\n\n" +
+          "Shall we carry on?\n"
+        : "This folder is empty, which is a good place to start. There is nothing to read " +
+          "yet, so nothing here is decided.\n\n" +
+          "Say yes and I mint the workspace, open a workstream to hold your answers, then " +
+          "ask the estate questions one at a time. Your answers name every account, package " +
+          "and prefix that comes after, and each one lands in a file as you give it — so " +
+          "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
+          "Would you like to start a new platform?\n");
+    const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
+      "so do not orient — open your first reply with the welcome above, word for word and whole, whatever the prompt, then " +
+      "load the `bootstrap` skill and walk it. " +
+      (started
+        ? "A day-0 walk is already open here: `" + relative(root, join(workstreamsDir(root, "open"), started.folder)) +
+          "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
+          "carry an answer for, and never ask again for one it holds.\n"
+        : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
+          "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
+          "opens the workstream that holds the answers, before the first question is asked.\n");
+    return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
+  }
+
+  const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
+  const floor = Object.entries(settings.enabledPlugins ?? {}).filter(([, on]) => on).map(([k]) => k);
+  const plugins = [...new Set(floor.map((k) => k.split("@")[0]))].sort();
+  const cache = plugins.length ? cacheState(root, plugins) : null;
+  const behind = loadedBehind();
+  const others = sessionsHere(root);
+  const status = statusLine({
+    repos: repos.length,
+    open: streams.filter((w) => w.state === "open"),
+    backlog: streams.filter((w) => w.state === "backlog").length,
+    others,
+    unwired: repos.filter((r) => !r.wired).length,
+    stale: cache?.startsWith("cache stale") ? cache : null,
+    behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
+    late: lateClauses(repos.flatMap((r) => lateBranch(r.name, r.path) ?? [])),
+    // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
+    rung: level < 4 ? `rung ${level}: ${why}` : null,
+  });
+  const message = clean([...greeting, WELCOME_SPACER, status]);
+
+  // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
+  // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
+  // reply needs and nothing else (RD.DEVEX.AGENT.105).
+  const lines: string[] = [];
+  if (behind)
+    lines.push(`⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
+      "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
+  if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
+  lines.push(...migrationLines(root));
+  lines.push(...closingLines(streams, others));
+  const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
+    "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
+    "or any named next step replaces it — under the status line, one line: *Picking up N<nn> — <the arc's title>, " +
+    "at row <n>: <what the row does>.* Then do the first thing, never by asking again. A handover block names a " +
+    "`model:`: before any action, compare it with the model your system prompt names. On a mismatch, one line " +
+    "under the status line names both and how to switch — the model picker or the `/model` command — and nothing " +
+    "runs until the developer switches or says to go on. Its effort is a note for the picker; nothing compares it. " +
+    "If the row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark " +
+    "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
+    "never lettered options or a `Q<n>` card. Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any " +
+    "tool's default: hand a page over as its full file path.\n";
+  return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
+}
+
+/** Whether a folder is a git checkout: `.git` is a folder, or a file where the checkout is a worktree. */
+function isCheckout(path: string): boolean {
+  return isDir(join(path, ".git")) || isFile(join(path, ".git"));
+}
+
+/** Runs git in a member and returns its output, or null when it fails. */
+function gitIn(path: string, args: string[]): string | null {
+  try { return execFileSync("git", ["-C", path, ...args], { encoding: "utf8", timeout: 2000, stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+  catch { return null; }
+}
+
+/** The branches a pull request promotes to: a checkout on one of these is never told to rebase. */
+const PERMANENT = ["develop", "qa", "uat", "main"];
+
+/** A member whose branch is behind its base: the repository, the branch, how many commits, and the base. */
+export type LateBranch = { name: string; branch: string; count: number; base: string };
+
+/**
+ * A member's branch that is behind its base, or null. The base is `origin/develop` unless the branch's
+ * git config records another in `spnBase`. A permanent branch, a detached HEAD and a branch that is not
+ * behind say nothing.
+ */
+export function lateBranch(name: string, path: string): LateBranch | null {
+  if (!isCheckout(path)) return null;
+  const branch = gitIn(path, ["branch", "--show-current"]);
+  if (!branch || PERMANENT.includes(branch)) return null;
+  const base = `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
+  const count = Number(gitIn(path, ["rev-list", "--count", `HEAD..${base}`]));
+  return count > 0 ? { name, branch, count, base } : null;
+}
+
+/** How many late branches each base names in full. The rest are counted, and `spnutils workspace status` lists them. */
+export const LATE_NAMED = 3;
+
+/**
+ * The late branches as clauses of the status line, one for each base: how many branches are behind it,
+ * that a rebase comes before the next push, and the most-behind branches by name with their counts.
+ *
+ * THE LIST IS CAPPED BECAUSE IT GROWS WITH THE WORKSPACE, AND THE SESSION-START TEXT MAY NOT. Every
+ * member on a branch behind its base used to add its own clause of about a hundred bytes, the rebase
+ * sentence repeated in each. A worktree set holds a member for every worktree, and sixteen of them
+ * behind took this text past the 8 KB every window pays for on every turn (RD.DEVEX.AGENT.105). So the
+ * sentence is said once for each base, and past the first few the branches are a count and the command
+ * that lists them all, which is where the ground is read on asking.
+ */
+export function lateClauses(late: LateBranch[]): string[] {
+  const bases = [...new Set(late.map((l) => l.base))].sort();
+  return bases.map((base) => {
+    const behind = late.filter((l) => l.base === base)
+      .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    const named = behind.slice(0, LATE_NAMED).map((l) => `${l.name} ${l.branch} by ${l.count}`).join(", ");
+    const more = behind.length - LATE_NAMED;
+    return `${behind.length} ${behind.length === 1 ? "branch" : "branches"} behind ${base}, rebase before the next push: ${named}`
+      + (more > 0 ? ` and ${more} more, listed by \`spnutils workspace status\`` : "");
+  });
+}
+
+/** The longest the session start waits for the members' remotes. */
+export const FETCH_BUDGET_MS = 5000;
+
+/**
+ * Fetches every member's origin, all at once, and gives up on whatever has not answered when the budget is
+ * spent. A fetch that fails, hangs or has no remote costs the window nothing: the clause it would have
+ * fed is simply not there.
+ */
+export function fetchMembers(paths: string[]): Promise<void> {
+  const env = { ...process.env, GIT_TERMINAL_PROMPT: "0" };
+  const running = paths.filter(isCheckout).map((path) => new Promise<void>((done) => {
+    try {
+      const child = spawn("git", ["-C", path, "fetch", "--quiet", "--no-tags", "origin"],
+        { env, stdio: "ignore", timeout: FETCH_BUDGET_MS, killSignal: "SIGKILL" });
+      child.on("error", () => done());
+      child.on("close", () => done());
+    } catch { done(); }
+  }));
+  return Promise.all(running).then(() => undefined);
+}
+
+if (runAlone("orientation.ts")) {
+  const stdinMode = process.argv.includes("--stdin");
+  let cwd = process.cwd();
+  let payload: Payload = {};
+  if (stdinMode) {
+    payload = readPayload();
+    cwd = payload.cwd || cwd;
+  } else {
+    const args = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+    if (args.length) cwd = args[0];
+  }
+  // `SessionStart` runs once, so its whole run is the useful number. `PreToolUse` is the hot path and
+  // times per check instead.
+  const started = performance.now();
+  begin({ script: "spn-devex", event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload),
+          process: { group: "events", action: "orientation" } }, cwd);
+  let result: [string, string] | null = null;
+  try {
+    const root = workspaceRootOf(cwd);
+    await fetchMembers(members(root).map(([, path]) => path));
+    result = orient(root, cwd);
+  }
+  catch (err) {
+    if (!stdinMode) console.error(`orientation unavailable: ${err}`);
+  }
+  record({ group: "orientation", action: "orientation" }, performance.now() - started);
+  end();
+  if (result) {
+    const [message, context] = result;
+    if (stdinMode)
+      // `systemMessage` is the developer's pane: the welcome and one status line. `additionalContext`
+      // is what the agent reads and acts on: the same, then the tables and the note.
+      console.log(JSON.stringify({ systemMessage: message,
+        hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: context } }));
+    else console.log(context);
+  }
+  process.exit(0);
+}

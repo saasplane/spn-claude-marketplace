@@ -1,0 +1,136 @@
+<meta charset="utf-8">
+<title>Tests — The Plugin's Own Folders, Without a Framework</title>
+<!-- spn:doc
+{"id":"surface-tests","variant":"construct","title":"Tests — The Plugin's Own Folders, Without a Framework","subtitle":"How this plugin proves the check and the scripts it ships.","lenses":["QA","WEB_DEV"],"status":"PLANNING","dependsOn":["surface-scripts"],"summary":"This plugin ships a rule that runs on a person's design file, so it owes proof of its own: one tier, mirrored on its source, behind a runner that walks and judges on an exit code.","keywords":["tests","tier","mirror","runner","harness","bundle"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../surface-overview.html">&larr; spn-surface — The Surface Domain</a>
+  <div class="sds-rail-title">Tests — The Plugin's Own Folders, Without a Framework</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests — The Plugin's Own Folders, Without a Framework</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Tests — The Plugin's Own Folders, Without a Framework</h1>
+  <p class="sds-subtitle">How this plugin proves the check and the scripts it ships.</p>
+  <p class="sds-standfirst">This plugin ships a rule that runs on a person's design file, so it owes proof of its own. Read this page to see how the proof is arranged: one tier, mirrored on the source, behind a runner that walks the folder and judges each suite on its exit code.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>A test sits at the path of the file it proves, under <code>tests/unit/</code>, and a suite is a file named <code>t-&lt;name&gt;.mjs</code>. The runner finds every suite by walking, so a new suite runs the day it exists. <strong>The design skill's scripts are proven here too</strong>, because they ship in this plugin and are read by the Figma connector.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>a suite</strong></td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one thing, named for what it proves rather than for where it sits</td></tr>
+      <tr><td><strong>the runner</strong></td><td><code>run.mjs</code></td><td>the one command that finds every suite and reports the verdict of each</td></tr>
+      <tr><td><strong>the harness</strong></td><td><code>harness.mjs</code></td><td>what a suite is written against: the plugin root, found once</td></tr>
+      <tr><td><strong>the mirror</strong></td><td></td><td>the path under a tier, which is the source file's own path inside the plugin</td></tr>
+      <tr><td><strong>the tier</strong></td><td><code>unit/</code></td><td>what kind of proof this is, which is the first thing a folder name answers</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The runner walks the tier, runs each suite in its own process, and reads the exit code as the verdict.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="279 22 541 353" style="max-width:541px" role="img" aria-label="The exit code is the verdict; the summary line only says how many cases there were.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="444" y="24" width="212" height="57" rx="3"/>
+    <text class="sds-label" x="460" y="50">the runner</text>
+    <text class="sds-note" x="460" y="69">tests/run.mjs walks the tier</text>
+    <rect class="sds-box" x="428" y="137" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="163">a suite</text>
+    <text class="sds-note" x="444" y="182">t-&lt;name&gt;.mjs at its source file's</text>
+    <text class="sds-note" x="444" y="201">path</text>
+    <rect class="sds-box" x="281" y="297" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="297" y="323">the harness</text>
+    <text class="sds-note" x="297" y="342">the plugin root, found and never</text>
+    <text class="sds-note" x="297" y="361">counted</text>
+    <rect class="sds-box" x="574" y="297" width="244" height="57" rx="3"/>
+    <text class="sds-label" x="590" y="323">the verdict</text>
+    <text class="sds-note" x="590" y="342">the exit code, one line per suite</text>
+    <path class="sds-connector" d="M550 81 V137" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M489 213 V241 H400 V297" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M611 213 V269 H696 V297" marker-end="url(#ar)"/>
+    <text class="sds-note" x="558" y="117">runs</text>
+    <text class="sds-note" x="619" y="233">is written against</text>
+    <text class="sds-note" x="631" y="261">ends in</text>
+  </svg>
+    <figcaption>The exit code is the verdict; the summary line only says how many cases there were.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The exit code is the verdict; the summary line only says how many cases there were.",
+  "boxes": [
+    { "id": "a", "label": "the runner", "note": "tests/run.mjs walks the tier" },
+    { "id": "b", "label": "a suite", "note": "t-<name>.mjs at its source file's path" },
+    { "id": "c", "label": "the harness", "note": "the plugin root, found and never counted" },
+    { "id": "d", "label": "the verdict", "note": "the exit code, one line per suite" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "runs" },
+    { "from": "b", "to": "c", "label": "is written against" },
+    { "from": "b", "to": "d", "label": "ends in" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-mirror-puts-a-test-where-its-source-">The mirror puts a test where its source is</h3>
+  <p>A test for <code>scripts/checks/figma-connector.ts</code> sits at <code>tests/unit/scripts/checks/t-figma-connector.mjs</code>. Moving a source file moves its test with it.</p>
+  <h3 id="a-suite-is-proven-against-the-bundle-as-">A suite is proven against the bundle as well as the source</h3>
+  <p>The bundle-parity suite runs the committed bundle and the source over the same recorded calls and requires the same answer, and the staleness suite refuses a bundle older than its sources, so a hook never runs a rule nobody wrote.</p>
+  <h3 id="the-launcher-and-the-tiers-file-are-held">The launcher and the tiers file are held to the code</h3>
+  <p>The launcher answers as the entry does from any folder, and the tiers file names exactly the groups the plugin ships.</p>
+  <h3 id="the-runner-judges-on-an-exit-code">The runner judges on an exit code</h3>
+  <p>A suite that prints a passing line and exits non-zero is red, and one that passes in different words is green. The runner never reads text to decide.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers how this plugin proves itself. It does not answer what a test tier is for a project the plugin governs — that is the foundation's test chapter, and <a href="../../03-apps/constructs/07-tests-construct.html">Tests</a> states the stack's side of it.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th></tr></thead>
+    <tbody>
+      <tr><td>the folder this plugin's suites sit in, the mirror and the runner</td><td>the tiers a project owes<span class="sds-small">Owned by: the foundation's test chapter</span></td></tr>
+      <tr><td>the harness and the cases for the bundle</td><td>how a stack names its test folders<span class="sds-small">Owned by: <a href="../../03-apps/constructs/07-tests-construct.html">Tests</a></span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-surface/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>

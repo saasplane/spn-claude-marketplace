@@ -1,0 +1,466 @@
+{
+ "kind": "skeleton",
+ "title": "An entry over the page",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the page the entry belongs to: the entry takes none of its own. A medium entry is a sheet beside its page at a desktop, a third and two thirds of the width, and on a phone it takes the full screen, drawn here without its page. A tablet keeps the sheet beside its page; the sketch draws it under the page, since a sheet and a table side by side do not fit the width of a tablet in a skeleton. It holds one container: its title and the action that closes it stand in its header, and its actions in its footer. A dialog over its page is not drawn here, because a skeleton lays no frame over another.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Team"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Invites"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBar",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTable",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Email",
+                "Role",
+                "State",
+                ""
+               ],
+               "cells": [
+                [
+                 "omar@acme.com",
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "ines@acme.com",
+                 "Admin",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "raj@acme.com",
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Expired"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSSheet",
+         "width": "1/3",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSPanelContainer",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Email",
+                  "text": "omar@acme",
+                  "error": "Enter a full email address"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Role",
+                  "text": "Member",
+                  "control": "select",
+                  "info": true
+                 }
+                ]
+               }
+              ],
+              "label": "Invite a member",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Cancel"
+                 },
+                 {
+                  "control": "button",
+                  "text": "Send",
+                  "main": true
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Invites"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "unit": "DSFilterBar",
+           "rows": [
+            {
+             "items": [
+              {
+               "icon": "default",
+               "mark": true
+              },
+              {
+               "control": "field",
+               "text": "Search",
+               "fill": true
+              },
+              {
+               "icon": "add"
+              },
+              {
+               "note": "|"
+              },
+              {
+               "icon": "search"
+              },
+              {
+               "icon": "close"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "unit": "DSDataTable",
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "table",
+               "fill": true,
+               "flush": true,
+               "columns": [
+                "Email",
+                "Role",
+                "State",
+                ""
+               ],
+               "cells": [
+                [
+                 "omar@acme.com",
+                 "Member",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "ines@acme.com",
+                 "Admin",
+                 {
+                  "control": "badge",
+                  "text": "Pending"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ],
+                [
+                 "raj@acme.com",
+                 "Viewer",
+                 {
+                  "control": "badge",
+                  "text": "Expired"
+                 },
+                 {
+                  "icon": "more"
+                 }
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSSheet",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSPanelContainer",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Email",
+                  "text": "omar@acme",
+                  "error": "Enter a full email address"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Role",
+                  "text": "Member",
+                  "control": "select",
+                  "info": true
+                 }
+                ]
+               }
+              ],
+              "label": "Invite a member",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Cancel"
+                 },
+                 {
+                  "control": "button",
+                  "text": "Send",
+                  "main": true
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSSheet",
+         "rows": [
+          {
+           "items": [
+            {
+             "frame": {
+              "unit": "DSPanelContainer",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Email",
+                  "text": "omar@acme",
+                  "error": "Enter a full email address"
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "standin": "field",
+                  "fill": true,
+                  "label": "Role",
+                  "text": "Member",
+                  "control": "select",
+                  "info": true
+                 }
+                ]
+               }
+              ],
+              "label": "Invite a member",
+              "actions": [
+               {
+                "icon": "close"
+               }
+              ],
+              "footer": [
+               {
+                "items": [
+                 {
+                  "spacer": true
+                 },
+                 {
+                  "control": "button",
+                  "text": "Cancel"
+                 },
+                 {
+                  "control": "button",
+                  "text": "Send",
+                  "main": true
+                 }
+                ]
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ]
+        },
+        "fill": true
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

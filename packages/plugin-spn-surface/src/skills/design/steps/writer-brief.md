@@ -1,0 +1,88 @@
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
+      "seen": "be8d8f0f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
+      "seen": "7a8cd98f"
+    }
+  ]
+}
+-->
+# Step: writer-brief — what a child agent reads before its own order
+
+Read this step when you are an agent started by another and your order is to change one page of a library file through the Figma connector. **It is all you read before your own order.** It stands in place of the long steps: `connector-rules.md`, `change-library.md` and `operations-and-composing.md` in this folder, and "The connector's facts" in `refs/support/surface/delivery-library.md`. Every line here restates a line of theirs. Open one of them only when you are stuck: when you meet a thing this brief does not cover, or when a call fails in a way you cannot explain. Read the fact there before you try anything, and say in your report which step you opened and why.
+
+Its provenance is the foundation book's design library chapter. Apply this restatement. The chapter is provenance, and not a file to open.
+
+## The work
+
+The book states a unit, the library draws it, and a stack builds it. You change one page of one library file with `use_figma`, and you pass `skillNames: "resource:figma-use"` on every call. You do not publish and you save no version: both are the developer's.
+
+| File | It holds | Its file key |
+| --- | --- | --- |
+| `DS 1-core` | the variables, the text styles, the scale and the icons | `3RZVOKGItY4Kos2ZVfmI3V` |
+| `DS 2-Components` | one page for each group of components | `saEPRBFUOa7QEj84NpCJkr` |
+| `DS 3-Widgets` | one page for each widget | `QfApgt8QTngjhGe0Hqf3Xq` |
+| `DS 4-Containers` | the panel, with its parts and its look | `XQPPdU83nFQjT5LQ3JmHgg` |
+| `DS 5-Layouts` | the layout, in each of its types | `ENmqF4WjVnecAVnpuy0nHF` |
+
+- **Check your order against the live file before the first change, and say what you corrected.** The order names the nodes you may touch, and the web's file and line for each thing you make. Where the order and the web differ, take the web and say so.
+- **Take the file's facts from the inventory you were handed, and read the file only for what it does not hold.** A key of Core that you import by is read in the inventory or in Core's own file, and never guessed.
+
+## A call
+
+1. Write plain JavaScript with top-level `await` and `return`, and no wrapper. Only the `return` value comes back. Nothing lives between calls, so pass an id as text.
+2. A call starts on the file's first page. Fetch a node by its exact id with `await figma.getNodeByIdAsync(id)`, and switch page at most once, with `await figma.setCurrentPageAsync(page)`. A call works on one page. Await every promise.
+3. **An answer over 20,480 bytes is refused, and the call's changes are then not kept.** A call that changes the file returns ids, names, counts and hashes, and never a whole read. A large read is taken in parts.
+4. A script that moves or makes many nodes answers dry first. Read the dry answer, then send the script for real.
+5. A call that throws leaves the file as it was. So a call that changes the file throws when what it set does not read as set.
+6. The read that proves a change is a call of its own, sent after it.
+7. Keep a call to one set or one step, and under about 90 seconds.
+8. Load a text's fonts before any change to it or near it: read them with `getStyledTextSegments(['fontName'])`, then `await figma.loadFontAsync(...)` for each.
+9. Fetch a variable with `figma.variables.getVariableByIdAsync`. Bring in a variable, a style or a component of Core that the file does not yet use with `importVariableByKeyAsync`, `importStyleByKeyAsync` or `importComponentByKeyAsync`.
+10. Fills and strokes are lists that you copy, change and assign back. A paint read from one node and assigned to another keeps its variable binding.
+11. Read property definitions from the set, never from a version. Read the inside of a hidden layer with care: set the instance's yes-or-no property on before you look for a hidden slot, and change the inside of a layer before it is hidden.
+12. **On an error, read `safeToRetryWithoutCanvasRead`.** If it is true, correct the script and send it again. If it is false, read the file first to see what changed. If the same API error comes twice, stop that unit and report it.
+13. **An answer that is not the script's own means the call was cut.** Read what stands, in a call of its own. A call that changes the file is not sent again as it was; a call that only reads is sent once more.
+14. `get_screenshot` with `enableBase64Response: true` returns the picture inline.
+
+## A set
+
+1. A version is named `property=value, property=value`, with no comma inside a value. The versions' names define the properties: renaming a property or a value in every version's name renames it, and the ids and keys stand.
+2. A published set, a version, a lone component and a case keep their ids and keys. Change what is inside one, and never remove one to make it again.
+3. A new version is `twin.clone()`, named, appended to the set, placed in the grid, with the set resized to hold it. **A copy loses every property tie, and each slot in it becomes a plain frame.** It keeps its variable bindings and its text styles. So in the same call, tie each layer again as its twin is tied (`componentPropertyReferences`), and make each slot again as a copy of the twin's slot. That copy stays a slot and loses its ties too: tie it again (`slotContentId`, and `visible` where the twin has it). Compare each copy with its twin.
+4. The default version is the one at the top left of the grid, not the first child. Read `set.defaultVariant.id` before and after any move.
+5. Before you add a property or a value, work out the versions the set will hold, and say the number. It never passes 1,000.
+6. Give a new property a default value that draws what stands. The versions that stand then gain the cell in their names and nothing else. Put the cell where a neighbouring set of the page puts it: `size` goes first.
+7. Bind a size, a radius, a gap, a padding, a fill and a text style to the variable or the style a neighbour binds. Type a number only where your order names one. Make no variable, no collection and no mode, and change no text style.
+8. Read the overrides of the cases and usages that place your unit before you change an instance inside it, and set again what the change dropped.
+9. Write a set's description with plain apostrophes, and check what reads back.
+
+## A section, a label, a case
+
+1. A unit's section holds, in this order: the header, the set with its row and column labels, the usage, the cases, the parts.
+2. The header is one text, in the layer `header · <Unit>`: the unit's name, ` — `, what the unit is in one line, ` · `, the layout as `rows: <axis> · columns: <axis>`. An axis is cells joined by `, `. A cell is `property=value`, or the value alone when its property is that of the cell before. ` x ` joins two properties that multiply. ` (default)` follows each default, which comes first. A property that changes nothing a person sees is named in ` · behaviour: a, b`. When the set gains a property, the header names it.
+3. A row or column label is a text whose layer is `label · ` and its whole text. Set the text and the layer's name in one step. A right-aligned label keeps its right edge when its text changes, so set `x` again.
+4. A case is a component on the unit's sheet `<Unit> cases`. It holds an instance of the unit with its values set, and it is named `property=value`, with `, ` between two cells. The sheet's label names its cases.
+5. A copy of a label or a case lands on the page's top level. Append it to its section or its sheet, and set its place again.
+6. Grow the set, its section and its sheet so that nothing inside the section meets. Move no other section: write a section that now reaches its neighbour in your report.
+
+## What you do not do
+
+- **Send no `align.js` and no scan part.** A closer does both when the drawing is done.
+- Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
+- Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
+- Draw nothing of a pattern, and no unit that a stack provides on its own.
+- Change no script: fill its inputs and pass the rest as it is.
+
+## Your proof, and your report
+
+- **Read each set you touch before the first change and after the last, in calls of their own:** its id, key, default and property definitions, and each version's id, key and name. Every version that stood keeps its id and its key. For a version that must look the same, compare the hash of its `exportAsync` PNG bytes before and after, and return the hashes, never the bytes.
+- **Take one picture of each set and sheet you changed, and look at it.** Say in the report which pictures you looked at and what each showed. Take one more only after a repair.
+- **Write the report after each unit, to the path your order names.** If your room runs short, stop at a clean point, with every version whole, named and tied, and say which units you did not reach.
+- **End the report with what the closer needs:** the page's id, each thing you made with its id, the sets, sheets and sections that grew with their sizes before and after, and anything you know stands out of place.
+- **Write down each fact about Figma or the connector that you had to learn,** in one sentence, so that no agent tries it again.

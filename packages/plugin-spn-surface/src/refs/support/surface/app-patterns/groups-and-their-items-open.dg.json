@@ -1,0 +1,395 @@
+{
+ "kind": "skeleton",
+ "title": "Groups and their items, an open set",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the title. A module may add a record type, so the groups are a list and never a row of tabs. The groups are the lines of a list, with a line between each two, and the chosen one has a band behind it. At a desktop the list stays in view beside the items of the chosen group, which are a plain table here: a few fields, each with two facts. The chosen group is the title of the container at the right, and the action that adds an item stands in its header. On a tablet and a phone one part shows at a time: the items of the chosen group take the place of the list, with a back action before the title, and the list is the screen before it. On a phone the items are the lines of a list, since a plain table gives way to a list there.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Settings"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Project",
+              "meta": [
+               "Work"
+              ]
+             },
+             "fill": true
+            }
+           ],
+           "chosen": true
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Customer",
+              "meta": [
+               "Sales"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Invoice",
+              "meta": [
+               "Billing"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Contract",
+              "meta": [
+               "Sales"
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Record types",
+         "width": "1/3",
+         "divided": true
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              "State",
+              ""
+             ],
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               "",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "control": "badge",
+                "text": "Inactive"
+               },
+               {
+                "icon": "more"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Name",
+              "Type",
+              "State",
+              ""
+             ],
+             "cells": [
+              [
+               "Budget",
+               "Number",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Due date",
+               "Date",
+               "",
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Stage",
+               "Choice",
+               {
+                "control": "badge",
+                "text": "Required"
+               },
+               {
+                "icon": "more"
+               }
+              ],
+              [
+               "Notes",
+               "Text",
+               {
+                "control": "badge",
+                "text": "Inactive"
+               },
+               {
+                "icon": "more"
+               }
+              ]
+             ]
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Custom fields"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Budget",
+              "meta": [
+               "Number",
+               {
+                "control": "badge",
+                "text": "Required"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Due date",
+              "meta": [
+               "Date"
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Stage",
+              "meta": [
+               "Choice",
+               {
+                "control": "badge",
+                "text": "Required"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Notes",
+              "meta": [
+               "Text",
+               {
+                "control": "badge",
+                "text": "Inactive"
+               }
+              ],
+              "end": [
+               {
+                "icon": "more"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Project",
+         "note": "Fields of this record type",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Add field",
+           "main": true
+          }
+         ],
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,553 @@
+{
+ "kind": "skeleton",
+ "title": "Compare across kinds, editing one kind",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. Edit opens the values of one kind over the page, as a dialog: the kind is its title, the action that closes it stands in its header, and its actions stand in its footer. A desktop and a tablet show the same table, and a phone shows one kind at a time, as on the page before; every screen shows the same entry. The dialog is drawn beside the page at a desktop, and under it on a tablet and a phone, because a skeleton lays no frame over another; on a phone it becomes a sheet from the bottom of the screen.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Settings"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "cells": [
+              [
+               "Passkey",
+               "Required",
+               "Required",
+               "Optional"
+              ],
+              [
+               "2-step",
+               "Optional",
+               "Off",
+               "Required"
+              ],
+              [
+               "Social",
+               "On",
+               "On",
+               "Off"
+              ],
+              [
+               "Session",
+               "8 hours",
+               "30 days",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite",
+               "Open",
+               "By review"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Passkey",
+             "text": "Required",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "2-step",
+             "text": "Optional",
+             "control": "select",
+             "info": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Social",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Session",
+             "text": "8 hours",
+             "control": "select",
+             "description": "How long a person stays signed in"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Sign-up",
+             "text": "Invite",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Enterprise",
+         "note": "Sign-in defaults",
+         "actions": [
+          {
+           "icon": "close"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ],
+         "width": "1/2"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "table",
+             "fill": true,
+             "flush": true,
+             "columns": [
+              "Setting",
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "cells": [
+              [
+               "Passkey",
+               "Required",
+               "Required",
+               "Optional"
+              ],
+              [
+               "2-step",
+               "Optional",
+               "Off",
+               "Required"
+              ],
+              [
+               "Social",
+               "On",
+               "On",
+               "Off"
+              ],
+              [
+               "Session",
+               "8 hours",
+               "30 days",
+               "8 hours"
+              ],
+              [
+               "Sign-up",
+               "Invite",
+               "Open",
+               "By review"
+              ]
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Passkey",
+             "text": "Required",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "2-step",
+             "text": "Optional",
+             "control": "select",
+             "info": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Social",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Session",
+             "text": "8 hours",
+             "control": "select",
+             "description": "How long a person stays signed in"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Sign-up",
+             "text": "Invite",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Enterprise",
+         "note": "Sign-in defaults",
+         "actions": [
+          {
+           "icon": "close"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Sign-in defaults"
+    }
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "control": "tabs",
+             "tabs": [
+              "Enterprise",
+              "Consumer",
+              "Merchant"
+             ],
+             "chosen": 0
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Passkey",
+             "text": "Required"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "2-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite"
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Edit"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Passkey",
+             "text": "Required",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "2-step",
+             "text": "Optional",
+             "control": "select",
+             "info": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Social",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Session",
+             "text": "8 hours",
+             "control": "select",
+             "description": "How long a person stays signed in"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Sign-up",
+             "text": "Invite",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Enterprise",
+         "note": "Sign-in defaults",
+         "actions": [
+          {
+           "icon": "close"
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

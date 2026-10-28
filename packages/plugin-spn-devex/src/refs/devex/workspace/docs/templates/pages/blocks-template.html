@@ -1,0 +1,2189 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The templates — the pages, and the two seat files behind them · § The blocks are an HTML vocabulary; markdown keeps its own · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, served in versions
+     This file shows every block and every figure kind rendered, beside a page template, and states no rule.
+     The sections above state when a page reaches for each one. -->
+<title>Every Block, Once</title>
+
+
+
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.css" integrity="sha384-EFi+bm+soztQp3Bg2oQPRtdkdyGkD/O1qSDL0QCFBIHQg2sNtFhUHlkwxArFA8dY" crossorigin="anonymous">
+<div class="sds-page">
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="{{THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html}}">&larr; {{THE HUB&rsquo;S REPOSITORY NAME}}</a>
+  <div class="sds-rail-title">Blocks</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><div class="sds-line sds-line1">SaaS Plane &middot; Foundation &middot; Blocks</div></div>
+  <h1>Every Block, Once</h1>
+  <p class="sds-standfirst">This page shows every block and every figure kind a page can use, each one once, as it looks on a finished page. Open it beside a page template when you choose how to show a piece of content.</p>
+  <p>Writing a page takes two files: the <strong>page template</strong> for the kind you are writing, which carries its masthead and its sections, and <strong>this page</strong>, which carries what every kind shares. Open both. This is a reference you consult, never a file you copy &mdash; and it is an HTML vocabulary: a markdown seat file keeps markdown's own components, and the renderer gives each one the form you see here.</p>
+</header>
+
+<section id="normal">
+  <div class="sds-section-head"><h2>Normal content &mdash; no block, and no ceremony</h2></div>
+  <p>Most of a page is this: paragraphs, lists, numbered steps and subheadings, written plainly and marked as nothing at all. <strong>A block is not how you write a section.</strong> It is what you drop into the writing when something must not read as prose. So start here, and reach for a block only when the content has a shape of its own.</p>
+  <p>{{A paragraph. Say why before what. <strong>Bold</strong> marks a rule or a term, never emphasis; <em>italic</em> is a phrase quoted from somewhere else; <code>inline code</code> is a literal &mdash; a file, a field, a command. A link sits on the words that name what it opens.}}</p>
+  <h3 id="n-sub">{{A subheading, where a section has parts}}</h3>
+  <p>{{The part, in its own paragraphs. A subsection opens with its own overview, then its details.}}</p>
+  <ul>
+    <li><strong>{{A named point}}</strong> &mdash; {{what it is, and why it is here}}</li>
+    <li><strong>{{A named point}}</strong> &mdash; {{…}}</li>
+  </ul>
+  <ol>
+    <li>{{A step, where the order is the meaning}}</li>
+    <li>{{…}}</li>
+  </ol>
+  <p><a class="sds-more" href="#">Read {{the page, by the name it carries}} &rarr;</a> &mdash; the link under a subsection's text, naming what it opens rather than saying &ldquo;read more&rdquo;</p>
+</section>
+
+<section id="blocks" data-block="example">
+  <div class="sds-section-head"><h2>Words &mdash; blocks that set writing apart</h2></div>
+  <p>Each one below is a <strong>block</strong>: it carries a border, a background or a form of its own, so a reader sees it is not the surrounding prose before reading a word of it. Use one when the content is a rule, a set, a comparison, a literal, a shape, or a passage that belongs in its own panel.</p>
+  <h3 id="b-prose">PROSE &mdash; the markdown block</h3>
+  <p>{{A passage that explains. Use it wherever the content is plain writing and no other block fits: <strong>REASONS</strong> is for prose that makes a claim and gives grounds, and this is for prose that simply teaches. It carries its own border, background and text colour, so it reads as a block the page chose rather than as the page's own voice continuing. Everything markdown gives you renders inside it.}}</p>
+  <div class="sds-prose">
+  <p>{{A paragraph. <strong>Bold</strong> marks a rule or a term, never emphasis; <em>italic</em> is a phrase quoted from somewhere else; <code>inline code</code> is a literal &mdash; a file, a field, a command. A link sits on the words that name what it opens, never on <a href="#">the whole sentence</a>.}}</p>
+  <ul>
+    <li><strong>{{A named point}}</strong> &mdash; {{what it is, and why it is here}}</li>
+    <li><strong>{{A named point}}</strong> &mdash; {{…}}</li>
+  </ul>
+  <ol>
+    <li>{{A step, where the order is the meaning}}</li>
+    <li>{{…}}</li>
+  </ol>
+  <blockquote><p>{{A sentence worth setting apart &mdash; a rule stated in full, or a line quoted from the source the page is about.}}</p></blockquote>
+  </div>
+  <h3 id="b-must">MUST &mdash; a rule</h3>
+  <div class="sds-pull">
+    <span class="sds-label">Must</span>
+    <p><strong>{{The rule, in one sentence.}}</strong> {{Who it binds, what it binds them to, and what happens when it is broken.}}</p>
+    <p class="sds-small">Check it with <code>{{command}}</code>.</p>
+  </div>
+  <h3 id="b-catalog">CATALOG &mdash; a fixed list, one line each</h3>
+  <p>{{What the set is, and the rule that decides what is in it.}}</p>
+  <div class="sds-tiles">
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{one line: what it is for}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{…}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{…}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+  </div>
+  <h3 id="b-comparison">COMPARISON &mdash; things side by side</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
+    <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{…}}</td><td>{{…}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{…}}</td><td>{{…}}</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="literals" data-block="example">
+  <div class="sds-section-head"><h2>Literals &mdash; code, trees and changes, read character by character</h2></div>
+  <p>{{A literal is read character by character, so it sits in a block of its own. The page's file holds the code plain, and the shared script colours it when the page opens.}}</p>
+  <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
+  <p>{{One sentence saying what you are looking at.}}</p>
+  <pre data-lang="ts">export enum {{SPContractType}} {
+  {{MEMBER}} = '{{member}}',   // what this member means
+}</pre>
+  <p>{{One sentence saying what to notice.}}</p>
+  <h3 id="b-code">CODE &mdash; one block per language the shared script colours</h3>
+  <p>{{Tag every block with its language, as <code>data-lang</code> on the <code>pre</code>. The file holds plain code. The shared script, <code>sds-docs.js</code>, reads the tag when the page opens and colours the block, so nobody writes a colour into a page. A block with no tag is never coloured.}}</p>
+  <p class="sds-small">ts &mdash; a contract as it is declared, a comment per member</p>
+  <pre data-lang="ts">export interface SPRepo {
+  type: SPRepoType;   // the world, and the whole of what a tool dispatches on
+  name: CDTString;          // what a person calls this repository
+  config: SPRepoConfig | null;
+}</pre>
+  <p class="sds-small">json &mdash; a manifest, with real values</p>
+  <pre data-lang="json">{
+  "type": "APPS",
+  "name": "Platform",
+  "config": { "stack": "TS", "deploys": true, "platform": null }
+}</pre>
+  <p class="sds-small">yaml &mdash; a declaration a person edits</p>
+  <pre data-lang="yaml"># one environment row, as the estate declares it
+setup: dev
+region: in
+deploy:
+  mtype: BRANCH
+  branch: develop</pre>
+  <p class="sds-small">sql &mdash; the authoritative shape of a table</p>
+  <pre data-lang="sql">CREATE TABLE iam_identity (
+  id CHAR(26) PRIMARY KEY,
+  handle VARCHAR(180) NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);</pre>
+  <p class="sds-small">sh &mdash; a command somebody else can run</p>
+  <pre data-lang="sh"># bring a repository to the standard, then wire its agent
+spnutils repo create platform
+spnutils repo agent-sync</pre>
+  <p class="sds-small">md &mdash; markdown shown as source, when the page is about the markup</p>
+  <pre data-lang="md">## Terms
+
+| Term | Contract term | What it means |
+| --- | --- | --- |
+| Estate | `SPEstate` | everything one company&#x27;s work runs on |</pre>
+  <p class="sds-small">no language &mdash; output, a path, a name pattern: nothing to colour</p>
+  <pre>{{org}}-{{spc}}-{{env}}-{{region}}
+&rarr; spn-dmo-live-in</pre>
+  <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
+  <pre>{{root}}/
+├── {{child}}/        {{what it holds}}
+│   └── {{leaf}}      {{what it is}}
+└── {{child}}         {{what it is}}</pre>
+  <p class="sds-small">where a change lands &mdash; one folder or file on each line, and a note in one column: new or changed, then what the change is</p>
+  <pre>{{repository}}/
+├── {{folder}}/
+│   ├── {{file}}      new      {{what the file is}}
+│   └── {{file}}      changed  {{what the change is}}
+└── {{folder}}/       changed  {{what changes in the files under it}}</pre>
+  <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
+  <p class="sds-small">a diff always shows one file, so it stands in a FILE frame</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{path of the file, from its repository&rsquo;s root}}</span><span class="sds-file-lang">diff</span></figcaption>
+    <pre data-lang="diff">- what the file says today
++ what it will say</pre>
+  </figure>
+  <h3 id="b-file">FILE &mdash; a code block that shows one file, framed with its path as the title</h3>
+  <p>{{Where a block of code is one file, or a part of one: a diff of a file, the declaration a file holds, a file&rsquo;s first lines. The path stands in the frame&rsquo;s title, from the repository&rsquo;s root; the language stands as a badge at its end; the code stays plain in the file and the shared script colours it. A block that is no one file (a command, a sample of output, a shape written out) stays a CODE block, with no frame.}}</p>
+  <figure class="sds-file">
+    <figcaption><span class="sds-file-path">{{packages/support-web-ds-ts/src/ui/core/theme.ts}}</span><span class="sds-file-lang">ts</span></figcaption>
+    <pre data-lang="ts">export interface IDSTheme {
+  {{field}}: {{Type}};
+}</pre>
+  </figure>
+  <p class="sds-small">the markup: a <code>figure.sds-file</code> holding a <code>figcaption</code> (its <code>.sds-file-path</code> and its <code>.sds-file-lang</code>) and the <code>pre</code></p>
+</section>
+
+<section id="figures" data-block="example">
+  <div class="sds-section-head"><h2>Figures &mdash; a shape the reader must see</h2></div>
+  <p>{{Every figure has a sentence before it saying what you are looking at, and a caption after it saying what to notice. Choose the kind by what the reader has to see.}}</p>
+  <h3 id="b-sequence">SEQUENCE &mdash; steps in order</h3>
+  <p>{{What you are looking at.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{Three steps in order, left to right.}}">
+    <defs><marker id="ar-blk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box sds-tone-blue" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Step}}</text><text class="sds-code" x="36" y="70">{{what it settles}}</text><text class="sds-note" x="36" y="90">{{where it lives}}</text>
+    <path class="sds-connector" d="M320 60 H376" marker-end="url(#ar-blk)"/>
+    <rect class="sds-box" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Step}}</text><text class="sds-code" x="392" y="70">{{what it settles}}</text>
+    <path class="sds-connector" d="M676 60 H732" marker-end="url(#ar-blk)"/>
+    <rect class="sds-box" x="732" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="748" y="48">{{Step}}</text><text class="sds-code" x="748" y="70">{{what it settles}}</text>
+  </svg>
+  <figcaption>{{What to notice.}}</figcaption>
+  </figure>
+  <ol>
+    <li><strong>{{Step}}</strong> &mdash; {{what happens, what must be true before it, what it leaves behind}}</li>
+    <li><strong>{{Step}}</strong> &mdash; {{…}}</li>
+  </ol>
+  <h3 id="b-map">MAP &mdash; the parts of one thing</h3>
+  <p>{{What you are looking at: the whole, then its parts and what flows between them.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 14 1036 234" width="1036" height="234" role="img" aria-label="{{A whole holding three parts; one part feeds the other two, and a fourth stands beside them.}}">
+    <defs><marker id="ar-blk2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box sds-absent" x="20" y="16" width="1032" height="230" rx="3"/><text class="sds-title" x="36" y="42">{{The whole}}</text>
+    <rect class="sds-box sds-tone-blue" x="36" y="62" width="300" height="168" rx="3"/><text class="sds-title" x="52" y="100">{{Part}}</text><text class="sds-code" x="52" y="126">{{what it is}}</text><text class="sds-note" x="52" y="152">{{where it lives}}</text>
+    <path class="sds-connector" d="M336 98 H392" marker-end="url(#ar-blk2)"/>
+    <path class="sds-connector" d="M336 194 H392" marker-end="url(#ar-blk2)"/>
+    <rect class="sds-box" x="392" y="62" width="280" height="72" rx="3"/><text class="sds-title" x="408" y="92">{{Part}}</text><text class="sds-code" x="408" y="116">{{what it is}}</text>
+    <rect class="sds-box" x="392" y="158" width="280" height="72" rx="3"/><text class="sds-title" x="408" y="188">{{Part}}</text><text class="sds-code" x="408" y="212">{{what it is}}</text>
+    <rect class="sds-box" x="696" y="62" width="340" height="168" rx="3"/><text class="sds-title" x="712" y="100">{{Part}}</text><text class="sds-code" x="712" y="126">{{stands beside}}</text>
+  </svg>
+  <figcaption>{{What to notice: which part everything else reads, and where the boundary is.}}</figcaption>
+  </figure>
+  <h3 id="b-seqdiagram">SEQUENCE figure &mdash; who speaks to whom</h3>
+  <p>{{What you are looking at: the participants, and the order they speak in. Use this instead of a flow whenever more than one party acts and <em>who</em> acted is the thing to see.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="58 14 984 306" width="984" height="306" role="img" aria-label="{{Three participants exchanging four messages in order, time running down.}}">
+    <defs><marker id="ar-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box sds-tone-blue" x="60" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="76" y="46">{{Participant}}</text>
+    <rect class="sds-box" x="420" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="436" y="46">{{Participant}}</text>
+    <rect class="sds-box" x="780" y="16" width="260" height="48" rx="3"/><text class="sds-title" x="796" y="46">{{Participant}}</text>
+    <path class="sds-connector" data-role="lifeline" d="M190 64 V318" stroke-dasharray="4 5"/>
+    <path class="sds-connector" data-role="lifeline" d="M550 64 V318" stroke-dasharray="4 5"/>
+    <path class="sds-connector" data-role="lifeline" d="M910 64 V318" stroke-dasharray="4 5"/>
+    <text class="sds-label" x="200" y="104">{{the message it sends}}</text>
+    <path class="sds-connector" d="M190 114 H545" marker-end="url(#ar-seq)"/>
+    <text class="sds-label" x="560" y="164">{{what it asks for}}</text>
+    <path class="sds-connector" d="M550 174 H905" marker-end="url(#ar-seq)"/>
+    <text class="sds-label" x="560" y="224">{{what comes back &mdash; a reply is dashed}}</text>
+    <path class="sds-connector" d="M910 234 H555" stroke-dasharray="6 4" marker-end="url(#ar-seq)"/>
+    <text class="sds-label" x="200" y="284">{{the outcome the first one sees}}</text>
+    <path class="sds-connector" d="M550 294 H195" marker-end="url(#ar-seq)"/>
+  </svg>
+  <figcaption>{{What to notice: which party never speaks to which, and where a reply crosses a boundary.}}</figcaption>
+  </figure>
+  <h3 id="b-entities">ENTITIES figure &mdash; what relates to what</h3>
+  <p>{{What you are looking at: the subject at the centre, what points at it, and what it points at. Every line carries its cardinality.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="38 38 1034 274" width="1034" height="274" role="img" aria-label="{{One central record, one thing pointing at it, and two things it points at, each relation labelled with its cardinality.}}">
+    <defs><marker id="ar-er" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="40" y="120" width="250" height="110" rx="3"/><text class="sds-title" x="56" y="152">{{Entity}}</text><text class="sds-code" x="56" y="180">{{the key}}</text><text class="sds-note" x="56" y="208">{{what it is}}</text>
+    <rect class="sds-box sds-tone-blue" x="470" y="110" width="250" height="130" rx="3"/><text class="sds-title" x="486" y="142">{{The subject}}</text><text class="sds-code" x="486" y="170">{{the key}}</text><text class="sds-note" x="486" y="196">{{the fields that relate}}</text><text class="sds-note" x="486" y="222">{{what it is}}</text>
+    <rect class="sds-box" x="880" y="40" width="190" height="100" rx="3"/><text class="sds-title" x="896" y="72">{{Entity}}</text><text class="sds-code" x="896" y="100">{{the key}}</text><text class="sds-note" x="896" y="126">{{what it is}}</text>
+    <rect class="sds-box" x="880" y="210" width="190" height="100" rx="3"/><text class="sds-title" x="896" y="242">{{Entity}}</text><text class="sds-code" x="896" y="270">{{the key}}</text><text class="sds-note" x="896" y="296">{{what it is}}</text>
+    <text class="sds-note" x="300" y="166">{{one}}</text><text class="sds-note" x="400" y="166">{{many}}</text>
+    <path class="sds-connector" d="M290 175 H470" marker-end="url(#ar-er)"/>
+    <text class="sds-note" x="300" y="200">{{what it means}}</text>
+    <text class="sds-note" x="730" y="142">{{many}}</text><text class="sds-note" x="812" y="82">{{one}}</text>
+    <path class="sds-connector" d="M720 150 H800 V90 H880" marker-end="url(#ar-er)"/>
+    <text class="sds-note" x="730" y="192">{{many}}</text><text class="sds-note" x="812" y="252">{{one}}</text>
+    <path class="sds-connector" d="M720 200 H800 V260 H880" marker-end="url(#ar-er)"/>
+  </svg>
+  <figcaption>{{What to notice: which way each relation points, and which of them may be absent.}}</figcaption>
+  </figure>
+  <h3 id="b-system">SYSTEM &mdash; the architecture of a thing you build</h3>
+  <p>{{What you are looking at: one bounded thing, its layers in the direction a call travels, and what it talks to outside its boundary. Use it for a server module, a web module, an app or an estate package &mdash; they are the same picture, and drawing them alike is the point.}}</p>
+  <div class="sds-pull">
+    <span class="sds-label">The three rules</span>
+    <p><strong>One outermost container, and it is the thing being described.</strong> Anything outside it is something the thing talks to, so a reader sees what is yours before reading a label. <strong>Inside it, boxes are grouped into layers that run one way</strong> &mdash; the direction a call travels &mdash; so the direction is learned once and never again. <strong>An edge is a call or data, and it carries what flows</strong>; an unlabelled line meaning <em>related</em> is the one thing this kind refuses.</p>
+    <p class="sds-small">It is a MAP with those three rules added, so the drawer is unchanged. MAP keeps its own job: the parts of one thing, where there is no inside and no order.</p>
+  </div>
+  <p class="sds-small">a server module &mdash; read the layers from the bottom: config, the environment it is started with, then app, then entry. Each door is met by the thing that knocks on it, and services and repositories are what reach outside</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A server module: an ingress reaches the api, an operator the cli, a queue the consumer; inside, config sits under app which sits under entry; services reaches the queue, the cache, the database and the object store, and repositories reaches the database alone.}}">
+    <defs><marker id="ar-sys1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="sds-box sds-absent" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="sds-connector" data-role="curve" d="M20 101 H190"/>
+    <text class="sds-title" x="36" y="125">{{Browser}}</text><text class="sds-note" x="36" y="147">a client, outside</text>
+    <path class="sds-box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="sds-title" x="300" y="115">{{Ingress}}</text><text class="sds-note" x="300" y="137">the way in</text>
+
+    <rect class="sds-box sds-absent" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="251">{{Terminal}}</text><text class="sds-note" x="36" y="273">an operator, by hand</text>
+
+    <rect class="sds-box sds-absent" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="451">{{Scheduler}}</text><text class="sds-note" x="36" y="473">starts work on time</text>
+    <rect class="sds-box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="sds-box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="sds-box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="sds-title" x="312" y="451">{{Queue}}</text><text class="sds-note" x="312" y="473">work, in order</text>
+
+    <rect class="sds-box sds-absent" x="560" y="16" width="320" height="976" rx="3"/><text class="sds-title" x="576" y="42">{{module-server-iam-ts}}</text>
+    <rect class="sds-box sds-absent" x="580" y="56" width="280" height="442" rx="3"/><text class="sds-title" x="596" y="80">Entry</text>
+    <rect class="sds-box" x="596" y="92" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="124">api</text>
+    <rect class="sds-box" x="596" y="228" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="260">cli</text>
+    <rect class="sds-box" x="596" y="428" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="460">queue</text>
+    <rect class="sds-box sds-absent" x="580" y="554" width="280" height="260" rx="3"/><text class="sds-title" x="596" y="578">App</text>
+    <rect class="sds-box sds-tone-blue" x="596" y="590" width="248" height="130" rx="3"/><text class="sds-title" x="612" y="624">services</text><text class="sds-note" x="612" y="646">every guarantee lives here</text>
+    <rect class="sds-box" x="596" y="744" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="776">repositories</text>
+    <rect class="sds-box sds-absent" x="580" y="870" width="280" height="106" rx="3"/><text class="sds-title" x="596" y="894">Config</text>
+    <rect class="sds-box" x="596" y="906" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="932">environment variables</text><text class="sds-note" x="612" y="952">what it is told at start</text>
+
+    <rect class="sds-box sds-absent" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="629">{{Cache}}</text><text class="sds-note" x="1116" y="651">losing it costs time</text>
+    <rect class="sds-box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="948">{{Database}}</text><text class="sds-note" x="1116" y="970">the record</text>
+    <path class="sds-box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="sds-title" x="1130" y="790">{{Object store}}</text><text class="sds-note" x="1130" y="812">files, not rows</text>
+
+    <text class="sds-note" x="203" y="111">{{arrives}}</text>
+    <path class="sds-connector" d="M190 119 H286" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="460" y="97">{{calls}}</text>
+    <path class="sds-connector" d="M436 119 V105 H596" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="210" y="247">{{runs a command}}</text>
+    <path class="sds-connector" d="M190 255 H596" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="250" y="347">{{calls the api instead}}</text>
+    <path class="sds-connector" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="200" y="447">{{enqueues}}</text>
+    <path class="sds-connector" d="M190 455 H286" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="460" y="447">{{pulls}}</text>
+    <path class="sds-connector" d="M436 455 H596" marker-end="url(#ar-sys1)"/>
+
+    <path class="sds-connector" d="M720 498 V554" marker-end="url(#ar-sys1)"/>
+    <path class="sds-connector" d="M720 814 V870" marker-end="url(#ar-sys1)"/>
+
+    <text class="sds-note" x="452" y="516">{{puts work}}</text>
+    <path class="sds-connector" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="200" y="548">{{creates a schedule}}</text>
+    <path class="sds-connector" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys1)"/>
+
+    <text class="sds-note" x="896" y="614">{{caches}}</text>
+    <path class="sds-connector" d="M844 622 H1100" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="896" y="647">{{commits}}</text>
+    <path class="sds-connector" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="896" y="679">{{files}}</text>
+    <path class="sds-connector" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys1)"/>
+    <text class="sds-note" x="896" y="763">{{rows}}</text>
+    <path class="sds-connector" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys1)"/>
+  </svg>
+  <figcaption>{{What to notice: read the layers from the bottom &mdash; config, then app, then entry &mdash; and every door of the entry layer is met by the thing that knocks on it. Services is what reaches outward: it puts work in the queue, caches, commits a transaction and writes files. Repositories reaches one resource and one only, the database. Files are not its business, and that single edge is what makes it the storage seam.}}</figcaption>
+  </figure>
+  <p class="sds-small">a web module &mdash; the same skeleton, drawn to the same coordinates as the server above. Read it from the bottom too: config, then app, then entry</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A web module drawn on the same skeleton as the server module: a person through the router reaches the pages, a deep link reaches a route, a push channel reaches the subscriptions; hooks and stores are what reach outside.}}">
+    <defs><marker id="ar-sys2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="sds-box sds-absent" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="sds-connector" data-role="curve" d="M20 101 H190"/>
+    <text class="sds-title" x="36" y="125">{{Person}}</text><text class="sds-note" x="36" y="147">at a screen, outside</text>
+    <path class="sds-box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="sds-title" x="300" y="115">{{Router}}</text><text class="sds-note" x="300" y="137">the way in</text>
+
+    <rect class="sds-box sds-absent" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="251">{{Deep link}}</text><text class="sds-note" x="36" y="273">a url from elsewhere</text>
+
+    <rect class="sds-box sds-absent" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="451">{{Push channel}}</text><text class="sds-note" x="36" y="473">the server speaks first</text>
+    <rect class="sds-box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="sds-box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="sds-box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="sds-title" x="312" y="451">{{Events}}</text><text class="sds-note" x="312" y="473">messages, in order</text>
+
+    <rect class="sds-box sds-absent" x="560" y="16" width="320" height="976" rx="3"/><text class="sds-title" x="576" y="42">{{module-web-iam-ts}}</text>
+    <rect class="sds-box sds-absent" x="580" y="56" width="280" height="442" rx="3"/><text class="sds-title" x="596" y="80">Entry</text>
+    <rect class="sds-box" x="596" y="92" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="124">pages</text>
+    <rect class="sds-box" x="596" y="228" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="260">routes</text>
+    <rect class="sds-box" x="596" y="428" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="460">subscriptions</text>
+    <rect class="sds-box sds-absent" x="580" y="554" width="280" height="260" rx="3"/><text class="sds-title" x="596" y="578">App</text>
+    <rect class="sds-box sds-tone-blue" x="596" y="590" width="248" height="130" rx="3"/><text class="sds-title" x="612" y="624">hooks</text><text class="sds-note" x="612" y="646">every guarantee lives here</text>
+    <rect class="sds-box" x="596" y="744" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="776">stores</text>
+    <rect class="sds-box sds-absent" x="580" y="870" width="280" height="106" rx="3"/><text class="sds-title" x="596" y="894">Config</text>
+    <rect class="sds-box" x="596" y="906" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="932">build-time settings</text><text class="sds-note" x="612" y="952">what it is built with</text>
+
+    <rect class="sds-box sds-absent" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="629">{{Browser storage}}</text><text class="sds-note" x="1116" y="651">losing it costs nothing</text>
+    <rect class="sds-box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="948">{{The api}}</text><text class="sds-note" x="1116" y="970">the server module</text>
+    <path class="sds-box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="sds-title" x="1130" y="790">{{Asset CDN}}</text><text class="sds-note" x="1130" y="812">images and bundles</text>
+
+    <text class="sds-note" x="203" y="111">{{arrives}}</text>
+    <path class="sds-connector" d="M190 119 H286" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="460" y="97">{{renders}}</text>
+    <path class="sds-connector" d="M436 119 V105 H596" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="210" y="247">{{opens a route}}</text>
+    <path class="sds-connector" d="M190 255 H596" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="250" y="347">{{or opens a page instead}}</text>
+    <path class="sds-connector" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="200" y="447">{{sends}}</text>
+    <path class="sds-connector" d="M190 455 H286" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="460" y="447">{{subscribes}}</text>
+    <path class="sds-connector" d="M436 455 H596" marker-end="url(#ar-sys2)"/>
+
+    <path class="sds-connector" d="M720 498 V554" marker-end="url(#ar-sys2)"/>
+    <path class="sds-connector" d="M720 814 V870" marker-end="url(#ar-sys2)"/>
+
+    <text class="sds-note" x="452" y="516">{{emits}}</text>
+    <path class="sds-connector" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="200" y="548">{{opens the channel}}</text>
+    <path class="sds-connector" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys2)"/>
+
+    <text class="sds-note" x="896" y="614">{{caches}}</text>
+    <path class="sds-connector" d="M844 622 H1100" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="896" y="647">{{calls}}</text>
+    <path class="sds-connector" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="896" y="679">{{assets}}</text>
+    <path class="sds-connector" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys2)"/>
+    <text class="sds-note" x="896" y="763">{{reads}}</text>
+    <path class="sds-connector" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys2)"/>
+  </svg>
+  <figcaption>{{What to notice: it is the server figure with different words. A person arrives through the router, a deep link lands straight on a route, a push channel feeds the subscriptions. Hooks is what reaches outward &mdash; it subscribes, caches, and writes assets &mdash; and stores reaches one thing only, the api. That a web module and a server module have the same drawing is the claim this kind exists to make.}}</figcaption>
+  </figure>
+  <p class="sds-small">an estate package &mdash; the same skeleton again. Here the layers are containment rather than call order, and it still reads from the bottom: what is declared, then what runs, then what is reachable</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A cloud account drawn on the same skeleton: the public internet through dns reaches the public subnet, an operator reaches the bastion, a peered account reaches the peering link; compute is what reaches the managed resources.}}">
+    <defs><marker id="ar-sys3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="sds-box sds-absent" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="sds-connector" data-role="curve" d="M20 101 H190"/>
+    <text class="sds-title" x="36" y="125">{{Public internet}}</text><text class="sds-note" x="36" y="147">outside every boundary</text>
+    <path class="sds-box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="sds-title" x="300" y="115">{{DNS}}</text><text class="sds-note" x="300" y="137">the way in</text>
+
+    <rect class="sds-box sds-absent" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="251">{{An operator}}</text><text class="sds-note" x="36" y="273">with a named session</text>
+
+    <rect class="sds-box sds-absent" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="sds-title" x="36" y="451">{{A peer}}</text><text class="sds-note" x="36" y="473">an account you trust</text>
+    <rect class="sds-box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="sds-box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="sds-box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="sds-title" x="312" y="451">{{Peering}}</text><text class="sds-note" x="312" y="473">traffic, one way</text>
+
+    <rect class="sds-box sds-absent" x="560" y="16" width="320" height="976" rx="3"/><text class="sds-title" x="576" y="42">{{account-spn-prod}}</text>
+    <rect class="sds-box sds-absent" x="580" y="56" width="280" height="442" rx="3"/><text class="sds-title" x="596" y="80">Entry</text>
+    <rect class="sds-box" x="596" y="92" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="124">public subnet</text>
+    <rect class="sds-box" x="596" y="228" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="260">bastion</text>
+    <rect class="sds-box" x="596" y="428" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="460">peering endpoint</text>
+    <rect class="sds-box sds-absent" x="580" y="554" width="280" height="260" rx="3"/><text class="sds-title" x="596" y="578">App</text>
+    <rect class="sds-box sds-tone-blue" x="596" y="590" width="248" height="130" rx="3"/><text class="sds-title" x="612" y="624">compute</text><text class="sds-note" x="612" y="646">what actually runs</text>
+    <rect class="sds-box" x="596" y="744" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="776">workers</text>
+    <rect class="sds-box sds-absent" x="580" y="870" width="280" height="106" rx="3"/><text class="sds-title" x="596" y="894">Config</text>
+    <rect class="sds-box" x="596" y="906" width="248" height="54" rx="3"/><text class="sds-title" x="612" y="932">declared variables</text><text class="sds-note" x="612" y="952">what the account is given</text>
+
+    <rect class="sds-box sds-absent" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="629">{{Secret store}}</text><text class="sds-note" x="1116" y="651">losing it costs everything</text>
+    <rect class="sds-box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="sds-box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="sds-title" x="1116" y="948">{{Managed database}}</text><text class="sds-note" x="1116" y="970">the record</text>
+    <path class="sds-box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="sds-title" x="1130" y="790">{{Bucket}}</text><text class="sds-note" x="1130" y="812">objects, not rows</text>
+
+    <text class="sds-note" x="203" y="111">{{resolves}}</text>
+    <path class="sds-connector" d="M190 119 H286" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="460" y="97">{{routes to}}</text>
+    <path class="sds-connector" d="M436 119 V105 H596" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="210" y="247">{{opens a session}}</text>
+    <path class="sds-connector" d="M190 255 H596" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="250" y="347">{{or reaches the subnet}}</text>
+    <path class="sds-connector" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="200" y="447">{{sends}}</text>
+    <path class="sds-connector" d="M190 455 H286" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="460" y="447">{{accepts}}</text>
+    <path class="sds-connector" d="M436 455 H596" marker-end="url(#ar-sys3)"/>
+
+    <path class="sds-connector" d="M720 498 V554" marker-end="url(#ar-sys3)"/>
+    <path class="sds-connector" d="M720 814 V870" marker-end="url(#ar-sys3)"/>
+
+    <text class="sds-note" x="452" y="516">{{answers}}</text>
+    <path class="sds-connector" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="200" y="548">{{authorises the peer}}</text>
+    <path class="sds-connector" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys3)"/>
+
+    <text class="sds-note" x="896" y="614">{{reads}}</text>
+    <path class="sds-connector" d="M844 622 H1100" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="896" y="647">{{writes}}</text>
+    <path class="sds-connector" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="896" y="679">{{objects}}</text>
+    <path class="sds-connector" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys3)"/>
+    <text class="sds-note" x="896" y="763">{{queries}}</text>
+    <path class="sds-connector" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys3)"/>
+  </svg>
+  <figcaption>{{What to notice: the third drawing of the same figure. The public internet arrives through dns, an operator arrives at the bastion, a peered account arrives at the peering link. Compute is what reaches outward &mdash; the secret store, the managed database, the bucket &mdash; and the workers reach one thing only. Server, web and estate are one shape, which is the whole reason this kind is not three kinds.}}</figcaption>
+  </figure>
+  <h3 id="b-flowchart">FLOWCHART &mdash; a path somebody takes, in the shapes a flowchart has</h3>
+  <p>{{What you are looking at: where the path starts, each step, and the points where it branches. Use this rather than a <strong>MAP</strong> whenever the content is a path rather than a set of parts &mdash; a MAP answers <em>what is this made of</em>, a flowchart answers <em>what happens, and where does it turn</em>. The shape carries the meaning, so a reader reads the picture before the labels.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="38 10 1024 384" width="1024" height="384" role="img" aria-label="{{A flowchart: a rounded terminator starts it, a process step follows, a diamond branches two ways into an input shape and a predefined process, and both reach the end through a data store and an on-page connector.}}">
+    <defs><marker id="ar-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="sds-box sds-tone-blue" x="40" y="30" width="180" height="52" rx="26"/><text class="sds-title" x="70" y="62">{{Start}}</text>
+    <path class="sds-connector" d="M220 56 H280" marker-end="url(#ar-flow)"/>
+    <rect class="sds-box" x="280" y="30" width="220" height="52" rx="3"/><text class="sds-title" x="300" y="62">{{A step}}</text>
+    <path class="sds-connector" d="M500 56 H560" marker-end="url(#ar-flow)"/>
+
+    <path class="sds-box" d="M700 12 L840 56 L700 100 L560 56 Z"/><text class="sds-label" x="643" y="61">{{A decision?}}</text>
+
+    <text class="sds-note" x="708" y="140">{{no}}</text>
+    <path class="sds-connector" d="M700 100 V190" marker-end="url(#ar-flow)"/>
+    <text class="sds-note" x="880" y="46">{{yes}}</text>
+    <path class="sds-connector" d="M840 56 H970 V190" marker-end="url(#ar-flow)"/>
+
+    <path class="sds-box" d="M590 190 L820 190 L790 242 L560 242 Z"/><text class="sds-title" x="600" y="222">{{Read input}}</text>
+    <rect class="sds-box" x="880" y="190" width="180" height="52" rx="3"/><text class="sds-title" x="908" y="222">{{A routine}}</text>
+    <path class="sds-connector" d="M892 190 V242"/><path class="sds-connector" d="M1048 190 V242"/>
+
+    <path class="sds-box" d="M40 336 C40 327 85 320 140 320 C195 320 240 327 240 336 L240 376 C240 385 195 392 140 392 C85 392 40 385 40 376 Z"/><text class="sds-title" x="80" y="362">{{Stored}}</text>
+    <circle class="sds-box" cx="560" cy="356" r="22"/><text class="sds-note" x="551" y="361">{{A}}</text>
+    <rect class="sds-box sds-tone-blue" x="880" y="330" width="180" height="52" rx="26"/><text class="sds-title" x="916" y="362">{{End}}</text>
+
+    <path class="sds-connector" d="M240 356 H538" marker-end="url(#ar-flow)"/>
+    <path class="sds-connector" d="M582 356 H700" marker-end="url(#ar-flow)"/>
+    <path class="sds-connector" d="M700 242 V356 H880" marker-end="url(#ar-flow)"/>
+    <path class="sds-connector" d="M970 242 V330" marker-end="url(#ar-flow)"/>
+  </svg>
+  <figcaption>{{What to notice: every branch leaves the diamond with its answer written on it, and the path only ever moves down and to the right.}}</figcaption>
+  </figure>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Shape</th><th>Means</th><th>Drawn as</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Terminator</strong></td><td>where the path starts, and where it ends</td><td>a rectangle with fully rounded ends</td></tr>
+      <tr><td><strong>Process</strong></td><td>one step: something is done</td><td>a plain rectangle</td></tr>
+      <tr><td><strong>Decision</strong></td><td>the path branches, and each branch carries its answer</td><td>a diamond</td></tr>
+      <tr><td><strong>Input or output</strong></td><td>something is read in or handed back</td><td>a parallelogram</td></tr>
+      <tr><td><strong>Predefined process</strong></td><td>a step defined somewhere else &mdash; a routine, a command, another flow</td><td>a rectangle with a bar down each side</td></tr>
+      <tr><td><strong>Data store</strong></td><td>something is read from or written to a store</td><td>a cylinder</td></tr>
+      <tr><td><strong>On-page connector</strong></td><td>the path continues from the matching letter, where a line would cross the page</td><td>a small circle with a letter in it</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="b-architecture">MAP figure, at its hardest &mdash; a cloud estate</h3>
+  <p>{{What you are looking at: the accounts an organization holds, then one of them opened up. This is still a MAP &mdash; containers holding boxes &mdash; and it holds the nesting rule: the account holds the network, the network holds the subnets, and nothing goes deeper. A third level is the first thing you will want and the first thing to cut.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 14 1064 578" width="1064" height="578" role="img" aria-label="{{A cloud organization holding four accounts, and one account opened to show its network, its three subnets and the services beside them.}}">
+    <defs><marker id="ar-arch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box sds-absent" x="20" y="16" width="1060" height="134" rx="3"/><text class="sds-title" x="36" y="42">{{Cloud organization}}</text>
+    <rect class="sds-box" x="40" y="62" width="240" height="72" rx="3"/><text class="sds-title" x="56" y="88">{{Management}}</text><text class="sds-note" x="56" y="112">{{users, policies, the root}}</text>
+    <rect class="sds-box" x="300" y="62" width="240" height="72" rx="3"/><text class="sds-title" x="316" y="88">{{Control centre}}</text><text class="sds-note" x="316" y="112">{{registries, state, logs}}</text>
+    <rect class="sds-box" x="560" y="62" width="240" height="72" rx="3"/><text class="sds-title" x="576" y="88">{{Non-production}}</text><text class="sds-note" x="576" y="112">{{dev &middot; qa &middot; uat}}</text>
+    <rect class="sds-box sds-tone-blue" x="820" y="62" width="240" height="72" rx="3"/><text class="sds-title" x="836" y="88">{{Production}}</text><text class="sds-note" x="836" y="112">{{live, one per region}}</text>
+    <rect class="sds-box sds-absent" x="20" y="190" width="1060" height="400" rx="3"/><text class="sds-title" x="36" y="216">{{Inside one account}}</text>
+    <rect class="sds-box sds-absent" x="40" y="236" width="660" height="300" rx="3"/><text class="sds-title" x="56" y="262">{{Network}}</text>
+    <rect class="sds-box" x="60" y="282" width="250" height="90" rx="3"/><text class="sds-title" x="76" y="308">{{Public subnet}}</text><text class="sds-code" x="76" y="332">{{the only way in}}</text><text class="sds-note" x="76" y="356">{{load balancer}}</text>
+    <rect class="sds-box sds-tone-blue" x="366" y="282" width="314" height="90" rx="3"/><text class="sds-title" x="382" y="308">{{Private subnet}}</text><text class="sds-code" x="382" y="332">{{no route from outside}}</text><text class="sds-note" x="382" y="356">{{cluster nodes, workers}}</text>
+    <rect class="sds-box" x="60" y="428" width="620" height="80" rx="3"/><text class="sds-title" x="76" y="454">{{Data subnet}}</text><text class="sds-note" x="76" y="480">{{database, cache, queue}}</text>
+    <rect class="sds-box" x="720" y="236" width="340" height="76" rx="3"/><text class="sds-title" x="736" y="262">{{Identity and access}}</text><text class="sds-note" x="736" y="288">{{roles a workload assumes}}</text>
+    <rect class="sds-box" x="720" y="328" width="340" height="76" rx="3"/><text class="sds-title" x="736" y="354">{{Secrets and keys}}</text><text class="sds-note" x="736" y="380">{{no long-lived credential}}</text>
+    <rect class="sds-box" x="720" y="430" width="340" height="76" rx="3"/><text class="sds-title" x="736" y="456">{{Object storage}}</text><text class="sds-note" x="736" y="482">{{buckets, lifecycle rules}}</text>
+    <path class="sds-connector" d="M310 327 H366" marker-end="url(#ar-arch)"/>
+    <path class="sds-connector" d="M523 372 V400 H370 V428" marker-end="url(#ar-arch)"/>
+    <text class="sds-note" x="532" y="404">{{only from private}}</text>
+    <path class="sds-connector" d="M680 468 H720" marker-end="url(#ar-arch)"/>
+  </svg>
+  <figcaption>{{What to notice: nothing reaches the data subnet from outside, and every account is the same shape at a different size.}}</figcaption>
+  </figure>
+  <h3 id="b-skeleton">SKELETON &mdash; a mock of a layout</h3>
+  <p>{{What you are looking at: the thing&rsquo;s outer frame, and where each of its places sits.}} A skeleton is a preview: each place reads by its own mark, never by a tint — a dotted boundary with a name for a component, a part or a slot; a background for raised, a solid line for bordered, neither for flat — in plain words or by a block&rsquo;s prop where one exists, and nothing shows the library&rsquo;s look. A construct page or an overview asks for one in a <code>dg</code> block of kind <code>skeleton</code>; a hand-written page takes the drawing from <code>docs figure draw &lt;spec&gt;</code>. One sample at each level:</p>
+  <p><strong>A page</strong> &mdash; a listing page: the shut rail, the page head, and one container holding a data table with its filter bar and its paging.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 501" style="max-width:1056px" role="img" aria-label="A listing page">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="476" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="476" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="120" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="496" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="494" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 500 L41 497.5 L44 496.5 L47 497.5 L48 500 L40 500"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="476" rx="0"/>
+  <text class="sds-title" x="80" y="77" style="font-size:24px">Orders</text>
+  <text class="sds-note" x="80" y="95">Every order placed in Lumen Labs</text>
+  <rect class="sds-skel-control sds-skel-main" x="965" y="68" width="95" height="28" rx="3"/>
+  <text class="sds-code" x="981" y="86">New order</text>
+  <rect class="sds-skel-guide" x="80" y="128" width="980" height="376" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="128" width="980" height="376" rx="8"/>
+  <text class="sds-note" x="88" y="144">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="88" y="156" width="964" height="64" rx="3"/>
+  <text class="sds-note" x="96" y="172">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="110" cy="198" r="14"/>
+  <rect class="sds-skel-control" x="148" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="164" y="202">Search</text>
+  <rect class="sds-skel-control" x="525" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="541" y="202">Status</text>
+  <path class="sds-skel-glyph" d="M854.5 196.25 L858 199.75 L861.5 196.25"/>
+  <rect class="sds-skel-control" x="902" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M916 193.92 L916 202.08 M911.92 198 L920.08 198"/>
+  <text class="sds-code" x="954" y="202">|</text>
+  <rect class="sds-skel-control" x="985" y="184" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph" cx="997.83" cy="196.83" r="3.5"/>
+  <path class="sds-skel-glyph" d="M1000.75 199.75 L1003.67 202.67"/>
+  <rect class="sds-skel-control" x="1017" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1027.5 194.5 L1034.5 201.5 M1034.5 194.5 L1027.5 201.5"/>
+  <rect class="sds-skel-guide" x="88" y="228" width="964" height="216" rx="3"/>
+  <text class="sds-note" x="96" y="244">DSDataTable</text>
+  <rect class="sds-skel-surface" x="88" y="256" width="964" height="36" rx="0"/>
+  <text class="sds-note" x="112" y="278" style="letter-spacing:.06em;font-weight:600">ORDER</text>
+  <text class="sds-note" x="309" y="278" style="letter-spacing:.06em;font-weight:600">CUSTOMER</text>
+  <text class="sds-note" x="548" y="278" style="letter-spacing:.06em;font-weight:600">STATUS</text>
+  <text class="sds-note" x="775" y="278" style="letter-spacing:.06em;font-weight:600">TOTAL</text>
+  <path class="sds-skel-control" d="M88 292 H1052"/>
+  <path class="sds-skel-control" d="M88 338 H1052"/>
+  <path class="sds-skel-control" d="M88 382 H1052"/>
+  <text class="sds-code" x="112" y="322">#1042</text>
+  <text class="sds-code" x="309" y="322">Acme Corp</text>
+  <text class="sds-code" x="775" y="322">$1,240.00</text>
+  <rect class="sds-skel-control" x="1000" y="304" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="318" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="318" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="318" r="0.93"/>
+  <text class="sds-code" x="112" y="366">#1041</text>
+  <text class="sds-code" x="309" y="366">Blue Bakery</text>
+  <rect class="sds-skel-control" x="548" y="352" width="65" height="20" rx="10"/>
+  <text class="sds-code" x="556" y="366">Pending</text>
+  <text class="sds-code" x="775" y="366">$86.50</text>
+  <rect class="sds-skel-control" x="1000" y="348" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="362" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="362" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="362" r="0.93"/>
+  <text class="sds-code" x="112" y="410">#1040</text>
+  <text class="sds-code" x="309" y="410">Dana Lee</text>
+  <text class="sds-code" x="775" y="410">$412.00</text>
+  <rect class="sds-skel-control" x="1000" y="392" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="406" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="406" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="406" r="0.93"/>
+  <path class="sds-skel-control" d="M80 448 H1060"/>
+  <text class="sds-code" x="96" y="478">1 to 20 of 312</text>
+  <rect class="sds-skel-control" x="888" y="460" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M903.17 469.92 L899.08 474 L903.17 478.08"/>
+  <rect class="sds-skel-control" x="920" y="460" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="930.5" y="478">1</text>
+  <rect class="sds-skel-control" x="952" y="460" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="962.5" y="478">2</text>
+  <rect class="sds-skel-control" x="984" y="460" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="994.5" y="478">3</text>
+  <rect class="sds-skel-control" x="1016" y="460" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1028.83 469.92 L1032.92 474 L1028.83 478.08"/>
+</svg>
+<figcaption>A listing page: the layout's shut rail, the page head with the title, its line and the main action, and one container. The container's content is two parts, the filter bar and the data table, whose records reach the outline; its footer holds the paging.</figcaption>
+</figure>
+  <p><strong>A layout</strong> &mdash; the RAIL layout: its five named places, each one block with its name.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 316" style="max-width:1056px" role="img" aria-label="DSLayout — RAIL">
+  <rect class="sds-box" x="24" y="24" width="1052" height="312" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSLayout — RAIL</text>
+  <text class="sds-code" x="40" y="69">startNode · nav · actionsNode · endNode · children</text>
+  <rect class="sds-skel-surface" x="40" y="88" width="255" height="232" rx="3"/>
+  <rect class="sds-skel-guide" x="40" y="88" width="255" height="232" rx="3"/>
+  <rect class="sds-skel-surface" x="56" y="104" width="223" height="32" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="104" width="223" height="32" rx="3"/>
+  <text class="sds-note" x="64" y="120">startNode</text>
+  <rect class="sds-skel-surface" x="56" y="160" width="223" height="32" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="160" width="223" height="32" rx="3"/>
+  <text class="sds-note" x="64" y="176">nav</text>
+  <rect class="sds-skel-surface" x="56" y="216" width="223" height="32" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="216" width="223" height="32" rx="3"/>
+  <text class="sds-note" x="64" y="232">actionsNode</text>
+  <rect class="sds-skel-surface" x="56" y="272" width="223" height="32" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="272" width="223" height="32" rx="3"/>
+  <text class="sds-note" x="64" y="288">endNode</text>
+  <rect class="sds-skel-surface" x="319" y="88" width="741" height="232" rx="3"/>
+  <rect class="sds-skel-guide" x="319" y="88" width="741" height="232" rx="3"/>
+  <rect class="sds-skel-surface" x="335" y="104" width="709" height="200" rx="3"/>
+  <rect class="sds-skel-guide" x="335" y="104" width="709" height="200" rx="3"/>
+  <text class="sds-note" x="343" y="120">children</text>
+</svg>
+<figcaption>The navigation is a sidebar that a person opens and shuts to its icons. Its head, navigation, actions and foot are four places in one column, and children fills the content beside it. Each place carries the name of its prop, and takes any node.</figcaption>
+</figure>
+  <p><strong>A container</strong> &mdash; a container as it stands today: its header unframed above, then one rounded box holding the content parts and the footer.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 496" style="max-width:1056px" role="img" aria-label="DSPanelContainer: a header, content and a footer">
+  <rect class="sds-box" x="24" y="24" width="1052" height="492" rx="3"/>
+  <rect class="sds-skel-guide" x="40" y="40" width="1020" height="460" rx="3"/>
+  <rect class="sds-skel-control" x="40" y="112" width="1020" height="388" rx="8"/>
+  <text class="sds-title" x="56" y="83" style="font-size:20px">Members</text>
+  <text class="sds-note" x="56" y="100">Everyone who can open this workspace</text>
+  <rect class="sds-skel-control" x="888" y="64" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="904" y="82">Export</text>
+  <rect class="sds-skel-control sds-skel-main" x="970" y="64" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="986" y="82">Invite</text>
+  <text class="sds-note" x="48" y="56">DSPanelContainer</text>
+  <text class="sds-title" x="56" y="146" style="font-size:13px">Details</text>
+  <rect class="sds-skel-bar" x="72" y="196" width="956" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="210" width="956" height="6" rx="3"/>
+  <path class="sds-skel-control" d="M40 244 H1060"/>
+  <text class="sds-title" x="56" y="274" style="font-size:13px">Access</text>
+  <rect class="sds-skel-guide" x="48" y="300" width="1004" height="140" rx="3"/>
+  <text class="sds-note" x="56" y="316">Group</text>
+  <text class="sds-title" x="56" y="346" style="font-size:13px">Admins</text>
+  <rect class="sds-skel-bar" x="72" y="396" width="956" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="410" width="956" height="6" rx="3"/>
+  <path class="sds-skel-control" d="M40 444 H1060"/>
+  <rect class="sds-skel-control" x="830" y="456" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="846" y="474">Cancel</text>
+  <rect class="sds-skel-control sds-skel-main" x="928" y="456" width="116" height="28" rx="3"/>
+  <text class="sds-code" x="944" y="474">Save changes</text>
+</svg>
+<figcaption>The header stands outside the box, with no frame: the title and the description at its start, the actions at its end. One rounded box holds the content and the footer: the content as parts with a line between every two, a group inside a part, and the footer under a line of its own.</figcaption>
+</figure>
+  <p><strong>The looks of a container</strong> &mdash; the same three parts, eight ways: which parts share a frame, and whether that frame is raised, bordered and rounded.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 604" style="max-width:1056px" role="img" aria-label="The looks of a container: the same three parts, eight ways">
+  <rect class="sds-box" x="24" y="24" width="1052" height="600" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSPanelContainer looks</text>
+  <text class="sds-note" x="48" y="84">1 all raised</text>
+  <rect class="sds-skel-surface" x="40" y="96" width="237" height="230" rx="8"/>
+  <rect class="sds-skel-guide" x="40" y="96" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="48" y="112">Header</text>
+  <text class="sds-label" x="56" y="144">Title</text>
+  <rect class="sds-skel-control" x="201" y="124" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="217" y="144">Edit</text>
+  <rect class="sds-skel-guide" x="40" y="172" width="237" height="110" rx="0"/>
+  <text class="sds-note" x="48" y="188">Content</text>
+  <rect class="sds-skel-bar" x="72" y="216" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="230" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="244" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-guide" x="40" y="282" width="237" height="44" rx="0"/>
+  <text class="sds-note" x="48" y="298">Footer</text>
+  <text class="sds-note" x="309" y="84">2 all flat</text>
+  <rect class="sds-skel-guide" x="301" y="96" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="309" y="112">Header</text>
+  <text class="sds-label" x="317" y="144">Title</text>
+  <rect class="sds-skel-control" x="462" y="124" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="478" y="144">Edit</text>
+  <rect class="sds-skel-guide" x="301" y="172" width="237" height="110" rx="0"/>
+  <text class="sds-note" x="309" y="188">Content</text>
+  <rect class="sds-skel-bar" x="333" y="216" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="333" y="230" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="333" y="244" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-guide" x="301" y="282" width="237" height="44" rx="0"/>
+  <text class="sds-note" x="309" y="298">Footer</text>
+  <text class="sds-note" x="570" y="84">3 header flat, the rest raised</text>
+  <rect class="sds-skel-surface" x="562" y="172" width="237" height="154" rx="8"/>
+  <rect class="sds-skel-guide" x="562" y="96" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="570" y="112">Header</text>
+  <text class="sds-label" x="578" y="144">Title</text>
+  <rect class="sds-skel-control" x="723" y="124" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="739" y="144">Edit</text>
+  <rect class="sds-skel-guide" x="562" y="172" width="237" height="110" rx="0"/>
+  <text class="sds-note" x="570" y="188">Content</text>
+  <rect class="sds-skel-bar" x="594" y="216" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="594" y="230" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="594" y="244" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-guide" x="562" y="282" width="237" height="44" rx="0"/>
+  <text class="sds-note" x="570" y="298">Footer</text>
+  <text class="sds-note" x="831" y="84">4 content raised alone</text>
+  <rect class="sds-skel-surface" x="823" y="172" width="237" height="110" rx="8"/>
+  <rect class="sds-skel-guide" x="823" y="96" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="831" y="112">Header</text>
+  <text class="sds-label" x="839" y="144">Title</text>
+  <rect class="sds-skel-control" x="984" y="124" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="1000" y="144">Edit</text>
+  <rect class="sds-skel-guide" x="823" y="172" width="237" height="110" rx="0"/>
+  <text class="sds-note" x="831" y="188">Content</text>
+  <rect class="sds-skel-bar" x="855" y="216" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="855" y="230" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="855" y="244" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-guide" x="823" y="282" width="237" height="44" rx="0"/>
+  <text class="sds-note" x="831" y="298">Footer</text>
+  <text class="sds-note" x="48" y="366">5 full border, connected</text>
+  <rect class="sds-skel-border" x="40" y="378" width="237" height="230" rx="8"/>
+  <path class="sds-skel-border" d="M40 454 H277"/>
+  <path class="sds-skel-border" d="M40 564 H277"/>
+  <text class="sds-note" x="48" y="394">Header</text>
+  <text class="sds-label" x="56" y="426">Title</text>
+  <rect class="sds-skel-control" x="201" y="406" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="217" y="426">Edit</text>
+  <text class="sds-note" x="48" y="470">Content</text>
+  <rect class="sds-skel-bar" x="72" y="498" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="512" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="72" y="526" width="173" height="6" rx="3"/>
+  <text class="sds-note" x="48" y="580">Footer</text>
+  <text class="sds-note" x="309" y="366">6 the rest bordered, raised</text>
+  <rect class="sds-skel-surface" x="301" y="454" width="237" height="154" rx="8"/>
+  <rect class="sds-skel-border" x="301" y="454" width="237" height="154" rx="8"/>
+  <path class="sds-skel-border" d="M301 564 H538"/>
+  <rect class="sds-skel-guide" x="301" y="378" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="309" y="394">Header</text>
+  <text class="sds-label" x="317" y="426">Title</text>
+  <rect class="sds-skel-control" x="462" y="406" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="478" y="426">Edit</text>
+  <text class="sds-note" x="309" y="470">Content</text>
+  <rect class="sds-skel-bar" x="333" y="498" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="333" y="512" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="333" y="526" width="173" height="6" rx="3"/>
+  <text class="sds-note" x="309" y="580">Footer</text>
+  <text class="sds-note" x="570" y="366">7 content bordered, raised</text>
+  <rect class="sds-skel-surface" x="562" y="454" width="237" height="110" rx="8"/>
+  <rect class="sds-skel-border" x="562" y="454" width="237" height="110" rx="8"/>
+  <rect class="sds-skel-guide" x="562" y="378" width="237" height="76" rx="0"/>
+  <text class="sds-note" x="570" y="394">Header</text>
+  <text class="sds-label" x="578" y="426">Title</text>
+  <rect class="sds-skel-control" x="723" y="406" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="739" y="426">Edit</text>
+  <text class="sds-note" x="570" y="470">Content</text>
+  <rect class="sds-skel-bar" x="594" y="498" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="594" y="512" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="594" y="526" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-guide" x="562" y="564" width="237" height="44" rx="0"/>
+  <text class="sds-note" x="570" y="580">Footer</text>
+  <text class="sds-note" x="831" y="366">8 the same border, square</text>
+  <rect class="sds-skel-border" x="823" y="378" width="237" height="230" rx="0"/>
+  <path class="sds-skel-border" d="M823 454 H1060"/>
+  <path class="sds-skel-border" d="M823 564 H1060"/>
+  <text class="sds-note" x="831" y="394">Header</text>
+  <text class="sds-label" x="839" y="426">Title</text>
+  <rect class="sds-skel-control" x="984" y="406" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="1000" y="426">Edit</text>
+  <text class="sds-note" x="831" y="470">Content</text>
+  <rect class="sds-skel-bar" x="855" y="498" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="855" y="512" width="173" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="855" y="526" width="173" height="6" rx="3"/>
+  <text class="sds-note" x="831" y="580">Footer</text>
+</svg>
+<figcaption>A background is a raised surface, a solid line is a border the container has, and a part with neither is flat. The dotted line around a part only marks where it ends, and says nothing about its look.</figcaption>
+</figure>
+  <p><strong>A widget</strong> &mdash; the data table: its bar, its records and its pagination.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 576" style="max-width:1056px" role="img" aria-label="DSDataTable: its bar, its records and its pagination">
+  <rect class="sds-box" x="24" y="24" width="1052" height="572" rx="3"/>
+  <rect class="sds-skel-guide" x="40" y="40" width="1020" height="540" rx="3"/>
+  <rect class="sds-skel-control" x="40" y="112" width="1020" height="468" rx="8"/>
+  <text class="sds-title" x="56" y="83" style="font-size:20px">Orders</text>
+  <text class="sds-note" x="56" y="100">Every order placed in Lumen Labs</text>
+  <text class="sds-note" x="48" y="56">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="48" y="120" width="1004" height="452" rx="3"/>
+  <text class="sds-note" x="56" y="136">DSDataTable</text>
+  <rect class="sds-skel-surface" x="56" y="148" width="988" height="72" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="148" width="988" height="72" rx="3"/>
+  <text class="sds-note" x="64" y="164">its bar</text>
+  <rect class="sds-skel-control" x="72" y="176" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M83.67 190 L85.42 191.75 L88.33 187.67"/>
+  <rect class="sds-skel-surface" x="124" y="176" width="96" height="28" rx="3"/>
+  <rect class="sds-skel-guide" x="124" y="176" width="96" height="28" rx="3"/>
+  <text class="sds-note" x="132" y="192">headerNode</text>
+  <rect class="sds-skel-control" x="833" y="176" width="84" height="28" rx="3"/>
+  <text class="sds-code" x="849" y="194">Sort</text>
+  <path class="sds-skel-glyph" d="M893.5 188.25 L897 191.75 L900.5 188.25"/>
+  <path class="sds-skel-control" d="M941 203 H1028"/>
+  <text class="sds-label" x="941" y="194">Table</text>
+  <path class="sds-skel-border" d="M941 203 H976"/>
+  <text class="sds-code" x="1000" y="194">List</text>
+  <rect class="sds-skel-surface" x="56" y="244" width="988" height="224" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="244" width="988" height="224" rx="3"/>
+  <text class="sds-note" x="64" y="260">its records</text>
+  <rect class="sds-skel-surface" x="56" y="272" width="988" height="36" rx="0"/>
+  <text class="sds-note" x="88" y="294" style="letter-spacing:.06em;font-weight:600">ORDER</text>
+  <text class="sds-note" x="287" y="294" style="letter-spacing:.06em;font-weight:600">CUSTOMER</text>
+  <text class="sds-note" x="528" y="294" style="letter-spacing:.06em;font-weight:600">STATUS</text>
+  <text class="sds-note" x="757" y="294" style="letter-spacing:.06em;font-weight:600">TOTAL</text>
+  <path class="sds-skel-control" d="M56 308 H1044"/>
+  <path class="sds-skel-control" d="M56 354 H1044"/>
+  <path class="sds-skel-control" d="M56 398 H1044"/>
+  <text class="sds-code" x="88" y="338">#1042</text>
+  <text class="sds-code" x="287" y="338">Acme Corp</text>
+  <text class="sds-code" x="757" y="338">$1,240.00</text>
+  <rect class="sds-skel-control" x="984" y="320" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="993.92" cy="334" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="998" cy="334" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1002.08" cy="334" r="0.93"/>
+  <text class="sds-code" x="88" y="382">#1041</text>
+  <text class="sds-code" x="287" y="382">Blue Bakery</text>
+  <rect class="sds-skel-control" x="528" y="368" width="65" height="20" rx="10"/>
+  <text class="sds-code" x="536" y="382">Pending</text>
+  <text class="sds-code" x="757" y="382">$86.50</text>
+  <rect class="sds-skel-control" x="984" y="364" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="993.92" cy="378" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="998" cy="378" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1002.08" cy="378" r="0.93"/>
+  <text class="sds-code" x="88" y="426">#1040</text>
+  <text class="sds-code" x="287" y="426">Dana Lee</text>
+  <text class="sds-code" x="757" y="426">$412.00</text>
+  <rect class="sds-skel-control" x="984" y="408" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="993.92" cy="422" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="998" cy="422" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1002.08" cy="422" r="0.93"/>
+  <rect class="sds-skel-surface" x="56" y="492" width="988" height="72" rx="3"/>
+  <rect class="sds-skel-guide" x="56" y="492" width="988" height="72" rx="3"/>
+  <text class="sds-note" x="64" y="508">its footer</text>
+  <text class="sds-code" x="72" y="538">1 to 20 of 312</text>
+  <rect class="sds-skel-control" x="872" y="520" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M887.17 529.92 L883.08 534 L887.17 538.08"/>
+  <rect class="sds-skel-control" x="904" y="520" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="914.5" y="538">1</text>
+  <rect class="sds-skel-control" x="936" y="520" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="946.5" y="538">2</text>
+  <rect class="sds-skel-control" x="968" y="520" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="978.5" y="538">3</text>
+  <rect class="sds-skel-control" x="1000" y="520" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1012.83 529.92 L1016.92 534 L1012.83 538.08"/>
+</svg>
+<figcaption>One widget placed whole, as it stands on a page: in the content of a container. Its bar holds the control that ticks every record, the node the page gives it, the sort and the layout switch; its records are one table; its footer holds the count and the pagination.</figcaption>
+</figure>
+  <p><strong>A component</strong> &mdash; a dialog, one of the few components that frame others, over its scrim.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 362" style="max-width:1056px" role="img" aria-label="DSDialog: a component that frames others">
+  <rect class="sds-box" x="24" y="24" width="1052" height="358" rx="3"/>
+  <rect class="sds-skel-surface" x="40" y="40" width="1020" height="326" rx="3"/>
+  <rect class="sds-skel-guide" x="40" y="40" width="1020" height="326" rx="3"/>
+  <text class="sds-note" x="48" y="56">scrim</text>
+  <text class="sds-note" x="64" y="84">DSDialog</text>
+  <rect class="sds-skel-border" x="56" y="96" width="988" height="254" rx="8"/>
+  <path class="sds-skel-border" d="M56 168 H1044"/>
+  <path class="sds-skel-border" d="M56 278 H1044"/>
+  <text class="sds-note" x="64" y="112">title</text>
+  <text class="sds-label" x="72" y="142">Remove Priya Shah?</text>
+  <rect class="sds-skel-control" x="1000" y="124" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1010.5 134.5 L1017.5 141.5 M1017.5 134.5 L1010.5 141.5"/>
+  <text class="sds-note" x="64" y="184">content</text>
+  <rect class="sds-skel-bar" x="88" y="212" width="924" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="88" y="226" width="924" height="6" rx="3"/>
+  <rect class="sds-skel-bar" x="88" y="240" width="924" height="6" rx="3"/>
+  <text class="sds-note" x="64" y="294">actions</text>
+  <rect class="sds-skel-control" x="856" y="306" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="872" y="324">Cancel</text>
+  <rect class="sds-skel-control sds-skel-main" x="954" y="306" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="970" y="324">Remove</text>
+</svg>
+<figcaption>A dialog frames its own parts over the page, under one scrim: its title with the action that closes it, its content, and its actions at the end, in one rounded box with a line between the parts.</figcaption>
+</figure>
+  <p><strong>A showcase section</strong> &mdash; one section of a unit&rsquo;s main page in the Inline layout: its title and one line, then a card holding its tabs, its preview and its code.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 22 1056 744" style="max-width:1056px" role="img" aria-label="The section of DSButton, in the Inline layout">
+  <rect class="sds-box" x="24" y="24" width="1052" height="740" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSButton: the Sizes section, showcase layout Inline</text>
+  <text class="sds-code" x="40" y="69">one section · its tabs, its preview and its code</text>
+  <text class="sds-label" x="40" y="108">Sizes</text>
+  <text class="sds-code" x="40" y="164">One tab for each size. SM is open. The open tab shows every variant in one row that wraps.</text>
+  <rect class="sds-skel-border" x="40" y="216" width="1020" height="532" rx="8"/>
+  <path class="sds-skel-border" d="M40 292 H1060"/>
+  <text class="sds-note" x="48" y="232">tabs</text>
+  <text class="sds-code" x="56" y="264">XS</text>
+  <rect class="sds-skel-control sds-skel-main" x="94" y="244" width="46" height="32" rx="3"/>
+  <text class="sds-code" x="110" y="264">SM</text>
+  <text class="sds-code" x="164" y="264">MD</text>
+  <text class="sds-code" x="202" y="264">LG</text>
+  <text class="sds-code" x="240" y="264">XL</text>
+  <text class="sds-note" x="48" y="308">the open tab</text>
+  <rect class="sds-skel-guide" x="56" y="320" width="482" height="412" rx="3"/>
+  <text class="sds-note" x="64" y="336">preview</text>
+  <rect class="sds-skel-control sds-skel-main" x="72" y="348" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="88" y="368">Save</text>
+  <rect class="sds-skel-control" x="156" y="348" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="172" y="368">Edit</text>
+  <rect class="sds-skel-control" x="240" y="348" width="67" height="32" rx="3"/>
+  <text class="sds-code" x="256" y="368">Share</text>
+  <rect class="sds-skel-control" x="331" y="348" width="74" height="32" rx="3"/>
+  <text class="sds-code" x="347" y="368">Delete</text>
+  <rect class="sds-skel-control" x="72" y="404" width="102" height="32" rx="3"/>
+  <text class="sds-code" x="88" y="424">Learn more</text>
+  <rect class="sds-skel-surface" x="562" y="320" width="482" height="412" rx="3"/>
+  <rect class="sds-skel-guide" x="562" y="320" width="482" height="412" rx="3"/>
+  <text class="sds-note" x="570" y="336">code</text>
+  <text class="sds-code" x="578" y="368">// Solid</text>
+  <rect class="sds-skel-control" x="968" y="348" width="60" height="32" rx="3"/>
+  <text class="sds-code" x="984" y="368">Copy</text>
+  <text class="sds-code" x="578" y="424">&lt;DSButton anchor={save} size={DSSizeType.SM}</text>
+  <text class="sds-code" x="578" y="480">variant={DSVariantType.SOLID} label="Save" /&gt;</text>
+  <text class="sds-code" x="578" y="536">// Outline</text>
+  <text class="sds-code" x="578" y="592">&lt;DSButton anchor={edit} size={DSSizeType.SM}</text>
+  <text class="sds-code" x="578" y="648">variant={DSVariantType.OUTLINE} label="Edit" /&gt;</text>
+  <text class="sds-code" x="578" y="704">// Ghost</text>
+</svg>
+<figcaption>One section of the main page of a unit whose showcase layout is Inline: its title and one line, then one card holding the tabs at its top, the preview at its start and the code beside it with Copy.</figcaption>
+</figure>
+  <p><strong>The same skeleton also draws a page as a person sees it, from sample values.</strong> A container has its title and its actions above a thin rounded outline; a card is a smaller outline with its title inside; a line of a list is an item with its facts under its title; and a field is the library&rsquo;s form field or its data unit. A part with no border of its own, such as the header of a container or a row of the page beside its containers, may be marked by a dotted line with <code>marked</code>, where a figure is about the parts and what they line up with. A figure that shows a page for its content leaves it off, as these five do:</p>
+  <p><strong>A page as a person sees it</strong> &mdash; a listing: one container, with its title and its main action above its outline, its filter bar, its records with no room around them, and its paging in its footer. One view for each screen class.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 1185" style="max-width:1056px" role="img" aria-label="Find in a list">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="520" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="520" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="120" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="540" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="538" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 544 L41 541.5 L44 540.5 L47 541.5 L48 544 L40 544"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="520" rx="0"/>
+  <text class="sds-title" x="80" y="77" style="font-size:24px">Orders</text>
+  <text class="sds-note" x="80" y="95">Every order placed in Lumen Labs</text>
+  <rect class="sds-skel-control sds-skel-main" x="965" y="68" width="95" height="28" rx="3"/>
+  <text class="sds-code" x="981" y="86">New order</text>
+  <rect class="sds-skel-guide" x="80" y="128" width="980" height="420" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="128" width="980" height="420" rx="8"/>
+  <text class="sds-note" x="88" y="144">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="88" y="156" width="964" height="64" rx="3"/>
+  <text class="sds-note" x="96" y="172">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="110" cy="198" r="14"/>
+  <rect class="sds-skel-control" x="148" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="164" y="202">Search</text>
+  <rect class="sds-skel-control" x="525" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="541" y="202">Status</text>
+  <path class="sds-skel-glyph" d="M854.5 196.25 L858 199.75 L861.5 196.25"/>
+  <rect class="sds-skel-control" x="902" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M916 193.92 L916 202.08 M911.92 198 L920.08 198"/>
+  <text class="sds-code" x="954" y="202">|</text>
+  <rect class="sds-skel-control" x="985" y="184" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph" cx="997.83" cy="196.83" r="3.5"/>
+  <path class="sds-skel-glyph" d="M1000.75 199.75 L1003.67 202.67"/>
+  <rect class="sds-skel-control" x="1017" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1027.5 194.5 L1034.5 201.5 M1034.5 194.5 L1027.5 201.5"/>
+  <rect class="sds-skel-guide" x="88" y="228" width="964" height="260" rx="3"/>
+  <text class="sds-note" x="96" y="244">DSDataTable</text>
+  <rect class="sds-skel-surface" x="88" y="256" width="964" height="36" rx="0"/>
+  <text class="sds-note" x="112" y="278" style="letter-spacing:.06em;font-weight:600">ORDER</text>
+  <text class="sds-note" x="307.25" y="278" style="letter-spacing:.06em;font-weight:600">CUSTOMER</text>
+  <text class="sds-note" x="544.5" y="278" style="letter-spacing:.06em;font-weight:600">STATUS</text>
+  <text class="sds-note" x="776.75" y="278" style="letter-spacing:.06em;font-weight:600">TOTAL</text>
+  <path class="sds-skel-control" d="M88 292 H1052"/>
+  <path class="sds-skel-control" d="M88 338 H1052"/>
+  <path class="sds-skel-control" d="M88 382 H1052"/>
+  <path class="sds-skel-control" d="M88 426 H1052"/>
+  <text class="sds-code" x="112" y="322">#1042</text>
+  <text class="sds-code" x="307.25" y="322">Acme Corp</text>
+  <text class="sds-code" x="776.75" y="322">$1,240.00</text>
+  <rect class="sds-skel-control" x="1000" y="304" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="318" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="318" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="318" r="0.93"/>
+  <text class="sds-code" x="112" y="366">#1041</text>
+  <text class="sds-code" x="307.25" y="366">Blue Bakery</text>
+  <rect class="sds-skel-control" x="544.5" y="352" width="65" height="20" rx="10"/>
+  <text class="sds-code" x="552.5" y="366">Pending</text>
+  <text class="sds-code" x="776.75" y="366">$86.50</text>
+  <rect class="sds-skel-control" x="1000" y="348" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="362" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="362" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="362" r="0.93"/>
+  <text class="sds-code" x="112" y="410">#1040</text>
+  <text class="sds-code" x="307.25" y="410">Dana Lee</text>
+  <text class="sds-code" x="776.75" y="410">$412.00</text>
+  <rect class="sds-skel-control" x="1000" y="392" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="406" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="406" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="406" r="0.93"/>
+  <text class="sds-code" x="112" y="454">#1039</text>
+  <text class="sds-code" x="307.25" y="454">Omar Haddad</text>
+  <rect class="sds-skel-control" x="544.5" y="440" width="72" height="20" rx="10"/>
+  <text class="sds-code" x="552.5" y="454">Refunded</text>
+  <text class="sds-code" x="776.75" y="454">$59.90</text>
+  <rect class="sds-skel-control" x="1000" y="436" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1009.92" cy="450" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="450" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1018.08" cy="450" r="0.93"/>
+  <path class="sds-skel-control" d="M80 492 H1060"/>
+  <text class="sds-code" x="96" y="522">1 to 20 of 312</text>
+  <rect class="sds-skel-control" x="888" y="504" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M903.17 513.92 L899.08 518 L903.17 522.08"/>
+  <rect class="sds-skel-control" x="920" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="930.5" y="522">1</text>
+  <rect class="sds-skel-control" x="952" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="962.5" y="522">2</text>
+  <rect class="sds-skel-control" x="984" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="994.5" y="522">3</text>
+  <rect class="sds-skel-control" x="1016" y="504" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1028.83 513.92 L1032.92 518 L1028.83 522.08"/>
+  <text class="sds-note" x="24" y="600">TABLET</text>
+  <rect class="sds-box" x="24" y="608" width="617" height="520" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="608" width="40" height="520" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="625" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="662" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="684" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="690" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="718" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="746" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="774" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="802" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="830" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="858" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="1104" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="1102" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 1108 L41 1105.5 L44 1104.5 L47 1105.5 L48 1108 L40 1108"/>
+  <rect class="sds-skel-border" x="64" y="608" width="577" height="520" rx="0"/>
+  <text class="sds-title" x="80" y="641" style="font-size:24px">Orders</text>
+  <text class="sds-note" x="80" y="659">Every order placed in Lumen Labs</text>
+  <rect class="sds-skel-control sds-skel-main" x="530" y="632" width="95" height="28" rx="3"/>
+  <text class="sds-code" x="546" y="650">New order</text>
+  <rect class="sds-skel-guide" x="80" y="692" width="545" height="420" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="692" width="545" height="420" rx="8"/>
+  <text class="sds-note" x="88" y="708">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="88" y="720" width="529" height="64" rx="3"/>
+  <text class="sds-note" x="96" y="736">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="110" cy="762" r="14"/>
+  <rect class="sds-skel-control" x="148" y="748" width="294" height="28" rx="3"/>
+  <text class="sds-code" x="164" y="766">Search</text>
+  <rect class="sds-skel-control" x="466" y="748" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M480 757.92 L480 766.08 M475.92 762 L484.08 762"/>
+  <text class="sds-code" x="518" y="766">|</text>
+  <rect class="sds-skel-control" x="549" y="748" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph" cx="561.83" cy="760.83" r="3.5"/>
+  <path class="sds-skel-glyph" d="M564.75 763.75 L567.67 766.67"/>
+  <rect class="sds-skel-control" x="581" y="748" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 758.5 L598.5 765.5 M598.5 758.5 L591.5 765.5"/>
+  <rect class="sds-skel-guide" x="88" y="792" width="529" height="260" rx="3"/>
+  <text class="sds-note" x="96" y="808">DSDataTable</text>
+  <rect class="sds-skel-surface" x="88" y="820" width="529" height="36" rx="0"/>
+  <text class="sds-note" x="112" y="842" style="letter-spacing:.06em;font-weight:600">ORDER</text>
+  <text class="sds-note" x="239.67" y="842" style="letter-spacing:.06em;font-weight:600">CUSTOMER</text>
+  <text class="sds-note" x="409.33" y="842" style="letter-spacing:.06em;font-weight:600">TOTAL</text>
+  <path class="sds-skel-control" d="M88 856 H617"/>
+  <path class="sds-skel-control" d="M88 902 H617"/>
+  <path class="sds-skel-control" d="M88 946 H617"/>
+  <path class="sds-skel-control" d="M88 990 H617"/>
+  <text class="sds-code" x="112" y="886">#1042</text>
+  <text class="sds-code" x="239.66666666666669" y="886">Acme Corp</text>
+  <text class="sds-code" x="409.33333333333337" y="886">$1,240.00</text>
+  <rect class="sds-skel-control" x="565" y="868" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="574.92" cy="882" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="882" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="583.08" cy="882" r="0.93"/>
+  <text class="sds-code" x="112" y="930">#1041</text>
+  <text class="sds-code" x="239.66666666666669" y="930">Blue Bakery</text>
+  <text class="sds-code" x="409.33333333333337" y="930">$86.50</text>
+  <rect class="sds-skel-control" x="565" y="912" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="574.92" cy="926" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="926" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="583.08" cy="926" r="0.93"/>
+  <text class="sds-code" x="112" y="974">#1040</text>
+  <text class="sds-code" x="239.66666666666669" y="974">Dana Lee</text>
+  <text class="sds-code" x="409.33333333333337" y="974">$412.00</text>
+  <rect class="sds-skel-control" x="565" y="956" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="574.92" cy="970" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="970" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="583.08" cy="970" r="0.93"/>
+  <text class="sds-code" x="112" y="1018">#1039</text>
+  <text class="sds-code" x="239.66666666666669" y="1018">Omar Haddad</text>
+  <text class="sds-code" x="409.33333333333337" y="1018">$59.90</text>
+  <rect class="sds-skel-control" x="565" y="1000" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="574.92" cy="1014" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="1014" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="583.08" cy="1014" r="0.93"/>
+  <path class="sds-skel-control" d="M80 1056 H625"/>
+  <text class="sds-code" x="96" y="1086">1 to 20 of 312</text>
+  <rect class="sds-skel-control" x="453" y="1068" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M468.17 1077.92 L464.08 1082 L468.17 1086.08"/>
+  <rect class="sds-skel-control" x="485" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="495.5" y="1086">1</text>
+  <rect class="sds-skel-control" x="517" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="527.5" y="1086">2</text>
+  <rect class="sds-skel-control" x="549" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="559.5" y="1086">3</text>
+  <rect class="sds-skel-control" x="581" y="1068" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M593.83 1077.92 L597.92 1082 L593.83 1086.08"/>
+  <text class="sds-note" x="665" y="600">MOBILE</text>
+  <rect class="sds-box" x="665" y="608" width="411" height="596" rx="3"/>
+  <rect class="sds-skel-surface" x="665" y="608" width="411" height="48" rx="0"/>
+  <rect class="sds-skel-control" x="673" y="616" width="32" height="32" rx="3"/>
+  <path class="sds-skel-glyph" d="M684.33 628.67 L693.67 628.67 M684.33 632 L693.67 632 M684.33 635.33 L693.67 635.33"/>
+  <rect class="sds-skel-bar" x="713" y="625" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="733" y="629" width="60" height="6" rx="3"/>
+  <circle class="sds-skel-control" cx="1048" cy="632" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1048" cy="630" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M1044 636 L1045 633.5 L1048 632.5 L1051 633.5 L1052 636 L1044 636"/>
+  <rect class="sds-skel-border" x="665" y="656" width="411" height="548" rx="0"/>
+  <text class="sds-title" x="681" y="689" style="font-size:24px">Orders</text>
+  <text class="sds-note" x="681" y="707">Every order placed in Lumen Labs</text>
+  <rect class="sds-skel-control sds-skel-main" x="965" y="680" width="95" height="28" rx="3"/>
+  <text class="sds-code" x="981" y="698">New order</text>
+  <rect class="sds-skel-guide" x="681" y="740" width="379" height="448" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="740" width="379" height="448" rx="8"/>
+  <text class="sds-note" x="689" y="756">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="689" y="768" width="363" height="64" rx="3"/>
+  <text class="sds-note" x="697" y="784">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="711" cy="810" r="14"/>
+  <rect class="sds-skel-control" x="749" y="796" width="295" height="28" rx="3"/>
+  <text class="sds-code" x="765" y="814">1 filter on</text>
+  <rect class="sds-skel-guide" x="689" y="840" width="363" height="288" rx="3"/>
+  <text class="sds-note" x="697" y="856">DSDataTable</text>
+  <text class="sds-title" x="697" y="885" style="font-size:12px;font-weight:500">#1042</text>
+  <text class="sds-note" x="697" y="903">Acme Corp</text>
+  <text class="sds-note" x="762" y="903">·</text>
+  <text class="sds-note" x="772" y="903">$1,240.00</text>
+  <rect class="sds-skel-control" x="1016" y="876" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1025.92" cy="890" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="890" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1034.08" cy="890" r="0.93"/>
+  <path class="sds-skel-control" d="M689 924 H1052"/>
+  <text class="sds-title" x="697" y="953" style="font-size:12px;font-weight:500">#1041</text>
+  <text class="sds-note" x="697" y="974">Blue Bakery</text>
+  <text class="sds-note" x="769" y="974">·</text>
+  <rect class="sds-skel-control" x="779" y="962" width="65" height="16" rx="8"/>
+  <text class="sds-code" x="787" y="974">Pending</text>
+  <text class="sds-note" x="850" y="974">·</text>
+  <text class="sds-note" x="860" y="974">$86.50</text>
+  <rect class="sds-skel-control" x="1016" y="945" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1025.92" cy="959" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="959" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1034.08" cy="959" r="0.93"/>
+  <path class="sds-skel-control" d="M689 994 H1052"/>
+  <text class="sds-title" x="697" y="1023" style="font-size:12px;font-weight:500">#1040</text>
+  <text class="sds-note" x="697" y="1041">Dana Lee</text>
+  <text class="sds-note" x="753" y="1041">·</text>
+  <text class="sds-note" x="763" y="1041">$412.00</text>
+  <rect class="sds-skel-control" x="1016" y="1014" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1025.92" cy="1028" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="1028" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1034.08" cy="1028" r="0.93"/>
+  <path class="sds-skel-control" d="M689 1062 H1052"/>
+  <text class="sds-title" x="697" y="1091" style="font-size:12px;font-weight:500">#1039</text>
+  <text class="sds-note" x="697" y="1112">Omar Haddad</text>
+  <text class="sds-note" x="775" y="1112">·</text>
+  <rect class="sds-skel-control" x="785" y="1100" width="72" height="16" rx="8"/>
+  <text class="sds-code" x="793" y="1112">Refunded</text>
+  <text class="sds-note" x="863" y="1112">·</text>
+  <text class="sds-note" x="873" y="1112">$59.90</text>
+  <rect class="sds-skel-control" x="1016" y="1083" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1025.92" cy="1097" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="1097" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1034.08" cy="1097" r="0.93"/>
+  <path class="sds-skel-control" d="M681 1132 H1060"/>
+  <text class="sds-code" x="697" y="1162">1 to 20 of 312</text>
+  <rect class="sds-skel-control" x="888" y="1144" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M903.17 1153.92 L899.08 1158 L903.17 1162.08"/>
+  <rect class="sds-skel-control" x="920" y="1144" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="930.5" y="1162">1</text>
+  <rect class="sds-skel-control" x="952" y="1144" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="962.5" y="1162">2</text>
+  <rect class="sds-skel-control" x="984" y="1144" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="994.5" y="1162">3</text>
+  <rect class="sds-skel-control" x="1016" y="1144" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1028.83 1153.92 L1032.92 1158 L1028.83 1162.08"/>
+</svg>
+<figcaption>The page stands in a shut rail. Its header is the page head, with no frame of its own; the filter bar and the data table are the content parts of one rounded box, and the paging is its footer under a line. The records reach the box with no room around them, and on a phone the table is a list and the filter bar is one button.</figcaption>
+</figure>
+  <p><strong>A form</strong> &mdash; a large form is one container: its sections are the parts of its content, each with its own title, and its actions stand in its footer.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 2133" style="max-width:1056px" role="img" aria-label="An entry that is a page">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="808" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="808" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="288" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="828" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="826" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 832 L41 829.5 L44 828.5 L47 829.5 L48 832 L40 832"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="808" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="68" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 77.92 L91.08 82 L95.17 86.08"/>
+  <text class="sds-title" x="132" y="77" style="font-size:24px">New schedule</text>
+  <text class="sds-note" x="132" y="95">Runs a job at a set time</text>
+  <rect class="sds-skel-guide" x="80" y="128" width="980" height="708" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="128" width="980" height="708" rx="8"/>
+  <text class="sds-note" x="88" y="144">DSPanelContainer</text>
+  <text class="sds-title" x="96" y="182" style="font-size:13px">Details</text>
+  <text class="sds-title" x="96" y="229" style="font-size:12px;font-weight:400">Name</text>
+  <circle class="sds-skel-glyph" cx="552" cy="225" r="6"/>
+  <text class="sds-note" x="552" y="228.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="96" y="242" width="462" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="260">Nightly export</text>
+  <text class="sds-title" x="582" y="229" style="font-size:12px;font-weight:400">Owner</text>
+  <rect class="sds-skel-control" x="582" y="242" width="462" height="28" rx="3"/>
+  <text class="sds-code" x="598" y="260">Dana Lee</text>
+  <path class="sds-skel-glyph" d="M1020.5 254.25 L1024 257.75 L1027.5 254.25"/>
+  <text class="sds-title" x="96" y="329" style="font-size:12px;font-weight:400">About</text>
+  <rect class="sds-skel-control" x="96" y="342" width="948" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="360"></text>
+  <text class="sds-note" x="96" y="387">Shown in the list of schedules</text>
+  <path class="sds-skel-control" d="M80 404 H1060"/>
+  <text class="sds-title" x="96" y="434" style="font-size:13px">Trigger</text>
+  <text class="sds-title" x="96" y="481" style="font-size:12px;font-weight:400">Repeats</text>
+  <rect class="sds-skel-control" x="96" y="494" width="300" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="512">Daily</text>
+  <path class="sds-skel-glyph" d="M372.5 506.25 L376 509.75 L379.5 506.25"/>
+  <text class="sds-title" x="420" y="481" style="font-size:12px;font-weight:400">Starts on</text>
+  <rect class="sds-skel-control" x="420" y="494" width="300" height="28" rx="3"/>
+  <text class="sds-code" x="436" y="512">2 May</text>
+  <text class="sds-note" x="420" y="539">In the time zone of the organization</text>
+  <text class="sds-title" x="744" y="481" style="font-size:12px;font-weight:400">Time</text>
+  <rect class="sds-skel-control" x="744" y="494" width="300" height="28" rx="3" style="stroke:var(--sds-fail)"/>
+  <text class="sds-code" x="760" y="512">25:00</text>
+  <text class="sds-note" x="744" y="539" style="fill:var(--sds-fail)">Enter a time from 00:00 to 23:59</text>
+  <path class="sds-skel-control" d="M80 556 H1060"/>
+  <text class="sds-title" x="96" y="586" style="font-size:13px">Destinations</text>
+  <rect class="sds-skel-control" x="935" y="568" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="951" y="586">Add another</text>
+  <rect class="sds-skel-guide" x="88" y="612" width="964" height="164" rx="3"/>
+  <text class="sds-note" x="96" y="628">Group</text>
+  <text class="sds-title" x="96" y="658" style="font-size:13px">Destination 1</text>
+  <text class="sds-title" x="96" y="705" style="font-size:12px;font-weight:400">Kind</text>
+  <rect class="sds-skel-control" x="96" y="718" width="436" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="736">Webhook</text>
+  <path class="sds-skel-glyph" d="M508.5 730.25 L512 733.75 L515.5 730.25"/>
+  <text class="sds-title" x="556" y="705" style="font-size:12px;font-weight:400">Address</text>
+  <circle class="sds-skel-glyph" cx="986" cy="701" r="6"/>
+  <text class="sds-note" x="986" y="704.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="556" y="718" width="436" height="28" rx="3"/>
+  <text class="sds-code" x="572" y="736">https://acme.com/hook</text>
+  <rect class="sds-skel-control" x="1016" y="716" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 726.5 L1033.5 733.5 M1033.5 726.5 L1026.5 733.5"/>
+  <path class="sds-skel-control" d="M80 780 H1060"/>
+  <rect class="sds-skel-control sds-skel-main" x="96" y="792" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="810">Create</text>
+  <rect class="sds-skel-control" x="194" y="792" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="210" y="810">Cancel</text>
+  <text class="sds-note" x="24" y="888">TABLET</text>
+  <rect class="sds-box" x="24" y="896" width="617" height="908" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="896" width="40" height="908" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="913" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="950" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="978" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="1006" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="1034" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="1062" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="1090" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="1118" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="1140" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="1146" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="1780" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="1778" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 1784 L41 1781.5 L44 1780.5 L47 1781.5 L48 1784 L40 1784"/>
+  <rect class="sds-skel-border" x="64" y="896" width="577" height="908" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="920" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 929.92 L91.08 934 L95.17 938.08"/>
+  <text class="sds-title" x="132" y="929" style="font-size:24px">New schedule</text>
+  <text class="sds-note" x="132" y="947">Runs a job at a set time</text>
+  <rect class="sds-skel-guide" x="80" y="980" width="545" height="808" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="980" width="545" height="808" rx="8"/>
+  <text class="sds-note" x="88" y="996">DSPanelContainer</text>
+  <text class="sds-title" x="96" y="1034" style="font-size:13px">Details</text>
+  <text class="sds-title" x="96" y="1081" style="font-size:12px;font-weight:400">Name</text>
+  <circle class="sds-skel-glyph" cx="335" cy="1077" r="6"/>
+  <text class="sds-note" x="335" y="1080.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="96" y="1094" width="245" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1112">Nightly export</text>
+  <text class="sds-title" x="365" y="1081" style="font-size:12px;font-weight:400">Owner</text>
+  <rect class="sds-skel-control" x="365" y="1094" width="245" height="28" rx="3"/>
+  <text class="sds-code" x="381" y="1112">Dana Lee</text>
+  <path class="sds-skel-glyph" d="M586.5 1106.25 L590 1109.75 L593.5 1106.25"/>
+  <text class="sds-title" x="96" y="1181" style="font-size:12px;font-weight:400">About</text>
+  <rect class="sds-skel-control" x="96" y="1194" width="513" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1212"></text>
+  <text class="sds-note" x="96" y="1239">Shown in the list of schedules</text>
+  <path class="sds-skel-control" d="M80 1256 H625"/>
+  <text class="sds-title" x="96" y="1286" style="font-size:13px">Trigger</text>
+  <text class="sds-title" x="96" y="1333" style="font-size:12px;font-weight:400">Repeats</text>
+  <rect class="sds-skel-control" x="96" y="1346" width="245" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1364">Daily</text>
+  <path class="sds-skel-glyph" d="M317.5 1358.25 L321 1361.75 L324.5 1358.25"/>
+  <text class="sds-title" x="365" y="1333" style="font-size:12px;font-weight:400">Starts on</text>
+  <rect class="sds-skel-control" x="365" y="1346" width="245" height="28" rx="3"/>
+  <text class="sds-code" x="381" y="1364">2 May</text>
+  <text class="sds-note" x="365" y="1391">In the time zone of the organization</text>
+  <text class="sds-title" x="96" y="1433" style="font-size:12px;font-weight:400">Time</text>
+  <rect class="sds-skel-control" x="96" y="1446" width="245" height="28" rx="3" style="stroke:var(--sds-fail)"/>
+  <text class="sds-code" x="112" y="1464">25:00</text>
+  <text class="sds-note" x="96" y="1491" style="fill:var(--sds-fail)">Enter a time from 00:00 to 23:59</text>
+  <path class="sds-skel-control" d="M80 1508 H625"/>
+  <text class="sds-title" x="96" y="1538" style="font-size:13px">Destinations</text>
+  <rect class="sds-skel-control" x="500" y="1520" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="516" y="1538">Add another</text>
+  <rect class="sds-skel-guide" x="88" y="1564" width="529" height="164" rx="3"/>
+  <text class="sds-note" x="96" y="1580">Group</text>
+  <text class="sds-title" x="96" y="1610" style="font-size:13px">Destination 1</text>
+  <text class="sds-title" x="96" y="1657" style="font-size:12px;font-weight:400">Kind</text>
+  <rect class="sds-skel-control" x="96" y="1670" width="219" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1688">Webhook</text>
+  <path class="sds-skel-glyph" d="M291.5 1682.25 L295 1685.75 L298.5 1682.25"/>
+  <text class="sds-title" x="339" y="1657" style="font-size:12px;font-weight:400">Address</text>
+  <circle class="sds-skel-glyph" cx="552" cy="1653" r="6"/>
+  <text class="sds-note" x="552" y="1656.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="339" y="1670" width="219" height="28" rx="3"/>
+  <text class="sds-code" x="355" y="1688">https://acme.com/hook</text>
+  <rect class="sds-skel-control" x="582" y="1668" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M592.5 1678.5 L599.5 1685.5 M599.5 1678.5 L592.5 1685.5"/>
+  <path class="sds-skel-control" d="M80 1732 H625"/>
+  <rect class="sds-skel-control sds-skel-main" x="96" y="1744" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1762">Create</text>
+  <rect class="sds-skel-control" x="194" y="1744" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="210" y="1762">Cancel</text>
+  <text class="sds-note" x="665" y="888">MOBILE</text>
+  <rect class="sds-box" x="665" y="896" width="411" height="1256" rx="3"/>
+  <rect class="sds-skel-surface" x="665" y="896" width="411" height="48" rx="0"/>
+  <rect class="sds-skel-control" x="673" y="904" width="32" height="32" rx="3"/>
+  <path class="sds-skel-glyph" d="M684.33 916.67 L693.67 916.67 M684.33 920 L693.67 920 M684.33 923.33 L693.67 923.33"/>
+  <rect class="sds-skel-bar" x="713" y="913" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="733" y="917" width="60" height="6" rx="3"/>
+  <circle class="sds-skel-control" cx="1048" cy="920" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1048" cy="918" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M1044 924 L1045 921.5 L1048 920.5 L1051 921.5 L1052 924 L1044 924"/>
+  <rect class="sds-skel-border" x="665" y="944" width="411" height="1208" rx="0"/>
+  <rect class="sds-skel-control" x="681" y="968" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M696.17 977.92 L692.08 982 L696.17 986.08"/>
+  <text class="sds-title" x="733" y="977" style="font-size:24px">New schedule</text>
+  <text class="sds-note" x="733" y="995">Runs a job at a set time</text>
+  <rect class="sds-skel-guide" x="681" y="1028" width="379" height="1108" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="1028" width="379" height="1108" rx="8"/>
+  <text class="sds-note" x="689" y="1044">DSPanelContainer</text>
+  <text class="sds-title" x="697" y="1082" style="font-size:13px">Details</text>
+  <text class="sds-title" x="697" y="1129" style="font-size:12px;font-weight:400">Name</text>
+  <circle class="sds-skel-glyph" cx="1038" cy="1125" r="6"/>
+  <text class="sds-note" x="1038" y="1128.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="697" y="1142" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1160">Nightly export</text>
+  <text class="sds-title" x="697" y="1229" style="font-size:12px;font-weight:400">Owner</text>
+  <rect class="sds-skel-control" x="697" y="1242" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1260">Dana Lee</text>
+  <path class="sds-skel-glyph" d="M1020.5 1254.25 L1024 1257.75 L1027.5 1254.25"/>
+  <text class="sds-title" x="697" y="1329" style="font-size:12px;font-weight:400">About</text>
+  <rect class="sds-skel-control" x="697" y="1342" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1360"></text>
+  <text class="sds-note" x="697" y="1387">Shown in the list of schedules</text>
+  <path class="sds-skel-control" d="M681 1404 H1060"/>
+  <text class="sds-title" x="697" y="1434" style="font-size:13px">Trigger</text>
+  <text class="sds-title" x="697" y="1481" style="font-size:12px;font-weight:400">Repeats</text>
+  <rect class="sds-skel-control" x="697" y="1494" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1512">Daily</text>
+  <path class="sds-skel-glyph" d="M1020.5 1506.25 L1024 1509.75 L1027.5 1506.25"/>
+  <text class="sds-title" x="697" y="1581" style="font-size:12px;font-weight:400">Starts on</text>
+  <rect class="sds-skel-control" x="697" y="1594" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1612">2 May</text>
+  <text class="sds-note" x="697" y="1639">In the time zone of the organization</text>
+  <text class="sds-title" x="697" y="1681" style="font-size:12px;font-weight:400">Time</text>
+  <rect class="sds-skel-control" x="697" y="1694" width="347" height="28" rx="3" style="stroke:var(--sds-fail)"/>
+  <text class="sds-code" x="713" y="1712">25:00</text>
+  <text class="sds-note" x="697" y="1739" style="fill:var(--sds-fail)">Enter a time from 00:00 to 23:59</text>
+  <path class="sds-skel-control" d="M681 1756 H1060"/>
+  <text class="sds-title" x="697" y="1786" style="font-size:13px">Destinations</text>
+  <rect class="sds-skel-control" x="935" y="1768" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="951" y="1786">Add another</text>
+  <rect class="sds-skel-guide" x="689" y="1812" width="363" height="264" rx="3"/>
+  <text class="sds-note" x="697" y="1828">Group</text>
+  <text class="sds-title" x="697" y="1858" style="font-size:13px">Destination 1</text>
+  <text class="sds-title" x="697" y="1905" style="font-size:12px;font-weight:400">Kind</text>
+  <rect class="sds-skel-control" x="697" y="1918" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1936">Webhook</text>
+  <path class="sds-skel-glyph" d="M1020.5 1930.25 L1024 1933.75 L1027.5 1930.25"/>
+  <text class="sds-title" x="697" y="2005" style="font-size:12px;font-weight:400">Address</text>
+  <circle class="sds-skel-glyph" cx="986" cy="2001" r="6"/>
+  <text class="sds-note" x="986" y="2004.5" text-anchor="middle" style="font-size:9px;font-weight:600">i</text>
+  <rect class="sds-skel-control" x="697" y="2018" width="295" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="2036">https://acme.com/hook</text>
+  <rect class="sds-skel-control" x="1016" y="2016" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 2026.5 L1033.5 2033.5 M1033.5 2026.5 L1026.5 2033.5"/>
+  <path class="sds-skel-control" d="M681 2080 H1060"/>
+  <rect class="sds-skel-control sds-skel-main" x="697" y="2092" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="2110">Create</text>
+  <rect class="sds-skel-control" x="795" y="2092" width="74" height="28" rx="3"/>
+  <text class="sds-code" x="811" y="2110">Cancel</text>
+</svg>
+<figcaption>The page head holds the way back and the title. The sections are the content parts of one rounded box, each with its own title and a line between every two, and a thing that repeats inside a part is a group with its own dotted boundary. The actions stand in the footer under a line. Each field has its title above its control and never beside it, and one line under the control for its description or its error.</figcaption>
+</figure>
+  <p><strong>A field that is read, beside one that is entered</strong> &mdash; a reading is its title with its value under it, as the library&rsquo;s data unit shows it.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 1449" style="max-width:1056px" role="img" aria-label="Inherit or override">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="416" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="416" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="260" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="436" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="434" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 440 L41 437.5 L44 436.5 L47 437.5 L48 440 L40 440"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="416" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="60" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 69.92 L91.08 74 L95.17 78.08"/>
+  <text class="sds-title" x="132" y="78" style="font-size:24px">Policies</text>
+  <rect class="sds-skel-guide" x="80" y="112" width="478" height="332" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="184" width="478" height="260" rx="8"/>
+  <text class="sds-title" x="96" y="155" style="font-size:20px">Sign-in policy</text>
+  <text class="sds-note" x="96" y="172">Follows Enterprise</text>
+  <rect class="sds-skel-control" x="433" y="136" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="449" y="154">Set our own</text>
+  <text class="sds-note" x="88" y="128">DSPanelContainer</text>
+  <text class="sds-note" x="96" y="213" style="font-size:12px;font-weight:600">Password</text>
+  <text class="sds-title" x="96" y="236" style="font-size:13px;font-weight:400">Required</text>
+  <text class="sds-note" x="253" y="213" style="font-size:12px;font-weight:600">Two-step</text>
+  <text class="sds-title" x="253" y="236" style="font-size:13px;font-weight:400">Optional</text>
+  <text class="sds-note" x="410" y="213" style="font-size:12px;font-weight:600">Session</text>
+  <text class="sds-title" x="410" y="236" style="font-size:13px;font-weight:400">8 hours</text>
+  <text class="sds-note" x="96" y="279" style="font-size:12px;font-weight:600">Social sign-in</text>
+  <text class="sds-title" x="96" y="302" style="font-size:13px;font-weight:400">On</text>
+  <text class="sds-note" x="253" y="279" style="font-size:12px;font-weight:600">Sign-up</text>
+  <text class="sds-title" x="253" y="302" style="font-size:13px;font-weight:400">Invite only</text>
+  <text class="sds-note" x="410" y="279" style="font-size:12px;font-weight:600">Lock after</text>
+  <text class="sds-title" x="410" y="302" style="font-size:13px;font-weight:400">5 tries</text>
+  <rect class="sds-skel-guide" x="582" y="112" width="478" height="332" rx="3"/>
+  <rect class="sds-skel-control" x="582" y="184" width="478" height="260" rx="8"/>
+  <text class="sds-title" x="598" y="155" style="font-size:20px">Data policy</text>
+  <text class="sds-note" x="598" y="172">Our own values</text>
+  <text class="sds-note" x="590" y="128">DSPanelContainer</text>
+  <text class="sds-title" x="598" y="213" style="font-size:12px;font-weight:400">Keep</text>
+  <rect class="sds-skel-control" x="598" y="226" width="446" height="28" rx="3"/>
+  <text class="sds-code" x="614" y="244">30 days</text>
+  <path class="sds-skel-glyph" d="M1020.5 238.25 L1024 241.75 L1027.5 238.25"/>
+  <text class="sds-note" x="598" y="271">How long a record is kept</text>
+  <text class="sds-title" x="598" y="313" style="font-size:12px;font-weight:400">Export</text>
+  <rect class="sds-skel-control" x="598" y="326" width="446" height="28" rx="3"/>
+  <text class="sds-code" x="614" y="344">On</text>
+  <path class="sds-skel-glyph" d="M1020.5 338.25 L1024 341.75 L1027.5 338.25"/>
+  <path class="sds-skel-control" d="M582 388 H1060"/>
+  <rect class="sds-skel-control" x="851" y="400" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="867" y="418">Use default</text>
+  <rect class="sds-skel-control sds-skel-main" x="984" y="400" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="1000" y="418">Save</text>
+  <text class="sds-note" x="24" y="496">TABLET</text>
+  <rect class="sds-box" x="24" y="504" width="617" height="718" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="504" width="40" height="718" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="521" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="558" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="586" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="614" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="642" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="670" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="698" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="720" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="726" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="754" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="1198" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="1196" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 1202 L41 1199.5 L44 1198.5 L47 1199.5 L48 1202 L40 1202"/>
+  <rect class="sds-skel-border" x="64" y="504" width="577" height="718" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="520" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 529.92 L91.08 534 L95.17 538.08"/>
+  <text class="sds-title" x="132" y="538" style="font-size:24px">Policies</text>
+  <rect class="sds-skel-guide" x="80" y="572" width="545" height="278" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="644" width="545" height="206" rx="8"/>
+  <text class="sds-title" x="96" y="615" style="font-size:20px">Sign-in policy</text>
+  <text class="sds-note" x="96" y="632">Follows Enterprise</text>
+  <rect class="sds-skel-control" x="500" y="596" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="516" y="614">Set our own</text>
+  <text class="sds-note" x="88" y="588">DSPanelContainer</text>
+  <text class="sds-note" x="96" y="673" style="font-size:12px;font-weight:600">Password</text>
+  <text class="sds-title" x="96" y="696" style="font-size:13px;font-weight:400">Required</text>
+  <text class="sds-note" x="365" y="673" style="font-size:12px;font-weight:600">Two-step</text>
+  <text class="sds-title" x="365" y="696" style="font-size:13px;font-weight:400">Optional</text>
+  <text class="sds-note" x="96" y="739" style="font-size:12px;font-weight:600">Session</text>
+  <text class="sds-title" x="96" y="762" style="font-size:13px;font-weight:400">8 hours</text>
+  <text class="sds-note" x="365" y="739" style="font-size:12px;font-weight:600">Social sign-in</text>
+  <text class="sds-title" x="365" y="762" style="font-size:13px;font-weight:400">On</text>
+  <text class="sds-note" x="96" y="805" style="font-size:12px;font-weight:600">Sign-up</text>
+  <text class="sds-title" x="96" y="828" style="font-size:13px;font-weight:400">Invite only</text>
+  <text class="sds-note" x="365" y="805" style="font-size:12px;font-weight:600">Lock after</text>
+  <text class="sds-title" x="365" y="828" style="font-size:13px;font-weight:400">5 tries</text>
+  <rect class="sds-skel-guide" x="80" y="874" width="545" height="332" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="946" width="545" height="260" rx="8"/>
+  <text class="sds-title" x="96" y="917" style="font-size:20px">Data policy</text>
+  <text class="sds-note" x="96" y="934">Our own values</text>
+  <text class="sds-note" x="88" y="890">DSPanelContainer</text>
+  <text class="sds-title" x="96" y="975" style="font-size:12px;font-weight:400">Keep</text>
+  <rect class="sds-skel-control" x="96" y="988" width="513" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1006">30 days</text>
+  <path class="sds-skel-glyph" d="M585.5 1000.25 L589 1003.75 L592.5 1000.25"/>
+  <text class="sds-note" x="96" y="1033">How long a record is kept</text>
+  <text class="sds-title" x="96" y="1075" style="font-size:12px;font-weight:400">Export</text>
+  <rect class="sds-skel-control" x="96" y="1088" width="513" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1106">On</text>
+  <path class="sds-skel-glyph" d="M585.5 1100.25 L589 1103.75 L592.5 1100.25"/>
+  <path class="sds-skel-control" d="M80 1150 H625"/>
+  <rect class="sds-skel-control" x="416" y="1162" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="432" y="1180">Use default</text>
+  <rect class="sds-skel-control sds-skel-main" x="549" y="1162" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="565" y="1180">Save</text>
+  <text class="sds-note" x="665" y="496">MOBILE</text>
+  <rect class="sds-box" x="665" y="504" width="411" height="964" rx="3"/>
+  <rect class="sds-skel-surface" x="665" y="504" width="411" height="48" rx="0"/>
+  <rect class="sds-skel-control" x="673" y="512" width="32" height="32" rx="3"/>
+  <path class="sds-skel-glyph" d="M684.33 524.67 L693.67 524.67 M684.33 528 L693.67 528 M684.33 531.33 L693.67 531.33"/>
+  <rect class="sds-skel-bar" x="713" y="521" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="733" y="525" width="60" height="6" rx="3"/>
+  <circle class="sds-skel-control" cx="1048" cy="528" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1048" cy="526" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M1044 532 L1045 529.5 L1048 528.5 L1051 529.5 L1052 532 L1044 532"/>
+  <rect class="sds-skel-border" x="665" y="552" width="411" height="916" rx="0"/>
+  <rect class="sds-skel-control" x="681" y="568" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M696.17 577.92 L692.08 582 L696.17 586.08"/>
+  <text class="sds-title" x="733" y="586" style="font-size:24px">Policies</text>
+  <rect class="sds-skel-guide" x="681" y="620" width="379" height="476" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="692" width="379" height="404" rx="8"/>
+  <text class="sds-title" x="697" y="663" style="font-size:20px">Sign-in policy</text>
+  <text class="sds-note" x="697" y="680">Follows Enterprise</text>
+  <rect class="sds-skel-control" x="935" y="644" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="951" y="662">Set our own</text>
+  <text class="sds-note" x="689" y="636">DSPanelContainer</text>
+  <text class="sds-note" x="697" y="721" style="font-size:12px;font-weight:600">Password</text>
+  <text class="sds-title" x="697" y="744" style="font-size:13px;font-weight:400">Required</text>
+  <text class="sds-note" x="697" y="787" style="font-size:12px;font-weight:600">Two-step</text>
+  <text class="sds-title" x="697" y="810" style="font-size:13px;font-weight:400">Optional</text>
+  <text class="sds-note" x="697" y="853" style="font-size:12px;font-weight:600">Session</text>
+  <text class="sds-title" x="697" y="876" style="font-size:13px;font-weight:400">8 hours</text>
+  <text class="sds-note" x="697" y="919" style="font-size:12px;font-weight:600">Social sign-in</text>
+  <text class="sds-title" x="697" y="942" style="font-size:13px;font-weight:400">On</text>
+  <text class="sds-note" x="697" y="985" style="font-size:12px;font-weight:600">Sign-up</text>
+  <text class="sds-title" x="697" y="1008" style="font-size:13px;font-weight:400">Invite only</text>
+  <text class="sds-note" x="697" y="1051" style="font-size:12px;font-weight:600">Lock after</text>
+  <text class="sds-title" x="697" y="1074" style="font-size:13px;font-weight:400">5 tries</text>
+  <rect class="sds-skel-guide" x="681" y="1120" width="379" height="332" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="1192" width="379" height="260" rx="8"/>
+  <text class="sds-title" x="697" y="1163" style="font-size:20px">Data policy</text>
+  <text class="sds-note" x="697" y="1180">Our own values</text>
+  <text class="sds-note" x="689" y="1136">DSPanelContainer</text>
+  <text class="sds-title" x="697" y="1221" style="font-size:12px;font-weight:400">Keep</text>
+  <rect class="sds-skel-control" x="697" y="1234" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1252">30 days</text>
+  <path class="sds-skel-glyph" d="M1020.5 1246.25 L1024 1249.75 L1027.5 1246.25"/>
+  <text class="sds-note" x="697" y="1279">How long a record is kept</text>
+  <text class="sds-title" x="697" y="1321" style="font-size:12px;font-weight:400">Export</text>
+  <rect class="sds-skel-control" x="697" y="1334" width="347" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1352">On</text>
+  <path class="sds-skel-glyph" d="M1020.5 1346.25 L1024 1349.75 L1027.5 1346.25"/>
+  <path class="sds-skel-control" d="M681 1396 H1060"/>
+  <rect class="sds-skel-control" x="851" y="1408" width="109" height="28" rx="3"/>
+  <text class="sds-code" x="867" y="1426">Use default</text>
+  <rect class="sds-skel-control sds-skel-main" x="984" y="1408" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="1000" y="1426">Save</text>
+</svg>
+<figcaption>The page stands in a shut rail; its head holds the way back and the title of what the values belong to, and each part is one container. A part says on the line under its title whether it follows the default or holds its own values. The title of a reading is heavier and lighter in tone than its value. A reading and the entry of the same field keep the title in the same place, so a field does not move when a page goes from reading to editing. Readings stand in a grid, several across at a desktop and a tablet and one under another on a phone.</figcaption>
+</figure>
+  <p><strong>A record and its lists</strong> &mdash; the record is the header of the page: its picture in a circle, its name, and its facts on the line under the name. Each list attached to it is a container.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 1461" style="max-width:1056px" role="img" aria-label="A record and what belongs to it">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="430" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="430" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="260" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="450" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="448" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 454 L41 451.5 L44 450.5 L47 451.5 L48 454 L40 454"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="430" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="69" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 78.92 L91.08 83 L95.17 87.08"/>
+  <circle class="sds-skel-control" cx="153" cy="83" r="21"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="153" cy="79.5" r="3.5"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M146 90 L147.75 85.63 L153 83.88 L158.25 85.63 L160 90 L146 90"/>
+  <text class="sds-title" x="182" y="77" style="font-size:24px">Dana Lee</text>
+  <rect class="sds-skel-control" x="182" y="86" width="65" height="16" rx="8"/>
+  <text class="sds-code" x="190" y="98">Invited</text>
+  <text class="sds-note" x="253" y="98">·</text>
+  <text class="sds-note" x="263" y="98">dana@a.co</text>
+  <rect class="sds-skel-control" x="948" y="69" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="964" y="87">Edit</text>
+  <rect class="sds-skel-control" x="1032" y="69" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1041.92" cy="83" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1046" cy="83" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1050.08" cy="83" r="0.93"/>
+  <rect class="sds-skel-guide" x="80" y="130" width="311" height="328" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="194" width="311" height="264" rx="8"/>
+  <text class="sds-title" x="96" y="173" style="font-size:20px">Roles</text>
+  <text class="sds-note" x="88" y="146">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="96" y="210" width="202" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="228">Find one to add</text>
+  <rect class="sds-skel-control" x="322" y="210" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="338" y="228">Add</text>
+  <text class="sds-title" x="96" y="279" style="font-size:12px;font-weight:500">Admin</text>
+  <text class="sds-note" x="96" y="297">All apps</text>
+  <rect class="sds-skel-control" x="347" y="270" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M357.5 280.5 L364.5 287.5 M364.5 280.5 L357.5 287.5"/>
+  <path class="sds-skel-control" d="M80 318 H391"/>
+  <text class="sds-title" x="96" y="347" style="font-size:12px;font-weight:500">Billing</text>
+  <text class="sds-note" x="96" y="365">Account</text>
+  <rect class="sds-skel-control" x="347" y="338" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M357.5 348.5 L364.5 355.5 M364.5 348.5 L357.5 355.5"/>
+  <path class="sds-skel-control" d="M80 386 H391"/>
+  <text class="sds-title" x="96" y="415" style="font-size:12px;font-weight:500">Auditor</text>
+  <text class="sds-note" x="96" y="433">Platform</text>
+  <rect class="sds-skel-control" x="347" y="406" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M357.5 416.5 L364.5 423.5 M364.5 416.5 L357.5 423.5"/>
+  <rect class="sds-skel-guide" x="415" y="130" width="311" height="328" rx="3"/>
+  <rect class="sds-skel-control" x="415" y="194" width="311" height="264" rx="8"/>
+  <text class="sds-title" x="431" y="173" style="font-size:20px">Groups</text>
+  <text class="sds-note" x="423" y="146">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="431" y="210" width="202" height="28" rx="3"/>
+  <text class="sds-code" x="447" y="228">Find one to add</text>
+  <rect class="sds-skel-control" x="657" y="210" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="673" y="228">Add</text>
+  <circle class="sds-skel-bar" cx="445" cy="276" r="14"/>
+  <text class="sds-title" x="467" y="280" style="font-size:12px;font-weight:500">Finance</text>
+  <rect class="sds-skel-control" x="682" y="262" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M692.5 272.5 L699.5 279.5 M699.5 272.5 L692.5 279.5"/>
+  <path class="sds-skel-control" d="M415 302 H726"/>
+  <circle class="sds-skel-bar" cx="445" cy="328" r="14"/>
+  <text class="sds-title" x="467" y="332" style="font-size:12px;font-weight:500">Sales</text>
+  <rect class="sds-skel-control" x="682" y="314" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M692.5 324.5 L699.5 331.5 M699.5 324.5 L692.5 331.5"/>
+  <rect class="sds-skel-guide" x="750" y="130" width="311" height="328" rx="3"/>
+  <rect class="sds-skel-control" x="750" y="194" width="311" height="264" rx="8"/>
+  <text class="sds-title" x="766" y="173" style="font-size:20px">Sessions</text>
+  <text class="sds-note" x="758" y="146">DSPanelContainer</text>
+  <text class="sds-title" x="766" y="227" style="font-size:12px;font-weight:500">Chrome, Mac</text>
+  <text class="sds-note" x="766" y="245">Active now</text>
+  <rect class="sds-skel-control" x="1017" y="218" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1027.5 228.5 L1034.5 235.5 M1034.5 228.5 L1027.5 235.5"/>
+  <path class="sds-skel-control" d="M750 266 H1061"/>
+  <text class="sds-title" x="766" y="295" style="font-size:12px;font-weight:500">Safari, iOS</text>
+  <text class="sds-note" x="766" y="313">2 May</text>
+  <rect class="sds-skel-control" x="1017" y="286" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1027.5 296.5 L1034.5 303.5 M1034.5 296.5 L1027.5 303.5"/>
+  <text class="sds-note" x="24" y="510">TABLET</text>
+  <rect class="sds-box" x="24" y="518" width="617" height="914" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="518" width="40" height="914" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="535" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="572" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="600" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="628" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="656" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="684" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="712" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="734" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="740" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="768" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="1408" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="1406" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 1412 L41 1409.5 L44 1408.5 L47 1409.5 L48 1412 L40 1412"/>
+  <rect class="sds-skel-border" x="64" y="518" width="577" height="914" rx="0"/>
+  <rect class="sds-skel-control" x="80" y="543" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M95.17 552.92 L91.08 557 L95.17 561.08"/>
+  <circle class="sds-skel-control" cx="153" cy="557" r="21"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="153" cy="553.5" r="3.5"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M146 564 L147.75 559.63 L153 557.88 L158.25 559.63 L160 564 L146 564"/>
+  <text class="sds-title" x="182" y="551" style="font-size:24px">Dana Lee</text>
+  <rect class="sds-skel-control" x="182" y="560" width="65" height="16" rx="8"/>
+  <text class="sds-code" x="190" y="572">Invited</text>
+  <text class="sds-note" x="253" y="572">·</text>
+  <text class="sds-note" x="263" y="572">dana@a.co</text>
+  <rect class="sds-skel-control" x="513" y="543" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="529" y="561">Edit</text>
+  <rect class="sds-skel-control" x="597" y="543" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="606.92" cy="557" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="611" cy="557" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="615.08" cy="557" r="0.93"/>
+  <rect class="sds-skel-guide" x="80" y="604" width="545" height="328" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="668" width="545" height="264" rx="8"/>
+  <text class="sds-title" x="96" y="647" style="font-size:20px">Roles</text>
+  <text class="sds-note" x="88" y="620">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="96" y="684" width="436" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="702">Find one to add</text>
+  <rect class="sds-skel-control" x="556" y="684" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="572" y="702">Add</text>
+  <text class="sds-title" x="96" y="753" style="font-size:12px;font-weight:500">Admin</text>
+  <text class="sds-note" x="96" y="771">All apps</text>
+  <rect class="sds-skel-control" x="581" y="744" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 754.5 L598.5 761.5 M598.5 754.5 L591.5 761.5"/>
+  <path class="sds-skel-control" d="M80 792 H625"/>
+  <text class="sds-title" x="96" y="821" style="font-size:12px;font-weight:500">Billing</text>
+  <text class="sds-note" x="96" y="839">Account</text>
+  <rect class="sds-skel-control" x="581" y="812" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 822.5 L598.5 829.5 M598.5 822.5 L591.5 829.5"/>
+  <path class="sds-skel-control" d="M80 860 H625"/>
+  <text class="sds-title" x="96" y="889" style="font-size:12px;font-weight:500">Auditor</text>
+  <text class="sds-note" x="96" y="907">Platform</text>
+  <rect class="sds-skel-control" x="581" y="880" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 890.5 L598.5 897.5 M598.5 890.5 L591.5 897.5"/>
+  <rect class="sds-skel-guide" x="80" y="956" width="545" height="228" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="1020" width="545" height="164" rx="8"/>
+  <text class="sds-title" x="96" y="999" style="font-size:20px">Groups</text>
+  <text class="sds-note" x="88" y="972">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="96" y="1036" width="436" height="28" rx="3"/>
+  <text class="sds-code" x="112" y="1054">Find one to add</text>
+  <rect class="sds-skel-control" x="556" y="1036" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="572" y="1054">Add</text>
+  <circle class="sds-skel-bar" cx="110" cy="1102" r="14"/>
+  <text class="sds-title" x="132" y="1106" style="font-size:12px;font-weight:500">Finance</text>
+  <rect class="sds-skel-control" x="581" y="1088" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 1098.5 L598.5 1105.5 M598.5 1098.5 L591.5 1105.5"/>
+  <path class="sds-skel-control" d="M80 1128 H625"/>
+  <circle class="sds-skel-bar" cx="110" cy="1154" r="14"/>
+  <text class="sds-title" x="132" y="1158" style="font-size:12px;font-weight:500">Sales</text>
+  <rect class="sds-skel-control" x="581" y="1140" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 1150.5 L598.5 1157.5 M598.5 1150.5 L591.5 1157.5"/>
+  <rect class="sds-skel-guide" x="80" y="1208" width="545" height="208" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="1272" width="545" height="144" rx="8"/>
+  <text class="sds-title" x="96" y="1251" style="font-size:20px">Sessions</text>
+  <text class="sds-note" x="88" y="1224">DSPanelContainer</text>
+  <text class="sds-title" x="96" y="1305" style="font-size:12px;font-weight:500">Chrome, Mac</text>
+  <text class="sds-note" x="96" y="1323">Active now</text>
+  <rect class="sds-skel-control" x="581" y="1296" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 1306.5 L598.5 1313.5 M598.5 1306.5 L591.5 1313.5"/>
+  <path class="sds-skel-control" d="M80 1344 H625"/>
+  <text class="sds-title" x="96" y="1373" style="font-size:12px;font-weight:500">Safari, iOS</text>
+  <text class="sds-note" x="96" y="1391">2 May</text>
+  <rect class="sds-skel-control" x="581" y="1364" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 1374.5 L598.5 1381.5 M598.5 1374.5 L591.5 1381.5"/>
+  <text class="sds-note" x="665" y="510">MOBILE</text>
+  <rect class="sds-box" x="665" y="518" width="411" height="962" rx="3"/>
+  <rect class="sds-skel-surface" x="665" y="518" width="411" height="48" rx="0"/>
+  <rect class="sds-skel-control" x="673" y="526" width="32" height="32" rx="3"/>
+  <path class="sds-skel-glyph" d="M684.33 538.67 L693.67 538.67 M684.33 542 L693.67 542 M684.33 545.33 L693.67 545.33"/>
+  <rect class="sds-skel-bar" x="713" y="535" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="733" y="539" width="60" height="6" rx="3"/>
+  <circle class="sds-skel-control" cx="1048" cy="542" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1048" cy="540" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M1044 546 L1045 543.5 L1048 542.5 L1051 543.5 L1052 546 L1044 546"/>
+  <rect class="sds-skel-border" x="665" y="566" width="411" height="914" rx="0"/>
+  <rect class="sds-skel-control" x="681" y="591" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M696.17 600.92 L692.08 605 L696.17 609.08"/>
+  <circle class="sds-skel-control" cx="754" cy="605" r="21"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="754" cy="601.5" r="3.5"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M747 612 L748.75 607.63 L754 605.88 L759.25 607.63 L761 612 L747 612"/>
+  <text class="sds-title" x="783" y="599" style="font-size:24px">Dana Lee</text>
+  <rect class="sds-skel-control" x="783" y="608" width="65" height="16" rx="8"/>
+  <text class="sds-code" x="791" y="620">Invited</text>
+  <text class="sds-note" x="854" y="620">·</text>
+  <text class="sds-note" x="864" y="620">dana@a.co</text>
+  <rect class="sds-skel-control" x="948" y="591" width="60" height="28" rx="3"/>
+  <text class="sds-code" x="964" y="609">Edit</text>
+  <rect class="sds-skel-control" x="1032" y="591" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1041.92" cy="605" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1046" cy="605" r="0.93"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1050.08" cy="605" r="0.93"/>
+  <rect class="sds-skel-guide" x="681" y="652" width="379" height="328" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="716" width="379" height="264" rx="8"/>
+  <text class="sds-title" x="697" y="695" style="font-size:20px">Roles</text>
+  <text class="sds-note" x="689" y="668">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="697" y="732" width="270" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="750">Find one to add</text>
+  <rect class="sds-skel-control" x="991" y="732" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="1007" y="750">Add</text>
+  <text class="sds-title" x="697" y="801" style="font-size:12px;font-weight:500">Admin</text>
+  <text class="sds-note" x="697" y="819">All apps</text>
+  <rect class="sds-skel-control" x="1016" y="792" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 802.5 L1033.5 809.5 M1033.5 802.5 L1026.5 809.5"/>
+  <path class="sds-skel-control" d="M681 840 H1060"/>
+  <text class="sds-title" x="697" y="869" style="font-size:12px;font-weight:500">Billing</text>
+  <text class="sds-note" x="697" y="887">Account</text>
+  <rect class="sds-skel-control" x="1016" y="860" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 870.5 L1033.5 877.5 M1033.5 870.5 L1026.5 877.5"/>
+  <path class="sds-skel-control" d="M681 908 H1060"/>
+  <text class="sds-title" x="697" y="937" style="font-size:12px;font-weight:500">Auditor</text>
+  <text class="sds-note" x="697" y="955">Platform</text>
+  <rect class="sds-skel-control" x="1016" y="928" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 938.5 L1033.5 945.5 M1033.5 938.5 L1026.5 945.5"/>
+  <rect class="sds-skel-guide" x="681" y="1004" width="379" height="228" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="1068" width="379" height="164" rx="8"/>
+  <text class="sds-title" x="697" y="1047" style="font-size:20px">Groups</text>
+  <text class="sds-note" x="689" y="1020">DSPanelContainer</text>
+  <rect class="sds-skel-control" x="697" y="1084" width="270" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="1102">Find one to add</text>
+  <rect class="sds-skel-control" x="991" y="1084" width="53" height="28" rx="3"/>
+  <text class="sds-code" x="1007" y="1102">Add</text>
+  <circle class="sds-skel-bar" cx="711" cy="1150" r="14"/>
+  <text class="sds-title" x="733" y="1154" style="font-size:12px;font-weight:500">Finance</text>
+  <rect class="sds-skel-control" x="1016" y="1136" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 1146.5 L1033.5 1153.5 M1033.5 1146.5 L1026.5 1153.5"/>
+  <path class="sds-skel-control" d="M681 1176 H1060"/>
+  <circle class="sds-skel-bar" cx="711" cy="1202" r="14"/>
+  <text class="sds-title" x="733" y="1206" style="font-size:12px;font-weight:500">Sales</text>
+  <rect class="sds-skel-control" x="1016" y="1188" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 1198.5 L1033.5 1205.5 M1033.5 1198.5 L1026.5 1205.5"/>
+  <rect class="sds-skel-guide" x="681" y="1256" width="379" height="208" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="1320" width="379" height="144" rx="8"/>
+  <text class="sds-title" x="697" y="1299" style="font-size:20px">Sessions</text>
+  <text class="sds-note" x="689" y="1272">DSPanelContainer</text>
+  <text class="sds-title" x="697" y="1353" style="font-size:12px;font-weight:500">Chrome, Mac</text>
+  <text class="sds-note" x="697" y="1371">Active now</text>
+  <rect class="sds-skel-control" x="1016" y="1344" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 1354.5 L1033.5 1361.5 M1033.5 1354.5 L1026.5 1361.5"/>
+  <path class="sds-skel-control" d="M681 1392 H1060"/>
+  <text class="sds-title" x="697" y="1421" style="font-size:12px;font-weight:500">Safari, iOS</text>
+  <text class="sds-note" x="697" y="1439">2 May</text>
+  <rect class="sds-skel-control" x="1016" y="1412" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 1422.5 L1033.5 1429.5 M1033.5 1422.5 L1026.5 1429.5"/>
+</svg>
+<figcaption>The page head is the record. The lists attached to it are containers side by side at a desktop and one under another on a tablet and a phone. The lines of a list have a line between each two, and a list a person adds to has a box at its top that finds a record as they type.</figcaption>
+</figure>
+  <p><strong>A value changed in a table</strong> &mdash; a row is read until a person opens it, and then its cell is a box as wide as the cell, with the action that saves it beside the box.</p>
+<figure>
+<svg class="sds-drawing sds-skeleton" viewBox="22 21 1056 1215" style="max-width:1056px" role="img" aria-label="Change in place, in a list">
+  <text class="sds-note" x="24" y="36">DESKTOP</text>
+  <rect class="sds-box" x="24" y="44" width="1052" height="520" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="44" width="40" height="520" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="61" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="98" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="126" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="154" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="182" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="210" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="238" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="266" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="288" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="294" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="540" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="538" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 544 L41 541.5 L44 540.5 L47 541.5 L48 544 L40 544"/>
+  <rect class="sds-skel-border" x="64" y="44" width="1012" height="520" rx="0"/>
+  <text class="sds-title" x="80" y="77" style="font-size:24px">Labels</text>
+  <text class="sds-note" x="80" y="95">The texts of the app, in each language</text>
+  <rect class="sds-skel-guide" x="80" y="128" width="980" height="420" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="128" width="980" height="420" rx="8"/>
+  <text class="sds-note" x="88" y="144">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="88" y="156" width="964" height="64" rx="3"/>
+  <text class="sds-note" x="96" y="172">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="110" cy="198" r="14"/>
+  <rect class="sds-skel-control" x="148" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="164" y="202">Search</text>
+  <rect class="sds-skel-control" x="525" y="184" width="353" height="28" rx="3"/>
+  <text class="sds-code" x="541" y="202">German</text>
+  <path class="sds-skel-glyph" d="M854.5 196.25 L858 199.75 L861.5 196.25"/>
+  <rect class="sds-skel-control" x="902" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M916 193.92 L916 202.08 M911.92 198 L920.08 198"/>
+  <text class="sds-code" x="954" y="202">|</text>
+  <rect class="sds-skel-control" x="985" y="184" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph" cx="997.83" cy="196.83" r="3.5"/>
+  <path class="sds-skel-glyph" d="M1000.75 199.75 L1003.67 202.67"/>
+  <rect class="sds-skel-control" x="1017" y="184" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1027.5 194.5 L1034.5 201.5 M1034.5 194.5 L1027.5 201.5"/>
+  <rect class="sds-skel-guide" x="88" y="228" width="964" height="260" rx="3"/>
+  <text class="sds-note" x="96" y="244">DSDataTable</text>
+  <rect class="sds-skel-surface" x="88" y="256" width="964" height="36" rx="0"/>
+  <text class="sds-note" x="112" y="278" style="letter-spacing:.06em;font-weight:600">TEXT</text>
+  <text class="sds-note" x="519.5" y="278" style="letter-spacing:.06em;font-weight:600">GERMAN</text>
+  <path class="sds-skel-control" d="M88 292 H1052"/>
+  <path class="sds-skel-control" d="M88 338 H1052"/>
+  <path class="sds-skel-control" d="M88 382 H1052"/>
+  <path class="sds-skel-control" d="M88 426 H1052"/>
+  <text class="sds-code" x="112" y="322">Sign in</text>
+  <text class="sds-code" x="519.5" y="322">Anmelden</text>
+  <rect class="sds-skel-control" x="1000" y="304" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="318" r="1.17"/>
+  <text class="sds-code" x="112" y="366">Sign out</text>
+  <rect class="sds-skel-control" x="519.5" y="348" width="404.5" height="28" rx="3"/>
+  <text class="sds-code" x="535.5" y="366">Abmelden</text>
+  <rect class="sds-skel-control" x="948" y="348" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M959.67 362 L961.42 363.75 L964.33 359.67"/>
+  <rect class="sds-skel-control" x="1000" y="348" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1010.5 358.5 L1017.5 365.5 M1017.5 358.5 L1010.5 365.5"/>
+  <text class="sds-code" x="112" y="410">Forgot password</text>
+  <text class="sds-code" x="519.5" y="410">Passwort vergessen</text>
+  <rect class="sds-skel-control" x="1000" y="392" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="406" r="1.17"/>
+  <text class="sds-code" x="112" y="454">Invite a member</text>
+  <rect class="sds-skel-control" x="519.5" y="440" width="65" height="20" rx="10"/>
+  <text class="sds-code" x="527.5" y="454">Missing</text>
+  <rect class="sds-skel-control" x="1000" y="436" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1014" cy="450" r="1.17"/>
+  <path class="sds-skel-control" d="M80 492 H1060"/>
+  <text class="sds-code" x="96" y="522">1 to 20 of 240</text>
+  <rect class="sds-skel-control" x="888" y="504" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M903.17 513.92 L899.08 518 L903.17 522.08"/>
+  <rect class="sds-skel-control" x="920" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="930.5" y="522">1</text>
+  <rect class="sds-skel-control" x="952" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="962.5" y="522">2</text>
+  <rect class="sds-skel-control" x="984" y="504" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="994.5" y="522">3</text>
+  <rect class="sds-skel-control" x="1016" y="504" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1028.83 513.92 L1032.92 518 L1028.83 522.08"/>
+  <text class="sds-note" x="24" y="600">TABLET</text>
+  <rect class="sds-box" x="24" y="608" width="617" height="520" rx="3"/>
+  <rect class="sds-skel-surface" x="24" y="608" width="40" height="520" rx="0"/>
+  <rect class="sds-skel-bar" x="37" y="625" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="662" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="690" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="718" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="746" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="774" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="802" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-bar" x="38" y="830" width="12" height="12" rx="3"/>
+  <rect class="sds-skel-surface" x="30" y="852" width="28" height="24" rx="4"/>
+  <rect class="sds-skel-bar" x="38" y="858" width="12" height="12" rx="3"/>
+  <circle class="sds-skel-control" cx="44" cy="1104" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="44" cy="1102" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M40 1108 L41 1105.5 L44 1104.5 L47 1105.5 L48 1108 L40 1108"/>
+  <rect class="sds-skel-border" x="64" y="608" width="577" height="520" rx="0"/>
+  <text class="sds-title" x="80" y="641" style="font-size:24px">Labels</text>
+  <text class="sds-note" x="80" y="659">The texts of the app, in each language</text>
+  <rect class="sds-skel-guide" x="80" y="692" width="545" height="420" rx="3"/>
+  <rect class="sds-skel-control" x="80" y="692" width="545" height="420" rx="8"/>
+  <text class="sds-note" x="88" y="708">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="88" y="720" width="529" height="64" rx="3"/>
+  <text class="sds-note" x="96" y="736">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="110" cy="762" r="14"/>
+  <rect class="sds-skel-control" x="148" y="748" width="135" height="28" rx="3"/>
+  <text class="sds-code" x="164" y="766">Search</text>
+  <rect class="sds-skel-control" x="307" y="748" width="135" height="28" rx="3"/>
+  <text class="sds-code" x="323" y="766">German</text>
+  <path class="sds-skel-glyph" d="M418.5 760.25 L422 763.75 L425.5 760.25"/>
+  <rect class="sds-skel-control" x="466" y="748" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M480 757.92 L480 766.08 M475.92 762 L484.08 762"/>
+  <text class="sds-code" x="518" y="766">|</text>
+  <rect class="sds-skel-control" x="549" y="748" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph" cx="561.83" cy="760.83" r="3.5"/>
+  <path class="sds-skel-glyph" d="M564.75 763.75 L567.67 766.67"/>
+  <rect class="sds-skel-control" x="581" y="748" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M591.5 758.5 L598.5 765.5 M598.5 758.5 L591.5 765.5"/>
+  <rect class="sds-skel-guide" x="88" y="792" width="529" height="260" rx="3"/>
+  <text class="sds-note" x="96" y="808">DSDataTable</text>
+  <rect class="sds-skel-surface" x="88" y="820" width="529" height="36" rx="0"/>
+  <text class="sds-note" x="112" y="842" style="letter-spacing:.06em;font-weight:600">TEXT</text>
+  <text class="sds-note" x="302" y="842" style="letter-spacing:.06em;font-weight:600">GERMAN</text>
+  <path class="sds-skel-control" d="M88 856 H617"/>
+  <path class="sds-skel-control" d="M88 902 H617"/>
+  <path class="sds-skel-control" d="M88 946 H617"/>
+  <path class="sds-skel-control" d="M88 990 H617"/>
+  <text class="sds-code" x="112" y="886">Sign in</text>
+  <text class="sds-code" x="302" y="886">Anmelden</text>
+  <rect class="sds-skel-control" x="565" y="868" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="882" r="1.17"/>
+  <text class="sds-code" x="112" y="930">Sign out</text>
+  <rect class="sds-skel-control" x="302" y="912" width="187" height="28" rx="3"/>
+  <text class="sds-code" x="318" y="930">Abmelden</text>
+  <rect class="sds-skel-control" x="513" y="912" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M524.67 926 L526.42 927.75 L529.33 923.67"/>
+  <rect class="sds-skel-control" x="565" y="912" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M575.5 922.5 L582.5 929.5 M582.5 922.5 L575.5 929.5"/>
+  <text class="sds-code" x="112" y="974">Forgot password</text>
+  <text class="sds-code" x="302" y="974">Passwort vergessen</text>
+  <rect class="sds-skel-control" x="565" y="956" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="970" r="1.17"/>
+  <text class="sds-code" x="112" y="1018">Invite a member</text>
+  <rect class="sds-skel-control" x="302" y="1004" width="65" height="20" rx="10"/>
+  <text class="sds-code" x="310" y="1018">Missing</text>
+  <rect class="sds-skel-control" x="565" y="1000" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="579" cy="1014" r="1.17"/>
+  <path class="sds-skel-control" d="M80 1056 H625"/>
+  <text class="sds-code" x="96" y="1086">1 to 20 of 240</text>
+  <rect class="sds-skel-control" x="453" y="1068" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M468.17 1077.92 L464.08 1082 L468.17 1086.08"/>
+  <rect class="sds-skel-control" x="485" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="495.5" y="1086">1</text>
+  <rect class="sds-skel-control" x="517" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="527.5" y="1086">2</text>
+  <rect class="sds-skel-control" x="549" y="1068" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="559.5" y="1086">3</text>
+  <rect class="sds-skel-control" x="581" y="1068" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M593.83 1077.92 L597.92 1082 L593.83 1086.08"/>
+  <text class="sds-note" x="665" y="600">MOBILE</text>
+  <rect class="sds-box" x="665" y="608" width="411" height="626" rx="3"/>
+  <rect class="sds-skel-surface" x="665" y="608" width="411" height="48" rx="0"/>
+  <rect class="sds-skel-control" x="673" y="616" width="32" height="32" rx="3"/>
+  <path class="sds-skel-glyph" d="M684.33 628.67 L693.67 628.67 M684.33 632 L693.67 632 M684.33 635.33 L693.67 635.33"/>
+  <rect class="sds-skel-bar" x="713" y="625" width="14" height="14" rx="3"/>
+  <rect class="sds-skel-bar" x="733" y="629" width="60" height="6" rx="3"/>
+  <circle class="sds-skel-control" cx="1048" cy="632" r="12"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1048" cy="630" r="2"/>
+  <path class="sds-skel-glyph sds-skel-glyph-solid" d="M1044 636 L1045 633.5 L1048 632.5 L1051 633.5 L1052 636 L1044 636"/>
+  <rect class="sds-skel-border" x="665" y="656" width="411" height="578" rx="0"/>
+  <text class="sds-title" x="681" y="689" style="font-size:24px">Labels</text>
+  <text class="sds-note" x="681" y="707">The texts of the app, in each language</text>
+  <rect class="sds-skel-guide" x="681" y="740" width="379" height="478" rx="3"/>
+  <rect class="sds-skel-control" x="681" y="740" width="379" height="478" rx="8"/>
+  <text class="sds-note" x="689" y="756">DSPanelContainer</text>
+  <rect class="sds-skel-guide" x="689" y="768" width="363" height="64" rx="3"/>
+  <text class="sds-note" x="697" y="784">DSFilterBar</text>
+  <circle class="sds-skel-bar" cx="711" cy="810" r="14"/>
+  <rect class="sds-skel-control" x="749" y="796" width="295" height="28" rx="3"/>
+  <text class="sds-code" x="765" y="814">1 filter on</text>
+  <rect class="sds-skel-guide" x="689" y="840" width="363" height="318" rx="3"/>
+  <text class="sds-note" x="697" y="856">DSDataTable</text>
+  <text class="sds-title" x="697" y="885" style="font-size:12px;font-weight:500">Sign in</text>
+  <text class="sds-note" x="697" y="903">Anmelden</text>
+  <rect class="sds-skel-control" x="1016" y="876" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="890" r="1.17"/>
+  <path class="sds-skel-control" d="M689 924 H1052"/>
+  <text class="sds-title" x="697" y="949" style="font-size:12px;font-weight:400">Sign out</text>
+  <rect class="sds-skel-control" x="697" y="962" width="263" height="28" rx="3"/>
+  <text class="sds-code" x="713" y="980">Abmelden</text>
+  <rect class="sds-skel-control" x="984" y="960" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M995.67 974 L997.42 975.75 L1000.33 971.67"/>
+  <rect class="sds-skel-control" x="1016" y="960" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1026.5 970.5 L1033.5 977.5 M1033.5 970.5 L1026.5 977.5"/>
+  <path class="sds-skel-control" d="M689 1024 H1052"/>
+  <text class="sds-title" x="697" y="1053" style="font-size:12px;font-weight:500">Forgot password</text>
+  <text class="sds-note" x="697" y="1071">Passwort vergessen</text>
+  <rect class="sds-skel-control" x="1016" y="1044" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="1058" r="1.17"/>
+  <path class="sds-skel-control" d="M689 1092 H1052"/>
+  <text class="sds-title" x="697" y="1121" style="font-size:12px;font-weight:500">Invite a member</text>
+  <rect class="sds-skel-control" x="697" y="1130" width="65" height="16" rx="8"/>
+  <text class="sds-code" x="705" y="1142">Missing</text>
+  <rect class="sds-skel-control" x="1016" y="1113" width="28" height="28" rx="3"/>
+  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="1030" cy="1127" r="1.17"/>
+  <path class="sds-skel-control" d="M681 1162 H1060"/>
+  <text class="sds-code" x="697" y="1192">1 to 20 of 240</text>
+  <rect class="sds-skel-control" x="888" y="1174" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M903.17 1183.92 L899.08 1188 L903.17 1192.08"/>
+  <rect class="sds-skel-control" x="920" y="1174" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="930.5" y="1192">1</text>
+  <rect class="sds-skel-control" x="952" y="1174" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="962.5" y="1192">2</text>
+  <rect class="sds-skel-control" x="984" y="1174" width="28" height="28" rx="3"/>
+  <text class="sds-code" x="994.5" y="1192">3</text>
+  <rect class="sds-skel-control" x="1016" y="1174" width="28" height="28" rx="3"/>
+  <path class="sds-skel-glyph" d="M1028.83 1183.92 L1032.92 1188 L1028.83 1192.08"/>
+</svg>
+<figcaption>The page stands in a shut rail, and its header is the page head. Only one row is changed at a time, nothing opens over the page, and the page holds no form. On a phone the table is in its LIST layout.</figcaption>
+</figure>
+</section>
+
+<section id="navigation" data-block="example">
+  <div class="sds-section-head"><h2>Navigation &mdash; the words and the ways out of a page</h2></div>
+  <p>{{What a reader uses to find a word, or to leave for the next page.}}</p>
+  <h3 id="b-glossary">GLOSSARY &mdash; the words, in the order a reader meets them</h3>
+  <p class="sds-small">On a <strong>domain overview</strong> this region is generated by <code>docs face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order, in three columns: <code>Term</code> &middot; <code>Contract term</code> &middot; <code>Description</code>. On a <strong>hub</strong> it is written by hand and is one column of item cells (the term in bold, then what it means): a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
+  <div class="sds-scroll"><table class="sds-terms">
+    <thead><tr><th>Term</th><th>Contract term</th><th>Description</th></tr></thead>
+    <tbody><tr><td><strong>{{Estate}}</strong></td><td><code>{{SPEstate}}</code></td><td>{{a definition the reader understands on this line}}</td></tr></tbody>
+  </table></div>
+  <h3 id="b-cards">CARDS &mdash; navigation, on a hub</h3>
+  <div class="sds-tiles">
+    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{what the path covers, in one line}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
+    <div class="sds-tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{…}}</p><a class="sds-more" href="#">Read more &rarr;</a></div>
+  </div>
+  <p><a class="sds-more" href="#">Read {{the page, by the name it carries}} &rarr;</a> {{— the link under a subsection's text, when it has one path}}</p>
+  <h3 id="b-next">NEXT &mdash; the two doors either side of here</h3>
+  <p>{{Small on purpose: a title and a direction. A reader leaving a page wants the next page, not a paragraph about it.}}</p>
+  <div class="sds-nextnav">
+    <a class="sds-nextnav-card" href="#"><span class="sds-direction">&larr; Previous</span><span class="sds-title">{{The page before this one}}</span></a>
+    <a class="sds-nextnav-card sds-next" href="#"><span class="sds-direction">Next &rarr;</span><span class="sds-title">{{The page after this one}}</span></a>
+  </div>
+</section>
+
+<section id="style" data-block="example">
+  <div class="sds-section-head"><h2>Colour and layout &mdash; tones, statuses and utilities</h2></div>
+  <p>{{The classes a block or a drawing takes for its colour, and the utilities for a layout no block covers.}}</p>
+  <h3 id="b-palette">PALETTE &mdash; the tones a drawing, a chart or a badge may take</h3>
+  <p>Put one tone class on a box, a connector, an arrowhead or a badge. A tone is a plain colour for a drawing or a chart, and it carries no meaning. A tone is a pair of tokens, so both themes follow, and a page never writes a colour of its own. A chart takes its series starting at violet, cyan, pink and olive, so a red line is not read as an error. To say how a thing stands, use a status class, shown in the next block.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 18 1020 196" width="1020" height="196" role="img" aria-label="Ten boxes in two rows, one in each tone of the palette, joined by connectors in the same tones.">
+    <defs>
+      <marker id="ar-tone-blue" class="sds-tone-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-green" class="sds-tone-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-amber" class="sds-tone-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-red" class="sds-tone-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-violet" class="sds-tone-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-cyan" class="sds-tone-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-pink" class="sds-tone-pink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-olive" class="sds-tone-olive" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-orange" class="sds-tone-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+      <marker id="ar-tone-grey" class="sds-tone-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+    </defs>
+    <rect class="sds-box sds-tone-blue" x="20" y="20" width="172" height="80" rx="3"/><text class="sds-title" x="34" y="48">Blue</text><text class="sds-code" x="34" y="70">sds-tone-blue</text><text class="sds-note" x="34" y="90">a plain colour</text>
+    <path class="sds-connector sds-tone-green" d="M192 60 H231" marker-end="url(#ar-tone-green)"/>
+    <rect class="sds-box sds-tone-green" x="231" y="20" width="172" height="80" rx="3"/><text class="sds-title" x="245" y="48">Green</text><text class="sds-code" x="245" y="70">sds-tone-green</text><text class="sds-note" x="245" y="90">a plain colour</text>
+    <path class="sds-connector sds-tone-amber" d="M403 60 H442" marker-end="url(#ar-tone-amber)"/>
+    <rect class="sds-box sds-tone-amber" x="442" y="20" width="172" height="80" rx="3"/><text class="sds-title" x="456" y="48">Amber</text><text class="sds-code" x="456" y="70">sds-tone-amber</text><text class="sds-note" x="456" y="90">a plain colour</text>
+    <path class="sds-connector sds-tone-red" d="M614 60 H653" marker-end="url(#ar-tone-red)"/>
+    <rect class="sds-box sds-tone-red" x="653" y="20" width="172" height="80" rx="3"/><text class="sds-title" x="667" y="48">Red</text><text class="sds-code" x="667" y="70">sds-tone-red</text><text class="sds-note" x="667" y="90">a plain colour</text>
+    <path class="sds-connector sds-tone-violet" d="M825 60 H864" marker-end="url(#ar-tone-violet)"/>
+    <rect class="sds-box sds-tone-violet" x="864" y="20" width="172" height="80" rx="3"/><text class="sds-title" x="878" y="48">Violet</text><text class="sds-code" x="878" y="70">sds-tone-violet</text><text class="sds-note" x="878" y="90">first series of a chart</text>
+    <rect class="sds-box sds-tone-cyan" x="20" y="132" width="172" height="80" rx="3"/><text class="sds-title" x="34" y="160">Cyan</text><text class="sds-code" x="34" y="182">sds-tone-cyan</text><text class="sds-note" x="34" y="202">second series of a chart</text>
+    <path class="sds-connector sds-tone-pink" d="M192 172 H231" marker-end="url(#ar-tone-pink)"/>
+    <rect class="sds-box sds-tone-pink" x="231" y="132" width="172" height="80" rx="3"/><text class="sds-title" x="245" y="160">Pink</text><text class="sds-code" x="245" y="182">sds-tone-pink</text><text class="sds-note" x="245" y="202">third series of a chart</text>
+    <path class="sds-connector sds-tone-olive" d="M403 172 H442" marker-end="url(#ar-tone-olive)"/>
+    <rect class="sds-box sds-tone-olive" x="442" y="132" width="172" height="80" rx="3"/><text class="sds-title" x="456" y="160">Olive</text><text class="sds-code" x="456" y="182">sds-tone-olive</text><text class="sds-note" x="456" y="202">fourth series of a chart</text>
+    <path class="sds-connector sds-tone-orange" d="M614 172 H653" marker-end="url(#ar-tone-orange)"/>
+    <rect class="sds-box sds-tone-orange" x="653" y="132" width="172" height="80" rx="3"/><text class="sds-title" x="667" y="160">Orange</text><text class="sds-code" x="667" y="182">sds-tone-orange</text><text class="sds-note" x="667" y="202">a plain colour</text>
+    <path class="sds-connector sds-tone-grey" d="M825 172 H864" marker-end="url(#ar-tone-grey)"/>
+    <rect class="sds-box sds-tone-grey" x="864" y="132" width="172" height="80" rx="3"/><text class="sds-title" x="878" y="160">Grey</text><text class="sds-code" x="878" y="182">sds-tone-grey</text><text class="sds-note" x="878" y="202">a plain colour</text>
+  </svg>
+  <figcaption>The same tones on a badge: <span class="sds-badge sds-tone-blue">blue</span> <span class="sds-badge sds-tone-green">green</span> <span class="sds-badge sds-tone-amber">amber</span> <span class="sds-badge sds-tone-red">red</span> <span class="sds-badge sds-tone-violet">violet</span> <span class="sds-badge sds-tone-cyan">cyan</span> <span class="sds-badge sds-tone-pink">pink</span> <span class="sds-badge sds-tone-olive">olive</span> <span class="sds-badge sds-tone-orange">orange</span> <span class="sds-badge sds-tone-grey">grey</span></figcaption>
+  </figure>
+  <h3 id="b-status">STATUS &mdash; info, success, warning and error</h3>
+  <p>A status says how a thing stands. Put one status class on a badge or a pull. Each status has two tokens of its own, the colour and its soft ground, and each has a dark value: <code>--sds-info</code> and <code>--sds-info-soft</code>, and so on. A status is never a tone of the palette, so changing a warning does not change a chart.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Class</th><th>On a badge</th><th>Use it when</th></tr></thead>
+    <tbody>
+      <tr><td><code>sds-info</code></td><td><span class="sds-badge sds-info">info</span></td><td>the reader should know something, and nothing is wrong</td></tr>
+      <tr><td><code>sds-success</code></td><td><span class="sds-badge sds-success">success</span></td><td>a thing is done, proven or allowed</td></tr>
+      <tr><td><code>sds-warning</code></td><td><span class="sds-badge sds-warning">warning</span></td><td>a thing has a gap, or needs care</td></tr>
+      <tr><td><code>sds-error</code></td><td><span class="sds-badge sds-error">error</span></td><td>a thing failed, was refused or was removed</td></tr>
+    </tbody>
+  </table></div>
+  <div class="sds-pull sds-info"><span class="sds-label">Info</span><p>A pull that carries <code>sds-info</code>: something the reader should know.</p></div>
+  <div class="sds-pull sds-success"><span class="sds-label">Success</span><p>A pull that carries <code>sds-success</code>: the step ran, and the check passed.</p></div>
+  <div class="sds-pull sds-warning"><span class="sds-label">Warning</span><p>A pull that carries <code>sds-warning</code>: this works, and one part of it is still done by hand.</p></div>
+  <div class="sds-pull sds-error"><span class="sds-label">Error</span><p>A pull that carries <code>sds-error</code>: the command stopped, and nothing was written.</p></div>
+  <p>A pull may hold a heading and a table in place of a label and a paragraph. The heading is an <code>h4</code>, and a badge may sit beside its words. A row's <code>th</code> names what its <code>td</code> says. The pull below carries <code>sds-warning</code>, and a hub writes a declared gap in this form.</p>
+  <div class="sds-pull sds-warning">
+    <h4><span class="sds-badge sds-warning">{{gap}}</span> {{The section}} &mdash; {{what stands open, in a few words}}</h4>
+    <div class="sds-scroll"><table><tbody>
+      <tr><th>{{Owed}}</th><td>{{what nobody has stated yet}}</td></tr>
+      <tr><th>{{Stated today}}</th><td>{{where the claim is written today, with a link}}</td></tr>
+    </tbody></table></div>
+  </div>
+  <h3 id="b-utilities">UTILITIES &mdash; a layout that no block covers</h3>
+  <p>Use a named class first. Use a Tailwind utility only for a layout that no block covers. A utility reads the same tokens as a named class, so both themes follow. Below, utilities put two boxes in one row. The first box is the named class <code>sds-pull</code>. The second box has no class of ours, and every part of its look is a utility.</p>
+  <div class="grid gap-4 my-6 sm:grid-cols-2">
+    <div class="sds-pull m-0"><span class="sds-label">A named class</span><p><code>sds-pull m-0</code> &mdash; the block, and one utility that takes away its margin inside the row.</p></div>
+    <div class="border border-ok bg-ok-soft rounded-sm px-5 py-4"><span class="block font-ui text-xs uppercase tracking-widest text-ok mb-1">Utilities alone</span><p class="m-0 max-w-none text-ink"><code>border border-ok bg-ok-soft rounded-sm px-5 py-4</code> &mdash; the same tokens, read through Tailwind.</p></div>
+  </div>
+  <p>The built stylesheet holds one standard set of utilities, and no other utility has a rule in it. The chapter lists the set by family. The row below uses three of them: <code>flex</code> and <code>justify-between</code> put its two ends apart, and <code>text-faint</code> writes the second end in faint text.</p>
+  <div class="flex justify-between gap-4"><span>{{A name}}</span><span class="text-faint">{{a note beside it, in faint text}}</span></div>
+</section>
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.10.0/sds-docs.js" integrity="sha384-MUUUVipJdxCmJyrxeNHKq8xMzGTvQ+TAsWDvN5w6TKPfuOUPtHk1E90wKCBZNRC7" crossorigin="anonymous"></script>
