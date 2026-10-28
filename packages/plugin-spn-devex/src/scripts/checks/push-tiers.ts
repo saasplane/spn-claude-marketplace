@@ -2,10 +2,11 @@
 // RESTATES: spn-foundation RD.DEVEX.WORKSPACE.281 — a check refuses an agent's push when no whole, green run covers exactly the tree it pushes.
 //
 // Refuses a `git push` that carries changes to a node whose offline tiers have no whole, green run, stamped by
-// spnutils, on the tree at HEAD. What a push carries is the nodes of `origin/<base>..HEAD`, where `<base>` is
+// spnutils, on the tree at HEAD, or that carries a changed file of a TypeScript node the repository's own pinned
+// Prettier would reformat. What a push carries is the nodes of `origin/<base>..HEAD`, where `<base>` is
 // `develop` unless the branch's git config records another (`branch.<name>.spnBase`). It reads files and runs git only.
 
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
@@ -83,7 +84,7 @@ function git(dir: string, args: string[], input?: string): string {
 }
 
 /** What one push carries: the paths it changes, and a way to ask the blob ids of any folder at HEAD. */
-export type Carried = { top: string; changed: string[]; blobsUnder: (folder: string) => Map<string, string> };
+export type Carried = { top: string; changed: string[]; written: string[]; blobsUnder: (folder: string) => Map<string, string> };
 
 /** The branch a push is measured against: `develop`, unless the branch's git config records another in `spnBase`. */
 function pushBase(top: string): string {
@@ -105,8 +106,10 @@ export function carriedBy(call: PushCall): Carried | null {
   const nul = (text: string): string[] => text.split("\0").filter(Boolean);
   // Three dots: the changes since the merge base, which after the rebase is the base itself.
   const changed = nul(git(top, ["diff", "--name-only", "--no-renames", "-z", `${pushBase(top)}...HEAD`]));
+  // Added or modified only: a deleted file has nothing to format.
+  const written = nul(git(top, ["diff", "--name-only", "--no-renames", "--diff-filter=AM", "-z", `${pushBase(top)}...HEAD`]));
   return {
-    top, changed,
+    top, changed, written,
     blobsUnder: (folder) => {
       const tree = new Map<string, string>();
       for (const entry of nul(git(top, ["ls-tree", "-r", "-z", "HEAD", "--", folder]))) {
@@ -219,6 +222,42 @@ function refusalOf(runFile: string, tier: Tier, content: string): string | null 
   return null;
 }
 
+/** The stack the repository's `sprepo.json` claims, or null. */
+function stackOf(top: string): string | null {
+  try { return JSON.parse(read(join(top, "sprepo.json"))).config?.stack ?? null; } catch { return null; }
+}
+
+/** How many paths one Prettier call takes, so a large push stays under the argument limit. */
+const FORMAT_CHUNK = 200;
+
+/** What the format check found for one push: the files Prettier would change, or why it could not ask. */
+export type FormatFinding = { files: string[] } | { missing: true } | null;
+
+/**
+ * The files of one push that the repository's own Prettier refuses. A push of a TypeScript repository
+ * (`config.stack` of `sprepo.json` is `TS`) is checked for the added or modified files that sit in a node. Prettier
+ * is the repository's pinned `node_modules/.bin/prettier`, run from the repository root so its `.prettierignore`
+ * applies, as `prettier --check --ignore-unknown`; it writes nothing. A push that changes no such file is not
+ * checked, and one that does while Prettier is not installed is refused.
+ */
+export function formatFindingOf(carried: Carried): FormatFinding {
+  if (stackOf(carried.top) !== "TS") return null;
+  const files = carried.written.filter((path) => existsSync(join(carried.top, path)) && nodeOf(carried.top, path)?.manifest === "spkind.json");
+  if (!files.length) return null;
+  const prettier = join(carried.top, "node_modules", ".bin", "prettier");
+  if (!existsSync(prettier)) return { missing: true };
+  const bad = new Set<string>();
+  for (let at = 0; at < files.length; at += FORMAT_CHUNK) {
+    const chunk = files.slice(at, at + FORMAT_CHUNK);
+    const ran = spawnSync(prettier, ["--check", "--ignore-unknown", ...chunk], { cwd: carried.top, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+    if (ran.status === 0) continue;
+    // Prettier names each file it would change on a `[warn]` line and each file it cannot parse on an `[error]` line.
+    const named = new Set(`${ran.stdout}\n${ran.stderr}`.split("\n").map((line) => /^\[(?:warn|error)\] (.+?)(?::|$)/.exec(line)?.[1] ?? "").filter((name) => chunk.includes(name)));
+    for (const name of named.size ? named : chunk) bad.add(name);
+  }
+  return bad.size ? { files: [...bad] } : null;
+}
+
 /** One finding: a node, a tier and why no run covers it. */
 type Gap = { folder: string; manifest: string; tier: Tier; reason: string };
 
@@ -226,11 +265,16 @@ export function checkPushTiers(payload: Payload): Verdict {
   const command = payload.tool_input?.command ?? "";
   if (!applies("", command)) return null;
   const gaps: Gap[] = [];
+  const unformatted: string[] = [];
+  let prettierMissing = false;
   let repo = "";
   for (const call of readPushes(command, payload.cwd ?? process.cwd())) {
     let carried: Carried | null;
     try { carried = carriedBy(call); } catch { continue; }
     if (!carried) continue;
+    const format = formatFindingOf(carried);
+    if (format && "missing" in format) prettierMissing = true;
+    else if (format) unformatted.push(...format.files);
     const touched = new Map<string, { manifest: string; tiers: Set<Tier> }>();
     for (const path of carried.changed) {
       const node = nodeOf(carried.top, path);
@@ -250,7 +294,20 @@ export function checkPushTiers(payload: Payload): Verdict {
       }
     }
   }
-  if (!gaps.length) return null;
+  const refusals: string[] = [];
+  if (prettierMissing) {
+    refusals.push(
+      `Denied: this push changes files of a TypeScript node and the repository's own Prettier is not installed, so their formatting ` +
+      `cannot be checked (RD.DEVEX.WORKSPACE.281).\nRun \`pnpm install\` in the repository, then push again.`);
+  }
+  if (unformatted.length) {
+    const quoted = unformatted.map((file) => (/\s/.test(file) ? `"${file}"` : file));
+    refusals.push(
+      `Denied: this push changes files the repository's Prettier would reformat (RD.DEVEX.WORKSPACE.281).\n` +
+      `${unformatted.map((file) => `- \`${file}\``).join("\n")}\n` +
+      `Run \`pnpm exec prettier --write ${quoted.join(" ")}\`, commit the result, then push again.`);
+  }
+  if (!gaps.length) return refusals.length ? { deny: refusals.join("\n\n") } : null;
   const lines: string[] = [];
   const infraDone = new Set<string>();
   for (const gap of gaps) {
@@ -265,11 +322,13 @@ export function checkPushTiers(payload: Payload): Verdict {
     }
   }
   return {
-    deny:
+    deny: [
       `Denied: this push carries changes to a node whose offline tiers have no whole, green run on the tree at HEAD ` +
       `(RD.DEVEX.WORKSPACE.281).\n${lines.join("\n")}\n` +
       `Run each command from \`${repo}\`, then push again. A run narrowed by files, names or a phase, a run with no stamp ` +
       `file and a run made on other content do not count; a file another window left in the node changes the content too.`,
+      ...refusals,
+    ].join("\n\n"),
   };
 }
 
