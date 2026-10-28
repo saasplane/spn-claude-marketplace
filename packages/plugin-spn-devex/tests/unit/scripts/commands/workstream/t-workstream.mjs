@@ -61,7 +61,7 @@ console.log("\n=== row write — opens an arc, changes its header, adds and move
   const mixed = cli(root, ["workstream", "row", "write", "031/N001", "--kind", "fix"]);
   ok("red: a row's field with no row named is refused", mixed.code === 2 && mixed.out.includes("row write <workstream>/N<nnn> <row> …"), mixed.out);
   const modelOnly = cli(root, ["workstream", "row", "write", "031/N001", "--model", "Opus 5.5"]);
-  ok("red: a row-only flag with no row (--model) is refused naming the full form, and the arc is not written", modelOnly.code === 2 && modelOnly.out.includes("`--model`") && modelOnly.out.includes("row write <workstream>/N<nnn> <row> …"), modelOnly.out);
+  ok("--model with no row sets the arc's model, a field the arc and its rows share", modelOnly.code === 0 && json(arcFile).model === "Opus 5.5", modelOnly.out);
   const usageText = cli(root, ["workstream", "row"]);
   ok("the usage of row write and row discard prints <workstream>/N<nnn>", /row write <workstream>\/N<nnn> \[<row>\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>"), usageText.out);
   const subjectAfter = cli(root, ["workstream", "031-probe", "row", "write", "--title", "x"]);

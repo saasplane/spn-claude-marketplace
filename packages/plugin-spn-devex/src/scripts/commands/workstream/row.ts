@@ -65,9 +65,8 @@ const OPTIONS = {
   preview: VALUE, under: VALUE,
 } as const;
 
+// A flag that changes only a row: typed with no row named, it is refused. `--model` and `--title` are the arc's too.
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
-// A flag that changes a row. Typed with no row named it would write the arc, so it is refused instead.
-const NEEDS_A_ROW = [...ROW_ONLY, "model"];
 const HEADER_ONLY = ["under", "subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "position", "preview"];
 
 /** The header as the words change it; the names of the fields that changed. */
@@ -249,7 +248,7 @@ function write(args: string[]): number {
   const under = words.value("under");
 
   if (rowId === undefined) {
-    const stray = NEEDS_A_ROW.filter((name) => words.given(name));
+    const stray = ROW_ONLY.filter((name) => words.given(name));
     if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")}, and no row is named — type \`row write <workstream>/N<nnn> <row> …\`, the row after the arc.`);
     if (!data) {
       const title = words.value("title");
