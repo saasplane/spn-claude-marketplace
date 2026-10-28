@@ -104,3 +104,11 @@ export function compare(name, pyArgs, tsFile, cases) {
   console.log(failed ? `  ${failed} FAILED` : `  all ${cases.length} passed`);
   return failed;
 }
+
+/**
+ * A suite that skips cases says so with this, once for each reason: `SKIP <n> <reason>`. The runner
+ * (`tests/run.mjs`) reads that line wherever it falls and shows the count beside the suite's passes.
+ */
+export function skipped(count, reason) {
+  console.log(`  SKIP ${count} ${reason}`);
+}

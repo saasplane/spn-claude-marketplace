@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../../helpers/harness.mjs";
+import { PLUGIN, skipped } from "../../../../helpers/harness.mjs";
 // `browser probe` — a page read as values. The browser cases run against a local fixture page and are
 // skipped, with a message, where no global Playwright is installed. The refusals need no browser.
 import { execFileSync } from "node:child_process";
@@ -38,7 +38,7 @@ try {
 } catch { hasBrowser = false; }
 
 if (!hasBrowser) {
-  console.log("\n  SKIP  the browser cases — no global Playwright on this machine (npm install -g playwright && npx playwright install chromium)");
+  skipped(20, "no global Playwright on this machine (npm install -g playwright && npx playwright install chromium)");
 } else {
   console.log("\n=== `browser probe` reads the fixture page as values");
   const read = (extra) => {

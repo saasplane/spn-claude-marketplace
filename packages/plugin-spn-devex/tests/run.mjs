@@ -25,7 +25,9 @@ import { RUN_NAME, writeRunFile } from "./helpers/run-file.mjs";
 // telemetry log, where its records would read as the developer's own tool calls.
 process.env.SPN_TELEMETRY = "off";
 
-const HERE = import.meta.dirname;
+// `SPN_RUN_SUITES` points the runner at another folder of suites; the runner's own case (t-run.mjs) uses it
+// to run a folder of fixture suites, since the runner cannot run itself.
+const HERE = process.env.SPN_RUN_SUITES ?? import.meta.dirname;
 const REPO = resolve(HERE, "..", "..", "..");
 // THE SUITES ARE WALKED, NOT LISTED, and they mirror `src/` beneath the tier that proves them: a
 // test for a file sits at that file's own path under `unit/`. A runner that globbed one folder made
@@ -56,8 +58,15 @@ if (writeStatus && runName === null) {
 const TIER = "UNIT";
 const ID = /\[([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2})\]/;
 
+// A suite that skips cases says so on a line of its own, `SKIP <n> <reason>`, anywhere in its output
+// (`skipped()` in helpers/harness.mjs). The runner counts those wherever they fall, so a run that
+// skipped cases never reads as if everything ran.
+const SKIP_LINE = /^\s*SKIP (\d+)\s*(.*)$/;
+
 let failed = 0;
 let cases = 0;
+let skipped = 0;
+let skippingSuites = 0;
 const results = [];
 for (const suite of suites) {
   let out = "";
@@ -82,14 +91,21 @@ for (const suite of suites) {
     results.push({ id: id[1], tier: TIER, status: verdict[1] === "PASS" ? "SUCCESS" : "FAILED", title: verdict[2].trim() });
   }
 
+  const skips = out.split("\n").map((line) => SKIP_LINE.exec(line)).filter((found) => found !== null);
+  const skippedHere = skips.reduce((sum, found) => sum + Number(found[1]), 0);
+  const reasons = [...new Set(skips.map((found) => found[2].trim()).filter(Boolean))].join("; ");
+
   const counted = /\b(\d+) passed\b/.exec(tail);
   const ok = code === 0 && counted !== null;
   if (counted) cases += Number(counted[1]);
+  if (skippedHere) { skipped += skippedHere; skippingSuites += 1; }
   if (!ok) failed += 1;
-  console.log(`  ${ok ? "ok  " : "FAIL"}  ${suite.padEnd(24)} ${tail}${code === 0 ? "" : ` (exit ${code})`}`);
+  const said = ok && skippedHere ? `${counted[1]} passed · ${skippedHere} skipped${reasons ? `: ${reasons}` : ""}` : tail;
+  console.log(`  ${ok ? "ok  " : "FAIL"}  ${suite.padEnd(24)} ${said}${code === 0 ? "" : ` (exit ${code})`}`);
 }
 console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
-  (failed ? ` · ${failed} SUITE(S) FAILING` : " · all passing"));
+  (skipped ? ` passed · ${skipped} skipped in ${skippingSuites} suite(s)` : "") +
+  (failed ? ` · ${failed} SUITE(S) FAILING` : skipped ? "" : " · all passing"));
 
 // THE RUN FILE IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
 // about the run — the register then says PLANNED for rows this tier covers and nothing named, which is

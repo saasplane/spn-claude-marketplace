@@ -30,10 +30,17 @@ const suites = walk(HERE)
   .map((f) => f.slice(HERE.length + 1))
   .sort();
 
+// A suite that skips cases says so on a line of its own, `SKIP <n> <reason>`, anywhere in its output;
+// the runner counts those wherever they fall, so a run that skipped cases never reads as if everything ran.
+const SKIP_LINE = /^\s*SKIP (\d+)\s*(.*)$/;
+
 let failed = 0;
 let cases = 0;
+let skipped = 0;
+let skippingSuites = 0;
 for (const suite of suites) {
   let tail = "";
+  let out = "";
   // THE EXIT CODE IS THE VERDICT, and the summary line only says how many cases there were. Judging
   // on the text alone read a suite that exits 1 while printing `all N passed` as green, and a suite
   // that passes in different words as red. A runner that can disagree with its own suites is a
@@ -42,19 +49,27 @@ for (const suite of suites) {
   try {
     // stderr is DISCARDED, not inherited. `stop` writes its warnings there, so a suite exercising it
     // prints a fixture's findings into this summary as though they were this run's.
-    tail = execFileSync(process.execPath, [resolve(HERE, suite)],
-      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })
-      .trimEnd().split("\n").at(-1).trim();
+    out = execFileSync(process.execPath, [resolve(HERE, suite)],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    tail = out.trimEnd().split("\n").at(-1).trim();
   } catch (error) {
-    tail = String(error.stdout ?? "").trimEnd().split("\n").at(-1).trim() || "CRASHED";
+    out = String(error.stdout ?? "");
+    tail = out.trimEnd().split("\n").at(-1).trim() || "CRASHED";
     code = error.status ?? 1;
   }
+  const skips = out.split("\n").map((line) => SKIP_LINE.exec(line)).filter((found) => found !== null);
+  const skippedHere = skips.reduce((sum, found) => sum + Number(found[1]), 0);
+  const reasons = [...new Set(skips.map((found) => found[2].trim()).filter(Boolean))].join("; ");
+
   const counted = /\b(\d+) passed\b/.exec(tail);
   const ok = code === 0 && counted !== null;
   if (counted) cases += Number(counted[1]);
+  if (skippedHere) { skipped += skippedHere; skippingSuites += 1; }
   if (!ok) failed += 1;
-  console.log(`  ${ok ? "ok  " : "FAIL"}  ${suite.padEnd(24)} ${tail}${code === 0 ? "" : ` (exit ${code})`}`);
+  const said = ok && skippedHere ? `${counted[1]} passed · ${skippedHere} skipped${reasons ? `: ${reasons}` : ""}` : tail;
+  console.log(`  ${ok ? "ok  " : "FAIL"}  ${suite.padEnd(24)} ${said}${code === 0 ? "" : ` (exit ${code})`}`);
 }
 console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
-  (failed ? ` · ${failed} SUITE(S) FAILING` : " · all passing"));
+  (skipped ? ` passed · ${skipped} skipped in ${skippingSuites} suite(s)` : "") +
+  (failed ? ` · ${failed} SUITE(S) FAILING` : skipped ? "" : " · all passing"));
 process.exit(failed ? 1 : 0);
