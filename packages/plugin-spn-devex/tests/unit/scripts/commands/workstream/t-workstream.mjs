@@ -2,7 +2,8 @@
 // throwaway workspace. Each command is shown answering in its line, writing its file, and refusing what
 // it is typed with wrongly.
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
 
@@ -29,6 +30,15 @@ console.log("=== help lists the group");
     ok(`help lists \`${words}\``, help.out.includes(words), words);
 }
 
+console.log("\n=== commandsRef — the plugin's own commands, one line each, from the same tree as help");
+{
+  const { commandsRef } = await import(resolve(PLUGIN, "src", "scripts", "cli.ts"));
+  const ref = await commandsRef();
+  ok("it opens with a heading that says it is generated", ref.startsWith("# spn-devex commands") && ref.includes("Never edited by hand"), ref.slice(0, 200));
+  ok("a line carries the bin, the words, the usage and what it does", ref.split("\n").some((line) => line.startsWith("spn-devex workstream row discard <workstream>/N<nnn> <row> --note") && line.includes(" — take a row found invalid")), ref);
+  ok("the subject-less and subject lines both appear", ref.includes("spn-devex workstream rows show"));
+}
+
 console.log("\n=== row write — opens an arc, changes its header, adds and moves rows");
 {
   const opened = cli(root, ["workstream", "row", "write", "031/N002", "--title", "the second arc", "--subject", "second", "--goal", "the second outcome"]);
@@ -49,7 +59,13 @@ console.log("\n=== row write — opens an arc, changes its header, adds and move
   const wrongWait = cli(root, ["workstream", "row", "write", "031/N001", "4", "--title", "x", "--kind", "fix", "--blocked-by", "9"]);
   ok("red: a row waiting on a row the arc lacks is refused, and nothing is written", wrongWait.code === 2 && /waits on row 9/.test(wrongWait.out) && !json(arcFile).rows.some((row) => row.id === "4"), wrongWait.out);
   const mixed = cli(root, ["workstream", "row", "write", "031/N001", "--kind", "fix"]);
-  ok("red: a row's field with no row named is refused", mixed.code === 2 && mixed.out.includes("name the row after the arc"), mixed.out);
+  ok("red: a row's field with no row named is refused", mixed.code === 2 && mixed.out.includes("row write <workstream>/N<nnn> <row> …"), mixed.out);
+  const modelOnly = cli(root, ["workstream", "row", "write", "031/N001", "--model", "Opus 5.5"]);
+  ok("red: a row-only flag with no row (--model) is refused naming the full form, and the arc is not written", modelOnly.code === 2 && modelOnly.out.includes("`--model`") && modelOnly.out.includes("row write <workstream>/N<nnn> <row> …"), modelOnly.out);
+  const usageText = cli(root, ["workstream", "row"]);
+  ok("the usage of row write and row discard prints <workstream>/N<nnn>", /row write <workstream>\/N<nnn> \[<row>\]/.test(usageText.out) && /row discard <workstream>\/N<nnn> <row>/.test(usageText.out) && !usageText.out.includes("<arc>"), usageText.out);
+  const subjectAfter = cli(root, ["workstream", "031-probe", "row", "write", "--title", "x"]);
+  ok("red: a subject placed after the group is refused, naming the right form", subjectAfter.code === 2 && subjectAfter.out.includes("spn-devex workstream row write 031-probe"), subjectAfter.out);
   const held = cli(root, ["workstream", "row", "write", "031/N001", "--status", "HELD"]);
   ok("red: HELD is no status, and the refusal names the stored set", held.code === 2 && held.out.includes("PROPOSED · DECIDED · LANDED · CARRIED · DROPPED"), held.out);
   const running = cli(root, ["workstream", "row", "write", "031/N001", "--status", "RUNNING", "--note", "the developer: go"]);

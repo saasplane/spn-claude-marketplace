@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc is cut by what is reviewed and released together, and named for its domain · § The commands · § The formats · § The life of an arc, and every file it touches · § An arc's status is one of six, stored or worked out · § Shaping: arcs open as the plan becomes clear
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream row write <arc> [<row>] [--field value …] [--position <n>] [--note "…"]
+//   spn-devex workstream row write <workstream>/N<nnn> [<row>] [--field value …] [--position <n>] [--note "…"]
 //
 // Given the arc alone, it opens the arc as PROPOSED (`--title`, `--subject` and `--goal` all needed: an arc opens only
 // when all three are known), or changes its header and its status; `--goal` is the outcome the arc's name file leads
@@ -32,7 +32,7 @@
 // After each write it names, in a `note:` line, a step with no repo or no altitude and a step out of chain order
 // (RD.DEVEX.WORKSPACE.183). It refuses nothing for them: the chain between two stacks is judgement.
 //
-//   spn-devex workstream row discard <arc> <row> --note "<the developer's words>"
+//   spn-devex workstream row discard <workstream>/N<nnn> <row> --note "<the developer's words>"
 //
 // A row found invalid or not needed leaves the arc's data (RD.DEVEX.WORKSPACE.279). The log keeps one
 // `discarded` line with the words and the row's What; no state is written. Only a row that never reached
@@ -66,6 +66,8 @@ const OPTIONS = {
 } as const;
 
 const ROW_ONLY = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
+// A flag that changes a row. Typed with no row named it would write the arc, so it is refused instead.
+const NEEDS_A_ROW = [...ROW_ONLY, "model"];
 const HEADER_ONLY = ["under", "subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "position", "preview"];
 
 /** The header as the words change it; the names of the fields that changed. */
@@ -247,8 +249,8 @@ function write(args: string[]): number {
   const under = words.value("under");
 
   if (rowId === undefined) {
-    const stray = ROW_ONLY.filter((name) => words.given(name));
-    if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")} — name the row after the arc.`);
+    const stray = NEEDS_A_ROW.filter((name) => words.given(name));
+    if (stray.length) throw new UsageFault(`changes a row with ${stray.map((name) => `\`--${name}\``).join(", ")}, and no row is named — type \`row write <workstream>/N<nnn> <row> …\`, the row after the arc.`);
     if (!data) {
       const title = words.value("title");
       if (!title || !subject || !words.value("goal")?.trim())
@@ -378,7 +380,7 @@ const DISCARDABLE = new Set(["waiting", "ready", "deferred"]);
 function discard(args: string[]): number {
   const words = readWords(args, { note: VALUE });
   const [ref, rowId, ...more] = words.paths;
-  if (!rowId || more.length) throw new UsageFault("takes an arc and one row: `row discard <arc> <row> --note \"…\"`.");
+  if (!rowId || more.length) throw new UsageFault("takes an arc and one row: `row discard <workstream>/N<nnn> <row> --note \"…\"`.");
   const note = words.value("note");
   if (!note?.trim()) throw new UsageFault(`discards row ${rowId} with \`--note\` carrying the developer's words, so nobody raises it again.`);
   const { ws, arc } = arcNamed(ref, true);
@@ -410,12 +412,12 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: {
     describe: "open an arc or change its header and status; add a row or change its fields and state; --note writes a log line",
-    usage: "<arc> [<row>] [--title …] [--subject …] [--goal …] [--under …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
+    usage: "<workstream>/N<nnn> [<row>] [--title …] [--subject …] [--goal …] [--under …] [--status …] [--wait …] [--start] [--review-fixes] [--reason …] [--kind …] [--state …] [--blocked-by …] [--touches …] [--position …] [--preview …] [--note …] …",
     run: write,
   },
   discard: {
     describe: "take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line",
-    usage: "<arc> <row> --note \"…\"",
+    usage: "<workstream>/N<nnn> <row> --note \"…\"",
     run: discard,
   },
 };

@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Questions are records, and every card is one rendered
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream question raise <arc> --file card.json
+//   spn-devex workstream question raise <workstream>/N<nnn> --file card.json
 //   spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html>
 //   spn-devex workstream question answer <qN> --key A --words "…"
 //   spn-devex workstream question withdraw <qN> --words "…"
@@ -120,7 +120,7 @@ function settle(args: string[], state: "answered" | "withdrawn"): number {
 }
 
 export const actions: Record<string, Action> = {
-  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<arc> --file card.json", run: raise },
+  raise: { describe: "raise a card: the next number, the record, the card in the approach page's Open", usage: "<workstream>/N<nnn> --file card.json", run: raise },
   show: { describe: "show an open card on an arc's preview, in its Open", usage: "<qN> --in <notes/N<nnn>/preview.html>", run: show },
   answer: { describe: "answer a card in your words; it leaves every Open", usage: "<qN> --key <option> --words \"…\"", run: (args) => settle(args, "answered") },
   withdraw: { describe: "withdraw a card in your words; it leaves every Open", usage: "<qN> --words \"…\"", run: (args) => settle(args, "withdrawn") },

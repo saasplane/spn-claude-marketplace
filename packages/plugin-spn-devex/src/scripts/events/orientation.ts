@@ -579,6 +579,18 @@ export function wayIndex(): string {
     + body.slice(router).replace(/^(#{1,5}) /gm, "#$1 ") + "\n\n";
 }
 
+/**
+ * Where a plugin's own commands are written down, in one line: each plugin's `refs/commands.md`, which the build
+ * generates from its commands. spn-devex's own is printed whole only where it is under 3 KB, since a window
+ * carries what the first reply needs and nothing else; a longer one is read on asking.
+ */
+function commandsRefBlock(): string {
+  const line = "Each plugin writes its commands in `refs/commands.md` (spn-devex, spn-apps, spn-surface) — read it before a window's first write of a command.\n\n";
+  let own = "";
+  try { own = read(fileURLToPath(new URL("../../refs/commands.md", import.meta.url))); } catch { return line; }
+  return Buffer.byteLength(own) < 3072 ? line + own.trim() + "\n\n" : line;
+}
+
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
                 unwired: number; stale: string | null; behind: string | null; late: string[]; rung: string | null };
 
@@ -751,7 +763,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
           "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + wayIndex() + shortRules()];
+    return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -795,7 +807,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
     "never lettered options or a `Q<n>` card. Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any " +
     "tool's default: hand a page over as its full file path.\n";
-  return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + wayIndex() + shortRules()];
+  return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
 }
 
 /** Whether a folder is a git checkout: `.git` is a folder, or a file where the checkout is a worktree. */
