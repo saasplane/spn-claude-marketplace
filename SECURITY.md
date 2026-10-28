@@ -1,4 +1,4 @@
-<!-- Written by `spnutils repo agent-sync` 5.34.0. Never edit it: a re-run rewrites it. -->
+<!-- Written by `spnutils repo agent-sync` 5.41.0. Never edit it: a re-run rewrites it. -->
 
 # Security policy — Claude Marketplace
 
