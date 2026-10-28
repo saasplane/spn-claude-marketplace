@@ -118,7 +118,8 @@ function arcOfPath(folder: string, path: string): string | null {
 // The `workstream` commands that write an arc's data, as the words after `workstream`, and what names
 // the arc: the arc itself, one of its cards, or a report under its notes.
 const ARC_WRITES: ReadonlyArray<{ words: string[]; names: "arc" | "card" | "report" }> = [
-  { words: ["row", "write"], names: "arc" }, { words: ["row", "discard"], names: "arc" },
+  { words: ["arc", "edit"], names: "arc" }, { words: ["row", "add"], names: "arc" }, { words: ["row", "state"], names: "arc" },
+  { words: ["row", "note"], names: "arc" }, { words: ["row", "edit"], names: "arc" }, { words: ["row", "discard"], names: "arc" },
   { words: ["fact", "write"], names: "arc" }, { words: ["arc", "stamp", "write"], names: "arc" },
   { words: ["question", "raise"], names: "arc" }, { words: ["question", "show"], names: "card" },
   { words: ["question", "answer"], names: "card" }, { words: ["question", "withdraw"], names: "card" },

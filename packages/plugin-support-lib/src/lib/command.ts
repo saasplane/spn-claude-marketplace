@@ -49,7 +49,7 @@ export type Exit = number | Promise<number>;
  * One action: the line `help` prints for it, the words it takes after its own name, and the
  * function that runs it. `run` receives what was typed after the action.
  */
-export type Action = { describe: string; usage: string; run: (args: string[]) => Exit };
+export type Action = { describe: string; usage: string; run: (args: string[]) => Exit; /** A retired action: it runs and refuses, and `help`, the commands ref and a usage line leave it out. */ hidden?: boolean };
 
 /** A command file that names its actions, typed as `<group> <subject> <action>`. */
 export type Subject = { describe: string; actions: Record<string, Action> };
@@ -226,7 +226,7 @@ export function usageLine(plugin: string, words: string, usage: string): string 
 
 /** The usage of a subject: one line for each of its actions, in the order the file names them. */
 export function usageOf(plugin: string, group: string, subject: string, actions: Record<string, Action>): string {
-  return usageText(Object.entries(actions).map(([name, action]) =>
+  return usageText(Object.entries(actions).filter(([, action]) => !action.hidden).map(([name, action]) =>
     usageLine(plugin, commandWords(group, subject, name), action.usage)));
 }
 

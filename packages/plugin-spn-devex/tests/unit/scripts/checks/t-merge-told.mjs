@@ -1,6 +1,6 @@
 import { CHECKS, EVENTS } from "../../../helpers/harness.mjs";
 // `checks/merge-told.ts` — after a Bash call that merged into `develop`, the agent is handed the running arcs of
-// each open workstream whose set holds the repository, and the `workstream row write <arc> --note` line each
+// each open workstream whose set holds the repository, and the `workstream arc edit <arc> --note` line each
 // owes. A note for the agent alone, never a refusal; silent where no running arc holds the repository, where
 // the merge went into another branch, and where nothing moved.
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
@@ -55,7 +55,7 @@ console.log("\n=== a merge into develop with a running arc in a set that holds t
   const verdict = checkMergeTold(bash("git merge --no-ff feature", repo));
   ok("a local merge that moved develop gives a note", Boolean(verdict?.note) && !verdict?.deny, JSON.stringify(verdict));
   ok("the note names the repository", verdict?.note?.includes("`spn-x`"), verdict?.note);
-  ok("and the line each running arc owes, with its workstream", verdict?.note?.includes('031-probe: `spn-devex workstream row write 031/N001 --note "…"`'), verdict?.note);
+  ok("and the line each running arc owes, with its workstream", verdict?.note?.includes('031-probe: `spn-devex workstream arc edit 031/N001 --note "…"`'), verdict?.note);
   ok("and says the agent writes it", /You write the lines/.test(verdict?.note ?? ""), verdict?.note);
   ok("it never refuses", !("deny" in (verdict ?? {})));
   ok("a leading `cd` moves where the command ran", Boolean(checkMergeTold(bash(`cd ${repo} && git merge --no-ff feature`, root))?.note));

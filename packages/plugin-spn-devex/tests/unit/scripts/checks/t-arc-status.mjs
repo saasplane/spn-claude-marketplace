@@ -46,14 +46,14 @@ console.log("\n=== the one owner works RUNNING and LANDED out from the steps (RD
   ok("CARRIED and DROPPED are the words stored", arcStatus(arc("CARRIED", [step("1", "running")])) === "CARRIED" && arcStatus(arc("DROPPED")) === "DROPPED");
 }
 
-console.log("\n=== the commands hold it: row write refuses a word outside the stored set, and the data reads through the owner");
+console.log("\n=== the commands hold it: arc edit refuses a word outside the stored set, and the data reads through the owner");
 {
   const { root, ws } = await dataWorkspace("arc-status-row-write");
-  const refused = cli(root, ["workstream", "row", "write", "031/N001", "--status", "DONE"]);
-  ok("known-bad: `row write --status DONE` is refused and writes nothing", refused.code !== 0 && statusOfData(ws, "N001") === "DECIDED", refused.out);
-  cli(root, ["workstream", "row", "write", "031/N001", "1", "--state", "running"]);
+  const refused = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "DONE"]);
+  ok("known-bad: `arc edit --status DONE` is refused and writes nothing", refused.code !== 0 && statusOfData(ws, "N001") === "DECIDED", refused.out);
+  cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
   ok("a step started is read as RUNNING through the owner", statusOfData(ws, "N001") === "RUNNING");
-  const moved = cli(root, ["workstream", "row", "write", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
+  const moved = cli(root, ["workstream", "arc", "edit", "031/N001", "--status", "CARRIED", "--reason", "to 032", "--note", "the developer: move it"]);
   ok("a stored word of the set is written", moved.code === 0 && statusOfData(ws, "N001") === "CARRIED", moved.out);
 }
 

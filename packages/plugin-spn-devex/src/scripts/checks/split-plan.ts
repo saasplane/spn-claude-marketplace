@@ -1063,7 +1063,7 @@ export function gateClose(payload: Payload): Verdict {
           `The split plan is the rows of the workstream's arcs, kept as data: each row's \`repo\` ` +
           `and its \`state\` (02-workstream/01-workstream.md § A step row says where, at what ` +
           `altitude, and how). The gate reads those two and nothing else.\n\n` +
-          `Give each arc its rows with \`spn-devex workstream row write <arc> <row>\`, then give each row one of three states:\n` +
+          `Give each arc its rows with \`spn-devex workstream row add <arc> "<title>" --repo <repo> --altitude <altitude>\`, then give each row one of three states:\n` +
           `  landed <commit>   what reached its node, and the commit that landed it\n` +
           `  carried           the successor workstream that takes it on\n` +
           `  deferred          the event that brings it back\n\n` +
@@ -1157,7 +1157,7 @@ export function gateClose(payload: Payload): Verdict {
           `and the status names where) and \`DROPPED\` (abandoned on purpose, with the reason).\n\n` +
           `${listed}${more}\n\n` +
           `For each one, decide which of the three it is and write it with ` +
-          `\`spn-devex workstream row write <arc> --status …\`; an arc never decided is deleted with ` +
+          `\`spn-devex workstream arc edit <arc> --status …\`; an arc never decided is deleted with ` +
           `\`spn-devex workstream arc delete <arc>\`, and the review-fixes arc lands on the developer's word to close. ` +
           `An arc left \`PROPOSED\`, \`DECIDED\` or \`RUNNING\` inside a closed workstream is a receipt that disagrees ` +
           `with itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,

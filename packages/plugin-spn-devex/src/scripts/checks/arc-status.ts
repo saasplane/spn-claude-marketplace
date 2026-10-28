@@ -3,7 +3,7 @@
 // The register rows are the source of truth. A rule change is edited there first, then here.
 //
 // THE SET, STATED ONCE IN THE PLUGIN. The schema (`lib/workstream-schema.ts`) takes the stored statuses from here,
-// so `workstream row write --status` refuses a word outside them, and `workstream state check` names a `state.json`
+// so `workstream arc edit --status` refuses a word outside them, and `workstream state check` names a `state.json`
 // that holds one. What an arc reads as is worked out by one owner, `arcStatus` in `lib/workstream.ts`, which every
 // reader asks.
 

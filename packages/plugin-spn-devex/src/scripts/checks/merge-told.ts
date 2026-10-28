@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // After a Bash call that merged into `develop`, remind the agent which open workstreams hold that repository
-// and which of their arcs are running, and the `workstream row write <ws>/<arc> --note` line each one is owed.
+// and which of their arcs are running, and the `workstream arc edit <ws>/<arc> --note` line each one is owed.
 // The agent writes the lines, because what changed is judgement; this reads no diff and writes nothing.
 // A note for the agent alone, never a refusal, and silent where no running arc holds the repository.
 
@@ -55,7 +55,7 @@ function holds(root: string, ws: string, repo: string): boolean {
   return arcIdsOf(ws).some((arc) => { const data = readArc(ws, arc); return !!data && arcRepos(data).includes(repo); });
 }
 
-/** The running arcs of each open workstream whose set holds the repository, as the ref `row write` takes. */
+/** The running arcs of each open workstream whose set holds the repository, as the ref `arc edit` takes. */
 export function owing(root: string, repo: string): Array<{ workstream: string; arcs: string[] }> {
   const out: Array<{ workstream: string; arcs: string[] }> = [];
   for (const ws of workstreamsOf(root, ["open"])) {
@@ -78,6 +78,6 @@ export function checkMergeTold(payload: Payload): Verdict {
   if (!repo) return null;
   const owed = owing(root, repo);
   if (!owed.length) return null;
-  const lines = owed.flatMap((one) => one.arcs.map((arc) => `- ${one.workstream}: \`spn-devex workstream row write ${arc} --note "…"\``));
+  const lines = owed.flatMap((one) => one.arcs.map((arc) => `- ${one.workstream}: \`spn-devex workstream arc edit ${arc} --note "…"\``));
   return { note: `\`${repo}\` took a merge into \`develop\`. Each running arc below belongs to an open workstream whose set holds it, and each is owed one line: what changed, a dependency the merge added, and for a breaking change its cutover (what must land with it, and in what order). You write the lines; nothing was written for you.\n${lines.join("\n")}` };
 }

@@ -77,7 +77,7 @@ export async function surface(): Promise<Listed[]> {
         listed.push({ group, subject: null, action: file, command: commandWords(group, null, file), describe: exported.describe ?? "" });
         continue;
       }
-      for (const [action, { describe }] of Object.entries(exported.actions))
+      for (const [action, { describe, hidden }] of Object.entries(exported.actions)) if (!hidden)
         listed.push({ group, subject: file, action, command: commandWords(group, file, action), describe: describe ?? "" });
     }
   }
@@ -104,7 +104,7 @@ export async function commandsRef(): Promise<string> {
         lines.push(`${usageLine(PLUGIN_NAME, commandWords(group, null, file), exported.usage ?? "")} — ${exported.describe ?? ""}`, "");
         continue;
       }
-      for (const [action, { describe, usage }] of Object.entries(exported.actions))
+      for (const [action, { describe, usage, hidden }] of Object.entries(exported.actions)) if (!hidden)
         lines.push(`${usageLine(PLUGIN_NAME, commandWords(group, file, action), usage)} — ${describe ?? ""}`, "");
     }
   }

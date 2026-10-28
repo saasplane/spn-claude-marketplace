@@ -129,7 +129,7 @@ wherever it stands. The `workstream question` commands are the record's only wri
 
 **What an answer means stays yours to write.** After `question answer`, write the decision into the
 page's `What`, with the `q<n>` anchor on the statement and no Q number on view, and into the preview
-section it settles; then write the arc's log line through `workstream row write <arc> --note "…"`.
+section it settles; then write the arc's log line through `workstream arc edit <arc> --note "…"`.
 `question answer` names both in its own line. The PreToolUse hook refuses a card written by hand and
 an edit inside an `open` block, and `workstream state check` fails an open record whose card is not on
 the approach page, or a preview's card that differs from its record.
