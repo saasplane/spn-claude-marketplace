@@ -1,16 +1,25 @@
-# Written by `spnutils repo agent-sync` 5.34.0 from this repository's sprepo.json (GENERAL).
+# Written by `spnutils repo agent-sync` 5.41.0 from this repository's sprepo.json (GENERAL).
 # Never edit it: a re-run rewrites it.
 #
 # Each job id is a status check the branch rulesets require, so a job that fails blocks the merge,
 # for every caller. Every action is pinned by its commit and every image by its digest; the release
 # each one is sits beside it, and the command holds the one table they are chosen from.
+#
+# The jobs run on a pull request into a permanent branch and on a push to develop. A promotion's pull
+# request into qa, uat or main has as its head a commit that already passed them on develop, so a job
+# skips there where the head is a permanent branch of this repository, and a skipped job meets its
+# check. Any other head runs every job, and promotion-source refuses it.
+#
+# The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070). Every job is written as it
+# runs, and its own `if: false` skips it: a skipped job meets its check, so no runner starts and no
+# merge waits. The switch in spnutils turns them back on, and each job then runs as written.
 name: checks
 
 on:
   pull_request:
+    branches: [develop, qa, uat, main]
   push:
-    branches: [develop, main]
-  workflow_dispatch:
+    branches: [develop]
 
 permissions:
   contents: read
@@ -20,8 +29,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Promotion source: a pull request into qa, uat or main comes from a permanent branch below its base,
+  # from the one directly above it for a merge down, or from a hotfix/* branch, each of this repository.
+  # Any head into develop passes. The head is read from the event, never from text a contributor types
+  # into the script, and a fork's head never passes.
+  promotion-source:
+    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the pull request's source branch
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$BASE" = "develop" ]; then
+            echo "A pull request into develop may come from any branch."
+            exit 0
+          fi
+          if [ "$HEAD_REPO" != "$REPO" ]; then
+            echo "::error::A pull request into $BASE comes from this repository, never from a fork ($HEAD_REPO)."
+            exit 1
+          fi
+          case "$BASE" in
+            qa) allowed="develop uat" ;;
+            uat) allowed="develop qa main" ;;
+            main) allowed="develop qa uat" ;;
+            *) allowed="" ;;
+          esac
+          for branch in $allowed; do
+            if [ "$HEAD" = "$branch" ]; then
+              echo "$HEAD into $BASE is a promotion or a merge down."
+              exit 0
+            fi
+          done
+          case "$HEAD" in
+            hotfix/?*)
+              echo "$HEAD into $BASE is a fix's own pull request."
+              exit 0
+              ;;
+          esac
+          echo "::error::$BASE takes a pull request from $allowed or a hotfix/* branch, never from '$HEAD'. Open it with spnutils repo promote $BASE, or cut a hotfix/<subject> branch from $BASE."
+          exit 1
+
   # The `test` script the root package.json declares.
   test:
+    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -39,6 +94,7 @@ jobs:
 
   # Semgrep CE, its default rules, failing on any finding.
   code-scan:
+    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
@@ -50,6 +106,7 @@ jobs:
 
   # OSV-Scanner: every lockfile in the tree, against the OSV database, failing on any advisory.
   dependency-scan:
+    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -61,6 +118,7 @@ jobs:
 
   # TruffleHog: the commits this change adds, failing on a secret that is verified or cannot be ruled out.
   secret-scan:
+    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

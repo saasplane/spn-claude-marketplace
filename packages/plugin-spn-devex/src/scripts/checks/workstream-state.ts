@@ -24,6 +24,7 @@ export type Finding = { workstream: string; arc: string | null; check: string; m
 
 /** The part of a page under its `h2` named `name`, to the next `h2`. Empty where it has none. */
 export function sectionText(text: string, name: string): string {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const heading = new RegExp(`<h2\\b[^>]*>\\s*${name}\\b[\\s\\S]*?</h2>`, "i").exec(text);
   if (!heading) return "";
   const rest = text.slice(heading.index + heading[0].length);

@@ -50,6 +50,7 @@ export function ruleMatches(rule: string, part: string): boolean {
   if (rule === "*") return true;
   const prefix = rule.endsWith(":*") ? rule.slice(0, -2) : null;
   const body = (prefix ?? rule).split("*").map(escapeRegex).join(".*");
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   return new RegExp(prefix !== null ? `^${body}(?:\\s.*)?$` : `^${body}$`, "s").test(text);
 }
 

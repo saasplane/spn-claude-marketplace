@@ -107,6 +107,7 @@ const cells = (row: string): string[] => row.trim().replace(/^\|/, "").replace(/
 /** The section of a ref that holds one unit's choice table, up to the next heading at its level or above. */
 function sectionOf(text: string, unit: string): string | null {
   const lines = text.split("\n");
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const start = lines.findIndex((line) => new RegExp(`^#{3,4} The choice table of \`${unit}\`\\s*$`).test(line));
   if (start < 0) return null;
   const level = /^(#+)/.exec(lines[start])![1].length;

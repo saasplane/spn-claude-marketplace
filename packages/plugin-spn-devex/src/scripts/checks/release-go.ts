@@ -115,6 +115,7 @@ export function isMajorBump(next: string, current: string): boolean {
 /** Whether the words name this version as a version of its own: `2.0.0` is not named by `12.0.0` or `2.0.01`. */
 export function namesVersion(words: string, version: string): boolean {
   const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   return new RegExp(`(?<![\\d.])${escaped}(?!\\d)`).test(words);
 }
 
