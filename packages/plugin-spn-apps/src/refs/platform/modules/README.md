@@ -83,7 +83,7 @@ The table above compresses each module to one commitment. Here is what actually 
 - Register a file's record before its bytes exist, and let its lifecycle state say how far the transfer got.
 - The record is immutable once written; content that should differ is a different file. Do not mutate a file record in place.
 - Sensitivity and access class are different questions, both stated on the record. Do not derive one from the other.
-- Every object key leads with `public/` or `private/`, stamped at creation and never changed. Do not reclassify a file, compose a key yourself, or let a key name a bucket.
+- Every object key leads with `public/` or `private/`, stamped at creation and never changed. A module's own area in the app store is `private/<module>/…`, formed by `prepareStorageModuleAreaKey`. Do not reclassify a file, compose a key yourself, or let a key name a bucket.
 - Generate variants from the original; do not accept an uploaded one. Carry each variant's own processing state.
 - Reach the configured store through the seam. Do not name a storage vendor at a call site.
 
