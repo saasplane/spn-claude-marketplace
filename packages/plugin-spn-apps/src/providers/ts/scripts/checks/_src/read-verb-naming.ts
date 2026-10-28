@@ -85,6 +85,7 @@ export function findings(source: string, added: string | null): string[] {
   for (const match of masked.matchAll(READ_LIST_DECLARATION)) {
     const [whole, name, , listType] = match;
     if (NAMED_FOR_ITS_LIST.test(name)) continue;
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
     if (added !== null && !new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[<(]`).test(added))
       continue;
     void whole;

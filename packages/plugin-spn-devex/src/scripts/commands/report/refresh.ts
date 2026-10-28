@@ -76,6 +76,7 @@ function blockOf(page: string): { at: number; text: string; value: Record<string
  * heading is what names it.
  */
 function sectionOf(page: string, heading: string): { from: number; to: number } | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const titled = new RegExp(`<h2\\b[^>]*>\\s*${escaped(heading)}\\s*</h2>`).exec(page);
   if (titled === null) return null;
   const from = page.lastIndexOf("<section", titled.index);
@@ -329,6 +330,7 @@ function writeTable(page: string, table: Numbers["tables"][number]): Written {
   // A table the page leaves out is missing only where the measurement has a row for it: a
   // repository with no package carries a sentence under Packages, and no table.
   const absent: Written = { page: page, placed: 0, unplaced: table.rows.length === 0 ? [] : [`the page has no \`${table.heading}\` table`], changes: [] };
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const heading = new RegExp(`<h3\\b[^>]*>\\s*${escaped(table.heading)}\\s*</h3>`).exec(page);
   if (heading === null) return absent;
   const after = heading.index + heading[0].length;

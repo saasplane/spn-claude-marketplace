@@ -197,6 +197,7 @@ export function checkFigures(src: string): FigureFinding[] {
     const conns: { pts: Pt[]; exempt: boolean }[] = [];
     for (const m of svg.matchAll(/<line\b([^>]*)>/g)) {
       const at = m[1];
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
       const g = (k: string) => Number(at.match(new RegExp(`\\s${k}="(-?[\\d.]+)"`))?.[1] ?? NaN);
       const pts: Pt[] = [[g("x1"), g("y1")], [g("x2"), g("y2")]];
       if (pts.flat().some(Number.isNaN)) continue;

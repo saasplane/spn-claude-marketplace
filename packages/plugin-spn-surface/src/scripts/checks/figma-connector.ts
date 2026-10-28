@@ -33,6 +33,7 @@ const NOTIFY_CALL = /\bfigma\s*\??\.\s*notify\s*\(/;
 const CLOSE_CALL = /\bfigma\s*\??\.\s*closePlugin\s*\(/;
 const PAGE_SWITCH = /\bsetCurrentPageAsync\s*\(/g;
 
+// nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
 const unsupportedCall = (name: string): RegExp => new RegExp(`\\??\\.\\s*${name}\\b`);
 
 /** Every refusal the script's text shows, one sentence each. `masked` has comment and string bodies blanked. */

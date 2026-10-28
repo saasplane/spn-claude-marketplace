@@ -241,6 +241,7 @@ export const attrOf = (tag: Tag, name: string): Attr | undefined => tag.attrs.fi
 export function memberOf(tag: Tag, name: string, enumName: string): string | null {
   const attr = attrOf(tag, name);
   if (!attr || attr.kind !== "expr") return null;
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const match = new RegExp(`^\\s*${enumName}\\.([A-Z][A-Z0-9_]*)\\s*$`).exec(attr.value);
   return match ? match[1] : null;
 }
