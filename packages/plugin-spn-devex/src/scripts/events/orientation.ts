@@ -738,6 +738,10 @@ export function orient(root: string, cwd: string): [message: string, context: st
     // already on disk. Offering the door again would ask somebody to name their organization twice
     // — and the second answer is the one that reaches the manifests.
     const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
+    // A PARTNER ARRIVES MINTED. The plugins reach a folder through the floor `workspace init` writes, so
+    // the window a partner opens after it already stands on act 1 — offering to mint again reads as if
+    // their own command did nothing. An empty folder is the builder's case, with plugins at user scope.
+    const minted = isDir(join(root, DEVEX)) && isWorkspaceDevex(readdirSync(join(root, DEVEX)));
     const message = clean(greeting) + "\n" + WELCOME_SPACER + "\n" +
       (started
         ? "You started a platform here and we did not finish. No repository exists yet, and " +
@@ -746,9 +750,12 @@ export function orient(root: string, cwd: string): [message: string, context: st
           "I will read what you already answered, tell you where we stopped, and pick up at the " +
           "next question. Nothing you decided is asked again.\n\n" +
           "Shall we carry on?\n"
-        : "This folder is empty, which is a good place to start. There is nothing to read " +
-          "yet, so nothing here is decided.\n\n" +
-          "Say yes and I mint the workspace, open a workstream to hold your answers, then " +
+        : (minted
+            ? "Your workspace is set up, and it holds no repository yet, so nothing here is decided.\n\n" +
+              "Say yes and I open a workstream to hold your answers, then "
+            : "This folder is empty, which is a good place to start. There is nothing to read " +
+              "yet, so nothing here is decided.\n\n" +
+              "Say yes and I mint the workspace, open a workstream to hold your answers, then ") +
           "ask the estate questions one at a time. Your answers name every account, package " +
           "and prefix that comes after, and each one lands in a file as you give it — so " +
           "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
@@ -761,7 +768,10 @@ export function orient(root: string, cwd: string): [message: string, context: st
           "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
           "carry an answer for, and never ask again for one it holds.\n"
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
-          "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
+          "answer and this folder stays empty. On a yes, " +
+          (minted
+            ? "act 1 has already run — `spnutils workspace init` minted this folder, so do not run it again — and act 2 "
+            : "act 1 mints the workspace and act 2 ") +
           "opens the workstream that holds the answers, before the first question is asked.\n");
     return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
   }

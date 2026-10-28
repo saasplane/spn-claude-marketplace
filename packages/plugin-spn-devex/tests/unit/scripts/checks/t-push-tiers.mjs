@@ -7,7 +7,7 @@
 // the check, so a hash the check gets wrong fails a case.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -284,6 +284,97 @@ console.log("\n=== the content hash is pinned");
     contentHash(entries, "node") === PINNED && indexHash(repo, "node") === PINNED, `${contentHash(entries, "node")} / ${blobs.join(" ")}`);
   ok("[MKT.HOOKS.68] the order the entries arrive in changes nothing",
     contentHash(new Map([...entries].reverse()), "node") === contentHash(entries, "node"));
+}
+
+console.log("\n=== a push of a TypeScript node also waits for the repository's own Prettier to accept the files it changes");
+{
+  // A stand-in for the pinned Prettier: it flags a file holding the word UNFORMATTED, skips what `.prettierignore` names,
+  // and records how it was called, so the case reads the flags and the folder the check used.
+  const STUB = [
+    "#!/usr/bin/env node",
+    'const fs = require("node:fs");',
+    'const args = process.argv.slice(2);',
+    'fs.appendFileSync(__dirname + "/prettier.calls", JSON.stringify({ cwd: process.cwd(), args }) + "\\n");',
+    'const ignored = fs.existsSync(".prettierignore") ? fs.readFileSync(".prettierignore", "utf8").split("\\n").filter(Boolean) : [];',
+    'let bad = false;',
+    'for (const file of args.filter((arg) => !arg.startsWith("--"))) {',
+    '  if (ignored.some((rule) => file === rule || file.startsWith(rule))) continue;',
+    '  if (!/\\.(ts|tsx|json)$/.test(file)) continue;',
+    '  if (fs.readFileSync(file, "utf8").includes("UNFORMATTED")) { console.error("[warn] " + file); bad = true; }',
+    '}',
+    'if (bad) console.error("[warn] Code style issues found in the above file. Run Prettier to fix.");',
+    "process.exit(bad ? 1 : 0);",
+    "",
+  ].join("\n");
+  const FORMATTED = "export const a = 1;\n";
+  const BAD = "export const a   =   1; // UNFORMATTED\n";
+  const calls = (repo) => { try { return readFileSync(join(repo, "node_modules", ".bin", "prettier.calls"), "utf8").trim().split("\n").map((line) => JSON.parse(line)); } catch { return []; } };
+
+  /** A TypeScript repository with one node, the stub installed unless `installed` is false, and `.prettierignore` as given. */
+  function fmtRepo(name, { stack = "TS", installed = true, ignore = "" } = {}) {
+    const repo = repository(name, {
+      "sprepo.json": JSON.stringify({ type: "APPS", name: "R", config: { mtype: "APPS", stack } }),
+      "pkg/spkind.json": JSON.stringify({ kind: "APP_SERVER", name: "Pkg", config: { mtype: "APP_SERVER" } }),
+      "pkg/package.json": JSON.stringify({ name: "pkg", private: true }),
+      "pkg/src/a.ts": FORMATTED,
+      "pkg/src/gen/g.ts": FORMATTED,
+      "pkg/src/keep.ts": BAD,
+      "pkg/README.md": "# pkg\n",
+      ".prettierignore": ignore,
+    });
+    if (installed) {
+      mkdirSync(join(repo, "node_modules", ".bin"), { recursive: true });
+      writeFileSync(join(repo, "node_modules", ".bin", "prettier"), STUB, { mode: 0o755 });
+    }
+    return repo;
+  }
+
+  const bad = fmtRepo("fmt-bad");
+  write(bad, { "pkg/src/a.ts": BAD });
+  land(bad, "pkg/src/a.ts");
+  const refused = checkPushTiers(push(bad));
+  ok("[MKT.HOOKS.82] a changed file Prettier would reformat refuses the push, naming the file and the fix",
+    verdictOf(refused) === "deny" && denial(refused).includes("`pkg/src/a.ts`") && denial(refused).includes("pnpm exec prettier --write pkg/src/a.ts"), denial(refused));
+  const ran = calls(bad);
+  ok("[MKT.HOOKS.82] the repository's own Prettier ran as --check --ignore-unknown from the repository root, on the changed file alone",
+    ran.length === 1 && ran[0].args.join(" ") === "--check --ignore-unknown pkg/src/a.ts" && realpathSync(ran[0].cwd) === bad, JSON.stringify(ran));
+
+  const good = fmtRepo("fmt-good");
+  write(good, { "pkg/src/a.ts": "export const a = 2;\n" });
+  land(good, "pkg/src/a.ts");
+  ok("[MKT.HOOKS.82] a changed file Prettier accepts passes", verdictOf(checkPushTiers(push(good))) === "silent", denial(checkPushTiers(push(good))));
+
+  const unchanged = fmtRepo("fmt-unchanged");
+  write(unchanged, { "pkg/src/a.ts": "export const a = 3;\n" });
+  land(unchanged, "pkg/src/a.ts");
+  ok("[MKT.HOOKS.82] an unformatted file the push does not change passes, and is not even handed to Prettier",
+    verdictOf(checkPushTiers(push(unchanged))) === "silent" && !calls(unchanged).some((call) => call.args.includes("pkg/src/keep.ts")));
+
+  const ignored = fmtRepo("fmt-ignored", { ignore: "pkg/src/gen/\n" });
+  write(ignored, { "pkg/src/gen/g.ts": BAD });
+  land(ignored, "pkg/src/gen/g.ts");
+  ok("[MKT.HOOKS.82] a changed file the repository's .prettierignore keeps out passes", verdictOf(checkPushTiers(push(ignored))) === "silent", denial(checkPushTiers(push(ignored))));
+
+  const docsOnly = fmtRepo("fmt-docs");
+  write(docsOnly, { "pkg/README.md": "# pkg\n\nmore\n" });
+  land(docsOnly, "pkg/README.md");
+  ok("[MKT.HOOKS.82] a push that changes no file Prettier handles passes", verdictOf(checkPushTiers(push(docsOnly))) === "silent", denial(checkPushTiers(push(docsOnly))));
+
+  const removed = fmtRepo("fmt-removed");
+  git(removed, "rm", "-q", "pkg/src/keep.ts");
+  git(removed, "commit", "-q", "-m", "delete");
+  ok("[MKT.HOOKS.82] a deleted file is not checked", verdictOf(checkPushTiers(push(removed))) === "silent" && calls(removed).length === 0, denial(checkPushTiers(push(removed))));
+
+  const missing = fmtRepo("fmt-missing", { installed: false });
+  write(missing, { "pkg/src/a.ts": "export const a = 4;\n" });
+  land(missing, "pkg/src/a.ts");
+  const noPrettier = checkPushTiers(push(missing));
+  ok("[MKT.HOOKS.82] Prettier not installed refuses the push, naming pnpm install", verdictOf(noPrettier) === "deny" && denial(noPrettier).includes("pnpm install"), denial(noPrettier));
+
+  const other = fmtRepo("fmt-py", { stack: "PY" });
+  write(other, { "pkg/src/a.ts": BAD });
+  land(other, "pkg/src/a.ts");
+  ok("[MKT.HOOKS.82] a node of a repository that is not TypeScript is not checked", verdictOf(checkPushTiers(push(other))) === "silent" && calls(other).length === 0, denial(checkPushTiers(push(other))));
 }
 
 console.log("\n=== the fast path");

@@ -50,7 +50,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | # | The act | The command | Why it sits here and not later |
 | --- | --- | --- | --- |
 | 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
-| 1 | Mint the workspace | `spnutils workspace init` | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
+| 1 | Mint the workspace | `spnutils workspace init` — already run where `.spndevex/` is the workspace's, which is how a partner arrives | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
 | 2 | Open the workstream | `mkdir`, then `spn-devex workstream arc edit` | The answers need a home on disk before the first one is given |
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
@@ -313,11 +313,13 @@ One more signal shapes your tone rather than your offer. Count the folders in `.
 
 A session that opens with a status dump greets nobody. Greet them, then show the ground, then leave one open question — never a menu of options. They arrive with something in mind, and a leading question picks their subject for them.
 
-> Welcome to SaaS Plane — this folder is minted and completely empty. A clean start.
+> Welcome to SaaS Plane — your workspace is set up, and it holds no repository yet. A clean start.
 >
-> Say yes and I mint the workspace, open a workstream to hold your answers, then ask the estate questions one at a time. Each answer lands in a file as you give it, so nothing rests on this window staying open. We finish with your platform running locally, and you looking at it. Say no and nothing is created.
+> Say yes and I open a workstream to hold your answers, then ask the estate questions one at a time. Each answer lands in a file as you give it, so nothing rests on this window staying open. We finish with your platform running locally, and you looking at it. Say no and nothing is created.
 >
 > Would you like to start a new platform?
+
+That is the door a partner meets: they ran `spnutils workspace init` before they opened the window, because the floor it writes is what brings the plugins here. In a folder nobody minted, which is a builder's case with the plugins at user scope, the door says the folder is empty and offers to mint the workspace as well.
 
 ## What this skill never does
 
@@ -326,5 +328,5 @@ A session that opens with a status dump greets nobody. Greet them, then show the
 - **Never print a provider key back, and never read the machine seat onto the screen.** Confirm that a key is set; never confirm what it is.
 - **Never run an act whose input nobody supplied.** A default you chose quietly is the hardest kind of decision to find later.
 - **Never hand-write a manifest, a settings file or a scaffolded folder.** The command that owns it writes it, and a hand-made copy drifts from the standard on the day it is created.
-- **Never skip act 1.** A workspace nobody minted has no permission floor, so the session guiding the rest of the walk is the one session with no guidance.
+- **Never skip act 1 where nobody minted the workspace.** A workspace nobody minted has no permission floor, so the session guiding the rest of the walk is the one session with no guidance. Where `.spndevex/` is already the workspace's, act 1 has run, and you go to act 2 without running it again.
 - **Never ask a question before the arc exists.** An answer given to a session with nowhere to put it is an answer the next window cannot read.
