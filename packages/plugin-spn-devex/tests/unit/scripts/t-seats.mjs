@@ -321,37 +321,35 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
       run2.status, (got) => got !== 0);
 }
 
-console.log("\n=== a repository is never the book it restates");
+console.log("\n=== the book is the workspace's spn-foundation, never the alphabetical first sibling");
 {
-  // `findBook` names the book by what it CARRIES — a decisions register and a concept — and reads
-  // the siblings of its own parent, which includes itself. The marketplace earned both the day it
-  // was documented as a GENERAL repository, so the bare command compared the plugins against
-  // their own repository's docs and reported 77 drifts that were not drift at all.
+  // `findBook` reads the path it is given, else `spn-foundation` in the workspace it runs in. It used
+  // to guess among the siblings of its own parent by what each CARRIED, so a repository that
+  // carried a register and a concept (the marketplace earned both) was compared against itself.
   const { findBook } = await import("../../../src/scripts/commands/restates/check.ts");
   const book = (name) => ({
     [`${name}/docs/${POCKET.registers}/decisions.md`]: "# decisions\n",
     [`${name}/CONCEPT.md`]: "# c\n",
   });
   const parent = join(BASE, `books${made += 1}`);
-  for (const [rel, body] of Object.entries({ ...book("self"), ...book("the-book") })) {
+  for (const [rel, body] of Object.entries({ ...book("self"), ...book("spn-foundation") })) {
     const full = join(parent, rel);
     mkdirSync(join(full, ".."), { recursive: true });
     writeFileSync(full, body, "utf8");
   }
+  mkdirSync(join(parent, ".spndevex", "workstreams"), { recursive: true });
   one("the repository being checked is skipped, even though it carries both files",
-      findBook(undefined, join(parent, "self")), join(parent, "the-book"));
+      findBook(undefined, join(parent, "self")), join(parent, "spn-foundation"));
   one("and an explicit argument is still honoured",
       findBook(join(parent, "self"), join(parent, "self")), join(parent, "self"));
-  // With a sibling that also carries both, `the-book` finds `self` — which is right: the test is
-  // what a repository CARRIES, and a second book beside you is a candidate. What must never
-  // happen is finding yourself.
-  const alone = join(BASE, `alone${made += 1}`, "only");
-  for (const [rel, body] of Object.entries({ [`docs/${POCKET.registers}/decisions.md`]: "# d\n", "CONCEPT.md": "# c\n" })) {
+  const alone = join(BASE, `alone${made += 1}`);
+  for (const [rel, body] of Object.entries({ [`only/docs/${POCKET.registers}/decisions.md`]: "# d\n", "only/CONCEPT.md": "# c\n" })) {
     mkdirSync(join(alone, rel, ".."), { recursive: true });
     writeFileSync(join(alone, rel), body, "utf8");
   }
-  one("a repository with no sibling book finds none, rather than itself",
-      findBook(undefined, alone), null);
+  mkdirSync(join(alone, ".spndevex", "workstreams"), { recursive: true });
+  one("a workspace with no spn-foundation finds none, rather than its other repository",
+      findBook(undefined, join(alone, "only")), null);
 }
 
 console.log("\n=== a code figure names a PATH; a bare file name is a term");

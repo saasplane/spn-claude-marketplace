@@ -77,7 +77,7 @@ rule is wrong and propose its change in the arc in hand.
 
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`, `RD.DEVEX.WORKSPACE.252`). While no arc row
 owns the subject, put a suggestion, `S<n>`, in chat, and record it the moment it is raised with
-`spn-devex workstream suggestion write <workstream> --title "…"`, which gives it its number in the
+`spn-devex workstream suggestion add <workstream> "<title>"`, which gives it its number in the
 workstream's `suggestions.jsonl`. It is never written on the approach page. A
 suggestion is a whole card, with the same parts as the card below and in the same order: why, what,
 the views that spoke, a lettered options table, and the one you recommend. When one reply holds both, the questions and the suggestions sit in two

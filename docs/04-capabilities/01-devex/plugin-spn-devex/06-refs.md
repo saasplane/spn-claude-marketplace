@@ -44,7 +44,7 @@ The files under `packages/plugin-spn-devex/src/refs/devex/` each restate part of
 
 **Why** — *a partner holds the plugins and not the book*. What the foundation publishes is the corrected restatement, never the checker.
 **What** — with no book to compare against, the tool prints one line and exits clean. It is run here, before a release.
-**How** — with no argument it looks for a sibling checkout carrying the register. The clean-exit behaviour is one of the properties the partner proof tests. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`, run as `spn-devex restates check`.
+**How** — with no argument it reads `spn-foundation` in the workspace it runs in, the nearest folder up that holds `.spndevex`, and refuses by name when there is none; every restates command names the book it read, its commit and whether it was given on its first line. The clean-exit behaviour is one of the properties the partner proof tests. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`, run as `spn-devex restates check`.
 
 ### A source comment is not a stamp
 
