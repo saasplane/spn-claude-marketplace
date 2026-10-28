@@ -1,8 +1,8 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The approach page keeps up with its arcs · § The commands · § Shaping: arcs open as the plan becomes clear
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream arc stamp write <arc>
-//   spn-devex workstream arc delete <arc> --note "<the developer's words>"
+//   spn-devex workstream arc stamp write <workstream>/N<nnn>
+//   spn-devex workstream arc delete <workstream>/N<nnn> --note "<the developer's words>"
 //
 // `stamp` is the stamp's only writer. The plugin's grammar reads three words after its name, so `stamp` is the
 // action and `write` is the first word it takes, which keeps the command as the chapter types it. `delete` takes
@@ -61,6 +61,6 @@ function remove(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  stamp: { describe: "write: restamp an arc's Cycles row once its part of the page is current", usage: "write <arc>", run: stamp },
-  delete: { describe: "delete an arc never decided, on the developer's words", usage: "<arc> --note \"…\"", run: remove },
+  stamp: { describe: "write: restamp an arc's Cycles row once its part of the page is current", usage: "write <workstream>/N<nnn>", run: stamp },
+  delete: { describe: "delete an arc never decided, on the developer's words", usage: "<workstream>/N<nnn> --note \"…\"", run: remove },
 };
