@@ -757,13 +757,35 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   git(other, "add", "-A"); git(other, "commit", "-q", "-m", "ahead"); git(other, "push", "-q", "origin", "develop");
   const late = hookIn(root);
   says("a member's branch behind origin/develop is named in the status line, after a fetch the window made",
-    statusOf(late.message).includes("spn-x  feat/031-x  1 behind origin/develop: rebase before the next push"), statusOf(late.message));
+    statusOf(late.message).includes("1 branch behind origin/develop, rebase before the next push: spn-x feat/031-x by 1"), statusOf(late.message));
   says("the status stays one line, and the welcome is whole above it", late.message.split("\n").filter(Boolean).at(-1) === statusOf(late.message) && late.message.includes("🧭 I work with you through"));
   git(member, "checkout", "-q", "develop");
   says("a permanent branch is never told to rebase", !statusOf(hookIn(root).message).includes("behind origin"));
   git(member, "checkout", "-q", "feat/031-x"); git(member, "config", "branch.feat/031-x.spnBase", "main");
   says("a branch whose git config records another base is measured from that base, which here is not behind",
     !statusOf(hookIn(root).message).includes("behind origin"));
+
+  // MANY BRANCHES BEHIND: a worktree set holds a member per worktree, so the late list grows with the workspace.
+  // The rebase sentence is said once, the three most behind are named, and the rest are a count and the command.
+  const crowded = fixture("fetch-behind-many", { ".spndevex/README.md": "state\n" });
+  const crowdedNames = [];
+  for (let at = 1; at <= 16; at += 1) {
+    const name = `spn-a-rather-long-member-name-${String(at).padStart(2, "0")}`;
+    crowdedNames.push(name);
+    execFileSync("git", ["clone", "-q", origin, join(crowded, name)]);
+    writeFileSync(join(crowded, name, "sprepo.json"), repo("APPS", { stack: "TS" }));
+    writeFileSync(join(crowded, name, "CONCEPT.md"), "# concept\n");
+    git(join(crowded, name), "checkout", "-q", "-b", `feat/0${at}-a-rather-long-workstream-subject`, "HEAD~1");
+  }
+  const crowdedHook = hookIn(crowded);
+  const lateMany = statusOf(crowdedHook.message);
+  says("sixteen branches behind say the rebase once, name three, and count the rest with the command that lists them",
+    lateMany.includes("16 branches behind origin/develop, rebase before the next push: ")
+      && (lateMany.match(/rebase before the next push/g) ?? []).length === 1
+      && crowdedNames.filter((name) => lateMany.includes(`${name} `)).length === 3
+      && lateMany.includes(" and 13 more, listed by `spnutils workspace status`"), lateMany);
+  says(`and that workspace's session-start output is under 8,192 bytes (${Buffer.byteLength(crowdedHook.context, "utf8")})`,
+    Buffer.byteLength(crowdedHook.context, "utf8") < 8192);
 
   // THE FETCH'S BUDGET: a remote that never answers costs the window five seconds and no more.
   const slow = fixture("fetch-slow", { ".spndevex/README.md": "state\n" });
