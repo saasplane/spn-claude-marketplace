@@ -17,13 +17,14 @@
 //
 //     spn-devex restates check [<book>]
 //
-// AN ACTION OF ITS GROUP. Its one path is the book's folder; given none, it looks for a sibling
-// checkout carrying the register. It exits 1 where it reports a finding.
+// AN ACTION OF ITS GROUP. Its one path is the book's folder; given none, it reads `spn-foundation` in
+// the workspace it runs in (RD.DEVEX.WORKSPACE.229). It exits 1 where it reports a finding.
 
-import { lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { lstatSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { isDir, isFile } from "../../lib/payload.ts";
+import { isDir, isFile, workspaceRoot } from "../../lib/payload.ts";
 import { capabilitiesDir, decisionsRegister, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
 
@@ -178,30 +179,63 @@ function headerFindings(root: string, book: string): string[] {
   return out;
 }
 
-/** The book's location, or null. An explicit path wins and is never second-guessed. */
+/**
+ * The one book a restates command reads: the path it is given, else `spn-foundation` in the workspace
+ * it runs in — the nearest folder up that holds `.spndevex` — and null where neither is a book.
+ *
+ * AN ALPHABETICAL GUESS AMONG SIBLINGS ANSWERED WITH WHICHEVER CHECKOUT SORTED FIRST. A workspace
+ * holding two foundation-like folders read the wrong one without saying so, so the book is now named
+ * by the workspace, never found by the order of a directory listing (RD.DEVEX.WORKSPACE.229).
+ */
 export function findBook(argument: string | undefined, root: string): string | null {
   if (argument) {
     const given = resolve(argument);
     return isFile(decisionsRegister(docsOf(given))) ? given : null;
   }
-  // A sibling checkout, which only a producer workspace has. Named by what it CARRIES rather than by
-  // what it is called, so a differently-named checkout still answers.
-  const here = resolve(root);
-  const parent = dirname(here);
-  let siblings: string[];
-  try { siblings = readdirSync(parent).sort(); } catch { return null; }
-  for (const name of siblings) {
-    const sibling = join(parent, name);
-    // A SIBLING, WHICH IS NEVER THE REPOSITORY BEING CHECKED. The test is *carries a decisions
-    // register and a concept*, and the marketplace earned both the day it was documented as a
-    // GENERAL repository — so the check compared the plugins against their own repository's docs
-    // and reported 77 drifts that were not drift at all. A repository cannot be the book it
-    // restates.
-    if (resolve(sibling) === here) continue;
-    if (isFile(decisionsRegister(docsOf(sibling))) && isFile(join(sibling, "CONCEPT.md")))
-      return sibling;
+  const workspace = workspaceRoot(root);
+  if (workspace === null) return null;
+  const book = join(workspace, "spn-foundation");
+  return isFile(decisionsRegister(docsOf(book))) ? book : null;
+}
+
+/** Why no book was found, naming the workspace that was looked in. */
+export function noBookReason(root: string): string {
+  const workspace = workspaceRoot(root);
+  return workspace === null
+    ? `no workspace found walking up from ${resolve(root)} (no .spndevex), so there is no spn-foundation to read`
+    : `the workspace ${workspace} holds no spn-foundation with a decisions register`;
+}
+
+/**
+ * The first line of every restates command: which book it read, at which commit, and whether the path
+ * was given or the workspace's own. The path is shown from the folder that owns `.spndevex`, so a
+ * worktree set's foundation reads as `.worktrees/<set>/spn-foundation` and not as a bare name.
+ */
+export function bookLine(book: string, given: boolean, root: string): string {
+  const workspace = workspaceRoot(root);
+  let base = workspace;
+  if (workspace !== null) {
+    try { base = dirname(realpathSync(join(workspace, ".spndevex"))); } catch { base = workspace; }
   }
-  return null;
+  let commit = "no commit";
+  try { commit = execFileSync("git", ["-C", book, "rev-parse", "--short", "HEAD"], { encoding: "utf8", stdio: "pipe" }).trim() || commit; } catch { /* not a git checkout */ }
+  const shown = base === null ? book : (relative(base, book) || ".");
+  return `book  ${shown}  at ${commit}  (${given ? "given" : "this workspace's"})`;
+}
+
+/** A folder is a marketplace when it holds `.claude-plugin/marketplace.json`, whatever it is called. */
+export function isMarketplace(dir: string): boolean {
+  return isFile(join(dir, ".claude-plugin", "marketplace.json"));
+}
+
+/** The repository's own name — the last part of its `origin` remote, else its folder name. */
+export function repoName(dir: string): string {
+  try {
+    const url = execFileSync("git", ["-C", dir, "config", "--get", "remote.origin.url"], { encoding: "utf8", stdio: "pipe" }).trim();
+    const name = url.replace(/\/+$/, "").split(/[/:]/).pop()?.replace(/\.git$/, "");
+    if (name) return name;
+  } catch { /* no remote */ }
+  return basename(resolve(dir));
 }
 
 /**
@@ -209,18 +243,27 @@ export function findBook(argument: string | undefined, root: string): string | n
  * plugin's own repository (`RD.DEVEX.AGENT.073`).
  *
  * `marketplaceRoot` IS THE MARKETPLACE REPOSITORY ITSELF, and every real plugin file sits under
- * `packages/plugin-<name>/` beneath it — the prefix `insideAPlugin` below tests against. Found
+ * `packages/plugin-<name>/` beneath it or beneath any other marketplace checkout in the workspace —
+ * the prefixes `insideAPlugin` below tests against. Found
  * running this command for real, not by a case: a wrong prefix here read every real ref, skill and
  * agent brief in this very plugin as a stray stamp, over a hundred false findings from one run.
  */
 function strayStamps(workspace: string, marketplaceRoot: string): string[] {
   const out: string[] = [];
-  const packages = join(marketplaceRoot, "packages");
+  // EVERY MARKETPLACE CHECKOUT IN THE WORKSPACE IS A MARKETPLACE, whatever its folder is called and
+  // however deep it sits (a hotfix pair holds its checkouts one folder down): a second checkout of
+  // the same repository holds plugins too, and reading its stamps as misplaced made a clean tree
+  // report findings from the checkout it was not run in.
   // Only a real `packages/plugin-<name>/` folder counts as "inside a plugin"; `packages/` itself,
   // and a non-plugin entry beside it such as `plugin-support-lib/`, are still walked.
   const insideAPlugin = (full: string): boolean => {
-    if (!full.startsWith(`${packages}/`)) return false;
-    return full.slice(packages.length + 1).split("/")[0].startsWith("plugin-");
+    const parts = full.split("/");
+    for (let i = 1; i + 1 < parts.length; i += 1) {
+      if (parts[i] !== "packages" || !parts[i + 1].startsWith("plugin-")) continue;
+      const base = parts.slice(0, i).join("/");
+      if (base === marketplaceRoot || isMarketplace(base)) return true;
+    }
+    return false;
   };
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
@@ -278,13 +321,16 @@ export function main(argv: string[], root: string): number {
     return 0;
   }
 
-  const book = findBook(argv.find((a) => !a.startsWith("-")), root);
+  const given = argv.find((a) => !a.startsWith("-"));
+  const book = findBook(given, root);
   if (book === null) {
     console.log(`${documents.length} plugin document(s) · no foundation book to compare against — quiet`);
+    console.log(given ? `  ${resolve(given)} is not a book: it carries no decisions register.` : `  ${noBookReason(root)}.`);
     console.log("  A partner holds the plugins and not the book, so this check is a builder's gate.");
     console.log("  Pass the book's path to run it: restates check path/to/spn-foundation");
     return 0;
   }
+  console.log(bookLine(book, Boolean(given), root));
 
   const findings: string[] = [];
   const omissions: string[] = [];
@@ -333,9 +379,10 @@ export function main(argv: string[], root: string): number {
   // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
   // because a broken header is a claim pointing at nothing rather than a chapter that moved.
   const strays = strayStamps(dirname(book), marketplaceOf(root) ?? root);
+  const owner = repoName(marketplaceOf(root) ?? root);
   const selves = documents.flatMap((path) => {
     const [block] = parse(path);
-    return block ? selfCitations(basename(root), shown(path), block as never) : [];
+    return block ? selfCitations(owner, shown(path), block as never) : [];
   });
   if (strays.length || selves.length) {
     console.log();

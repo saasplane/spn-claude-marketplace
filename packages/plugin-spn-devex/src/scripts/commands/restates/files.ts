@@ -23,6 +23,7 @@ import { dirname, join, relative, resolve } from "node:path";
 
 import { type Action, REQUIRED, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { seenHash, treeHash } from "../../lib/restates.ts";
+import { bookLine } from "./check.ts";
 import { BOOK_PATTERNS, BOOK_SITE_PATTERNS, BOOK_TEMPLATES, PLUGIN_PATTERNS, PLUGIN_SITE_PATTERNS, PLUGIN_TEMPLATES } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 
@@ -350,6 +351,8 @@ const SPEC_SETS: Array<[CopySet, string]> = [
  */
 const run = (args: string[], write: boolean): number => {
   const book = onePath(scopeOf(readWords(args).paths, REQUIRED));
+  // The book is always the path given, and the first line says so.
+  if (existsSync(book)) console.log(bookLine(resolve(book), true, process.cwd()));
   let worst = exportTemplates(book, OUT, write);
   // The specs are copied only where the book holds them and the surface plugin stands beside this one.
   for (const [set, out] of SPEC_SETS) {

@@ -106,6 +106,78 @@ console.log("\n=== a stamp under packages/plugin-<name>/ is inside a plugin, not
   one("and PLACEMENT reports zero misplaced stamps for this fixture", out.out.includes("0 misplaced"));
 }
 
+console.log("\n=== the book is the workspace's own spn-foundation, and the first line says which");
+{
+  const body = "# A thing\n\nIt is stated here, once.";
+  const seen = createHash("sha256").update(body, "utf8").digest("hex").slice(0, 8);
+  const stamp = (cited, at) => `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${cited}", "seen": "${at}" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`;
+  /** A workspace: `.spndevex`, the folders named, each a book when it carries a register. */
+  const workspace = (name, books) => {
+    const w = join(BASE, name);
+    mkdirSync(join(w, ".spndevex", "workstreams"), { recursive: true });
+    for (const b of books) {
+      mkdirSync(join(w, b, "docs", POCKET.registers), { recursive: true });
+      mkdirSync(join(w, b, "docs", SEAT.constructs), { recursive: true });
+      writeFileSync(join(w, b, "CONCEPT.md"), "# concept\n");
+      writeFileSync(join(w, b, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+      writeFileSync(join(w, b, "docs", SEAT.constructs, "01-thing.md"), `${body}\n`);
+    }
+    return w;
+  };
+  const marketIn = (w, folder, { manifest = false } = {}) => {
+    const m = join(w, folder);
+    mkdirSync(join(m, "packages", "plugin-spn-devex", "refs"), { recursive: true });
+    writeFileSync(join(m, "packages", "plugin-spn-devex", "refs", "thing.md"),
+      stamp(`spn-foundation/docs/${SEAT.constructs}/01-thing.md`, seen));
+    if (manifest) {
+      mkdirSync(join(m, ".claude-plugin"), { recursive: true });
+      writeFileSync(join(m, ".claude-plugin", "marketplace.json"), JSON.stringify({ name: folder, plugins: [] }));
+    }
+    return m;
+  };
+
+  // Two foundation-like folders, and the alphabetical first is not the book.
+  const two = workspace("ws-two", ["aaa-foundation-copy", "spn-foundation"]);
+  const m2 = marketIn(two, "spn-claude-marketplace");
+  const first = run([], m2);
+  one("[MKT.SCRIPTS.192] with no path it reads spn-foundation, not the alphabetical first, and says so on its first line",
+    first.out.split("\n")[0] === "book  spn-foundation  at no commit  (this workspace's)" && !first.out.includes("aaa-foundation-copy"));
+  one("and the same line opens a `docs check` and a `decisions check`",
+    typed(["docs", "check"], m2).out.split("\n")[0] === first.out.split("\n")[0]
+    && typed(["decisions", "check"], m2).out.split("\n")[0] === first.out.split("\n")[0]);
+  const given = run([join(two, "aaa-foundation-copy")], m2);
+  one("[MKT.SCRIPTS.192] a path given is read, and the first line says (given)",
+    given.out.split("\n")[0] === "book  aaa-foundation-copy  at no commit  (given)");
+
+  // No spn-foundation: refused by name, never guessed from the sibling that carries a register.
+  const none = workspace("ws-none", ["aaa-foundation-copy"]);
+  const m3 = marketIn(none, "spn-claude-marketplace");
+  const refused = run([], m3);
+  one("[MKT.SCRIPTS.192] with no spn-foundation and no path it is refused by name, naming the workspace",
+    refused.out.includes("holds no spn-foundation") && refused.out.includes(none) && !refused.out.startsWith("book  "));
+  one("and it reads nothing from the sibling that carries a register", !refused.out.includes("DRIFT"));
+
+  // A second marketplace checkout beside the one that runs.
+  const many = workspace("ws-many", ["spn-foundation"]);
+  const run1 = marketIn(many, "spn-claude-marketplace", { manifest: true });
+  marketIn(many, "spn-claude-marketplace-debug", { manifest: true });
+  marketIn(many, join("pair", "spn-claude-marketplace-hotfix"), { manifest: true });
+  const plural = run([], run1);
+  one("[MKT.SCRIPTS.193] a second marketplace checkout under another name, or one folder down, is a marketplace: 0 misplaced",
+    /\b0 misplaced/.test(plural.out) && !plural.out.includes("outside the plugins"));
+
+  // A checkout under another folder name is still its own repository.
+  const own = workspace("ws-own", ["spn-foundation"]);
+  const checkout = marketIn(own, "mkt-checkout-x", { manifest: true });
+  writeFileSync(join(checkout, "packages", "plugin-spn-devex", "refs", "self.md"),
+    stamp("spn-claude-marketplace/docs/x.md", "deadbeef"));
+  execFileSync("git", ["-C", checkout, "init", "-q"]);
+  execFileSync("git", ["-C", checkout, "remote", "add", "origin", "https://example.com/org/spn-claude-marketplace.git"]);
+  const selfOut = run([], checkout);
+  one("[MKT.SCRIPTS.193] a self-citation from a checkout under another folder name is still its own",
+    selfOut.out.includes("cites `spn-claude-marketplace/docs/x.md` in its own repository"));
+}
+
 console.log("\n=== a finding is exit 1, whatever the count, and a typing fault is exit 2");
 {
   // A second stale citation: two findings, and the exit code stays 1, because 2 is a fault in how the command was typed.

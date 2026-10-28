@@ -142,6 +142,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.184 | Engineering leader | turn recording on | `debug switch on <name>` turns a switch on, and a name outside the closed set is refused with the set listed | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.185 | Engineering leader | turn recording off | `debug switch off <name>` turns a switch off, keeping the other keys of `switches.json` | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.186 | Engineering leader | see what the debug store holds | `debug store show` prints each container of `.spndevex/.debug/`, its files, its bytes and its lifetime rule | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.192 | Editor | know which book a restatement check read | Each `restates` command reads the path it is given, else `spn-foundation` in the workspace it runs in, never a sibling picked by name order; its first line names the book, its commit and whether the path was given, and a workspace with no `spn-foundation` is refused by name | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.193 | Editor | run the restates gate from any checkout of the marketplace | `restates check` takes every folder holding `.claude-plugin/marketplace.json` as a marketplace, so a stamp in a second checkout is not misplaced, and a checkout's own name is read from its `origin` remote, not its folder | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
