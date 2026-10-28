@@ -3,7 +3,7 @@
 // that repository is in flight.
 //
 // Refuses a write under a repository's `src` or `tests` while a test command for that repository has
-// a start file under `.spndevex/.debug/telemetry/pending/`, which `lib/bash-timing.ts` writes before a
+// a start file under `.spndevex/.debug/sessions/<id>/pending/`, which `lib/bash-timing.ts` writes before a
 // timed Bash command. The design is in the hooks chapter, § A source edit waits while a test run is going.
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -11,13 +11,13 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { bashWrites } from "./doc-check.ts";
 import { markAge } from "./split-plan.ts";
 import { emit, readPayload, runAlone, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
-import { DEVEX } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { repoOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import type { Reading } from "../lib/command-reader.ts";
 
 /**
  * The harness's longest timeout for a foreground Bash call, in milliseconds. A start file older than
- * this has no call behind it, and `lib/bash-timing.ts` removes one at the same age.
+ * this has no call behind it, and is not read as a run.
  */
 export const RUN_BOUND_MS = 600_000;
 
@@ -73,18 +73,24 @@ const commandOf = (found: Reading): string =>
  * be read, or that names no repository, is not a run.
  */
 export function testRuns(root: string, now = Date.now()): TestRun[] {
-  const pending = join(root, DEVEX, ".debug", "telemetry", "pending");
-  let names: string[];
-  try { names = readdirSync(pending).filter((name) => name.endsWith(".json")).sort(); } catch { return []; }
+  // Every window's folder is looked in: a run another window started is a run.
+  const windows = dirname(sessionDir(root, "-"));
+  let sessions: string[];
+  try { sessions = readdirSync(windows).sort(); } catch { return []; }
   const out: TestRun[] = [];
-  for (const name of names) {
-    let started: { at?: unknown; found?: unknown };
-    try { started = JSON.parse(readFileSync(join(pending, name), "utf8")); } catch { continue; }
-    if (!started || typeof started.at !== "number" || !Array.isArray(started.found)) continue;
-    if (now - started.at > RUN_BOUND_MS) continue;
-    for (const found of started.found as Reading[]) {
-      if (!found || typeof found !== "object" || !found.repo || !isTestCommand(found)) continue;
-      out.push({ command: commandOf(found), repo: found.repo, startedAt: started.at, file: join(pending, name) });
+  for (const session of sessions) {
+    const pending = join(sessionDir(root, session), "pending");
+    let names: string[];
+    try { names = readdirSync(pending).filter((name) => name.endsWith(".json")).sort(); } catch { continue; }
+    for (const name of names) {
+      let started: { at?: unknown; found?: unknown };
+      try { started = JSON.parse(readFileSync(join(pending, name), "utf8")); } catch { continue; }
+      if (!started || typeof started.at !== "number" || !Array.isArray(started.found)) continue;
+      if (now - started.at > RUN_BOUND_MS) continue;
+      for (const found of started.found as Reading[]) {
+        if (!found || typeof found !== "object" || !found.repo || !isTestCommand(found)) continue;
+        out.push({ command: commandOf(found), repo: found.repo, startedAt: started.at, file: join(pending, name) });
+      }
     }
   }
   return out;

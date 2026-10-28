@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "9273d6bc"
+      "seen": "d1da1db5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
@@ -19,12 +19,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "section": "The kinds of page, by level",
-      "seen": "062d51e2"
+      "seen": "00ac6fb8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "section": "What holds across",
-      "seen": "91be8a81"
+      "seen": "f2c3055a"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
@@ -35,7 +35,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.SURFACE.208",
-      "seen": "dd7c3f3e"
+      "seen": "4df3c45d"
     }
   ]
 }

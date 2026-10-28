@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "b46463d4"
+      "seen": "770a7475"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "662e0f2d"
+      "seen": "e9a7f755"
     }
   ],
   "decisions": [
@@ -95,25 +95,33 @@ ship, and `validate` is the half that names what you still owe.
 
 ## `workspace` — the folder your day runs in
 
-`workspace` mints the folder, keeps its settings and plugins current, reports what is open, and
-turns the agent's own timing on or off. It needs no repository, so its commands are the one group a
-repository's `rules.md` does not list: `spnutils help --json` names them.
+`workspace` mints the folder, keeps its settings and plugins current, and reports what is open. It
+needs no repository, so its commands are the one group a repository's `rules.md` does not list:
+`spnutils help --json` names them. It does not turn the agent's own recording on or off, and it writes
+nothing under `.spndevex/.debug/`: that folder is the plugin's, and `workspace status` only reads
+`switches.json` for its recording line.
 
-**Each line `timings` records names the work it was spent on — MUST.** While recording is on, every
-hook check and every plugin command appends one line to `.spndevex/.debug/telemetry/hooks.jsonl`, and
-so does each Bash command the agent runs through a program the filter names (by default `spnutils`,
-the plugin CLIs, `nx`, `git` and `docker`; `.spndevex/.debug/telemetry/filter.json` adds or removes
-programs). The line carries `script` (the program or plugin), `group`, `subgroup` and `action` (up to
-three levels, null where unused), `args` (what was typed after the action, with a secret-looking
+**Each telemetry line names the work it was spent on — MUST.** While the `telemetry` switch is on
+(`spn-devex debug switch on telemetry`), every hook check and every plugin command appends one line to
+`.spndevex/.debug/telemetry/hooks.jsonl`, and so does each Bash command the agent runs through a program
+the filter names (by default `spnutils`, the plugin CLIs, `nx`, `git` and `docker`; a workspace file adds
+or removes programs). The line carries `script` (the program or plugin), `group`, `subgroup` and `action`
+(up to three levels, null where unused), `args` (what was typed after the action, with a secret-looking
 option's value written as `***`), `event`, `tool`, `ms`, `exit`, `at` in UTC ending in `Z`, `repo` and
-`pid`, then the `workstream`, `arc` and `order` read from the paths the tool call touches, and the
-`agent` when the hook's input carries one. A Bash call that ran more than one program writes one line,
-named for the first program the filter picks, with `programs`, the count it ran. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
-beside the log, a call that touches no workstream path inherits them, and a call that names other work
-replaces them. A `Stop` event carries the turn's own token usage beside its `ms`: read fresh, read from
-cache, written to cache, and output. **A window's cost is read from this telemetry by a command of the
-plugin (`spn-devex plugin cost show`), which sums the usage per session, for the main window and for each
-child, and never from a transcript — MUST** (`RD.DEVEX.AGENT.082`).
+`pid`, then `verdict` and `out`. `verdict` says what a hook check did: `pass` when it said nothing,
+`note` when it added words to the context, `deny` when it refused the call or held the turn, and null for
+a command. `out` is the bytes a hook check or a tool call put into the context, null where it put none,
+because every later turn reads those bytes again. A Bash call that ran more than one program writes one
+line, named for the first program the filter picks, with `programs`, the count it ran. The line also
+carries `workstream`, `arc`, `order` and `row`, read from the paths the tool call touches (`row` from the
+order a call reads or writes, or else the row the window last moved to `running`), and `agent` when the
+hook's input carries one. **The tags carry forward**: per session and agent, the last tagged call's tags
+are kept in the window's folder, `.spndevex/.debug/sessions/<session-id>/tags.json`, a call that touches
+no workstream path inherits them, and a call that names other work replaces them. **The plugin, not
+`spnutils`, reads these lines**: `spn-devex debug hooks show` prints the time per check and per event,
+and `spn-devex debug cost show` prints the tokens spent per workstream, per arc and per order from the
+usage lines, which count each reply once, keyed by the message id. A window's cost is read from this
+telemetry and never from a transcript — MUST (`RD.DEVEX.AGENT.082`).
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
 command or on a group of commands, and a plugin declares the tiers of its own command groups.
@@ -137,24 +145,29 @@ is broken rather than fussy.
 
 The `gen-*` chain is never hand-edited: validators are what the API enforces, symbols and labels are
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
-routed by each package's own scope. A dry run runs every tier and lists every failure, and a publish on the
-commit of a green dry run shows that run's verdict again unless `--run-gates` is given. `infra release`
-answers the same way.
+routed by each package's own scope. A dry run runs every tier and lists every failure. A tier whose exact
+inputs a past green verdict covers is not run again unless `--run-gates` is given, and the tag names the run
+behind each tier (`RD.SUPPORT.APPS.228`). `infra release` answers the same way.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
-keeps four groups. The operations are `snapshot`, `library`, `gaps`, `accepted` and `status`, and the
-options are `--level`, `--unit` and `--file`. `snapshot <package>` writes a stack's snapshot from its
-code. `library` takes in the inventory of one library file that the agent prepared elsewhere, and writes
+keeps four groups. The operations are `construct`, `snapshot`, `library`, `gaps`, `accepted` and `status`,
+and the options are `--level`, `--unit`, `--file`, `--book` and `--out`. `construct` writes the CONSTRUCT
+snapshot, what the library must draw, from the book: `--book` names the book's folder, and `--out` writes
+the same snapshot to a second file as well, such as the copy a plugin carries. `snapshot <package>` writes a
+stack's snapshot from its code. `library` takes in the inventory of one library file that the agent prepared elsewhere, and writes
 the library's snapshot when the inventories of all five are held. `gaps <package>` compares the two
 snapshots and writes the gaps, with `rulesApplied` and `accepted`, and a view of one line for each gap.
 `accepted <package>` takes in the differences that have been looked at and accepted, and the next `gaps`
 leaves them out and counts them. `status` says what is on the machine and what is missing, and writes
 nothing. `library` and `accepted` check the file they take in and copy it into place, and refuse by name
-a file that fails the check, writing nothing. Four of the five operations read and write the machine's
-folder alone and need no stack. The tool never touches a repository. In Figma it does one thing: it
-reads a library file with the developer's read-only token, and it changes nothing there. Every file is under
-`~/.spnutils/surface/`, in folders that say who writes there, and none enters a repository.
+a file that fails the check, writing nothing. Five of the six operations read and write the machine's
+folder alone and need no stack. The tool never writes into a repository by itself. The one file it writes
+outside its folder is the CONSTRUCT snapshot's second copy, at the path `construct --out` names: that
+snapshot is written from the book alone and holds nothing of the machine, so it is the one a repository may
+carry, and it differs on every run because it holds when the book was read. In Figma it does one thing: it
+reads a library file with the developer's read-only token, and it changes nothing there. Every other file is
+under `~/.spnutils/surface/`, in folders that say who writes there, and none enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing

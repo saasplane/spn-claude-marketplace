@@ -33,9 +33,8 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import type { Payload, Verdict } from "../lib/payload.ts";
 import { read, workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, SEAT } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 
-const DEBUG = ".debug";
-const MIRROR = "mirror";
 
 /**
  * The capability face governing a node, found through the node's own README.
@@ -127,11 +126,11 @@ export function governing(rows: Row[], within: string): Row | null {
  */
 function alreadySaid(root: string | null, session: string | undefined, mirror: string): boolean {
   if (!session || !root) return false;
-  const marker = join(root, DEVEX, DEBUG, MIRROR, session);
+  const marker = join(sessionDir(root, session), "mirror");
   try {
     const said = (read(marker) ?? "").split("\n").filter(Boolean);
     if (said.includes(mirror)) return true;
-    mkdirSync(join(root, DEVEX, DEBUG, MIRROR), { recursive: true });
+    mkdirSync(dirname(marker), { recursive: true });
     writeFileSync(marker, [...said, mirror].join("\n") + "\n", "utf8");
     return false;
   } catch { return false; }

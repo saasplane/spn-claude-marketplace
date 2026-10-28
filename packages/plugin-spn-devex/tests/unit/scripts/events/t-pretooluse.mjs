@@ -228,7 +228,7 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
     "spn-x/apps/api/src/a.ts": "export const x = 1;\n",
     "spn-x/docs/a.md": "# A\n",
   });
-  const pending = join(root, ".spndevex", ".debug", "telemetry", "pending");
+  const pending = join(root, ".spndevex", ".debug", "sessions", "s-run", "pending");
   mkdirSync(pending, { recursive: true });
   writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: Date.now() - 90_000, background: false,
     found: [{ script: "spnutils", group: "apps", subgroup: null, action: "test", args: "contract r1 api", repo: "spn-x" }] }));

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "51846001"
+      "seen": "b9bf6ac3"
     }
   ]
 }
@@ -91,7 +91,7 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 
 ### How a change moves up
 
-1. Open the worktree set. `spnutils workspace worktree add <NNN>` cuts the workstream's branch, `feat/<NNN>-<subject>`, from a fresh `origin/develop` in each repository the workstream's rows name. The set lives at `.worktrees/<NNN>-<subject>/` in the workspace, and the main checkouts stay on `develop`.
+1. Open the worktree set. `spnutils workspace worktree add <NNN>` cuts the workstream's branch, `feat/<NNN>-<subject>`, from `origin/develop` in each repository the workstream's rows name. The set lives at `.worktrees/<NNN>-<subject>/` in the workspace, and the main checkouts stay on `develop`.
 2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RD.DEVEX.FUNCTION.069`): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 3. Take `develop`, then push. The branch takes `origin/develop` at the start of each pass (the agent fetches, and rebases where `develop` moved) and again before each push and each pull request, so the pull request merges clean (`RD.DEVEX.FUNCTION.071`). After a rebase the owed tiers run again only where it changed a node's content, as the stamp's content hash says. The agent's push is checked for the offline test tiers of each node it carries and, in a TypeScript repository, for the formatting of every file it adds or changes: the repository's own pinned Prettier runs `--check`, and a failure names the files and `pnpm exec prettier --write <files>`.
 4. Open the pull request into `develop`. The first push opens one pull request for the repository, and it stays open for the workstream. At least one approval is required, and new commits dismiss stale approvals. Every check the repository's world requires runs on the pull request, and it cannot merge while one fails.
@@ -162,7 +162,7 @@ A check runs at the first step that can run it and at no later one.
 | Step | What runs | Who runs it |
 | --- | --- | --- |
 | Commit | the typecheck and lint of the projects the change touches; a commit on a permanent branch is refused | the repository's own commit hook, and the agent's hook for the refusal |
-| Push | the offline test tiers of each node the pushed commits touch, on the tree at the pushed commit | the agent's hook on its own push |
+| Push | the offline test tiers of each node the pushed commits touch, on the tree at the pushed commit; and for a TypeScript node, every added or modified file Prettier handles passes the repository's own `prettier --check` | the agent's hook on its own push |
 | Pull request into `develop` | every required check of the repository's world, on a clean runner | GitHub Actions |
 | Pull request from a `hotfix/*` back into its source branch | every required check of the world, on a clean runner, against the code that is running | GitHub Actions |
 | Back-merge pull request into `develop` | develop's checks | GitHub Actions |

@@ -16,6 +16,22 @@ spn-devex browser probe <url> --select <css> [--select <css> …] [--props <p,�
 
 spn-devex coverage measure [<path>] [--json] — the coverage report's measurement — written, built and proved, and the gaps, per package, app, domain and repository
 
+spn-devex debug cost show <target> [--json] — what a target cost, a line for each part its breakdown names
+
+spn-devex debug hooks show [--json] — every hook check's, then every event's, runs, time and bytes
+
+spn-devex debug store show [--json] — each container of the store: files, size, lifetime
+
+spn-devex debug switch show [--json] — each switch and whether it is on
+
+spn-devex debug switch on <name> — turn a switch on
+
+spn-devex debug switch off <name> — turn a switch off
+
+spn-devex debug window show <session|this> [--json] — the notes one window keeps in its folder
+
+spn-devex debug window sweep — remove the window folders idle past 14 days
+
 spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>] — the findings under the paths, read from the whole repository of each path
 
 spn-devex docs audit report <repo> [--json] — the gap scan of one repository, printed; with --json, as data
@@ -76,8 +92,6 @@ spn-devex plan stale <plan.md> — whether a plan's pinned facts have moved sinc
 
 spn-devex plugin build [<marketplace-root>] [--watch] — bundle every plugin's cli and events, via the marketplace root's scripts/build-plugins.mjs
 
-spn-devex plugin cost show [--json] [<root>] — print the turns and tokens of the window and of each child; with --json, as data
-
 spn-devex plugin migration show [--json] — each migration this plugin ships: applied, pending, or nothing to do; with --json, as data
 
 spn-devex plugin migration check [--json] — exit 1 while a migration is pending or the ledger does not read
@@ -87,8 +101,6 @@ spn-devex plugin migration write <id>… [--steps-done] — apply each migration
 spn-devex plugin partner check [--keep] — run every hook in a fixture that holds no book, and name each one that crashes or is not shipped
 
 spn-devex plugin paths check [<path>] — name each plugin path, in the plugin files under the path, that resolves to no shipped file
-
-spn-devex plugin timings show [--json] [<root>] — print one row for each script › group › subgroup › action the log holds; with --json, as data
 
 spn-devex report refresh check <page> — measure a coverage or a tests report again and print each number a write would put on its page, beside the one the page holds
 
@@ -107,8 +119,6 @@ spn-devex restates docs write <ref> — restamp one ref's `docs` citations, afte
 spn-devex restates files check <book> — report each copy that is behind the book or that the book no longer holds, and write nothing
 
 spn-devex restates files write <book> — copy the book's templates into this plugin, and remove each copy the book no longer holds
-
-spn-devex workspace tokens show [<workstream>] [--json] [--root <workspace>] [--projects <folder>] — print tokens and the model's own time per workstream, arc and order; with --json, as data
 
 spn-devex workstream arc edit <workstream>/N<nnn> [--title …] [--goal …] [--status …] [--wait …] [--reason …] [--start] [--review-fixes] [--subject …] [--under …] [--preview …] [--decides …] [--repos …] [--cycle …] [--follows …] [--model …] [--position …] [--note …] — open an arc, or change any field of its header and its status; --note writes a log line
 

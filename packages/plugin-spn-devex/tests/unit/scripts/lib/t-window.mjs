@@ -191,9 +191,9 @@ console.log("\n=== window — a hook speaks only of this window's workstreams");
   check("a workstream that moved to closed/ drops out of the window's set", windowWorkstreams(root, "win-b").length === 0 && Object.keys(readWindow(root, "win-b").workstreams).includes(B));
   check("an old baseline's workstreams list binds nothing at Stop", (() => {
     const r = two("w-old-baseline");
-    const dir = join(r, ".spndevex", ".debug", "stop", "sessions");
+    const dir = join(r, ".spndevex", ".debug", "sessions", "old");
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "old.json"), JSON.stringify({ at: 1, steps: {}, workstreams: [A, B], cards: [] }));
+    writeFileSync(join(dir, "stop.json"), JSON.stringify({ at: 1, steps: {}, workstreams: [A, B], cards: [] }));
     return stop(r, "old") === "";
   })());
 }

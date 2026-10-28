@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "cc3c9ac0"
+      "seen": "47502fd8"
     }
   ]
 }
@@ -88,6 +88,8 @@ Order a composite index you add with organization scope first, then parent keys 
 
 **Make every business row you write resolvable to an organization**, directly through a scope column or through an unbroken parent chain. Carry the scope predicate on every query you write, by-id reads included — never write `WHERE id = :id` alone; write `WHERE id = :id AND org_id = :orgId`, so isolation is enforced in the query rather than remembered in review. Resolve an id outside the caller's scope as not found, never as forbidden.
 
+**Ask for a transaction by the standard's names, in every stack** (`RD.SUPPORT.APPS.224`). A call states the options it needs and takes the default for the rest: the connection (`default`), the propagation (`REQUIRED`), the isolation (the database's own), read-only (off), a time limit in milliseconds (none) and the error codes that leave work committed (none). The propagations are `REQUIRED`, `REQUIRES_NEW`, `NESTED` (a real savepoint on the same connection), `SUPPORTS`, `MANDATORY`, `NOT_SUPPORTED` and `NEVER`, and the isolations are the SQL standard's four, `READ_UNCOMMITTED`, `READ_COMMITTED`, `REPEATABLE_READ` and `SERIALIZABLE`. A join asks for no more than the open transaction holds, and an option an engine cannot honour is refused by name, never rounded and never ignored. Four hooks run code around the outcome, each added by an exported function and refused by name outside a transaction: `runBeforeTransactionCommit` runs inside the transaction, and a throw rolls it back; `runOnTransactionCommit`, `runOnTransactionRollback` and `runOnTransactionComplete` run after it. A module or the app registers handlers that are called for every transaction the framework closes. The limit is that a transaction's scope is the call chain that opened it, so two parallel calls that each open a transaction of their own inside one are not supported; joins are safe.
+
 ### Cache — never the only copy
 
 The rule that matters most: **never the only copy — correctness may not depend on a hit.**
@@ -108,7 +110,7 @@ Make every consumer you write idempotent — short-circuit redelivered work thro
 
 The rule that matters most: **reached by reference, never streamed through the application.**
 
-Expect buckets to be provisioned; never create one at runtime. Put the **access class first** in an object key — `{class}/{org}/…`, `public` or `private` as the leading segment — because a prefix is the one thing both the edge and the store's policy can scope by. Put the owning organization second, so storage-level isolation mirrors the database's tenancy scoping.
+Expect buckets to be provisioned; never create one at runtime. A world always stands its default store, which every module shares the way it shares the database, and a module's part of it is its own area under one of the roots `private/` and `public/`, such as `private/iam/`; a module writes only in its own area and composes no key in another's. A named store, such as the `PUBLIC` docs store of a platform that composes the document module, is added only for what an area cannot give: an object lock, another region or public serving. Each store has its own config block, `providers.storages.<name>` in code. In the docs store, put the **access class first** in an object key — `{class}/{org}/…`, `public` or `private` as the leading segment — because a prefix is the one thing both the edge and the store's policy can scope by. Put the owning organization second, so storage-level isolation mirrors the database's tenancy scoping.
 
 **Derive a key; never author one.** What you hold as a caller is a logical folder path — bounded, POSIX-style segments with no way to spell `.`, `..` or a separator — and let the store compose the physical key from validated segments, the file's own id, and a lossy key-safe rendering of the display name. **Put metadata in the database and content in storage** — own every stored object with a database record carrying identity, scope, classification and lifecycle, and treat the storage key as an attribute of that record, never a public fact.
 

@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "77626921"
+      "seen": "f0167489"
     }
   ],
   "decisions": [
@@ -35,7 +35,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.160",
-      "seen": "827eaa2f"
+      "seen": "7d34986b"
     },
     {
       "repo": "spn-foundation",

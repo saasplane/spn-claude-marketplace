@@ -906,15 +906,15 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
   writeFileSync(later, lines(["I'll start by reading the arc file.", "Done."], 3), "utf8");
   one("a later turn (three prompts) with no baseline raises no welcome", root, "silent",
     { session: "f1-later", extra: { transcript_path: later }, parity: false, why: "a new check" });
-  const baselineFile = (sid) => join(root, ".spndevex", ".debug", "stop", "sessions", `${sid}.json`);
+  const baselineFile = (sid) => join(root, ".spndevex", ".debug", "sessions", sid, "stop.json");
   const marked = JSON.stringify({ at: 1, steps: { "arc": "x" }, fired: [], cards: [], arcs: {}, ownCopy: [] });
-  mkdirSync(join(root, ".spndevex", ".debug", "stop", "sessions"), { recursive: true });
+  mkdirSync(join(root, ".spndevex", ".debug", "sessions", "f1-window"), { recursive: true });
   writeFileSync(baselineFile("f1-window"), marked, "utf8");
   n += 1;
   bindOpen(root, "f1-window");
   run("node", [`${HOOKS}/src/scripts/events/stop.ts`],
     { cwd: root, last_assistant_message: "done", session_id: "f1-window", agent_id: "child-1", transcript_path: bad }, root);
-  const kept = readFileSync(baselineFile("f1-window"), "utf8") === marked && existsSync(baselineFile("f1-window").replace(".json", "_child-1.json"));
+  const kept = readFileSync(baselineFile("f1-window"), "utf8") === marked && existsSync(baselineFile("f1-window").replace("stop.json", "stop.child-1.json"));
   if (!kept) failed += 1;
   console.log(`  ${kept ? "PASS" : "FAIL"}  a child's Stop leaves the window's baseline as it was and writes its own`);
 }
@@ -973,9 +973,9 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
   {
     const root = two("s198-old-baseline");
     wroteTo(root, "old", `${A}/approach.html`);
-    const dir = join(root, ".spndevex", ".debug", "stop", "sessions");
+    const dir = join(root, ".spndevex", ".debug", "sessions", "old");
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, "old.json"), JSON.stringify({ at: 1, steps: {}, workstreams: ["001-a-subject", "002-b-subject"], cards: [] }));
+    writeFileSync(join(dir, "stop.json"), JSON.stringify({ at: 1, steps: {}, workstreams: ["001-a-subject", "002-b-subject"], cards: [] }));
     const out = run("node", [HOOK], { cwd: root, session_id: "old", last_assistant_message: "done" }, root);
     check("an old baseline listing another workstream does not make the window answer for it", !/\[state\]/.test(out) && !/needs-you/.test(out), out.slice(0, 200));
   }
@@ -1603,11 +1603,11 @@ console.log("\n=== stop — outside a workspace it writes nothing, so it makes n
 
   const stray = join(BASE, "stray-debug");
   const below = join(stray, "partner", "acme-orders");
-  mkdirSync(join(stray, ".spndevex", ".debug", "stop", "sessions"), { recursive: true });
+  mkdirSync(join(stray, ".spndevex", ".debug", "sessions"), { recursive: true });
   mkdirSync(below, { recursive: true });
   run("node", [HOOK], { cwd: below, session_id: "below-stray", last_assistant_message: "done" }, below);
   check("a .spndevex holding only .debug is no workspace: the Stop writes no note into it",
-    readdirSync(join(stray, ".spndevex", ".debug", "stop", "sessions")).length === 0);
+    readdirSync(join(stray, ".spndevex", ".debug", "sessions")).length === 0);
 }
 
 console.log(failed ?`\n  ${failed} FAILED` : `\n  all ${n} passed`);

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
-      "seen": "0d015613"
+      "seen": "fc01e988"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",

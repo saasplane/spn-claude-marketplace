@@ -50,11 +50,13 @@ import { execFileSync, spawn } from "node:child_process";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { arcIdsOf } from "../lib/workstream.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { sweepSessions } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { windowStartLines } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
 
@@ -546,6 +548,45 @@ export const SHORT_RULES: string[] = [
   "No script tells you a prompt opens a discussion about a shape; you decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
 ];
 
+/**
+ * THE CEILING IS THE HARNESS'S. Claude Code saves any hook output string past 10,000 characters to a file and shows
+ * the model a 2,000-character preview, so a longer session start would lose the rules its first reply follows
+ * (code.claude.com/docs/en/hooks.md). Counted as Claude Code counts, in string length; 500 is the margin.
+ */
+export const SESSION_START_CEILING = 9_500;
+/** Past this the session start still loads whole, and its test asks for the new text's reason (RD.DEVEX.AGENT.105). */
+export const SESSION_START_NOTE = 8_000;
+
+/** One part of the session start below its head: its text, the rank it is left out by, and where it is read instead. */
+type StartPart = { text: string; rank: number; readAt: string };
+
+/**
+ * The session start in its priority order (RD.DEVEX.AGENT.105). The head (the welcome, the status and the first-reply
+ * note) always goes whole. The parts keep their order on the page, and past the ceiling the highest rank is left out
+ * first (the router, then the debug lines), with one line naming where to read what went.
+ */
+export function fitSessionStart(head: string, parts: StartPart[]): string {
+  const kept = [...parts];
+  const left: string[] = [];
+  const size = () => head.length + kept.reduce((sum, part) => sum + part.text.length, 0);
+  while (kept.length && size() > SESSION_START_CEILING) {
+    const lowest = kept.reduce((worst, part) => (part.rank > worst.rank ? part : worst));
+    kept.splice(kept.indexOf(lowest), 1);
+    left.push(lowest.readAt);
+  }
+  const tail = left.length ? `Left out to stay inline, read on asking: ${left.join(" · ")}.\n` : "";
+  return head + kept.map((part) => part.text).join("") + tail;
+}
+
+/** The parts below the head, in page order, each ranked by how much a first reply needs it. */
+function startParts(): StartPart[] {
+  return [
+    { text: commandsRefBlock(), rank: 2, readAt: "`refs/commands.md`" },
+    { text: wayIndex(), rank: 3, readAt: "`refs/devex/agent/way.md`" },
+    { text: shortRules(), rank: 1, readAt: "the short rules in `refs/devex/agent/agent.md`" },
+  ];
+}
+
 /** The short rules as the block the agent reads: the heading, then one list line for each rule. */
 export function shortRules(): string {
   return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
@@ -580,15 +621,34 @@ export function wayIndex(): string {
 }
 
 /**
+ * The command lines of the `debug` group, one for each action, rendered as `refs/commands.md` renders them (the plugin,
+ * the command's words, its usage, then what it does) from the same `commands/debug/` tree. Read once, when the module
+ * loads. A tree that cannot be read gives none, and the window still opens.
+ */
+async function debugCommandLines(): Promise<string[]> {
+  const lines: string[] = [];
+  try {
+    const folder = fileURLToPath(new URL("../commands/debug/", import.meta.url));
+    const extension = import.meta.url.endsWith(".mjs") ? ".mjs" : ".ts";
+    for (const entry of readdirSync(folder).filter((name) => name.endsWith(extension) && !name.startsWith("_")).sort()) {
+      const exported = (await import(pathToFileURL(join(folder, entry)).href)) as { actions?: Record<string, { describe?: string; usage: string; hidden?: boolean }> };
+      for (const [action, { describe, usage, hidden }] of Object.entries(exported.actions ?? {})) if (!hidden)
+        lines.push(`${usageLine(CORE, commandWords("debug", entry.slice(0, -extension.length), action), usage)} — ${describe ?? ""}`);
+    }
+  } catch { return []; }
+  return lines;
+}
+
+const DEBUG_LINES = await debugCommandLines();
+
+/**
  * Where a plugin's own commands are written down, in one line: each plugin's `refs/commands.md`, which the build
- * generates from its commands. spn-devex's own is printed whole only where it is under 3 KB, since a window
- * carries what the first reply needs and nothing else; a longer one is read on asking.
+ * generates from its commands. Under it, the commands of the `debug` group, one line each, so the window knows how
+ * to read its own machinery without a search; the rest of the commands are read on asking.
  */
 function commandsRefBlock(): string {
   const line = "Each plugin writes its commands in `refs/commands.md` (spn-devex, spn-apps, spn-surface) — read it before a window's first write of a command.\n\n";
-  let own = "";
-  try { own = read(fileURLToPath(new URL("../../refs/commands.md", import.meta.url))); } catch { return line; }
-  return Buffer.byteLength(own) < 3072 ? line + own.trim() + "\n\n" : line;
+  return DEBUG_LINES.length ? `${line}${DEBUG_LINES.join("\n")}\n\n` : line;
 }
 
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
@@ -773,7 +833,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
             ? "act 1 has already run — `spnutils workspace init` minted this folder, so do not run it again — and act 2 "
             : "act 1 mints the workspace and act 2 ") +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, WELCOME_LEAD + "\n\n" + message + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
+    return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + note + "\n", startParts())];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -817,7 +877,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
     "never lettered options or a `Q<n>` card. Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any " +
     "tool's default: hand a page over as its full file path.\n";
-  return [message, WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n" + commandsRefBlock() + wayIndex() + shortRules()];
+  return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n", startParts())];
 }
 
 /** Whether a folder is a git checkout: `.git` is a folder, or a file where the checkout is a worktree. */
@@ -917,14 +977,17 @@ if (runAlone("orientation.ts")) {
   let result: [string, string] | null = null;
   try {
     const root = workspaceRootOf(cwd);
+    sweepSessions(root);
     await fetchMembers(members(root).map(([, path]) => path));
     result = orient(root, cwd);
   }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);
   }
-  record({ group: "orientation", action: "orientation" }, performance.now() - started);
-  end();
+  // What the session start put into the context is the words the agent reads.
+  const told = result ? Buffer.byteLength(result[1]) : null;
+  record({ group: "orientation", action: "orientation" }, performance.now() - started, null, told === null ? "pass" : "note", told);
+  end(null, false, { verdict: told === null ? "pass" : "note", out: told });
   if (result) {
     const [message, context] = result;
     if (stdinMode)

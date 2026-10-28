@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "51ee6619"
+      "seen": "36b0dd5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "945e9c18"
+      "seen": "e9a7f755"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -21,7 +21,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status is one of six, stored or worked out",
-      "seen": "23256a3c"
+      "seen": "656a5e70"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -31,7 +31,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "988c276e"
+      "seen": "37153ba7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
@@ -261,11 +261,15 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
     state.json                            `lastNumber`: the highest workstream number ever used
   .debug/                                 what the agent's own machinery says about itself
+    switches.json                         the switches, {"telemetry": true}; written by `debug switch on/off` only
+    sessions/<session-id>/                one folder for each window; swept 14 days after its newest write
+    workspace/                            what spans windows: filter.json
+    telemetry/                            hooks.jsonl and usage.jsonl; a log past 20 MB is renamed <name>.1.jsonl
   migrations.jsonl                        the plugin migrations this workspace has applied, one line each
   README.md
 ```
 
-**`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery says about itself. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+**`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds four containers, and each has one lifetime rule — MUST.** `switches.json` is kept and written only by `debug switch on` and `debug switch off`. `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, and a reader reads both. **The plugin is the only writer of `.debug/`**, and `spnutils workspace status` only reads `switches.json` for its recording line. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
 
 **A hook keeps its notes in `.debug/` only inside a workspace it found, and a `.spndevex/` holding nothing but `.debug/` is no workspace — MUST.** A hook that made `.spndevex/` to hold its notes would make a workspace out of wherever the window stood, root every later session below it there, and tell a partner's repository under it that it is day 0. So a hook with no workspace writes nothing, and every walk up to the root passes over a `.spndevex/` such a hook left before.
 
@@ -294,7 +298,7 @@ orders are yours to write by hand, and no command writes them. Two marked region
 exception, each with one owner: the progress block and the `Open` block, which the commands write. An arc is
 named by its number, `N<nnn>`, and its short subject, its title and its goal are fields of its data; one
 number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
-on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
+on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is never part of the state of the work** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation. The plugin keeps a note of its own for hooks, `window.json` in that window's folder under `.debug/sessions/`, and the note never says which state a workstream is in: the folder tree says that.
 
 **A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RD.DEVEX.WORKSPACE.274`). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RD.DEVEX.AGENT.104`). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`).
 

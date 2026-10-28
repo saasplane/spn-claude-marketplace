@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { WELCOME_LEAD, orient, workstreams } from "../../../../src/scripts/events/orientation.ts";
+import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -134,7 +134,7 @@ compare("day zero resumed: a new-platform workstream is already open",
 // wherever a window stopped, so `/tmp` grew one, and every partner repository under it was told day 0.
 compare("a partner's repository below a folder whose .spndevex holds only .debug: not day 0",
   join(fixture("stray-debug", {
-    ".spndevex/.debug/stop/sessions/s1.json": "{}\n",
+    ".spndevex/.debug/sessions/s1/stop.json": "{}\n",
     "partner/acme-orders/sprepo.json": repo("APPS", { stack: "TS" }),
   }), "partner", "acme-orders"),
   ["1 repo"], ["This folder is empty", "Day-0 mode", "no sprepo.json under"]);
@@ -800,8 +800,8 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
       && (lateMany.match(/rebase before the next push/g) ?? []).length === 1
       && crowdedNames.filter((name) => lateMany.includes(`${name} `)).length === 3
       && lateMany.includes(" and 13 more, listed by `spnutils workspace status`"), lateMany);
-  says(`and that workspace's session-start output is under 8,192 bytes (${Buffer.byteLength(crowdedHook.context, "utf8")})`,
-    Buffer.byteLength(crowdedHook.context, "utf8") < 8192);
+  says(`and that workspace's session-start output stays inline, under ${SESSION_START_CEILING} characters (${crowdedHook.context.length})`,
+    crowdedHook.context.length <= SESSION_START_CEILING);
 
   // THE FETCH'S BUDGET: a remote that never answers costs the window five seconds and no more.
   const slow = fixture("fetch-slow", { ".spndevex/README.md": "state\n" });
@@ -822,19 +822,24 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   const together = hookIn(parallel, { GIT_SSH_COMMAND: "sh -c 'sleep 30' sh" });
   says("three members that never answer cost one budget, not three: the fetches run in parallel", together.ms < 9000, `${together.ms} ms`);
 
-  // THE SIZE: the real workspace's session-start output stays under 8,192 bytes, and the welcome is unchanged.
+  // THE SIZE: the session start stays under the harness's inline ceiling. Past the soft line it still loads whole,
+  // and the run names the size so a new text's reason is asked for (RD.DEVEX.AGENT.105).
+  const sized = (what, context) => {
+    if (context.length > SESSION_START_NOTE)
+      console.log(`        note: ${what} session start is ${context.length} characters, past ${SESSION_START_NOTE}: say why the new text earns its place`);
+    return context.length <= SESSION_START_CEILING;
+  };
   if (IN_WORKSPACE) {
     const real = hookIn(WORKSPACE);
-    const bytes = Buffer.byteLength(real.context, "utf8");
-    console.log(`        session-start additionalContext of this workspace: ${bytes} bytes`);
-    says(`the session-start output is under 8,192 bytes (${bytes})`, bytes < 8192);
+    console.log(`        session-start additionalContext of this workspace: ${real.context.length} characters`);
+    says(`the session-start output stays inline, under ${SESSION_START_CEILING} characters (${real.context.length})`, sized("this workspace's", real.context));
   }
   const big = hookIn(fixture("size-ordinary", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
   }));
-  says(`a fixture workspace's session-start output is under 8,192 bytes (${Buffer.byteLength(big.context, "utf8")})`, Buffer.byteLength(big.context, "utf8") < 8192);
+  says(`a fixture workspace's session-start output stays inline (${big.context.length} characters)`, sized("a fixture workspace's", big.context));
   // SEVERAL OPEN WORKSTREAMS: the listing grows with every folder, and the text still stays under the line.
   const crowd = {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
@@ -848,11 +853,39 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   }
   for (let at = 1; at <= 4; at += 1) crowd[`.spndevex/${WORKSTREAMS}/backlog/${String(60 + at).padStart(3, "0")}-waiting-subject-${at}/approach.html`] = "<h1>x</h1>\n";
   const many = hookIn(fixture("size-many-workstreams", crowd));
-  says(`a workspace with twelve open workstreams opens under 8,192 bytes (${Buffer.byteLength(many.context, "utf8")})`, Buffer.byteLength(many.context, "utf8") < 8192);
+  says(`a workspace with twelve open workstreams still opens inline (${many.context.length} characters)`, sized("a twelve-workstream", many.context));
+  // THE PRIORITY ORDER: past the ceiling the router goes first, then the debug lines, and the head never goes.
+  const head = "H".repeat(6000);
+  const fitted = fitSessionStart(head, [
+    { text: "D".repeat(1500), rank: 2, readAt: "`refs/commands.md`" },
+    { text: "R".repeat(1800), rank: 3, readAt: "`refs/devex/agent/way.md`" },
+    { text: "S".repeat(1500), rank: 1, readAt: "the short rules" },
+  ]);
+  says("past the ceiling the router is left out first and named, and the head, the debug lines and the short rules stay",
+    fitted.startsWith(head) && !fitted.includes("R") && fitted.includes("D".repeat(1500)) && fitted.includes("S".repeat(1500))
+      && fitted.includes("read on asking: `refs/devex/agent/way.md`") && fitted.length <= SESSION_START_CEILING + 120);
+  const tight = fitSessionStart(head, [
+    { text: "D".repeat(2500), rank: 2, readAt: "`refs/commands.md`" },
+    { text: "R".repeat(1800), rank: 3, readAt: "`refs/devex/agent/way.md`" },
+    { text: "S".repeat(1500), rank: 1, readAt: "the short rules" },
+  ]);
+  says("and when that is not enough the debug lines go next, the short rules last",
+    !tight.includes("R") && !tight.includes("D") && tight.includes("S".repeat(1500)) && tight.includes("`refs/devex/agent/way.md` · `refs/commands.md`"));
   says("and still carries the welcome lead and the status line in its first 2,000 bytes",
     Buffer.byteLength(many.context.slice(0, many.context.indexOf(" workstream")), "utf8") < 2000 && many.context.includes("12 workstreams open"), many.context.slice(0, 600));
   says("known-bad: the ground and the way's principles are not carried",
     !big.context.includes("### Repositories") && !big.context.includes("Start from what the thing is for"));
+
+  // THE DEBUG GROUP'S COMMANDS, one line each under the pointer line, rendered from the same command tree as `refs/commands.md`.
+  const { commandsRef } = await import("../../../../src/scripts/cli.ts");
+  const treeDebug = (await commandsRef()).split("\n").filter((one) => one.startsWith("spn-devex debug "));
+  const shown = big.context.split("\n").filter((one) => one.startsWith("spn-devex debug "));
+  says(`the session start lists the eight debug commands, ${shown.length} lines`, shown.length === 8 && treeDebug.length === 8);
+  says("and each line is the one the command tree renders, in the tree's order, arguments included",
+    JSON.stringify(shown) === JSON.stringify(treeDebug) && shown.every((one) => /^spn-devex debug \w+ \w+/.test(one)), shown.join("\n"));
+  says("and they sit right after the pointer line to `refs/commands.md`",
+    big.context.includes("read it before a window's first write of a command.\n\n" + treeDebug.join("\n") + "\n\n"));
+  says("and no other command line is carried", !big.context.includes("spn-devex workstream ") && !big.context.includes("spn-devex docs "));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

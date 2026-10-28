@@ -150,7 +150,7 @@ console.log("\n=== cli — a run writes one telemetry line, with its words as th
     // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
     mkdirSync(join(root, ".spndevex", ".debug"), { recursive: true });
     writeFileSync(join(root, ".spndevex", "README.md"), "# .spndevex\n", "utf8");
-    writeFileSync(join(root, ".spndevex", ".debug", "telemetry.on"), "on\n", "utf8");
+    writeFileSync(join(root, ".spndevex", ".debug", "switches.json"), '{"telemetry": true}\n', "utf8");
     mkdirSync(join(root, "repo", "docs"), { recursive: true });
     writeFileSync(join(root, "repo", "sprepo.json"), '{"type":"APPS"}', "utf8");
     const entry = join(PLUGIN, "src", "scripts", "cli.ts");

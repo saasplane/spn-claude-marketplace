@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "9fc0e7b8"
+      "seen": "a8effffe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -66,7 +66,7 @@ An edit to the folder changes nothing about the cache until an install copies on
 | **Path** | It says what the action acts on, and it may be a folder inside a repository or one file. A check of the whole corpus still reads everything and reports only the findings under the path. | `spn-devex docs audit check docs/artifacts` |
 | **Filter** | An option named for what it selects: `--variant` for documents, `--block` for a generated block, `--finding` for a kind of finding. | `--finding link` |
 
-**Name the smallest path the work needs, and run `check` before `write`.** A `write` with no path refuses, so a write never reaches a file nobody named. With no path, `check` and `show` take the repository you are in, and they refuse at a workspace root, where several repositories sit side by side.
+**Name the smallest path the work needs, and run `check` before `write`.** A `write` with no path refuses, so a write never reaches a file nobody named. With no path, `check` and `show` take the repository you are in, and they refuse at a workspace root, where several repositories sit side by side. **A lookup is the exception** (`RD.DEVEX.AGENT.112`): it takes a name or a few words rather than a path, such as `spn-surface unit show <Unit>`. Inside a repository it reads the plugin's own copy and that repository; at the workspace root it reads every member repository and names the one each answer came from, and `--repo` narrows it to one.
 
 **Read the exit.** For `check` and `write`, exit 1 means a rule finding. Exit 2 means the command was typed wrongly, and the refusal prints the usage to type. `spn-<plugin> help` lists every command with its actions.
 

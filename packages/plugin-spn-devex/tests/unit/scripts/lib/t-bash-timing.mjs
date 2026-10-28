@@ -1,10 +1,10 @@
 // `lib/bash-timing.ts` — the Bash commands the agent runs, timed by pairing the hooks before and
 // after the call on `tool_use_id` (RD.DEVEX.WORKSPACE.185, N8 row 2p).
 //
-// Driven through the real entries: `events/pretooluse.ts` writes `telemetry/pending/<id>.json` for a
+// Driven through the real entries: `events/pretooluse.ts` writes `sessions/<session>/pending/<id>.json` for a
 // matched command while recording is on, and `events/closed.ts` — registered for `PostToolUse` and
 // `PostToolUseFailure` on Bash — reads it, writes one line for the call, and removes it. Every case
-// points a temporary workspace (with `.spndevex/.debug/telemetry.on`) at the recorder.
+// points a temporary workspace (with `.spndevex/.debug/switches.json`) at the recorder.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -13,8 +13,8 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 const EVENTS = resolve(PLUGIN, "src", "scripts", "events");
 const KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
-  "repo", "pid", "session", "agent", "workstream", "arc", "order"];
-// A Bash command's line carries one more key, after the seventeen every line carries.
+  "repo", "pid", "verdict", "out", "session", "agent", "workstream", "arc", "order", "row"];
+// A Bash command's line carries one more key, after the twenty every line carries.
 const COMMAND_KEYS = [...KEYS, "programs"];
 
 let total = 0, failed = 0;
@@ -32,14 +32,14 @@ const hook = (entry, payload) => {
       cwd: payload.cwd, stdio: ["pipe", "pipe", "pipe"] });
   } catch (error) { return String(error.stdout ?? ""); }
 };
-const pendingOf = (root) => join(root, ".spndevex", ".debug", "telemetry", "pending");
+const pendingOf = (root) => join(root, ".spndevex", ".debug", "sessions", "sess-2p", "pending");
 const logOf = (root) => {
   const log = join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl");
   return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
 };
 const commands = (root) => logOf(root).filter((line) => line.event === "command" && line.tool === "Bash");
 
-const ON = { ".spndevex/.debug/telemetry.on": "on\n", "spn-infra-ts/README.md": "x\n" };
+const ON = { ".spndevex/.debug/switches.json": "{\"telemetry\": true}\n", "spn-infra-ts/README.md": "x\n" };
 const call = (root, id, command, extra = {}) => ({
   session_id: "sess-2p", tool_name: "Bash", tool_use_id: id, cwd: join(root, "spn-infra-ts"),
   tool_input: { command, ...(extra.input ?? {}) }, ...(extra.payload ?? {}),
@@ -51,7 +51,7 @@ console.log("=== a matched command, paired before and after");
   const before = call(root, "toolu_pair", "spnutils infra platform up dmo --apply");
   hook("pretooluse", { ...before, hook_event_name: "PreToolUse" });
   same("PreToolUse writes the start file for a matched command", existsSync(join(pendingOf(root), "toolu_pair.json")), true);
-  hook("closed", { ...before, hook_event_name: "PostToolUse", tool_response: { stdout: "", stderr: "", interrupted: false } });
+  hook("closed", { ...before, hook_event_name: "PostToolUse", tool_response: { stdout: "héllo", stderr: "!", interrupted: false } });
   const lines = commands(root);
   same("PostToolUse writes one line", lines.length, 1);
   const line = lines[0] ?? {};
@@ -64,9 +64,10 @@ console.log("=== a matched command, paired before and after");
   same("at is UTC ending in Z", /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(line.at ?? ""), true);
   same("repo is the member the call ran in, and the session is the hook's", [line.repo, line.session], ["spn-infra-ts", "sess-2p"]);
   same("the start file is removed", existsSync(join(pendingOf(root), "toolu_pair.json")), false);
+  same("a command's line has no verdict, and `out` is the bytes of its output", [line.verdict, line.out], [null, 7]);
   same("every hook line carries at ending in Z too", logOf(root).every((one) => /Z$/.test(one.at)), true);
   const checks = logOf(root).filter((one) => one.event !== "command");
-  same("a hook check's line keeps the seventeen keys, and no `programs`",
+  same("a hook check's line keeps the twenty keys, and no `programs`",
     checks.length > 0 && checks.every((one) => JSON.stringify(Object.keys(one)) === JSON.stringify(KEYS)), true);
 }
 
@@ -122,7 +123,7 @@ console.log("\n=== what writes nothing");
   same("with recording off, a matched command writes no start file", existsSync(pendingOf(root)), false);
 }
 
-console.log("\n=== a secret, a background call, a compound command, and the prune");
+console.log("\n=== a secret, a background call, and a compound command");
 {
   const root = workspace("2p-more", ON);
   const secret = call(root, "toolu_secret", "spnutils infra config set --token abc123 --api-key=zzz FOO");
@@ -152,24 +153,20 @@ console.log("\n=== a secret, a background call, a compound command, and the prun
     commands(root).slice(before + 1).map((one) => [one.script, one.action, one.programs]), [["spnutils", "check", 2]]);
 
   // A refused call leaves its start file behind: the hook wrote it, and no hook runs after a refusal.
+  // Only the 14-day sweep of the window's folder removes it; writing the next start file prunes nothing.
   mkdirSync(pendingOf(root), { recursive: true });
   const minutesAgo = (minutes) => (Date.now() - minutes * 60 * 1000) / 1000;
   const refused = join(pendingOf(root), "toolu_refused.json");
   writeFileSync(refused, JSON.stringify({ at: Date.now() - 11 * 60 * 1000, background: false, found: [] }));
   utimesSync(refused, minutesAgo(11), minutesAgo(11));
-  const running = join(pendingOf(root), "toolu_running.json");
-  writeFileSync(running, JSON.stringify({ at: Date.now() - 9 * 60 * 1000, background: false, found: [] }));
-  utimesSync(running, minutesAgo(9), minutesAgo(9));
   hook("pretooluse", { ...call(root, "toolu_fresh", "git status"), hook_event_name: "PreToolUse" });
-  same("[MKT.HOOKS.43] a start file older than 600,000 ms is removed when the next one is written",
-    existsSync(refused), false);
-  same("[MKT.HOOKS.43] and one younger than that is left, because its call may still be running",
-    readdirSync(pendingOf(root)).sort(), ["toolu_fresh.json", "toolu_running.json"]);
+  same("[MKT.HOOKS.43] a start file older than ten minutes is left where it is when the next one is written",
+    readdirSync(pendingOf(root)).sort(), ["toolu_fresh.json", "toolu_refused.json"]);
 }
 
 console.log("\n=== the workspace filter file");
 {
-  const root = workspace("2p-filter", { ...ON, ".spndevex/.debug/telemetry/filter.json": JSON.stringify({ remove: ["git"], add: [{ program: "make" }] }) });
+  const root = workspace("2p-filter", { ...ON, ".spndevex/.debug/workspace/filter.json": JSON.stringify({ remove: ["git"], add: [{ program: "make" }] }) });
   const git = call(root, "toolu_git", "git status");
   hook("pretooluse", { ...git, hook_event_name: "PreToolUse" });
   same("a program the filter removes writes no start file", existsSync(join(pendingOf(root), "toolu_git.json")), false);

@@ -36,7 +36,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "a08c1401"
+      "seen": "34d54f05"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
@@ -235,6 +235,8 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 **Before a push, each tier the change touches runs whole for its node, once per batch.** A batch of orders is pushed together, so the run is not repeated per order. These are the tiers that need nothing running: unit, component and integration without its live cases, and for an infra node its offline contract tier too. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses an agent's push when no whole, green run covers exactly the tree at the pushed commit, for each node the commits in `origin/develop..HEAD` touch, an apps node and an infra node alike. The commit itself runs no test check of the agent's.
 
 **The dry run is the full pass before a release.** It runs every tier the release can run by itself and lists every failure at once. Run only the tier it names as not run, a client's contract tier, with the service up, and ask for the release go after both. The release command starts no service and releases every library, a generated client among them, so a client's contract tier, which calls a running service, is named as not run.
+
+**A release is proven when every tier is proven for the exact inputs it ships — MUST** (`RD.SUPPORT.APPS.228`). A tier is proven by a run made now or by a past green verdict on the same key, and the push check, the dry run and the release itself each reuse a verdict before they run a tier, so one change pays for one real run of each tier and not three. The key is computed from git every time and names the inputs of one project and one tier: the hash of the project's own tree, the tree of each workspace project it builds on, the lock file, the versions of the toolchain and of `spnutils`, and the tier. A commit is not a key, because merging `develop` into `main` makes a new commit over the same files. Only a green run on a clean tree writes a verdict, and a run on a tree with uncommitted changes writes nothing reusable. Unit and component verdicts never expire; integration and contract verdicts expire after 24 hours, because they also depend on what sits outside the repository, and an expired verdict is not reused. A release may skip a project whose exact inputs a past green verdict covers, the previous release's included; no verdict for the key, an expired one or a changed input runs the tier, and `--run-gates` runs every tier anyway. The tag of a release names the run behind each tier.
 
 **Outside a release, a push and an arc's `PROOF` row, run a whole tier only in these five cases:**
 

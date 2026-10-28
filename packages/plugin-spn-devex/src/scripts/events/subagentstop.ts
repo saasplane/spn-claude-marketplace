@@ -7,7 +7,7 @@
 // `SubagentStop` instead, and Claude Code hands that event the child's own transcript in
 // `agent_transcript_path` (its `transcript_path` is the window's). This reads the child's transcript the way
 // `stop.ts` reads the window's and tags each turn with the child's `agent_id`, so a child's cost is read from
-// telemetry by `plugin cost show` and never from a transcript by hand.
+// telemetry by `debug cost show` and never from a transcript by hand.
 //
 // It writes nothing while recording is off, says nothing to the child and never blocks it.
 

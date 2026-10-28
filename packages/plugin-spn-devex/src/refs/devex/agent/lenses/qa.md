@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "b72a5ed5"
+      "seen": "46776da2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
@@ -108,7 +108,7 @@
   - **Status honesty**: a `SUCCESS` row resolves to a case that ran and passed. No case is `PLANNED`; a case the run met and could not run is `PENDING`.
   - **A run speaks for the tier it ran and the nodes it collected, and nothing else.**
   - **While work is under way, a run covers what the change touched** (`RD.DEVEX.WORKSPACE.207`): rows counted through the capability page, the selection written in the order and passed after `--`, one freshly named run, acceptance read as `SUCCESS` from the run file.
-  - **A whole tier runs before a push, in an arc's `PROOF` row, before a release, or in one of five named cases** (`RD.DEVEX.WORKSPACE.245`). The `PROOF` row is the arc's one final re-check, where the whole tiers, the walks and the look run once, and no order runs them. The five cases: a published package changed and outsiders import it; a test configuration changed; a file was renamed, moved or deleted; a dependency moved; the developer asks. The release's dry run is the full pass: it runs every tier the release can run by itself and lists every failure, so the agent runs only the tier it names as not run, a client's contract tier, with the service up.
+  - **A whole tier runs before a push, in an arc's `PROOF` row, before a release, or in one of five named cases** (`RD.DEVEX.WORKSPACE.245`). The `PROOF` row is the arc's one final re-check, where the whole tiers, the walks and the look run once, and no order runs them. The five cases: a published package changed and outsiders import it; a test configuration changed; a file was renamed, moved or deleted; a dependency moved; the developer asks. The release's dry run is the full pass: it runs every tier the release can run by itself and lists every failure, so the agent runs only the tier it names as not run, a client's contract tier, with the service up. A tier proven for the exact inputs the release ships is not run again: a past green verdict on the same key stands in for a run, integration and contract verdicts expire after 24 hours, and the tag names the run behind each tier (`RD.SUPPORT.APPS.228`).
   - **Before a push, each tier the change touches runs whole for its node, once per batch**, since a batch of orders is pushed together: unit, component and integration without its live cases, and for an infra node its offline contract tier too. A source change touches every owed tier of its node, a case file its own tier, a document none. A check refuses the push when no whole, green run covers exactly the tree at the pushed commit, for each node the commits in `origin/develop..HEAD` touch, an apps node and an infra node alike. The commit runs no test check of the agent's; the tiers that need a running stack run in the pull request into `develop`.
   - **A pipeline publishes evidence and never writes a document.**
   - **Keep each claim at one tier.** A gate is not a test, and no gate is inferred from another.

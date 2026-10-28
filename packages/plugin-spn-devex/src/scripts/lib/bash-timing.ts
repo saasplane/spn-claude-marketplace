@@ -2,7 +2,7 @@
 // duration, so the hooks before and after the call pair on its `tool_use_id`:
 //
 // - `startCommand`, from `PreToolUse`: while recording is on, the command is read (`command-reader.ts`)
-//   and, only where a program the filter names is in it, `telemetry/pending/<tool_use_id>.json` is
+//   and, only where a program the filter names is in it, `sessions/<id>/pending/<tool_use_id>.json` is
 //   written with the start time and the reading. An unmatched call pays for the reading and nothing
 //   more.
 // - `finishCommand`, from `PostToolUse` or `PostToolUseFailure`: the start file is read and removed,
@@ -12,19 +12,17 @@
 //   returns before its command ends, so its line is written with `exit` null.
 //
 // A START FILE NO HOOK CLOSES. A call refused after `PreToolUse` wrote its start file never runs, so
-// no hook comes after it; a crashed call leaves one the same way, and so does a failed call in a
-// window that loaded its hooks before `PostToolUseFailure` was registered. Writing a start file
-// removes every one older than `STALE_MS`, so no reader takes it for a running command.
+// no hook comes after it; a crashed call leaves one the same way. Nothing prunes it here: the window's
+// folder is swept whole once nothing in it has been written for 14 days (`debug-store.ts`).
 
-import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { tagsOf, telemetryDir, write, type Entry } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { loadPrograms, readCommand, type Reading } from "./command-reader.ts";
 import { workspaceRoot, type Payload } from "./payload.ts";
 
 const PENDING = "pending";
-/** The longest a foreground Bash call runs: the harness's largest timeout. A start file older than this has no call behind it. */
-export const STALE_MS = 600_000;
 
 /** The start file: when the call began, whether it runs in the background, and every program the filter matched in it. */
 export type Started = { at: number; background: boolean; found: Reading[] };
@@ -35,30 +33,23 @@ function fileOf(payload: Payload): string | null {
   return /^[A-Za-z0-9_-]{1,200}$/.test(id) ? `${id}.json` : null;
 }
 
-function prune(dir: string): void {
-  const now = Date.now();
-  for (const name of readdirSync(dir)) {
-    try { if (now - statSync(join(dir, name)).mtimeMs > STALE_MS) rmSync(join(dir, name), { force: true }); }
-    catch { /* another hook removed it first */ }
-  }
-}
-
 /** `PreToolUse` on Bash: write the start file for a matched command while recording is on. Never throws. */
 export function startCommand(payload: Payload): void {
   try {
     if (payload.tool_name !== "Bash") return;
     const file = fileOf(payload);
     const command = payload.tool_input?.command;
-    if (!file || !command) return;
+    const session = typeof payload.session_id === "string" ? payload.session_id : "";
+    if (!file || !command || !session) return;
     const cwd = payload.cwd ?? process.cwd();
     const root = workspaceRoot(cwd);
     const dir = telemetryDir(root);
     if (!dir) return;
-    const found = readCommand(command, cwd, loadPrograms(dir), root);
+    if (!root) return;
+    const found = readCommand(command, cwd, loadPrograms(root), root);
     if (!found.length) return;
-    const pending = join(dir, PENDING);
+    const pending = join(sessionDir(root, session), PENDING);
     mkdirSync(pending, { recursive: true });
-    prune(pending);
     const started: Started = { at: Date.now(), background: payload.tool_input?.run_in_background === true, found };
     writeFileSync(join(pending, file), JSON.stringify(started), "utf8");
   } catch { /* a tool never fails because timing failed */ }
@@ -82,28 +73,46 @@ export function exitOf(payload: Payload, failed: boolean): number {
   return failed ? 1 : 0;
 }
 
-/** `PostToolUse` or `PostToolUseFailure` on Bash: write the call's line and remove the start file. Never throws. */
-export function finishCommand(payload: Payload, failed: boolean): void {
+/** The bytes a tool's response put into the context: a Bash call's stdout and stderr, else the response as it is. */
+function bytesOfResponse(payload: Payload): number {
+  const response = payload.tool_response;
+  if (response === undefined || response === null) return 0;
+  if (typeof response === "string") return Buffer.byteLength(response);
+  const shell = response as { stdout?: unknown; stderr?: unknown };
+  if (typeof shell.stdout === "string" || typeof shell.stderr === "string")
+    return Buffer.byteLength(typeof shell.stdout === "string" ? shell.stdout : "") + Buffer.byteLength(typeof shell.stderr === "string" ? shell.stderr : "");
+  try { return Buffer.byteLength(JSON.stringify(response)); } catch { return 0; }
+}
+
+/**
+ * `PostToolUse` or `PostToolUseFailure` on Bash: write the call's line and remove the start file.
+ * Returns the bytes the tool's response put into the context, for the run's own whole-run line. Never throws.
+ */
+export function finishCommand(payload: Payload, failed: boolean): number {
+  let out = 0;
   try {
-    if (payload.tool_name !== "Bash") return;
+    out = bytesOfResponse(payload);
+    if (payload.tool_name !== "Bash") return out;
     const file = fileOf(payload);
-    if (!file) return;
+    const session = typeof payload.session_id === "string" ? payload.session_id : "";
+    if (!file || !session) return out;
     const root = workspaceRoot(payload.cwd ?? process.cwd());
-    if (!root) return;
-    const path = join(root, ".spndevex", ".debug", "telemetry", PENDING, file);
+    if (!root) return out;
+    const path = join(sessionDir(root, session), PENDING, file);
     let started: Started;
-    try { started = JSON.parse(readFileSync(path, "utf8")) as Started; } catch { return; }
+    try { started = JSON.parse(readFileSync(path, "utf8")) as Started; } catch { return out; }
     try { rmSync(path, { force: true }); } catch { /* ignore */ }
-    if (!Array.isArray(started.found) || !started.found.length || typeof started.at !== "number") return;
+    if (!Array.isArray(started.found) || !started.found.length || typeof started.at !== "number") return out;
     const ms = Math.max(0, Math.round(Date.now() - started.at));
     const background = started.background || payload.tool_input?.run_in_background === true;
     const exit = background && !failed ? null : exitOf(payload, failed);
     const first = started.found[0];
     const entry: Entry = {
       script: first.script, group: first.group, subgroup: first.subgroup, action: first.action, args: first.args,
-      repo: first.repo, ms, exit, programs: started.found.length,
+      repo: first.repo, ms, exit, programs: started.found.length, out,
     };
     write(root, { script: "spn-devex", event: "command", tool: "Bash", session: payload.session_id ?? null, ...tagsOf(payload) },
           [entry]);
   } catch { /* a tool never fails because timing failed */ }
+  return out;
 }

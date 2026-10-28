@@ -1,7 +1,7 @@
 // `checks/test-run.ts` — a write under a repository's `src` or `tests` waits while a test run for that
 // repository is going (the book's RD.DEVEX.WORKSPACE.207).
 //
-// The guard knows a run only by its start file, `.spndevex/.debug/telemetry/pending/<tool_use_id>.json`,
+// The guard knows a run only by its start file, `.spndevex/.debug/sessions/<id>/pending/<tool_use_id>.json`,
 // which `lib/bash-timing.ts` writes before a timed command and removes after it. Each case writes a
 // start file into a temporary workspace and calls the check's own function. The suites run with
 // recording off, so the check reads `pending/` by path and never asks whether recording is on.
@@ -26,7 +26,7 @@ const APPS_TEST = reading("spnutils", "apps", "test", "contract r1 api");
 /** A workspace holding one start file, written `ageMs` before NOW. */
 function withRun(name, found, ageMs = 120_000, files = {}) {
   const root = workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n", ...files });
-  const pending = join(root, ".spndevex", ".debug", "telemetry", "pending");
+  const pending = join(root, ".spndevex", ".debug", "sessions", "s-run", "pending");
   mkdirSync(pending, { recursive: true });
   writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: NOW - ageMs, background: false, found }), "utf8");
   return root;
@@ -44,7 +44,7 @@ console.log("=== a source edit waits while a test run for that repository is goi
   ok("[MKT.HOOKS.31] and how long ago it started", (refused?.deny ?? "").includes("2 min ago"), refused?.deny);
   ok("[MKT.HOOKS.31] and the repository", (refused?.deny ?? "").includes("`spn-x`"), refused?.deny);
   ok("[MKT.HOOKS.31] and the start file it knows the run by, with the age at which one stops counting",
-    (refused?.deny ?? "").includes(".spndevex/.debug/telemetry/pending/toolu_run.json") && (refused?.deny ?? "").includes("10 minutes"), refused?.deny);
+    (refused?.deny ?? "").includes(".spndevex/.debug/sessions/s-run/pending/toolu_run.json") && (refused?.deny ?? "").includes("10 minutes"), refused?.deny);
   ok("[MKT.HOOKS.31] an Edit under tests is refused too",
     verdictOf(checkTestRun(edit(root, "spn-x/apps/api/tests/unit/a.spec.ts"), NOW)) === "deny");
   ok("[MKT.HOOKS.31] a Write of a new file under src is refused",
@@ -87,7 +87,7 @@ console.log("\n=== what the guard leaves alone");
     checkTestRun(edit(none, "spn-x/apps/api/src/a.ts"), NOW) === null);
 
   const broken = withRun("test-run-unreadable", [APPS_TEST]);
-  writeFileSync(join(broken, ".spndevex", ".debug", "telemetry", "pending", "toolu_run.json"), "{ not json", "utf8");
+  writeFileSync(join(broken, ".spndevex", ".debug", "sessions", "s-run", "pending", "toolu_run.json"), "{ not json", "utf8");
   ok("[MKT.HOOKS.32] a start file that cannot be read is not a run, and nothing throws",
     checkTestRun(edit(broken, "spn-x/apps/api/src/a.ts"), NOW) === null);
   ok("[MKT.HOOKS.32] a payload with no path and no command gets no verdict", checkTestRun({ cwd: root }, NOW) === null);
