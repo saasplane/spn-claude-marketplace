@@ -36,7 +36,7 @@ import { FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/s
 export const describe = "Print one unit's props, values, defaults, usage and cases from the snapshot this plugin carries";
 export const usage = "<Unit> [--json]";
 
-const SNAPSHOT = "construct.snapshot.json";
+export const SNAPSHOT = "construct.snapshot.json";
 const REFS = ["architecture-components.md", "architecture-widgets.md"];
 const PLACE_SIZED = "their size from the place, a field's check from its DSForm.Field";
 
@@ -51,7 +51,7 @@ type Unit = {
   usage?: { words?: string; caption?: string } | null;
 };
 type IndexRow = { unit: string; prop: string; values: { value: string; cases: string }[] };
-type Snapshot = { source: { readFrom: string[] }; units: Unit[]; choiceIndex: IndexRow[]; placeSized?: string[] };
+export type Snapshot = { source: { readFrom: string[] }; units: Unit[]; choiceIndex: IndexRow[]; placeSized?: string[] };
 
 /** One case of a unit's table: what it is, where it stands, each prop's value, what the page writes, and its rule. */
 type Case = { when: string; props: { prop: string; value: string }[]; writes: string; rule: string; redirect: string | null };
@@ -94,12 +94,12 @@ const WORKSPACE_STATE = ".spndevex";
  * The folder the snapshot and the two refs sit in: the plugin's own, three folders above both
  * `scripts/commands/unit/` and `dist/commands/unit/`, unless a test names another.
  */
-function root(): string {
+export function root(): string {
   return process.env.SPN_SURFACE_UNIT_ROOT ?? resolve(import.meta.dirname, "..", "..", "..", "refs", "support", "surface");
 }
 
 /** A cell or a line as plain words: no backticks and no bold marks. */
-const plain = (text: string): string => text.replace(/`/g, "").replace(/\*\*/g, "").trim();
+export const plain = (text: string): string => text.replace(/`/g, "").replace(/\*\*/g, "").trim();
 
 /** The cells of one markdown table row. */
 const cells = (row: string): string[] => row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
@@ -234,7 +234,7 @@ function membersIndex(workspace: string): IndexEntry[] {
  * `packages/*` and `apps/*` — or, from a workspace's root, of each member repository. `packages` is
  * empty where there is none to read.
  */
-function symbolIndex(start: string): Index {
+export function symbolIndex(start: string): Index {
   const repository = repositoryOf(start);
   if (!repository) {
     const workspace = workspaceOf(start);
@@ -268,7 +268,7 @@ const hasProps = (symbol: IndexSymbol): boolean => Boolean(symbol.roleMeta?.prop
  * Within one repository the first of a name wins; across a workspace's members the first whose entry
  * carries props wins, so a member's pin of an older build never hides the member that built it.
  */
-function componentsOf(index: Index): Map<string, Found> {
+export function componentsOf(index: Index): Map<string, Found> {
   const found = new Map<string, Found>();
   for (const { pkg, file, repository } of index.packages) {
     for (const symbol of pkg.symbols ?? []) {
@@ -282,7 +282,7 @@ function componentsOf(index: Index): Map<string, Found> {
 }
 
 /** The core block a unit's last word points to, the container patterns, or neither. */
-function blockOf(name: string): { block: string | null; pattern: string | null } {
+export function blockOf(name: string): { block: string | null; pattern: string | null } {
   for (const [word, blocks] of BLOCK_WORDS) {
     if (!name.endsWith(word) || name === word) continue;
     if (!blocks.length) return { block: null, pattern: CONTAINER_PATTERNS };
