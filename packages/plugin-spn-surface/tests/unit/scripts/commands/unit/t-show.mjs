@@ -9,8 +9,9 @@
 // package's own, it proves a unit beyond the core prints its props and the core block its name points
 // to, and that the snapshot still answers first. Against a fixture workspace of two members it proves
 // a module's unit is found from the root and named with its member, that a name both members carry
-// comes from the one whose entry carries props, and that inside a member nothing changes. Against the
-// plugin's own copy it proves the real snapshot reads whole.
+// comes from the one whose entry carries props with a line naming the other, that `--repo` reads one
+// member by its name or a path and refuses a name no member holds, and that inside a member nothing
+// changes. Against the plugin's own copy it proves the real snapshot reads whole.
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -218,6 +219,9 @@ console.log("\n=== unit show — from a workspace's root, the index of each repo
   ok("a unit both members carry prints from the first whose entry carries props, not the first member",
     detail.code === 0 && detail.out.includes("of the repository z-support in this workspace")
       && /^listWidth\s+WIDE\s+COMPACT NARROW WIDE$/m.test(detail.out) && !detail.out.includes("carries no props"), detail.out);
+  ok("a line under the index line names the other member that carries the name",
+    detail.out.split("\n")[2] === "also in a-platform — `--repo <name>` reads one alone", detail.out);
+  ok("a name one member carries prints no such line", !badge.out.includes("also in"), badge.out);
 
   const core = runIn(root, FIXTURE, "unit", "show", "DSSheet");
   ok("a core unit still comes from the snapshot at a workspace's root", core.code === 0 && core.out.includes("not a sheet: a DSDialog"), core.out);
@@ -227,11 +231,31 @@ console.log("\n=== unit show — from a workspace's root, the index of each repo
   try { parsed = JSON.parse(json.out); } catch { parsed = null; }
   ok("--json carries the repository beside the index", parsed?.repository === "z-support"
     && parsed?.index === "z-support/.claude/saasplane/spn-symbols.json", json.out);
+  const both = runIn(root, FIXTURE, "unit", "show", "DSListDetail", "--json");
+  let bothParsed;
+  try { bothParsed = JSON.parse(both.out); } catch { bothParsed = null; }
+  ok("--json carries the other members as alsoIn", JSON.stringify(bothParsed?.alsoIn) === JSON.stringify(["a-platform"]), both.out);
 
   const unknown = runIn(root, FIXTURE, "unit", "show", "IdentityFactorVerificationBadg");
   ok("a name no member carries exits 1 and names the closest from the members and the snapshot",
     unknown.code === 1 && unknown.out.includes("in the snapshot or the symbol index")
       && unknown.out.includes("IdentityFactorVerificationBadge"), unknown.out);
+
+  const named = runIn(root, FIXTURE, "unit", "show", "DSListDetail", "--repo", "a-platform");
+  ok("--repo with a member's name reads that member alone, and its line says --repo named it", named.code === 0
+    && named.out.split("\n")[1] === "the symbol index: .claude/saasplane/spn-symbols.json, of the repository a-platform, which --repo names"
+    && named.out.includes("the index carries no props for it") && !named.out.includes("also in"), named.out);
+  const byPath = runIn(root, FIXTURE, "unit", "show", "IdentityFactorVerificationBadge", "--repo", join("z-support", "apps", "web"));
+  ok("--repo with a path reads the repository the path sits in", byPath.code === 0
+    && byPath.out.includes("of the repository z-support, which --repo names") && /^size\s+XS\s+XS SM MD LG XL$/m.test(byPath.out), byPath.out);
+  const sibling = runIn(join(root, "z-support", "apps", "web"), FIXTURE, "unit", "show", "DSListDetail", "--repo", "a-platform");
+  ok("--repo names a sibling member from inside another", sibling.code === 0 && sibling.out.includes("of the repository a-platform, which --repo names"), sibling.out);
+  const absent = runIn(root, FIXTURE, "unit", "show", "IdentityFactorVerificationBadge", "--repo", "a-platform");
+  ok("a unit the named repository lacks exits 1 and names that repository", absent.code === 1
+    && absent.out.includes("no unit `IdentityFactorVerificationBadge` in the snapshot or the symbol index of a-platform"), absent.out);
+  const wrong = runIn(root, FIXTURE, "unit", "show", "DSListDetail", "--repo", "b-nothing");
+  ok("--repo naming no repository is a usage fault that lists the members", wrong.code === 2
+    && wrong.out.includes("`--repo b-nothing` names no repository") && wrong.out.includes("a-platform · z-support"), wrong.out);
   rmSync(root, { recursive: true, force: true });
 
   const bare = mkdtempSync(join(tmpdir(), "unit-show-bare-workspace-"));

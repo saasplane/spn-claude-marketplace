@@ -8,7 +8,8 @@
 // searched the source for the task's words and read the file it found. This command is that search,
 // over what `unit show` reads and nothing else: the core units of the snapshot this plugin carries,
 // and the components of the symbol index `unit show` finds — the repository's, or each member's from
-// a workspace's root. A unit is matched by its name, split at each capital, and by its line or intent.
+// a workspace's root, or the one repository `--repo` names. A unit is matched by its name, split at
+// each capital, and by its line or intent.
 //
 // A WORD MATCHES BY ITS FIRST FIVE LETTERS, so "verified" finds `Verification` and "upload" finds
 // `Upload`, and a word of three letters or fewer is dropped, as it says nothing of a unit. A unit
@@ -16,11 +17,11 @@
 // line, so the unit named for the task comes before a block that mentions it.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { SNAPSHOT, type Snapshot, blockOf, componentsOf, plain, root, symbolIndex } from "./show.ts";
+import { FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { SNAPSHOT, type Snapshot, blockOf, componentsOf, indexFor, plain, root } from "./show.ts";
 
 export const describe = "Name the units whose name or line carries a task's words, from the snapshot and the symbol index";
-export const usage = "<words…> [--json]";
+export const usage = "<words…> [--repo <name or path>] [--json]";
 
 const LIMIT = 8;
 const STEM = 5;
@@ -38,14 +39,14 @@ const wordsOf = (text: string): string[] => text
 const stems = (text: string): Set<string> => new Set(wordsOf(text).map((word) => word.slice(0, STEM)));
 
 /** Every unit a search can name: the snapshot's first, then each component of the index the snapshot does not hold. */
-function candidates(): Candidate[] {
+function candidates(repo: string | null): Candidate[] {
   const path = join(root(), SNAPSHOT);
   const snapshot = existsSync(path) ? (JSON.parse(readFileSync(path, "utf8")) as Snapshot) : null;
   const core = new Set((snapshot?.units ?? []).map((unit) => unit.name));
   const found: Candidate[] = (snapshot?.units ?? []).map((unit) => ({
     unit: unit.name, line: plain((unit.line ?? "").replace(/\.$/, "")), core: true, package: null, repository: null, block: null, pattern: null,
   }));
-  for (const [name, { symbol, pkg, repository }] of componentsOf(symbolIndex(process.cwd()))) {
+  for (const [name, { symbol, pkg, repository }] of componentsOf(indexFor(repo, process.cwd()))) {
     if (core.has(name)) continue;
     found.push({ unit: name, line: plain((symbol.intent ?? "").replace(/\.$/, "")), core: false, package: pkg.name, repository, ...blockOf(name) });
   }
@@ -74,11 +75,11 @@ function whereOf(hit: Hit): string {
 }
 
 export function run(args: string[]): number {
-  const given = readWords(args, { json: FLAG });
+  const given = readWords(args, { json: FLAG, repo: VALUE });
   const words = stems(given.paths.join(" "));
   if (!words.size) throw new UsageFault("needs the words of a task, such as `forgot password`.");
 
-  const hits = search(words, candidates());
+  const hits = search(words, candidates(given.value("repo")));
   if (given.given("json")) {
     console.log(JSON.stringify({ words: [...words], units: hits }, null, 2));
     return hits.length ? 0 : 1;

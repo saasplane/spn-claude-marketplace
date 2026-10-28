@@ -188,7 +188,10 @@ console.log("\n=== the frame — any other path leaves before the check is loade
   rmSync(telemetry, { recursive: true, force: true });
   ok("a `.tsx` in a server node gets no note", hook({ file_path: join(SERVER, "Page.tsx"), content: page(PAIRS[3][2]) }).kind === "");
   ok("a `.tsx` spec gets no note", hook({ file_path: join(WEB, "Page.spec.tsx"), content: page(PAIRS[3][2]) }).kind === "");
-  ok("another tool is not looked at", hook({ file_path: join(WEB, "Page.tsx"), content: page(PAIRS[3][2]) }, "Read").kind === "");
+  ok("another tool is not looked at", hook({ file_path: join(WEB, "Page.tsx"), content: page(PAIRS[3][2]) }, "NotebookEdit").kind === "");
+  const read = hook({ file_path: join(WEB, "Page.tsx") }, "Read");
+  ok("a Read of a unit's file gets the read advice, never the Surface check's notes",
+    read.kind === "note" && read.text.includes("spn-surface unit show Page") && !read.text.includes("RD.SUPPORT"), JSON.stringify(read));
   ok("an event the hook cannot read leaves it with nothing to say", hook(null).kind === "");
 }
 
