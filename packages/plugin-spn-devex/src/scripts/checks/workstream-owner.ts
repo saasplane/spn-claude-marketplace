@@ -24,7 +24,7 @@ const WRITERS: Record<string, string> = {
   "log.jsonl": "every `workstream` write, which appends its event",
   "facts.jsonl": "`workstream fact write`",
   "questions.jsonl": "the `workstream question` commands",
-  "suggestions.jsonl": "`workstream suggestion write`",
+  "suggestions.jsonl": "`workstream suggestion add`, `suggestion state` and `suggestion edit`",
 };
 
 /** Why a path a call writes is a script's alone, or null. */

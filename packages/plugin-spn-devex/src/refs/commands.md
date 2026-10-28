@@ -156,4 +156,8 @@ spn-devex workstream state show [<workstream>] [--json] — where each open and 
 
 spn-devex workstream state check [<workstream>] [--facts] [--json] — whether each open and backlog workstream is whole: its data, previews, samples, notes folders, stamps, cards and step files
 
-spn-devex workstream suggestion write <workstream> [<sN>] [--title …] [--state …] [--preview …] [--words …] — raise a suggestion, or move it on
+spn-devex workstream suggestion add <workstream> "<title>" [--preview …] — raise a suggestion: the next number, raised
+
+spn-devex workstream suggestion state <workstream> <sN> <state> [--words "…"] — move it on: shaped, decided, parked or dropped, with the words beside the move
+
+spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …] — change its title or its preview, never its state

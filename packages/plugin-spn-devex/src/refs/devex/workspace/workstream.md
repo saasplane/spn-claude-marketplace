@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "5b240cac"
+      "seen": "a424ed3b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -149,7 +149,9 @@ name, so `workstream arc stamp write` is the group `workstream`, the subject `ar
 | `arc delete <arc> --note "…"` | deletes an arc never decided, both its folders, on the developer's words; an arc ever decided is refused, and becomes `DROPPED` instead |
 | `report write <workstream> <notes/N<nnn>/orders/<row>.report.md>` | folds a child's hand-back in from its front matter: state, proof, cost, commits, follow-ups. `ok · N007 18/19 · 57b added · 58 ready` |
 | `fact write <arc> --source <repository>/<path>[:<line>] --fact "…"` | one fact, its source's current commit pinned: `f12 · pinned 8b99ae92` |
-| `suggestion write <workstream> [<sN>] [--title …] [--state …]` | raises a suggestion, or moves it on |
+| `suggestion add <workstream> "<title>" [--preview …]` | raises a suggestion: the next number, raised |
+| `suggestion state <workstream> <sN> <state> [--words "…"]` | moves it on: shaped, decided, parked or dropped, with the words beside the move |
+| `suggestion edit <workstream> <sN> [--title …] [--preview …]` | changes its title or its preview, never its state |
 | `question raise · show · answer · withdraw` | a card from raised to answered; [`docs/decision-cards.md`](docs/decision-cards.md) states them |
 | `progress write <workstream>` | regenerates the progress block; every other write calls it |
 
@@ -340,7 +342,7 @@ depends on one question: **does the prompt change what is being built, or open a
 could?**
 
 Answer a question or a request for status, and talk an idea through and keep it as a suggestion
-(`workstream suggestion write`). Place anything else as § *Placing something new* says. A step that has not
+(`workstream suggestion add`). Place anything else as § *Placing something new* says. A step that has not
 started takes the change, and the run goes on. A change to the step running now, or to the plan it follows,
 stops the run at the next commit: tell the developer the new plan in words, and resume. A question whose
 answer can change the work stops only the steps it can change.
@@ -413,7 +415,7 @@ the rule.
 
 **Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`, `RD.DEVEX.WORKSPACE.252`). While no arc row
 owns the subject, put a suggestion to the developer: `S<n>`, in chat, recorded the moment it is raised
-with `workstream suggestion write <workstream> --title "…"`, which gives it its number in the
+with `workstream suggestion add <workstream> "<title>"`, which gives it its number in the
 workstream's `suggestions.jsonl`. It is never written on the approach page. A suggestion is a whole card, as a question is: why, what, the views that spoke, lettered
 options, and the one you recommend, in that order and with each view kept short. When one reply holds both, put the questions and the suggestions in two sections,
 each with its own cards. Once the answer settles the shape, write the arc row, and anything still open becomes the page's next
