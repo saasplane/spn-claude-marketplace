@@ -286,7 +286,8 @@ export function rowText(register: string, row: string): string | null {
   // `RD.DEVEX.WORKSPACE.106` in its own text, earlier in the file than `RD.DEVEX.WORKSPACE.106`'s own row — so a search
   // for "does this line mention the id anywhere" returns the wrong row's text, and two different
   // citations can silently hash to the same line.
-  const pattern = new RegExp(`^\\|\\s*${row.replace(/\./g, "\\.")}\\s*\\|`);
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
+  const pattern = new RegExp(`^\\|\\s*${row.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\|`);
   for (const line of read(register).split("\n"))
     if (pattern.test(line.trim())) return line;
   return null;

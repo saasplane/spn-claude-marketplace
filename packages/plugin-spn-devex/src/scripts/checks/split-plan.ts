@@ -564,6 +564,7 @@ function repoOf(root: string, path: string): string | null {
 }
 
 function namesRepo(scope: string, repo: string): boolean {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   return new RegExp(`(?<![\\w-])${repo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`).test(scope);
 }
 

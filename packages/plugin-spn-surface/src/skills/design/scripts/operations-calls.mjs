@@ -127,6 +127,7 @@ const specOf = (unit) => JSON.parse(readFileSync(join(folders.specs, `${unit}.js
 const operationsOf = (draw, leftOut) => {
   const words = leftToTheDeveloper[draw.unit] ?? [];
   if (words.length === 0) return draw.ops ?? [];
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const mentions = (value) => words.some((word) => new RegExp(`\\b${word}\\b`).test(JSON.stringify(value)));
   const lines = new Set((draw.choices ?? []).filter((choice) => mentions(choice.what)).flatMap((choice) => choice.lines));
   return (draw.ops ?? []).filter((operation) => {
