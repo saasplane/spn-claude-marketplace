@@ -2,10 +2,10 @@
   "snapshotVersion": 1,
   "source": {
     "kind": "CONSTRUCT",
-    "readAt": "2026-10-27T18:49:18.347Z",
+    "readAt": "2026-10-28T06:07:05.223Z",
     "level": 2,
     "readFrom": [
-      "spn-foundation@1fe5e95f"
+      "spn-foundation@6c2332e1"
     ],
     "version": null,
     "inventoryVersion": 0
@@ -21648,6 +21648,24 @@
         {
           "value": "XL",
           "cases": "the place's. A page writes one only to keep a size of its own, such as a small card of a sign-in step"
+        }
+      ]
+    },
+    {
+      "unit": "DSItemCard",
+      "prop": "card.color",
+      "values": [
+        {
+          "value": "BASE",
+          "cases": "a tile as a card of its own on a tinted surface, bordered; or a feature's boxed items whose items.surface gives it"
+        },
+        {
+          "value": "DEFAULT",
+          "cases": "a tile as a card of its own in the quiet tint; or a feature's boxed items whose items.surface gives it"
+        },
+        {
+          "value": "PRIMARY",
+          "cases": "a tile as a card of its own in the brand's colour; or a feature's boxed items whose items.surface gives it. Left out in a PRIMARY rail, the tile takes the rail's tint, which is the place's and no colour of its own"
         }
       ]
     },
