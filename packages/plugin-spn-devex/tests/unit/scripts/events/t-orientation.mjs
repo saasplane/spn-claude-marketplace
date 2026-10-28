@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { WELCOME_LEAD, workstreams } from "../../../../src/scripts/events/orientation.ts";
+import { WELCOME_LEAD, orient, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -92,14 +92,30 @@ if (IN_WORKSPACE) compare("this workspace, as a window actually sees it", `${WOR
 
 console.log("\n=== orientation — the states this workspace is not in");
 
-compare("day zero: no sprepo.json anywhere",
+compare("day zero: no sprepo.json anywhere, and workspace init already ran",
   fixture("day-zero", { "README.md": "nothing here yet\n", ".spndevex/README.md": "the workspace state, and no repo cloned yet\n" }),
-  ["This folder is empty, which is a good place to start",
+  ["Your workspace is set up, and it holds no repository yet",
    // Act 0 is a door, and the render has to BE the door rather than announce a form. The screen
    // that said "I have five questions" opened the walk on a question nobody had agreed to answer.
    "Would you like to start a new platform?", "lands in a file as you give it",
-   "open a workstream to hold your answers"],
-  [WORKSTREAMS, "wired", "So — what are we building?"]);
+   "Say yes and I open a workstream to hold your answers",
+   "act 1 has already run — `spnutils workspace init` minted this folder, so do not run it again"],
+  [WORKSTREAMS, "wired", "So — what are we building?", "I mint the workspace", "This folder is empty"]);
+
+// THE BUILDER'S EMPTY FOLDER. Plugins installed at user scope reach a folder nobody minted, and there
+// act 1 is still owed — so the door offers it. `orient` is handed its root: with no `.spndevex/` to stop
+// at, the walk from a temp folder climbs into whatever other suites left beside it.
+{
+  n += 1;
+  const bare = fixture("day-zero-unminted", { "README.md": "nothing here yet\n" });
+  const [message, context] = orient(bare, bare);
+  const ok = message.includes("This folder is empty, which is a good place to start")
+    && message.includes("Say yes and I mint the workspace, open a workstream to hold your answers")
+    && context.includes("act 1 mints the workspace and act 2")
+    && !message.includes("Your workspace is set up") && !context.includes("act 1 has already run");
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  day zero: an empty folder nobody minted`);
+}
 
 // THE WINDOW THAT CLOSES AFTER THE THIRD QUESTION. Still no sprepo.json, so this is still day 0 —
 // and offering the door again asks somebody to name their organization twice. The screen has to
@@ -573,7 +589,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // Day zero opens on the same welcome, and its door follows.
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
   says("day zero opens on the first-visit welcome, then the door, and no status line",
-    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nThis folder is empty`)
+    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nYour workspace is set up`)
     && zero.context.startsWith(`${WELCOME_LEAD}\n\n${zero.message}`)
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
