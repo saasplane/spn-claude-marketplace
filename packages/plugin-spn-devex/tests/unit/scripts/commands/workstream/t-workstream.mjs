@@ -25,7 +25,7 @@ console.log("=== help lists the group");
 {
   const help = cli(root, ["help"]);
   for (const words of ["workstream state show", "workstream state check", "workstream rows show", "workstream arc edit", "workstream row add", "workstream row state", "workstream row note", "workstream row edit", "workstream row discard", "workstream arc stamp",
-    "workstream report write", "workstream fact write", "workstream suggestion write", "workstream progress write",
+    "workstream report write", "workstream fact write", "workstream suggestion add", "workstream suggestion state", "workstream suggestion edit", "workstream progress write",
     "workstream question raise", "workstream question show", "workstream question answer", "workstream question withdraw"])
     ok(`help lists \`${words}\``, help.out.includes(words), words);
 }
@@ -162,18 +162,39 @@ console.log("\n=== fact write — one fact, pinned to its source's commit");
   ok("red: a source in no checkout is refused", nowhere.code === 2 && nowhere.out.includes("finds no checkout `spn-nope`"), nowhere.out);
 }
 
-console.log("\n=== suggestion write — raised, then moved on");
+console.log("\n=== suggestion add, state and edit — raised, moved on, reworded");
 {
-  const raised = cli(root, ["workstream", "suggestion", "write", "031", "--title", "keep it as data"]);
+  const raised = cli(root, ["workstream", "suggestion", "add", "031", "keep it as data"]);
   ok("a suggestion is raised with the next number", raised.code === 0 && raised.out.trim() === "s1 · raised", raised.out);
-  const shaped = cli(root, ["workstream", "suggestion", "write", "031", "s1", "--state", "shaped", "--preview", "notes/N001/preview.html#p1"]);
-  ok("and moved on", shaped.code === 0 && shaped.out.trim() === "s1 · shaped", shaped.out);
+  const shaped = cli(root, ["workstream", "suggestion", "state", "031", "s1", "shaped", "--words", "shaped on the preview"]);
+  ok("and moved on, with the words beside the move", shaped.code === 0 && shaped.out.trim() === "s1 · shaped", shaped.out);
+  const edited = cli(root, ["workstream", "suggestion", "edit", "031", "s1", "--title", "keep it as rows", "--preview", "notes/N001/preview.html#p1"]);
+  ok("its title and preview are changed", edited.code === 0 && edited.out.trim() === "s1 · shaped", edited.out);
   const record = lines(join(ws, "suggestions.jsonl"))[0];
-  ok("its record holds the preview it was shaped in", record.state === "shaped" && record.preview === "notes/N001/preview.html#p1" && record.words === null);
-  const bad = cli(root, ["workstream", "suggestion", "write", "031", "s9", "--state", "decided"]);
+  ok("its record holds the new title, the preview, the state and the words", record.title === "keep it as rows" && record.state === "shaped" && record.preview === "notes/N001/preview.html#p1" && record.words === "shaped on the preview");
+  const second = cli(root, ["workstream", "suggestion", "add", "031", "a second one", "--preview", "notes/N001/preview.html#p2"]);
+  ok("the next one takes the next number and may carry a preview", second.code === 0 && second.out.trim() === "s2 · raised" && lines(join(ws, "suggestions.jsonl"))[1].preview === "notes/N001/preview.html#p2", second.out);
+  const bad = cli(root, ["workstream", "suggestion", "state", "031", "s9", "decided"]);
   ok("red: a suggestion not recorded is refused", bad.code === 2 && bad.out.includes("finds no s9"), bad.out);
-  const state = cli(root, ["workstream", "suggestion", "write", "031", "s1", "--state", "maybe"]);
-  ok("red: a state outside the five is refused", state.code === 2 && state.out.includes("raised · shaped · decided · parked · dropped"), state.out);
+  const maybe = cli(root, ["workstream", "suggestion", "state", "031", "s1", "maybe"]);
+  ok("red: a state outside the four is refused", maybe.code === 2 && maybe.out.includes("shaped · decided · parked · dropped"), maybe.out);
+  const again = cli(root, ["workstream", "suggestion", "state", "031", "s1", "raised"]);
+  ok("red: `raised` is no move", again.code === 2 && again.out.includes("suggestion add"), again.out);
+  const addState = cli(root, ["workstream", "suggestion", "add", "031", "x", "--state", "shaped"]);
+  ok("red: add refuses --state and names state", addState.code === 2 && addState.out.includes("suggestion state"), addState.out);
+  const editState = cli(root, ["workstream", "suggestion", "edit", "031", "s1", "--state", "decided"]);
+  ok("red: edit refuses --state and names state", editState.code === 2 && editState.out.includes("does not take `--state`") && editState.out.includes("suggestion state"), editState.out);
+  const stateTitle = cli(root, ["workstream", "suggestion", "state", "031", "s1", "decided", "--title", "y"]);
+  ok("red: state refuses --title and names edit", stateTitle.code === 2 && stateTitle.out.includes("suggestion edit"), stateTitle.out);
+  const stillShaped = lines(join(ws, "suggestions.jsonl"))[0];
+  ok("the refusals changed nothing", stillShaped.state === "shaped" && stillShaped.title === "keep it as rows");
+  const retiredAdd = cli(root, ["workstream", "suggestion", "write", "031", "--title", "t"]);
+  ok("red: write is retired and names add", retiredAdd.code === 2 && retiredAdd.out.includes("is retired, and writes nothing") && retiredAdd.out.includes("suggestion add 031 \"t\""), retiredAdd.out);
+  const retiredState = cli(root, ["workstream", "suggestion", "write", "031", "s1", "--state", "decided", "--words", "w"]);
+  ok("red: write with a state names state", retiredState.code === 2 && retiredState.out.includes("suggestion state 031 s1 decided --words"), retiredState.out);
+  const retiredEdit = cli(root, ["workstream", "suggestion", "write", "031", "s1", "--preview", "p"]);
+  ok("red: write with a preview names edit", retiredEdit.code === 2 && retiredEdit.out.includes("suggestion edit 031 s1 --preview"), retiredEdit.out);
+  ok("write wrote nothing", lines(join(ws, "suggestions.jsonl")).length === 2);
 }
 
 console.log("\n=== progress write, and arc stamp write");
@@ -211,7 +232,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   ok("shown on the preview, with the line back to the approach page", shown.code === 0 && preview.includes('<h4 id="q8">') && preview.includes('href="../../approach.html#s4"'), shown.out);
   const key = cli(root, ["workstream", "question", "answer", "031/q8", "--key", "Z", "--words", "Z"]);
   ok("red: an answer naming no option is refused with the options", key.code === 2 && key.out.includes("one of A · B"), key.out);
-  cli(root, ["workstream", "suggestion", "write", "031", "--title", "x"]);
+  cli(root, ["workstream", "suggestion", "add", "031", "x"]);
   put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second question" }));
   cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]);
   const withdrawn = cli(root, ["workstream", "question", "withdraw", "031/q9", "--words", "not needed"]);
@@ -277,7 +298,7 @@ console.log("\n=== arc edit --preview — a carried arc's Cycles row links where
 console.log("\n=== state show and state check");
 {
   const show = cli(root, ["workstream", "state", "show", "031"]);
-  ok("show: one line, the arcs, the cards and the suggestions", show.code === 0 && /^031 · N001 \d+\/\d+ · .*N002 proposed · N009 proposed · 0 open cards · 1 suggestion raised/.test(show.out.trim()), show.out);
+  ok("show: one line, the arcs, the cards and the suggestions", show.code === 0 && /^031 · N001 \d+\/\d+ · .*N002 proposed · N009 proposed · 0 open cards · 2 suggestions raised/.test(show.out.trim()), show.out);
   const asData = JSON.parse(cli(root, ["workstream", "state", "show", "031", "--json"]).out);
   ok("show --json: the same, as data", asData[0].workstream === "031-probe" && asData[0].arcs.length === 3);
   const check = cli(root, ["workstream", "state", "check", "031"]);
