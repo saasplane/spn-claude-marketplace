@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "74d14315"
+      "seen": "335e0492"
     }
   ]
 }
@@ -183,7 +183,7 @@ A page is read in one of three ways, and its words follow the way it is read. In
 - Each section answers one question a reader asks: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
 - A headline states the outcome, and the line under it gives the proof. A headline that describes the system is a finding.
 - The words are a buyer's and a builder's. A word of the system's own — a layer, a task intent, a unit, a seat, a pattern's name — does not stand on the page unless the same sentence explains it.
-- A number stands in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear.
+- A number stands in one card: the number, its plain label, then what it gives the reader. Every number **MUST** be read from the real system, and a made-up number **MUST NOT** appear. This one keeps its MUST while the rest of this list is advice. It is about whether the page tells the truth, not how it is written, and a buyer's review reads every number on a site as a claim.
 - **The words fit the length of their level** (`RD.SUPPORT.SURFACE.286`, `RD.SUPPORT.SURFACE.287`, both advice), measured at 1440. The `MARKETING` lens writes to this table.
 
 | Level | Eyebrow | Title | Description | Item title and description | Actions |
