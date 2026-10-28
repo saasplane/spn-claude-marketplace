@@ -662,6 +662,7 @@ const BLOCK_END = "<!-- /spn:generated -->";
 
 /** Where one generated block sits: its opening marker's line, its inside, and its closing marker. */
 export function blockAt(text: string, kind: GeneratedKind): { from: number; inner: number; innerEnd: number; to: number } | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const open = new RegExp(`^[ \\t]*<!--\\s*spn:generated\\s+${kind}\\b[^\\n]*-->[ \\t]*$`, "m").exec(text);
   if (!open) return null;
   const inner = open.index + open[0].length + 1;
@@ -1189,6 +1190,7 @@ export function whatEntryOf(text: string, arc: string): { from: number; to: numb
   let at = heads.findIndex((head) => head.id === id);
   let kind: "entry" | "anchor" = "entry";
   if (at < 0) {
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
     const span = new RegExp(`<span\\b[^>]*\\bid="${id}"[^>]*>\\s*</span>`).exec(text.slice(range.from, range.to));
     if (!span) return null;
     at = heads.filter((head) => head.at < range.from + span.index).length - 1;

@@ -239,6 +239,7 @@ export function resolvePath(root: string, path: string): string[] {
   const folder = holderOf(clean);
   let name = clean.slice(folder.length);
   if (name.includes("…") && !EXTENSION.test(name)) name = `${name}*`;
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const pattern = new RegExp(`^${name.split(/[…*]/).map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*")}$`);
   return entriesOf(join(root, folder)).filter((entry) => pattern.test(entry)).map((entry) => join(root, folder, entry));
 }

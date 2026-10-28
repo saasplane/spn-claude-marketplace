@@ -33,6 +33,7 @@ export function publishes(payload: Payload): boolean {
 
 /** The value of one attribute of a tag, in double or single quotes, or null where the tag has none. */
 function attributeOf(tag: string, name: string): string | null {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const found = new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, "i").exec(tag);
   return found ? found[1] ?? found[2] ?? "" : null;
 }

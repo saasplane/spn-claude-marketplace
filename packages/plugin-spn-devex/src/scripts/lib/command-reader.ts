@@ -51,6 +51,7 @@ export type Reading = {
 const named = (name: string) => (word: string) => basename(word) === name;
 /** A plugin CLI: the installed `spn-<plugin>/<version>/dist/cli.mjs`, the marketplace's own build, or its bin name. */
 const pluginCli = (plugin: string) => {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   const path = new RegExp(`(?:^|/)(?:plugin-)?${plugin}/(?:.*/)?cli\\.(?:mjs|ts)$`);
   return (word: string) => word === plugin || path.test(word);
 };

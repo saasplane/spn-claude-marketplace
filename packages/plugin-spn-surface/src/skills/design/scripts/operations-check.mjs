@@ -85,7 +85,7 @@ for (const file of files) {
     if (operation.op === "names") {
       for (const [from, to] of Object.entries(operation.renameProperty ?? {})) versions = versions.map((cells) => Object.fromEntries(Object.entries(cells).map(([property, value]) => [property === from ? to : property, value])));
       for (const one of operation.renameValue ?? []) for (const cells of versions) if (cells[one.property] === String(one.from)) cells[one.property] = String(one.to);
-      for (const one of operation.fold ?? []) for (const cells of versions) if (matches(cells, one.match)) Object.assign(cells, Object.fromEntries(Object.entries(one.set).map(([property, value]) => [property, String(value)])));
+      for (const one of operation.fold ?? []) for (const cells of versions) if (matches(cells, one.match)) for (const [property, value] of Object.entries(one.set)) cells[property] = String(value);
       for (const property of operation.dropProperty ?? []) {
         // A dropped property may hold two values when a fold has carried the difference into another
         // property (`selected=true` folded into `state=selected`): the names must only stay unique.

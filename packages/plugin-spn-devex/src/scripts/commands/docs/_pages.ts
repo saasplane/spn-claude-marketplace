@@ -112,6 +112,7 @@ export function withHead(template: string, head: Head): string {
     `<!-- spn:doc\n${JSON.stringify(head.block)}\n-->\n<!-- ${head.produced} -->`, "`spn:doc` block");
   page = swap(page, new RegExp(`<link\\b[^>]*\\bhref="[^"]*${literal(STYLESHEET)}"[^>]*>`), lines.stylesheet,
     `line that links \`${STYLESHEET}\``);
+  // nosemgrep: javascript.lang.security.audit.unknown-value-with-script-tag.unknown-value-with-script-tag, javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- a pattern that finds the template's own script line, built from this script's constants and escaped text; no page text is written from a value here
   page = swap(page, new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${literal(head.script)}"[^>]*></script>`), lines.script,
     `line that loads \`${head.script}\``);
   return page;

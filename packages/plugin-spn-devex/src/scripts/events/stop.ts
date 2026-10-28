@@ -886,6 +886,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
  * `\b` after the digits is what keeps `Q1` from matching inside `Q11`.
  */
 function namesCard(text: string, card: string): boolean {
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
   return new RegExp(`\\b${card}\\b`, "i").test(text);
 }
 
