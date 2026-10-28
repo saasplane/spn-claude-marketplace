@@ -1,7 +1,7 @@
 // `cli.ts` — the one entry: `<group> [<subject>] <action> [<path>…] [options]`.
 //
-// THIS SUITE OWNS THE ENTRY. The plugin ships two commands, `check scan` and `unit show`: `help` prints
-// the grammar under the plugin's own name and lists both, an unknown group is refused by name, the scan
+// THIS SUITE OWNS THE ENTRY. The plugin ships three commands, `check scan`, `unit find` and `unit show`: `help`
+// prints the grammar under the plugin's own name and lists them, an unknown group is refused by name, the scan
 // reads a seeded repository whole, and `unit show` reaches its command through the entry. The entry is
 // the same text spn-devex and spn-apps ship.
 import { execFileSync } from "node:child_process";
@@ -27,7 +27,7 @@ function run(...args) {
   }
 }
 
-console.log("=== cli — help lists the two commands");
+console.log("=== cli — help lists the three commands");
 {
   const { out, code } = run("help");
   ok("exits clean", code === 0, out);
@@ -39,8 +39,8 @@ console.log("=== cli — help lists the two commands");
   let parsed;
   try { parsed = JSON.parse(out); } catch { parsed = null; }
   ok("--json exits clean and names the plugin", code === 0 && parsed?.plugin === "spn-surface", out);
-  ok("--json lists `check scan` and `unit show`, and nothing else",
-    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["check scan","unit show"]', out);
+  ok("--json lists `check scan`, `unit find` and `unit show`, and nothing else",
+    JSON.stringify(parsed?.commands?.map((listed) => listed.command)) === '["check scan","unit find","unit show"]', out);
 }
 
 console.log("\n=== cli — unknown names, refused by name");
