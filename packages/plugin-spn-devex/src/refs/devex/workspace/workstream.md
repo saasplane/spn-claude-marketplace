@@ -815,6 +815,9 @@ report write`. The close reads it, and so does `workstream rows show`.
 | `carried` | the work left this workstream, and its proof names where | passes |
 | `deferred` | it waits on a named event | passes |
 
+The table names all eight states, the eight a `--state` option takes. `in progress <time>` is how `running` is
+shown, never a state word: the state is `running`, and no command takes `in progress`.
+
 **A row found invalid or not needed is discarded, never deferred** (`RD.DEVEX.WORKSPACE.279`). A deferred row
 comes back on its event, and wrong or unneeded work has none. `workstream row discard <arc> <row> --note
 "<the developer's words>"` removes it from `state.json`, and its one log line, of kind `discarded`, keeps
