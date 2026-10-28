@@ -1,0 +1,268 @@
+{
+ "kind": "skeleton",
+ "title": "Closing call, the product beside",
+ "caption": "The variant for a call to go and see the product: the same section, PRIMARY, SUBTLE, with inset, and a DSFeature that splits as SPLIT_END, the words at START with the two actions under them, and the product picture beside, framed MEDIA and raised MD as a product is. On a phone the words, the buttons one under another, then the picture.",
+ "layout": {
+  "type": "TOPNAV",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "nav": [
+    "Product",
+    "Pricing",
+    "Docs"
+   ],
+   "chosen": "Product"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "What to do now",
+                        "description": "The page's last words, and its one call to act.",
+                        "textAlign": "START"
+                       }
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "control": "button",
+                       "text": "Main action",
+                       "main": true
+                      },
+                      {
+                       "control": "button",
+                       "text": "Another page"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "slot": "mediaNode · the product",
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "MD"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "frame": {
+                   "rows": [
+                    {
+                     "items": [
+                      {
+                       "head": {
+                        "title": "What to do now",
+                        "description": "The page's last words, and its one call to act.",
+                        "textAlign": "START"
+                       }
+                      }
+                     ]
+                    },
+                    {
+                     "items": [
+                      {
+                       "control": "button",
+                       "text": "Main action",
+                       "main": true
+                      },
+                      {
+                       "control": "button",
+                       "text": "Another page"
+                      }
+                     ]
+                    }
+                   ]
+                  }
+                 },
+                 {
+                  "slot": "mediaNode · the product",
+                  "fill": true
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "MD"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "frame": {
+    "rows": [
+     {
+      "items": [
+       {
+        "fill": true,
+        "frame": {
+         "unit": "DSSectionContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "fill": true,
+             "frame": {
+              "unit": "DSFeature",
+              "rows": [
+               {
+                "items": [
+                 {
+                  "head": {
+                   "title": "What to do now",
+                   "description": "The page's last words, and its one call to act.",
+                   "textAlign": "START"
+                  }
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Main action",
+                  "main": true,
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "control": "button",
+                  "text": "Another page",
+                  "fill": true
+                 }
+                ]
+               },
+               {
+                "items": [
+                 {
+                  "slot": "mediaNode · the product",
+                  "fill": true,
+                  "height": 5
+                 }
+                ]
+               }
+              ],
+              "frames": [
+               "MEDIA"
+              ],
+              "surface": {
+               "raised": true,
+               "elevation": "MD"
+              }
+             }
+            }
+           ]
+          }
+         ],
+         "size": "SM",
+         "color": "PRIMARY",
+         "strength": "SUBTLE",
+         "inset": true
+        }
+       }
+      ]
+     }
+    ],
+    "size": "XS"
+   }
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html data-mode="light">
+<head>
+<meta charset="utf-8">
+<title>probe fixture</title>
+<style data-vite-dev-id="/src/first.css">
+  .card { background-color: rgb(255, 0, 0); color: rgb(0, 0, 0); }
+  [data-mode="dark"] .card { background-color: rgb(0, 0, 255); }
+</style>
+<style data-vite-dev-id="/src/second.css">
+  .card { background-color: rgb(0, 128, 0); }
+  .wide { width: 1000px; max-width: 100%; }
+</style>
+<style data-vite-dev-id="/src/third.css">
+  @layer base, utilities;
+  @layer utilities { .card { color: rgb(1, 1, 1); } }
+  .fill { --fill: rgb(10, 20, 30); background: var(--fill); }
+  .tint { &:is([data-mode="dark"] *) { outline-color: rgb(9, 9, 9); } }
+  .other { &:is(*) { outline-color: rgb(8, 8, 8); } }
+</style>
+</head>
+<body>
+  <div data-mode="light" data-slot="outer">
+    <section data-mode="dark" data-slot="inner">
+      <div class="card wide" data-slot="card" role="region" aria-label="Quarterly card">Quarterly numbers</div>
+      <p class="fill tint" data-slot="note">Filled note</p>
+    </section>
+  </div>
+</body>
+</html>

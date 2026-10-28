@@ -1,0 +1,730 @@
+{
+ "kind": "skeleton",
+ "title": "A record and what belongs to it",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level is the record: the way back, the picture of the person, the name, and the email on the line under it, with the state before it on that line: the end of the page level holds actions only. Then the lists attached to the record, each a container. A list a person adds to has a box at its top that finds a record as they type, with Add beside it, so one is attached without leaving the page; a list that is only read has none. The lists stand side by side at a desktop, and one under another on a tablet and a phone. Every screen shows every list. Each line ends with the action that removes it. No list shows a count.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Team"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@a.co"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Roles",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Admin",
+                "meta": [
+                 "All apps"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Billing",
+                "meta": [
+                 "Account"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Auditor",
+                "meta": [
+                 "Platform"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Groups",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Finance",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Sales",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Chrome, Mac",
+              "meta": [
+               "Active now"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Safari, iOS",
+              "meta": [
+               "2 May"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Sessions",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@a.co"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Roles",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Admin",
+                "meta": [
+                 "All apps"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Billing",
+                "meta": [
+                 "Account"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Auditor",
+                "meta": [
+                 "Platform"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Groups",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Finance",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Sales",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Chrome, Mac",
+              "meta": [
+               "Active now"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Safari, iOS",
+              "meta": [
+               "2 May"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Sessions",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "media": "person",
+     "title": "Dana Lee",
+     "meta": [
+      {
+       "control": "badge",
+       "text": "Invited"
+      },
+      "dana@a.co"
+     ]
+    },
+    "actions": [
+     {
+      "control": "button",
+      "text": "Edit"
+     },
+     {
+      "icon": "more"
+     }
+    ],
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Roles",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Admin",
+                "meta": [
+                 "All apps"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Billing",
+                "meta": [
+                 "Account"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "title": "Auditor",
+                "meta": [
+                 "Platform"
+                ],
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "label": "Groups",
+         "sections": [
+          {
+           "rows": [
+            {
+             "items": [
+              {
+               "control": "field",
+               "text": "Find one to add",
+               "fill": true
+              },
+              {
+               "control": "button",
+               "text": "Add"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "divided": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Finance",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "item": {
+                "media": "default",
+                "title": "Sales",
+                "end": [
+                 {
+                  "icon": "close"
+                 }
+                ]
+               },
+               "fill": true
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Chrome, Mac",
+              "meta": [
+               "Active now"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "item": {
+              "title": "Safari, iOS",
+              "meta": [
+               "2 May"
+              ],
+              "end": [
+               {
+                "icon": "close"
+               }
+              ]
+             },
+             "fill": true
+            }
+           ]
+          }
+         ],
+         "label": "Sessions",
+         "divided": true
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

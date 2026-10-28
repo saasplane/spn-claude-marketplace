@@ -1,0 +1,141 @@
+---
+name: verify
+description: Prove SaaS Plane TS work is sound by running gates. Use when the ask names a target to run against - "verify this package", "verify the app", "clean reset and verify". Modes - package (conformance gates and tests, no running stack), app (health checks on what is running), reset (rebuild from a clean state, destructive). If the ask is a claim about what the code does rather than a target to run, hand to the check skill instead.
+---
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
+      "seen": "6943024a"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
+      "seen": "36c99f62"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
+      "seen": "aa82da09"
+    }
+  ]
+}
+-->
+
+# verify — run the gates against a target
+
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
+**First decide what was actually asked**, because developers say *verify* for two different jobs:
+
+| The object is… | Then… |
+| --- | --- |
+| a statement that could be true or false — *"verify accounts have MFA in migrations"* | **hand to `check`.** It is an evidence question; running gates answers nothing |
+| a target — *"verify this package"*, *"verify the app"*, *"clean reset and verify"* | this skill |
+| unclear | ask which is wanted before running anything |
+
+**Then decide the scope.** Every mode below is scoped to a project. When the ask does not name one and the workspace holds more than one, **ask: this app, this package, or all?** Never infer it from the last file edited or from what the branch changed — see the core plugin's `refs/commands.md`.
+
+**Then read the repository's Test and verify guide** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RD.DEVEX.WORKSPACE.181`). It holds this repository's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the modes below and name the missing guide in your report.
+
+**Then pick the mode** — `package` | `app` | `reset`. `package` and `app` prove different things and neither substitutes for the other: `package` proves what was *written* conforms, `app` proves what is *running* works. Code green with a broken stack is a passing build of a broken product; a healthy stack with unvalidated code is a change nobody checked. After a change on a running stack, run `package` first, then `app`.
+
+## Mode: package — conformance gates on what was written
+
+**`package` mode proves what a project can prove ALONE.** It runs the gates and the tiers that need no wired stack — codegen freshness, validation, build, check, and the `unit/` and `component/` suites. It does **not** run `integration/` or a journey: those need real resources or a real browser against a running platform, so they belong to `app` mode. A `package` pass is therefore not a claim that the thing works wired, and reporting it as one is the false green this mode exists to avoid.
+
+No running stack required. Run the cheapest gate first, so a failure stops the run early:
+
+1. **Codegen freshness** — regenerate what is derived, then prove nothing changed:
+   - `spnutils apps gen-validators <pkg>` for every package with edited `contract/states/**`
+   - `spnutils apps gen-barrel <pkg>` for every lib package that gained or lost files (never apps, never the API client, never the CLI)
+   - then `git status --short` on the generated paths. **A diff here is the finding**: either generated output was hand-edited or a generator was never re-run. Both mean the committed artifact and its source disagree.
+   - `spnutils apps gen-symbols` — **no `-p`** — sweeps every project in the workspace, the way `repo agent-sync` refreshes the merged index. Run it when you need the workspace's own packages to describe themselves *now*. Generation is a release-time cost by design, so a package changed on this branch otherwise still advertises the surface it last released. It writes to `dist/` and is never committed, so there is no diff to check — the point is fresh context, not a gate.
+2. **Description coverage** — the symbol indexes ARE the report. After the sweep above, read each `dist/generated/spn-symbols.json`. Count the symbols in the **required set** whose `intent` is null. That set is `SERVICE`, `OPERATION`, `COMMAND`, `STATE`, `EVENT`, `ENUM`, `COMPONENT`, `HOOK`, `PAGE`, `CLI_COMMAND`, and every `ERROR` / `PERMISSION` member. Each one is a published symbol an agent cannot select (the core plugin's `refs/intent.md` owns the rule). Report the count per package and name the worst offenders; a repo-wide sweep is one pass over files that already exist, so there is no reason to sample.
+
+   **Count only what owns its meaning, or the number is worse than useless.** Three exclusions, each of them the rule rather than a convenience:
+
+   - **`internal: true`** — not reachable by a consumer, so nothing selects it.
+   - **A symbol whose owner is a `CONTROLLER`, `REPOSITORY` or `LISTENER`.** The artifact names members as `Owner.member`, so resolve each `OPERATION`'s owner and drop it if that owner is a transport adapter. The standard says never to describe one; a gate that demands it is asking for filler, and filler is worse than absence because it reads as information. In one real module this alone was 312 of 785 `OPERATION` rows.
+   - **A generated package** — never hand-edited, and it inherits whatever its source document gave it.
+
+   One thing this cannot see, and it must not be reported as clean: a **Command's members**. The artifact carries states by name, so member descriptions are checked in the source. They are also the highest-value descriptions in the repo, because they become the input-field descriptions of every agent tool. So a package with described Commands and undescribed members is a worse result than the headline number suggests.
+3. **Kind conformance** — `spnutils apps validate`. Walks every workspace project and reports where one disagrees with what its own declared kind requires: `UNDECLARED`, `NAMING`, `TOOLCHAIN`, `SCOPE`, `LAYER`, `FILE_NAMING`. Exits non-zero on findings, changes nothing on disk. Each message names the rule *and* the remedy — apply the remedy rather than inventing one.
+4. **Build** — `spnutils apps build <package>` for each package in scope. Reach for the `spnutils apps` commands before any `npx` or `pnpm` invocation: they derive the target from the node's kind.
+5. **Check** — `spnutils apps check <package>`. It runs the project's own typecheck and ESLint together, so neither is inferred from the other. `lint` and `prettier` were second names for it and are retired (`RD.SUPPORT.APPS.118`).
+6. **Tests** — choose one run name for the sitting, such as `verify-1001`, then `spnutils apps test unit <run> <package>`, and `spnutils apps test component <run> <package>` where the kind carries that tier. **Every test command carries the run name**, and the caller chooses it. **The tier is named, never aggregated**: there is no `test` target, because one word covering every tier meant the unit tier for seven kinds and the component tier for a web application. A node has the tiers its kind owes or it carries cases for, and a tier it has neither of is refused by name. **The command runs the tier and writes `tests/.output/<tier>/runs/<run>.json`, and nothing else** — it never touches a behaviour row (`RD.DEVEX.UTILS.071`). A reused name replaces that one file, and each tier keeps its 20 newest. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see `implement`'s `test` step, § Before you write or fix a case — `providers/{stack}/skills/implement/steps/test.md`.
+7. **Stamp the rows** — the **spn-devex** plugin's row writer, `spn-devex behaviours stamp write <run> .` in that plugin, as its `test` skill runs it. It reads only that run's files, writes `Status` and `Updated at` (`<time> · <run>`) into each row the run named, at the row's own tier, and leaves every other row as it found it. Add `--reach repository` only when that run is the whole of the tiers it names.
+8. **Check the join** — `node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .` names a `SUCCESS` row no case cites and a case citing an id no row declares. It reads the rows and the cases and opens no run file. The run's name in `Updated at` is a label, and nothing checks a row against its run file after the stamp.
+
+**What the gates cover follows from the project's declared kind**, not from the repo it sits in:
+
+| Kind | `package` mode covers |
+| --- | --- |
+| `SUPPORT_*` · `MODULE_SERVER` | validator + barrel freshness, `validate`, build, check, unit tests |
+| `MODULE_WEB` | barrel freshness, `validate`, build, check, unit tests — journeys belong to the app that mounts it |
+| `APP_SERVER` | the above, plus migrations applying cleanly and the integration suite |
+| `APP_WEB` | the above, plus the production build; journeys run in `app` mode |
+| `CLIENT_API` | regenerate from the live OpenAPI and diff — **a diff is the finding**, never a fix-up |
+| `APP_UTILITY` | build, check, tests |
+
+Report per gate: the command run and its **actual output**. Report the test count, not just the color — a suite that silently stopped collecting is green. **Never report a gate you did not run**, and never infer one gate from another: a passing build says nothing about kind conformance.
+
+> Every gate here is static. Passing all of them means the code is *well-formed*, not that the feature *works* — that is mode `app`, and for anything user-visible it is the real exit criterion.
+
+## Mode: app — health checks on what is running
+
+Read the ports and hosts from the pinned platform declaration's `apps[]` row — never assume them.
+
+1. **API up** — the service's OpenAPI endpoint returns 200. A 200 means boot, migrations, and module wiring all held.
+2. **Infra layers** — `spnutils infra platform status <spc>` and `spnutils infra organization status` report healthy. `<spc>` is the platform code `sprepo.json` pins (`RD.DEVEX.UTILS.072`).
+3. **Web apps respond** on their configured dev ports, or through the local proxy's vhosts.
+4. **Login proof**, where the repo seeds credentials — authenticate a seeded principal through its own site host and assert the session comes back active.
+5. **Exercise the changed flow end to end** through the real entry. Tests passing is not the exit criterion; the change working in the running app is.
+6. **Read each changed page against its pattern.** No check reads a page for its pattern, so this step is a reading, and you report it as one. The rules are the spn-surface plugin's, reached through its entry ref, `refs/support/surface/README.md`, by its route 4, *Review or verify a page*: the pattern and its spec, the panels and the task states, then the choice tables.
+   - **Name the kind of person and the pattern the page should follow.** Take them from the tree the `design` skill wrote. Where the page has no tree, read the kind from the app's personas and rows (route 1's *Who an app is for*), then read the page's data and its person against the table of the app patterns, and name the one whose *For* line names that kind. A page that no pattern fits is derived from the patterns whose person and data fit it; a page that follows a pattern whose *For* line leaves its kind out, or ignores that kind's line, is a finding.
+   - **Open the spec of that pattern, and look at the page beside it at each screen class**: a desktop, a tablet and a phone. Look at the page through `spn-devex docs look <page>`, and never through a script inside a repository. The values in a spec are samples, so compare the arrangement and not the words.
+   - **Go down the pattern's tree by level**: the page level, the panels, then the widgets and cards, then the components. The page level is the head of the page, `DSPageLevel` at `PAGE` or the header of the one panel that is the page, with `fullPage`, and a card stands at the level of a widget (`RD.SUPPORT.SURFACE.202`). Each line of the tree is on the page, built with the unit the tree names. A suffix names where a unit is placed, and a component, a composite included, takes none (`RD.SUPPORT.SURFACE.229`). A part the page built for itself is a finding. A unit that the stack provides on its own is none: on the web, `DSListDetail` places the two parts of a page of groups and their items, and no core unit does (`RD.SUPPORT.SURFACE.099`). So is a part shown by another unit than its data asks for, such as a plain table over a query that takes a page, a text or a filter (`RD.SUPPORT.SURFACE.054`).
+   - **Count the panels against what is read or saved as a whole** (`RD.SUPPORT.SURFACE.116`). A page uses one panel for each such thing, and its sections are content parts. A section framed as a panel of its own is a finding, and so are two things saved apart in one panel. An editor with its preview is one panel, with each thing written beside its own result (`RD.SUPPORT.SURFACE.115`).
+   - **Read the page that changes a record beside the page that reads it.** The two hold the same parts in the same order (`RD.SUPPORT.SURFACE.117`): a reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. A part that moves is a finding.
+   - **Check each rule of content with its reviewer's check**, through the entry ref: a label, a frame, a state, the end of a line, a count, a field, the choices of one set, and the lines of a list.
+   - **Check each closed prop the page writes against its unit's choice table**, through the entry ref's route 3. The first case that matches gives each value and who writes it; a value the page wrote where the case leaves it to the place or the level, or a value the index marks never, is a finding. A second `SOLID` button in one view is a finding (`RD.SUPPORT.SURFACE.370`); a site page's closing call repeats the hero's one act, so its `SOLID` is the same main action said again, never a second.
+   - **Read each site section's eyebrows against its site pattern.** A hero's state is a `PRIMARY` badge eyebrow, a grid cell's eyebrow is text unless it says a state, and a plan holds one eyebrow; a second eyebrow on a plan, or a badge that names a kind as a cell's eyebrow, is a finding (`RD.SUPPORT.SURFACE.371`, `.372`, `.373`).
+   - **Read each confirmation against what its act does.** An act a person can undo asks in a popover, `DSConfirmPopover`, and an act that cannot be undone asks in a dialog, `DSConfirmDialog`. A dialog for a small act that can be undone is a finding. Both stay open while the act runs, and a failure is shown where the person confirmed.
+   - **Look behind each overlay.** One that covers the page dims it with the one scrim. A sheet that is not modal stands beside the page and draws no scrim, and the page stays usable.
+   - **Type a search that matches a record on another page of the list.** A search that finds nothing ran in the page, and that is a finding (`RD.SUPPORT.SURFACE.070`).
+   - **A difference the refs list as not done yet is a gap of the unit, and not a finding on the page.** The entry ref's route 3 lists them. Report it as a gap, with the unit. A private copy that a page built to close such a gap is a finding.
+   - **Say where a finding rests on a proposed rule.** The refs mark each proposed rule.
+   - **Report the pattern by name, the screen classes you looked at, and each finding with its rule id.** Name each screen class you did not look at.
+
+Report per check: pass/fail with the observed evidence. Never report a check you did not run.
+
+## Mode: reset — rebuild from a clean state
+
+**What reset means depends on the kind, and for most projects it is not destructive at all.**
+
+### A package — build and tests
+
+For every kind except an app, there is no stack to tear down. Reset is `package` mode from a clean build: remove stale build output, rebuild, run the suite. Nothing is provisioned and nothing is wiped.
+
+### An app, in a repo whose `sprepo.json` pins a platform — the full cycle
+
+Destructive, and the local stack is frequently **shared**: `infra platform down <spc> --apply --clean` wipes a database other work on the machine is using. **Run only on an explicit instruction, and only against a named target.**
+
+1. **Regenerate and typecheck first** — never reset onto stale or broken code. Run the codegen commands for everything touched on the branch, then build to green. A stale barrel or a type error means the reset boots broken code and the whole cycle is wasted. **A green build does not cover `tests/`** — `nx build` compiles `src` only, so typecheck each test sibling too (`tsc --noEmit --pretty false -p tsconfig.test.json`, and `tsconfig.integration.json` where present); see `implement`'s `test` step, § Typechecking the tests themselves — `providers/{stack}/skills/implement/steps/test.md`.
+2. **Stop what is running** — the app and any stale watch or dev-server processes holding its ports.
+3. **Cycle the stack** — `spnutils infra app down <package>` → `infra platform down <spc> --apply --clean` → `infra platform up <spc> --apply` → `infra app up <package>`.
+4. **Hosted-vendor modules cycle with the platform layer.** A vendor you run is a module row in the platform declaration, with no lifecycle of its own. Its state is wiped only by the same explicit `--clean`, never as an inferred side step.
+5. **Migrate** the clean database.
+6. **Seed and test** — run the suite that seeds, then the integration suite, then the journeys on a **quiesced** stack: `pnpm build test` → `pnpm start` → `spnutils apps test journey <run> <node>`, with `--phase serialized` and `--phase window` as separate runs under the same name where the node carries those cases. Every tier of the sitting carries the one run name. Do not run a reset, a build, or a re-provision concurrently with a journey; the resulting timeouts read as failures and are not.
+7. **Write back what the run proved** — a full run is the one moment the documents can be brought current, so do it here and not by hand.
+   - the **spn-devex** plugin's `spn-devex behaviours stamp write <run> . --reach repository` writes `Status` and `Updated at` into every behaviour row the run's ids resolve to, reading only that run's files. **`--reach repository` is the caller saying this run is the whole of these tiers**, which is true after a full run and false after any narrower one — it sends a row nothing cited back to `PLANNED`, so on a partial run it erases evidence that was true. Run it without the flag when you ran less than everything.
+   - **Run the tiers through `spnutils apps test <tier> <run>`.** Where a repository still consumes a published toolchain older than the named-run change, the run writes no file under its name, and the stamp refuses the name rather than reading something else.
+   - **Then check the join** — `node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .` names a `SUCCESS` row no case cites and a case citing an id no row declares. `spnutils` reads no row, so this is the gate. It opens no run file, and nothing checks a row against its run file after the stamp.
+   - **Fix what keeps a row unproved, before the report** (`RD.DEVEX.FUNCTION.064`). A full run is not only a report. A row whose tier is not the tier of the case that proves it, a runner that ran and wrote no run file, a case its tier binds that carries no id, and a red case are each the run's own work. Fix each one, run that tier again under the same name, and stamp again. Name anything you cannot fix in the report, with the reason.
+   - **Report the code coverage the run printed** — lines, statements, functions and branches, per project whose run collected it, read from its `coverage-summary.json`. It is reported, never enforced (`RD.SUPPORT.APPS.133`): no configuration carries a threshold and nothing fails on a percentage. `spn-apps coverage check <project>` names an exclude that gives no reason.
+   - **Then produce the pages whose behaviours moved**: the `spn-devex:check` skill, asking it to produce the matching `02-constructs` seat page. A construct page joins its behaviours from the register, so writing statuses makes every page for a changed construct stale, and `docs audit check` reds until they are produced again.
+   - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-devex:report` skill, into `docs/artifacts/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for. The **spn-devex** plugin's `spn-devex behaviours coverage show --json` hands you the measurement to write it from.
+8. **Finish** — stop what you started unless told to leave it running, and report the seeded credentials and the tally per suite.
+
+A seed or template migration edit only lands on a clean re-migrate. A warm database keeps the old row, so a seed change tested against a warm stack proves nothing about a fresh one.
+
+**The repo supplies the specifics.** Read ports, app names, vendor stacks, seeded principals, and host names from the repo being reset — its Test and verify guide first (`docs/05-guides/*-test-and-verify.md`, § Clean reset and verify), then the estate manifests and the seed files. An apps repository's guide links to the estate repository's guide for the machine reset. Never `CLAUDE.md`. This skill supplies the shape of the sequence; it never hardcodes one repo's instance of it.

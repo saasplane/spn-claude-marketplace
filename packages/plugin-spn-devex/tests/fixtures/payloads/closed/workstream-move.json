@@ -1,0 +1,8 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/"
+  }
+}

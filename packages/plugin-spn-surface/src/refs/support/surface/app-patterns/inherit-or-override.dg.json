@@ -1,0 +1,457 @@
+{
+ "kind": "skeleton",
+ "title": "Inherit or override",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. The page level holds the way back and the title of what the values belong to, then one container for each part. The values a person reads stand in a grid, three across at a desktop, two on a tablet, and one under another on a phone. A part says which it is on the line under its title: it follows the default, with one action to set its own, or it holds its own values, with a way back in its footer. Following the default is the normal state and shows no badge. Every screen shows every value and every action.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Team"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       },
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Use default"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            },
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Use default"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "Policies"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Password",
+             "text": "Required"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Two-step",
+             "text": "Optional"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Session",
+             "text": "8 hours"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Social sign-in",
+             "text": "On"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Sign-up",
+             "text": "Invite only"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "read": true,
+             "label": "Lock after",
+             "text": "5 tries"
+            }
+           ]
+          }
+         ],
+         "label": "Sign-in policy",
+         "note": "Follows Enterprise",
+         "actions": [
+          {
+           "control": "button",
+           "text": "Set our own"
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Keep",
+             "text": "30 days",
+             "control": "select",
+             "description": "How long a record is kept"
+            }
+           ]
+          },
+          {
+           "items": [
+            {
+             "standin": "field",
+             "fill": true,
+             "label": "Export",
+             "text": "On",
+             "control": "select"
+            }
+           ]
+          }
+         ],
+         "label": "Data policy",
+         "note": "Our own values",
+         "footer": [
+          {
+           "items": [
+            {
+             "spacer": true
+            },
+            {
+             "control": "button",
+             "text": "Use default"
+            },
+            {
+             "control": "button",
+             "text": "Save",
+             "main": true
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,311 @@
+<!-- spn:restates
+{
+  "docs": [
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
+      "seen": "9fc0e7b8"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
+      "seen": "e83fbba1"
+    }
+  ]
+}
+-->
+
+# Agent Plugins — What You Are Holding
+
+What a plugin is, the four kinds of file inside one, the `spn:restates` stamp, and the difference between a BUILDER checkout and a PARTNER install. Read this first if you are working out what the folder in front of you actually is. Source of truth: the foundation's `02-constructs/01-devex/02-agent/04-plugins.md` and `04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md`. Where this restatement and those disagree, the sources win and this file is regenerated.
+
+## What a plugin is
+
+**A rule an agent cannot load is a rule it cannot follow, however well the rule is written.** The book states standards and runs nothing. A plugin is the unit that turns a standard into bytes a session actually reads: one folder, one small manifest, one row in a public listing, carrying every hook, skill, reference file and reviewer brief the agent uses.
+
+**Configuration and behaviour are two steps apart, never one.** The plugins are authored and delivered in one public repository — `spn-claude-marketplace` — and publishing them is pushing it; there is no build step between source and surface, and none may be added. You never type a plugin name: the set a repository loads is **derived** from what that repository declares about itself. And nothing you edit is live until an install runs.
+
+**Three separate things carry a plugin from an author's edit to your session**, and confusing any two of them is where an afternoon goes:
+
+| Thing | What it is |
+| --- | --- |
+| the plugin folder | the substance — the files themselves |
+| its manifest and the marketplace listing | how it is named and found |
+| the plugin cache | what a session actually reads |
+
+An edit to the folder changes nothing about the cache until an install copies one into the other.
+
+**Every file in a plugin restates chapters of the book and adds no rule of its own.** That is what makes publishing the whole marketplace safe: a restatement that hid its chapter's substance would not be one. Where a restatement and its chapter disagree, **the chapter wins and the restatement is regenerated — never the other way round.** That direction is the whole reason a copy is safe to keep at all.
+
+## The four kinds of file inside a plugin
+
+**Claude Code loads four of them.** Each answers a different question — *when does this reach the session*:
+
+| Kind | What it is | When it reaches you |
+| --- | --- | --- |
+| **Hook** (`hooks/hooks.json`) | code the runtime calls on a named event, or runs by name | on that event, once installed |
+| **Skill** (`skills/`) | a name, a description your ask is matched against, and the steps loaded once matched | when your ask matches it |
+| **Agent brief** (`agents/`) | a reviewer or worker the session can convene, with the authority it carries once it runs | when the session convenes it |
+| **Manifest** (`.claude-plugin/`) | the plugin's own name, version and description | at install time |
+
+**`scripts/` and `refs/` are ours, not Claude Code's.** They sit in folders the runtime ignores. `scripts/` holds the code a hook or a tool runs. `refs/` holds this file and every one like it — a markdown restatement of one or more chapters.
+
+**Nothing loads a ref on its own.** A ref reaches a session only when a skill names it. A file sitting in `refs/` that no skill cites is dead weight nobody will ever read in a session, whatever its content says.
+
+**A hook either refuses a call or reports on it, and the difference is declared rather than emergent.** A refusal stops the tool call and says which rule it met; a report warns and lets the call through. A check that could refuse but only warns is a decision somebody made, and it belongs in the hook rather than in a habit.
+
+**A ref is the only layer a consumer actually has.** The book is not loaded in a session, and a partner holds no checkout of it. So a ref carries the actionable substance itself and cites its chapter **by name**, never by a path that resolves only for somebody holding both trees.
+
+## How a plugin's command is typed
+
+**Every command reads the same way** (`RD.DEVEX.AGENT.078`): `spn-<plugin> <group> [<subject>] <action> [<path>…] [options]`. The last word before the path is a verb, and you always type it.
+
+**A command is typed by the plugin's own name**, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`, and the delivery chapter states how `spnutils` turns that into rules.
+
+| Part | The rule | Example |
+| --- | --- | --- |
+| **Action** | `check` reads and reports. `write` changes files. `show` prints. A subject may have a verb of its own, such as `measure` or `report`. A command with more than one action has no default. | `spn-devex docs face check` |
+| **Path** | It says what the action acts on, and it may be a folder inside a repository or one file. A check of the whole corpus still reads everything and reports only the findings under the path. | `spn-devex docs audit check docs/artifacts` |
+| **Filter** | An option named for what it selects: `--variant` for documents, `--block` for a generated block, `--finding` for a kind of finding. | `--finding link` |
+
+**Name the smallest path the work needs, and run `check` before `write`.** A `write` with no path refuses, so a write never reaches a file nobody named. With no path, `check` and `show` take the repository you are in, and they refuse at a workspace root, where several repositories sit side by side.
+
+**Read the exit.** For `check` and `write`, exit 1 means a rule finding. Exit 2 means the command was typed wrongly, and the refusal prints the usage to type. `spn-<plugin> help` lists every command with its actions.
+
+## The `spn:restates` stamp
+
+**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
+
+**The stamp is a comment block at the top of a ref, and it is the one place a restatement declares what it stands on.** In a skill's `SKILL.md` it comes right after the frontmatter, because a skill whose first line is not its frontmatter is never offered to the session (`RD.DEVEX.AGENT.108`). You write one without reading any tool's source:
+
+```jsonc
+<!-- spn:restates
+{
+  // Documents the ref REWRITES in its own words. You read the chapter and restate it.
+  "docs": [
+    { "path": "spn-foundation/CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md", "seen": "b204d81c" }
+  ],
+
+  // Files you COPY rather than rewrite — a template, a schema, a sample.
+  // A path may name a FOLDER, and then the hash covers every file's path and contents,
+  // so an addition, a removal, a rename and an edit all move the same stamp.
+  "files": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates/", "seen": "c41b90d2" }
+  ],
+
+  // Register rows the ref carries the ruling of. `repo` names the workspace member carrying the
+  // register — every register lives at that repo's fixed `docs/registers/decisions.md` — `row` is
+  // the decision id, and `seen` hashes that row's own line, never the whole register.
+  "decisions": [
+    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.086", "seen": "79c8a6ab" }
+  ]
+}
+-->
+```
+
+**The block carries exactly three kinds, and they are three different obligations — never treat them as one list.**
+
+| Kind | What you do with the source | So the copy is |
+| --- | --- | --- |
+| `docs` | **rewrite** the chapter in your own words | different wording, same rules — pasting a chapter has shipped the book |
+| `files` | **copy** the file | byte-identical. A template is used as-is; an improved copy is a different template, silently |
+| `decisions` | **re-read** the row, then update the ref and restamp | moves when that one row's own line is rewritten |
+
+A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry means somebody copies a file again. A `decisions` entry moves when the row it names is rewritten — never when an unrelated row in the same register changes. Collapsing them tells you that something changed and not what you owe.
+
+**A fourth kind, `commands`, was tried and dropped (2026-09-28).** The idea was a citation that re-ran a command and took its output — the way `utils/spnutils.md` once rendered `spnutils help --json` into a generated region. The command surface has one source, the book, and a ref restates that source the same way it restates anything else: through `docs`, in its own words. A second generator for facts `docs` already covers was a second source of truth for no reader.
+
+**A path starts at the repository**, so it resolves from the workspace rather than from whichever checkout you happen to be standing in — a `decisions` citation names its repository the same way, through `repo` rather than a path, because every register sits at that repository's own fixed `docs/registers/decisions.md`. **A citation that does not resolve is broken, never skipped** — the check reports it rather than passing over an address it cannot resolve.
+
+**`section` is optional, and it decides what the hash covers.** Name one and the stamp covers that heading's own text; leave it out and it covers the whole file. A citation is exactly as precise as the sentence it replaces, so a long chapter does not re-stamp every ref that cites one paragraph of it. **Each citation carries its own `seen`, not one stamp per block** — a block citing an eight-thousand-line concept and a hundred-line section would otherwise re-stamp the second every time the first moved, which is usually a wrong finding and teaches you to stop reading the run.
+
+**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
+
+## The four plugins, and how they divide
+
+Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin name never carries an instance. A stack or a cloud is a `providers/<instance>/` folder inside the plugin that owns its domain. The set reads in domain order: how you work first, then Support's three domains in the order the book holds them.
+
+| Plugin | Domain | Carries |
+| --- | --- | --- |
+| `spn-devex` | the foundation itself, stack-agnostic | the stack-agnostic skills, the engineer persona and the reviewer, the lens files, the doc rules, the cross-repository protocol, and the hooks that guard generated files, check every document, print the session's orientation and hold the two write-time gates |
+| `spn-surface` | the surface, every stack | the Surface refs under `refs/support/surface/`, one file per book construct, reached through one entry ref; the design skill, which draws a page's tree in Figma or as skeletons; and the hook that guards a write through the Figma connector and gives the Surface check's notes, its reader in `providers/<stack>/` |
+| `spn-apps` | the apps domain, stack-agnostic with its stacks inside it | the apps commands, the build-loop step files and standards under `providers/<stack>/`, and the write-time checks: the rule stated once and parsed per stack |
+| `spn-infra` | the estate, every provider | the estate commands, the manifest and layer references, the estate laws, and the hook that refuses secrets, account identifiers and hand edits to built output |
+
+**There are four plugins, one per domain, and the set is closed** (`RD.DEVEX.AGENT.002`, `RD.DEVEX.AGENT.015`). The plugin's name is the domain, with nothing suffixed onto it. `SPDevExAgentPluginType` holds the four as `DEVEX`, `SURFACE`, `APPS` and `INFRA`, in that order. `DEVEX` names the domain the stack-agnostic plugin serves, how you work, and never the repository that writes the standards.
+
+**A domain earns a plugin when the agent does a different act in it, and so needs different instructions.** Writing TypeScript and writing Python are one act in two languages, so a stack is a `providers/<name>/` folder inside its domain's plugin (`spn-apps`'s `providers/ts/`), with its own parser and its own steps checking the rule stated once beside them. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a cloud is a blueprint library and a provider folder (`spn-infra`'s `providers/aws/`) with no skill of its own. Neither earns a plugin. **A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time, which is the defect the whole restatement discipline exists to stop.
+
+**Surface is a domain of its own, so it has a plugin of its own.** Designing, drawing and judging what a person sees is a different act from building, proving and releasing a kind. It reaches a designer who may never open a code file, and a mock of a page comes before any app code exists. The book holds Surface as one of Support's three domains, stated once and realized by every stack.
+
+### The pointer from apps into Surface, and the rule that keeps it safe
+
+Building a screen reads the Surface rules, so `spn-apps`' implement, verify and review steps point into `spn-surface`, at its one entry ref, `refs/support/surface/README.md`. **`spn-surface` names nothing in `spn-apps`.** Every other pointer between plugins goes to `spn-devex`, which every repository loads, and this pointer is safe for one reason: **every repository that loads `spn-apps` also loads `spn-surface`**, because the world loads them together (`RD.DEVEX.AGENT.039`). The pointer then always finds its target, and a partner types nothing. **A pointer may run only toward a plugin that the same world always loads, and never back.**
+
+| Option weighed | What it does | Why it was not taken, or why it was |
+| --- | --- | --- |
+| Surface stays a group of refs inside `spn-apps` | no pointer between plugins | about five thousand lines of Surface rules load into server-only work, and a mock has no home before an `APPS` repository exists |
+| **`spn-surface` carries the Surface refs, and `spn-apps` copies none** | one pointer, apps into Surface, made safe by the world loading both | **taken**: one copy of every Surface rule, and Surface grows without growing `spn-apps` |
+| the Surface refs live in `spn-devex` | no pointer, because every repository loads `spn-devex` | `spn-devex` is how you work in every repository, and would carry a domain's rules into the estate and the foundation, which never draw a page |
+
+## The listing, the manifest, and what a version means
+
+Two files name a plugin, and they answer different questions.
+
+```jsonc
+// .claude-plugin/marketplace.json — one file at the marketplace root, hand-kept
+{ "name": "saasplane",
+  "owner":   { "name": "SaaS Plane" },
+  "plugins": [ { "name": "spn-devex", "source": "./packages/plugin-spn-devex", "description": "…" } ] }
+
+// packages/plugin-spn-devex/src/.claude-plugin/plugin.json — inside the plugin's own folder
+{ "name": "spn-devex", "version": "0.7.2", "description": "…", "author": { "name": "SaaS Plane" } }
+```
+
+The listing is the only file that knows all four plugins exist, and nothing generates it. The manifest is a plugin's own claim about itself, read at install time.
+
+**A version names what is published, never what you are working on — MUST.** The number moves only when a release begins, written by the marketplace's release command, and stays put while work lands between releases. **That is what makes a stale cache findable** — a cache directory is keyed by name and version, so a plugin edited without moving the number installs over its own published bytes, and nothing tells you which copy you are running.
+
+**The four plugins carry one version, and release together — MUST** (`RD.DEVEX.AGENT.110`). They share code compiled into every one of them, one test run proves them together, and one tag ships them, so a number that moved for one plugin and not another would claim a difference nobody built. The current number is the one the four manifests carry; the released number is the marketplace's newest `vX.Y.Z` tag, and only the release command writes either.
+
+## Two install modes, and the place you are standing decides
+
+| The source reads | You are | What that means |
+| --- | --- | --- |
+| a directory and a path | a **BUILDER** | the marketplace is the checkout beside your other repositories, and its files are yours to edit |
+| a repository reference | a **PARTNER** | the marketplace is the published repository, installed rather than authored |
+
+**Unset means PARTNER, and that is the point.** It is the answer somebody gets by doing nothing, so nothing has to be set on anybody's behalf.
+
+**A partner's marketplace is pinned to a release tag, never a branch — MUST.** The wiring command writes the published repository's source with a `ref` naming the marketplace's own release tag, `vX.Y.Z` on `main`, and a source that names a branch, or none, is rewritten to the tag on the next sync. The tag is never typed: a Support release reads the marketplace's newest `vX.Y.Z` tag once, proves its install against it and stamps it into what it publishes, and the wiring command writes the tag it was released with. Run from source with no stamp, it refuses to write a partner's source, by name. Without a `ref`, Claude Code reads the repository's default branch, which is `develop`, so a partner would run plugins nobody released. A builder's directory source names no `ref`: it is the checkout, read as it is on disk.
+
+**The plugins release in lockstep, through one command — MUST.** The four are released together at the one version they all carry, and the marketplace tag is that version. A release tags `main` with `v<version>`, and with `<plugin>--v<version>` for each plugin, Claude Code's own convention for tagging a plugin (`RD.DEVEX.AGENT.109`, `RD.DEVEX.AGENT.110`). The tag action refuses off `main`, on a dirty tree, on versions that disagree and on a tag that already exists, so a release can neither skip its tag nor cut one twice. In the marketplace, the release runs in four steps:
+
+| Step | What it does |
+| --- | --- |
+| `npm run release:plugins -- prepare <version>` | on a branch from `develop`: refuses a dirty tree, a version that is not `X.Y.Z` and one not above the newest `vX.Y.Z` tag; writes the version into the four manifests, builds and tests the plugins, and commits `chore(release): plugins <version>`. It pushes nothing |
+| the PRs | the commit goes to `develop`, then `develop` goes to `main` |
+| `npm run release:plugins -- tag` | on `main`, once `HEAD` is `origin/main`: prints the five tags and their messages, and cuts nothing |
+| `npm run release:plugins -- tag --push` | cuts the five tags annotated, pushes those five refs only, and reads them back from `origin`, failing by name on any that did not land |
+
+**The two modes differ in what you may edit and in nothing else.** A partner's workspace is a full workspace, worked the same way — its repositories carry their own concept, their own documents, their own code and their own tests. What it does not hold is the book and the marketplace, so the book is cited by name and the plugins arrive installed.
+
+**A partner reports a standard that is wrong or missing; they never edit the plugin they installed — MUST.** That edit sits in one plugin cache, reaches nobody else, and the next install replaces it. The ask crosses upward instead, as a written request, because a rule you cannot get from a plugin or a package is a gap in what the foundation publishes — and naming it is how it closes.
+
+**On a partner workspace the install fetches over the network**, and what it fetches is executable: hooks and the scripts behind them. The workspace floor allows that without asking, because the act writes a plugin cache and the workspace's own settings rather than publishing anything.
+
+## The set a repository gets is derived from its own claim
+
+You never type a plugin name. The wiring command reads the repository's own manifest and derives the set from the world it declares.
+
+| What the repository declares | The set it loads |
+| --- | --- |
+| the foundation world | `spn-devex` |
+| the apps world | `spn-devex`, `spn-surface` and `spn-apps`; the declared stack picks which `providers/` folder the work reaches, never a plugin |
+| the estate world | `spn-devex` and `spn-infra` |
+| a general world, or no manifest at all | `spn-devex` alone |
+| the workspace root | the union of its members' sets |
+
+**The world decides the set, and nothing else does — MUST** (`RD.DEVEX.AGENT.039`). **`APPS` loads `spn-surface` and `spn-apps` together, because `spn-apps` points into `spn-surface`**: a world that loaded one without the other would send apps' steps to a file that is not there. A workspace with no `APPS` member gets no `spn-surface`.
+
+**A repository with no claim gets `spn-devex` and never a stack's.** Hand such a repository a stack's skills and you have offered commands whose door is not there — the command exists in the session and refuses the moment it runs.
+
+**A repository may narrow this further and may never widen it.**
+
+## Nothing you edit is live before the install
+
+| Act | What is live afterwards |
+| --- | --- |
+| editing the concept, a chapter, a register, a provider seat or a plugin file | **nothing** |
+| releasing the deterministic tool, where a command or the floor changed | the new command surface, once released |
+| the workspace-wide sync — installs or refreshes every plugin whose installed copy differs from its source, then re-mints both wiring levels | hook **scripts** only |
+| a fresh window | skills, agent briefs, reference files, the hook wiring, the generated rule files, and the floor |
+
+A session reads the installed cache, so changed files and unchanged behaviour is the normal state until the sync runs. **A hook script is the one exception**, and reloads on its next run because the wiring already points at it.
+
+**The install and the two wiring levels are one act, not three.** The sync compares each installed plugin against its source, replaces the ones that differ, and names the file that drove each replacement; then it writes every repository's generated rule file and managed instruction block, and re-mints the floor. All of it is read at session start, so a window opened first loads the previous generation and you owe a second one.
+
+**Replacing a plugin by hand before that sync costs you the one answer worth having.** The comparison happens *before* the replacement, when the installed copy is still what the live session actually loaded — which is what makes it an answer about this window rather than a guess. Take that moment away and the sync can only report that everything is current, which is true and tells you nothing.
+
+**The tool is released before the plugins are synced — MUST.** The plugins restate a tool the session runs, and the installed command surface is the last released one rather than the checkout — a plugin naming a command that has not shipped is a rule nobody can follow.
+
+**Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which copy answered. Do every edit, release the tool if it moved, sync once, then take one fresh window.
+
+**A session cannot adopt its own new wiring, so the tool that changed it owes the handover — MUST.** The session that installs a plugin or re-mints a wiring level is the one session that will not read the result, and it is also the only one that knows what changed and why. A handover that reports only the fact is the failure this rule exists to prevent — told that the plugins updated, the next window starts from nothing and re-derives the work that produced the change. Carry the work itself, so the next window continues rather than restarts.
+
+**The sitting that changed the wiring finishes it before it offers a handover — MUST** (`RD.DEVEX.AGENT.059`). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
+
+**A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
+
+## A release carries its migration, and a window applies what is pending first
+
+**A release that changes a shape the agent writes or keeps ships a migration — MUST** (`RD.DEVEX.AGENT.094`). A shape is the layout of a file the agent works with: the workstream folder, an arc's state, the approach page, a preview, a seat file, a lens. Without a migration, a workspace taking the release holds both shapes, and each old file surfaces only as a check failing in some later window. Code works the same way: a schema change ships the step that moves the existing rows, and that step runs once.
+
+| A migration carries | Meaning |
+| --- | --- |
+| an id | `001`, `002`, …: the order they apply in; once released, never edited or renumbered |
+| a version | the release whose change it carries |
+| what changed | one sentence |
+| a check | each place still in the old shape; nothing once none is left |
+| how to apply it | a script for a mechanical change; steps for the agent where a page is rewritten |
+
+The plugin keeps its migrations in `scripts/lib/migrations/`, one file each, listed in id order by `index.ts`.
+
+**The ledger is `.spndevex/migrations.jsonl`**: one line per applied migration — plugin, id, version, time, who, and how (`script`, `agent`, or `nothing to do`). It is workspace state, not a rule. Only `spn-devex plugin migration write` appends to it, and the owner hook refuses a hand write. It lives in the workspace rather than the machine store because it records what this workspace's files went through, which every machine opening the workspace must agree on; appending one line at a time means two windows never overwrite each other. **A ledger line that does not parse stops every write** and is reported, never rewritten — the developer mends it.
+
+**At a window's start, pending migrations come before any other work — MUST.** The session-start hook runs the check of every migration the ledger lacks and tells the agent once, in its context and never on the developer's pane:
+
+| The check finds | What the agent does |
+| --- | --- |
+| old shapes; the migration has a script | `spn-devex plugin migration write <id>` runs it, checks again and records it |
+| old shapes; the migration has steps | the steps are the first task; `migration write <id> --steps-done` records it once the check is clean |
+| old shapes; the rewrite needs the developer's look | a needs-you that opens the reply; applied after the look |
+| nothing | `migration write <id>` records it with nothing to do |
+
+**The Stop hook holds the turn while a migration the ledger lacks still finds old shapes**, in any window, because the files are the workspace's. `write` applies in id order and refuses a later id while an earlier one is pending.
+
+```text
+spn-devex plugin migration show                         applied, pending, or nothing to do — each one
+spn-devex plugin migration check                        exit 1 while one is pending or the ledger does not read
+spn-devex plugin migration write <id>… [--steps-done]   apply and record, in id order
+```
+
+**Alpha does not change the retrofit rule.** A standard change still brings every existing open and backlog file to it in the same change (`RD.DEVEX.WORKSPACE.255`). The migration is how a workspace *elsewhere* — a partner's — gets that change when it takes the release: the builder's workspace is migrated before the cut, and its ledger says so.
+
+## What a hook runs, and where its cache lives
+
+**A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
+
+**A plugin's cache lives in the machine store, keyed by content, and never in the shared workspace folder — MUST.** `.spndevex/` is shared by every parallel window and every workstream, so a mutable file written there is overwritten by whichever window finishes second, and neither session did anything wrong — they only disagree about which verdict is current. A cache kept in the machine store and keyed by content sidesteps the race rather than resolving it: two windows either compute the identical verdict or never touch the same key at all.
+
+**The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one; past 450k it asks always, and again only after another 50k (`RD.DEVEX.AGENT.103`).
+
+**The PreToolUse `agent-model` check holds every launch to its model.** It refuses a launch of the Agent tool that names no model, a launch of an order on a model other than its `model:` line names, and a fork (`RD.DEVEX.AGENT.104`).
+
+## Where the Surface check sits among the hooks
+
+**`spn-surface` carries its own PreToolUse hook, and in its first release every rule is a note — MUST** (`RD.DEVEX.AGENT.107`). The hook runs on `Write`, `Edit` and a write through the Figma connector, and a connector write meets the Figma guard first. A write to a `.tsx` file in a web node's `src/` goes to the stack's reader, `providers/<stack>/scripts/checks/surface.ts`; for every other path the hook leaves before it loads anything. The reader judges named design-system tags only, literal values only, and only what the write added. Each note names its book row and the fix, and goes to the agent alone.
+
+**A note becomes a refusal only in a later version**, once a scan of the three TypeScript repositories finds no note on correct code and the rule's book row makes the deciding fact visible in the code. That version's release names the rule that refuses. What one file cannot show, such as a task state, a pattern's fit or a button's view across files, stays with verify and the design review.
+
+## Who a hook's line is for
+
+**A hook shows the developer a refusal, and gives its advice to the agent alone — MUST** (`RD.DEVEX.AGENT.092`). A refusal stops a tool call, and the developer sees it. Advice lets the call go on: a soft finding of the doc standard, or a reminder. Advice goes to the agent as context, and nothing of it is shown on the developer's screen. In a hook's output, `additionalContext` is the agent's channel and `systemMessage` is the developer's, so advice is written to the first alone. A soft finding of the doc standard is said once for a file in a window, and a finding that changes is said again.
+
+## What breaks if you skip this
+
+| If you… | Then |
+| --- | --- |
+| edit a ref and expect it live this session | nothing changed — you read the installed cache, not the checkout |
+| paste a chapter's own wording into a `docs` restatement | you have shipped the book instead of restating it — restating means the same rules in different words, and different words are what a restatement is for |
+| reword a `files` copy to read better | the improved copy is a different template, and nobody knows it diverged |
+| guess a `seen` hash instead of computing it | the block reports agreement that was never checked |
+| cite a chapter by path from a partner's ref | it resolves only for somebody holding both trees, so a partner's session gets a broken link |
+| edit an installed plugin cache directly as a partner | the fix reaches nobody else and disappears at the next install |
+| sync the plugins before releasing the tool that changed | the plugins restate a command surface the session cannot run |
+| replace a plugin by hand before running the workspace sync | you lose the one comparison that could tell you what actually changed |
+| type a plugin name into a repository's wiring instead of letting it derive | the repository stops correcting itself when its declared world changes |
+| release a change to a shape the agent keeps with no migration | every workspace that takes it finds its old files one failing check at a time |
+| edit or renumber a released migration | a ledger that recorded it now names something else |
+| start other work while a migration is pending | the work lands in the old shape and has to be moved again |
+| load `spn-apps` without `spn-surface` | apps' steps point at an entry ref the session does not hold |
+| let a Surface note refuse a write before the scan finds it silent on correct code | correct code is stopped, such as two `SOLID` buttons in the two branches of one condition |

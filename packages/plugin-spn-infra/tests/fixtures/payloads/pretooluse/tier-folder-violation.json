@@ -1,0 +1,9 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/estate/packages/infra-module-idp/tests/edge.tftest.hcl",
+    "content": "run \"EDGE_01\" {}\n"
+  }
+}

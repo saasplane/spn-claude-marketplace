@@ -1,0 +1,7 @@
+{
+  "groups": {
+    "check": "allow",
+    "unit": "allow"
+  },
+  "commands": {}
+}

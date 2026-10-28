@@ -1,0 +1,494 @@
+{
+ "kind": "skeleton",
+ "title": "An entry that is a page",
+ "caption": "It stands in a rail, the navigation and the content attached, at the body's full width: the rail stands shut to its icons, and on a phone one bar stands at the top. A large form is a page of its own, and the page is one container: its header is the page level, the way back and the title with a line under it; its sections are the content parts of the container, all in its one rounded box, each with its own title and its actions, and a line between every two; a thing that repeats inside a part, such as Destination 1 in Destinations, is a group inside that part, with its dotted boundary. Its actions stand in its footer, under a line in the same box. The parts belong to one form that is saved once, so they are not containers of their own, and no list of the sections stands beside it. Each field is drawn as the form field of the design system lays it out: its title; the mark of its help at the end of the title's line, where the field has one; its control, as wide as its place; and one line under the control, which is its description, or its error where the value is refused; the room of that line is kept where a field has neither, so a form does not change its height when an error shows. A title never stands beside its control. Fields that are short and belong together share a row at a desktop, fewer share one on a tablet, and on a phone each takes a row. Every screen shows every field, and the last row of a destination keeps the action that removes it. The actions stand at the start of the footer.",
+ "layout": {
+  "type": "RAIL",
+  "body": {
+   "width": "FULL"
+  },
+  "navigation": {
+   "attached": true,
+   "nav": [
+    "Dashboard",
+    "Orders",
+    "Customers",
+    "Invoices",
+    "Catalogue",
+    "Integrations",
+    "Team",
+    "Settings"
+   ],
+   "chosen": "Settings"
+  },
+  "content": {
+   "attached": true
+  }
+ },
+ "views": [
+  {
+   "viewport": "DESKTOP",
+   "page": {
+    "item": {
+     "title": "New schedule",
+     "description": "Runs a job at a set time"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Details",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Name",
+               "text": "Nightly export",
+               "info": true
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Owner",
+               "text": "Dana Lee",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "About",
+               "text": "",
+               "description": "Shown in the list of schedules"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Trigger",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Repeats",
+               "text": "Daily",
+               "control": "select"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Starts on",
+               "text": "2 May",
+               "description": "In the time zone of the organization"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Time",
+               "text": "25:00",
+               "error": "Enter a time from 00:00 to 23:59"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Destinations",
+           "part": true,
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add another"
+            }
+           ],
+           "rows": [],
+           "sections": [
+            {
+             "label": "Destination 1",
+             "rows": [
+              {
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                },
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Create",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "TABLET",
+   "page": {
+    "item": {
+     "title": "New schedule",
+     "description": "Runs a job at a set time"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Details",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Name",
+               "text": "Nightly export",
+               "info": true
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Owner",
+               "text": "Dana Lee",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "About",
+               "text": "",
+               "description": "Shown in the list of schedules"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Trigger",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Repeats",
+               "text": "Daily",
+               "control": "select"
+              },
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Starts on",
+               "text": "2 May",
+               "description": "In the time zone of the organization"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Time",
+               "text": "25:00",
+               "error": "Enter a time from 00:00 to 23:59"
+              },
+              {
+               "spacer": true
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Destinations",
+           "part": true,
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add another"
+            }
+           ],
+           "rows": [],
+           "sections": [
+            {
+             "label": "Destination 1",
+             "rows": [
+              {
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                },
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Create",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "viewport": "MOBILE",
+   "page": {
+    "item": {
+     "title": "New schedule",
+     "description": "Runs a job at a set time"
+    },
+    "back": true
+   },
+   "frame": {
+    "size": "XS",
+    "rows": [
+     {
+      "items": [
+       {
+        "frame": {
+         "unit": "DSPanelContainer",
+         "rows": [],
+         "sections": [
+          {
+           "label": "Details",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Name",
+               "text": "Nightly export",
+               "info": true
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Owner",
+               "text": "Dana Lee",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "About",
+               "text": "",
+               "description": "Shown in the list of schedules"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Trigger",
+           "part": true,
+           "rows": [
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Repeats",
+               "text": "Daily",
+               "control": "select"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Starts on",
+               "text": "2 May",
+               "description": "In the time zone of the organization"
+              }
+             ]
+            },
+            {
+             "items": [
+              {
+               "standin": "field",
+               "fill": true,
+               "label": "Time",
+               "text": "25:00",
+               "error": "Enter a time from 00:00 to 23:59"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "label": "Destinations",
+           "part": true,
+           "actions": [
+            {
+             "control": "button",
+             "text": "Add another"
+            }
+           ],
+           "rows": [],
+           "sections": [
+            {
+             "label": "Destination 1",
+             "rows": [
+              {
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Kind",
+                 "text": "Webhook",
+                 "control": "select"
+                }
+               ]
+              },
+              {
+               "items": [
+                {
+                 "standin": "field",
+                 "fill": true,
+                 "label": "Address",
+                 "text": "https://acme.com/hook",
+                 "info": true
+                },
+                {
+                 "icon": "close"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "footer": [
+          {
+           "items": [
+            {
+             "control": "button",
+             "text": "Create",
+             "main": true
+            },
+            {
+             "control": "button",
+             "text": "Cancel"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

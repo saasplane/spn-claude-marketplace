@@ -1,0 +1,91 @@
+{
+ "kind": "skeleton",
+ "title": "A value from an enum",
+ "caption": "How a value is shown follows from what it is on the page. An icon in a skeleton is the default icon, whichever icon the enum or the value takes.",
+ "frame": {
+  "label": "How a value is shown",
+  "rows": [
+   {
+    "items": [
+     {
+      "icon": "default",
+      "text": "Enterprise"
+     },
+     {
+      "note": "one icon for the whole enum"
+     }
+    ],
+    "label": "a kind, beside other facts"
+   },
+   {
+    "items": [
+     {
+      "icon": "default",
+      "text": "Email"
+     },
+     {
+      "note": "an icon for each value"
+     }
+    ],
+    "label": "a familiar thing"
+   },
+   {
+    "items": [
+     {
+      "control": "badge",
+      "text": "Suspended"
+     },
+     {
+      "note": "the normal state shows no badge"
+     }
+    ],
+    "label": "a state that is not normal"
+   },
+   {
+    "items": [
+     {
+      "control": "badge",
+      "text": "Email",
+      "icon": "default"
+     },
+     {
+      "control": "badge",
+      "text": "SMS",
+      "icon": "default"
+     },
+     {
+      "control": "badge",
+      "text": "WhatsApp",
+      "icon": "default"
+     },
+     {
+      "note": "a row of small badges"
+     }
+    ],
+    "label": "several values of one set"
+   },
+   {
+    "items": [
+     {
+      "text": "Email"
+     },
+     {
+      "note": "a title, and no badge"
+     }
+    ],
+    "label": "the subject of a part"
+   },
+   {
+    "items": [
+     {
+      "note": "Enterprise"
+     },
+     {
+      "note": "plain text"
+     }
+    ],
+    "label": "alone in a labelled field"
+   }
+  ]
+ }
+}
