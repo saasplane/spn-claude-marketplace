@@ -1,8 +1,8 @@
 // `commands/workstream/` — the only writers of what a script owns, run as the agent types them, in a
 // throwaway workspace. Each command is shown answering in its line, writing its file, and refusing what
 // it is typed with wrongly.
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { CARD, cli, dataWorkspace, put } from "../../../../helpers/workstream-fixture.mjs";
 import { workspace } from "../../../../helpers/fixture.mjs";
@@ -135,6 +135,18 @@ console.log("\n=== report write — a hand-back folded in from its front matter"
   ok("red: an outcome outside the three is refused", bad.code === 2 && bad.out.includes("landed · stopped · needs-you"), bad.out);
   const nowhere = cli(root, ["workstream", "report", "write", "031", "notes/N001/plan.md"]);
   ok("red: a file that is no report is refused", nowhere.code === 2 && nowhere.out.includes("notes/N<nnn>/orders/<row>.report.md"), nowhere.out);
+
+  // A REPORT WITH NO COST of its own takes the order's cost from the telemetry, as `debug cost show <workstream>/<arc>` reads it.
+  const telemetry = join(root, ".spndevex", ".debug", "telemetry");
+  mkdirSync(telemetry, { recursive: true });
+  const reply = (turn, order, ms) => JSON.stringify({ at: "2026-10-10T10:00:00Z", session: "s1", agent: "c1", workstream: basename(ws), arc: "N001", order, row: "3",
+    turn, model: "claude-sonnet-5-5", ms, input: 100, cache_read: 200, cache_write: 300, output: 50 });
+  writeFileSync(join(telemetry, "usage.jsonl"), [reply("a", "3", 90000), reply("b", "3", 30000), reply("b", "3", 30000), reply("c", "9", 600000)].join("\n") + "\n");
+  put(ws, "notes/N001/orders/3.report.md", ["---", 'row: "3"', "outcome: landed", "---", "Body.", ""].join("\n"));
+  const measured = cli(root, ["workstream", "report", "write", "031", "notes/N001/orders/3.report.md"]);
+  const three = json(arcFile).rows.find((row) => row.id === "3");
+  ok("the order's cost is read from the telemetry: its tokens summed once for each reply, its minutes from the model's time, another order's left out",
+    measured.code === 0 && three.cost?.tokens === 1300 && three.cost?.minutes === 2, `${measured.out} ${JSON.stringify(three.cost)}`);
 }
 
 console.log("\n=== fact write — one fact, pinned to its source's commit");

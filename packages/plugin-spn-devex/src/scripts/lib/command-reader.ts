@@ -15,7 +15,7 @@
 // in the suite compares it with the command files.
 //
 // THE FILTER. `DEFAULT_PROGRAMS` names `spnutils`, the three plugin CLIs, `nx`, `git` and `docker`.
-// A workspace may add or remove programs in `.spndevex/.debug/telemetry/filter.json`:
+// A workspace may add or remove programs in `.spndevex/.debug/workspace/filter.json`:
 //
 //     { "add":    [{ "program": "make", "levels": 1, "valued": ["f", "C"] }],
 //       "remove": ["git"] }
@@ -27,6 +27,7 @@
 
 import { readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
+import { workspaceDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { argsText, repoOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 /** How one program is read. */
@@ -66,11 +67,11 @@ const DOCKER_GROUPS = ["builder", "buildx", "compose", "config", "container", "c
 export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
   "spn-devex": {
     behaviours: ["coverage", "ids", "stamp"],
+    debug: ["cost", "hooks", "store", "switch", "window"],
     docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "index", "page", "parity", "prose", "sds", "status", "topics"],
-    plugin: ["cost", "migration", "partner", "paths", "timings"],
+    plugin: ["migration", "partner", "paths"],
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],
-    workspace: ["tokens"],
     workstream: ["arc", "fact", "progress", "question", "report", "row", "rows", "state", "suggestion"],
   },
   "spn-surface": {},
@@ -116,10 +117,10 @@ export function programsFrom(filter: Filter | null | undefined): Program[] {
   } catch { return DEFAULT_PROGRAMS; }
 }
 
-/** The programs a workspace times: the defaults, and its `filter.json` beside the log where there is one. */
-export function loadPrograms(telemetryDir: string): Program[] {
+/** The programs a workspace times: the defaults, and its `filter.json` in the debug store's workspace folder where there is one. */
+export function loadPrograms(root: string): Program[] {
   let filter: Filter | null = null;
-  try { filter = JSON.parse(readFileSync(join(telemetryDir, "filter.json"), "utf8")) as Filter; } catch { return DEFAULT_PROGRAMS; }
+  try { filter = JSON.parse(readFileSync(join(workspaceDir(root), "filter.json"), "utf8")) as Filter; } catch { return DEFAULT_PROGRAMS; }
   return programsFrom(filter);
 }
 

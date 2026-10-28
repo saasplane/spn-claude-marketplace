@@ -3,12 +3,12 @@
     "behaviours": "allow",
     "browser": "allow",
     "coverage": "allow",
+    "debug": "allow",
     "docs": "allow",
     "plan": "allow",
     "plugin": "allow",
     "report": "allow",
     "restates": "allow",
-    "workspace": "allow",
     "workstream": "allow"
   },
   "commands": {}

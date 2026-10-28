@@ -1,6 +1,6 @@
 // The readers that read an arc kept as data (01-workstream.md § The formats): `arc-status` and
-// `split-plan` read its status and its rows from `state.json`, `plan stale` its pinned facts, `workspace
-// tokens` its titles, the telemetry tags its folders, and the Stop hook refuses a turn while `state
+// `split-plan` read its status and its rows from `state.json`, `plan stale` its pinned facts, the
+// telemetry tags its folders, and the Stop hook refuses a turn while `state
 // check` fails for this window's workstream.
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -9,7 +9,6 @@ import { arcData, cli, dataWorkspace, put } from "../../../helpers/workstream-fi
 const { statusOfData } = await import("../../../../src/scripts/lib/workstream.ts");
 const split = await import("../../../../src/scripts/checks/split-plan.ts");
 const { factPinsOf } = await import("../../../../src/scripts/commands/plan/stale.ts");
-const { titlesOf, withTitles } = await import("../../../../src/scripts/commands/workspace/tokens.ts");
 const { checkWorkstreamState, workRuns } = await import("../../../../src/scripts/events/stop.ts");
 
 let total = 0, failed = 0;
@@ -66,14 +65,6 @@ console.log("\n=== plan stale reads the arc's pinned facts");
   ok("red: the source moved, and the fact is named", loud.out.includes(`f1 spn-x/a.ts: moved since ${head}`), loud.out);
   const check = cli(root, ["workstream", "state", "check", "031", "--facts"]);
   ok("state check --facts names it as a note, never a failure", /note 031-probe N001 f1: `spn-x\/a.ts:1` moved since/.test(check.out) && check.code === 0, check.out);
-}
-
-console.log("\n=== workspace tokens labels arcs and orders from the data");
-{
-  const titles = titlesOf(root, "031-probe");
-  ok("the arc's title and each row's, by id", titles.get("N001")?.title === "the probe arc" && titles.get("N001")?.rows.get("2") === "build it");
-  const [row] = withTitles(root, [{ workstream: "031-probe", arc: "N001", order: "2" }]);
-  ok("an order named for its row takes the row's title", row.arcTitle === "the probe arc" && row.rowTitle === "build it", JSON.stringify(row));
 }
 
 console.log("\n=== telemetry tags read the data's folders");

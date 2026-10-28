@@ -4,11 +4,12 @@
 // Which workstreams a window works on (RD.DEVEX.WORKSPACE.236), and the one reader every hook uses.
 // A window is bound by the PATH a write goes to, the arc a `workstream` command writes, its first prompt,
 // or a handover; never by text inside a write, and never by a read. The note is
-// `.spndevex/.debug/windows/<session>.json`, removed after fourteen days. The reader returns the empty set, never "everything", for a window with no
-// binding, and a workstream that has left `open/` drops out of its answer.
+// `.spndevex/.debug/sessions/<id>/window.json`, swept with the window's folder. The reader returns the empty
+// set, never "everything", for a window with no binding, and a workstream that has left `open/` drops out of its answer.
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { ARCS, DEVEX, legacyWorkstreamsDir, workstreamDirOf, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { isDir } from "./payload.ts";
 import { LOG_FILE, NOTES, findWorkstream, readQuestions, workstreamAround, workstreamsOf } from "./workstream.ts";
@@ -31,22 +32,14 @@ export type WindowNote = {
   repos: Record<string, string>;
 };
 
-const DEBUG = ".debug";
-const WINDOWS = "windows";
-// A note older than this belongs to a window long closed, and is removed when a new note is made.
-const KEEP_MS = 14 * 24 * 3600 * 1000;
-
 const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {} });
 
 const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
 
-/** The folder of the notes, `<root>/.spndevex/.debug/windows`. */
-export const windowsDir = (root: string): string => join(root, DEVEX, DEBUG, WINDOWS);
-
-/** The file that holds a window's note, or null for a session with no usable id. */
+/** The file that holds a window's note, `sessions/<id>/window.json`, or null for a session with no usable id. */
 export function windowFile(root: string, session: string | undefined): string | null {
   const key = sessionKey(session ?? "");
-  return key ? join(windowsDir(root), `${key}.json`) : null;
+  return key ? join(sessionDir(root, key), "window.json") : null;
 }
 
 /** A window's note. Absent or unreadable is an empty note, never a failure. */
@@ -71,22 +64,11 @@ function save(root: string, session: string | undefined, note: WindowNote): void
   const file = windowFile(root, session);
   if (!file) return;
   try {
-    const fresh = !existsSync(file);
     mkdirSync(dirname(file), { recursive: true });
     const draft = `${file}.${process.pid}.tmp`;
     writeFileSync(draft, JSON.stringify(note), "utf8");
     renameSync(draft, file);
-    if (fresh) prune(dirname(file));
   } catch { /* a note that cannot be written is a note that is missing, and nothing more */ }
-}
-
-/** Remove every note older than fourteen days. */
-function prune(dir: string): void {
-  const cutoff = Date.now() - KEEP_MS;
-  try {
-    for (const name of readdirSync(dir))
-      try { if (statSync(join(dir, name)).mtimeMs < cutoff) rmSync(join(dir, name), { force: true }); } catch { /* next */ }
-  } catch { /* nothing to prune */ }
 }
 
 /**

@@ -13,16 +13,16 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "51ee6619"
+      "seen": "36b0dd5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e21ff4f5"
+      "seen": "5b240cac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
-      "seen": "a0672358"
+      "seen": "49858691"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "81cb46d8"
+      "seen": "8d5c6f56"
     }
   ]
 }
@@ -583,9 +583,9 @@ on no workstream is held for none.
 
 **A window's workstreams are bound by where it wrote and by what the developer named, never by what it wrote — MUST**
 (`RD.DEVEX.WORKSPACE.236`). The plugin keeps a note of its own for each session in
-`.spndevex/.debug/windows/`, named by Claude Code's session id and removed after fourteen days. It
-lists the workstream folders the window has worked on, the time it last wrote each arc, and the last
-finding of each note it was told. No person reads it, and it never says which state a workstream is
+`.spndevex/.debug/sessions/<session-id>/window.json`, in the folder of Claude Code's session id, which is
+swept whole fourteen days after its newest write. It lists the workstream folders the window has worked on,
+the time it last wrote each arc, and the last finding of each note it was told. No person reads it, and it never says which state a workstream is
 in: the folder tree says that. A window writes an arc when a write goes inside the arc's
 `arcs/N<nnn>/` or `notes/N<nnn>/`, or when it runs a `workstream` command that writes the arc's data:
 `arc edit`, `row add`, `row state`, `row note`, `row edit` or `row discard` on the arc, `fact write`, `arc stamp write`, `question raise` on it,
@@ -963,7 +963,8 @@ whole run can meet it. Report a selection that matched no case in these words: *
 **A whole tier runs before a commit, in an arc's `PROOF` row, before a release, or in one of five
 named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). Before a commit, each tier a change touches runs whole
 for the node it touched, once per batch: commit a batch of orders as one commit, so the commit gate's
-run happens once for the batch and not once per order (`RD.DEVEX.WORKSPACE.281`). Before a release, the full pass is a named step: run the owed tiers of
+run happens once for the batch and not once per order (`RD.DEVEX.WORKSPACE.281`). That push is refused when no
+whole, green run covers exactly the tree at the pushed commit, or when a changed file is not formatted. Before a release, the full pass is a named step: run the owed tiers of
 the nodes the release publishes, whole and once, with the services up, and ask for the release go only
 after it. The release command runs every tier it can run by itself and releases every library, a
 generated client among them; it does not run a client's contract tier, which calls a running

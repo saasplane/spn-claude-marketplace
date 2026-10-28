@@ -1,7 +1,7 @@
 // The spn-surface PreToolUse hook's telemetry lines: the one shape every plugin writes, under
 // `script: "spn-surface"`, with the work tags of the call (RD.DEVEX.WORKSPACE.185).
 //
-// A temporary workspace with `.spndevex/.debug/telemetry.on` is pointed at the recorder, in a child
+// A temporary workspace with `.spndevex/.debug/switches.json` is pointed at the recorder, in a child
 // with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
@@ -11,7 +11,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const EVENT = resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts");
 const KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
-  "repo", "pid", "session", "agent", "workstream", "arc", "order"];
+  "repo", "pid", "verdict", "out", "session", "agent", "workstream", "arc", "order", "row"];
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -24,7 +24,7 @@ const same = (label, got, expected) => {
 const root = realpathSync(mkdtempSync(join(tmpdir(), "spn-surface-telemetry-")));
 process.on("exit", () => rmSync(root, { recursive: true, force: true }));
 const files = {
-  ".spndevex/.debug/telemetry.on": "on\n",
+  ".spndevex/.debug/switches.json": "{\"telemetry\": true}\n",
   ".spndevex/workstreams/open/033-surface-agent/notes/N001/orders/02-plugin-move.md": "# order\n",
   "spn-sample-ts/sprepo.json": JSON.stringify({ type: "APPS", name: "Sample", config: { mtype: "APPS", stack: "TS" } }),
 };
@@ -44,7 +44,7 @@ console.log("=== spn-surface — every line carries its plugin and the call's wo
   };
   execFileSync("node", [EVENT], { input: JSON.stringify(payload), env, encoding: "utf8", cwd: payload.cwd });
   const lines = readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
-  same("every line has the seventeen keys, in the book's order", lines.every((l) => JSON.stringify(Object.keys(l)) === JSON.stringify(KEYS)), true);
+  same("every line has the twenty keys, in the book's order", lines.every((l) => JSON.stringify(Object.keys(l)) === JSON.stringify(KEYS)), true);
   same("every line's script is the plugin", [...new Set(lines.map((l) => l.script))], ["spn-surface"]);
   same("every line carries the work tags", lines.every((l) => l.workstream === "033-surface-agent" && l.arc === "N001"
     && l.order === "02-plugin-move" && l.agent === "lane-02" && l.session === "sess-surface"), true);

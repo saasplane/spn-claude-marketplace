@@ -7,7 +7,7 @@
 // is that command's own suite.
 //
 // The cases that write telemetry point a temporary workspace (with `.spndevex/README.md` and
-// `.spndevex/.debug/telemetry.on`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real
+// `.spndevex/.debug/switches.json`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real
 // workspace.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
@@ -160,7 +160,7 @@ console.log("\n=== runCommand records a command once, with its words as the leve
   const levels = (line) => [line.script, line.group, line.subgroup, line.action, line.args, line.exit];
 
   // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
-  const RECORDING = { [`${DEVEX}/README.md`]: "# .spndevex\n", [`${DEVEX}/.debug/telemetry.on`]: "on\n" };
+  const RECORDING = { [`${DEVEX}/README.md`]: "# .spndevex\n", [`${DEVEX}/.debug/switches.json`]: "{\"telemetry\": true}\n" };
   const root = folder("recorded", RECORDING);
   const ran = child(root, `
     const code = await runCommand({ plugin: "spn-devex", group: "docs", subject: "face", action: "check", usage: "[<path>]",

@@ -1,12 +1,12 @@
 // `lib/timing.ts` — the one telemetry library every plugin bundles (RD.DEVEX.WORKSPACE.185).
 //
 // Each line has one shape, key for key: `script`, `group`, `subgroup`, `action`, `args`, `event`,
-// `tool`, `ms`, `exit`, `at`, `repo`, `pid`, `session`, `agent`, `workstream`, `arc`, `order`. And
-// each says which work it belongs to: `workstream`, `arc` and `order` from the paths the tool call
-// touches, `agent` from the hook input, carried forward per session and agent.
+// `tool`, `ms`, `exit`, `at`, `repo`, `pid`, `verdict`, `out`, `session`, `agent`, `workstream`, `arc`,
+// `order`, `row`. And each says which work it belongs to: `workstream`, `arc`, `order` and `row` from the
+// paths the tool call touches, `agent` from the hook input, carried forward per session and agent.
 //
 // The cases that write point a temporary workspace (with `.spndevex/README.md` and
-// `.spndevex/.debug/telemetry.on`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
+// `.spndevex/.debug/switches.json`) at the recorder, in a child process with `SPN_TELEMETRY` removed; nothing is written into a real workspace.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -39,7 +39,7 @@ const same = (label, got, expected) => {
 };
 
 // A workspace's `.spndevex` holds its README beside `.debug/`; one holding `.debug/` alone is no workspace.
-const ON = { ".spndevex/README.md": "# .spndevex\n", ".spndevex/.debug/telemetry.on": "on\n" };
+const ON = { ".spndevex/README.md": "# .spndevex\n", ".spndevex/.debug/switches.json": "{\"telemetry\": true}\n" };
 const env = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
 /** Run a module snippet against the library in a child, the way a hook process does. */
 const child = (body) => execFileSync("node", ["--input-type=module", "-e",
@@ -49,7 +49,7 @@ const logOf = (root) => readFileSync(join(root, ".spndevex", ".debug", "telemetr
   .trim().split("\n").map((l) => JSON.parse(l));
 
 const WS = `/opt/work/saasplane/code/.spndevex/${WORKSTREAMS}/open/008-plain-language`;
-const tags = (workstream, arc, order, agent = null) => ({ workstream, arc, order, agent });
+const tags = (workstream, arc, order, agent = null, row = null) => ({ workstream, arc, order, row, agent });
 
 console.log("=== tagsOf — the work a tool call touches");
 same("an order file names the workstream, the arc and the order",
@@ -127,10 +127,10 @@ console.log("\n=== the line — one shape, key for key");
     record({ group: "env-seat", action: "env-seat" }, 1.5);
     end();`);
   const lines = logOf(root);
-  same("every line has the seventeen keys, in the book's order", lines.map((l) => Object.keys(l).join(",")),
+  same("every line has the twenty keys, in the book's order", lines.map((l) => Object.keys(l).join(",")),
     lines.map(() => LINE_KEYS.join(",")));
-  same("the keys are the approved preview's", LINE_KEYS, ["script", "group", "subgroup", "action", "args", "event", "tool",
-    "ms", "exit", "at", "repo", "pid", "session", "agent", "workstream", "arc", "order"]);
+  same("the keys are the approved sample's", LINE_KEYS, ["script", "group", "subgroup", "action", "args", "event", "tool",
+    "ms", "exit", "at", "repo", "pid", "verdict", "out", "session", "agent", "workstream", "arc", "order", "row"]);
   same("a check's name is structured, never a parsed string", [lines[0].script, lines[0].group, lines[0].subgroup, lines[0].action],
     ["spn-devex", "split-plan", null, "close"]);
   same("a hook check's `exit` and `args` are null", [lines[0].exit, lines[0].args, lines[1].exit, lines[1].args], [null, null, null, null]);
@@ -230,6 +230,62 @@ console.log("\n=== commandFacts — a command run through the shell has no hook 
   same("a command touching no workstream path carries null tags", commandFacts("spn-devex", ["audit", "docs"]).workstream, null);
   if (saved.id !== undefined) process.env.CLAUDE_CODE_SESSION_ID = saved.id;
   if (saved.old !== undefined) process.env.CLAUDE_SESSION_ID = saved.old;
+}
+
+console.log("\n=== verdict and out — what a check decided, and the bytes it put into the context");
+{
+  const root = workspace("n8-verdict", ON);
+  child(`
+    begin({ script: "spn-devex", event: "PreToolUse", tool: "Bash", session: "sv", process: { group: "events", action: "pretooluse" } },
+          ${JSON.stringify(root)});
+    span({ group: "quiet", action: "quiet" }, () => null);
+    span({ group: "noting", action: "noting" }, () => ({ note: "héllo" }));
+    span({ group: "denying", action: "denying" }, () => ({ deny: "no" }));
+    end();`);
+  const lines = logOf(root);
+  same("a check that says nothing is `pass` with no `out`", [lines[0].verdict, lines[0].out], ["pass", null]);
+  same("a noting check is `note` with the bytes of its words", [lines[1].verdict, lines[1].out], ["note", 6]);
+  same("a denying check is `deny` with the bytes of its reason", [lines[2].verdict, lines[2].out], ["deny", 2]);
+  same("the whole run is the worst of its checks, their words summed", [lines[3].verdict, lines[3].out], ["deny", 8]);
+}
+{
+  const root = workspace("n8-verdict-command", ON);
+  child(`
+    begin({ script: "spn-apps", event: "command", tool: null, session: null, process: { group: "cli", action: "cli" } }, ${JSON.stringify(root)});
+    record({ group: "docs", action: "audit" }, 1, 0);
+    end(0);`);
+  same("a command's lines carry no verdict and no `out`", logOf(root).map((l) => [l.verdict, l.out]), [[null, null], [null, null]]);
+}
+
+console.log("\n=== row and order — normalised, and read from where the work is");
+{
+  const root = workspace("n8-row", { ...ON,
+    [`.spndevex/${WORKSTREAMS}/open/031-compliance/notes/N008/orders/38-plugin-debug-layout.md`]: "---\nrow: \"50\"\nmodel: sonnet\n---\n# Order\n" });
+  const orderFile = join(root, ".spndevex", WORKSTREAMS, "open", "031-compliance", "notes", "N008", "orders", "38-plugin-debug-layout.md");
+  same("the row comes from the order file's front matter", tagsOf({ tool_input: { file_path: orderFile } }).row, "50");
+  same("an order file that does not exist names no row", tagsOf({ tool_input: { file_path: orderFile.replace("38-", "39-") } }).row, null);
+  same("a Bash call that moves a row to running names its row",
+    tagsOf({ tool_input: { command: "spn-devex workstream row state 031/N008 51 running" } }).row, "51");
+  same("moving a row to another state names no row",
+    tagsOf({ tool_input: { command: "spn-devex workstream row state 031/N008 51 done" } }).row, null);
+  same("the order is the file's stem, never its report", tagsOf({ tool_input: { file_path: orderFile.replace(".md", ".report.md") } }).order,
+    "38-plugin-debug-layout");
+  same("and never a sentence's punctuation after the name",
+    tagsOf({ tool_input: { command: `cat ${orderFile},` } }).order, "38-plugin-debug-layout");
+
+  const call = (payload) => child(`
+    const payload = ${JSON.stringify(payload)};
+    begin({ script: "spn-devex", event: "PreToolUse", tool: "Read", session: payload.session_id, ...tagsOf(payload),
+            process: { group: "events", action: "pretooluse" } }, ${JSON.stringify(root)});
+    record({ group: "a-check", action: "a-check" }, 1);
+    end();`);
+  call({ session_id: "sr", tool_input: { file_path: orderFile } });
+  call({ session_id: "sr", agent_id: "lane", tool_input: { file_path: orderFile } });
+  call({ session_id: "sr", tool_input: { command: "spn-devex workstream row state 031/N008 51 running" } });
+  const rows = logOf(root).filter((row) => row.group === "a-check").map((row) => [row.agent, row.order, row.row]);
+  same("a main window's line carries order null, and the row of the order it writes", rows[0], [null, null, "50"]);
+  same("a child's line carries the order and its row", rows[1], ["lane", "38-plugin-debug-layout", "50"]);
+  same("the row a main window moves to running replaces the carried one", rows[2], [null, null, "51"]);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — timing` : `\n  all ${total} passed — timing`);

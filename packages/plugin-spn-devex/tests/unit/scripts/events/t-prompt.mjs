@@ -5,7 +5,7 @@
 //
 // Each case runs on a scratch workspace this file builds. The pure parts are called directly, and
 // the script is run as a process wherever the case is about what reaches stdout, the exit code, or
-// the record under `.spndevex/.debug/names/`.
+// the record under `.spndevex/.debug/sessions/<id>/name.json`.
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -82,8 +82,9 @@ function titleOf(ran) {
   } catch { return "UNREADABLE"; }
 }
 const recordOf = (root, session) => readRecord(recordFile(root, session));
-const namesFolder = (root) => join(root, DEVEX, ".debug", "names");
-const recordsIn = (root) => (existsSync(namesFolder(root)) ? readdirSync(namesFolder(root)) : []);
+const sessionsFolder = (root) => join(root, DEVEX, ".debug", "sessions");
+const recordsIn = (root) => (existsSync(sessionsFolder(root))
+  ? readdirSync(sessionsFolder(root)).filter((id) => existsSync(join(sessionsFolder(root), id, "name.json"))) : []);
 
 console.log("\n=== prompt");
 
@@ -163,7 +164,7 @@ console.log("\n=== prompt");
   same("the name still comes from the `continue:` line alone", sessionName(withBoth, root), { name: "020-N011 artifacts-by-domain", form: "arc" });
   same("a prompt with no handover names nothing as also open", alsoOpenOf(`also open: ${NEXT}`, root), []);
   const ran = hook(event(root, "sess-also", fenced(withBoth)), root);
-  const note = JSON.parse(readFileSync(join(root, DEVEX, ".debug", "windows", "sess-also.json"), "utf8"));
+  const note = JSON.parse(readFileSync(join(root, DEVEX, ".debug", "sessions", "sess-also", "window.json"), "utf8"));
   same("the hook writes the window as owner of `continue:`'s workstream and visitor of the rest",
     [ran.exit, note.workstreams[THIS]?.tie, note.workstreams[NEXT]?.tie, note.workstreams[DONE]?.tie], [0, "owns", "visits", "visits"]);
 }
@@ -195,7 +196,7 @@ console.log("\n=== prompt");
   same("[MKT.HOOKS.48] the answer is exactly the documented object",
     first.out, JSON.stringify({ hookSpecificOutput: { hookEventName: EVENT, sessionTitle: THIS } }));
   same("[MKT.HOOKS.48] the record holds the name and its form, one file for the session",
-    [recordOf(root, "sess-one"), recordsIn(root)], [{ name: THIS, form: "workstream" }, ["sess-one.json"]]);
+    [recordOf(root, "sess-one"), recordsIn(root)], [{ name: THIS, form: "workstream" }, ["sess-one"]]);
 
   // KNOWN-BAD — the same name again. An answer here writes over a name the developer typed.
   const again = hook(event(root, "sess-one", `carry on with ${THIS}, row 2`), root);
@@ -224,7 +225,7 @@ console.log("\n=== prompt");
   const second = hook(event(root, "sess-two", fenced(handover(RELOAD))), root);
   same("[MKT.HOOKS.49] the reload form names a second session for the workstream it opens",
     [second.exit, titleOf(second), recordOf(root, "sess-two")], [0, NEXT, { name: NEXT, form: "workstream" }]);
-  same("[MKT.HOOKS.48] each session has its own record", recordsIn(root).sort(), ["sess-one.json", "sess-two.json"]);
+  same("[MKT.HOOKS.48] each session has its own record", recordsIn(root).sort(), ["sess-one", "sess-two"]);
 
   // UNTOUCHED — a window rooted in a member repository finds the workspace above it.
   const member = hook(event(root, "sess-three", `pick up ${THIS}`, join(root, "spn-support-ts", "src")), join(root, "spn-support-ts"));
@@ -282,12 +283,12 @@ console.log("\n=== prompt");
     [outside.exit, outside.out, outside.err], [0, "", ""]);
 
   // KNOWN-BAD — a record that cannot be written gives no name, so the next prompt cannot give it twice.
-  const blocked = build("blocked", { [`${DEVEX}/.debug/names`]: "a file where the folder of names belongs\n" });
+  const blocked = build("blocked", { [`${DEVEX}/.debug/sessions`]: "a file where the folder of sessions belongs\n" });
   const ran = hook(event(blocked, "sess-blocked", `pick up ${THIS}`), blocked);
   same("[MKT.HOOKS.52] known-bad: a name that cannot be recorded is not given", [ran.exit, ran.out, ran.err], [0, "", ""]);
 
   // KNOWN-BAD — a record that holds something else is read as no record.
-  const odd = build("odd-record", { [`${DEVEX}/.debug/names/sess-odd.json`]: "{\"name\": 7" });
+  const odd = build("odd-record", { [`${DEVEX}/.debug/sessions/sess-odd/name.json`]: "{\"name\": 7" });
   const reread = hook(event(odd, "sess-odd", `pick up ${THIS}`), odd);
   same("[MKT.HOOKS.52] a record that cannot be read counts as none, and the name is given",
     [reread.exit, titleOf(reread), recordOf(odd, "sess-odd")], [0, THIS, { name: THIS, form: "workstream" }]);
@@ -300,7 +301,7 @@ console.log("\n=== prompt");
     const log = join(root, DEVEX, ".debug", "telemetry", "hooks.jsonl");
     return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
   };
-  const on = build("recorded", { [`${DEVEX}/.debug/telemetry.on`]: "on\n" });
+  const on = build("recorded", { [`${DEVEX}/.debug/switches.json`]: "{\"telemetry\": true}\n" });
   hook(event(on, "sess-timed", `pick up ${THIS}`), on, recording());
   same("[MKT.HOOKS.48] while recording is on, a run writes its check's line and its whole-run line",
     linesOf(on).map((line) => `${line.event} ${line.group} › ${line.action} ${line.session}`),
