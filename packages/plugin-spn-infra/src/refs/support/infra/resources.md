@@ -28,7 +28,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 | `DATABASE` | the server; the platform, product and migration schemas; the default role groups | a role set at its own coordinate; its migrations own its DDL |
 | `CACHE` | one instance, one logical database, read-write and read-only groups | a key prefix at its own coordinate |
 | `QUEUE` | a broker, auto-create off | topics `{owner}-{noun}`, created by its own migrations |
-| `STORAGE` | the default store `app`, a bucket private with no exception | an area of the default store for each module code; documents through the one document system, never a key prefix |
+| `STORAGE` | the default store `app`, a bucket private with no exception | an area of the default store for each module code, under the `private/` root (`private/<module>/…`); documents through the one document system, never a key prefix |
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
@@ -111,7 +111,7 @@ A module's resources are its own engine instances, in its own world, under the m
 
 ## Every family has one default engine, and a declaration lists the rest
 
-**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RD.SUPPORT.INFRA.124`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
+**Each family gives a world one default engine, named `app` and never written — as a database gets its baseline schemas** (`RD.SUPPORT.INFRA.125`, amending `.122`). A declaration lists only what goes beyond it: named engines with a reason, lifecycle rules for storage, and access groups beyond the application's own. **`app` is the one reserved name.**
 
 | Family | Default (`app`) | Named entries | `dedicated` gives | `need`, a closed set | Created by code |
 | --- | --- | --- | --- | --- | --- |
@@ -122,7 +122,7 @@ A module's resources are its own engine instances, in its own world, under the m
 
 **A named engine is the same four fields in every family:** `name` (lowercase, never `app`, unique in its family); `dedicated` (always written — true gives its own credentials the default group cannot reach, false shares the app's pair); `need` (from the family's set); `region` (an organization `regions[]` code, only with `REGION`, else null). Storage adds `lifecycle`. A named engine is added only for what the default cannot give — a need an area, a key prefix or a topic can meet gets no engine.
 
-**A lifecycle rule** covers one key prefix and is off unless written: `prefix` (ends in `/`), `expiryDays` (null never expires), `isDeleteRefused` (binds every group, the app's included), `isAccessRecorded` (reads and writes go to the estate's trail). The storage block carries the default store's rules at its root; each named store carries its own. A prefix not named keeps every object.
+**A lifecycle rule** covers one key prefix and is off unless written: `prefix` (written with its root and ending in `/`, as `private/iam/privacy/exports/`), `expiryDays` (null never expires), `isDeleteRefused` (binds every group, the app's included), `isAccessRecorded` (reads and writes go to the estate's trail). The storage block carries the default store's rules at its root; each named store carries its own. A prefix not named keeps every object.
 
 **A `users` entry is a group beyond the app's own, scoped by engine:** its group, purposes (`RO`/`RW`), the engines of its family it reaches (`app` is the default) and, for storage, the key prefixes. It gets its own credentials inside the blocks it reaches; people never receive them.
 

@@ -35,9 +35,9 @@
 // keeps `cli.mjs` the size of the dispatcher, so a run pays for the one command it calls.
 
 import * as esbuild from "esbuild";
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { bannerFor, pluginSourceHash } from "./lib/source-hash.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -109,6 +109,23 @@ function buildOptionsFor(pluginName) {
   };
 }
 
+/**
+ * `src/refs/commands.md`: the ref of the plugin's own commands, written from the bundled `cli.mjs` (its
+ * `commandsRef()`, built from the same `commands/` tree as `help`). Importing the bundle does not run the CLI —
+ * its entry fires only where the process was started as `cli.mjs`. Left as it is when the text is unchanged.
+ */
+async function writeCommandsRef(pluginName, outdir) {
+  const bundle = join(outdir, "cli.mjs");
+  if (!isFile(bundle)) return null;
+  const { commandsRef } = await import(pathToFileURL(bundle).href);
+  const text = (await commandsRef()).replace(/\n+$/, "") + "\n";
+  const target = join(PACKAGES, pluginName, "src", "refs", "commands.md");
+  mkdirSync(dirname(target), { recursive: true });
+  const same = isFile(target) && readFileSync(target, "utf8") === text;
+  if (!same) writeFileSync(target, text);
+  return Buffer.byteLength(text);
+}
+
 /** `dist/` rebuilt from nothing every time, so a renamed or removed source leaves no orphan bundle. */
 function cleanDist(outdir) {
   if (existsSync(outdir)) rmSync(outdir, { recursive: true, force: true });
@@ -133,6 +150,8 @@ async function buildOnce() {
       .filter((f) => f.endsWith(".mjs")).sort();
     console.log(`  ok    ${pluginName}  (${built.length} bundle(s), source hash ${plan.sourceHash.slice(0, 12)})`);
     for (const file of built) console.log(`          ${file}`);
+    const refBytes = await writeCommandsRef(pluginName, plan.outdir);
+    if (refBytes !== null) console.log(`          src/refs/commands.md (${refBytes} bytes)`);
   }
   return builtAny;
 }

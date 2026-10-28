@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Ideation is kept as it happens · § The formats
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream fact write <arc> --source <repository>/<path>[:<line>] --fact "…" [--used-by q59,57]
+//   spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by q59,57]
 //
 // One fact, read while ideating, pinned to the source repository's current commit, which `git` gives
 // so the agent never types a commit.
@@ -50,5 +50,5 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  write: { describe: "write one fact, the source's current commit pinned", usage: "<arc> --source <repository>/<path>[:<line>] --fact \"…\" [--used-by …]", run: write },
+  write: { describe: "write one fact, the source's current commit pinned", usage: "<workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact \"…\" [--used-by …]", run: write },
 };

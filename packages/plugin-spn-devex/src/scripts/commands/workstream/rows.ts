@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The commands · § Orders name what they need by id, and a workflow runs the ready rows
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-//   spn-devex workstream rows show <workstream>[/<arc>] [--ready] [--parallel] [--tree] [--json]
+//   spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--tree] [--json]
 //
 // `--ready` keeps the rows whose blockers have all resolved; `--parallel` keeps, of those, the ones
 // whose `touches` do not overlap; `--tree` draws each row under its parent.
@@ -51,5 +51,5 @@ function show(args: string[]): number {
 
 export const actions: Record<string, Action> = {
   show: { describe: "print the rows of a workstream or an arc: --ready, --parallel, --tree; with --json, as data",
-          usage: "<workstream>[/<arc>] [--ready] [--parallel] [--tree] [--json]", run: show },
+          usage: "<workstream>[/N<nnn>] [--ready] [--parallel] [--tree] [--json]", run: show },
 };
