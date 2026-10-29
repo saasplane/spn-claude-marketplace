@@ -121,13 +121,50 @@ console.log("\n=== 007 — a planning job is never a step: it leaves a decided a
   ok("every arc it wrote holds to the schema", ["N002", "N003"].every((id) => arcFaults(read(id)).length === 0), arcFaults(read("N002")).concat(arcFaults(read("N003"))).join("; "));
 }
 
+console.log("\n=== 008 — the switch folds into the debug node once spnutils has made .spndevex/state.json, and refuses before it");
+{
+  const m008 = MIGRATIONS.find((one) => one.id === "008");
+  ok("the plugin ships 008 after 007, at 0.89.0, with a script and no steps",
+    MIGRATIONS[7]?.id === "008" && m008?.version === "0.89.0" && m008.changed.endsWith(".") && typeof m008.script === "function" && !m008.steps?.length);
+  const SWITCHES = ".spndevex/.debug/switches.json";
+  const STATE = ".spndevex/state.json";
+  const SPNUTILS = '{\n  "workspace": {\n    "name": "saasplane"\n  },\n  "workstreams": {\n    "lastNumber": 35\n  }';
+  const REFUSAL = "Install Support 5.50.0 or later and run `spnutils workspace init <name>`; the switch moves into .spndevex/state.json after that.";
+
+  const early = workspace("m008-early", { [SWITCHES]: '{"telemetry": true}\n' }, [], { migrated: false });
+  ok("its check names the old file while it exists", m008.check(early).join() === `${SWITCHES} → the debug node of ${STATE}`, m008.check(early).join(" | "));
+  const refused = m008.script(early);
+  ok("with no state.json its script refuses in s3f's one line, and moves nothing",
+    refused.join() === REFUSAL && readFileSync(join(early, SWITCHES), "utf8") === '{"telemetry": true}\n' && !existsSync(join(early, STATE)), refused.join(" | "));
+  const walked = applyMigrations(early, MIGRATIONS, ["008"]);
+  ok("so it stays pending: written, it is not recorded and says why",
+    walked.code === 1 && walked.out.includes(`008 · ${REFUSAL}`) && walked.out.some((line) => line.startsWith("008 · not recorded"))
+      && !readLedger(early).entries.some((entry) => entry.id === "008"), walked.out.join(" | "));
+  ok("and the window's start still names it pending", windowStartLines(early, MIGRATIONS).some((line) => line.startsWith("- **008**")), windowStartLines(early, MIGRATIONS).join(" | "));
+
+  const ready = workspace("m008-fold", { [SWITCHES]: '{"telemetry": true}\n', [STATE]: `${SPNUTILS}\n}\n` }, [], { migrated: false });
+  const folded = applyMigrations(ready, MIGRATIONS, ["008"]);
+  const text = readFileSync(join(ready, STATE), "utf8");
+  ok("once spnutils has made the file, the switch folds into debug and the old file is deleted",
+    folded.code === 0 && JSON.parse(text).debug?.telemetry === true && !existsSync(join(ready, SWITCHES)) && text.startsWith(`${SPNUTILS},\n`), `${folded.out.join(" | ")} · ${text}`);
+  ok("its line says what moved, and it is recorded by its script",
+    folded.out.includes(`008 · ${SWITCHES} → ${STATE}, the debug node (telemetry on; the old file is deleted)`) && folded.out.includes("008 · recorded · by its script")
+      && m008.check(ready).length === 0, folded.out.join(" | "));
+
+  const both = workspace("m008-both", { [SWITCHES]: '{"telemetry": true}\n', [STATE]: `${SPNUTILS},\n  "debug": {\n    "telemetry": false\n  }\n}\n` }, [], { migrated: false });
+  const kept = m008.script(both);
+  ok("a debug node already there wins over the old file, which is deleted",
+    JSON.parse(readFileSync(join(both, STATE), "utf8")).debug.telemetry === false && !existsSync(join(both, SWITCHES))
+      && kept.join() === `${SWITCHES} deleted — ${STATE} holds a debug node already, and it is kept (telemetry off)`, kept.join(" | "));
+}
+
 console.log("\n=== a check that finds nothing → recorded without work");
 {
   const root = current("nothing-to-do");
   const [one] = standings(root, MIGRATIONS);
   ok("001 has nothing to do where the workstream is kept as data", one.state === "nothing to do", one.state);
   ok("the window's start says so in one line, naming the command that records it",
-    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007` records it, with nothing to do.",
+    windowStartLines(root, MIGRATIONS).join("\n") === "- 001, 002, 003, 004, 005, 006, 007, 008: the check finds nothing in the old shape — `spn-devex plugin migration write 001 002 003 004 005 006 007 008` records it, with nothing to do.",
     windowStartLines(root, MIGRATIONS).join("\n"));
   const applied = applyMigrations(root, MIGRATIONS, ["001"]);
   const line = JSON.parse(readFileSync(ledgerOf(root), "utf8").trim());

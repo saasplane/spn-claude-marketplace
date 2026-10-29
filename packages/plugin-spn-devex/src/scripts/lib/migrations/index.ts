@@ -12,5 +12,6 @@ import { migration004 } from "./004-design-rows.ts";
 import { migration005 } from "./005-lean-arcs.ts";
 import { migration006 } from "./006-stored-status.ts";
 import { migration007 } from "./007-planning-rows.ts";
+import { migration008 } from "./008-workspace-state.ts";
 
-export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007];
+export const MIGRATIONS: readonly Migration[] = [migration001, migration002, migration003, migration004, migration005, migration006, migration007, migration008];

@@ -39,6 +39,20 @@ try {
   ok("`off` turns it off and keeps the other keys of the file", off.code === 0 && off.out.trim() === "telemetry  off"
     && JSON.stringify(JSON.parse(readFileSync(file, "utf8"))) === JSON.stringify({ telemetry: false, kept: 1 }), readFileSync(file, "utf8"));
 
+  console.log("\n=== once spnutils has made .spndevex/state.json, the switch is its debug node");
+  const stateFile = join(root, ".spndevex", "state.json");
+  const SPNUTILS = '{\n  "workspace": {\n    "name": "saasplane"\n  },\n  "workstreams": {\n    "lastNumber": 35\n  }';
+  writeFileSync(stateFile, `${SPNUTILS}\n}\n`);
+  const node = typed(root, "on", "telemetry");
+  const text = readFileSync(stateFile, "utf8");
+  ok("`on` writes the debug node, keeping workspace and workstreams byte for byte",
+    node.code === 0 && text === `${SPNUTILS},\n  "debug": {\n    "telemetry": true\n  }\n}\n`, text);
+  ok("and leaves the old file as it was", JSON.stringify(JSON.parse(readFileSync(file, "utf8"))) === JSON.stringify({ telemetry: false, kept: 1 }), readFileSync(file, "utf8"));
+  ok("`show` reads the node", typed(root, "show").out.trim() === "telemetry  on");
+  typed(root, "off", "telemetry");
+  ok("`off` changes only debug.telemetry", readFileSync(stateFile, "utf8") === `${SPNUTILS},\n  "debug": {\n    "telemetry": false\n  }\n}\n`, readFileSync(stateFile, "utf8"));
+  rmSync(stateFile);
+
   console.log("\n=== the words");
   const unknown = typed(root, "on", "verbose");
   ok("an unknown name is refused with the set listed, and nothing is written",

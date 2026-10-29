@@ -181,7 +181,7 @@ export function approachOf(ws: string): string | null {
 /**
  * The file a script owns, as its place in a workstream, or null where the path is none: every file in
  * an arc's data folder, its three data files and its name file alike, and the workstream's two records.
- * The workspace's own `workstreams/state.json` is `spnutils`'s and is not one of these.
+ * The workspace's own `.spndevex/state.json` is `spnutils`'s but for its `debug` node, and is not one of these.
  */
 export function scriptOwned(path: string): { workstream: string; file: string } | null {
   const slashed = resolve(path).split(sep).join("/");
