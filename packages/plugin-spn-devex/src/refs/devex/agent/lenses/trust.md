@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "9adab203"
+      "seen": "9bbbc342"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
@@ -69,7 +69,7 @@ Threat modelling with **STRIDE**, and the **SOC 2 Trust Services Criteria**, for
 | `foundation + estate` | both halves; the control holds only when both do | each half by its own proof |
 | `company` | a policy, a review, a signed paper, a person on call | the organization; the map only names it |
 
-Met is ✅ only once a test or a check has seen the control refuse something; 🚧 is partly, 🔮 not yet. A row not met names the planned work that meets it.
+Met is ✅ only once a test or a check has seen the control refuse something; 🚧 is partly, 🔮 not yet. A row not met names the work that meets it, or says it is deferred, or that its code landed and its row has not.
 
 **Supported and certified are two claims** (`RD.PLATFORM.CORE.045`). A standard reads *supported* only once every foundation and estate row that asks for it is met. A company row never decides that, in either direction. A standard reads *certified* only once an outside auditor says so, and until then a supported standard reads *not certified yet*.
 

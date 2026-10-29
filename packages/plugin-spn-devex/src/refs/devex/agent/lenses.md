@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "f31cc588"
+      "seen": "f12d2c5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "9e929bd1"
+      "seen": "2213a815"
     }
   ]
 }
@@ -86,7 +86,7 @@
 | | Worn | A view | Convened |
 | --- | --- | --- | --- |
 | When | mid-task, while the work is written | while a shape is discussed with the developer, before anything is built on it | after, over a scope that already exists |
-| What it reads | the work in hand | the proposal's own words, and the developer's | the work itself, never a summary of it |
+| What it reads | the work in hand | the problem in the developer's words, the constraints and the nearest constructs, then the proposal | the work itself, never a summary of it |
 | What it produces | better work | objections and additions, each named by its view | a verdict and findings |
 | May it block | no | only when a fresh agent makes it, and only where its lens file says so | where its lens file says so |
 

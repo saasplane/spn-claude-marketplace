@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "22784284"
+      "seen": "f7fd61a4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
@@ -137,6 +137,8 @@ Declare one discriminator, `mtype`, on a polymorphic family's base, typed as the
 **Route every write to a module's storage through the owning service** — that is what keeps authorization, invariants, cache invalidation, audit and events from being skipped. Never list a repository in a contract, and never call one from an entry or from another module — only the owning module's own services call it.
 
 **A handler is called for every transaction the framework closes — MUST** (`RD.SUPPORT.APPS.224`). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. A handler runs inside the transaction before it commits, and its throw rolls the transaction back; work that must follow the outcome uses the transaction's hooks.
+
+**A transaction of its own is for a write that must outlive its caller — SHOULD** (`RD.SUPPORT.APPS.229`). It runs before the caller's transaction opens and never inside it, and a write that must never run inside a transaction declares `NEVER`.
 
 When you write a service method, compose the same seven steps, in order, each one declared line rather than hand-written control flow: gate → cached read or transaction open → repository work → cache invalidation → post-commit publish → audit → canonical re-read. Omit the steps a method does not need; never reorder them.
 
