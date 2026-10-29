@@ -26,7 +26,8 @@ console.log("=== help lists the group");
   const help = cli(root, ["help"]);
   for (const words of ["workstream state show", "workstream state check", "workstream rows show", "workstream arc edit", "workstream row add", "workstream row state", "workstream row note", "workstream row edit", "workstream row discard", "workstream arc stamp",
     "workstream report write", "workstream fact write", "workstream suggestion add", "workstream suggestion state", "workstream suggestion edit", "workstream progress write",
-    "workstream question raise", "workstream question show", "workstream question answer", "workstream question withdraw"])
+    "workstream question raise", "workstream question show", "workstream question answer", "workstream question withdraw",
+    "workstream sheet write", "workstream sheet edit", "workstream sheet drop", "workstream sheet show", "workstream sheet check"])
     ok(`help lists \`${words}\``, help.out.includes(words), words);
 }
 
@@ -538,6 +539,22 @@ console.log("\n=== row discard — a row found invalid leaves the arc, in the de
   ok("red: a row the arc lacks is refused", missing.code === 2 && missing.out.includes("finds no row 9"), missing.out);
   const check = cli(gone.root, ["workstream", "state", "check", "031"]);
   ok("the arc's data still holds to the schema", !/\[data\]/.test(check.out), check.out);
+}
+
+console.log("\n=== the change sheet — the opening write, and a row's entries");
+{
+  const opened = cli(root, ["workstream", "arc", "edit", "031/N070", "--title", "the sheet arc", "--subject", "sheeted", "--goal", "the sheet is kept"]);
+  const sheetFile = join(ws, "arcs", "N070", "sheet.json");
+  ok("the opening write writes the empty sheet beside state.json", opened.code === 0 && existsSync(sheetFile) &&
+    JSON.stringify(json(sheetFile)) === JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [] }), opened.out);
+  const added = cli(root, ["workstream", "row", "add", "031/N070", "build it", "--repo", "spn-x", "--altitude", "CODE", "--entries", "E1,E2"]);
+  ok("`row add --entries` names the entries on the row", added.code === 0 && json(join(ws, "arcs", "N070", "state.json")).rows[0].entries.join() === "E1,E2", added.out);
+  const edited = cli(root, ["workstream", "row", "edit", "031/N070", "1", "--entries", "E3"]);
+  ok("`row edit --entries` changes them", edited.code === 0 && /entries/.test(edited.out) && json(join(ws, "arcs", "N070", "state.json")).rows[0].entries.join() === "E3", edited.out);
+  const bad = cli(root, ["workstream", "row", "edit", "031/N070", "1", "--entries", "X1"]);
+  ok("red: a name that is no entry id is refused", bad.code !== 0 && json(join(ws, "arcs", "N070", "state.json")).rows[0].entries.join() === "E3", bad.out);
+  const arcSide = cli(root, ["workstream", "arc", "edit", "031/N070", "--entries", "E1"]);
+  ok("red: `arc edit` refuses `--entries`, a row's field", arcSide.code !== 0 && arcSide.out.includes("row edit"), arcSide.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream commands` : `\n  all ${total} passed — workstream commands`);

@@ -17,11 +17,11 @@ import { STORED_STATUSES } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import {
   NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
-  previewPathFault, proposedLines, readArc, restamped, stampsOn, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
+  previewPathFault, proposedLines, readArc, restamped, sheetFileOf, stampsOn, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
 export const describe = "an arc's header written, opened or changed; the stamp an arc's Cycles row carries, written once the page is current with its goal, title and repositories; or an arc never decided, deleted";
@@ -209,6 +209,7 @@ function edit(args: string[]): number {
     header(data, words);
     foresee(ws, data, under);
     typed(() => writeArc(ws, data!));
+    writeWhole(sheetFileOf(ws, arc), `${JSON.stringify({ schemaVersion: SHEET_SCHEMA_VERSION, releaseChain: [], dependsOn: [], stack: null, entries: [] }, null, 2)}\n`);
     logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
     said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     opened = leavePageWhole(ws, data, under);

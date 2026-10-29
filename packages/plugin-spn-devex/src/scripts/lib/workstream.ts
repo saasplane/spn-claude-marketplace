@@ -16,7 +16,7 @@ import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
-  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
+  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
 } from "./workstream-schema.ts";
 
 // ---------------------------------------------------------------------------- the folder
@@ -25,6 +25,8 @@ export const NOTES = "notes";
 export const STATE_FILE = "state.json";
 export const LOG_FILE = "log.jsonl";
 export const FACTS_FILE = "facts.jsonl";
+/** An arc's change sheet, written by the `workstream sheet` commands and the opening write of `arc edit`. */
+export const SHEET_FILE = "sheet.json";
 export const QUESTIONS_FILE = "questions.jsonl";
 export const SUGGESTIONS_FILE = "suggestions.jsonl";
 /** An arc's one preview, by its fixed name, in `notes/N<nnn>/`. */
@@ -139,6 +141,7 @@ export const arcDataDir = (ws: string, arc: string): string => join(ws, ARCS, ar
 export const stateFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), STATE_FILE);
 export const logFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), LOG_FILE);
 export const factsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FACTS_FILE);
+export const sheetFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), SHEET_FILE);
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
 /**
@@ -161,7 +164,7 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RD.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder; with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE];
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE];
 
 /**
  * The arc's address on the approach page: its Cycles row, by its number (RD.DEVEX.WORKSPACE.263).
@@ -327,6 +330,12 @@ export function writeJsonl(path: string, records: readonly unknown[]): void {
 export function appendJsonl(path: string, record: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
   appendFileSync(path, `${JSON.stringify(record)}\n`, "utf8");
+}
+
+/** An arc's change sheet, or null where it keeps none: the arc is then judged as it was before sheets. */
+export function readSheet(ws: string, arc: string): Sheet | null {
+  const data = readJson(sheetFileOf(ws, arc));
+  return data && typeof data === "object" && !Array.isArray(data) ? data as Sheet : null;
 }
 
 /** An arc's data, or null where its `state.json` is absent or does not parse. */

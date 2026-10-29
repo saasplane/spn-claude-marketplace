@@ -20,12 +20,12 @@ import { stepRowFindings } from "../../checks/workstream-state.ts";
 export const describe = "add a row, move its state, write a note on it, change its fields, or discard one found invalid";
 
 const ROW_TEXT = ["parent", "title", "repo", "mechanism", "acceptance", "model", "proof", "order"] as const;
-const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", touches: "touches", decisions: "decisions", facts: "facts" };
+const ROW_LISTS: Record<string, keyof ArcRow> = { "blocked-by": "blockedBy", touches: "touches", decisions: "decisions", facts: "facts", entries: "entries" };
 
 /** What a row carries beyond its title, shared by `row add` and `row edit`. */
 const FIELDS = {
   repo: VALUE, altitude: ALTITUDES, kind: ROW_KINDS, model: VALUE, "blocked-by": VALUE, touches: VALUE, position: VALUE,
-  parent: VALUE, mechanism: VALUE, acceptance: VALUE, decisions: VALUE, facts: VALUE, proof: VALUE, order: VALUE,
+  parent: VALUE, mechanism: VALUE, acceptance: VALUE, decisions: VALUE, facts: VALUE, entries: VALUE, proof: VALUE, order: VALUE,
 } as const;
 const ADD_OPTIONS = { ...FIELDS, state: ROW_STATES, note: VALUE } as const;
 const EDIT_OPTIONS = { ...FIELDS, title: VALUE } as const;
@@ -251,7 +251,7 @@ function discard(args: string[]): number {
 export const actions: Record<string, Action> = {
   add: {
     describe: "add a row to an arc, taking the arc's next number and printing it",
-    usage: "<workstream>/N<nnn> \"<title>\" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …]",
+    usage: "<workstream>/N<nnn> \"<title>\" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …]",
     run: add,
   },
   state: {
@@ -266,7 +266,7 @@ export const actions: Record<string, Action> = {
   },
   edit: {
     describe: "change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--position …]",
+    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …]",
     run: edit,
   },
   discard: {

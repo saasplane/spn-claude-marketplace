@@ -1,0 +1,184 @@
+// `commands/workstream/sheet.ts` — the change sheet as the arc's data: written whole from a file, one entry
+// edited or dropped, shown for a row, and checked against the rows and the cards. Run as the agent types
+// the commands, in a throwaway workspace.
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { CARD, cli, dataWorkspace } from "../../../../helpers/workstream-fixture.mjs";
+
+let total = 0, failed = 0;
+const ok = (label, condition, detail = "") => {
+  total += 1;
+  if (condition) { console.log(`  PASS  ${label}`); return; }
+  failed += 1;
+  console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
+};
+const json = (path) => JSON.parse(readFileSync(path, "utf8"));
+const lines = (path) => (existsSync(path) ? readFileSync(path, "utf8") : "").split("\n").filter(Boolean).map((line) => JSON.parse(line));
+
+const { root, ws } = await dataWorkspace("sheet");
+const sheetFile = join(ws, "arcs", "N001", "sheet.json");
+const log = join(ws, "arcs", "N001", "log.jsonl");
+const stateFile = join(ws, "arcs", "N001", "state.json");
+
+const entry = (id, over = {}) => ({
+  id, op: "edit", file: `spn-x:packages/mod/src/app/services/Thing${id}.ts`, what: `change ${id}`, decidedBy: ["q1"], facts: ["f1"],
+  then: [], rules: [], callers: [], tiers: { unit: [`T.${id}.01`] }, docs: [], book: [], ...over,
+});
+const sheetOf = (entries, over = {}) => ({
+  schemaVersion: 1, releaseChain: ["merges with the pull request"], dependsOn: [],
+  stack: { folder: "the spn-x checkout at the branch tip, never a worktree folder", dmo: "none", reset: "from empty, before the contract tier" },
+  entries, ...over,
+});
+const put = (name, value) => { const path = join(root, name); writeFileSync(path, JSON.stringify(value, null, 2)); return path; };
+const sheet = (...args) => cli(root, ["workstream", "sheet", ...args]);
+
+// the arc has one fact, f1
+console.log("=== help lists the five commands");
+{
+  const help = cli(root, ["help"]);
+  for (const words of ["workstream sheet write", "workstream sheet edit", "workstream sheet drop", "workstream sheet show", "workstream sheet check"])
+    ok(`help lists \`${words}\``, help.out.includes(words), words);
+}
+
+console.log("\n=== an arc with no sheet.json is judged as before");
+{
+  const shown = sheet("show", "N001");
+  ok("show says so in one line and exits 0", shown.code === 0 && shown.out.trim().split("\n").length === 1 && shown.out.includes("no sheet"), shown.out);
+  const checked = sheet("check", "N001");
+  ok("check says so in one line and exits 0", checked.code === 0 && checked.out.trim().split("\n").length === 1 && checked.out.includes("no sheet"), checked.out);
+  const edited = sheet("edit", "N001", "E1", "--what", "x");
+  ok("edit is refused and names `sheet write`", edited.code !== 0 && edited.out.includes("sheet write"), edited.out);
+}
+
+console.log("\n=== write: a whole sheet in one call");
+{
+  const fact = cli(root, ["workstream", "fact", "write", "N001", "--source", "spn-x/a.ts", "--fact", "a is 1", "--used-by", "1"]);
+  ok("a fact f1 is pinned", fact.code === 0 && fact.out.includes("f1"), fact.out);
+  const file = put("sheet-in.json", sheetOf([entry("E1"), entry("E2", { facts: ["f1"], tiers: { unit: ["T.2.01", "T.2.02"], contract: ["T.2.03"] }, callers: ["a.ts", "b.ts"], then: ["spnutils apps gen-barrel mod"] })]));
+  const wrote = sheet("write", "N001", "--file", file);
+  ok("writes and says how many entries", wrote.code === 0 && wrote.out.includes("2 entries"), wrote.out);
+  ok("sheet.json holds both entries, whole", existsSync(sheetFile) && json(sheetFile).entries.length === 2 && json(sheetFile).entries[1].tiers.contract[0] === "T.2.03");
+  const last = lines(log).at(-1);
+  ok("one log line", last.kind === "sheet" && last.note.includes("2 entries"), JSON.stringify(last));
+}
+
+console.log("\n=== write: a fault is refused with nothing written");
+{
+  const before = readFileSync(sheetFile, "utf8");
+  const logged = lines(log).length;
+  const refuse = (label, value, words) => {
+    const run = sheet("write", "N001", "--file", put("bad.json", value));
+    ok(label, run.code === 1 && run.out.startsWith("Refused: ") && run.out.includes("Nothing was written.") && words.every((word) => run.out.includes(word)), run.out);
+  };
+  refuse("an empty field is refused", sheetOf([entry("E1", { what: "" })]), ["E1", "what"]);
+  refuse("an absent list is refused", sheetOf([(() => { const one = entry("E1"); delete one.callers; return one; })()]), ["E1", "callers"]);
+  refuse("an unknown op is refused", sheetOf([entry("E1", { op: "mangle" })]), ["E1", "mangle"]);
+  refuse("an entry with no fact is refused", sheetOf([entry("E1", { facts: [] })]), ["E1 names no fact"]);
+  refuse("a fact the arc does not hold is refused", sheetOf([entry("E1", { facts: ["f9"] })]), ["E1", "f9"]);
+  refuse("an entry with no tiers is refused", sheetOf([(() => { const one = entry("E1"); delete one.tiers; return one; })()]), ["E1 has no"]);
+  refuse("an unknown tier is refused", sheetOf([entry("E1", { tiers: { smoke: ["X"] } })]), ["E1", "smoke"]);
+  refuse("a repeated id is refused", sheetOf([entry("E1"), entry("E1")]), ["E1 is written twice"]);
+  refuse("a null stack is refused", sheetOf([entry("E1")], { stack: null }), ["stack"]);
+  refuse("two faults are joined with a dot between", sheetOf([entry("E1", { facts: [] }), entry("E2", { what: "" })]), [" · "]);
+  const missing = sheet("write", "N001", "--file", join(root, "nope.json"));
+  ok("a file that is not there is refused", missing.code !== 0, missing.out);
+  ok("sheet.json is as it was, and no line was logged", readFileSync(sheetFile, "utf8") === before && lines(log).length === logged);
+}
+
+console.log("\n=== edit: one entry");
+{
+  const run = sheet("edit", "N001", "E1", "--what", "a new line", "--then", "spnutils a b,spnutils c d", "--tiers", "unit=T.1.01,T.1.02;contract=T.1.03", "--decided-by", "q1,s2", "--facts", "f1");
+  const one = json(sheetFile).entries[0];
+  ok("the entry changes and nothing else does", run.code === 0 && one.what === "a new line" && one.then.length === 2 && one.tiers.unit.length === 2 && one.tiers.contract[0] === "T.1.03" && one.decidedBy[1] === "s2" && json(sheetFile).entries[1].what === "change E2", run.out + JSON.stringify(one));
+  ok("one log line", lines(log).at(-1).kind === "sheet" && lines(log).at(-1).note.includes("E1"));
+  const none = sheet("edit", "N001", "E1", "--tiers", "none");
+  ok("`--tiers none` empties the tiers", none.code === 0 && Object.keys(json(sheetFile).entries[0].tiers).length === 0, none.out);
+  const bad = sheet("edit", "N001", "E1", "--op", "mangle");
+  ok("an invalid edit is refused with nothing written", bad.code !== 0 && json(sheetFile).entries[0].op === "edit", bad.out);
+  const fact = sheet("edit", "N001", "E1", "--facts", "f9");
+  ok("a fact the arc lacks is refused", fact.code === 1 && fact.out.includes("f9") && fact.out.includes("Nothing was written"), fact.out);
+  const gone = sheet("edit", "N001", "E9", "--what", "x");
+  ok("a missing entry is refused, naming `sheet write`", gone.code !== 0 && gone.out.includes("E9") && gone.out.includes("sheet write"), gone.out);
+  const same = sheet("edit", "N001", "E1");
+  ok("an edit naming no field changes nothing", same.code !== 0, same.out);
+}
+
+console.log("\n=== show");
+{
+  const rows = json(stateFile);
+  rows.rows[1].entries = ["E2"];
+  writeFileSync(stateFile, JSON.stringify(rows, null, 2));
+  const all = sheet("show", "N001");
+  ok("the head line names the arc, the count, the stack's folder and the reset", all.code === 0 && /^N001 · 2 entries · stack: the spn-x checkout at the branch tip · reset from empty/.test(all.out), all.out);
+  ok("a line for each entry", /\nE1 edit /.test(all.out) && /\nE2 edit /.test(all.out), all.out);
+  ok("E2's line carries its then, callers and tier counts", /E2 edit .*then gen-barrel.*callers 2.*unit 2.*contract 1/.test(all.out), all.out);
+  ok("it ends on the --json hint", all.out.trim().endsWith("--json for every field"), all.out);
+  const row = sheet("show", "N001", "--row", "2");
+  ok("`--row` prints only that row's entries", row.code === 0 && row.out.includes("row 2 · 1 entries") && row.out.includes("E2 edit") && !row.out.includes("E1 edit"), row.out);
+  const asJson = sheet("show", "N001", "--row", "2", "--json");
+  ok("`--json` prints the entries whole", asJson.code === 0 && JSON.parse(asJson.out).entries.length === 1 && JSON.parse(asJson.out).entries[0].id === "E2", asJson.out);
+  const nope = sheet("show", "N001", "--row", "9");
+  ok("a row the arc lacks is refused", nope.code !== 0, nope.out);
+}
+
+console.log("\n=== check");
+{
+  // E1 is named by no row; row 2 (CODE) names E2, which names a test; the arc has a CODE row.
+  const first = sheet("check", "N001");
+  ok("an entry no row names is found", first.out.includes("E1 is named by no row"), first.out);
+  ok("it ends on the count and exits 1", first.code === 1 && /\n1 finding · exit 1\n?$/.test(first.out), first.out);
+
+  const rows = json(stateFile);
+  rows.rows[0].entries = ["E1"]; rows.rows[1].entries = ["E2", "E7"];
+  writeFileSync(stateFile, JSON.stringify(rows, null, 2));
+  const second = sheet("check", "N001");
+  ok("a row naming an entry the sheet does not hold is found", second.out.includes("row 2 names E7, which the sheet does not hold"), second.out);
+
+  sheet("edit", "N001", "E2", "--tiers", "none");
+  rows.rows[1].entries = ["E2"];
+  writeFileSync(stateFile, JSON.stringify(rows, null, 2));
+  const third = sheet("check", "N001");
+  ok("a CODE row whose entries name no test is found", third.out.includes("row 2 is a CODE row and its entries name no test"), third.out);
+  sheet("edit", "N001", "E2", "--tiers", "unit=T.2.01");
+
+  for (const one of ["E1", "E2"]) sheet("edit", "N001", one, "--decided-by", "s2");
+  const raised = cli(root, ["workstream", "question", "raise", "N001", "--file", put("card.json", CARD)]);
+  const id = /q\d+/.exec(raised.out)?.[0];
+  const answered = id ? cli(root, ["workstream", "question", "answer", id, "--key", "A", "--words", "A it is"]) : raised;
+  const fourth = sheet("check", "N001");
+  ok("an answered card no entry cites is found", id && fourth.out.includes(`${id} is answered and no entry cites it`) || false, `${raised.out} ${answered.out} ${fourth.out}`);
+
+  const sheetData = json(sheetFile);
+  sheetData.stack = null;
+  writeFileSync(sheetFile, JSON.stringify(sheetData, null, 2));
+  const fifth = sheet("check", "N001");
+  ok("a null stack while the arc has a CODE row is found", fifth.out.includes("stack is null"), fifth.out);
+}
+
+console.log("\n=== check: a whole sheet exits 0");
+{
+  const rows = json(stateFile);
+  rows.rows[0].entries = ["E1"]; rows.rows[1].entries = ["E2"];
+  writeFileSync(stateFile, JSON.stringify(rows, null, 2));
+  const data = json(sheetFile);
+  data.stack = sheetOf([]).stack;
+  const id = /q\d+/.exec(readFileSync(join(ws, "questions.jsonl"), "utf8"))?.[0] ?? "q1";
+  data.entries[0].decidedBy = [id];
+  writeFileSync(sheetFile, JSON.stringify(data, null, 2));
+  const run = sheet("check", "N001");
+  ok("no finding, exit 0", run.code === 0 && !run.out.includes("finding"), run.out);
+}
+
+console.log("\n=== drop");
+{
+  const noNote = sheet("drop", "N001", "E1");
+  ok("drop needs a note", noNote.code !== 0 && json(sheetFile).entries.length === 2, noNote.out);
+  const run = sheet("drop", "N001", "E1", "--note", "no longer needed");
+  ok("the entry is taken out", run.code === 0 && json(sheetFile).entries.length === 1 && json(sheetFile).entries[0].id === "E2", run.out);
+  ok("the note goes to its log line", lines(log).at(-1).note.includes("no longer needed") && lines(log).at(-1).kind === "sheet");
+  const again = sheet("drop", "N001", "E1", "--note", "x");
+  ok("a missing entry is refused", again.code !== 0, again.out);
+}
+
+console.log(failed ? `\n  ${failed} of ${total} FAILED — sheet` : `\n  all ${total} passed — sheet`);
+process.exit(failed ? 1 : 0);

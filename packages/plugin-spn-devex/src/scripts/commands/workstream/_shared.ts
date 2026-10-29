@@ -77,7 +77,7 @@ export function refreshIfMoved(ws: string, before: ReturnType<typeof arcSignatur
 }
 
 /** The options that describe a row, and no arc: `arc edit` refuses them and names `row edit`. */
-export const ROW_FLAGS = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "state", "proof", "order"];
+export const ROW_FLAGS = ["parent", "kind", "repo", "altitude", "mechanism", "acceptance", "blocked-by", "touches", "decisions", "facts", "entries", "state", "proof", "order"];
 /** The options that describe an arc's header, and no row: `row add` and `row edit` refuse them and name `arc edit`. */
 export const ARC_FLAGS = ["under", "subject", "goal", "status", "reason", "wait", "start", "review-fixes", "decides", "repos", "cycle", "follows", "preview"];
 

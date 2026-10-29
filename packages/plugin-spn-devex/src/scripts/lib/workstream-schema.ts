@@ -52,6 +52,14 @@ export function subjectFault(subject: string): string | null {
 /** A row's id: a number, an optional letter, and optional dotted parts — `57`, `57b`, `3e.1`. */
 export const ROW_ID = /^\d+[a-z]?(?:\.\d+[a-z]?)*$/i;
 export const FACT_ID = /^f\d+$/;
+/** The version of `sheet.json` this plugin reads and writes. */
+export const SHEET_SCHEMA_VERSION = 1;
+/** A change-sheet entry's id, `E3`. */
+export const ENTRY_ID = /^E\d+$/;
+/** What an entry does to its file. */
+export const ENTRY_OPS = ["create", "edit", "drop", "rename"] as const;
+/** The tiers an entry's tests are named at. */
+export const TIERS = ["unit", "component", "contract", "integration", "journey"] as const;
 export const SUGGESTION_ID = /^s\d+$/;
 export const QUESTION_ID = /^q\d+$/;
 /** What a row may wait on: a row of its arc, a card, or an arc or a row of another arc (`N011`, `N011/3`). */
@@ -61,7 +69,7 @@ export type Cost = { tokens: number; minutes: number };
 export type ArcRow = {
   id: string; parent: string; title: string; kind: string;
   repo?: string | null; altitude?: string | null; mechanism?: string | null; acceptance?: string | null; model?: string | null;
-  blockedBy?: string[]; touches?: string[]; decisions?: string[]; facts?: string[];
+  blockedBy?: string[]; touches?: string[]; decisions?: string[]; facts?: string[]; entries?: string[];
   state?: RowState | null; proof?: string | null; cost?: Cost | null; commits?: Record<string, string[]> | null; order?: string | null;
   [field: string]: unknown;
 };
@@ -162,6 +170,7 @@ const ROW_FIELDS: Record<string, Rule> = {
   touches: { kind: "strings", required: false, pattern: /^[^:\s]+:\S/ },
   decisions: { kind: "strings", required: false },
   facts: { kind: "strings", required: false, pattern: FACT_ID },
+  entries: { kind: "strings", required: false, pattern: ENTRY_ID },
   state: { kind: "enum", required: false, values: ROW_STATES, nullable: true },
   proof: { kind: "text", required: false },
   order: { kind: "text", required: false },
@@ -284,5 +293,61 @@ export function questionFaults(line: unknown, where: string): string[] {
   if ((line.state === "answered" || line.state === "withdrawn") &&
       !(isObject(line.answer) && typeof line.answer.words === "string" && typeof line.answer.at === "string"))
     out.push(`${where} is ${String(line.state)} and carries no answer with your words and when`);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- the change sheet
+
+export type SheetStack = { folder: string; dmo: string; reset: string; ports?: string };
+export type SheetEntry = {
+  id: string; op: string; file: string; what: string; decidedBy: string[]; facts: string[]; then: string[];
+  rules: string[]; callers: string[]; tiers: Record<string, string[]>; docs: string[]; book: string[];
+  [field: string]: unknown;
+};
+export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
+
+const STACK_FIELDS: Record<string, Rule> = {
+  folder: { kind: "string", required: true }, dmo: { kind: "string", required: true },
+  reset: { kind: "string", required: true }, ports: { kind: "text", required: false },
+};
+const SHEET_FIELDS: Record<string, Rule> = {
+  releaseChain: { kind: "strings", required: true }, dependsOn: { kind: "strings", required: true },
+};
+const ENTRY_FIELDS: Record<string, Rule> = {
+  id: { kind: "string", required: true, pattern: ENTRY_ID },
+  op: { kind: "enum", required: true, values: ENTRY_OPS },
+  file: { kind: "string", required: true, pattern: /^[^:\s]+:\S/ },
+  what: { kind: "string", required: true },
+  decidedBy: { kind: "strings", required: true }, facts: { kind: "strings", required: true, pattern: FACT_ID },
+  then: { kind: "strings", required: true }, rules: { kind: "strings", required: true }, callers: { kind: "strings", required: true },
+  docs: { kind: "strings", required: true }, book: { kind: "strings", required: true },
+};
+
+/**
+ * Every fault of a change sheet, read as JSON already. The header's faults are named by `where`; an entry's by its id, so a
+ * refusal reads `E3 has no \`tiers\``. A null stack is whole here (the opening write); `sheet write` refuses it.
+ */
+export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
+  if (!isObject(data)) return [`${where} is not a JSON object`];
+  const out: string[] = [];
+  if (data.schemaVersion !== SHEET_SCHEMA_VERSION) out.push(`${where}'s \`schemaVersion\` is \`${String(data.schemaVersion)}\`, and this spn-devex reads ${SHEET_SCHEMA_VERSION}`);
+  out.push(...fieldFaults(where, data, SHEET_FIELDS));
+  if (data.stack === undefined) out.push(`${where} has no \`stack\``);
+  else if (data.stack !== null) out.push(...(isObject(data.stack) ? fieldFaults(`${where}'s stack`, data.stack, STACK_FIELDS) : [`${where}'s \`stack\` is neither { folder, dmo, reset } nor null`]));
+  if (!Array.isArray(data.entries)) { out.push(`${where}'s \`entries\` is not a list`); return out; }
+  const seen = new Set<string>();
+  for (const [at, entry] of data.entries.entries()) {
+    if (!isObject(entry)) { out.push(`${where}'s entry ${at + 1} is not an object`); continue; }
+    const label = typeof entry.id === "string" && entry.id ? entry.id : `entry ${at + 1}`;
+    out.push(...fieldFaults(label, entry, ENTRY_FIELDS));
+    if (typeof entry.id === "string") { if (seen.has(entry.id)) out.push(`${label} is written twice`); seen.add(entry.id); }
+    if (Array.isArray(entry.facts) && !entry.facts.length) out.push(`${label} names no fact`);
+    if (entry.tiers === undefined) out.push(`${label} has no \`tiers\``);
+    else if (!isObject(entry.tiers)) out.push(`${label}'s \`tiers\` is not an object from a tier to its behaviour ids`);
+    else for (const [tier, ids] of Object.entries(entry.tiers)) {
+      if (!(TIERS as readonly string[]).includes(tier)) out.push(`${label}'s \`tiers\` holds \`${tier}\`, and a tier is one of ${TIERS.join(" · ")}`);
+      else if (!Array.isArray(ids) || !ids.length || ids.some((id) => typeof id !== "string" || !id.trim())) out.push(`${label}'s \`${tier}\` is not a list of behaviour ids`);
+    }
+  }
   return out;
 }
