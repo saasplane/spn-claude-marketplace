@@ -43,7 +43,7 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { type Computed, hashFile, hashFiles, prune, type Source, verdictFor } from "../lib/corpus-cache.ts";
+import { type Computed, hashFile, hashFiles, prune, type Source, storeMissingLine, verdictFor } from "../lib/corpus-cache.ts";
 import { bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Warning = { check: string; message: string };
@@ -253,7 +253,12 @@ export type SubjectRun = { subject: string; source: Source | "skipped" | "not re
  * it. SKIPPING THE WORK IS THE POINT; skipping the VERDICT never was. The findings are stored with the
  * key and re-reported verbatim until the tree or the checker moves.
  */
-export function runCorpus(root: string, repos: Set<string> | null = null): { warnings: Warning[]; runs: SubjectRun[] } {
+export function runCorpus(root: string, repos: Set<string> | null = null): { warnings: Warning[]; runs: SubjectRun[]; stopped?: string } {
+  // NO HOME, NO STORE: the run stops with the line that names the command, and runs nothing. The Stop
+  // hook ignores the line, since a hook says nothing when the home is missing.
+  const stopped = storeMissingLine();
+  if (stopped) return { warnings: [], runs: [], stopped };
+
   // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RD.DEVEX.WORKSPACE.236).
   // `null` is every tree, and only the command run by hand asks for it; the Stop hook always passes the set.
   const trees = docsTrees(root).filter((tree) => !repos || repos.has(basename(dirname(tree))));
@@ -370,7 +375,8 @@ if (process.argv[1] && basename(process.argv[1]) === "corpus.ts") {
   const root = process.argv[2] ?? process.cwd();
   // `--repos=a,b` reads as a window that wrote under those repositories, and `--repos=` as one that wrote under none.
   const only = process.argv.find((arg) => arg.startsWith("--repos="));
-  const { warnings, runs } = runCorpus(root, only ? new Set(only.slice("--repos=".length).split(",").filter(Boolean)) : null);
+  const { warnings, runs, stopped } = runCorpus(root, only ? new Set(only.slice("--repos=".length).split(",").filter(Boolean)) : null);
+  if (stopped) { console.log(stopped); process.exit(1); }
   // What each subject did goes first, so a reader can see which trees were re-run and which replayed.
   console.log(`subjects: ${runs.map((r) => `${r.subject} ${r.source}`).join(" · ") || "none"}\n`);
   for (const w of warnings) console.log(`[${w.check}] ${w.message}\n`);

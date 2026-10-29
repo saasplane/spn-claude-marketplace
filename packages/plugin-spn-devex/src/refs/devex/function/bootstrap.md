@@ -47,7 +47,7 @@ somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version mana
 before the CLI: it serves the checks that render a page rather than reading its source. Those report
 *not checked* on a machine without it, so an install that skipped it still works. **The browser you
 install here is for the rendering checks, not for automation**: `spnutils` provisions its own Chrome
-under `~/.spnutils/browser/chrome`, because Chrome refuses automation on the default one, and you
+under `~/.saasplane/state/browser/chrome`, because Chrome refuses automation on the default one, and you
 install nothing for that.
 
 **Part 1 · Your workspace**

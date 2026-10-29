@@ -228,10 +228,10 @@ Some facts about the web are numbers that only a browser can say, because the st
 
 ### The folders of the tool
 
-The folder is `~/.spnutils/surface/`. It holds what the tool takes in and what the tool makes, in two folders, one for the library's side and one for each stack's.
+The folder is `~/.saasplane/state/surface/`. It holds what the tool takes in and what the tool makes, in two folders, one for the library's side and one for each stack's.
 
 ```text
-~/.spnutils/surface/
+~/.saasplane/state/surface/
   library/                          the library's side, taken in by `library`
     ds-1-core.inventory.json        one inventory for each library file
     ds-2-components.inventory.json

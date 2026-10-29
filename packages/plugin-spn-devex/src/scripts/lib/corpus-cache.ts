@@ -1,4 +1,4 @@
-// The corpus check's verdict store, in `~/.spnutils/cache/corpus/`: one immutable file per verdict,
+// The corpus check's verdict store, in `~/.saasplane/cache/plugins/spn-devex/corpus/`: one immutable file per verdict,
 // named by the content it describes, shared safely by every window on the machine. The rule it
 // follows is spn-foundation `docs/02-constructs/01-devex/02-agent/04-plugins.md` § The shape of a
 // plugin: a plugin's state lives in the machine store, never in the shared `.spndevex/` folder.
@@ -7,14 +7,14 @@ import { createHash, randomBytes } from "node:crypto";
 import {
   closeSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync, writeSync,
 } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
+import { missingHomeLine, roomPath } from "./machine-home.ts";
 
 /**
  * The one way to move the store, and it exists for the plugin's own tests and measurements only.
  *
- * A user never sets this. The machine store is `~/.spnutils`, resolved the way the `spnutils` CLI
- * resolves it (`os.homedir()`), so every window on the machine shares one store.
+ * A user never sets this. The machine store is the plugin's room under `~/.saasplane/`, found through
+ * `machine-home.ts`, so every window on the machine shares one store.
  */
 export const TEST_STORE_ENV = "SPN_CORPUS_CACHE_FOR_TESTS";
 
@@ -30,7 +30,15 @@ const PRUNE_AFTER_MS = 14 * 24 * 60 * 60 * 1000;
 const TEMP_STALE_MS = 60 * 60 * 1000;
 
 export function storeDir(): string {
-  return process.env[TEST_STORE_ENV] || join(homedir(), ".spnutils", "cache", "corpus");
+  return process.env[TEST_STORE_ENV] || roomPath("cache", "plugins", "spn-devex", "corpus");
+}
+
+/**
+ * The line to say when the store cannot be used because spnutils has not made the home, else `null`.
+ * The store makes its own room, but only inside a home that is there; the test override needs none.
+ */
+export function storeMissingLine(): string | null {
+  return process.env[TEST_STORE_ENV] ? null : missingHomeLine();
 }
 
 /** What one subject's tools found. `findings` are the lines replayed verbatim on a later run. */

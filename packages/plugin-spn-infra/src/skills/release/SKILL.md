@@ -42,7 +42,7 @@ spnutils infra release <package> -y            # → the org's registry pair
 spnutils infra release <package> --local -y    # → the machine store, staged only
 ```
 
-- **The release target is the organization's `-public`/`-private` pair**, routed by the name's scope. Same as `apps release`. **`--local` stages into the machine store (`~/.spnutils/registry`) instead** — the target is a choice on the command, never derived from what happens to be bound.
+- **The release target is the organization's `-public`/`-private` pair**, routed by the name's scope. Same as `apps release`. **`--local` stages into the machine store (`~/.saasplane/state/infra/registry`) instead** — the target is a choice on the command, never derived from what happens to be bound.
 - **A `--local` stage is not a publish.** The store is the resolve-side cache — where a fetched artifact is kept, and where an unbound workspace may stage its own. Never report a stage as a release, and never tell a consumer to pin against one.
 - An **unlisted scope refuses by name** — `scopes` routes everything.
 - A version **already present refuses** — immutability holds in the pair and in the cache alike. A fix is a new version, never a re-publish.

@@ -103,7 +103,7 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.saasplane`** on purpose. `rm -rf ~/.saasplane/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
