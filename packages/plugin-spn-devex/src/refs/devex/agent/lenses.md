@@ -122,9 +122,11 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | | The one agent reads the lens file | A fresh agent speaks |
 | --- | --- | --- |
 | Used for | a choice with fewer than two signs | a choice with two signs or more, and any view whose word is to count as a review that can block a gate (only a lens that may block can) |
-| What it knows | the whole conversation | only what it is handed: the proposal's own words, and the developer's. There is no file yet |
+| What it knows | the whole conversation | only what it is handed: the problem in the developer's words, the constraints, and the nearest constructs by path. It answers before it reads the proposal. There is no file yet |
 | How independent | the least. The agent that prefers a design also argues against it | the most. It has not read the agent's own reasons |
 | May it block | no. It is a worn lens | yes, where its lens file says so |
+
+**A fresh view is handed the problem first, and sees the proposal only after it has said what it would build — MUST** (`RD.DEVEX.AGENT.086`). A view handed only a proposal answers inside it. The brief gives the problem in the developer's words, the constraints, and the existing constructs nearest the change, by path. The view answers open, saying what it would build and where it would live, then reads the proposal and says where the two differ, what it objects to and what it would add.
 
 **A view that the one agent makes is advice, whatever lens it reads.** The context that wrote a proposal cannot block it, and it cannot pass it either.
 
@@ -169,7 +171,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | structure before content | are the units, their names and their grouping designed, before anything is put in them? |
 | ownership and direction | who owns this, and which way does the dependency point? |
 | every place a change lands | each repository, the estate and the cloud, the local stack, the book and the plugin |
-| new or existing | is this a pattern the system already has? |
+| new or existing | on anything new, who reads it and who writes it, so is it a page, a note or data, and which existing construct of that kind does it join? Whether the system already has the pattern comes second, answered from that construct |
 | the build | does the code that was written still match the design? |
 | what the work needs written | what goes on the approach page, in a preview, in a sample, in the plan and in an order, and how detailed each one is |
 | the order of execution | what order makes the whole work cheapest? |

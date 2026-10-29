@@ -145,6 +145,15 @@
     </tbody>
   </table></div>
 
+  <h3 id="s3h">{{A subsection that shows each behaviour row the arc changes}}</h3>
+  <p>{{Every behaviour row the arc changes, before and after, in the words of the person it is for. The sheet's <code>docs</code> line for the row points at this section, so a decision about what someone sees is made here.}}</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>{{Behaviour row, as the person it is for would say it}}</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>{{The behaviour, in the person&rsquo;s words}}</strong></p><p>{{After: what they see or can do.}}</p><span class="sds-small">Before: {{what they saw or could do}}</span></td></tr>
+    </tbody>
+  </table></div>
+
   <h3 id="s3d">{{A subsection that shows a sample of the real thing}}</h3>
   <p>{{What the sample is: a row, a file&rsquo;s first lines, a command&rsquo;s output, with real values. The page shows it with its own blocks and never in a frame.}}</p>
   <pre>{{the sample, as the real thing prints it}}</pre>
@@ -182,6 +191,25 @@
 └── {{folder}}/
     ├── {{file}}   new      {{what the file is}}
     └── {{file}}   changed  {{what the change is}}</pre>
+
+  <h3 id="s4b">{{What proves it}}</h3>
+  <p>{{The tests by tier, each repository and node named. A tier the change owes nothing at says "None" and why.}}</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>{{Each tier, and the tests that prove it}}</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>{{Unit, repository}}</strong></p><ul><li><code>{{test file}}</code>: {{what it shows}}</li></ul><span class="sds-small">{{New cases: red first on the unchanged code}}</span></td></tr>
+      <tr><td><p><strong>{{Contract, integration, journey}}</strong></p><p>{{The tests, or None and why.}}</p><span class="sds-small">Owed: {{what is owed}}</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s4c">{{How it ships}}</h3>
+  <p>{{The release chain, in order: what merges and releases, and what each step waits on.}}</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>{{Each step, in order}}</th></tr></thead>
+    <tbody>
+      <tr><td><p><strong>1 &middot; {{The step}}</strong></p><p>{{What happens, and where.}}</p><span class="sds-small">Waits on: {{what must land first}}</span></td></tr>
+    </tbody>
+  </table></div>
   <p>{{Read the full change in the approach page&rsquo;s How &rarr;}}</p>
 </section>
 

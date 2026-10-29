@@ -265,6 +265,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             state.json                    the arc's header and every row
             log.jsonl                     one line per event
             facts.jsonl                   each fact read, pinned to its commit
+            sheet.json                    the arc's change sheet: one entry for each file operation, written by the `workstream sheet` commands
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
           N<nnn>/                         one arc's work order: at most these six entries, each made when the arc needs it
