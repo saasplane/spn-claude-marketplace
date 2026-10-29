@@ -39,6 +39,11 @@
       "seen": "f2a8cb33"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "The worktree set",
+      "seen": "b74a817b"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
       "seen": "b1bdbbce"
@@ -238,6 +243,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 - **The set needs no new permission.** The workspace's settings already allow reads and edits under the root.
 - **The main checkouts stay on `develop`, fetched, and the agent never commits in one — MUST.** A release is the one time a main checkout is switched to `main`.
 - **`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin — MUST.** It refuses while any worktree holds a commit that is not on origin or a change that is not committed. Once the repository's pull requests are merged, it deletes the branch on origin too.
+- **The set is removed before its workstream closes, and a set left behind is named at session start — MUST** (`RD.DEVEX.WORKSPACE.325`). The close gate refuses while the set is on disk, and the session's status line names each set whose workstream is in `closed/`, or whose name no workstream folder carries, with the command that removes it.
 
 **The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about. Its `.gitignore` carries two lines, `.debug/` and `.state.*`, so neither the machinery's notes nor the state file's lock and temporary file reach the history, and a re-run of `workspace init` adds a line it finds missing. `state.json` is in the history on purpose: a record of when telemetry was on is worth having beside the cost figures it explains. No command commits, so a change to it is in whatever commit is made there next.
 

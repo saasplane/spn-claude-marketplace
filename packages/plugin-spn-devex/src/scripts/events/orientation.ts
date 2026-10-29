@@ -49,7 +49,7 @@
 import { execFileSync, spawn } from "node:child_process";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
@@ -652,7 +652,32 @@ function commandsRefBlock(): string {
 }
 
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
-                unwired: number; stale: string | null; behind: string | null; late: string[]; rung: string | null };
+                unwired: number; stale: string | null; behind: string | null; late: string[];
+                left: string[]; rung: string | null };
+
+/** The folder under the workspace root that holds each workstream's worktree set. */
+const WORKTREES = ".worktrees";
+
+/**
+ * The sets that outlived their workstream, each as the clause the status line prints: its folder, and
+ * why it is left behind and what removes it. A set is left behind when its workstream is in `closed/`,
+ * or when no workstream folder carries its name. A window inside a set stands on the set as its root, so
+ * the sets are read from the workspace root above it. The closed ones come first, each group by name.
+ */
+function setsLeftBehind(root: string, streams: Workstream[]): string[] {
+  const above = dirname(root);
+  const home = basename(above) === WORKTREES ? dirname(above) : root;
+  const closed: string[] = [], unnamed: string[] = [];
+  for (const folder of listdir(join(home, WORKTREES))) {
+    if (!isDir(join(home, WORKTREES, folder))) continue;
+    const owner = streams.find((w) => w.folder === folder);
+    if (owner?.state === "closed")
+      closed.push(`${WORKTREES}/${folder} (${owner.number || folder} is closed: spnutils workspace worktree remove ${owner.number || folder})`);
+    else if (!owner)
+      unnamed.push(`${WORKTREES}/${folder} (no workstream has this name: git worktree remove, in each repository)`);
+  }
+  return [...closed, ...unnamed];
+}
 
 /**
  * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
@@ -670,6 +695,8 @@ export function statusLine(s: Status): string {
   if (s.stale) parts.push(s.stale);
   if (s.behind) parts.push(s.behind);
   parts.push(...s.late);
+  if (s.left.length)
+    parts.push(`${plural(s.left.length, "worktree set")} left behind, remove ${s.left.length === 1 ? "it" : "each"}: ${s.left.join(", ")}`);
   if (s.rung) parts.push(s.rung);
   return parts.join(" · ");
 }
@@ -851,6 +878,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     stale: cache?.startsWith("cache stale") ? cache : null,
     behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
     late: lateClauses(repos.flatMap((r) => lateBranch(r.name, r.path) ?? [])),
+    left: setsLeftBehind(root, streams),
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
   });

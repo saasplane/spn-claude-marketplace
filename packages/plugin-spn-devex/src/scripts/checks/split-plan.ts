@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
-//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, at what altitude, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate
+//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, at what altitude, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate · § Closing a workstream is a check; closing a window is nothing
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The two gates a workstream's split plan carries, and the parser both read it with. This script
@@ -998,6 +998,19 @@ function saysItIsClosed(page: string): boolean {
   return FINISHED.test(mastheadStatus(text) ?? flat(found[1]));
 }
 
+// The folder under the workspace root that holds each workstream's worktree set.
+const WORKTREES = ".worktrees";
+
+/**
+ * The root that holds `.worktrees/`. A window inside a set walks up to the set's own `.spndevex` link and
+ * reads the set as the workspace root, so a root that is itself `<root>/.worktrees/<set>` gives back
+ * the workspace root above it.
+ */
+function setsRoot(root: string): string {
+  const above = dirname(root);
+  return basename(above) === WORKTREES ? dirname(above) : root;
+}
+
 export function gateClose(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
   const command = supplied.command ?? "";
@@ -1161,6 +1174,20 @@ export function gateClose(payload: Payload): Verdict {
           `\`spn-devex workstream arc delete <arc>\`, and the review-fixes arc lands on the developer's word to close. ` +
           `An arc left \`PROPOSED\`, \`DECIDED\` or \`RUNNING\` inside a closed workstream is a receipt that disagrees ` +
           `with itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
+      };
+    }
+
+    // THE THIRD CHECK, AFTER THE MASTHEAD AND THE ROWS: THE WORKTREE SET IS NOT ON DISK (RD.DEVEX.WORKSPACE.325).
+    // The gate names the command and never removes, because a plugin script never runs `spnutils`
+    // (RD.DEVEX.UTILS.076). There is no override; the way through is the command.
+    if (!empty.length && !stopped.length && !running.length && !held.length && isDir(join(setsRoot(root), WORKTREES, subject))) {
+      const number = /^(\d+)-/.exec(subject)?.[1] ?? subject;
+      return {
+        note: `Close gate — \`${subject}\` cannot close yet: its worktree set is still on disk.`,
+        deny:
+          `Denied: ${subject}'s worktree set is still on disk, at ${WORKTREES}/${subject}/.\n` +
+          `Run \`spnutils workspace worktree remove ${number}\` from the workspace root, then close again.\n` +
+          `It refuses work that is not on origin and names it, so push that work or carry it first.`,
       };
     }
 
