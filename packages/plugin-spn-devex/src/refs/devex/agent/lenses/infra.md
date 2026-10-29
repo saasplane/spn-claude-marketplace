@@ -20,7 +20,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
-      "seen": "552f5ea6"
+      "seen": "ce934667"
     }
   ],
   "decisions": [

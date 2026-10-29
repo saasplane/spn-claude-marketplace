@@ -421,5 +421,33 @@ console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a reposi
       && JSON.parse(readFileSync(join(ws, "arcs", "N001", "state.json"), "utf8")).rows.some((row) => row.id === "3"), wrote.out);
 }
 
+console.log("\n=== the change sheet — allowed in the arc's data, held to its schema, and named by a moved fact");
+{
+  const { root, ws, repo, git } = await dataWorkspace("state-sheet");
+  const sheetFile = join(ws, "arcs", "N001", "sheet.json");
+  const whole = { schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [] };
+  writeFileSync(sheetFile, JSON.stringify(whole, null, 2));
+  ok("green: `sheet.json` is allowed in the arc's data", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
+  writeFileSync(join(ws, "arcs", "N001", "other.json"), "{}");
+  ok("red: another file is still named, and the message lists `sheet.json`", has(checkWorkstream(ws), "name", /is not the arc's data.*`sheet.json`/), said(checkWorkstream(ws)));
+  rmSync(join(ws, "arcs", "N001", "other.json"));
+  writeFileSync(sheetFile, JSON.stringify({ ...whole, entries: [{ id: "E1", op: "mangle" }] }, null, 2));
+  ok("red: a sheet with a fault is reported under the schema", has(checkWorkstream(ws), "schema", /sheet\.json/) && has(checkWorkstream(ws), "schema", /E1/), said(checkWorkstream(ws)));
+  writeFileSync(sheetFile, "{ not json");
+  ok("red: a sheet that is not JSON is reported", has(checkWorkstream(ws), "schema", /sheet\.json is not JSON/), said(checkWorkstream(ws)));
+  const entry = (id, facts) => ({ id, op: "edit", file: "spn-x:a.ts", what: "x", decidedBy: [], facts, then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] });
+  writeFileSync(sheetFile, JSON.stringify({ ...whole, entries: [entry("E1", ["f1"]), entry("E2", ["f2"]), entry("E3", ["f1", "f2"])] }, null, 2));
+  const fact = (n) => cli(root, ["workstream", "fact", "write", "031/N001", "--source", "spn-x/a.ts", "--fact", `fact ${n}`]);
+  fact(1); fact(2);
+  writeFileSync(join(repo, "a.ts"), "export const a = 2;\n");
+  git(["add", "-A"]);
+  git(["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "second"]);
+  const { staleFacts } = await import("../../../../src/scripts/checks/workstream-state.ts");
+  const stale = staleFacts(ws, "N001", root);
+  ok("green: a moved fact names the entries that cite it", stale.length === 2 && stale[0].endsWith(" · refresh E1, E3") && stale[1].endsWith(" · refresh E2, E3"), stale.join(" | "));
+  rmSync(sheetFile);
+  ok("green: an arc with no sheet reads as before", staleFacts(ws, "N001", root).every((line) => !line.includes("refresh")), staleFacts(ws, "N001", root).join(" | "));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workstream state check` : `\n  all ${total} passed — workstream state check`);
 process.exit(failed ? 1 : 0);

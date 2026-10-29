@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
-      "seen": "8bad9098"
+      "seen": "8518ff67"
     }
   ]
 }

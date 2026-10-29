@@ -410,6 +410,32 @@ console.log("\n=== pretooluse — a launch of a helper agent names its model, an
   one("agent-model: a prompt naming no order, with a model, is allowed", launch({ model: "haiku" }), "silent", waived);
 }
 
+console.log("\n=== pretooluse — a launch of an order is read through its row to the sheet's entries");
+{
+  const base = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe");
+  const arc = (name, rows, sheet) => {
+    mkdirSync(join(base, "arcs", name), { recursive: true });
+    mkdirSync(join(base, "notes", name, "orders"), { recursive: true });
+    writeFileSync(join(base, "arcs", name, "state.json"), JSON.stringify({ schemaVersion: 2, arc: name, subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows }));
+    if (sheet) writeFileSync(join(base, "arcs", name, "sheet.json"), JSON.stringify(sheet));
+  };
+  const row = (id, altitude, entries) => ({ id, parent: "N002", title: `r${id}`, kind: "change", altitude, repo: "probe-repo", state: "ready", ...(entries ? { entries } : {}) });
+  const entry = { id: "E1", op: "edit", file: "probe-repo:a.ts", what: "x", decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] };
+  const sheet = { schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [entry] };
+  arc("N002", [row("1", "CODE", ["E1", "E6"]), row("2", "CODE"), row("3", "DOCS"), row("4", "CODE", ["E1"])], sheet);
+  arc("N003", [{ ...row("1", "CODE"), parent: "N003" }], null);
+  const order = (name, text, arcName = "N002") => { const path = join(base, "notes", arcName, "orders", name); writeFileSync(path, text); return path; };
+  const launch = (path) => ({ tool_name: "Agent", session_id: "order-entries", cwd: WORKSPACE, tool_input: { description: "a", model: "sonnet", prompt: `Carry out the order at ${path} exactly.` } });
+  const waived = { parity: false, why: "the Python has no Agent branch" };
+  one("order-entries: a row naming an entry the sheet does not hold is denied", launch(order("1.md", '---\nrow: "1"\nmodel: sonnet\n---\n')), "deny", { says: "E6, which arcs/N002/sheet.json does not hold", ...waived });
+  one("order-entries: a CODE row of a sheet arc naming no entry is denied", launch(order("2.md", '---\nrow: "2"\nmodel: sonnet\n---\n')), "deny", { says: "names no entry", ...waived });
+  one("order-entries: a docs row with no entry is not judged", launch(order("3.md", '---\nrow: "3"\nmodel: sonnet\n---\n')), "silent", waived);
+  one("order-entries: a row whose entries the sheet holds is allowed", launch(order("4.md", '---\nrow: "4"\nmodel: sonnet\n---\n')), "silent", waived);
+  one("order-entries: an arc with no sheet is judged as today", launch(order("1.md", '---\nrow: "1"\nmodel: sonnet\n---\n', "N003")), "silent", waived);
+  one("order-entries: an order with no row is not judged", launch(order("5.md", "---\nmodel: sonnet\n---\n")), "silent", waived);
+  one("order-entries: an order that cannot be read is not judged", launch(join(base, "notes", "N002", "orders", "9.md")), "silent", waived);
+}
+
 console.log("\n=== pretooluse — an order asks for no screenshot unless the developer asked to see a look");
 {
   const orders = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "notes", "N1", "orders");

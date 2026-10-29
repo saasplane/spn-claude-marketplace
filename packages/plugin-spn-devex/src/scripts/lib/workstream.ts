@@ -6,17 +6,19 @@
 // stamp of what the page states about an arc, the two generated blocks a page holds, and a preview's status. Every `workstream` command, the
 // checks and the hooks read through it, so a path or a format is spelled once.
 
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { appendFileSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { namedRun, worst, type Run } from "../../../../plugin-support-lib/src/lib/runs.ts";
 import { STATUSES, TERMINAL, type Status } from "../checks/arc-status.ts";
 import { withOffset } from "./clock.ts";
 import { isDir, isFile, listdir, workspaceRoot } from "./payload.ts";
 import { APPROACH_PAGE, ARCS, PLUGIN_TEMPLATES, WORKSTREAM_STATES, isApproachPage, workstreamPrefixSource, workstreamsDir, type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   ARC_ID, DONE_STATES, QUESTION_ID, SCHEMA_VERSION, arcFaults, parentIds,
-  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState,
+  type ArcData, type ArcRow, type Card, type LogLine, type Question, type RowState, type Sheet,
 } from "./workstream-schema.ts";
 
 // ---------------------------------------------------------------------------- the folder
@@ -25,6 +27,8 @@ export const NOTES = "notes";
 export const STATE_FILE = "state.json";
 export const LOG_FILE = "log.jsonl";
 export const FACTS_FILE = "facts.jsonl";
+/** An arc's change sheet, written by the `workstream sheet` commands and the opening write of `arc edit`. */
+export const SHEET_FILE = "sheet.json";
 export const QUESTIONS_FILE = "questions.jsonl";
 export const SUGGESTIONS_FILE = "suggestions.jsonl";
 /** An arc's one preview, by its fixed name, in `notes/N<nnn>/`. */
@@ -139,6 +143,7 @@ export const arcDataDir = (ws: string, arc: string): string => join(ws, ARCS, ar
 export const stateFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), STATE_FILE);
 export const logFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), LOG_FILE);
 export const factsFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), FACTS_FILE);
+export const sheetFileOf = (ws: string, arc: string): string => join(arcDataDir(ws, arc), SHEET_FILE);
 export const notesDirOf = (ws: string, arc: string): string => join(ws, NOTES, arc);
 export const previewOf = (ws: string, arc: string): string => join(notesDirOf(ws, arc), PREVIEW_FILE);
 /**
@@ -161,7 +166,7 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RD.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder; with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE];
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE];
 
 /**
  * The arc's address on the approach page: its Cycles row, by its number (RD.DEVEX.WORKSPACE.263).
@@ -327,6 +332,12 @@ export function writeJsonl(path: string, records: readonly unknown[]): void {
 export function appendJsonl(path: string, record: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
   appendFileSync(path, `${JSON.stringify(record)}\n`, "utf8");
+}
+
+/** An arc's change sheet, or null where it keeps none: the arc is then judged as it was before sheets. */
+export function readSheet(ws: string, arc: string): Sheet | null {
+  const data = readJson(sheetFileOf(ws, arc));
+  return data && typeof data === "object" && !Array.isArray(data) ? data as Sheet : null;
 }
 
 /** An arc's data, or null where its `state.json` is absent or does not parse. */
@@ -1261,4 +1272,84 @@ export function withEntryLink(text: string, arc: string, from: string, to: strin
   if (!entry) return text;
   const inside = text.slice(entry.from, entry.to).split(`href="${from}"`).join(`href="${to}"`);
   return text.slice(0, entry.from) + inside + text.slice(entry.to);
+}
+
+// ---------------------------------------------------------------------------- landing on a run
+
+/** Where a repository's run files can be: its checkout in the workspace, and each worktree of the workstream's set that begins with its name. */
+function runPlaces(ws: string, repo: string): string[] {
+  const root = dirname(dirname(dirname(dirname(ws))));
+  const base = basename(dirname(root)) === ".worktrees" ? dirname(dirname(root)) : root;
+  const set = join(base, ".worktrees", basename(ws));
+  return [join(base, repo), ...listdir(set).filter((name) => name.startsWith(repo)).map((name) => join(set, name))].filter(isDir);
+}
+
+/** The newest commit time among a row's commits in its repository, or null where git knows none of them. */
+function lastCommitOf(places: readonly string[], shas: readonly string[]): { at: number; sha: string } | null {
+  let last: { at: number; sha: string } | null = null;
+  for (const sha of shas) for (const cwd of places) {
+    try {
+      const at = Date.parse(execFileSync("git", ["log", "-1", "--format=%cI", sha], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim());
+      if (!Number.isNaN(at)) { if (!last || at > last.at) last = { at, sha }; break; }
+    } catch { /* try the next place */ }
+  }
+  return last;
+}
+
+const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", SUCCESS: "SUCCESS" };
+
+/**
+ * Whether a row may land on a run (RD.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
+ * An arc with no sheet, and a row that is neither CODE nor PROOF, are judged as before sheets and get null.
+ */
+export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow, run: string | null): string | null {
+  const sheet = readSheet(ws, arc);
+  if (!sheet || (row.altitude !== "CODE" && row.altitude !== "PROOF")) return null;
+  const entries = Array.isArray(sheet.entries) ? sheet.entries : [];
+  if (!run)
+    return `row ${row.id} is a ${row.altitude} row of an arc that keeps a sheet; it lands on a run of its entries' tests.\n`
+      + `Name the run: \`workstream row state ${arc} ${row.id} landed --run <name>\`.`;
+  const repo = row.repo ?? "";
+  const mine = entries.filter((one) => (row.entries ?? []).includes(one.id));
+  if (row.altitude === "CODE" && !mine.some((one) => Object.values(one.tiers ?? {}).some((ids) => ids.length)))
+    return `row ${row.id} is a CODE row and its entries name no test; \`workstream sheet check ${arc}\` lists what is missing.`;
+
+  const places = runPlaces(ws, repo);
+  const found = places.map((place) => ({ place, runs: namedRun(place, run).runs })).filter((one) => one.runs.length);
+  if (!found.length) return `${run} is in none of ${places.length ? places.join(" · ") : `the places of ${repo || "the row's repository"}`}.`;
+  if (found.length > 1) return `${run} is in two places, ${found.map((one) => one.place).join(" and ")}; name a run that is in one.`;
+  const runs: Run[] = found[0].runs;
+
+  const shas = row.commits?.[repo] ?? [];
+  if (!shas.length) return `row ${row.id} has no commit in ${repo || "its repository"}; \`workstream report write\` records them.`;
+  const last = lastCommitOf(places, shas);
+  const ranAt = runs.map((one) => one.ranAt).filter(Boolean).sort()[0] ?? null;
+  if (last && ranAt && Date.parse(ranAt) < last.at) return `${run} was taken before ${last.sha.slice(0, 8)}, row ${row.id}'s last commit.`;
+
+  const statusAt = (tier: string, id: string): string[] =>
+    runs.flatMap((one) => one.results).filter((result) => result.id === id && String(result.tier).toLowerCase() === tier).map((result) => result.status);
+  const faults: string[] = [];
+  const judge = (tier: string, ids: readonly string[]): void => {
+    for (const id of ids) {
+      const seen = statusAt(tier, id);
+      if (!seen.length) {
+        const other = runs.flatMap((one) => one.results).filter((result) => result.id === id).map((result) => String(result.tier).toLowerCase());
+        faults.push(other.length ? `${tier} ${id} is not in ${run} at ${tier}; it reads ${SHOWN[worst(runs.flatMap((one) => one.results).filter((result) => result.id === id).map((result) => result.status))]} at ${[...new Set(other)].join(", ")} only`
+          : `${id} is not in the run`);
+      } else if (worst(seen) !== "SUCCESS") faults.push(`${tier} ${id} reads ${SHOWN[worst(seen)]} in ${run}`);
+    }
+  };
+  if (row.altitude === "CODE") {
+    for (const one of mine) for (const [tier, ids] of Object.entries(one.tiers ?? {})) judge(tier, ids);
+  } else {
+    const owed = new Map<string, Set<string>>();
+    for (const one of entries.filter((entry) => entry.file.startsWith(`${repo}:`)))
+      for (const [tier, ids] of Object.entries(one.tiers ?? {})) owed.set(tier, new Set([...(owed.get(tier) ?? []), ...ids]));
+    for (const [tier, ids] of owed) {
+      judge(tier, [...ids]);
+      for (const result of runs.flatMap((one) => one.results))
+        if (String(result.tier).toLowerCase() === tier && result.status === "FAILED" && !ids.has(result.id)) faults.push(`${tier} ${result.id} reads FAILURE in ${run}`);
+    }
+  }
+  return faults.length ? [...new Set(faults)].join(" · ") + "." : null;
 }

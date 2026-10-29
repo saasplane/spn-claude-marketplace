@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "770a7475"
+      "seen": "22208517"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -24,7 +24,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.UTILS.075",
-      "seen": "e94a2e3b"
+      "seen": "0ee01e40"
     },
     {
       "repo": "spn-foundation",
