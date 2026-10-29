@@ -6,19 +6,19 @@
 // command prints it, and the Stop hook refuses to end a turn while it fails for this window's work.
 
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { cardsDiffer, openWithoutCard } from "./questions.ts";
 import { cyclesOf, headerStatusRule, tableStatuses } from "../commands/docs/cycles.ts";
 import { isDir, isFile, listdir } from "../lib/payload.ts";
 import { linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import {
-  DATA_FILES, FACTS_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
+  DATA_FILES, FACTS_FILE, SHEET_FILE, LOG_FILE, NOTES, PREVIEW_FILE, approachOf, arcStatus, stepsMayStart, arcDataDir, arcIdsOf, factsFileOf, sheetFileOf, readSheet, firstOpenArc, leafRows, isDataLayout, logFileOf, markdownArcsOf,
   NO_REPO, arcStamp, markdownIn, nameFileHolds, nameFileOf, notesDirOf, previewOf, questionsFileOf, readJsonl, readQuestions, stampsOn, stateFileOf,
   strayLevels, strayNotes, suggestionsFileOf, readJson, workstreamsOf, previewWithStatus,
   localLinks, previewHrefOf, previewOwners, slotsIn, whatEntryOf, whatId, whatRange, workstreamName,
 } from "../lib/workstream.ts";
-import { ALTITUDES, DONE_STATES, arcFaults, factFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
+import { ALTITUDES, DONE_STATES, arcFaults, factFaults, sheetFaults, logFaults, questionFaults, subjectFault, suggestionFaults, type ArcData, type Fact } from "../lib/workstream-schema.ts";
 
 export type Finding = { workstream: string; arc: string | null; check: string; message: string };
 
@@ -113,7 +113,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
   for (const other of markdown.filter((one) => one !== name))
     out.push(`\`arcs/${arc}/${other}\` is a second Markdown file — an arc's data folder holds one, \`${name}\`, which the commands write`);
   for (const entry of listdir(arcDataDir(ws, arc)).filter((one) => !one.endsWith(".md") && !DATA_FILES.includes(one) && !one.startsWith(".")))
-    out.push(`\`arcs/${arc}/${entry}\` is not the arc's data — \`arcs/${arc}/\` holds \`state.json\`, \`log.jsonl\`, \`facts.jsonl\` and \`${name}\``);
+    out.push(`\`arcs/${arc}/${entry}\` is not the arc's data — \`arcs/${arc}/\` holds \`state.json\`, \`log.jsonl\`, \`facts.jsonl\`, \`sheet.json\` and \`${name}\``);
   let current: string | null = null;
   try { current = readFileSync(nameFileOf(ws, arc, data.subject), "utf8"); } catch { /* absent */ }
   if (current === null) out.push(`${arc} has no name file \`arcs/${arc}/${name}\` — \`spn-devex docs cycles write\` writes it`);
@@ -305,9 +305,16 @@ function linesFindings(path: string, label: string, faults: (line: unknown, wher
   return readJsonl(path).flatMap((line, at) => line === undefined ? [`${label} line ${at + 1} is not JSON`] : faults(line, `${label} line ${at + 1}`));
 }
 
+/** ` · refresh E2, E4`: each entry of the arc's sheet whose `facts` cite a fact, or nothing where the arc keeps no sheet or no entry cites it. */
+const refresh = (entries: unknown, fact: string): string => {
+  const named = (Array.isArray(entries) ? entries : []).filter((entry) => Array.isArray(entry?.facts) && entry.facts.includes(fact)).map((entry) => entry.id);
+  return named.length ? ` · refresh ${named.join(", ")}` : "";
+};
+
 /** The facts whose source moved since the commit they were pinned at, each as a line. */
 export function staleFacts(ws: string, arc: string, root: string): string[] {
   const out: string[] = [];
+  const entries = readSheet(ws, arc)?.entries;
   for (const line of readJsonl(factsFileOf(ws, arc))) {
     const fact = line as Fact | undefined;
     if (!fact || typeof fact.source !== "string") continue;
@@ -319,7 +326,7 @@ export function staleFacts(ws: string, arc: string, root: string): string[] {
       moved = execFileSync("git", ["-C", join(root, repo), "log", "--format=%h", `${fact.commit}..HEAD`, "--", file],
         { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
     } catch { continue; }
-    if (moved) out.push(`${arc} ${fact.id}: \`${fact.source}\` moved since ${fact.commit} (${moved.split("\n").length} commit(s))`);
+    if (moved) out.push(`${arc} ${fact.id}: \`${fact.source}\` moved since ${fact.commit} (${moved.split("\n").length} commit(s))${refresh(entries, fact.id)}`);
   }
   return out;
 }
@@ -341,6 +348,9 @@ export function checkWorkstream(ws: string): Finding[] {
     out.push(...faults.map(say(arc, "schema")));
     out.push(...linesFindings(logFileOf(ws, arc), `arcs/${arc}/${LOG_FILE}`, logFaults).map(say(arc, "schema")));
     out.push(...linesFindings(factsFileOf(ws, arc), `arcs/${arc}/${FACTS_FILE}`, factFaults).map(say(arc, "schema")));
+    const sheetRaw = existsSync(sheetFileOf(ws, arc)) ? readJson(sheetFileOf(ws, arc)) : undefined;
+    if (sheetRaw !== undefined)
+      out.push(...(sheetRaw === null ? [`arcs/${arc}/${SHEET_FILE} is not JSON`] : sheetFaults(sheetRaw, `arcs/${arc}/${SHEET_FILE}`).map((fault) => fault.startsWith("arcs/") ? fault : `arcs/${arc}/${SHEET_FILE}: ${fault}`)).map(say(arc, "schema")));
     const data = faults.length ? null : raw as ArcData;
     out.push(...previewFindings(ws, arc).map(say(arc, "preview")));
     out.push(...sampleFindings(ws, arc).map(say(arc, "samples")));

@@ -222,6 +222,10 @@ host serves matches what is on disk. **`dist/spn-build.json` names the flavour a
 a stale folder is readable rather than inferred. The server needs no restart — it serves `dist` per
 request.
 
+**`dmo` refuses a worktree folder, so the stack runs from the repository's checkout at the branch tip.** A stack started from inside a worktree is refused; run it from the repository's own checkout with the branch's tip checked out.
+
+**A reset run from a checkout behind the branch pins an older `dmo`.** Bring the checkout to the branch tip before `platform down --clean` and the `up` after it, so the reset stands up the `dmo` the branch declares.
+
 **Serve every app before a sweep, not just the one under test.** Signing in leaves for the hub, so
 an unserved `identity` makes nginx answer **502** and the login form never renders — which reads as
 broken auth. Measured: with one app served, 94 of 95 cases did not run. The snapshot tells you which:

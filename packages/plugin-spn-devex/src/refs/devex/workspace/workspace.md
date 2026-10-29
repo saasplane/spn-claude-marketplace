@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "646b9091"
+      "seen": "79b3c27a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -73,7 +73,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.UTILS.044",
-      "seen": "3f0880fd"
+      "seen": "9814cdcb"
     },
     {
       "repo": "spn-foundation",
@@ -265,6 +265,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             state.json                    the arc's header and every row
             log.jsonl                     one line per event
             facts.jsonl                   each fact read, pinned to its commit
+            sheet.json                    the arc's change sheet: one entry for each file operation, written by the `workstream sheet` commands
             <subject>.md                  the arc's name: its goal, its status and its links, written by the commands
         notes/
           N<nnn>/                         one arc's work order: at most these six entries, each made when the arc needs it

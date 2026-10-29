@@ -17,11 +17,12 @@ import { STORED_STATUSES } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import {
   NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
-  previewPathFault, proposedLines, readArc, restamped, stampsOn, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
+  previewPathFault, proposedLines, readArc, restamped, sheetFileOf, stampsOn, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
 import { refreshViews } from "../docs/cycles.ts";
-import { subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { sheetFindings } from "./sheet.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
 export const describe = "an arc's header written, opened or changed; the stamp an arc's Cycles row carries, written once the page is current with its goal, title and repositories; or an arc never decided, deleted";
@@ -209,6 +210,7 @@ function edit(args: string[]): number {
     header(data, words);
     foresee(ws, data, under);
     typed(() => writeArc(ws, data!));
+    writeWhole(sheetFileOf(ws, arc), `${JSON.stringify({ schemaVersion: SHEET_SCHEMA_VERSION, releaseChain: [], dependsOn: [], stack: null, entries: [] }, null, 2)}\n`);
     logEvent(ws, arc, "opened", null, note ? `opened as ${data.status} · ${note}` : `opened as ${data.status}`);
     said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     opened = leavePageWhole(ws, data, under);
@@ -255,6 +257,10 @@ function edit(args: string[]): number {
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
+  if (goes) {
+    const found = sheetFindings(ws, arc);
+    if (found.length) { console.log(`the sheet reads ${found.length} finding${found.length === 1 ? "" : "s"} — bring each current now the go is given:`); for (const line of found) console.log(`  ${line}`); }
+  }
   return 0;
 }
 

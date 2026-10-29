@@ -13,11 +13,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "646b9091"
+      "seen": "79b3c27a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e48a3cfd"
+      "seen": "ef2cc21d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -32,12 +32,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "8bac539a"
+      "seen": "5b907f4c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "4d7f1f7a"
+      "seen": "3fa05ceb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -108,7 +108,7 @@ conflicts are declared once.
 | Owner | Files |
 | --- | --- |
 | **you, by hand** | `approach.html`; each arc's `notes/N<nnn>/preview.html`, `samples/`, `plan.md`, `orders/`, `scripts/` and `work/` |
-| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl`, `facts.jsonl` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
+| **the `spn-devex workstream` commands** | `suggestions.jsonl` and `questions.jsonl`; each arc's `arcs/N<nnn>/state.json`, `log.jsonl`, `facts.jsonl`, `sheet.json` and its name file `<subject>.md`; the `progress` and `open` blocks inside the pages |
 
 **A file a command owns is never edited by hand**: the PreToolUse hook refuses a direct write to it, an
 edit that touches a `progress` or `open` block, and a hand edit of an arc's `data-arc-stamp`. A page you
@@ -243,11 +243,47 @@ developer as soon as the batch lands.
 
 **A tool's output stays short, because every later turn reads it again — MUST** (`RD.DEVEX.AGENT.106`). A file over 20 KB is read in parts: search it first, then read the lines needed. A command whose output may pass 10 KB writes to a file, and the agent reads the part it needs. A child's hand-back stays at 15 lines. A hook refuses a `Read` over 20 KB and a command whose output passes 10 KB, each with the form to use instead (`RD.DEVEX.AGENT.111`).
 
-### Once an arc is decided, it runs in three passes per repository
+### An arc keeps a change sheet, and only its commands write it
 
-**Once an arc is decided, each repository it touches runs one docs pass, then one code-and-test pass, then the owed tiers once — MUST** (`RD.DEVEX.WORKSPACE.320`). The docs pass writes the book and the node documents. The code-and-test pass writes the source and the specs that prove it. The tiers pass runs, once, the whole tiers the arc owes that repository. Each repository's whole tiers run once as a baseline before its code pass, so a surprise that would have shown at the gate shows first, while the fix is still cheap.
+**Every arc keeps a change sheet as its data, `arcs/N<nnn>/sheet.json`, written only by the `workstream sheet` commands while the arc is ideated — MUST** (`RD.DEVEX.WORKSPACE.326`). It holds one entry for each file operation the arc makes: the change in a line, what the file drags with it, and the tests that prove it. You read the code once, while you ideate, and the sheet is where that reading goes, so an order never finds it out again. It sits beside the arc's rows and facts, the developer is never asked to review it, and the preview stays plain. The plan stays optional, for traps and moves.
 
-**An order is cut per repository and pass, from the preview's file list, never per row, and it is never researched again.** The preview already names every file the arc changes, so an order is that list for one repository and one pass. A row the preview does not pin is a gap in the ideation: it is fixed in the preview first, and the order is cut after. The alternative is an order per row, which reads the same files again for each row and runs a gate for each.
+**An arc with no `sheet.json` is judged as it was before the sheet existed — MUST.** The write that opens an arc writes its sheet with an empty list of entries. An arc already running has none and needs no migration, and every refusal below is skipped for it.
+
+**An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id, a new test marked red first) and `docs` and `book` (what it changes, and the book line it changes or must still agree with).
+
+**A command validates each entry as it is written, so a gap is refused where it is made — MUST.** A field with nothing to say reads `[]` and is never left out, an entry with no tiers or no fact is refused, and a refused write writes nothing.
+
+| Command | What it does |
+| --- | --- |
+| `sheet write <arc> --file sheet.json` | the ideation write: every entry in one call, each validated |
+| `sheet edit <arc> <E> [--what …] [--tiers …] …` | one entry, as the drift step refreshes it |
+| `sheet drop <arc> <E> --note "…"` | an entry no longer needed |
+| `sheet show <arc> [--row <id>] [--json]` | what an order's child reads; `--row` prints only that row's entries |
+| `sheet check <arc>` | the sheet whole, and the rows and cards meeting it: a row with no entry, an entry no row names, a code row whose entries name no test, an answered card no entry cites. The go lists what it finds |
+
+**A row names its entries, and a report names its run.** A step row gains `entries`, the ids of the entries it carries; a report's front matter gains `run`. Each is a field added and never repurposed.
+
+### Once an arc is decided, a drift step runs, then four passes per repository
+
+**Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs one docs pass, book first, one code-and-test pass, and the named tests of its entries at every tier, contract and journey included, on the stack the sheet names. Then the release chain runs in its order — MUST** (`RD.DEVEX.WORKSPACE.320`). The drift step is `workstream state check --facts`, which names each pinned fact whose source moved and the entries that cite it, so only those are read again and refreshed with `sheet edit`. The docs pass writes the book and the node documents from every entry's `docs` and `book` lines. The code-and-test pass writes the source and the specs, and each order reads only the entries of its row. The tiers pass runs the tests the entries name, at the tier each names, on the stack the sheet plans, so a contract or journey test a change breaks shows there and not at a final proof. Each repository's whole tiers run once as a baseline before its code pass, so a surprise that would have shown at the gate shows first, while the fix is still cheap. The release chain runs last, in the order the sheet's header sets.
+
+**The reading happens once, on the top row, and every question is asked while the arc is ideated.** Each behaviour change carries its product question then, as a card, before any code exists.
+
+**An order is cut per repository and pass, never per row, and it is never researched again.** The sheet already names every file the arc changes, so an order is the entries of one repository and one pass. A file the sheet does not hold is a gap in the ideation: it is fixed in the sheet and the preview first, and the order is cut after.
+
+**A question from the developer mid-run is read for what it changes.** If the answer changes running work, what is in flight finishes, only the entries the answer touches pause, they and their `docs` line are updated, and they rejoin the code pass. If it is new, it becomes a suggestion or a later arc, and the running passes never change.
+
+**A surprise in the tiers comes back to the developer as a card, with the rows it holds, and is never fixed quietly in code — MUST.** When a tier run turns up a consequence a person would notice, you raise a card and hold the rows it can change.
+
+**Before a pull request, each entry that changes behaviour has its book line read against the landed code, and the verdict goes in the tiers pass's report — MUST** (`RD.DEVEX.WORKSPACE.330`). A line that no longer agrees with the code is fixed in the book before the pull request opens, since the book is the contract and the code its implementation.
+
+**An order's launch is checked against the sheet — MUST** (`RD.DEVEX.WORKSPACE.327`). The launch check reads the order's `row` and then the row's entries in the sheet, and refuses an order whose row names an entry the sheet does not hold, and a code row of a sheet arc with no entries; its message names the entry and the command that adds it, `workstream sheet write`, or says to take the entry off the row. An order of an arc with no `sheet.json` is judged as before.
+
+### In an arc that keeps a sheet, a row lands on a run of its tests
+
+**A code row lands only on a named run, taken after the row's last commit, in which every id its entries name reads `SUCCESS` at the tier the entry names — MUST** (`RD.DEVEX.WORKSPACE.328`). A proof row lands only on a whole run of each tier the arc owes its repository. No row of those altitudes is stamped by hand: `row state <arc> <row> landed --run <run>` names the run. The run is what `spnutils apps test <tier> <run> <package>` or `spnutils infra test` writes, read by the reader `behaviours stamp write` uses. A refusal names the id that reads `FAILURE`, the id the run does not hold, and an id green only at another tier; `report write` reads the report's `run` before it lands a row, so a proof string written by hand is refused. A docs, generated or release row lands as it did, and so does any row of an arc that has no sheet.
+
+**Each arc reports what its orders cost and how many rows were rework, split into what ideation missed and what a later answer of the developer's asked for — MUST** (`RD.DEVEX.WORKSPACE.331`). Rework is the rows added after the arc's go. `workstream state show` prints each arc's cost and its rework beside its rows.
 
 ### A workstream works on one branch per repository
 
@@ -255,7 +291,7 @@ developer as soon as the batch lands.
 
 - **One pull request per repository, opened at the first push — MUST.** It stays open for the workstream and targets `develop`. The checks workflow runs on it.
 - **The pull request is rebase-merged into `develop` each time an arc lands a group of rows — MUST.** Each row's commit stays as it was written. The branch is not deleted then, because the workstream goes on using it.
-- **The branch takes `develop` at three moments, and in each repository the moment touches — MUST** (`RD.DEVEX.FUNCTION.071`). At the start of each pass (§ *Once an arc is decided, it runs in three passes per repository*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
+- **The branch takes `develop` at three moments, and in each repository the moment touches — MUST** (`RD.DEVEX.FUNCTION.071`). At the start of each pass (§ *Once an arc is decided, a drift step runs, then four passes per repository*) the agent fetches, and where `develop` moved it rebases the branch. Before each push and each pull request it rebases again, so the pull request merges clean. Git drops the commits already upstream, so the push carries only what `develop` does not hold. After that rebase the owed tiers run again only where it changed a node's content, because the stamp's content hash already says which, and a node whose content did not change keeps its stamp.
 - **A merge into `develop` is told to every open workstream that holds the repository — MUST.** The window that merges writes one line into each open workstream whose set holds that repository, naming what changed. A breaking contract change names its cutover: what must land with it, and in what order. The line is for a window that has not fetched yet, and the window's own *behind `develop`* line below tells it that a rebase is owed. **The line lands as a `note` on the log of each running arc** in those workstreams, written with `workstream arc edit <arc> --note "…"` (the only writer of a log line); a hook reminds the agent after the merge, and the agent writes the line. The line names what changed, a dependency the merge added, and a breaking change's cutover.
 - **A window that opens names a branch that is behind `develop` — MUST.** It fetches every member in parallel and says, for each branch behind, how many commits it is behind and that a rebase comes before the next push.
 - **A conflict outside the arc's own files stops the agent — MUST.** The developer decides how a conflict in another arc's or another workstream's files resolves, because the agent does not own those files.
@@ -643,7 +679,7 @@ at the block above it. The check keeps the step rows it read when a whole block 
 while those rows have not moved it asks for no second block. A new block is owed only when the work
 has moved since. **A card that is open at a handover is one line, never the card in full**: name it
 on the block's `open:` line with its number and its question. The full card is on the approach page,
-and the next window reads it there.
+and the next window reads it there. **An open point is written as the question, and the options weighed are named as considered, never as the options themselves** (`RD.DEVEX.AGENT.086`), so the next window starts from the question and weighs the options fresh.
 
 ## Every moment gets a plain, warm line
 
@@ -764,6 +800,8 @@ section, with no report file.
 - **A move is a table with unique targets.** Source and target, one row per file. Two rows naming one target is a finding about the table, not a detail to settle while moving.
 - **A step producing many files carries one worked example.** Twenty-six documents described as *a real answer rather than a placeholder* is twenty-six placeholders, because that is what a brief without an example produces.
 - **An arc carries no counts.** `RD.DEVEX.WORKSPACE.162` rules it for prose and it is broken most often in arcs. Name the set; let the reader count it.
+
+**Every behaviour row an arc changes is shown on its preview, before and after, in the words of the person it is for — MUST** (`RD.DEVEX.WORKSPACE.329`). The sheet's `docs` line for that row points at the preview section, so a decision about what someone sees is made where the developer reads it. The preview also carries *What proves it* (the tests by tier) and *How it ships* (the release chain). A consequence a person would notice that turns up later, in the tiers, comes back as a card.
 
 **And an arc records its traps** — what is known to go wrong on this path, written where you will meet it rather than in a log you will not read first.
 
@@ -900,6 +938,8 @@ files; when you carry out an order, read further only where one of them sends yo
 round trip of about 20 seconds, so a reading list costs the work its time. Work that adds a new prop,
 token, rule or construct takes one more section, which names every new construct before anything is
 added.
+
+**In an arc that keeps a change sheet, an order names its row, the row names its entries, and the sheet holds the files, the rules, the callers, the tiers and the book lines — MUST** (`RD.DEVEX.WORKSPACE.327`). The order's front matter carries `row`, and the child's first read is `workstream sheet show <arc> --row <row>`. Prose in an order was read and still missed, which is why those fields come from the sheet and not from the order.
 
 **An agent edits only the files its order names.** Another agent owns every other file. When a
 change needs a file outside the list, the agent stops and says so in its report, because two agents

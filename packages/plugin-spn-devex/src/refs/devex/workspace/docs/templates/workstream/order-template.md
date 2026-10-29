@@ -35,16 +35,20 @@ facts: [{{f<n>}}]                       # the facts it rests on, by id, from the
 hand back. **Read only** the files below; read further only where one of them sends you, and read a file over 20 KB in
 parts. **Hand back** at most 8 lines; save the report, at most 15 lines, as `orders/{{row}}.report.md` beside this order, its front matter first.
 
+<!-- IN AN ARC THAT KEEPS A CHANGE SHEET (arcs/N<nnn>/sheet.json), THE ORDER NAMES ITS ROW AND NOTHING ELSE ABOUT THE WORK:
+     the files, the rules, the callers, the tiers and the book lines come from the row's entries, read first with
+     `spn-devex workstream sheet show N{{nnn}} --row {{row}}`, and never from prose here. The launch check refuses an
+     order whose row names an entry the sheet does not hold. An arc with no sheet keeps the two sections below. -->
 ## The files
 
-- `{{absolute path}}` — {{what changes in it, in a line}}
+- `{{absolute path}}` — {{what changes in it, in a line; in a sheet arc: "the entries of row {{row}}, from `workstream sheet show`"}}
 
 Every other file belongs to another agent. If you must touch one, stop and say so in your report.
 
 ## The rule
 
 {{The one rule these files follow, as the section that states it: `{{chapter}}` § {{section}}, or a fact quoted with its
-source and commit.}}
+source and commit. In a sheet arc, the rules and the book lines are the row's entries'.}}
 
 ## The constructs (new prop, token, rule or construct only)
 

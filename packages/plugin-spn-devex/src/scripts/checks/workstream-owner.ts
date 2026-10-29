@@ -23,6 +23,7 @@ const WRITERS: Record<string, string> = {
   "state.json": "`workstream arc edit` and the `workstream row` commands (and `report write`)",
   "log.jsonl": "every `workstream` write, which appends its event",
   "facts.jsonl": "`workstream fact write`",
+  "sheet.json": "the `workstream sheet` commands, and the opening write of `workstream arc edit`",
   "questions.jsonl": "the `workstream question` commands",
   "suggestions.jsonl": "`workstream suggestion add`, `suggestion state` and `suggestion edit`",
 };

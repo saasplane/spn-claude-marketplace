@@ -5,6 +5,8 @@
 <!-- The handover: written into the arc's log AND given in the reply as a fenced block (02-workstream/01-workstream.md, MUST).
      A window change the agent chooses is offered as the last line of a reply, and the block is given when the developer
      says yes; a forced stop gives it at once.
+     The `open:` line is each open point written as the question, with the options considered named as weighed, never as its
+     options, so the window that picks it up weighs them fresh (RD.DEVEX.AGENT.086).
      Nine lowercase labels, in this order. Every value starts in the column `do not touch:` sets; a value longer than
      about 100 characters wraps, and each continuation line is indented to the value column. No blank lines inside.
      The window that picks this up compares its own model and effort with `model:` before it acts, so name an exact model and an effort. -->
@@ -24,5 +26,6 @@ live now:     {{what is installed and live}} · waits for the window:
               {{what only a new window reads}} — or "no reload"
 done when:    Commands row `{{name}}` → {{Green after}}
 do not touch: {{files or cycles this window must leave alone}}
-open:         Q{{n}} on `{{approach page}}` — {{one line}} — or "none"
+open:         Q{{n}} on `{{approach page}}` — {{the question, as the developer would answer it}}; weighed: {{each option
+              considered, by name}} — or "none"
 ```

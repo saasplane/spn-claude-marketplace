@@ -34,7 +34,9 @@ const state = join(ws, "arcs", "N001", "state.json");
 
 console.log("=== a file a script owns is written only by its command");
 {
-  for (const file of ["arcs/N001/state.json", "arcs/N001/log.jsonl", "arcs/N001/facts.jsonl", "questions.jsonl", "suggestions.jsonl"]) {
+  const [sheetVerdict, sheetWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "arcs", "N001", "sheet.json"), content: "{}" } }, root);
+  ok("red: a Write to sheet.json names the sheet commands as its writer", sheetVerdict === "deny" && sheetWhy.includes("`workstream sheet` commands") && sheetWhy.includes("opening write"), sheetWhy.slice(0, 250));
+  for (const file of ["arcs/N001/state.json", "arcs/N001/log.jsonl", "arcs/N001/facts.jsonl", "arcs/N001/sheet.json", "questions.jsonl", "suggestions.jsonl"]) {
     const [verdict, why] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, file), content: "{}" } }, root);
     ok(`red: a Write to ${file} is refused`, verdict === "deny" && why.includes(`\`${file}\` is written only by`), `${verdict}: ${why.slice(0, 200)}`);
   }
