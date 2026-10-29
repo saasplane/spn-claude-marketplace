@@ -32,7 +32,7 @@
 
 ## Coming down
 
-**`platform up` also registers every stored route with the ingress** — each `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json` the local edge provider kept — so a rebuilt machine serves every tenant it served before (`RD.SUPPORT.INFRA.106`).
+**`platform up` also registers every stored route with the ingress** — each `~/.saasplane/state/infra/platforms/{org}/{spc}/routes/{host}.json` the local edge provider kept — so a rebuilt machine serves every tenant it served before (`RD.SUPPORT.INFRA.106`).
 
 **A teardown removes what the platform owns and refuses its data.** Destroying a stateful resource is a separate act, named separately and confirmed separately (`RD.SUPPORT.INFRA.024`). That rule holds on a laptop for the same reason it holds in an account: the habit is what carries.
 

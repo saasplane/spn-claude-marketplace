@@ -167,7 +167,7 @@ outside its folder is the CONSTRUCT snapshot's second copy, at the path `constru
 snapshot is written from the book alone and holds nothing of the machine, so it is the one a repository may
 carry, and it differs on every run because it holds when the book was read. In Figma it does one thing: it
 reads a library file with the developer's read-only token, and it changes nothing there. Every other file is
-under `~/.spnutils/surface/`, in folders that say who writes there, and none enters a repository.
+under `~/.saasplane/state/surface/`, in folders that say who writes there, and none enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing
@@ -220,8 +220,8 @@ vocabulary, stack adapters are its realizations.
 
 ## The env seat — `~/.spnenv`
 
-The second machine path, holding your own values, sitting **outside** `~/.spnutils` on purpose — a
-routine `rm -rf ~/.spnutils/*` is an allowed reset, and your typed credentials are the one thing on
+The second machine path, holding your own values, sitting **outside** `~/.saasplane` on purpose — a
+routine `rm -rf ~/.saasplane/*` is an allowed reset, and your typed credentials are the one thing on
 the machine nobody can regenerate. Five regions, one writer each, read top to bottom:
 
 | # | Region | Writer | Holds |
@@ -238,31 +238,53 @@ a declaration; it reads a token through the seat's reader, where a value exporte
 and the seat answers otherwise. A value is never
 printed and never logged — a run reports a key name and whether it is set, nothing more.
 
-## The two machine paths under `~/.spnutils`
+## The two machine paths under `~/.saasplane`
 
-Everything the local realization writes is addressed by coordinate — the organization alone at
-organization level, organization and platform together at platform level — so two platforms share
-one laptop without evicting each other's registration. The exceptions are the genuinely
-machine-singleton pieces: the trust root and the shared `:443` proxy, each named for the machine and
-never for an organization. Everything under `cache/` may be deleted at any time at the cost of
-recomputing it; nothing else there should be.
+The machine home is `~/.saasplane/`, made by `spnutils workspace init` with three folders, divided by what
+deleting one costs. Everything the local realization writes is addressed by coordinate — the organization
+alone at organization level, organization and platform together at platform level — so two platforms share
+one laptop without evicting each other's registration. The exceptions are the genuinely machine-singleton
+pieces: the trust root and the shared `:443` proxy, each named for the machine and never for an
+organization. Everything under `cache/` may be deleted at any time at the cost of recomputing it.
 
 **What you have there, by top-level folder.** Read this before you look for any of it in source.
 
-| Path under `~/.spnutils` | Holds |
+| Path under `~/.saasplane` | Holds |
 | --- | --- |
-| `certs/` | the machine's trust root, and each platform's certificates under `{org}/{spc}/` |
-| `ingress/` | the shared proxy and the machine resolver: compose file, `nginx/conf.d/` with a vhost for each registered app |
-| `platforms/{org}/{spc}/` | the rendered platform stack, its app registry, its routes, its spaces and its modules |
-| `estate/{org}/{spc}/` | resolved state, and the engine's working data for each layer |
-| `registry/` | the machine store: every estate package released with `--local` |
-| `cache/` | copies that can be fetched again, such as the engine's providers |
-| `browser/chrome/` | the automation browser profile: the machine's own, and deliberately not the developer's Chrome |
+| `state/` | what is kept: the local estate, the surface comparison, the browser profile, each plugin's own state; deleting it is a reset |
+| `cache/` | what can be fetched or computed again; deleting it costs only time |
 | `run/` | one record and one log for each server `apps dev` or `start` started on this machine, removed when the server is gone |
+
+**Inside `state/`.**
+
+| Path under `~/.saasplane/state` | Holds |
+| --- | --- |
+| `infra/certs/` | the machine's trust root, and each platform's certificates under `{org}/{spc}/` |
+| `infra/ingress/` | the shared proxy and the machine resolver: compose file, `nginx/conf.d/` with a vhost for each registered app |
+| `infra/platforms/{org}/{spc}/` | the rendered platform stack, its app registry, its routes, its spaces and its modules |
+| `infra/estate/{org}/{spc}/` | resolved state, and the engine's working data for each layer |
+| `infra/registry/` | the machine store: every estate package released with `--local` |
+| `infra/engine/` | the engine's working folder |
 | `surface/` | the design comparison: the library's inventories and snapshot, and for each package its snapshot, its gaps and its accepted differences, as the delivery library states |
+| `browser/chrome/` | the automation browser profile: the machine's own, and deliberately not the developer's Chrome |
+| `plugins/{plugin}/` | what one plugin keeps, if it keeps anything |
+
+**Inside `cache/`.** `verdicts/` holds the verdicts of tiers already proven, `opentofu-providers/` the engine's
+providers, and `plugins/{plugin}/` what one plugin caches; the DevEx plugin keeps its corpus at
+`plugins/spn-devex/corpus/`.
+
+**Each tool writes only its own rooms** (`RD.DEVEX.UTILS.076`). A tool that needs data from another tool's
+room asks that tool's command for it and never reads the folder. The one exception is the browser profile,
+which the agent drives as a running program.
+
+**A plugin script never runs `spnutils`, and no file sits between them.** It asks one shared module of the
+plugin for the folder it needs under `~/.saasplane/`. Where the folder is missing, the script stops with one
+line that names the `spnutils` command that makes it, and a hook says nothing: the corpus cache names
+`spnutils workspace init`; `docs look` does not stop, prints that the browser profile is missing and names
+`spnutils infra organization up --apply`; the stop event stays silent.
 
 **The tool's home folder is the tool's own — MUST** (`RD.DEVEX.UTILS.075`). A developer and an agent are
-never asked to add or change a file in `~/.spnutils`. What the tool needs from outside is taken in by a
+never asked to add or change a file in `~/.saasplane`. What the tool needs from outside is taken in by a
 command, which checks the file and copies it into place, so a file is prepared elsewhere and never left
 in the folder by hand.
 
