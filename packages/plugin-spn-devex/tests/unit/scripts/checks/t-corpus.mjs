@@ -13,7 +13,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 //
 // THE CHECK RUNS FROM A COPY OF THE PLUGIN, AND ITS STORE IS A TEMPORARY FOLDER. The copy is what lets
 // a case change the checker's bytes without touching the real plugin, and the store override
-// (`SPN_CORPUS_CACHE_FOR_TESTS`) keeps every verdict out of the real `~/.spnutils/cache/corpus/`.
+// (`SPN_CORPUS_CACHE_FOR_TESTS`) keeps every verdict out of the real `~/.saasplane/cache/plugins/spn-devex/corpus/`.
 
 import { spawn, execFileSync } from "node:child_process";
 import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";

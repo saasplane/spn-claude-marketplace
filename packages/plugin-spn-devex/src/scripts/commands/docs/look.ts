@@ -10,7 +10,7 @@
 //
 // THE BROWSER IS THE ONE THE MACHINE ALREADY HAS. The global Playwright is found the way `figure.ts`
 // finds it (`npm root -g`; the same few lines, written again here because that file does not export
-// them). The profile at `~/.spnutils/browser/chrome` is used where it exists, and Playwright's own
+// them). The profile at `~/.saasplane/state/browser/chrome` is used where it exists, and Playwright's own
 // chromium where it does not or where the profile cannot be opened. NO OTHER BROWSER PROFILE IS EVER
 // OPENED.
 //
@@ -19,9 +19,10 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
-import { homedir, tmpdir } from "node:os";
+import { tmpdir } from "node:os";
 import { basename, extname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { MISSING_PROFILE_LINE, findRoom, roomPath } from "../../lib/machine-home.ts";
 import { REQUIRED, UsageFault, VALUE, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
 export const describe = "render a whole page in light and in dark, and report console errors, failed requests and a page wider than its window";
@@ -42,7 +43,7 @@ function playwrightPath(): string | null {
 }
 
 /** The one browser profile this command may open. */
-export const PROFILE = join(homedir(), ".spnutils", "browser", "chrome");
+export const PROFILE = roomPath("state", "browser", "chrome");
 
 const NOT_CHECKED = [
   "not checked — no browser on this machine, so nothing was rendered. This is not a failure.",
@@ -60,13 +61,16 @@ export async function run(args: string[]): Promise<number> {
   const entry = playwrightPath();
   if (!entry) { for (const line of NOT_CHECKED) console.log(line); return 0; }
 
+  // A MISSING PROFILE IS SAID IN ONE LINE AND NEVER STOPS THE RUN: this command reports and never refuses.
+  if (!findRoom("state", "browser", "chrome")) console.log(MISSING_PROFILE_LINE);
+
   // THE PROFILE FIRST, THE BUNDLED CHROMIUM SECOND. A profile another window holds open cannot be
   // opened twice, so a failed open falls back rather than ending the run.
   const { chromium } = await import(entry);
   let browser: { close: () => Promise<void> } | null = null;
   let context: any = null;
   try {
-    if (existsSync(PROFILE)) {
+    if (findRoom("state", "browser", "chrome")) {
       try { context = await chromium.launchPersistentContext(PROFILE, { headless: true, viewport: WINDOW }); browser = context; }
       catch { context = null; }
     }

@@ -44,7 +44,7 @@
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
 // that one reads the workspace. It is here because nothing else ran it — `N38` found that every
 // corpus tool in this plugin was hand-run, so a defect was only ever found by somebody looking for
-// something else. It keeps one verdict per docs tree, keyed by content, in `~/.spnutils/cache/corpus/`
+// something else. It keeps one verdict per docs tree, keyed by content, in `~/.saasplane/cache/plugins/spn-devex/corpus/`
 // — a tree that has not moved since its verdict was written replays it rather than re-running every
 // tool over it, which is what makes a per-turn hook affordable; see `checks/corpus.ts` for why that
 // matters and what it costs.
