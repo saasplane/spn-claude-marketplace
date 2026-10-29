@@ -3,7 +3,7 @@
 // this workspace is not in and would otherwise never be exercised: day zero, a workspace with no
 // workstreams, one with exactly one open (the standing offer), and the legacy shapes.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync, rmSync, cpSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, rmSync, cpSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 
 import { existsSync } from "node:fs";
@@ -223,6 +223,53 @@ compare("a repo with no claim at all still counts as a member, rather than being
     ".spndevex/README.md": "state\n",
   }),
   ["2 repos"]);
+
+// A WORKTREE SET OUTLIVES ITS WORKSTREAM ONLY BY NEGLECT (RD.DEVEX.WORKSPACE.325). The status line names each
+// one, the way it names a branch behind develop: a set whose workstream is in `closed/`, and a set no
+// workstream folder carries. A set whose workstream is open or in backlog is in use, and says nothing.
+const SETS = (extra = {}) => ({
+  "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+  "spn-app-ts/CONCEPT.md": "# concept\n",
+  [`.spndevex/${WORKSTREAMS}/open/031-in-use/arcs/N1/state.json`]: "{}\n",
+  [`.spndevex/${WORKSTREAMS}/closed/033-finished/arcs/N1/state.json`]: "{}\n",
+  ".worktrees/031-in-use/spn-app-ts/README.md": "a worktree\n",
+  ...extra,
+});
+const left = compare("sets left behind: one for a closed workstream, one no workstream names",
+  fixture("sets-left", SETS({
+    ".worktrees/033-finished/spn-app-ts/README.md": "a worktree\n",
+    ".worktrees/031-release/spn-app-ts/README.md": "a worktree\n",
+  })),
+  ["2 worktree sets left behind, remove each: " +
+     ".worktrees/033-finished (033 is closed: spnutils workspace worktree remove 033), " +
+     ".worktrees/031-release (no workstream has this name: git worktree remove, in each repository)"],
+  [".worktrees/031-in-use"]);
+{
+  n += 1;
+  const status = left.split("\n").find((line) => line.includes("worktree sets left behind")) ?? "";
+  const ok = status.startsWith("1 repo · 1 workstream open (031)") && status.split("\n").length === 1;
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  and they sit on the one status line, after the workstreams${ok ? "" : ` — ${status}`}`);
+}
+compare("no set on disk: the status line says nothing about sets", fixture("sets-none", SETS({ ".worktrees/031-in-use/spn-app-ts/README.md": "a worktree\n" })),
+  ["1 workstream open (031)"], ["worktree set", "left behind"]);
+compare("no .worktrees folder at all: the status line says nothing about sets", fixture("sets-no-folder", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    [`.spndevex/${WORKSTREAMS}/closed/033-finished/arcs/N1/state.json`]: "{}\n",
+  }), ["1 repo"], ["worktree set", "left behind"]);
+{
+  // A window inside a set stands on the set as its root, with `.spndevex` and each member linked in.
+  n += 1;
+  const home = fixture("sets-from-within", SETS({ ".worktrees/033-finished/spn-app-ts/README.md": "a worktree\n" }));
+  const inSet = join(home, ".worktrees", "031-in-use");
+  symlinkSync(join(home, ".spndevex"), join(inSet, ".spndevex"));
+  symlinkSync(join(home, "spn-app-ts"), join(inSet, "spn-app-ts-link"));
+  const [, context] = orient(inSet, inSet);
+  const ok = context.includes("1 worktree set left behind, remove it: .worktrees/033-finished (033 is closed:");
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  a window inside a set reads the sets from the workspace root above it`);
+}
 
 console.log(IN_WORKSPACE ? "\n=== orientation — the hook form, which is what a window actually runs"
   : "\n=== orientation — the hook form: not run, this copy sits outside a workspace");

@@ -17,12 +17,17 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "ea963cff"
+      "seen": "e48a3cfd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
       "seen": "49858691"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "Closing a workstream is a check; closing a window is nothing",
+      "seen": "af95034c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -81,7 +86,7 @@ context ends with the session and the files do not.
 | **S3** | **confirm** | an arc's preview shows what the developer decides, and `Open` holds no card its build rests on | nothing new — the preview is shown, and a go is asked for on the arcs it names | the developer says go, **and the go is its own write, carrying their words**: `workstream arc edit <arc> --status DECIDED --note "<the developer's words>"` (`RD.DEVEX.WORKSPACE.278`) |
 | **S4** | **execute** | the developer said go | `workstream rows show <workstream> --ready --parallel` names the rows that can run; a row you start is set `running` with `workstream row state <arc> <row> running`, and its log line says since when. A row already running under somebody else is left alone: ask the developer, saying how old its log line is. A child's report is folded in with `workstream report write`, and a row lands only when its acceptance holds and is proven. A question hit mid-work becomes a card (`workstream question raise`), and the rows its answer can change wait on it in `blockedBy`; everything the answer cannot touch keeps moving. A row you started and put down is set `stopped`, its log line carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
 | **S5** | **sweep** | the rows are done | what the work owes the standards: a contradiction as a register row, a convention in its owning chapter | nothing the work owes the standards is left in the conversation |
-| **S6** | **close** | every row is landed, carried or deferred | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row waiting, ready, running or stopped refuses the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. Then **the page is stamped closed**, then the folder moves, then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
+| **S6** | **close** | every row is landed, carried or deferred | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row waiting, ready, running or stopped refuses the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. **After the page and the rows, the worktree set refuses it too — MUST, with no override** (`RD.DEVEX.WORKSPACE.325`): while `.worktrees/<NNN>-<subject>/` is on disk the move is refused, and the gate names `spnutils workspace worktree remove <NNN>` and never removes, because a plugin script never runs `spnutils` (`RD.DEVEX.UTILS.076`). That command refuses work that is not on origin and names it, so push it or carry it first. Then **the page is stamped closed**, then the folder moves, then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
 
 **A standard the sweep corrects is not live yet.** A chapter reaches a session only once it is
 carried into the plugins, installed, and synced. `refs/devex/workspace/workspace.md` § *Open a
@@ -1469,6 +1474,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream arc edit`, `row add` and `row state` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
 | an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `arc edit`, which name the other |
 | a close while an arc is `PROPOSED` or `DECIDED` | `split-plan.ts --gate close` |
+| a close while the workstream's worktree set is on disk | `split-plan.ts --gate close` |
 | a running row of an arc the window wrote named with the age of its log line, never called runnable | `stop.ts`, when a turn ends |
 | a row waiting on a card open in `questions.jsonl` never called runnable | `stop.ts`, when a turn ends |
 | a card raised in full once, under **Needs you** at the top of its reply, and named in one line in a reply that ends the work or stops it | `stop.ts`, when a turn ends |

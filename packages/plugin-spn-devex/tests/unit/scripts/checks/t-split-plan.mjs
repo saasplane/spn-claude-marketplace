@@ -7,7 +7,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 import { execFileSync } from "node:child_process";
 import { bindOpen, workspace } from "../../../helpers/fixture.mjs";
 
-import { existsSync } from "node:fs";
+import { existsSync, symlinkSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { WORKSTREAMS, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -113,9 +113,10 @@ const answeredRecords = (ids) => ids.map((id) => JSON.stringify({ id, arc: "N1",
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", answered = [], log = "", state = "open", arcStatus = "LANDED", arcId = "N1", form = page } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", answered = [], log = "", state = "open", arcStatus = "LANDED", arcId = "N1", form = page, extra = {} } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/${state}/001-a-subject`;
   return workspace(name, {
+    ...extra,
     [`${folder}/a-subject-approach.html`]: form({ eyebrow, rows, cards }),
     [`${folder}/arcs/${arcId}/state.json`]: dataArc(arcId, arcStatus),
     ...(log ? { [`${folder}/arcs/${arcId}/log.jsonl`]: log } : {}),
@@ -256,6 +257,42 @@ one("landed, carried and deferred all pass", "close",
   build("sp-accounted", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried to 002-a-successor"], ["c", "spn-platform-ts", "&#x2298; deferred until a partner asks"]] }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
+
+// THE THIRD CHECK (RD.DEVEX.WORKSPACE.325): after the masthead and the rows, a worktree set on disk
+// refuses the close, names the command, and never removes. Each case is the same workstream, with every
+// row landed, so the set is the only thing that can refuse it.
+const SET_REFUSAL = [
+  "Denied: 001-a-subject's worktree set is still on disk, at .worktrees/001-a-subject/.",
+  "Run `spnutils workspace worktree remove 001` from the workspace root, then close again.",
+  "It refuses work that is not on origin and names it, so push that work or carry it first.",
+].join("\n");
+const SET_FILES = { ".worktrees/001-a-subject/probe-repo/README.md": "# a worktree of probe-repo\n" };
+const closeSet = (root, cwd = root) => {
+  const payload = { tool_name: "Bash", cwd, tool_input: move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`), session_id: "t-split-plan" };
+  bindOpen(root, "t-split-plan");
+  return ts("close", payload, cwd);
+};
+{
+  const [none] = closeSet(build("sp-set-none"));
+  const onDisk = build("sp-set-on-disk", { extra: SET_FILES });
+  const [held, said] = closeSet(onDisk);
+  // A WINDOW INSIDE THE SET STANDS ON IT AS ITS ROOT: the set holds `.spndevex` as a link to the one store.
+  const within = build("sp-set-from-within", { extra: SET_FILES });
+  const inSet = join(within, ".worktrees", "001-a-subject");
+  symlinkSync(join(within, ".spndevex"), join(inSet, ".spndevex"));
+  const [fromSet, saidFromSet] = closeSet(within, inSet);
+  for (const [label, ok, shown] of [
+    ["no set on disk: the close goes on to the rows and passes", none === "silent", none],
+    ["a set on disk refuses the close", held === "deny", held],
+    ["and the refusal is the three lines, word for word", said.includes(SET_REFUSAL), said],
+    ["and the gate removes nothing", existsSync(join(onDisk, ".worktrees/001-a-subject/probe-repo/README.md")), "the set was removed"],
+    ["a window inside the set is refused the same way", fromSet === "deny" && saidFromSet.includes(SET_REFUSAL), `${fromSet} ${saidFromSet}`],
+  ]) {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : ` — ${shown}`}`);
+  }
+}
 
 one("backlog moving into open is not a close", "close",
   build("sp-start", { rows: [...LANDED, ["the third", "spn-platform-ts", ""]], state: "backlog" }),
