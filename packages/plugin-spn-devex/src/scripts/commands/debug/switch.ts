@@ -1,11 +1,12 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § `.debug/` holds
-// four containers. The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The state file has
+// a node for each owner. The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 //     spn-devex debug switch show [--json]
 //     spn-devex debug switch on <name>
 //     spn-devex debug switch off <name>
 //
-// The switches live in `switches.json`, from the closed set `SWITCH_NAMES` (`debug-store.ts`); this is their only writer.
+// The switches are the `debug` node of `.spndevex/state.json`, or `.debug/switches.json` where spnutils has not made that
+// file yet, from the closed set `SWITCH_NAMES` (`debug-store.ts`); this is their only writer, and it writes no other node.
 
 import { resolve } from "node:path";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";

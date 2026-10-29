@@ -1,21 +1,23 @@
 // This file OWNS the layout of `.spndevex/.debug/` and is the one place the folder is named. It restates the
 // book's `.debug/` table (spn-foundation `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md`).
 //
-// `switches.json` holds the settings, `telemetry/` the two logs, `workspace/` what belongs to the workspace
-// and `sessions/<id>/` everything one window keeps. The session start sweeps a window nobody has written to
-// for `SESSION_KEEP_MS`; no other store prunes.
+// `telemetry/` holds the two logs, `workspace/` what belongs to the workspace and `sessions/<id>/` everything
+// one window keeps. The session start sweeps a window nobody has written to for `SESSION_KEEP_MS`; no other
+// store prunes. The switches are not here: they are the `debug` node of `.spndevex/state.json`
+// (`workspace-state.ts`), and `switches.json` is read only where that node is not there yet.
 //
 // A TOOL MUST NEVER FAIL BECAUSE THE DEBUG STORE FAILED: the reads answer "off" or "nothing", and the callers
 // of the writes swallow their own errors.
 
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { type WorkspaceDebugState, hasStateFile, readDebugNode, writeDebugNode } from "./workspace-state.ts";
 
 const DEVEX = ".spndevex", DEBUG = ".debug";
 
 /** `<root>/.spndevex/.debug`. */
 export const debugDir = (root: string): string => join(root, DEVEX, DEBUG);
-/** The settings file, `switches.json`. */
+/** The switches' file before `.spndevex/state.json`, kept only for the fold into its `debug` node and the fallback. */
 export const switchesFile = (root: string): string => join(debugDir(root), "switches.json");
 /** One window's folder, `sessions/<id>`; the id keeps its letters, digits, `_` and `-` (80 at most). */
 export const sessionDir = (root: string, session: string): string =>
@@ -29,21 +31,38 @@ export const telemetryFolder = (root: string): string => join(debugDir(root), "t
 export const SWITCH_NAMES = ["telemetry"] as const;
 export type SwitchName = (typeof SWITCH_NAMES)[number];
 
-/** On only when `switches.json` parses to an object whose `name` is `true`; anything else is off. Never throws. */
-export function readSwitch(root: string, name: SwitchName): boolean {
+/** The switches as `.debug/switches.json` holds them, or null where it is absent or does not hold an object. Never throws. */
+function readOldSwitches(root: string): Record<string, unknown> | null {
   try {
     const parsed: unknown = JSON.parse(readFileSync(switchesFile(root), "utf8"));
-    return !!parsed && typeof parsed === "object" && !Array.isArray(parsed) && (parsed as Record<string, unknown>)[name] === true;
-  } catch { return false; }
+    return !!parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null;
+  } catch { return null; }
 }
 
-/** Set one switch, keeping the others. */
+/**
+ * On only when the switch reads `true`: from the `debug` node of `.spndevex/state.json`, or from
+ * `.debug/switches.json` where that file is absent or holds no `debug` node. Anything else is off. Never throws.
+ */
+export function readSwitch(root: string, name: SwitchName): boolean {
+  const node = readDebugNode(root);
+  if (node) return node[name] === true;
+  return readOldSwitches(root)?.[name] === true;
+}
+
+/**
+ * Set one switch, keeping the others: in the `debug` node of `.spndevex/state.json` where spnutils has made
+ * that file, and in `.debug/switches.json` where it has not. The node is written by the file's five steps.
+ */
 export function writeSwitch(root: string, name: SwitchName, on: boolean): void {
-  let current: Record<string, unknown> = {};
-  try {
-    const parsed: unknown = JSON.parse(readFileSync(switchesFile(root), "utf8"));
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) current = parsed as Record<string, unknown>;
-  } catch { current = {}; }
+  if (hasStateFile(root)) {
+    writeDebugNode(root, (current) => {
+      const next: Record<string, unknown> = { ...current };
+      next[name] = on;
+      return next as WorkspaceDebugState;
+    });
+    return;
+  }
+  const current = readOldSwitches(root) ?? {};
   current[name] = on;
   mkdirSync(debugDir(root), { recursive: true });
   writeFileSync(switchesFile(root), `${JSON.stringify(current, null, 2)}\n`, "utf8");

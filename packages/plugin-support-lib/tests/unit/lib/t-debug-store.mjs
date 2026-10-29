@@ -1,6 +1,8 @@
-// `lib/debug-store.ts` — the one place `.spndevex/.debug/` is named: its paths, its switches, its rotated
-// logs and the sweep of a window's folder. Every case runs in a temporary folder.
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+// `lib/debug-store.ts` — the one place `.spndevex/.debug/` is named: its paths, its switches (the `debug`
+// node of `.spndevex/state.json`, through `lib/workspace-state.ts`), its rotated logs and the sweep of a
+// window's folder. Every case runs in a temporary folder.
+import { spawn } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -53,6 +55,63 @@ console.log("\n=== readSwitch — on only where switches.json says true");
   same("writeSwitch turns it on", [readSwitch(set, "telemetry"), JSON.parse(readFileSync(switchesFile(set), "utf8"))], [true, { telemetry: true }]);
   writeSwitch(set, "telemetry", false);
   same("and off", readSwitch(set, "telemetry"), false);
+}
+
+console.log("\n=== the switch is the debug node of .spndevex/state.json, and .debug/switches.json where there is none");
+{
+  const stateOf = (root) => join(root, ".spndevex", "state.json");
+  // spnutils's two nodes, as spnutils writes them: the bytes a plugin write must keep.
+  const SPNUTILS = '{\n  "workspace": {\n    "name": "saasplane"\n  },\n  "workstreams": {\n    "lastNumber": 35\n  }';
+  const withDebug = (on) => `${SPNUTILS},\n  "debug": {\n    "telemetry": ${on}\n  }\n}\n`;
+
+  const node = fresh(); writeFileSync(stateOf(node), withDebug(true)); writeFileSync(switchesFile(node), '{"telemetry": false}');
+  same("the switch is read from the node, and the old file beside it is not", readSwitch(node, "telemetry"), true);
+  const nodeOff = fresh(); writeFileSync(stateOf(nodeOff), withDebug(false)); writeFileSync(switchesFile(nodeOff), '{"telemetry": true}');
+  same("a node that says off is off, whatever the old file says", readSwitch(nodeOff, "telemetry"), false);
+  const noNode = fresh(); writeFileSync(stateOf(noNode), `${SPNUTILS}\n}\n`); writeFileSync(switchesFile(noNode), '{"telemetry": true}');
+  same("a state file with no debug node reads the old file", readSwitch(noNode, "telemetry"), true);
+  const noFile = fresh(); writeFileSync(switchesFile(noFile), '{"telemetry": true}');
+  same("no state file reads the old file", readSwitch(noFile, "telemetry"), true);
+  const broken = fresh(); writeFileSync(stateOf(broken), "{ not json");
+  same("a state file that does not read, and no old file, is off and does not throw", readSwitch(broken, "telemetry"), false);
+  const odd = fresh(); writeFileSync(stateOf(odd), `${SPNUTILS},\n  "debug": "yes"\n}\n`);
+  same("a debug node that is not an object of switches is off", readSwitch(odd, "telemetry"), false);
+
+  const kept = fresh();
+  const before = `${SPNUTILS},\n  "extra": {\n    "kept": [1, 2]\n  }\n}\n`;
+  writeFileSync(stateOf(kept), before);
+  writeSwitch(kept, "telemetry", true);
+  const after = readFileSync(stateOf(kept), "utf8");
+  same("a write adds the debug node and keeps workspace and workstreams byte for byte",
+    [after.startsWith(`${SPNUTILS},\n`), JSON.parse(after).debug, JSON.parse(after).extra, readSwitch(kept, "telemetry")],
+    [true, { telemetry: true }, { kept: [1, 2] }, true]);
+  writeSwitch(kept, "telemetry", false);
+  const off = readFileSync(stateOf(kept), "utf8");
+  same("turning it off changes only debug.telemetry", [off.startsWith(`${SPNUTILS},\n`), JSON.parse(off)], [true, { workspace: { name: "saasplane" }, workstreams: { lastNumber: 35 }, extra: { kept: [1, 2] }, debug: { telemetry: false } }]);
+  same("a write to the node makes no old file, and leaves no lock and no temporary file",
+    [existsSync(switchesFile(kept)), existsSync(join(kept, ".spndevex", ".state.lock")), readdirSync(join(kept, ".spndevex")).filter((name) => name.endsWith(".tmp"))], [false, false, []]);
+
+  const old = fresh(); writeSwitch(old, "telemetry", true);
+  same("with no state file a write goes to the old file, and makes no state file",
+    [JSON.parse(readFileSync(switchesFile(old), "utf8")), existsSync(stateOf(old))], [{ telemetry: true }, false]);
+
+  const held = fresh(); writeFileSync(stateOf(held), `${SPNUTILS}\n}\n`);
+  const lock = join(held, ".spndevex", ".state.lock");
+  mkdirSync(lock);
+  // Another program holds the lock, and lets it go 400 ms from now.
+  spawn(process.execPath, ["-e", `setTimeout(() => require("fs").rmSync(${JSON.stringify(lock)}, { recursive: true, force: true }), 400)`], { stdio: "ignore" });
+  const start = Date.now();
+  writeSwitch(held, "telemetry", true);
+  const waited = Date.now() - start;
+  same("a held lock is waited on, and the write lands once it is let go", [waited >= 300, readSwitch(held, "telemetry"), existsSync(lock)], [true, true, false]);
+
+  const stale = fresh(); writeFileSync(stateOf(stale), `${SPNUTILS}\n}\n`);
+  const staleLock = join(stale, ".spndevex", ".state.lock");
+  mkdirSync(staleLock);
+  utimesSync(staleLock, new Date(Date.now() - 60_000), new Date(Date.now() - 60_000));
+  const quick = Date.now();
+  writeSwitch(stale, "telemetry", true);
+  same("a lock older than 30 seconds is taken over at once", [Date.now() - quick < 1000, readSwitch(stale, "telemetry"), existsSync(staleLock)], [true, true, false]);
 }
 
 console.log("\n=== appendLog and logFiles — one rotation, the rotated file read first");

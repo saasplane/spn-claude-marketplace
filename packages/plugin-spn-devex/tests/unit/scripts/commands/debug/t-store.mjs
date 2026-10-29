@@ -29,8 +29,10 @@ try {
 
   console.log("=== a store with nothing in it");
   const bare = JSON.parse(typed(root, "show", "--json").out);
-  ok("still names the four containers, each with no files", bare.containers.length === 4 && bare.containers.every((one) => one.files === 0 && one.bytes === 0),
+  ok("still names the three containers, each with no files", bare.containers.length === 3 && bare.containers.every((one) => one.files === 0 && one.bytes === 0),
     JSON.stringify(bare));
+  ok("and the switch, off, read from .debug/switches.json while there is no state.json",
+    JSON.stringify(bare.debug) === JSON.stringify({ from: ".spndevex/.debug/switches.json", telemetry: false }), JSON.stringify(bare.debug));
 
   mkdirSync(join(debug, "sessions", "a", "pending"), { recursive: true });
   mkdirSync(join(debug, "sessions", "b"), { recursive: true });
@@ -46,21 +48,27 @@ try {
   console.log("\n=== the data form");
   const data = JSON.parse(typed(root, "show", "--json").out);
   const by = Object.fromEntries(data.containers.map((one) => [one.container, one]));
-  ok("the containers are the book's four, in its order", data.containers.map((one) => one.container).join(" | ") === "switches.json | sessions/<session-id>/ | workspace/ | telemetry/",
+  ok("the containers are the book's three, in its order", data.containers.map((one) => one.container).join(" | ") === "sessions/<session-id>/ | workspace/ | telemetry/",
     data.containers.map((one) => one.container).join(" | "));
-  ok("each has its files counted, a folder's nested ones too, and its bytes", by["switches.json"].files === 1 && by["switches.json"].bytes === 20
-    && by["sessions/<session-id>/"].files === 3 && by["sessions/<session-id>/"].bytes === 15
+  ok("each has its files counted, a folder's nested ones too, and its bytes", by["sessions/<session-id>/"].files === 3 && by["sessions/<session-id>/"].bytes === 15
     && by["workspace/"].files === 0 && by["telemetry/"].files === 3 && by["telemetry/"].bytes === 9, JSON.stringify(data.containers.map((one) => [one.container, one.files, one.bytes])));
   ok("and each its lifetime rule, as the table states it",
-    by["switches.json"].lifetime.startsWith("kept; written by `debug switch on`")
-    && by["sessions/<session-id>/"].lifetime.includes("swept whole, 14 days after the folder's newest write") && by["sessions/<session-id>/"].lifetime.includes("`debug window sweep`")
+    by["sessions/<session-id>/"].lifetime.includes("swept whole, 14 days after the folder's newest write") && by["sessions/<session-id>/"].lifetime.includes("`debug window sweep`")
     && by["workspace/"].lifetime === "kept" && by["telemetry/"].lifetime.includes("past 20 MB") && by["telemetry/"].lifetime.includes("<name>.1.jsonl"),
     JSON.stringify(data.containers.map((one) => one.lifetime)));
 
   console.log("\n=== the printed form");
   const printed = typed(root, "show").out;
-  ok("each container is a line with its count and its rule under it", /switches\.json {2}1 file\(s\), 20 bytes/.test(printed) && /telemetry\/ {2}3 file\(s\), 9 bytes/.test(printed)
-    && /renamed `<name>\.1\.jsonl`/.test(printed), printed);
+  ok("each container is a line with its count and its rule under it", /telemetry\/ {2}3 file\(s\), 9 bytes/.test(printed)
+    && /renamed `<name>\.1\.jsonl`/.test(printed) && !printed.includes("switches.json  "), printed);
+  ok("and the switch is its own last line, naming the file it is read from",
+    printed.trimEnd().split("\n").at(-1) === "debug  telemetry on — read from .spndevex/.debug/switches.json until plugin migration 008 folds it into the debug node of .spndevex/state.json", printed);
+
+  console.log("\n=== once spnutils has made .spndevex/state.json, the switch is its debug node");
+  writeFileSync(join(root, ".spndevex", "state.json"), '{\n  "workspace": {},\n  "workstreams": {\n    "lastNumber": 0\n  },\n  "debug": {\n    "telemetry": false\n  }\n}\n');
+  const node = JSON.parse(typed(root, "show", "--json").out);
+  ok("the data form shows the debug node, which wins over the old file", JSON.stringify(node.debug) === JSON.stringify({ from: ".spndevex/state.json", telemetry: false }), JSON.stringify(node.debug));
+  ok("and the printed form says so", typed(root, "show").out.trimEnd().split("\n").at(-1) === "debug  telemetry off — the debug node of .spndevex/state.json", typed(root, "show").out);
 
   console.log("\n=== the words");
   const USAGE = "usage: spn-devex debug store show [--json]\n";
