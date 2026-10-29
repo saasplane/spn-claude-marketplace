@@ -50,7 +50,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | # | The act | The command | Why it sits here and not later |
 | --- | --- | --- | --- |
 | 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
-| 1 | Mint the workspace | `spnutils workspace init` — already run where `.spndevex/` is the workspace's, which is how a partner arrives | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
+| 1 | Ask the workspace's name, then mint the workspace | — you ask, one question; then `spnutils workspace init <name>` — already run where `.spndevex/` is the workspace's, which is how a partner arrives | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream, and a new workspace is refused without its name |
 | 2 | Open the workstream | `mkdir`, then `spn-devex workstream arc edit` | The answers need a home on disk before the first one is given |
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
@@ -67,6 +67,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 
 - **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
 - **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
+- **Act 1 opens with one question: the workspace's name.** Ask it alone, before init runs, because init refuses a new workspace without one. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters, such as `saasplane` or `acme-platform`, and it is given once: init writes it to the `workspace` node of `.spndevex/state.json`, and a later run keeps it. Then run `spnutils workspace init <name>` with their answer.
 - **Act 1 also writes the machine seat, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The machine seat carries the rule.
 - **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
@@ -319,7 +320,7 @@ A session that opens with a status dump greets nobody. Greet them, then show the
 >
 > Would you like to start a new platform?
 
-That is the door a partner meets: they ran `spnutils workspace init` before they opened the window, because the floor it writes is what brings the plugins here. In a folder nobody minted, which is a builder's case with the plugins at user scope, the door says the folder is empty and offers to mint the workspace as well.
+That is the door a partner meets: they ran `spnutils workspace init <name>` before they opened the window, because the floor it writes is what brings the plugins here. In a folder nobody minted, which is a builder's case with the plugins at user scope, the door says the folder is empty and offers to mint the workspace as well.
 
 ## What this skill never does
 

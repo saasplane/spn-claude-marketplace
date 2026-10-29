@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "36b0dd5f"
+      "seen": "646b9091"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "e9a7f755"
+      "seen": "68c1e693"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -31,7 +31,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "37153ba7"
+      "seen": "5a817634"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "The state file has a node for each owner",
+      "seen": "f2a8cb33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
@@ -79,6 +84,11 @@
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.118",
       "seen": "baf42b07"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.324",
+      "seen": "fe694315"
     }
   ]
 }
@@ -86,7 +96,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.WORKSPACE.020, RD.DEVEX.UTILS.044, RD.DEVEX.UTILS.048, RD.DEVEX.AGENT.049 and RD.DEVEX.WORKSPACE.118. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. The state file is `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The state file has a node for each owner**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.WORKSPACE.020, RD.DEVEX.UTILS.044, RD.DEVEX.UTILS.048, RD.DEVEX.AGENT.049, RD.DEVEX.WORKSPACE.118 and RD.DEVEX.WORKSPACE.324. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -229,12 +239,13 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 - **The main checkouts stay on `develop`, fetched, and the agent never commits in one — MUST.** A release is the one time a main checkout is switched to `main`.
 - **`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin — MUST.** It refuses while any worktree holds a commit that is not on origin or a change that is not committed. Once the repository's pull requests are merged, it deletes the branch on origin too.
 
-**The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about.
+**The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about. Its `.gitignore` carries two lines, `.debug/` and `.state.*`, so neither the machinery's notes nor the state file's lock and temporary file reach the history, and a re-run of `workspace init` adds a line it finds missing. `state.json` is in the history on purpose: a record of when telemetry was on is worth having beside the cost figures it explains. No command commits, so a change to it is in whatever commit is made there next.
 
 **The container is a workstream, and it is named for its subject.** One folder holds everything a subject needs: the argument you read, the arcs the agent executes, and the brief behind every delegated run. Its name is a number and the subject; its parent folder is its state.
 
 ```
 .spndevex/
+  state.json                              what the commands record, a node for each owner: workspace, workstreams, debug
   workstreams/
     backlog/
       {NNN}-{subject}/                    prepared, blocked, or not picked up yet
@@ -259,9 +270,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
             work/                         what the work leaves behind: a view's whole words, a proof's output, a baseline
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
-    state.json                            `lastNumber`: the highest workstream number ever used
   .debug/                                 what the agent's own machinery says about itself
-    switches.json                         the switches, {"telemetry": true}; written by `debug switch on/off` only
     sessions/<session-id>/                one folder for each window; swept 14 days after its newest write
     workspace/                            what spans windows: filter.json
     telemetry/                            hooks.jsonl and usage.jsonl; a log past 20 MB is renamed <name>.1.jsonl
@@ -269,7 +278,29 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
   README.md
 ```
 
-**`workstreams/` and `.debug/` are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds four containers, and each has one lifetime rule — MUST.** `switches.json` is kept and written only by `debug switch on` and `debug switch off`. `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, and a reader reads both. **The plugin is the only writer of `.debug/`**, and `spnutils workspace status` only reads `switches.json` for its recording line. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+**`workstreams/` and `.debug/` are the only two containers, and `state.json` sits beside them.** `workstreams/` holds one folder per scope of work, `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs, and `state.json` holds what the commands record that the tree cannot show. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds three containers, and each has one lifetime rule — MUST.** `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, and a reader reads both. **The plugin is the only writer of `.debug/`.** The switch that starts the recording is not there: it is the `debug` node of `state.json`. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
+
+**`.spndevex/state.json` is the one file where the workspace's commands record what they need to remember, with one node for each owner — MUST** (RD.DEVEX.WORKSPACE.324). Only commands write it, and nobody edits it by hand:
+
+```json
+{
+  "workspace": {
+    "name": "saasplane"
+  },
+  "workstreams": {
+    "lastNumber": 35
+  },
+  "debug": {
+    "telemetry": true
+  }
+}
+```
+
+A node joins the file only when the folder tree cannot show its fact — MUST; a new node, or a new key in one, comes with the reason the tree cannot hold it. **Each node has one writer, and a program changes only the nodes in its own column — MUST.** `workspace.name` is spnutils's, written by `workspace init <name>` and read by `workspace status`'s first line. `workstreams.lastNumber` is spnutils's, written when a folder shows a higher number than the record; it is read by spnutils, for the next free number, and by the plugin's workstream commands, which still write none. `debug.telemetry` is the plugin's, written by `debug switch on|off` and read by the plugin's hooks and by `workspace status`'s recording line. spnutils never writes `debug`, and the plugin never writes `workspace` or `workstreams`. A name is lower-case letters, digits and hyphens, starting with a letter, at most 40 characters — MUST.
+
+**A write follows the same five steps in both programs — MUST.** (1) Take the lock: make the folder `.spndevex/.state.lock/`; making a folder either succeeds or fails at once, so only one writer holds it, and a lock older than 30 seconds was left by a program that died and is taken over with one line saying so. (2) Read the whole file again, under the lock. (3) Change its own node and nothing else: every other top-level node is written back exactly as it was read, including one this program does not know, so an older spnutils never drops a `debug` node a newer plugin wrote. (4) Write the result to a temporary file beside it, `.spndevex/.state.json.<pid>.tmp`. (5) Rename the temporary file over `state.json`, and remove the lock. **A read takes no lock**: the rename replaces the file in one step, so a hook reading `debug.telemetry` mid-write sees the old file or the new one, never half of either. A read that fails still answers *off*: a tool never fails because a switch could not be read.
+
+**spnutils and the plugin ship on their own trains, so Support 5.50.0 goes out first and plugins 0.89.0 after it — MUST.** With Support 5.50.0 and plugins 0.88.0, spnutils folds `workstreams/state.json` into its node on its first run and deletes the old file, the higher number winning, and reads `debug.telemetry` when the node is there and `.debug/switches.json` when it is not. With both new, the plugin's migration 008 folds `.debug/switches.json` into `debug` under the lock and deletes the old file, a `debug` node already there winning; from then on the plugin reads and writes the node. With Support 5.49.0 and plugins 0.89.0, the migration refuses and stays pending, with one line: *"Install Support 5.50.0 or later and run `spnutils workspace init <name>`; the switch moves into .spndevex/state.json after that."* Until then the plugin goes on reading and writing `.debug/switches.json`, so the switch is never lost. **The move is one way**: a Support older than 5.50.0, run after the fold, counts from the folders alone and reads telemetry as off.
 
 **A hook keeps its notes in `.debug/` only inside a workspace it found, and a `.spndevex/` holding nothing but `.debug/` is no workspace — MUST.** A hook that made `.spndevex/` to hold its notes would make a workspace out of wherever the window stood, root every later session below it there, and tell a partner's repository under it that it is day 0. So a hook with no workspace writes nothing, and every walk up to the root passes over a `.spndevex/` such a hook left before.
 
@@ -324,9 +355,9 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | **crosses more than one repo** | the split plan is the only thing holding the halves in order |
 | **outlives one sitting** | the next window finds it by reading, never by remembering |
 
-**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `lastNumber` in `workstreams/state.json` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
+**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `lastNumber` in the `workstreams` node of `.spndevex/state.json` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
 
-**`workstreams/state.json` holds only what the folder tree cannot show — MUST** (`RD.DEVEX.WORKSPACE.190`). Today that is one key, `lastNumber`: once a closed folder is deleted, no folder carries the highest number any more. A value the tree already shows, such as which state a workstream is in or how many arcs it has, never goes in the file, and a new key is added only with the reason the tree cannot hold it. `spnutils workspace init` and `workspace agent-sync` move an older `workstreams/.last-number` into `state.json` and delete the old file.
+**The `workstreams` node holds only what the folder tree cannot show — MUST** (`RD.DEVEX.WORKSPACE.190`). Today that is one key, `lastNumber`: once a closed folder is deleted, no folder carries the highest number any more. A value the tree already shows, such as which state a workstream is in or how many arcs it has, never goes in the node, and a new key is added only with the reason the tree cannot hold it. `spnutils workspace init` and `workspace agent-sync` fold an older `workstreams/state.json` and `workstreams/.last-number` into the node, the higher number winning, and delete the old files.
 
 ### Which state a new workstream starts in
 

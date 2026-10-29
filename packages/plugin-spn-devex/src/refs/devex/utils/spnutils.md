@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "e9a7f755"
+      "seen": "68c1e693"
     }
   ],
   "decisions": [
@@ -25,6 +25,11 @@
       "repo": "spn-foundation",
       "row": "RD.DEVEX.UTILS.075",
       "seen": "e94a2e3b"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.324",
+      "seen": "fe694315"
     }
   ]
 }
@@ -98,8 +103,38 @@ ship, and `validate` is the half that names what you still owe.
 `workspace` mints the folder, keeps its settings and plugins current, and reports what is open. It
 needs no repository, so its commands are the one group a repository's `rules.md` does not list:
 `spnutils help --json` names them. It does not turn the agent's own recording on or off, and it writes
-nothing under `.spndevex/.debug/`: that folder is the plugin's, and `workspace status` only reads
-`switches.json` for its recording line.
+nothing under `.spndevex/.debug/`: that folder is the plugin's. It writes the `workspace` and
+`workstreams` nodes of `.spndevex/state.json` and never the plugin's `debug` node, and `workspace
+status` reads `debug.telemetry` for its recording line, or `.debug/switches.json` where the file has no
+`debug` node yet, and writes nothing to the file.
+
+**`spnutils workspace init [name]` takes the workspace's name as its one argument, and a name is given
+once — MUST** (RD.DEVEX.WORKSPACE.324). The name is positional, written to the `workspace` node, and is
+lower-case letters, digits and hyphens, starting with a letter, at most 40 characters. A partner runs
+init before opening a window, so they type it themselves. Init meets four cases:
+
+| Case | You run | What init does | Exit |
+| --- | --- | --- | --- |
+| A first run with no name | `spnutils workspace init` in a folder with no `.spndevex/` | Refused before anything is written: *"A new workspace needs a name. Run `spnutils workspace init <name>`, for example `spnutils workspace init saasplane`."* | 1 |
+| A re-run with no name | `spnutils workspace init` in the workspace named `saasplane` | Converges as today and keeps the name. Its first line reads `workspace saasplane · /opt/work/saasplane/code`. | 0 |
+| A different name | `spnutils workspace init acme` in the workspace named `saasplane` | Refused before anything is written: *"This workspace is named saasplane, and init was given acme. A workspace keeps the name it was given: run init with no name, or with saasplane."* | 1 |
+| A workspace made before names | `spnutils workspace init` where `state.json` has no `workspace.name` | Converges as today, and ends with one sentence: *"This workspace has no name yet; give it one with `spnutils workspace init <name>`."* Running that names it, which is the one time a re-run sets a name. | 0 |
+
+**`workspace status` opens with the name, beside the path:**
+
+```text
+workspace saasplane · /opt/work/saasplane/code   floor ✅   directory:/opt/work/saasplane/code/spn-claude-marketplace
+```
+
+In a workspace made before names, the first line is the path alone, and one line follows the engine:
+
+```text
+workspace /opt/work/saasplane/code   floor ✅   directory:/opt/work/saasplane/code/spn-claude-marketplace
+engine     OpenTofu v1.12.6
+name       none yet — `spnutils workspace init <name>` names this workspace
+```
+
+The telemetry line is printed only while the `debug` node's `telemetry` is `true`.
 
 **Each telemetry line names the work it was spent on — MUST.** While the `telemetry` switch is on
 (`spn-devex debug switch on telemetry`), every hook check and every plugin command appends one line to
