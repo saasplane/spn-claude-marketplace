@@ -140,17 +140,27 @@ spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in
 
 spn-devex workstream report write [<workstream>] <report.md> — fold a child's report into its row: state, proof, cost, commits, follow-ups
 
-spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
+spn-devex workstream row add <workstream>/N<nnn> "<title>" --repo <repo> --altitude <altitude> [--kind change] [--state ready] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--model …] [--note …] — add a row to an arc, taking the arc's next number and printing it
 
-spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note …] — move a row to a state; --note carries the words beside the move
+spn-devex workstream row state <workstream>/N<nnn> <row> <state> [--note …] [--run <name>] — move a row to a state; --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on
 
 spn-devex workstream row note <workstream>/N<nnn> <row> "<text>" — write one line on a row's log, and change nothing else
 
-spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--position …] — change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named
+spn-devex workstream row edit <workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] — change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named
 
 spn-devex workstream row discard <workstream>/N<nnn> <row> --note "…" — take a row found invalid or not needed out of the arc; --note carries the developer's words into its one log line
 
 spn-devex workstream rows show <workstream>[/N<nnn>] [--ready] [--parallel] [--tree] [--json] — print the rows of a workstream or an arc: --ready, --parallel, --tree; with --json, as data
+
+spn-devex workstream sheet write <workstream>/N<nnn> --file <sheet.json> — write the arc's whole sheet from a file, every entry validated and every fact one the arc holds
+
+spn-devex workstream sheet edit <workstream>/N<nnn> <E> [--what …] [--op …] [--file …] [--decided-by …] [--facts …] [--then …] [--rules …] [--callers …] [--docs …] [--book …] [--tiers unit=ID,ID;contract=ID] — change one entry of the sheet; a missing entry is refused, and `sheet write` is named
+
+spn-devex workstream sheet drop <workstream>/N<nnn> <E> --note "…" — take an entry out of the sheet; --note carries why into its one log line
+
+spn-devex workstream sheet show <workstream>/N<nnn> [--row <id>] [--json] — print the sheet, or one row's entries; --json prints every field
+
+spn-devex workstream sheet check <workstream>/N<nnn> — read the sheet against the rows and the cards, one finding to a line; exits 1 on any
 
 spn-devex workstream state show [<workstream>] [--json] — where each open and backlog workstream stands, in a line; with --json, as data
 
