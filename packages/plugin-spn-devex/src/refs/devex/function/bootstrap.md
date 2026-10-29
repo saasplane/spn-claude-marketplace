@@ -12,6 +12,10 @@
     {
       "path": "spn-foundation/docs/05-guides/README.md",
       "seen": "b8aaf1d5"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "seen": "68c1e693"
     }
   ]
 }
@@ -19,7 +23,7 @@
 
 # Bootstrap — Empty Folder to First Feature
 
-**Source of truth:** the foundation's `02-constructs/01-devex/01-function/01-bootstrap.md` and `04-capabilities/01-devex/01-function/01-bootstrap.md` for the stage, and the guides seat (`docs/05-guides/`) for the walk itself. This file restates them for use inside a wired workspace and adds nothing; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation's `02-constructs/01-devex/01-function/01-bootstrap.md` and `04-capabilities/01-devex/01-function/01-bootstrap.md` for the stage, the guides seat (`docs/05-guides/`) for the walk itself, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` for `workspace init <name>`. This file restates them for use inside a wired workspace and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
 Follow this walk from an empty folder to one sample platform answering on the laptop, then a first feature in flight. Every step names the command or skill that carries it; statuses are honest — ✅ runs today, 🚧 the step works but by hand, or with the agent improvising more than it should. No cloud account is needed: AWS is only for standing environments in the cloud, and that walk comes later.
 
@@ -28,7 +32,7 @@ the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **
 (`tofu`, never `terraform` — every infra node is OpenTofu, and its tests plan with `tofu test`),
 **`jq`** — an infra node's contract cases read its declaration with it — a **container runtime** —
 the local estate is real containers rather than mocks — then a **browser**, **VS Code with the Claude
-extension**, and the CLI last, **because it is what turns the rest on**: step 2 is `workspace init`,
+extension**, and the CLI last, **because it is what turns the rest on**: step 2 is `workspace init <name>`,
 which wires the agent to the versions actually installed, so whatever is on the machine when the CLI
 arrives is what the agent gets. **`tofu -v` reporting OpenTofu, `jq --version` answering and
 `spnutils --version` answering are the whole test**, and if all three do, the machine is ready.
@@ -55,7 +59,7 @@ install nothing for that.
 | # | Step | Where | Runs | Status |
 | --- | --- | --- | --- | --- |
 | 1 | Install the CLI | Terminal | `npm install -g @saasplane/utility-ts` | ✅ |
-| 2 | Mint the workspace — marketplace, plugin union, permission tiers, `~/.spnenv`, `.spndevex/`; every repository inside wired | Terminal | `spnutils workspace init` | ✅ |
+| 2 | Mint the workspace and name it — marketplace, plugin union, permission tiers, `~/.spnenv`, `.spndevex/` with its `state.json`; every repository inside wired. The name is lower-case letters, digits and hyphens, given once | Terminal | `spnutils workspace init <name>` | ✅ |
 | 3 | Open the folder in VS Code and Claude | Terminal · Claude in VS Code | `code .` | ✅ |
 | 4 | Read the orientation, and fill the GitHub token in the machine seat | Terminal | `spnutils workspace status` | ✅ |
 
