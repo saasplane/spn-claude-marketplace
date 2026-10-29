@@ -29,6 +29,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { emit, readPayload, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { readArc, readSheet } from "../lib/workstream.ts";
 import { alreadyTold, commandWrites, fromWorkspace, recordWrites } from "../lib/window.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
@@ -316,6 +317,39 @@ export function checkAgentModel(payload: Payload): Verdict {
 }
 
 /**
+ * THE ORDER-ENTRIES CHECK: a launch of an order is read through the order's row to the row's entries in the arc's sheet.
+ * It is refused where the row names an entry the sheet does not hold, and where a CODE row of an arc that keeps a sheet names
+ * none. An arc with no sheet, an order with no `row:`, and an order that cannot be read are not judged.
+ */
+export function checkOrderEntries(payload: Payload): Verdict {
+  const input = (payload.tool_input ?? {}) as { prompt?: string };
+  const cwd = payload.cwd ?? process.cwd();
+  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
+    try {
+      const path = resolve(cwd, named[0]);
+      const placed = /^(.*)\/notes\/(N\d+[a-z]?)\/orders\/([^/]+)$/.exec(path.split("\\").join("/"));
+      if (!placed || path.endsWith(".report.md")) continue;
+      const [, ws, arc, file] = placed;
+      const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(path, "utf8"))?.[1] ?? "";
+      const rowId = /^row:\s*"?([^"\s]+)"?/m.exec(front)?.[1];
+      if (!rowId) continue;
+      const sheet = readSheet(ws, arc);
+      const row = readArc(ws, arc)?.rows.find((one) => one.id === rowId);
+      if (!sheet || !row) continue;
+      const held = new Set((Array.isArray(sheet.entries) ? sheet.entries : []).map((one) => one.id));
+      const missing = (row.entries ?? []).filter((id) => !held.has(id));
+      if (missing.length)
+        return { deny: `order ${file} carries row ${rowId}, and row ${rowId} names ${missing.join(", ")}, which arcs/${arc}/sheet.json does not hold.\n`
+          + `Add ${missing.join(", ")} with \`workstream sheet write\`, or take ${missing.length === 1 ? "it" : "them"} off the row, then launch again.` };
+      if (row.altitude === "CODE" && !(row.entries ?? []).length)
+        return { deny: `order ${file} carries row ${rowId}, a CODE row of an arc that keeps a sheet, and row ${rowId} names no entry.\n`
+          + `Name them with \`workstream row edit ${arc} ${rowId} --entries E1,E2\`, then launch again.` };
+    } catch { /* an order that cannot be read is not judged */ }
+  }
+  return null;
+}
+
+/**
  * A step that asks for a picture: shot, screenshot, "take a picture", `page.screenshot`, or a `.png` the
  * step takes, captures, renders or saves. A `.png` named alone is a file the step uses, such as an
  * image imported as media, and asks for no picture.
@@ -361,7 +395,10 @@ export function checkOrderPicture(payload: Payload): Verdict {
 export function dispatch(payload: Payload): Verdict {
   // A LAUNCH OF A HELPER AGENT has no path or command, so nothing below has anything to read in it.
   if (payload.tool_name === "Agent" || payload.tool_name === "Task") {
-    try { return span({ group: "agent-model", action: "agent-model" }, () => checkAgentModel(payload)); } catch { return null; }
+    let refused: Verdict = null;
+    try { refused = span({ group: "agent-model", action: "agent-model" }, () => checkAgentModel(payload)); } catch { refused = null; }
+    if (refused) return refused;
+    try { return span({ group: "order-entries", action: "order-entries" }, () => checkOrderEntries(payload)); } catch { return null; }
   }
 
   const supplied = payload.tool_input ?? {};

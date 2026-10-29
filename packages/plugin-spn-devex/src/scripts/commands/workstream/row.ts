@@ -12,7 +12,7 @@
 // `row add` takes the arc's next number and prints it; the rules for a started step and a landed arc are RD.DEVEX.WORKSPACE.278 and .261.
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { arcStatus, doneOf, logEvent, readArc, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
+import { arcStatus, doneOf, landingFault, logEvent, readArc, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
@@ -137,7 +137,7 @@ function add(args: string[]): number {
 }
 
 function state(args: string[]): number {
-  const words = readWords(args, { note: VALUE });
+  const words = readWords(args, { note: VALUE, run: VALUE });
   const [ref, rowId, next, ...more] = words.paths;
   if (!rowId || !next || more.length) throw new UsageFault(`takes an arc, a row and the state: \`row state <workstream>/N<nnn> <row> <state>\`, one of ${ROW_STATES.join(" · ")}.`);
   if (!(ROW_STATES as readonly string[]).includes(next)) throw new UsageFault(`takes a state from ${ROW_STATES.join(" · ")}, and \`${next}\` is none of them.`);
@@ -145,11 +145,16 @@ function state(args: string[]): number {
   const was = stateOfRow(data.rows, row);
   if (was === next) throw new UsageFault(`changes nothing: row ${rowId} is already ${next}; \`row note\` writes a line on it.`);
   mayStart(arc, data, rowId, next);
+  const run = words.value("run");
+  if (next === "landed") {
+    const fault = landingFault(ws, arc, data, row, run);
+    if (fault) { console.log(`Refused: ${fault}`); return 1; }
+  }
   const statusBefore = arcStatus(data);
   const before = arcSignatures(ws);
   row.state = next;
   typed(() => writeArc(ws, data));
-  logEvent(ws, arc, next, rowId, words.value("note") ?? `${was} → ${next}`);
+  logEvent(ws, arc, next, rowId, words.value("note") ?? `${was} → ${next}${next === "landed" && run ? ` · run ${run}` : ""}`);
   return finish(ws, arc, data, before, statusBefore, [`row ${rowId} · state`]);
 }
 
@@ -255,8 +260,8 @@ export const actions: Record<string, Action> = {
     run: add,
   },
   state: {
-    describe: "move a row to a state; --note carries the words beside the move",
-    usage: "<workstream>/N<nnn> <row> <state> [--note …]",
+    describe: "move a row to a state; --note carries the words beside the move, and --run names the run a CODE or PROOF row of a sheet arc lands on",
+    usage: "<workstream>/N<nnn> <row> <state> [--note …] [--run <name>]",
     run: state,
   },
   note: {

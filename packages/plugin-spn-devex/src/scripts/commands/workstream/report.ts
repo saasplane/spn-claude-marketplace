@@ -11,7 +11,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { type Action, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { frontMatter } from "../../lib/front-matter.ts";
-import { doneOf, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
+import { doneOf, landingFault, logEvent, notesDirOf, readArc, readQuestions, readyRows, workspaceOf, writeArc } from "../../lib/workstream.ts";
 import { OUTCOMES, ROW_ID, type ArcRow, type Cost } from "../../lib/workstream-schema.ts";
 import { afterWrite, arcSignatures, refreshIfMoved, typed, workstreamNamed } from "./_shared.ts";
 import { readCost } from "../../lib/cost.ts";
@@ -59,6 +59,10 @@ function write(args: string[]): number {
     for (const [repo, list] of Object.entries(matter.commits))
       commits[repo] = [...new Set([...(commits[repo] ?? []), ...(Array.isArray(list) ? list : [list]).map(String)])];
     row.commits = commits;
+  }
+  if (outcome === "landed") {
+    const fault = landingFault(ws, arc, data, row, typeof matter.run === "string" ? matter.run : null);
+    if (fault) { console.log(`Refused: ${fault} Nothing was written.`); return 1; }
   }
   const cost = matter.cost as { tokens?: unknown; minutes?: unknown } | null;
   if (cost && typeof cost === "object" && typeof cost.tokens === "number" && typeof cost.minutes === "number")

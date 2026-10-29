@@ -194,7 +194,10 @@ export function sheetFindings(ws: string, arc: string): string[] {
     if (!held.has(id)) out.push(`row ${row.id} names ${id}, which the sheet does not hold`);
   }
   for (const entry of entries) if (!named.has(entry.id)) out.push(`${entry.id} is named by no row`);
-  for (const row of leaves.filter((one) => one.altitude === "CODE")) {
+  // A RELEASE or PROOF row names its files through no entry, so it is never this finding.
+  for (const row of leaves.filter((one) => ["DOCS", "CODE", "GENERATED"].includes(one.altitude ?? "") && !(one.entries ?? []).length))
+    out.push(`row ${row.id} names no entry`);
+  for (const row of leaves.filter((one) => one.altitude === "CODE" && (one.entries ?? []).length)) {
     const tested = (row.entries ?? []).some((id) => Object.values(held.get(id)?.tiers ?? {}).some((ids) => ids.length));
     if (!tested) out.push(`row ${row.id} is a CODE row and its entries name no test`);
   }

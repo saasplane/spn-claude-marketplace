@@ -22,6 +22,7 @@ import {
 import { isFile } from "../../lib/payload.ts";
 import { refreshViews } from "../docs/cycles.ts";
 import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
+import { sheetFindings } from "./sheet.ts";
 import { ROW_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 
 export const describe = "an arc's header written, opened or changed; the stamp an arc's Cycles row carries, written once the page is current with its goal, title and repositories; or an arc never decided, deleted";
@@ -256,6 +257,10 @@ function edit(args: string[]): number {
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
+  if (goes) {
+    const found = sheetFindings(ws, arc);
+    if (found.length) { console.log(`the sheet reads ${found.length} finding${found.length === 1 ? "" : "s"} — bring each current now the go is given:`); for (const line of found) console.log(`  ${line}`); }
+  }
   return 0;
 }
 

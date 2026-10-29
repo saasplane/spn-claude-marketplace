@@ -126,7 +126,18 @@ console.log("\n=== check");
   // E1 is named by no row; row 2 (CODE) names E2, which names a test; the arc has a CODE row.
   const first = sheet("check", "N001");
   ok("an entry no row names is found", first.out.includes("E1 is named by no row"), first.out);
-  ok("it ends on the count and exits 1", first.code === 1 && /\n1 finding · exit 1\n?$/.test(first.out), first.out);
+  ok("a DOCS row that names no entry is found, in the preview's words", first.out.includes("row 1 names no entry"), first.out);
+  ok("it ends on the count and exits 1", first.code === 1 && /\n2 findings · exit 1\n?$/.test(first.out), first.out);
+  {
+    const kinds = json(stateFile);
+    const was = kinds.rows[0].altitude;
+    const lone = (altitude) => { kinds.rows[0].altitude = altitude; writeFileSync(stateFile, JSON.stringify(kinds, null, 2)); return sheet("check", "N001").out; };
+    ok("a CODE row that names no entry is found as that, not as a missing test", lone("CODE").includes("row 1 names no entry") && !lone("CODE").includes("row 1 is a CODE row"));
+    ok("a GENERATED row that names no entry is found", lone("GENERATED").includes("row 1 names no entry"));
+    ok("a RELEASE row names its files through no entry and is never this finding", !lone("RELEASE").includes("row 1 names no entry"));
+    ok("a PROOF row is never this finding", !lone("PROOF").includes("row 1 names no entry"));
+    kinds.rows[0].altitude = was; writeFileSync(stateFile, JSON.stringify(kinds, null, 2));
+  }
 
   const rows = json(stateFile);
   rows.rows[0].entries = ["E1"]; rows.rows[1].entries = ["E2", "E7"];
