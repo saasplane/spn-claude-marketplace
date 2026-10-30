@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md",
-      "seen": "51c43104"
+      "seen": "5c55c38f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/04-flow-patterns.md",
-      "seen": "72a73a8d"
+      "seen": "b221e6b1"
     }
   ]
 }

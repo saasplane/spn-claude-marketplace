@@ -3,23 +3,23 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "section": "The rungs, and what a path may be",
-      "seen": "80cf3ac6"
+      "section": "The rungs",
+      "seen": "3dcae51d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
-      "seen": "69544d52"
+      "seen": "ee4a7d32"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
-      "seen": "c5c17c66"
+      "seen": "8a3bd6ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "One packages declaration; the registry derives",
-      "seen": "2a316266"
+      "seen": "bbc5a5d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/02-vendors.md",

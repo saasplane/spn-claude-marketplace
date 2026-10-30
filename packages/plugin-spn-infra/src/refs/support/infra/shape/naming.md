@@ -3,17 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/01-shape/02-coordinates.md",
-      "seen": "db5f0772"
+      "seen": "d6a3fcf9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/02-config.md",
       "section": "The published vocabulary",
-      "seen": "178a9c0e"
+      "seen": "3a0f15b3"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "section": "The rungs, and what a path may be",
-      "seen": "80cf3ac6"
+      "section": "The rungs",
+      "seen": "3dcae51d"
     }
   ]
 }

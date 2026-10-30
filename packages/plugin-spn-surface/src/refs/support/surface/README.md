@@ -8,8 +8,8 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "section": "The pointer from apps into Surface, and the rule that keeps it safe",
-      "seen": "db7d7579"
+      "section": "Apps into Surface",
+      "seen": "91f2b341"
     }
   ]
 }
