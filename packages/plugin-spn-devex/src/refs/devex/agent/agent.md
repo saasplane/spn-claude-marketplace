@@ -4,47 +4,47 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "0cb8b638"
+      "seen": "8189487f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "df609deb"
+      "seen": "bbfbb700"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "b77b4de2"
+      "seen": "35ea96d0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "03db8a18"
+      "seen": "268ef0f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "3fb4ffdd"
+      "seen": "ea5ff3ed"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "c41c3aab"
+      "seen": "1b6effa4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "14280d8e"
+      "seen": "3dd16782"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
-      "seen": "9d79771b"
+      "seen": "7e0aa277"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "7e4f58e7"
+      "seen": "ca4761e4"
     }
   ]
 }

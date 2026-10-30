@@ -16,11 +16,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/README.md",
-      "seen": "cc389843"
+      "seen": "560c206b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/README.md",
-      "seen": "9d972dd6"
+      "seen": "2861bc85"
     }
   ]
 }

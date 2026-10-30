@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "292167d6"
+      "seen": "fb02e581"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "41eb6c10"
+      "seen": "ca20ffee"
     }
   ],
   "decisions": []

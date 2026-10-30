@@ -8,27 +8,27 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "b21b85e4"
+      "seen": "bf59bc6a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "The layout",
-      "seen": "01381bd5"
+      "seen": "ca49f430"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
       "section": "The panel",
-      "seen": "856135c4"
+      "seen": "8e4c297b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",
       "section": "The six parts of a pattern",
-      "seen": "aa628b3b"
+      "seen": "25dfdf3d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "How the navigation behaves",
-      "seen": "dedee7cb"
+      "seen": "e18643e5"
     }
   ]
 }
@@ -104,7 +104,7 @@ Read the page itself, never a description of it — the frame, the preview, the 
   - **The facts of the data were written down after those two, before the choice, and a block was chosen last**: what one record holds, whether the query takes a page, a text or a filter, whether the set grows, how many there usually are, and who comes and why (`RULE.SUPPORT.SURFACE.052` · MUST · skill:spn-surface/design).
   - **A record is chosen by an autocomplete, never a select**: a short bounded list opens whole, a long one is searched (`RULE.SUPPORT.SURFACE.307` · GUIDE).
   - **A part that holds many of one thing is shown by what its own data asks for.** A query taking a page, a text or a filter is a data table, even while small; a search run in the page over loaded records is a finding, and so is a page depending on a count the server does not give (`RULE.SUPPORT.SURFACE.049` · GUIDE) (`RULE.SUPPORT.SURFACE.050` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.054` · GUIDE) (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design).
-  - **A label, a frame, a state and the end of a line each follow their rule of content**: no label on a value a person can tell without it; a frame only round a part with a title of its own; a state as a badge on the line of facts; the end of a line holds data or the arrow, never an action (`RULE.SUPPORT.SURFACE.056` · GUIDE) (`RULE.SUPPORT.SURFACE.057` · GUIDE) (`RULE.SUPPORT.SURFACE.058` · GUIDE) (`RULE.SUPPORT.SURFACE.059` · GUIDE) (`RULE.SUPPORT.SURFACE.087` · GUIDE) (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design).
+  - **A label, a frame, a state and the end of a line each follow their rule of content**: no label on a value a person can tell without it; a frame only round a part with a title of its own; a state as a badge on the line of facts or at the end of the line, never after the title; the end of a line holds what the page puts there, its actions, a badge or both, and a line that leads to a page usually shows the arrow where that end holds no action (`RULE.SUPPORT.SURFACE.056` · GUIDE) (`RULE.SUPPORT.SURFACE.057` · GUIDE) (`RULE.SUPPORT.SURFACE.058` · GUIDE) (`RULE.SUPPORT.SURFACE.059` · GUIDE) (`RULE.SUPPORT.SURFACE.087` · GUIDE) (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design).
   - **A field, a set of choices and a list each keep their layout**: an entered field has its title above and one line under; every control a person sets is a form field; readings stand in a grid; choices stand in columns; a line between each two lines of a list; anything set one under another is a `DSList` (`RULE.SUPPORT.SURFACE.060` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.061` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.062` · GUIDE) (`RULE.SUPPORT.SURFACE.063` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.096` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.288` · GUIDE).
   - **The data table is in the layout its data asks for**: `TABLE` to compare facts, `LIST` for a record read by its name, `GRID` for a thing of its own, `LIST` on a phone; a record's actions at the end of its row; a value changed in its cell; the filter bar in its one form, one button on a phone whose drawer fits its fields (`RULE.SUPPORT.SURFACE.068` · GUIDE) (`RULE.SUPPORT.SURFACE.069` · GUIDE) (`RULE.SUPPORT.SURFACE.070` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.071` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.072` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.073` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.097` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.246` · MUST · skill:spn-surface/design).
   - **A pitch is one `DSFeature`, a section of a website is a `DSSectionContainer`, and a grid of features under a heading is a `DSFeatureGridSectionContainer`.** A hero, a section head, a closing call or a tile drawn by hand, and a section painted by hand, is a finding (`RULE.SUPPORT.SURFACE.233` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.243` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.259` · MUST · skill:spn-surface/design).

@@ -8,32 +8,32 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "b21b85e4"
+      "seen": "bf59bc6a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/01-common/01-library.md",
       "section": "Each shared state has one picture",
-      "seen": "a913b5bb"
+      "seen": "a410741b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
       "section": "A frame is drawn once",
-      "seen": "6b703b51"
+      "seen": "cc2e573c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/01-common/02-settings-and-theme.md",
       "section": "The theme",
-      "seen": "81472149"
+      "seen": "aa375042"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/01-task-patterns.md",
       "section": "Interrupt",
-      "seen": "0ae00cf2"
+      "seen": "945618f6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
       "section": "The three parts",
-      "seen": "63687057"
+      "seen": "1eb4e639"
     }
   ]
 }

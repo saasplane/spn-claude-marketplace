@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
       "section": "What a partner follows, by what they build and deliver",
-      "seen": "2acae3b9"
+      "seen": "ddad3998"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/05-lifecycle/01-lifecycle.md",

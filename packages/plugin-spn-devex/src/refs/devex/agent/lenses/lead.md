@@ -8,29 +8,29 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/README.md",
-      "seen": "6ca1c307"
+      "seen": "cb59d6ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "08736f20"
+      "seen": "0c562b94"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
-      "seen": "91b0a8fa"
+      "seen": "d630647e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "ae9375a4"
+      "seen": "29a2c878"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "A task has three possible fates, and promotion is only one of them",
-      "seen": "459917b3"
+      "seen": "2c989bf3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
       "section": "Repo tasks",
-      "seen": "9b3398b1"
+      "seen": "bc677dfe"
     }
   ]
 }

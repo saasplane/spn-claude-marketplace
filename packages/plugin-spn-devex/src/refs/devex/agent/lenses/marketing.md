@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "579ab101"
+      "seen": "b46842e1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "Who an app is for",
-      "seen": "2752aca1"
+      "seen": "1406d762"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
@@ -24,11 +24,11 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md",
       "section": "What holds across",
-      "seen": "968d7f08"
+      "seen": "92df3611"
     },
     {
       "path": "spn-foundation/docs/01-purpose/02-what.md",
-      "seen": "95f586a4"
+      "seen": "0298f6cf"
     }
   ]
 }

@@ -8,27 +8,27 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "c82fb94f"
+      "seen": "aefb3708"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Code coverage is reported, never enforced",
-      "seen": "3e80db4e"
+      "seen": "64be0e7c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The behaviour rows are the denominator",
-      "seen": "eff24f91"
+      "seen": "e9eb7744"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "What a run owes",
-      "seen": "6b079954"
+      "seen": "389d7537"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Scope — where you stand decides what runs",
-      "seen": "b3fb0d40"
+      "seen": "2f2249e2"
     }
   ]
 }

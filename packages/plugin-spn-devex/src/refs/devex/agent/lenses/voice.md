@@ -9,86 +9,86 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "579ab101"
+      "seen": "b46842e1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "08736f20"
+      "seen": "0c562b94"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "27ba6754"
+      "seen": "976c630a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "27c0f75b"
+      "seen": "11a26765"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "acd56ab4"
+      "seen": "1a0d2100"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The words a report uses",
-      "seen": "f2b64ff8"
+      "seen": "25da240f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Voice discipline",
-      "seen": "7810ab17"
+      "seen": "2fc78ce3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "section": "Structure rules",
-      "seen": "a7b99e50"
+      "seen": "912c7da9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
       "section": "The readability bar",
-      "seen": "d5ba0e53"
+      "seen": "58222581"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
       "section": "The behaviour row",
-      "seen": "23251549"
+      "seen": "f6a350cf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Naming rules",
-      "seen": "f5447b09"
+      "seen": "f35875fe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "section": "This book divides by area; every other repository divides by domain",
-      "seen": "9b71a904"
+      "seen": "2748392c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "A construct types no proof, and its rows sit at its own path",
-      "seen": "c5e41f21"
+      "seen": "1ec94c4e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Upkeep discipline",
-      "seen": "9dad6b6a"
+      "seen": "526408cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Counting discipline",
-      "seen": "87bb90dc"
+      "seen": "26c241ed"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.AGENT.032",
-      "seen": "91c04689"
+      "seen": "9a4272b7"
     },
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.143",
-      "seen": "3f5365b8"
+      "seen": "6a6fd577"
     }
   ]
 }
