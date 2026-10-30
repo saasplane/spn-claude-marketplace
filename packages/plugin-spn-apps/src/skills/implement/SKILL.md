@@ -7,28 +7,28 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "810ac3e8"
+      "seen": "1f777cff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "80f70315"
+      "seen": "98829f23"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "cef5acd3"
+      "seen": "e34ccd2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "97e9441a"
+      "seen": "36949f42"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
       "section": "Where the comment goes",
-      "seen": "c3984457"
+      "seen": "5c8ea835"
     }
   ]
 }

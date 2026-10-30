@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
-      "seen": "8b1c2dd7"
+      "seen": "c1ee9f58"
     }
   ]
 }

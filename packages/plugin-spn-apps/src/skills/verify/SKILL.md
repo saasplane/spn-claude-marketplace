@@ -7,15 +7,15 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "c61a000e"
+      "seen": "2ffa2fa3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "80f70315"
+      "seen": "98829f23"
     }
   ]
 }

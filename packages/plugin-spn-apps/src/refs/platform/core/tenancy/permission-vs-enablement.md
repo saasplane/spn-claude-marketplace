@@ -3,17 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "5856fbb7"
+      "seen": "198b3bd7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
       "section": "Enablement: what an organization type is offered",
-      "seen": "61a67756"
+      "seen": "88faaa26"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
       "section": "`@SPAuthorize` + the module `_AUTHZ` table",
-      "seen": "92726a2f"
+      "seen": "9b0e48e0"
     }
   ]
 }

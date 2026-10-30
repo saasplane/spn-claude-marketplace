@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
-      "seen": "8d924b6f"
+      "seen": "cbbdd181"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
-      "seen": "7e98a4ed"
+      "seen": "883f1ee6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "1f3c8b4a"
+      "seen": "f7e907e3"
     }
   ]
 }

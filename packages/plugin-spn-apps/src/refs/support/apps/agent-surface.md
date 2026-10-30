@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/08-agent-surface.md",
-      "seen": "2d24d3ee"
+      "seen": "bb2e9940"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/",
-      "seen": "bfe3f734"
+      "seen": "ef5f2622"
     }
   ]
 }

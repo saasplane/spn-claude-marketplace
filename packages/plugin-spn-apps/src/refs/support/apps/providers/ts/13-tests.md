@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
-      "seen": "f42da34c"
+      "seen": "ba0be14f"
     }
   ]
 }
