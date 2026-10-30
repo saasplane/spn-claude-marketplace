@@ -97,7 +97,7 @@ type Rule =
   | { kind: "text"; required: boolean }                         // a string or null
   | { kind: "enum"; required: boolean; values: readonly string[]; nullable?: boolean }
   | { kind: "strings"; required: boolean; pattern?: RegExp }
-  | { kind: "number"; required: boolean }
+  | { kind: "number"; required: boolean; nullable?: boolean }
   | { kind: "boolean"; required: boolean };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -128,6 +128,7 @@ function fieldFaults(where: string, record: Record<string, unknown>, fields: Rec
         else if (rule.pattern) for (const item of value) if (!rule.pattern.test(item)) out.push(`${where}'s \`${name}\` holds \`${item}\`, which is not of the form ${rule.pattern}`);
         break;
       case "number":
+        if (value === null && rule.nullable) break;
         if (typeof value !== "number" || !Number.isFinite(value)) out.push(`${where}'s \`${name}\` is not a number`);
         break;
       case "boolean":
@@ -302,6 +303,8 @@ export type SheetStack = { folder: string; dmo: string; reset: string; ports?: s
 export type SheetEntry = {
   id: string; op: string; file: string; what: string; decidedBy: string[]; facts: string[]; then: string[];
   rules: string[]; callers: string[]; tiers: Record<string, string[]>; docs: string[]; book: string[];
+  /** The kind of change the entry is; a sheet written before it was added has none, and `entryAltitude` reads the file's kind. */
+  altitude?: string | null;
   [field: string]: unknown;
 };
 export type Sheet = { schemaVersion: number; releaseChain: string[]; dependsOn: string[]; stack: SheetStack | null; entries: SheetEntry[]; [field: string]: unknown };
@@ -321,7 +324,20 @@ const ENTRY_FIELDS: Record<string, Rule> = {
   decidedBy: { kind: "strings", required: true }, facts: { kind: "strings", required: true, pattern: FACT_ID },
   then: { kind: "strings", required: true }, rules: { kind: "strings", required: true }, callers: { kind: "strings", required: true },
   docs: { kind: "strings", required: true }, book: { kind: "strings", required: true },
+  altitude: { kind: "enum", required: false, values: ALTITUDES, nullable: true },
 };
+
+/**
+ * An entry's kind of change, from which an arc's steps are derived: the one it names, else the kind of its file's path —
+ * a dist bundle or a generated ref is GENERATED, a docs or refs file DOCS, and a source or test file CODE.
+ */
+export function entryAltitude(entry: Pick<SheetEntry, "file" | "altitude">): (typeof ALTITUDES)[number] {
+  if (typeof entry.altitude === "string" && (ALTITUDES as readonly string[]).includes(entry.altitude)) return entry.altitude as (typeof ALTITUDES)[number];
+  const path = entry.file.slice(entry.file.indexOf(":") + 1);
+  if (/(^|\/)dist\//.test(path) || /generated/i.test(path)) return "GENERATED";
+  if (/(^|\/)(docs|refs)\//.test(path) || /\.md$/.test(path)) return "DOCS";
+  return "CODE";
+}
 
 /**
  * Every fault of a change sheet, read as JSON already. The header's faults are named by `where`; an entry's by its id, so a
@@ -347,6 +363,75 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
     else for (const [tier, ids] of Object.entries(entry.tiers)) {
       if (!(TIERS as readonly string[]).includes(tier)) out.push(`${label}'s \`tiers\` holds \`${tier}\`, and a tier is one of ${TIERS.join(" · ")}`);
       else if (!Array.isArray(ids) || !ids.length || ids.some((id) => typeof id !== "string" || !id.trim())) out.push(`${label}'s \`${tier}\` is not a list of behaviour ids`);
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------- the go plan
+
+/** The version of `go.json` this plugin reads and writes. */
+export const GO_SCHEMA_VERSION = 1;
+/** The passes of a go, in the order they run inside a repository (the release comes last, after every repository). */
+export const GO_PASSES = ["BASELINE", "DOCS", "CODE", "FULL_RUN", "GENERATED", "RELEASE"] as const;
+/** Where a part of a go stands. */
+export const GO_PART_STATES = ["ready", "running", "held", "landed"] as const;
+/** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
+export const GO_PART_ID = /^(baseline|docs|code|full|generated|release)-\S+$/;
+/** An entry as a go names it: its arc and its id, `N009/E14`. */
+export const GO_ENTRY = /^N\d+[a-z]?\/E\d+$/;
+
+export type GoPass = (typeof GO_PASSES)[number];
+/**
+ * One part of a go: what one helper carries out. `signature` is the entries' hashes joined by `.`, in the order of
+ * `entries`, so a changed entry is the one whose hash differs.
+ */
+export type GoPart = {
+  id: string; repo: string; pass: GoPass; entries: string[]; tests: string[];
+  minutes: number | null; measuredFrom: string | null; waitsOn: string[]; model: string; signature: string;
+  state: (typeof GO_PART_STATES)[number];
+};
+/** The plan of a go, written only by `go write` into the lead arc's folder: the arcs it covers and its parts in build order. */
+export type GoPlan = { schemaVersion: number; lead: string; scope: string[]; writtenAt: string; parts: GoPart[] };
+
+const GO_FIELDS: Record<string, Rule> = {
+  lead: { kind: "string", required: true, pattern: ARC_ID }, scope: { kind: "strings", required: true, pattern: ARC_ID },
+  writtenAt: { kind: "string", required: true },
+};
+const GO_PART_FIELDS: Record<string, Rule> = {
+  id: { kind: "string", required: true, pattern: GO_PART_ID }, repo: { kind: "string", required: true },
+  pass: { kind: "enum", required: true, values: GO_PASSES },
+  entries: { kind: "strings", required: true, pattern: GO_ENTRY }, tests: { kind: "strings", required: true },
+  minutes: { kind: "number", required: true, nullable: true }, measuredFrom: { kind: "text", required: true },
+  waitsOn: { kind: "strings", required: true }, model: { kind: "string", required: true },
+  signature: { kind: "text", required: true }, state: { kind: "enum", required: true, values: GO_PART_STATES },
+};
+
+/** Every fault of a go plan, read as JSON already. Empty where it holds to the schema. */
+export function goFaults(data: unknown, where = "go.json"): string[] {
+  if (!isObject(data)) return [`${where} is not a JSON object`];
+  const out: string[] = [];
+  if (data.schemaVersion !== GO_SCHEMA_VERSION) out.push(`${where}'s \`schemaVersion\` is \`${String(data.schemaVersion)}\`, and this spn-devex reads ${GO_SCHEMA_VERSION}`);
+  out.push(...fieldFaults(where, data, GO_FIELDS));
+  if (!Array.isArray(data.parts)) { out.push(`${where}'s \`parts\` is not a list`); return out; }
+  const ids = new Set<string>();
+  const held = new Map<string, string>();
+  for (const [at, part] of data.parts.entries()) {
+    if (!isObject(part)) { out.push(`${where}'s part ${at + 1} is not an object`); continue; }
+    const label = typeof part.id === "string" && part.id ? `part ${part.id}` : `part ${at + 1}`;
+    out.push(...fieldFaults(label, part, GO_PART_FIELDS));
+    if (typeof part.id === "string") { if (ids.has(part.id)) out.push(`${label} is written twice`); ids.add(part.id); }
+    if (Array.isArray(part.entries)) {
+      const hashes = typeof part.signature === "string" && part.signature ? part.signature.split(".").length : 0;
+      if (!part.entries.length && part.pass !== "BASELINE" && part.pass !== "FULL_RUN" && part.pass !== "RELEASE") out.push(`${label} holds no entry`);
+      if (typeof part.signature === "string" && hashes !== part.entries.length)
+        out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
+      for (const entry of part.entries) {
+        if (typeof entry !== "string") continue;
+        const other = held.get(entry);
+        if (other && other !== label) out.push(`${entry} is held by ${other} and ${label}`);
+        held.set(entry, label);
+      }
     }
   }
   return out;
