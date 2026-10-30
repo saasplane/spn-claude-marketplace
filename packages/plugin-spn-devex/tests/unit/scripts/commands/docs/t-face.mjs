@@ -517,9 +517,9 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   // folder, so the link is an anchor whose address is expressed from the overview's own folder.
   one("a link in a term's meaning is an anchor, expressed from the overview's folder, with its fragment kept",
     page, has('<a href="../../../registers/decisions.md#r1">the rule</a>'));
-  one("a link in a term's meaning to another domain's construct seat is that construct's page, fragment kept (Q234)",
+  one("[MKT.SCRIPTS.194] a link in a term's meaning to another domain's construct seat is that construct's page, fragment kept (Q234)",
     page, has('<a href="../02-edge/constructs/gate-construct.html#g">the gate</a>'));
-  one("and no `.md` seat address is left in the glossary", page.slice(page.indexOf("spn:generated glossary")), lacks("gate.md"));
+  one("[MKT.SCRIPTS.194] and no `.md` seat address is left in the glossary", page.slice(page.indexOf("spn:generated glossary")), lacks("gate.md"));
   one("a hosted address in a term's meaning is kept as it is",
     page, has('<a href="https://example.com/s">the standard</a>'));
   one("and no markdown link is left as text in the page", page, lacks("](../../registers/"));

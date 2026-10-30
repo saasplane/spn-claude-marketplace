@@ -63,9 +63,12 @@ export function* walk(dir: string): Generator<string> {
 /** A runner's raw report, `<run>.runner.json` or `.xml`, which belongs to a run still folding it. */
 const RAW_REPORT = /\.runner\.(json|xml)$/;
 
-/** Whether a path is a run file: `<node>/tests/.output/<tier>/runs/<name>.json`, never a raw report. */
+/** A run's reuse record, `<run>.stamp.json`: what the run was taken on, so a later run may reuse it. It holds no results. */
+const REUSE_RECORD = /\.stamp\.json$/;
+
+/** Whether a path is a run file: `<node>/tests/.output/<tier>/runs/<name>.json`, never a raw report or a reuse record. */
 export const isRunFile = (file: string): boolean => {
-  if (!file.endsWith(".json") || RAW_REPORT.test(file)) return false;
+  if (!file.endsWith(".json") || RAW_REPORT.test(file) || REUSE_RECORD.test(file)) return false;
   const runs = dirname(file);
   const output = dirname(dirname(runs));
   return basename(runs) === RUNS_FOLDER && basename(output) === ".output" && basename(dirname(output)) === "tests";
