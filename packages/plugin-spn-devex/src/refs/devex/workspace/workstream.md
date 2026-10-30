@@ -3,55 +3,55 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
-      "section": "Every moment gets a plain, warm line",
-      "seen": "644f26c5"
+      "section": "A warm line always",
+      "seen": "bd7e9c0f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "a3a482bc"
+      "seen": "c0f8d092"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "342d87d8"
+      "seen": "256903bc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "5fbcb172"
+      "seen": "2a782db3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A step row says where, at what altitude, and how",
-      "seen": "0953b69a"
+      "seen": "16674105"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Closing a workstream is a check; closing a window is nothing",
-      "seen": "12670a9d"
+      "seen": "3d499a33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "286f9045"
+      "seen": "63bbe16f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc carries its specification, or names the note that holds it",
-      "seen": "ff2a293c"
+      "seen": "c3c57049"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "Placing something new",
-      "seen": "2bfea5b3"
+      "seen": "cbc7f492"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A prompt while an arc runs",
-      "seen": "34fa8a87"
+      "seen": "e2d4493f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e73c8317"
+      "seen": "d2ff2f73"
     }
   ]
 }
@@ -193,7 +193,7 @@ files it writes, and a file a command owns is written only by that command.
 | release and land | the steps, by command, which work out `LANDED`; the book's rows; the references restated; *Cycles* |
 | review fixes | `arc edit <ws>/<arc> --review-fixes --note "<their words>"` at the first fix after a landing; one step per fix, naming the arc it fixes |
 | carry, drop, delete | `CARRIED` or `DROPPED` and its reason, by command; an arc never decided, by `arc delete` |
-| close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate, which refuses an arc `PROPOSED` or `DECIDED`; the folder moves to `closed/` |
+| close the workstream | on the developer's word, after the review links: the review-fixes arc's `LANDED`, by command; the close gate (`workstream close` runs it), which refuses an arc `PROPOSED` or `DECIDED`, any finding of `go check` and a part of the plan not landed (`RULE.DEVEX.WORKSPACE.463` · MUST · check:split-plan); once it passes, the command stamps the page `DONE` and the folder moves to `closed/` |
 
 **Each fact you read while ideating is written as you read it, pinned to its commit — MUST**
 (`RULE.DEVEX.WORKSPACE.252` · MUST · short). Read your own knowledge first, then the plugin's references and the book,
@@ -245,9 +245,11 @@ developer as soon as the batch lands.
 
 ### An arc keeps a change sheet, and only its commands write it
 
-**Every arc keeps a change sheet as its data, `arcs/N<nnn>/sheet.json`, written only by the `workstream sheet` commands while the arc is ideated** (`RULE.DEVEX.WORKSPACE.326` · MUST · check:workstream-state). It holds one entry for each file operation the arc makes: the change in a line, what the file drags with it, and the tests that prove it. You read the code once, while you ideate, and the sheet is where that reading goes, so an order never finds it out again. It sits beside the arc's rows and facts, the developer is never asked to review it, and the preview stays plain. The plan stays optional, for traps and moves.
+**Every arc keeps a change sheet as its data, `arcs/N<nnn>/sheet.json`, written only by the `workstream sheet` commands while the arc is ideated. Before the go, the sheet lists every file the arc will change** (`RULE.DEVEX.WORKSPACE.326` · MUST · check:workstream-state). It holds one entry for each file operation the arc makes: the change in a line, what the file drags with it, and the tests that prove it. You read the code once, while you ideate, and the sheet is where that reading goes, so an order never finds it out again. It sits beside the arc's rows and facts, the developer is never asked to review it, and the preview stays plain. The plan stays optional, for traps and moves.
 
 **An arc with no `sheet.json` is judged as it was before the sheet existed — MUST.** The write that opens an arc writes its sheet with an empty list of entries. An arc already running has none and needs no migration, and every refusal below is skipped for it.
+
+**In an arc that keeps a sheet, the steps are derived from the sheet and never added by hand.** `sheet write` writes one step for each repository and kind of change its entries name, and each entry names its kind: docs, code or generated. The release and proof steps come from the sheet's release order. `fact write` pins a fact on the workstream's own branch where one exists, so a fact is read where the work is written.
 
 **An entry points at what was decided and never says it again, and it holds no code.** The sheet's header holds `releaseChain` (what releases, in what order, and the release slots of other workstreams it must follow), `dependsOn` (other repositories and workstreams' branches that merge first) and `stack` (the folder the tiers run from, the `dmo` version, how it is reset, the ports; none where the stack has no `dmo`). Each entry holds `id`, `op` (`create` · `edit` · `drop` · `rename`), `file` (`repository:path`), `what`, `decidedBy` (the cards or preview sections), `facts` (by id; the drift step reads their commits), `then` (the generators to run after it), `rules`, `callers` (found by search, by path), `tiers` (the named tests by tier, each a behaviour id, a new test marked red first) and `docs` and `book` (what it changes, and the book line it changes or must still agree with).
 
@@ -637,6 +639,10 @@ The moment also chooses how a reply speaks: its register, its one icon and its s
 stated in `refs/devex/agent/agent.md` § *A reply speaks as a teammate: the moment chooses its register, its icon and its shape*,
 and **Needs you** and the close keep the form given here.
 
+**The developer's words and decisions are quoted and restated exactly, and only a spelling slip is corrected**
+(`RULE.DEVEX.AGENT.144` · MUST · short). A paraphrase of a decision is a second decision that nobody made. A spelling
+slip is corrected because the quote is read again in the log and on the page.
+
 **The diff is how the developer follows the work.** A line that says *row 3 landed* asks them to
 trust it. The few lines that changed, with a sentence on what they do, let them check it in the time
 it takes to read them, the way they would read a change sent for review.
@@ -800,9 +806,11 @@ plain questions at a time until you can say these back in one block.
 | **what they want to see first**, and in what form | `N001` and its preview |
 | **the limits**: what must not change, and what a release may be | the traps, and the steps that are never written |
 
-You do not need the arcs, the steps or the sizes: shaping finds those. At the yes, create the workstream at
-the next free number, write its approach page from the block, and open `N001`, the arc for what they want to
-see first, named for its domain, as `PROPOSED` with its preview. Each arc you expect beyond `N001` is one line
+You do not need the arcs, the steps or the sizes: shaping finds those. At the yes, run `workstream open`, which takes
+the six things as one block and refuses a block with one missing. A new workstream stays the developer's call, so
+the command carries their words and logs them. It takes the next free number and records it, writes the approach
+page from the block, and opens `N001`, the arc for what they want to see first, named for its domain, as `PROPOSED`
+with its preview. A workstream opened into `backlog/` names its blocker. Each arc you expect beyond `N001` is one line
 in `How`. From its first write the workstream passes `workstream state check` and the Stop hook, with `N001`
 at `PROPOSED` and no steps.
 
@@ -1569,7 +1577,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | each open and backlog workstream whole: its data, one preview per arc, each arc's `What` entry linking its own preview and no other, each arc's row in Cycles and its stamp current with its goal, title and repositories, an approach page to stand on, a stored `LANDED` arc with every step landed, every card equal to its record, the report of each landed row with an order | `workstream state check`; the Stop hook refuses a turn while it fails for this window's workstream |
 | a step started before the go or against a wait, a stored status moved without the developer's words, `RUNNING` written, and a step added to an arc that reads `LANDED` | `workstream arc edit`, `row add` and `row state` refuses it; `workstream state check` names a step running on an arc not `DECIDED` or holding a wait |
 | an arc ever decided deleted, or one never decided dropped | `workstream arc delete` and `arc edit`, which name the other |
-| a close while an arc is `PROPOSED` or `DECIDED` | `split-plan.ts --gate close` |
+| a close while an arc is `PROPOSED` or `DECIDED`, while `go check` finds anything, or while a part of the plan has not landed | `split-plan.ts --gate close` |
 | a close while the workstream's worktree set is on disk | `split-plan.ts --gate close` |
 | a running row of an arc the window wrote named with the age of its log line, never called runnable | `stop.ts`, when a turn ends |
 | a row waiting on a card open in `questions.jsonl` never called runnable | `stop.ts`, when a turn ends |
