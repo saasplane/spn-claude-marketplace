@@ -166,7 +166,7 @@ export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
 /** The arc's name file beside its data, named for its subject (RULE.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder; with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
-export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE];
+export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE, "go.json"];
 
 /**
  * The arc's address on the approach page: its Cycles row, by its number (RULE.DEVEX.WORKSPACE.263).
@@ -1278,12 +1278,22 @@ export function withEntryLink(text: string, arc: string, from: string, to: strin
 
 // ---------------------------------------------------------------------------- landing on a run
 
-/** Where a repository's run files can be: its checkout in the workspace, and each worktree of the workstream's set that begins with its name. */
+/**
+ * Where a repository's run files can be: its checkout in the workspace, each worktree of the workstream's set that begins with
+ * its name, and, where a place is a GENERAL repository, the `packages/*` folders that hold `tests/.output/unit/runs/`.
+ */
 function runPlaces(ws: string, repo: string): string[] {
   const root = dirname(dirname(dirname(dirname(ws))));
   const base = basename(dirname(root)) === ".worktrees" ? dirname(dirname(root)) : root;
   const set = join(base, ".worktrees", basename(ws));
-  return [join(base, repo), ...listdir(set).filter((name) => name.startsWith(repo)).map((name) => join(set, name))].filter(isDir);
+  const repos = [join(base, repo), ...listdir(set).filter((name) => name.startsWith(repo)).map((name) => join(set, name))].filter(isDir);
+  const general = (place: string): boolean => {
+    try { return JSON.parse(readFileSync(join(place, "sprepo.json"), "utf8")).type === "GENERAL"; } catch { return false; }
+  };
+  const runs = repos.filter(general).flatMap((place) =>
+    listdir(join(place, "packages")).map((name) => join(place, "packages", name, "tests", ".output", "unit", "runs")).filter(isDir));
+  // a run folder inside a place already listed would find the same run file twice
+  return [...repos, ...runs.filter((one) => !repos.some((place) => one === place || one.startsWith(place + sep)))];
 }
 
 /** The newest commit time among a row's commits in its repository, or null where git knows none of them. */
@@ -1302,12 +1312,12 @@ const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", S
 
 /**
  * Whether a row may land on a run (RULE.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
- * An arc with no sheet, and a row that is neither CODE nor PROOF, are judged as before sheets and get null.
+ * A row that is neither CODE nor PROOF gets null; a CODE or PROOF row is judged by its altitude alone, with a sheet or without one.
  */
 export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow, run: string | null): string | null {
   const sheet = readSheet(ws, arc);
-  if (!sheet || (row.altitude !== "CODE" && row.altitude !== "PROOF")) return null;
-  const entries = Array.isArray(sheet.entries) ? sheet.entries : [];
+  if (row.altitude !== "CODE" && row.altitude !== "PROOF") return null;
+  const entries = sheet && Array.isArray(sheet.entries) ? sheet.entries : [];
   if (!run)
     return `row ${row.id} is a ${row.altitude} row of an arc that keeps a sheet; it lands on a run of its entries' tests.\n`
       + `Name the run: \`workstream row state ${arc} ${row.id} landed --run <name>\`.`;
