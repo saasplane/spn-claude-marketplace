@@ -13,7 +13,7 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | The wiring | `packages/plugin-spn-surface/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its time budget |
-| The matcher | the `matcher` field of that entry | `mcp__figma__use_figma`, `Write` and `Edit`, and nothing else |
+| The matcher | the `matcher` field of that entry | `mcp__figma__use_figma`, `Write`, `Edit` and `Read`, and nothing else |
 | The command | the `command` field of that entry | the one process, addressed through the plugin root rather than through this checkout |
 | The dispatcher | `packages/plugin-spn-surface/src/scripts/events/pretooluse.ts` | hands a connector call to the connector check and a `.tsx` write to the Surface check, keeps the verdict, and never lets a check that throws take the chain down |
 | The connector check | `packages/plugin-spn-surface/src/scripts/checks/figma-connector.ts` | refuses a `use_figma` script that calls an API the connector does not support or one that throws there, and notes a second page switch and a missing `skillNames` |
@@ -59,7 +59,7 @@ Ten of the notes read named design-system tags and literal values in a `.tsx` fi
 ### The narrowest wiring this plugin could have
 
 **Why** — *a moment claimed for symmetry is a start-up paid on every call in a session*, for an answer nobody asked for.
-**What** — one moment, narrowed to the connector's `use_figma` and to a write or an edit of a file; a write that is not a `.tsx` file in a web node's `src/` leaves the dispatcher on a test of its path before anything is read. Every other call a session makes never reaches this plugin at all.
+**What** — one moment, narrowed to the connector's `use_figma` and to a write, an edit or a read of a file; a write that is not a `.tsx` file in a web node's `src/` leaves the dispatcher on a test of its path before anything is read. Every other call a session makes never reaches this plugin at all.
 **How** — the harness applies the matcher before any process of this plugin's starts, so the filter is free. `packages/plugin-spn-surface/src/hooks/hooks.json`.
 
 ### The connector check refuses only what the text shows
