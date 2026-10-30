@@ -80,5 +80,41 @@ put(join(book, "docs", SEAT.constructs, "03-bad.md"), "# Bad\n\n**A bare one** (
 ok("a rule whose parenthesis does not read is left out and named",
   (() => { const bad = restates.writeRulesIndex(book, market); return bad.faults.length === 1 && bad.faults[0].includes("RULE.DEVEX.AGENT.905"); })());
 
+console.log("\n=== the parentheses, field by field");
+{
+  const stated = restates.ruleMarks(ws);
+  const ref = "# Ref\n\n**A reply starts with the answer.** (`RULE.DEVEX.AGENT.901`)\n";
+  const found = restates.parenFindings("refs/agent.md", ref, stated);
+  ok("a ref that drops the book's level and holder is one finding for each field",
+    found.length === 2 && found[0] === "refs/agent.md:3: `RULE.DEVEX.AGENT.901` — level: the book says MUST, this says none"
+      && found[1] === "refs/agent.md:3: `RULE.DEVEX.AGENT.901` — short: the book says short, this says nothing", JSON.stringify(found));
+  ok("a parenthesis equal to the book's has no finding",
+    restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.901` · MUST · short)\n", stated).length === 0);
+  ok("a rule no member of the workspace states is named",
+    restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.777` · MUST · short)\n", stated)[0].includes("no member of the workspace states this rule"));
+  ok("a parenthesis citing two ids is refused, one id to a parenthesis",
+    restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.901`, `RULE.DEVEX.AGENT.903`)\n", stated).length === 1);
+}
+
+console.log("\n=== the nearest book up");
+{
+  const { findBook, noBookReason } = await import(pathToFileURL(resolve(PLUGIN, "src", "scripts", "commands", "restates", "check.ts")).href);
+  const w = join(BASE, "w");
+  const registers = (repo) => put(join(repo, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+  put(join(w, ".spndevex", "state.json"), "{}");
+  registers(join(w, "spn-foundation"));
+  registers(join(w, ".worktrees", "s", "spn-foundation"));
+  put(join(w, ".worktrees", "s", "spn-claude-marketplace", "sprepo.json"), "{}");
+  put(join(w, "spn-claude-marketplace", "sprepo.json"), "{}");
+  ok("from a worktree set's marketplace, the set's own book is read",
+    findBook(undefined, join(w, ".worktrees", "s", "spn-claude-marketplace")) === join(w, ".worktrees", "s", "spn-foundation"));
+  ok("from the workspace's marketplace, the workspace's book is read",
+    findBook(undefined, join(w, "spn-claude-marketplace")) === join(w, "spn-foundation"));
+  const lonely = join(BASE, "lonely", "somewhere");
+  mkdirSync(lonely, { recursive: true });
+  ok("with no book anywhere up, there is none and the reason names where the walk began",
+    findBook(undefined, lonely) === null && noBookReason(lonely).includes(lonely));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — restates` : `\n  all ${total} passed — restates`);
 process.exit(failed ? 1 : 0);

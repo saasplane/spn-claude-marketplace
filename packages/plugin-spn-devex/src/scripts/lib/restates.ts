@@ -53,7 +53,7 @@ import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
 import { decisionsRegister, docsOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { type RuleEntry, type RuleMark, type RulesIndex, classOf, formatMark, holderFaults, readMarks }
+import { type RuleEntry, type RuleMark, type RulesIndex, classOf, compareMarks, formatMark, holderFaults, readMarks }
   from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
@@ -586,6 +586,18 @@ export function ruleMarks(workspace: string): Map<string, StatedRule> {
       }
     };
     walk(docs);
+  }
+  return out;
+}
+
+/** Each parenthesis in one plugin file that the book does not state, or states with another level or holder. */
+export function parenFindings(shown: string, text: string, stated: Map<string, StatedRule>): string[] {
+  const { marks, faults } = readMarks(text, "ref");
+  const out = faults.map((one) => `${shown}:${one.line}: ${one.raw} — ${one.fault}`);
+  for (const mark of marks) {
+    const rule = stated.get(mark.id);
+    if (!rule) { out.push(`${shown}:${mark.line}: \`${mark.id}\` — no member of the workspace states this rule`); continue; }
+    for (const field of compareMarks(rule, mark)) out.push(`${shown}:${mark.line}: \`${mark.id}\` — ${field}`);
   }
   return out;
 }

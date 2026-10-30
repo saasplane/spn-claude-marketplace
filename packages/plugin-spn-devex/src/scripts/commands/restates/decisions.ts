@@ -15,7 +15,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative } from "node:path";
 import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { workspaceRoot } from "../../lib/payload.ts";
 import { BLOCK_COMMENT, DEC_ID_SRC, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
 import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
@@ -28,13 +27,15 @@ const IS_ROW = new RegExp(`^${DEC_ID_SRC}$`);
  * and named, because there is nothing here to restamp it against.
  */
 function writeOne(refPath: string): number {
-  const workspace = workspaceRoot(dirname(refPath));
-  if (!workspace) {
-    console.error(`${refPath}: no workspace found walking up from this file (no .spndevex)`);
+  // The citations resolve from the folder that holds the ref's own book, so a ref in a worktree set is
+  // restamped against the set's book and never against the main checkout's.
+  const own = findBook(undefined, dirname(refPath));
+  if (own === null) {
+    console.error(`${refPath}: ${noBookReason(dirname(refPath))}`);
     return 1;
   }
-  const own = findBook(undefined, workspace);
-  if (own !== null) console.log(bookLine(own, false, workspace));
+  const workspace = dirname(own);
+  console.log(bookLine(own, false, workspace));
   const [block, broken] = parse(refPath);
   if (broken) { console.error(`${refPath}: ${broken}`); return 1; }
   const citations: DecisionCitation[] = block?.decisions ?? [];
