@@ -172,10 +172,37 @@ function onceForAFile(shown) {
     ...arcAt("001-a-subject", "PROPOSED", false),
     "probe-repo/src/existing.ts": "export const x = 1;\n",
   });
-  one("F9: confirmed's warning now reaches the turn",
+  one("[MKT.HOOKS.100] F9: confirmed's refusal now reaches the turn",
     { tool_name: "Write", cwd: root, session_id: "d1", tool_input: { file_path: "probe-repo/src/probe.ts", content: "x" } },
-    "note", { says: "no open workstream records a go", cwd: root,
+    "deny", { says: "no open workstream records a go", cwd: root,
               parity: false, why: "the Python dispatcher discarded it — this is finding F9" });
+}
+
+{
+  // arc-status: a go that quotes words the developer never typed, in this window's transcript or any log.
+  const root = workspace("dispatch-arc-status", { ...arcAt("001-a-subject", "PROPOSED", false) });
+  const transcript = join(root, "transcript.jsonl");
+  writeFileSync(transcript, `${JSON.stringify({ type: "user", message: { content: "looks right, build it" } })}\n`);
+  const edit = (note) => ({ tool_name: "Bash", cwd: root, session_id: "arc-status", transcript_path: transcript,
+    tool_input: { command: `spn-devex workstream arc edit 001-a-subject/N001 --status DECIDED --note "the developer: '${note}'"` } });
+  const waived = { parity: false, why: "the Python dispatcher never carried this check" };
+  // The window reads the group's usage first, so usage-first, earlier in the chain, has nothing to say.
+  one("the window reads the `workstream` usage", { tool_name: "Bash", cwd: root, session_id: "arc-status", tool_input: { command: "spn-devex workstream" } },
+    "silent", { cwd: root, ...waived });
+  one("[MKT.HOOKS.102] arc-status's refusal survives the chain", edit("all good"), "deny", { says: "quotes 'all good'", cwd: root, ...waived });
+  one("[MKT.HOOKS.102] a go quoting the developer's own words passes the chain", edit("looks right, build it"), "silent", { cwd: root, ...waived });
+}
+
+{
+  // command-shape: each part is allowed on its own, and joined they would be sent for approval by their shape.
+  const root = workspace("dispatch-command-shape", {
+    ".claude/settings.json": `${JSON.stringify({ permissions: { allow: ["Bash(git status:*)", "Bash(ls:*)"] } })}\n`,
+  });
+  const waived = { parity: false, why: "the Python dispatcher never carried this check" };
+  one("[MKT.HOOKS.121] command-shape's refusal survives the chain",
+    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short && ls" } }, "deny", { says: "Run one command per call", cwd: root, ...waived });
+  one("[MKT.HOOKS.121] one plain command passes the chain",
+    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short" } }, "silent", { cwd: root, ...waived });
 }
 
 {
@@ -435,6 +462,42 @@ console.log("\n=== pretooluse — a launch of an order is read through its row t
   one("order-entries: an arc with no sheet is judged as today", launch(order("1.md", '---\nrow: "1"\nmodel: sonnet\n---\n', "N003")), "silent", waived);
   one("order-entries: an order with no row is not judged", launch(order("5.md", "---\nmodel: sonnet\n---\n")), "silent", waived);
   one("order-entries: an order that cannot be read is not judged", launch(join(base, "notes", "N002", "orders", "9.md")), "silent", waived);
+}
+
+console.log("\n=== pretooluse — a helper is launched only from a part of the go's plan");
+{
+  const { entryHash } = await import("../../../../src/scripts/lib/go-plan.ts");
+  const base = join(WORKSPACE, ".spndevex", "workstreams", "open", "042-go-probe");
+  const entry = (id, what = "x") => ({ id, op: "edit", file: "probe-repo:a.ts", what, decidedBy: [], facts: ["f1"], then: [], rules: [], callers: [], tiers: {}, docs: [], book: [] });
+  const E1 = entry("E1"), E2 = entry("E2"), E3 = entry("E3");
+  mkdirSync(join(base, "arcs", "N004"), { recursive: true });
+  mkdirSync(join(base, "notes", "N004", "orders"), { recursive: true });
+  writeFileSync(join(base, "arcs", "N004", "state.json"), JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] }));
+  // E3 is written again after the plan, so the part that holds it no longer matches its signature.
+  writeFileSync(join(base, "arcs", "N004", "sheet.json"), JSON.stringify({ schemaVersion: 1, releaseChain: [], dependsOn: [], stack: null, entries: [E1, E2, entry("E3", "changed")] }));
+  const part = (n, held, state) => ({ id: `code-probe-repo-${n}`, repo: "probe-repo", pass: "CODE", entries: [`N004/${held.id}`], tests: [], minutes: null,
+    measuredFrom: null, waitsOn: [], model: "sonnet", signature: entryHash(held), state });
+  const goFile = join(base, "arcs", "N004", "go.json");
+  writeFileSync(goFile, JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30",
+    parts: [part(1, E1, "ready"), part(2, E2, "held"), part(3, E3, "ready")] }));
+  const brief = (name, front) => { const path = join(base, "notes", "N004", "orders", name); writeFileSync(path, `---\n${front}\nmodel: sonnet\n---\n# Part\n`); return path; };
+  const launch = (path) => ({ tool_name: "Agent", session_id: "launch", cwd: WORKSPACE, tool_input: { description: "a", model: "sonnet", prompt: `Carry out the order at ${path} exactly.` } });
+  const waived = { parity: false, why: "the Python has no Agent branch" };
+  one("[MKT.HOOKS.300] an order with no go, in a workstream whose go has a plan, is refused",
+    launch(brief("8c.md", 'row: "8"')), "deny", { says: "orders/8c.md names no go, and 042's go has a plan", ...waived });
+  one("[MKT.HOOKS.300] a part the plan does not hold is refused",
+    launch(brief("code-probe-repo-9.md", 'go: "N004"\npart: "code-probe-repo-9"')), "deny", { says: "holds no part code-probe-repo-9", ...waived });
+  one("[MKT.HOOKS.303] a held part is refused",
+    launch(brief("code-probe-repo-2.md", 'go: "N004"\npart: "code-probe-repo-2"')), "deny", { says: "code-probe-repo-2 is held", ...waived });
+  one("[MKT.HOOKS.303] a part whose entries changed since the plan is refused, naming them",
+    launch(brief("code-probe-repo-3.md", 'go: "N004"\npart: "code-probe-repo-3"')), "deny", { says: "N004/E3 changed after 042's plan was written", ...waived });
+  one("[MKT.HOOKS.302] a ready part is launched",
+    launch(brief("code-probe-repo-1.md", 'go: "N004"\npart: "code-probe-repo-1"')), "silent", waived);
+  const states = Object.fromEntries(JSON.parse(readFileSync(goFile, "utf8")).parts.map((one) => [one.id, one.state]));
+  const marked = states["code-probe-repo-1"] === "running" && states["code-probe-repo-2"] === "held" && states["code-probe-repo-3"] === "ready";
+  n += 1;
+  if (!marked) failed += 1;
+  console.log(`  ${marked ? "PASS" : "FAIL"}  [MKT.HOOKS.302] and the launched part is marked running, the others as they were\n        ${JSON.stringify(states)}`);
 }
 
 console.log("\n=== pretooluse — an order asks for no screenshot unless the developer asked to see a look");
