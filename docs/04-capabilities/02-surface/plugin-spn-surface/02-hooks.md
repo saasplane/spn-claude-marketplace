@@ -20,11 +20,12 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 | The Surface check's gate | `packages/plugin-spn-surface/src/scripts/checks/subjects.ts` | decides that a write is a `.tsx` file in a web node's `src/`, reads the stack the node's `sprepo.json` declares, and loads that stack's reader; a stack with no reader answers nothing |
 | The Surface reader | `packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts` | reads the file as the write would leave it, and gives back only the notes the write added, so an edit beside an old slip says nothing about it |
 | The tag reader | `packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/jsx.ts` | finds the JSX tags of a file and their attributes, in code, strings, template literals and JSX, and keeps the branches of a condition each tag stands in |
-| The notes | `packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts` | the ten notes below, each naming its book row and the fix |
+| The notes | `packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts` | the ten notes on a `.tsx` file below, each naming its book row and the fix |
+| The design-guidance note | `packages/plugin-spn-surface/src/scripts/checks/design-guidance.ts` | the eleventh note: reads a Surface ref, a design-system page or a check source, and notes a MUST, a "never" or a refusal attached to how a prop is used |
 
 ## The Surface notes
 
-Each note reads named design-system tags and literal values, and stays silent where the deciding fact is not written in the file: a colour from a lookup, a variant left to the place, props that arrive by a spread.
+Ten of the notes read named design-system tags and literal values in a `.tsx` file, and stay silent where the deciding fact is not written in the file: a colour from a lookup, a variant left to the place, props that arrive by a spread.
 
 | Note | What it says | Book row |
 | --- | --- | --- |
@@ -38,8 +39,9 @@ Each note reads named design-system tags and literal values, and stays silent wh
 | `state-hue-table` | a state's hue written in the file differs from the hue table | `RULE.SUPPORT.SURFACE.369` |
 | `container-in-container` | a container takes no container or card inside it | `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.SURFACE.263` |
 | `hand-set-look` | a design-system unit takes its colour, padding, radius and gap from its props and the theme, never from a class | `RULE.SUPPORT.APPS.150` |
+| `design-guidance` | a MUST, a "never" or a refusal attached to how a prop is used is noted, never refused: a design rule about a prop is guidance, with its cases | `RULE.SUPPORT.SURFACE.398` |
 
-**Every note is advice, and none refuses a write** (`RULE.DEVEX.AGENT.107`). One note is held back from ever refusing: `button-one-solid`. A showcase draws every variant of a button on purpose, so two written `SOLID` buttons in one file can be correct, and the scan of our apps finds that one false note. The other nine are held back only until a scan finds no note on correct code.
+**Every note is advice, and none refuses a write** (`RULE.DEVEX.AGENT.107`). One note is held back from ever refusing: `button-one-solid`. A showcase draws every variant of a button on purpose, so two written `SOLID` buttons in one file can be correct, and the scan of our apps finds that one false note. The other nine notes on a `.tsx` file are held back only until a scan finds no note on correct code. `design-guidance` is advice by design: it names the better way, and the choice stays with whoever writes the page.
 
 ## Follows the pattern
 

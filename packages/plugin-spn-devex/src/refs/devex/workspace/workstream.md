@@ -267,17 +267,73 @@ developer as soon as the batch lands.
 
 **Once an arc is decided, a drift step refreshes the entries whose facts moved. Then each repository runs one docs pass, book first, one code-and-test pass, and the named tests of its entries at every tier, contract and journey included, on the stack the sheet names. Then the release chain runs in its order — MUST** (`RULE.DEVEX.WORKSPACE.320`). The drift step is `workstream state check --facts`, which names each pinned fact whose source moved and the entries that cite it, so only those are read again and refreshed with `sheet edit`. The docs pass writes the book and the node documents from every entry's `docs` and `book` lines. The code-and-test pass writes the source and the specs, and each order reads only the entries of its row. The tiers pass runs the tests the entries name, at the tier each names, on the stack the sheet plans, so a contract or journey test a change breaks shows there and not at a final proof. Each repository's whole tiers run once as a baseline before its code pass, so a surprise that would have shown at the gate shows first, while the fix is still cheap. The release chain runs last, in the order the sheet's header sets.
 
+**The go's scope runs as one set of passes, derived by `workstream go write` from the scope's sheets and the measured times** (`RULE.DEVEX.WORKSPACE.455` · MUST · skill:spn-devex/execute). The scope is every arc the go covers, and each of them has its preview filled and its sheet whole. The command groups the entries by repository, in chain order, and then by pass. Each pass splits into parts, and a part is what one helper carries out. Parts in the same pass run side by side, because no two of them touch the same file.
+
+| What `go write` settles | Read from |
+| --- | --- |
+| **The passes**: each repository's entries, grouped by pass, with the book first and the release last | the sheets' entries and each sheet's release order |
+| **The parts**: a pass split by files that do not overlap, so each part finishes within 45 measured minutes. Where nothing has been measured yet, a part holds at most eight entries | the files each entry names |
+| **The time of each part**: the same kind of work in the same repository. A full suite is priced from its last three timed runs | the timed commands and the cost of past orders |
+| **The tests each part runs**: only the test files whose cases carry the part's behaviour ids | each entry's tiers, and the ids in the test labels |
+| **The full runs**: one baseline run per repository before its code pass, and one full run at the end that every code change lands on | the repositories the scope touches |
+| **Each helper's brief**: its files, its changes, the decisions behind them and its test commands, written from the order template | the part's entries |
+
+**The plan is written only by `go write`, into the lead arc's `go.json`, and it never appears on a preview or on the approach page** (`RULE.DEVEX.WORKSPACE.456` · MUST · skill:spn-devex/execute). The lead arc is the lowest arc of the scope. The developer reviews the goal, the constructs and the files; how the work runs is the agent's job, and the agent adds nothing to a brief by hand.
+
+**A helper is briefed only from a part of the plan** (`RULE.DEVEX.WORKSPACE.457` · MUST · check:pretooluse). An order's front matter names its go, its part and the entries the part carries. While a go has a plan, the launch check refuses an order that names no go:
+
+```text
+Refused: orders/code-plugins.md names no go, and 036's go has a plan.
+A helper is briefed from a part: run `workstream go show 036/N004` and launch the part's own brief.
+```
+
+**A whole suite runs only in a baseline run or a full run of the plan** (`RULE.DEVEX.WORKSPACE.458` · MUST · check:test-run). A part runs only its own test files. `workstream go start` marks a baseline or full run as running, and only then does the test-run check let the whole suite run:
+
+```text
+Refused: `node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite, and no full run of 036's go is running.
+Run the part's own test files, or start the full run with `workstream go start 036/N004 full-spn-claude-marketplace`.
+```
+
 **The reading happens once, on the top row, and every question is asked while the arc is ideated.** Each behaviour change carries its product question then, as a card, before any code exists.
 
 **An order is cut per repository and pass, never per row, and it is never researched again.** The sheet already names every file the arc changes, so an order is the entries of one repository and one pass. A file the sheet does not hold is a gap in the ideation: it is fixed in the sheet and the preview first, and the order is cut after.
 
-**A question from the developer mid-run is read for what it changes.** If the answer changes running work, what is in flight finishes, only the entries the answer touches pause, they and their `docs` line are updated, and they rejoin the code pass. If it is new, it becomes a suggestion or a later arc, and the running passes never change.
+**A change to what is being built runs as five steps, and the plan never carries on with work the developer has just changed** (`RULE.DEVEX.WORKSPACE.459` · MUST · skill:spn-devex/execute). The agent first reads the message for what it changes (§ A prompt while an arc runs). An idea or a later want becomes a suggestion, and nothing that runs changes. A change pauses only the parts it touches.
+
+1. **What is running finishes.** A part already running is never edited underneath. It stops at its next commit, and its report is folded as usual. The parts the change does not touch carry on.
+2. **The touched parts are held.** Each part whose entries the change reaches is marked held.
+3. **The entries and the preview are updated.** The sheet's entries take the change, and the preview section the developer read shows it. Where it changes what they see, they see it before those parts run. It counts as rework from the developer's answer, apart from what design missed.
+4. **The plan is derived again.** `go write` keeps every landed and running part as it is, and derives again only the parts that have not started. A landed part whose files the change reaches gets a follow-up part. `go check` names every part whose entries changed since the plan was written.
+5. **The full run comes after.** A full run taken before the change does not count for the code it touched. The full run at the end of the pass is the one everything lands on.
+
+**A held part is refused by the launch check until the plan is derived again** (`RULE.DEVEX.WORKSPACE.460` · MUST · check:pretooluse).
+
+```text
+Refused: part code-spn-claude-marketplace-2 is held: entries N005/E7 and N005/E9 changed after 036's plan was written.
+Derive the plan again with `workstream go write 036/N004 --scope …`, then launch the part's new brief.
+```
 
 **A surprise in the tiers comes back to the developer as a card, with the rows it holds, and is never fixed quietly in code — MUST.** When a tier run turns up a consequence a person would notice, you raise a card and hold the rows it can change.
 
 **Before a pull request, each entry that changes behaviour has its book line read against the landed code, and the verdict goes in the tiers pass's report — MUST** (`RULE.DEVEX.WORKSPACE.330`). A line that no longer agrees with the code is fixed in the book before the pull request opens, since the book is the contract and the code its implementation.
 
 **An order's launch is checked against the sheet — MUST** (`RULE.DEVEX.WORKSPACE.327`). The launch check reads the order's `row` and then the row's entries in the sheet, and refuses an order whose row names an entry the sheet does not hold, and a code row of a sheet arc with no entries; its message names the entry and the command that adds it, `workstream sheet write`, or says to take the entry off the row. An order of an arc with no `sheet.json` is judged as before.
+
+### After the go, every moment names the next step
+
+The plan holds the release parts too, merged from the scope's sheets in chain order, so no release is added on the side. A helper's report is named for its part, and folding the report lands the part.
+
+**A step lands once every entry it holds sits in a landed part, and a code step lands on the full run** (`RULE.DEVEX.WORKSPACE.461` · MUST · skill:spn-devex/execute). Every command's output ends with the next step. Each moment of the loop reads the plan and says one thing, which is what comes next.
+
+| The moment | What it says |
+| --- | --- |
+| **Between windows** | `go show` prints the handover's state and next steps, so they are never written by hand. A handover keeps only what the data cannot say |
+| **A window opens** | the session start names each running go in one line: its parts running, held and ready, and the next step. A new window needs no handover to know where the work stands |
+| **The developer writes while work runs** | the message comes with a reminder to the agent. It reads the message for what it changes, and if it changes running work, it follows the five steps in § Once an arc is decided. The reminder comes only while a go has a part running or ready |
+| **A test runs** | every runner the test-run check knows is timed, a repository's own included, so the plan prices a full run from real times |
+| **The turn ends** | the next step, as the rule below says |
+
+**A turn that ends with a part ready to start or a report waiting to be folded, and no question open to the developer, is told the next step** (`RULE.DEVEX.WORKSPACE.462` · MUST · check:stop). The note goes to the agent before the developer sees the reply, and it never blocks them.
 
 ### In an arc that keeps a sheet, a row lands on a run of its tests
 
