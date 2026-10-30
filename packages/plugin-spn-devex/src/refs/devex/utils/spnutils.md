@@ -3,33 +3,33 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "2a67491a"
+      "seen": "3120cd3e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b94b30ff"
+      "seen": "63707e78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "`infra` — the estate",
-      "seen": "02a84eaf"
+      "seen": "32740953"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "The machine's own layout",
-      "seen": "f3fdbd05"
+      "seen": "3933d067"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "988f3333"
+      "seen": "9950ee87"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.180",
-      "seen": "58811447"
+      "seen": "85afe267"
     }
   ]
 }

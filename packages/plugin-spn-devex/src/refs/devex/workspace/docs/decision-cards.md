@@ -4,17 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "8ad5914a"
+      "seen": "c538883a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "0e29bb4e"
+      "seen": "3c5ec4f1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "a3a482bc"
+      "seen": "c0f8d092"
     }
   ]
 }
@@ -32,7 +32,7 @@ must be kept in step with it. **When the two disagree, the book wins.**
 The chapter is explicit, and this is the clause most often missed:
 
 > *Open items put to a person in chat follow this layout exactly as a document's Open section
-> does — **MUST**. That covers a status reply, an answer to "what's left?", and a pending-work
+> does. That covers a status reply, an answer to "what's left?", and a pending-work
 > report at any moment.*
 
 **Every phrasing below is one question.** *"open items"* — the book's own wording —

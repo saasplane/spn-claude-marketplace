@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "cd25e1e1"
+      "seen": "ddb0d8d6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e73c8317"
+      "seen": "d2ff2f73"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "acd56ab4"
+      "seen": "1a0d2100"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,15 +21,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "62ba86b0"
+      "seen": "bd2ed932"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "27ba6754"
+      "seen": "976c630a"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "8a5d36e7"
+      "seen": "20f83c54"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -40,7 +40,7 @@
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.143",
-      "seen": "3f5365b8"
+      "seen": "6a6fd577"
     }
   ]
 }
@@ -397,13 +397,13 @@ need, and reads the Subtitle before the Description.
   *node*, *seat*, *tier*, *arc*, *estate* and *ring*.
 - **The argument goes in the first section**, below the first heading.
 
-**The Description is one paragraph, in the standfirst's place — MUST.** The first sentence says what
+**The Description is one paragraph, in the standfirst's place** (`RULE.DEVEX.WORKSPACE.401` · MUST · check:doc-check · due:036/N008). The first sentence says what
 the page is about, in everyday words. The second says why you would read it. At most two short
 sentences follow, on how the page is laid out, and there is no second paragraph. **A report's
 Description carries no number**: the count moves to `Summary` and to the `summary` field.
 
-**The one exception is the foundation's hub, whose Title and Subtitle are
-DEC.DEVEX.WORKSPACE.143's, word for word.** No other page copies that pair's style, and the
+**The one exception is the foundation's hub, whose Title and Subtitle are the punchline's, word for word**
+(`RULE.DEVEX.WORKSPACE.143` · MUST · check:doc-check · due:036/N008). No other page copies that pair's style, and the
 Description under it still says in everyday words what SaaS Plane is.
 
 **Write the Title and the Subtitle of every page kind yourself, and keep them current as the page
@@ -474,7 +474,7 @@ kind: a good example beside a poor one shows the difference faster than the rule
 5. The Subtitle is one plain sentence. On a report it is a question that names the repository by its
    folder name, on an approach it names the decision the page plans, on a preview it names what you
    are asked to decide, and on the foundation's hub it
-   is `DEC.DEVEX.WORKSPACE.143`'s, word for word.
+   is the punchline's, word for word (`RULE.DEVEX.WORKSPACE.143` · MUST · check:doc-check · due:036/N008).
 6. Read the three levels aloud once, and rewrite any sentence you stumble on.
 
 ### The templates sit beside the chapters, in `templates/`
