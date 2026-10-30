@@ -106,7 +106,7 @@
   <h3 id="the-frontmatter">The frontmatter</h3>
   <p><code>name</code> and <code>description</code>, read the same way <a href="./04-skills-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has.</p>
   <h3 id="where-a-read-only-promise-is-actually-bo">Where a read-only promise is actually bound</h3>
-  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose (rule RULE.MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.</p>
+  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose (rule RULE.CLAUDE_MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.</p>
   <h3 id="a-fixed-persona">A fixed persona</h3>
   <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called.</p>
   <h3 id="a-parameterized-reviewer">A parameterized reviewer</h3>
@@ -149,7 +149,7 @@
       <tr><td><p>the foundation's Actors, Lenses and Panels construct</p><p>the viewpoint set is closed by a rule, and a reviewer blocks only where its own file says it may</p></td><td>MUST</td></tr>
       <tr><td><p>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</p><p>a brief edit needs an install and a fresh window before a convening can read it</p></td><td>MUST</td></tr>
       <tr><td><p><code>RULE.DEVEX.WORKSPACE.118</code></p><p>a lens is a restatement, and the book wins wherever the two disagree</p></td><td>MUST</td></tr>
-      <tr><td><p>RULE.MARKETPLACE.DEVEX.004</p><p>a read-only promise is bound only where the brief declares <code>tools</code>; elsewhere it is prose</p></td><td>MUST</td></tr>
+      <tr><td><p>RULE.CLAUDE_MARKETPLACE.DEVEX.004</p><p>a read-only promise is bound only where the brief declares <code>tools</code>; elsewhere it is prose</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>spn-devex restates check</code></p>

@@ -131,7 +131,7 @@ The dispatcher imports every check and calls each in turn. Each check declares w
 
 ### The dispatcher's own refusal
 
-One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.MARKETPLACE.DEVEX.002).
+One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.CLAUDE_MARKETPLACE.DEVEX.002).
 
 ### Measuring what a run cost
 
@@ -162,7 +162,7 @@ This page answers which moments exist, how a script claims one, what it is hande
 | `RULE.DEVEX.AGENT.092` | a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window | MUST |
 | `RULE.DEVEX.WORKSPACE.189` | a reply opens with *Needs you* when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on | MUST |
 | `RULE.DEVEX.WORKSPACE.244` | while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held | MUST |
-| RULE.MARKETPLACE.DEVEX.002 | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
+| RULE.CLAUDE_MARKETPLACE.DEVEX.002 | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
 Try it: `spn-devex plugin partner check`
