@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/01-shape.md",
-      "seen": "7ec10e41"
+      "seen": "dea108e0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/",
-      "seen": "d3743b40"
+      "seen": "17320694"
     }
   ]
 }
@@ -51,7 +51,7 @@ When you scaffold or classify a node, you pick exactly one of ten kinds — one 
 | `APP_UTILITY` | APP · server | an installed tool serving an operator — runs on the server runtime despite being named for how it is delivered | `utility{-usecase}-{stack}` |
 | `CLIENT_API` | CLIENT · universal | a generated client mirroring one service's published surface | `client-{usecase}-api-{stack}` |
 
-Read the name against two conventions before you trust it. A project **leads with its family token**, except the `APP` family, which you will find named by delivery form (`service-` · `web-` · `utility-`), and `UNIVERSAL`, the unmarked runtime — so a universal support package is simply `support-`. Never type `{stack}` yourself; tooling appends it.
+Read the name against two conventions before you trust it. A project **leads with its family token**, except the `APP` family, which you will find named by delivery form (`service-` · `web-` · `utility-`), and `UNIVERSAL`, the unmarked runtime — so a universal support package is simply `support-`. Never type `{stack}` yourself; tooling appends it. A kind is spelled `FAMILY_RUNTIME`, family first, and a spelling the grammar does not produce fails validation as an unknown value (RULE.SUPPORT.APPS.022).
 
 When you are unsure which kind fits, ask the same three questions the vocabulary is built from: is it imported, or does it run; does it hold state while running; does it stay up or finish and exit. Embeddable kinds are libraries something imports and that never start on their own (`TOOLCHAIN`, `SUPPORT_*`, `MODULE_*`, `CLIENT_API`). Runnable kinds are applications a process starts (`APP_SERVER`, `APP_WEB`, `APP_UTILITY`) — the same code can run to completion or stay resident, and you decide which one it is at deployment, never by how you wrote it.
 
@@ -127,7 +127,7 @@ Write `config` as `null` for `TOOLCHAIN`, every `SUPPORT_*` kind and `CLIENT_API
 
 **Never write into the manifest what you can derive.** Not the runtime, the folders, the publish shape, the barrel, or the test tiers — read those off `kind` instead. Not the stack — the node's own toolchain answers that. Not dependencies — the package manager owns them. And no estate configuration: leave ports, entry declarations, and resource sizing in `spestate.json`, owned by the operator and changing on infrastructure's own clock rather than the node's identity clock. `spkind.json` **replaces** any kind key a stack's own project file might otherwise carry, so if you find one duplicated there, remove it — two places declaring one fact is drift waiting to happen.
 
-**Treat the authored manifest as what makes a folder a node at all.** A folder carrying `spkind.json` (or `spestate.json`) plus its own documents is a node you can act on; a folder with neither is only a folder, whatever it contains. A repository's own root carries neither — it declares its world once in `sprepo.json`, and you never treat a root as a node.
+**Treat the authored manifest as what makes a folder a node at all.** A folder carrying `spkind.json` (or `spestate.json`) is a node you can act on; a folder with neither is only a folder, whatever it contains. A repository's own root carries neither — it declares its world once in `sprepo.json`, and you never treat a root as a node.
 
 **Check the declaration; never infer it.** Compare a node's name and its workspace folder against the declared kind rather than guessing the kind from either. If you find a `MODULE_SERVER` named `service-…`, or sitting among applications, flag it — that is a visible defect the moment you validate it, not an ambiguity to resolve by eye. The manifest's shape is a contract state with a generated validator, so expect a malformed file to fail the way a malformed command does. The one exception you will meet is the readable `name`: its not-blank rule lives in the validation command rather than the generated schema, because a schema refusing a blank name would throw inside the read before the command that reports the omission ever runs.
 
@@ -153,7 +153,7 @@ Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), t
 
 ### Modules that live inside an application
 
-You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
+You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. It carries no field that says it is app-owned: a `MODULE_*` node under an `APP_*` node's `src/modules/` is app-owned by where it sits, so resolve its parent before you apply what follows (RULE.SUPPORT.APPS.057). Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
 
 ## The four shapes a platform is built in on the server
 

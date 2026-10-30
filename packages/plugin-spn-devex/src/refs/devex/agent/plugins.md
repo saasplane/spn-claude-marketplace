@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "a8effffe"
+      "seen": "a5411128"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "3109a5dc"
+      "seen": "7aacfe3a"
     }
   ]
 }
@@ -72,7 +72,7 @@ An edit to the folder changes nothing about the cache until an install copies on
 
 ## The `spn:restates` stamp
 
-**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RULE.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
+**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RULE.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it. `restates check` reports a stamp found outside a marketplace plugin and a citation of the plugin's own repository, with no exception for a generated file stamping its own generator.
 
 **The stamp is a comment block at the top of a ref, and it is the one place a restatement declares what it stands on.** In a skill's `SKILL.md` it comes right after the frontmatter, because a skill whose first line is not its frontmatter is never offered to the session (`RULE.DEVEX.AGENT.108`). You write one without reading any tool's source:
 
@@ -122,7 +122,7 @@ A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry 
 
 ## The four plugins, and how they divide
 
-Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin name never carries an instance. A stack or a cloud is a `providers/<instance>/` folder inside the plugin that owns its domain. The set reads in domain order: how you work first, then Support's three domains in the order the book holds them.
+Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin name never carries an instance. A stack or a cloud is a `providers/<instance>/` folder inside the plugin that owns its domain. The set reads in domain order: how you work first, then Support's three domains in the order the book holds them. A gate never names an instance: each skill and check reads the instance from the nearest `sprepo.json` and dispatches into `providers/<instance>/`, which carries only the `skills/` or `scripts/` half it has something to put in.
 
 | Plugin | Domain | Carries |
 | --- | --- | --- |
@@ -133,7 +133,7 @@ Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin 
 
 **There are four plugins, one per domain, and the set is closed** (`RULE.DEVEX.AGENT.002`, `DEC.DEVEX.AGENT.015`). The plugin's name is the domain, with nothing suffixed onto it. `SPDevExAgentPluginType` holds the four as `DEVEX`, `SURFACE`, `APPS` and `INFRA`, in that order. `DEVEX` names the domain the stack-agnostic plugin serves, how you work, and never the repository that writes the standards.
 
-**A domain earns a plugin when the agent does a different act in it, and so needs different instructions.** Writing TypeScript and writing Python are one act in two languages, so a stack is a `providers/<name>/` folder inside its domain's plugin (`spn-apps`'s `providers/ts/`), with its own parser and its own steps checking the rule stated once beside them. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a cloud is a blueprint library and a provider folder (`spn-infra`'s `providers/aws/`) with no skill of its own. Neither earns a plugin. **A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time, which is the defect the whole restatement discipline exists to stop.
+**A domain earns a plugin when the agent does a different act in it, and so needs different instructions.** Writing TypeScript and writing Python are one act in two languages, so a stack is a `providers/<name>/` folder inside its domain's plugin (`spn-apps`'s `providers/ts/`), with its own parser and its own steps checking the rule stated once beside them. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a cloud is a blueprint library and a provider folder (`spn-infra`'s `providers/aws/`) with no skill of its own. A cloud's rendering is read by a parser under the estate plugin's `providers/<cloud>/`, and a blueprint library is selected at apply time, so the install never chooses a cloud. Neither earns a plugin. **A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time, which is the defect the whole restatement discipline exists to stop.
 
 **Surface is a domain of its own, so it has a plugin of its own.** Designing, drawing and judging what a person sees is a different act from building, proving and releasing a kind. It reaches a designer who may never open a code file, and a mock of a page comes before any app code exists. The book holds Surface as one of Support's three domains, stated once and realized by every stack.
 

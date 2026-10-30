@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
-      "seen": "c10ab333"
+      "seen": "b5882a34"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "bf4fcd9c"
+      "seen": "7c8f16af"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
       "section": "Generated primitives are never hand-edited",
-      "seen": "87b2001b"
+      "seen": "1b2ea22c"
     }
   ]
 }
@@ -225,7 +225,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RULE.SUPPORT.SURFACE.139` | the theme holds the layout look, in three parts, the body, the navigation and the content, and a surface takes a colour and a strength |
 | `RULE.SUPPORT.SURFACE.200` | a layout has three parts, the body, the navigation and the content; the width is the body's, attached and sticky are the navigation's and the content's, and the spacing follows the theme's size |
 | `RULE.SUPPORT.SURFACE.128` | the theme holds the card look, apart from the panel look, and the card widget look, the order each is read in, and the theme holds no block for a list |
-| `RULE.SUPPORT.SURFACE.232` | each theme look is read only by its own component, and an unset field takes its own look's default |
+| `RULE.SUPPORT.SURFACE.232` | each theme look is read only by its own component, where one component draws another the inner one takes its own section of the theme for what is unset, and an unset field takes its own look's default |
 | `RULE.SUPPORT.SURFACE.240` | a feature frames nothing unless the page lists its `frames`, and takes the paint of a frame from its own `surface`, else from the design system's fixed feature default |
 | `RULE.SUPPORT.SURFACE.264` | the theme groups its choices by layer: app, layout, container, widget and component |
 | `RULE.SUPPORT.SURFACE.276` | the theme's first layer is the app, the layer that reads the six values, and the layers stand top-down in the type, the default theme and every list of them |

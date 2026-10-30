@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/aws/08-environment.md",
-      "seen": "b5d1e475"
+      "seen": "ec81a2e4"
     }
   ]
 }

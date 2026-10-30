@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "section": "The choice table",
-      "seen": "ad0e1742"
+      "seen": "af5c2473"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
       "section": "The pointer from apps into Surface, and the rule that keeps it safe",
-      "seen": "8a42866a"
+      "seen": "db7d7579"
     }
   ]
 }

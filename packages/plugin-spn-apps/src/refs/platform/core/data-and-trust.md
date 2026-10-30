@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "a69900d9"
+      "seen": "1c3455ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "5014c243"
+      "seen": "3576576a"
     }
   ]
 }
@@ -100,7 +100,7 @@ Read the **effective policy** — the section-by-section merge of the two layers
 
 ## Each person's rights are controls your module answers
 
-Every privacy law gives a person the same handful of rights over their data, numbered differently, so the platform builds each right once. **A module that holds personal data answers each duty — MUST**: access, export, correction, erasure, consent, retention and deletion, and breach notice. Erase in place where you can. Where a record must stay, such as the audit trail, anonymise it instead. Mark each personal field on its contract, so the export finds it, the erasure clears it and every log line prints it redacted. The contract a module joins to answer a person's request is planned, so until it ships these duties are open for your module's data, and the control map says so row by row.
+Every privacy law gives a person the same handful of rights over their data, numbered differently, so the platform builds each right once. **A module that holds personal data answers each duty — MUST**: access, export, correction, erasure, consent, retention and deletion, and breach notice. Erase in place where you can. Where a record must stay, such as the audit trail, anonymise it instead. Mark each personal field on its contract, so the export finds it, the erasure clears it and every log line prints it redacted. Build each duty once for every law; only the mapping of a duty to a law's article differs per law. The contract a module joins to answer a person's request is planned, so until it ships these duties are open for your module's data, and the control map says so row by row.
 
 **Each law is answered in the role held under it** (`RULE.PLATFORM.CORE.049`). Your platform is the controller of its own people's data, and SaaS Plane's modules are the processor. So your team runs the controller's share: the privacy notice, the processing agreement with each tenant, the list of subprocessors, the person a request goes to, and the clock on each answer. That clock is one month under GDPR and UK GDPR, 45 days under CCPA and 30 under PIPEDA.
 

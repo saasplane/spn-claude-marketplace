@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/07-comments.md",
-      "seen": "f80ea4b7"
+      "seen": "24c41c02"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/",
-      "seen": "95d8dfbe"
+      "seen": "db60c9a9"
     }
   ]
 }
@@ -165,4 +165,4 @@ Neither side ever carries a history word — not *"moved from"*, not *"renamed"*
 
 ## A file you edit leaves with its comments in standard
 
-Bringing a source file's comments up to standard is part of editing it — MUST. A published declaration the edit touches carries an intent comment; a description sits where the harvester can read it; nothing in the file narrates its own history. The reach is the file you edited and no further — a defect noticed in another file is recorded as a finding rather than fixed on the way past. A rule that turns every edit into a sweep is a rule people stop following, and the backlog it was meant to drain grows instead.
+Bringing a source file's comments up to standard is part of editing it — MUST. A published declaration the edit touches carries an intent comment (`apps validate` reports one without as a `no-intent` finding, and exempts only the transport adapters the intent table leaves undescribed: a repository, a controller and a listener); a description sits where the harvester can read it; nothing in the file narrates its own history. The reach is the file you edited and no further — a defect noticed in another file is recorded as a finding rather than fixed on the way past. A rule that turns every edit into a sweep is a rule people stop following, and the backlog it was meant to drain grows instead.

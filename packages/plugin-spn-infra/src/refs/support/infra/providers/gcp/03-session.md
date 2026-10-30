@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/gcp/03-session.md",
-      "seen": "c5d9e979"
+      "seen": "82647d40"
     }
   ]
 }

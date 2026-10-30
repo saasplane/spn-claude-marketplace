@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/04-addressing.md",
-      "seen": "f572cc70"
+      "seen": "534ef72f"
     }
   ]
 }
@@ -22,7 +22,7 @@
 
 ## Hosts resolve to loopback, and the port carries the transport
 
-**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for every local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9000` (`RULE.SUPPORT.INFRA.079`).
+**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for every local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9000` (`RULE.SUPPORT.INFRA.079`). Every engine family takes its name in the host, `database`, `cache`, `queue` or `storage`, and its server certificate is minted per `{world}-{family}`, so an engine presents a certificate for the name a client dials.
 
 ## Each platform declares its own five hundred ports
 

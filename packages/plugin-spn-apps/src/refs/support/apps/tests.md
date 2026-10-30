@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/06-tests.md",
-      "seen": "6671f4b0"
+      "seen": "973b6baa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/",
-      "seen": "a1c549a0"
+      "seen": "1887902c"
     }
   ]
 }
@@ -41,7 +41,7 @@ SPTestTierType  UNIT · INTEGRATION · CONTRACT · COMPONENT · JOURNEY
 
 ## Kind decides the tier
 
-Derive the tier — never debate it. A project's kind fixes its consumer, and the consumer fixes what proof has to mean: prove a package where other code meets it, and prove an application where people meet it. The set of kinds is closed, so read the row for the kind in front of you rather than guessing.
+Derive the tier — never debate it. A project's kind fixes its consumer, and the consumer fixes what proof has to mean: prove a package where other code meets it, and prove an application where people meet it. The set of kinds is closed, so read the row for the kind in front of you rather than guessing. A tier the kind owes and the node carries no case for is a warning from the gate and never an error, because it says proof has not been written yet, not that something broke.
 
 | Kind | Owes | Why |
 | --- | --- | --- |
@@ -193,7 +193,7 @@ A title of the id alone hands a reader in a pipeline an identifier and no way to
 
 ## Coverage: what a release-gating sweep must reach
 
-A percentage is not the answer — it moves when a case is added and says nothing about which case. What this section measures is the proved side of a repository's coverage: the `tests` report shows it row by row, and the `coverage` report sets it beside what is written and what is built, per package, per app and for the repository. **What a route owes is read from the behaviour rows that claim it.** An action is an interaction whichever way it is reached: a person reaches it through a browser, another system reaches it through the published client, so the published surface *is* the behaviour surface and a row is what both answer to.
+A percentage is not the answer — it moves when a case is added and says nothing about which case. What this section measures is the proved side of a repository's coverage: the `tests` report shows it row by row, and the `coverage` report sets it beside what is written and what is built, per package, per app and for the repository. **What a route owes is read from the behaviour rows that claim it.** An action is an interaction whichever way it is reached: a person reaches it through a browser, another system reaches it through the published client, so the published surface *is* the behaviour surface and a row is what both answer to. An action that no behaviour row claims is a defect, because nobody has said who may perform it and nothing tests it on either surface.
 
 | Surface | Driven by | Proven at |
 | --- | --- | --- |

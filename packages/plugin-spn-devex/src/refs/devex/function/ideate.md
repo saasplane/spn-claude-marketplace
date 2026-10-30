@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "32bc2649"
+      "seen": "8df77438"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "c03daadd"
+      "seen": "1f0cef86"
     }
   ]
 }
@@ -55,7 +55,7 @@ The DevEx stages are eight: `BOOTSTRAP · SCM · IDEATE · DEVELOP · TEST · PR
 
 ## Classify the altitude before you classify the change
 
-You classify twice, and the order matters. First the **nature of the work**, which decides where you enter. Then the size of the change — new capability, additive, breaking, or fix — which runs inside the altitude you already chose. Reverse the two and you patch at the lowest rung, then meet the construct three rounds later.
+You classify twice, and the order matters. First the **nature of the work**, which decides where you enter. Then the size of the change — new capability, additive, breaking, or fix — which runs inside the altitude you already chose. Reverse the two and you patch at the lowest rung, then meet the construct three rounds later. A change to a repository outside the workspace is an order, never an edit made from here: markdown stating the outcome, the constraints and the acceptance, executed in that repository's own window. Inside the workspace the declaration governs, so working across siblings is ordinary.
 
 | Nature of the work | Enter at | The highest thing that must re-align |
 | --- | --- | --- |
@@ -73,7 +73,7 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 | upward | what is the highest document that must change? | rows, a chapter, and a handover where it reaches the book. No release |
 | downward | what is the lowest shared package the change reaches? | a release and a pin bump in every consumer — and every other platform on the stack inherits it, asked for or not |
 
-**A design is not classified until both ends are named.** The downward question is the modularity check: the lower a change reaches, the more products it commits to it.
+**A design is not classified until both ends are named.** The downward question is the modularity check: the lower a change reaches, the more products it commits to it. A change whose blast radius crosses a boundary is a design decision routed to the architect lens before any fix is proposed, whether it arrives as a compiler error, a repair breaking many call sites, a change to generated output or a change across a package or repository boundary, and options that all share one noun are one idea rather than several (`RULE.DEVEX.AGENT.026`).
 
 **The altitude is discovered, so escalate rather than absorb.** Work entered at module level routinely turns out to need the rung above — settle the higher document first, because a row written against a construct that is about to move is a row written twice. The top rung is not one document either: this book holds a construct per subject, so name *which* construct owns the idea before you climb into it, or the writing lands in the wrong chapter.
 

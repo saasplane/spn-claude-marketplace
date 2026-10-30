@@ -3,33 +3,33 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "22208517"
+      "seen": "2a67491a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "68c1e693"
+      "seen": "b94b30ff"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "section": "`infra` — the estate",
+      "seen": "02a84eaf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "section": "The machine's own layout",
+      "seen": "f3fdbd05"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "The state file has a node for each owner",
+      "seen": "988f3333"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.180",
-      "seen": "f5c6cb20"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.UTILS.072",
-      "seen": "eb25b0de"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.UTILS.075",
-      "seen": "0ee01e40"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.324",
-      "seen": "fe694315"
+      "seen": "58811447"
     }
   ]
 }
@@ -45,9 +45,10 @@ rewritten.
 ## The commands you run are listed in each repository, not here
 
 **This file lists no command by hand.** A list typed here drifts from the program the day a command
-gains an argument. Each repository's generated `.claude/saasplane/rules.md` carries § *Commands you
+gains an argument. Each repository's generated `CLAUDE.md` imports its own context (`DEC.DEVEX.WORKSPACE.180`),
+and the generated `.claude/saasplane/rules.md` among those imports carries § *Commands you
 run here*: the `spnutils` commands that repository's world and stack use, each with its arguments,
-read from the command tree itself (`DEC.DEVEX.WORKSPACE.180`). `repo agent-sync` rewrites it, so it
+read from the command tree itself. `repo agent-sync` rewrites it, so it
 matches the installed release. Read it before you run a command in a repository.
 
 - **For every command, and every option**, run `spnutils help --json` or `spnutils <command> --help`.
@@ -159,7 +160,9 @@ usage lines, which count each reply once, keyed by the message id. A window's co
 telemetry and never from a transcript — MUST (`RULE.DEVEX.AGENT.082`).
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
-command or on a group of commands, and a plugin declares the tiers of its own command groups.
+command or on a group of commands, and a plugin declares the tiers of its own command groups. The same
+traversal that publishes `help` serves the tiers, so the commands an agent is offered and the commands a
+tier classifies cannot disagree.
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close
@@ -208,7 +211,9 @@ under `~/.saasplane/state/surface/`, in folders that say who writes there, and n
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing
 else; `infra test <run> [package]` does the same for the estate. **The caller names every run, and the
 name is required**: build one while you work, such as `full-1001`, and give every tier of one sitting
-the same name. A reused name replaces that one file, and each tier keeps its 20 newest. What that run
+the same name. A reused name replaces that one file, and each tier keeps its 20 newest. A run given
+`--phase <phase>` writes `<run>.<phase>.json`, so one name never overwrites itself across phases, and the 20
+newest count every file in the tier's folder. What that run
 means for the documents is the agent's own work, through plugin scripts:
 `spn-devex behaviours stamp write <run> <repo>` reads only that run's files and writes `Status` and
 `Updated at` as `<time> · <run>`, and coverage and the reports read the stamped rows only. The run's
@@ -239,7 +244,9 @@ lists every runnable command, and `--json` gives each one as data: its path, int
 arguments and options. `-v` prints this build and the standards range it implements.
 
 `login` is declared, not yet realized — a conformance finding against the realization, recorded
-rather than dropped. Every installed tool answers `help` from the **assembled program**, never from
+rather than dropped. When it exists, a simulated posture will mint a token shaped like a real one against the
+local estate, never stored, marked in every output that names it, and refused by every `--cloud` command.
+Every installed tool answers `help` from the **assembled program**, never from
 source text, so an approximation cannot sneak in as a reading of the code.
 
 ## The derivation laws
@@ -251,7 +258,8 @@ never exists.
 
 **A mutation is reviewable or it does not exist.** Pins bump by editing a manifest — the one-line
 diff is the whole review. A second stack changes no command: the groups are the platform's
-vocabulary, stack adapters are its realizations.
+vocabulary, stack adapters are its realizations. Only `apps` dispatches through a stack's adapter;
+`workspace`, `repo` and `infra` are the same commands in every stack (RULE.DEVEX.UTILS.004).
 
 ## The env seat — `~/.spnenv`
 

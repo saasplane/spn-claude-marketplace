@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/04-resources.md",
-      "seen": "ee42bfda"
+      "seen": "a6e317cf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "92260be1"
+      "seen": "c454e47b"
     }
   ]
 }
@@ -102,7 +102,7 @@ Carry the application's own `{CODE}` prefix on every cache key you build, and fo
 
 The rule that matters most: **at-least-once delivery, so every consumer is idempotent.**
 
-Make each topic by your module's own migrations — the framework holds no list of topics. A topic is to a queue what a table is to a database: the module that consumes it **MUST** make it by its own migration before anything publishes to it or subscribes to it. No broker and no client creates a missing topic, on a laptop as in a cloud, so publishing or subscribing to a topic that does not exist is an error that names the topic (RULE.SUPPORT.APPS.178). Pair every topic with an error topic, provisioned together with it, so failed handling always lands somewhere you can inspect. **Put contract Events on the queue only — never Commands, never States.** Publish post-commit only; roll back and you emit nothing. Carry an idempotency key on a cross-module write request you send as an event.
+Make each topic by your module's own migrations — the framework holds no list of topics. A topic is to a queue what a table is to a database: the module that consumes it **MUST** make it by its own migration before anything publishes to it or subscribes to it. No broker and no client creates a missing topic, on a laptop as in a cloud, so publishing or subscribing to a topic that does not exist is an error that names the topic (RULE.SUPPORT.APPS.178). The queue seam is publish and subscribe only: a failing packet is set aside and the one behind it proceeds, no position is guaranteed, and an order-sensitive stream is a different construct with its own seam, never a flag on this one (RULE.SUPPORT.APPS.075). Pair every topic with an error topic, provisioned together with it, so failed handling always lands somewhere you can inspect. **Put contract Events on the queue only — never Commands, never States.** Publish post-commit only; roll back and you emit nothing. Carry an idempotency key on a cross-module write request you send as an event.
 
 Make every consumer you write idempotent — short-circuit redelivered work through the event's request key before any effect, so the same event processed twice produces one outcome for you.
 
@@ -155,7 +155,7 @@ Hold the access token in a module closure and nowhere else — not local storage
 
 Treat the web bundle as public by construction, so **put only publishable values in web configuration** — never an API key, signing key, vendor credential or connection string. If a capability needs a secret, put it behind a server capability fronted by an API; let the browser ask and the server hold.
 
-Reach the network through exactly one path: the generated API client, which you configure once at boot with its base address and the session's bearer token on the transport. Never construct a request by hand — no raw fetch, no second HTTP helper, no per-feature wrapper — and normalize every failure through one error interceptor into the platform's error type, so every caller you write sees the same thrown shape regardless of which call failed.
+Reach the network through exactly one path: the generated API client, which you configure once at boot with its base address and the session's bearer token on the transport. Never construct a request by hand — no raw fetch, no second HTTP helper, no per-feature wrapper — and normalize every failure through one error interceptor into the platform's error type, so every caller you write sees the same thrown shape regardless of which call failed. The API reads the bearer header alone: a header token that does not resolve never falls back to a cookie, and a request carrying only a cookie is anonymous (RULE.SUPPORT.APPS.038).
 
 ## What a resource costs to change
 

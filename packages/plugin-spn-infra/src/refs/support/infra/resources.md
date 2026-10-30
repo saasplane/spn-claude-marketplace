@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/04-resources.md",
-      "seen": "c79262b3"
+      "seen": "557503ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/",
-      "seen": "a546311f"
+      "seen": "f796b4c0"
     }
   ]
 }
@@ -32,7 +32,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
-**An environment also stands a key for stored secrets, and nobody declares that either** (`RULE.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of an application whose row lists the `SEAL` grant may use it; the role that provisions the account may not, and no database role can. **It is one for each environment** — the platform and its spaces share it, so an application in a space that lists the grant seals with the same key. **The declaration gains nothing for it** — no row to write and no engine family to name. The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
+**An environment also stands a key for stored secrets, and nobody declares that either** (`RULE.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of an application whose row lists the `SEAL` grant may use it; the role that provisions the account may not, and no database role can. **It is one for each environment** — the platform and its spaces share it, so an application in a space that lists the grant seals with the same key. **The declaration gains nothing for it** — no row to write and no engine family to name. **The key service renews it every year.** The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
 
 **An application selects no engine and names no share — MUST NOT.** Every scheduled deployment receives a derived share scoped to its own coordinates: its role set from the factory, topics named for their owner, storage reached through the one document system, its own configuration prefix. Nothing nameable crosses the seam in either direction, in either direction — that is what keeps the estate from ever reading a code repository. A new application is one reviewed row; a new version is no estate change at all.
 
@@ -97,7 +97,7 @@ A prefix is one word for a platform and two words for a space. A space's code mu
 
 ## A module owns its own world
 
-A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RULE.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared range, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
+A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RULE.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared range, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. A module's placement is `layer`, `after` and `hosting` on its `modules[]` entry; its config vocabulary is its own, free-form through the entry's `config: {}`, with no standardized module config variables and no estate-declared families, and a module never carries a `space` key. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
 
 ## Hosting and size are independent axes
 

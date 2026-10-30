@@ -3,97 +3,72 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "14d06850"
+      "seen": "4dba48e6"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "79b3c27a"
+      "seen": "342d87d8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "68c1e693"
+      "seen": "b94b30ff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "c0ba7e1b"
+      "seen": "3dd16e2b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status is one of six, stored or worked out",
-      "seen": "656a5e70"
+      "seen": "2dcea68f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A landed arc is never reopened",
-      "seen": "14638107"
+      "seen": "39c20c64"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "5a817634"
+      "seen": "eda6566b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "f2a8cb33"
+      "seen": "988f3333"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The worktree set",
-      "seen": "b74a817b"
+      "seen": "7ed4af7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
-      "seen": "b1bdbbce"
+      "seen": "73890b8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Restatement discipline",
-      "seen": "2586b987"
+      "seen": "abe4bd6f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "DevEx Workspace — One Window, Laws by Declaration",
+      "seen": "f81e3645"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "section": "Five regions, one writer each",
+      "seen": "49d90178"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.058",
-      "seen": "9875bea1"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.261",
-      "seen": "d9b77fe5"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.020",
-      "seen": "3661c8a9"
-    },
-    {
-      "repo": "spn-foundation",
       "row": "DEC.DEVEX.UTILS.044",
-      "seen": "9814cdcb"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.UTILS.048",
-      "seen": "32c30358"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.AGENT.049",
-      "seen": "6dce9417"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.118",
-      "seen": "baf42b07"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.324",
-      "seen": "fe694315"
+      "seen": "f30e3970"
     }
   ]
 }
@@ -118,7 +93,7 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (rule RULE.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.saasplane`** on purpose. `rm -rf ~/.saasplane/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (RULE.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.saasplane`** on purpose. `rm -rf ~/.saasplane/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
@@ -611,7 +586,7 @@ One constraint decides where every common rule lives. **A product repo built on 
 
 **Common rules are carried by the plugin, never by a link into a peer repo.** Cite by name any document that must be cited across repos, and let the plugin carry the substance.
 
-**The rule reaches every file that ships inside a repository, agent instruments included** (rule RULE.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. The workspace's `CLAUDE.md` is generated too and names no checkout, so it needs no exception. And a repository's instruction file states what is true of that repository, never what other repositories may do.
+**The rule reaches every file that ships inside a repository, agent instruments included** (RULE.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. The workspace's `CLAUDE.md` is generated too and names no checkout, so it needs no exception. And a repository's instruction file states what is true of that repository, never what other repositories may do.
 
 ## Skills are what a consumer acts on; the book is why
 

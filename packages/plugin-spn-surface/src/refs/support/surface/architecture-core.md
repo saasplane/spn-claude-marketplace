@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/05-architecture-core.md",
-      "seen": "453a4498"
+      "seen": "cf9121e5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/05-architecture-core/",
-      "seen": "3085be7b"
+      "seen": "9baaf498"
     }
   ]
 }
@@ -142,7 +142,7 @@ A pitch is sized by the level of the page it stands at, and the sizes must not b
 | `GROUP` | `HEADING_XS` | 18px | 18px | 8px | 16px | 16px | 24px |
 
 - **A unit MUST read the title through the type step.** `--level-<level>-title` names the type step's own size token, which carries its phone value, so the phone size follows with nothing written. A unit that sizes its title by a level token never asks what the device is.
-- **The side of a small picture MUST NOT be a level token** (`RULE.SUPPORT.SURFACE.253`). It follows the title of the feature and the lines the feature has, so it is read from the scale sizes of the item line (`architecture-components.md`), and a level holds no `-box` token.
+- **The side of a small picture MUST NOT be a level token** (`RULE.SUPPORT.SURFACE.253`). It is one box for each level whatever lines the feature has, so it is read from the scale sizes of the item line (`architecture-components.md`), and a level holds no `-box` token.
 - **A page MUST NOT write a level token.** A level is a position, and a theme that wants another rhythm changes the token once.
 - **The words of a feature's items MUST be 14px or larger under a `PAGE`, a `CONTAINER` or a `WIDGET` feature** (`RULE.SUPPORT.SURFACE.239`). A `PAGE` or a `CONTAINER` feature draws its items at `WIDGET`, a title of 16px over a description of 14px, and a `WIDGET` feature draws them at `GROUP`, 14px over 14px, so the 14px floor of a website holds for every item line from `GROUP` up. Under a `GROUP` or a `CONTENT` feature the items are at `CONTENT`, 13px over 13px, and under an `INLINE` feature at `INLINE`, 12px over 12px: the one waiver, since items there are seldom used.
 
@@ -194,7 +194,7 @@ This ref names every role, every step of the scale, every scale size, and the fa
 | `RULE.SUPPORT.SURFACE.282` | `IDSFrameSurface` carries `elevation`, and `DSMotionType` is the core's set of reveal motions |
 | `RULE.SUPPORT.SURFACE.266` | the parts of any box are `DSBoxPartType`, one closed set of the core |
 | `RULE.SUPPORT.SURFACE.289` | `IDSSurfaceLook` carries `elevation`, `MD` where left out, read only where `raised` is true |
-| `RULE.SUPPORT.SURFACE.253` | the side of a feature's small picture follows its title and its lines, so a level holds no box token |
+| `RULE.SUPPORT.SURFACE.253` | the side of a feature's small picture is one box for each level whatever lines the feature has, so a level holds no box token |
 | `RULE.SUPPORT.SURFACE.103` | a type step sets the size and the weight of a text, and its element is a separate property |
 | `RULE.SUPPORT.SURFACE.142` | the Heading scale starts at `HEADING_XXS`, and the size and line height of its three smallest steps |
 | `RULE.SUPPORT.SURFACE.143` | the quiet tone stands between the body and the muted tone, and the job of each text tone |

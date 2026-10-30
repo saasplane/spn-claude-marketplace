@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/03-blueprints.md",
-      "seen": "f209d11e"
+      "seen": "14b2b8f2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/03-blueprints/",
-      "seen": "5ad6eafd"
+      "seen": "506efbc4"
     }
   ]
 }
@@ -33,11 +33,13 @@ The command surface **resolves and drives**; the blueprint library **creates**. 
 
 | # | Layer noun | Level | Stands up |
 | --- | --- | --- | --- |
-| 0 | `GROUND` | company | nothing — it checks what was brought and discovers its coordinates |
+| 0 | `GROUND` | company | the estate's state store, its key, its bucket and its lock table, and nothing else — it checks what was brought and discovers its coordinates |
 | 1 | `ORGANIZATION` | company | provider accounts, root guardrails, billing boundaries, and the output store as its first act |
 | 2 | `PLATFORM` | product | the product's containers, its two workload accounts, its control accounts and the trust graph between them, its policies, its zone — and what SaaS Plane installs into them: scanners, the runner fleet, and one observability stack per workload |
 | 3 | `ENVIRONMENT` | environment | in order — the network, then the resources that sit in it, then the compute beside them, then under `CLUSTER` the engines on that compute, and last each world's users and published facts |
 | 4 | `DEPLOYMENTS` | environment | what actually runs |
+
+**Every layer above `GROUND` keeps its state in that store**, and a layer initialized with no shared backend is a conformance finding that refuses a cloud apply (`RULE.SUPPORT.INFRA.071`). `PLATFORM` creates a product's own organizational units and accounts, its control accounts and its two workload accounts, and then stands up what lives inside them; `ORGANIZATION` creates none of a product's accounts (`RULE.SUPPORT.INFRA.070`).
 
 **These five are the model's layer nouns — `GROUND`, never `BOOTSTRAP`.** `GROUND` has no principals of its own and rides the `organization` command noun; `DEPLOYMENTS` rides the `environment` command noun the same way, so the command surface speaks three nouns for five layers.
 
@@ -73,7 +75,7 @@ The tree is logical and free of any provider's words — stated once in the name
 
 **A third account holds no environments at all.** Outside data lands in the staging account and is conditioned there before any of it reaches a workload. Workloads **pull** what they are entitled to; the staging account never pushes into them, holds no interactive access, and assumes no role into either workload.
 
-**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RULE.SUPPORT.INFRA.017`). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. The shared substrate falls only with a region's last environment.
+**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RULE.SUPPORT.INFRA.017`). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. A region's substrate rises with the first environment declared in it, the platform layer stands nothing per region ahead of demand (`RULE.SUPPORT.INFRA.074`), and the shared substrate falls only with a region's last environment.
 
 ## The trust graph
 

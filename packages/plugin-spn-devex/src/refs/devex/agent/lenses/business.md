@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
-      "seen": "f12d2c5f"
+      "seen": "292167d6"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
@@ -16,7 +16,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "ee1bac47"
+      "seen": "41eb6c10"
     }
   ],
   "decisions": []
@@ -74,7 +74,7 @@
 - **The plan model and the account** — held by this lens worn.
   - **Someone can be billed for this, or it is deliberately free.** A capability that consumes real resources and belongs to no plan, tier or entitlement is a cost with no revenue — a decision that must be recorded, never an omission.
   - **An entitlement is data, never a code path.** A capability gated by a build flag, an environment check or a hardcoded account list cannot be sold, changed or granted without a deploy.
-  - **The account is the unit that pays.** Anything metered, limited or invoiced resolves to an account — never to a user, a session, or an organization node that may be reorganized underneath it.
+  - **The account is the unit that pays.** Anything metered, limited or invoiced resolves to an account — never to a user or a session. Any organization node may wear the Account face (a subsidiary that begins paying gains one in place, keeping its id, people, history and position), so billing and entitlement lookups resolve to the nearest face along the path, never at a fixed depth (`RULE.PLATFORM.CORE.014`).
   - **A limit that exists is enforced and observable.** A quota with no enforcement is a promise broken silently; an enforced quota with no counter is one nobody can support a customer through.
   - **Nothing traps a customer.** A capability that produces data gives its owner a way to get that data out, and a subscription that starts has a stated path to stopping.
   - **The commercial vocabulary matches the product's.** What the interface calls a plan, an add-on or a seat is what the invoice, the docs and the support article call it.

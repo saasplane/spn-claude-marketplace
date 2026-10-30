@@ -4,47 +4,47 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "8e6ea6e3"
+      "seen": "0cb8b638"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "ab30d65d"
+      "seen": "df609deb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "fb1917d3"
+      "seen": "b77b4de2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "add5b92a"
+      "seen": "03db8a18"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "cca6075a"
+      "seen": "3fb4ffdd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "4144f9f2"
+      "seen": "c41c3aab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "10c658c7"
+      "seen": "14280d8e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
-      "seen": "9c4b01b6"
+      "seen": "9d79771b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "e7069100"
+      "seen": "7e4f58e7"
     }
   ]
 }
@@ -95,7 +95,9 @@ The session-start hook prints it. It is a heading that greets the developer by n
 every seat on the team by its lens's role name, grouped by function. In a builder's workspace, the one
 `SPN_DEVEX_AGENT_WORKSPACE` names, it also names the partner view by what it guards, because that view
 speaks for the people who build on what the builders publish and is no seat on a partner's team. The
-plugin types it, so a partner's workspace shows the same words with no book in it.
+plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
+groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
+and Finance and business, each with its role names (RULE.DEVEX.WORKSPACE.283).
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the
 agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole

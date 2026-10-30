@@ -7,11 +7,11 @@ description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "c7702f71"
+      "seen": "9c999d7f"
     }
   ]
 }
@@ -93,7 +93,7 @@ A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — *
 **A repository has ONE docs tree, at the repository root — never one per node** (foundation
 decision DEC.DEVEX.WORKSPACE.070). The `repo` target above writes it once, at scaffold time. Every kind
 scaffolded afterwards — an app, a package, an app-module — carries **`README.md` and no seats of
-its own** (rule RULE.DEVEX.WORKSPACE.088): about twenty-five lines saying what the node is, what it is for,
+its own** (RULE.DEVEX.WORKSPACE.088): about twenty-five lines saying what the node is, what it is for,
 and linking into the seats it realizes. Read `refs/devex/workspace/docs/doc-sets.md` in the **spn-devex** plugin before
 writing a word into either.
 
@@ -127,11 +127,11 @@ writing a word into either.
 
 ## Target: app-module
 
-A product module owned by one app — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (rule RULE.SUPPORT.APPS.029). Living inside an app is a packaging decision, not a different kind of thing.
+A product module owned by one app — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (RULE.SUPPORT.APPS.029). Living inside an app is a packaging decision, not a different kind of thing.
 
 - **Backend**: `apps/<service-app>/src/modules/<code>/` mirroring the module skeleton — `spkind.json`, `interface.ts`, `<code>Module.ts`, `<CODE>ModuleManager.ts`, `contract/` (states, services, validators, constants), `app/` (entities, repositories, services, support, utils), `entry/api/controllers/`, `migrations/`. Add **one line** to the app manager's module list to register it.
 - **Frontend** (if it has a surface): `apps/<web-app>/src/modules/<code>/entry/ui/` with `components/hooks/pages`, its own vite `manualChunks` claim, literal route strings in `nav.ts` (no URL-helper package).
-- **Docs**: the module carries **`README.md` and no docs tree** (rule RULE.DEVEX.WORKSPACE.088). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RULE.DEVEX.WORKSPACE.125). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
+- **Docs**: the module carries **`README.md` and no docs tree** (RULE.DEVEX.WORKSPACE.088). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RULE.DEVEX.WORKSPACE.125). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
 - Commands: `spnutils apps gen-validators <app-pkg>` after writing `contract/states/**` (gen-validators applies to apps too); do **not** run `gen-barrel` on apps (their `index.ts` is a bootstrap, not a barrel).
 
 **The scaffold writes the gate table; it cannot answer the question behind it.** Every new module gets an `app/utils/authz.ts` and a seeded permission catalog. Before you fill either, decide what varies the answer — a person, an organization type, or a plan. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries that question, the `{MOD}_MANAGE_{NOUN}` grammar, and the append rule an app-owned module needs when it contributes an option to another module's definition. This plugin's `providers/ts/scripts/checks/_src/enablement-grammar.ts` refuses the checkable mistakes as you write them.

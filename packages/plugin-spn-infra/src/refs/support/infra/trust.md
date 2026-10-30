@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/07-trust.md",
-      "seen": "7d47eb26"
+      "seen": "54b15190"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/07-trust/",
-      "seen": "21d8e901"
+      "seen": "4b92cdcc"
     }
   ]
 }
@@ -58,7 +58,7 @@ The company's identity provider feeds both the cloud and the repository host. Gr
 Every provisioning run names its own mode, and there is no default.
 
 - A **plan** reaches no account and changes nothing, so it needs no credential. Rehearse the riskiest path — the first cloud walk a new company takes — before any account exists.
-- An **apply** performs the change; against a cloud realization it also takes an explicit approval.
+- An **apply** performs the change; against a cloud realization it also takes an explicit approval, and it is refused while no state backend is configured, because the driver initializes each layer without one (`RULE.SUPPORT.INFRA.069`). A plan is unaffected, and the refusal clears itself once a backend is declared.
 - A run naming neither mode, or naming both, **MUST** be refused (`RULE.SUPPORT.INFRA.094`).
 
 **The credential check reads the provider the estate declared**, expects that provider's own session variables, and refuses by naming the provider when they are absent. Nothing in the driver names a vendor — a session holding a different provider's credentials reads as holding none. That fails safe, not dangerously, but it is still worth surfacing as a defect if you see it happen.
@@ -81,7 +81,9 @@ Organization-level policies back every plane, and every one of them can only ref
 | no untagged resources | anything created outside the declaration |
 | no decryption across an environment boundary | one environment reading another's data, however valid its role |
 
-The last one carries two jobs. It is the line that holds when every other limit has already failed — a stolen non-production role still cannot read production data, because the key policy itself refuses. And it is what makes a single workload account safe to span regions, because keys are per environment: a principal scoped to one production environment cannot reach another's data even holding a valid role in the same account.
+`no wildcard actions` is a detective control and not a guardrail, because a service control policy denies actions being called, while a wildcard grant is a property of a policy document being written and no condition key inspects its `Action` field (`RULE.SUPPORT.INFRA.072`); a finding rule over the organization trail catches it.
+
+The last refusal in the table carries two jobs. It is the line that holds when every other limit has already failed — a stolen non-production role still cannot read production data, because the key policy itself refuses. And it is what makes a single workload account safe to span regions, because keys are per environment: a principal scoped to one production environment cannot reach another's data even holding a valid role in the same account.
 
 A guardrail that grants anything is not a guardrail — it is a permission wearing the wrong name. Treat any policy that adds access, rather than only removing it, as a defect regardless of where it sits.
 
@@ -121,7 +123,7 @@ Scanners are stood up by the platform layer, into whichever cloud the organizati
 
 Findings, audit trails and configuration history flow into the observing accounts continuously, so compliance is a query rather than a project. The accounts that receive them can deploy nothing, which is what makes the record worth trusting.
 
-**The audit trail is declared, and it records each use of the key for stored secrets** (`RULE.SUPPORT.INFRA.109`). An environment holds one key that protects the secrets a product must read back. A running service asks the key service for a data key when it stores such a secret, and asks it to unwrap one when it uses the secret; each call names the organization and the row the secret belongs to. The trail records every such call with those names, into the log archive the estate already has — append-only, and no operator may delete from it. So *when was this organization's secret opened* is a query over that archive, and the service that opened the secret cannot edit the answer. The trail is designed and not declared yet.
+**The audit trail is declared, and it records each use of the key for stored secrets** (`RULE.SUPPORT.INFRA.109`). An environment holds one key that protects the secrets a product must read back. A running service asks the key service for a data key when it stores such a secret, and asks it to unwrap one when it uses the secret; each call names the organization and the row the secret belongs to. The trail records every such call with those names, into the log archive the estate already has — append-only, and no operator may delete from it. So *when was this organization's secret opened* is a query over that archive, and the service that opened the secret cannot edit the answer. The trail is declared in the blueprints, and no apply on a real account has stood it yet.
 
 **What is unproven MUST say so.** A claim with no evidence behind it is reported as unproven rather than quietly left out, because a report that hides its gaps is worse than no report — it gets believed. When you cannot establish a fact about what is running, state that you could not establish it. Never fill the gap with an inference and present it as a finding.
 

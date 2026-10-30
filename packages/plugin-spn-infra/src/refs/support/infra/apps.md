@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
-      "seen": "edc798c3"
+      "seen": "11fba2f8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
@@ -79,7 +79,7 @@ A database, a cache and a queue are reached with a user and a password, which ar
 | `SEAL` | use the environment's key for stored secrets, so the application seals secrets of its own in its own rows |
 | `EDGE` | bind a tenant's own domain: request its certificate and write its route |
 
-- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value.
+- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. The contract states no other key for a grant, and a manifest that writes one is refused.
 - **A grant is not restricted by `space`.** An application that lists one is granted it, on the platform or in a space.
 - **A workload that lists no grant holds none**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow. `EDGE` is true for the application that owns identity and for no other.
 - **A service lists `SEAL` only when a module it mounts stores secrets.** A service that holds that module remotely receives the opened value from it and never touches the seal.
@@ -242,7 +242,7 @@ export interface SPEstateAppDeploymentGatewayRateLimit {
 - **The rate limit's window is one second, one minute, one hour or one day — MUST** (`RULE.SUPPORT.INFRA.118`). `windowSeconds` is `1`, `60`, `3600` or `86400`, because a gateway counts in those four units and no other. The estate's rules refuse any other number and name the row.
 - **The count is one count, however many proxy pods a gateway runs.** The gateway keeps it in the environment's own cache (`RULE.SUPPORT.INFRA.120`).
 
-The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing.
+The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing. It takes any window in seconds, where the gateway's takes only the four above.
 
 ### A web firewall on the public load balancer
 

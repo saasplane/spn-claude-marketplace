@@ -8,34 +8,27 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
-      "seen": "46776da2"
+      "seen": "c82fb94f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Code coverage is reported, never enforced",
-      "seen": "300e384f"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.086",
-      "seen": "599f52fd"
+      "seen": "3e80db4e"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.119",
-      "seen": "25475d44"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
+      "section": "The behaviour rows are the denominator",
+      "seen": "eff24f91"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.120",
-      "seen": "415f41e2"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
+      "section": "What a run owes",
+      "seen": "6b079954"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.133",
-      "seen": "accf48b3"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
+      "section": "Scope — where you stand decides what runs",
+      "seen": "b3fb0d40"
     }
   ]
 }
@@ -106,6 +99,7 @@
   - **Each claim is proven once, at the level that owns it** (`DEC.SUPPORT.APPS.087`).
   - **The id is the join, and a link has a direction.** A UI row `Realizes` an API row, never a peer. **The join reads one register per repository.** **A case proving the toolchain's own machinery is not join evidence.** **A behaviour row names no package.**
   - **Status honesty**: a `SUCCESS` row resolves to a case that ran and passed. No case is `PLANNED`; a case the run met and could not run is `PENDING`.
+  - **An action no behaviour row claims is a defect**: nobody has said who may perform it and nothing tests it on either surface.
   - **A run speaks for the tier it ran and the nodes it collected, and nothing else.**
   - **While work is under way, a run covers what the change touched** (`RULE.DEVEX.WORKSPACE.207`): rows counted through the capability page, the selection written in the order and passed after `--`, one freshly named run, acceptance read as `SUCCESS` from the run file.
   - **A whole tier runs before a push, in an arc's `PROOF` row, before a release, or in one of five named cases** (`RULE.DEVEX.WORKSPACE.245`). The `PROOF` row is the arc's one final re-check, where the whole tiers, the walks and the look run once, and no order runs them. The five cases: a published package changed and outsiders import it; a test configuration changed; a file was renamed, moved or deleted; a dependency moved; the developer asks. The release's dry run is the full pass: it runs every tier the release can run by itself and lists every failure, so the agent runs only the tier it names as not run, a client's contract tier, with the service up. A tier proven for the exact inputs the release ships is not run again: a past green verdict on the same key stands in for a run, integration and contract verdicts expire after 24 hours, and the tag names the run behind each tier (`RULE.SUPPORT.APPS.228`).
@@ -114,7 +108,7 @@
   - **Keep each claim at one tier.** A gate is not a test, and no gate is inferred from another.
   - **Suites group by actor where the consumer is people, and by capability where it is a system.** **Leave the system as the tests found it.**
   - **A result is read from the gate's own exit AND its finding count** (`RULE.SUPPORT.APPS.096`). **A run that must prove a change verifies the artifact, never the runner** (`RULE.SUPPORT.APPS.097`).
-  - **A tier nothing invokes proves nothing**, and a tier declared with no cases is a gap or a deletion — say which. **The ladder is a floor**, and **`Owes` is a floor, never a ceiling** (`RULE.SUPPORT.APPS.114`).
+  - **A tier nothing invokes proves nothing**, and a tier declared with no cases is a gap or a deletion — say which. **The ladder is a floor**, and **`Owes` is a floor, never a ceiling** (`RULE.SUPPORT.APPS.114`). A gate reports an owed tier with no case as a warning and never an error, since it says proof is not written yet rather than that something broke.
   - **A runner is not the runtime you ship.** Prove it by running what you publish, installed as a consumer installs it.
   - **Behaviour does not cross a harness's process boundary** (`RULE.SUPPORT.APPS.099`). **A red naming what no source declares is a stale build** (`RULE.SUPPORT.APPS.100`). **A case that destroys a session runs where nothing else depends on it** (`RULE.SUPPORT.APPS.098`).
   - **Code coverage is reported, never enforced** (`RULE.SUPPORT.APPS.133`). No threshold fails a run; proof is read from the behaviour rows, and unreachable code is excluded with its reason beside it.

@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "8afb2f28"
+      "seen": "d9f7a931"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/06-architecture-components.md",
       "section": "The choice table",
-      "seen": "ad0e1742"
+      "seen": "af5c2473"
     }
   ]
 }

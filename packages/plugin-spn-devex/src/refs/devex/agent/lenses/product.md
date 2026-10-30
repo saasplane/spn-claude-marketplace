@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/README.md",
-      "seen": "52e3d431"
+      "seen": "f5185f4d"
     },
     {
       "path": "spn-foundation/docs/03-behaviors/README.md",
@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "Who an app is for",
-      "seen": "576ea36a"
+      "seen": "2752aca1"
     }
   ]
 }

@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/02-organizations.md",
-      "seen": "ee1bac47"
+      "seen": "41eb6c10"
     }
   ]
 }
@@ -67,7 +67,7 @@
 
 - **Cost attribution and the account** — held by the tag policy and the estate guard.
   - **Every resource carries the mandatory tags, emitted from manifest coordinates**, so cost is attributed by team, workload and data class, and nobody types a tag.
-  - **Cost resolves to the account**, the boundary billing scopes to.
+  - **Cost resolves to the account**, the boundary billing scopes to. Any organization node may wear the Account face, so billing and entitlement lookups resolve to the nearest face along the path and never at a fixed depth (`RULE.PLATFORM.CORE.014`).
   - **A design option names its cost** before it is chosen (principle 15).
 
 ## Gates

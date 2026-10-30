@@ -3,19 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "4bbfb9ad"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.PLATFORM.CORE.033",
-      "seen": "c395af4b"
+      "seen": "5856fbb7"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.PLATFORM.CORE.034",
-      "seen": "3735ef74"
+      "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
+      "section": "Enablement: what an organization type is offered",
+      "seen": "61a67756"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "section": "`@SPAuthorize` + the module `_AUTHZ` table",
+      "seen": "92726a2f"
     }
   ]
 }
@@ -39,6 +37,8 @@ Ask what the answer varies by. That one question separates the three axes.
 | …and does it gate a **read**? | then it is **never** an enablement |
 
 Two of these rows carry a trap. A plan feature looks like an org type when the estate has one plan, so you fold it into the enablement and the two dimensions become one. And a read gated by an offer refuses a module doing work on an organization's behalf. That module still stores the file, writes the audit row and sends the notification, whoever the customer is.
+
+Outside identity, what an organization may configure follows ownership and never its type: a thing scoped to the organization is its to change, for every organization type alike (RULE.PLATFORM.CORE.028).
 
 **A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization type is offered at all. A gate passes when both hold.
 
@@ -67,7 +67,7 @@ The test is not a count. IAM owns eight of the estate's codes, because IAM owns 
 
 `MANAGE` in the second position is what tells an enablement from a permission. Hold it and a reader classifies any code on sight.
 
-- **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off.
+- **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off. A code is on when its value is a boolean that is true or a selection that is not empty.
 - **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, narrowed per type.
 - Name a selection after its area and the console shows *Customization* holding a list of entity types. Whoever flips that cell cannot tell what they are choosing.
 - **There is no amount form.** Seats, storage caps and retention limits are billing's, on the axis that composes with org type. A quota written as an enablement puts a plan decision in a cell the console cannot price.

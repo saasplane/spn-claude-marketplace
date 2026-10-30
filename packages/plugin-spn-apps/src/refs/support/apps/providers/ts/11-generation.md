@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
-      "seen": "e55ea6ae"
+      "seen": "060533b4"
     }
   ]
 }
@@ -14,7 +14,7 @@
 
 **Read this before you write anything**, because what is generated decides what you may not edit.
 
-**A generated file is never hand-edited. Change the source it is derived from, then re-run its generator.** This is the one rule that governs everything below, and it has no exception — a hand edit survives until the next generation and then disappears, taking whatever it was fixing with it.
+**A generated file is never hand-edited. Change the source it is derived from, then re-run its generator.** This is the one rule that governs everything below, and it has no exception — a hand edit survives until the next generation and then disappears, taking whatever it was fixing with it. A manifest is a declared input, not a generated output, so it carries no `spn-` prefix and is edited by hand: `sprepo.json`, `spkind.json`, `spinfrapkg.json` and `src/spestate.json`.
 
 | Generator | Re-run it when | It writes |
 | --- | --- | --- |

@@ -9,111 +9,86 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/01-common/01-standards.md",
       "section": "The words of a page, by what it is for",
-      "seen": "d1da1db5"
+      "seen": "579ab101"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "8a47c457"
+      "seen": "08736f20"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "b58b31a1"
+      "seen": "27ba6754"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
-      "seen": "be52cb72"
+      "seen": "27c0f75b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "25162f20"
+      "seen": "acd56ab4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The words a report uses",
       "seen": "f2b64ff8"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Voice discipline",
+      "seen": "7810ab17"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
+      "section": "Structure rules",
+      "seen": "a7b99e50"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
+      "section": "The readability bar",
+      "seen": "d5ba0e53"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
+      "section": "The behaviour row",
+      "seen": "23251549"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Naming rules",
+      "seen": "f5447b09"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
+      "section": "This book divides by area; every other repository divides by domain",
+      "seen": "9b71a904"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "A construct types no proof, and its rows sit at its own path",
+      "seen": "c5e41f21"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Upkeep discipline",
+      "seen": "9dad6b6a"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Counting discipline",
+      "seen": "87bb90dc"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.096",
-      "seen": "4709147e"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.106",
-      "seen": "5476fd32"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.107",
-      "seen": "b68ad9dd"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.115",
-      "seen": "2e6ee299"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.123",
-      "seen": "d849ffad"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.125",
-      "seen": "01791b6b"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.128",
-      "seen": "14eb2f0f"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.131",
-      "seen": "1056821c"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.132",
-      "seen": "14c2ea18"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.142",
-      "seen": "d0144f4b"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.144",
-      "seen": "2409a449"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.146",
-      "seen": "923a6205"
-    },
-    {
-      "repo": "spn-foundation",
       "row": "DEC.DEVEX.AGENT.032",
-      "seen": "b62ab180"
+      "seen": "91c04689"
     },
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.143",
-      "seen": "449130e9"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.182",
-      "seen": "926c1ff2"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.DEVEX.WORKSPACE.187",
-      "seen": "126e2b90"
+      "seen": "0db66b95"
     }
   ]
 }
@@ -123,7 +98,7 @@
 
 **Consumer first:** the newcomer reading in a second language.
 **Persona:** a senior technical editor and content designer with 10 years and more in developer docs and interface writing. **Carries:** the SaaS Plane way 3 · 4 · 8 · 10 · 14 (`refs/devex/agent/way.md`).
-**Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a page that misses its seat's share of reach (`RULE.DEVEX.WORKSPACE.107`).
+**Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a corpus that misses its seat's share of reach (`RULE.DEVEX.WORKSPACE.107`).
 **Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-artifacts.md`), the words of a page by kind (`02-support/01-surface/01-standards-core/01-common/01-standards.md`), rules RULE.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and DEC.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
@@ -169,7 +144,7 @@
   - **Read it aloud.** A sentence awkward when spoken is split — never shortened, because force lives in the exact term and the MUST.
   - **Ask what you are trying to say**, then check the page says that.
   - **Find your reader.** The moves and the per-seat shares are in `refs/devex/workspace/docs/doc-sets.md` § One voice, and the doc-check sweep reports the share hit.
-  - **No idioms, and this reaches your own speech** (RULE.DEVEX.WORKSPACE.115): *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. A defined house term is not an idiom.
+  - **No idioms, and this reaches your own speech** (RULE.DEVEX.WORKSPACE.115): *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. A defined house term is not an idiom: `owes`, `seat`, `carries` and `rung` each stay, defined where it first appears.
   - **A rule keeps its subject.** Warmth sits in the sentence beside it; a class subject never becomes *you*, and a record is never warmed (RULE.DEVEX.WORKSPACE.096).
   - **Precision outranks warmth on a file that instructs** (DEC.DEVEX.AGENT.032), and the ranking runs both ways.
   - **Nothing measures length, and nothing counts *you*.** What is checked is the missing why, the undefined term, the idiom, the carried phrase and the dropped reasoning.
@@ -180,10 +155,12 @@
   - **A report uses plain words — MUST**: *docs folder*, *design topic*, *project type*, *worked out from*, *implement*, *folder*, *test*; the book's term only in `code`; the unit defined before it is counted.
   - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (RULE.DEVEX.WORKSPACE.128). The agent writes `Status` and `Updated at` from a named run; `Sees` is never empty; a status is a reading, never a claim.
   - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (RULE.DEVEX.WORKSPACE.131 · .132); a foundation row claiming a status is refused.
-  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it.
+  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it, and a behaviour row's subject is a persona, never an actor (RULE.DEVEX.WORKSPACE.090).
   - **A register row is a record and stays one** (RULE.DEVEX.WORKSPACE.106): one clause a sentence, the ruling and nothing else, no *you*.
   - **An edit leaves what it touched at standard — MUST** (RULE.DEVEX.WORKSPACE.142), and the reach stops at the file the change opened.
   - **A number in prose only when the set is closed and the sentence names what it holds — MUST** (RULE.DEVEX.WORKSPACE.144). Ask what happens when somebody adds one.
+  - **A bare `for you`, `to you` or `on you` is a finding graded RULE, never BLOCK** (RULE.DEVEX.WORKSPACE.109): strip the phrase, and if what remains no longer reaches, address the reader.
+  - **A document states a status, never a tally of progress** (RULE.DEVEX.WORKSPACE.163); a count that is the point is a dated snapshot of a problem that says so.
   - **Could a newcomer do this after reading it?** A page with a rule and neither its why nor the symptom of breaking it fails, whatever its share says.
 - **The words of a page, by what it is for** — held by this lens worn. The writer decides whether a page is a doc, an app's screen or a marketing page before writing a word.
   - **A doc** follows the readability bar, holds no persuasion, and names the real command, the real path and what the reader will see.
@@ -192,7 +169,7 @@
 
 ## Gates
 
-- **Blocks a page under its seat's share of reach**; everything else is advice. The share is evidence it cites, never the verdict: the fix is a split, a defined term or a clause that lands on its reader, never a shortened sentence. It reports and never fixes the page. Because it is worn on every document, it never appears in a page's `lenses` metadata.
+- **Blocks a corpus under its seat's share of reach** (twenty-five in a hundred prose sentences on a README face, fifteen on every other seat); everything else is advice, and the share is never a finding on one file. The share is evidence it cites, never the verdict: the fix is a split, a defined term or a clause that lands on its reader, never a shortened sentence. It reports and never fixes the page. Because it is worn on every document, it never appears in a page's `lenses` metadata.
 
 ## Sweeps
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
-      "seen": "5f66f7f1"
+      "seen": "f42da34c"
     }
   ]
 }
@@ -23,6 +23,8 @@
 | contract | the generated client against a live service | that the published surface is what the client believes |
 | integration | Testcontainers | the node against a real resource it fronts |
 | journey | Playwright against a running stack | a path a person takes, end to end |
+
+**A `MODULE_WEB` that carries a component tier keeps its suites in `tests/component/**/*.ct.spec.tsx`**, the folder of the tier they answer to, and a browser case never sits under `tests/unit/` behind an override.
 
 **A node may double a seam it owns, and nothing else.** That one rule decides where a case belongs: a case reaching for a double of somebody else's seam is a case in the wrong node.
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "c7702f71"
+      "seen": "9c999d7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "b9bf6ac3"
+      "seen": "f7d50a90"
     }
   ]
 }
@@ -162,7 +162,7 @@ A check runs at the first step that can run it and at no later one.
 | Step | What runs | Who runs it |
 | --- | --- | --- |
 | Commit | the typecheck and lint of the projects the change touches; a commit on a permanent branch is refused | the repository's own commit hook, and the agent's hook for the refusal |
-| Push | the offline test tiers of each node the pushed commits touch, on the tree at the pushed commit; and for a TypeScript node, every added or modified file Prettier handles passes the repository's own `prettier --check` | the agent's hook on its own push |
+| Push | the offline test tiers of each node the pushed commits touch, on the tree at the pushed commit; and for a TypeScript node, every added or modified file Prettier handles passes the repository's own `prettier --check`; the check never writes, and a refusal names the file and the command that formats it | the agent's hook on its own push |
 | Pull request into `develop` | every required check of the repository's world, on a clean runner | GitHub Actions |
 | Pull request from a `hotfix/*` back into its source branch | every required check of the world, on a clean runner, against the code that is running | GitHub Actions |
 | Back-merge pull request into `develop` | develop's checks | GitHub Actions |

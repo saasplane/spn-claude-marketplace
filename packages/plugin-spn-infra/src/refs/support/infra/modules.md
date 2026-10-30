@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "seen": "55e05ea4"
+      "seen": "eb4b5da3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "c6abea3e"
+      "seen": "69e609c6"
     }
   ]
 }
@@ -151,7 +151,7 @@ the standard block
 
 **A local environment is the same composition against a different source** — the compose tree stands in for the ledger, so an environment behaves the same on a laptop without a second mechanism, and a missing key is found on a laptop instead of in a pipeline.
 
-Which world rungs a deployment is given follows from its application's row (`RULE.SUPPORT.INFRA.113`):
+Which world rungs a deployment is given follows from its application's row (`RULE.SUPPORT.INFRA.113`). The row's `platform` key is written only as `true`, on a row that names a space; the estate's rules refuse it on a row with no `space`, on a web application, and written as `false`.
 
 | Path | On the platform | Space only | The platform and a space |
 | --- | --- | --- | --- |
@@ -161,7 +161,7 @@ Which world rungs a deployment is given follows from its application's row (`RUL
 | `/environments/{env}/apps/{app}/vars` | yes | yes | yes |
 | `/environments/{env}/apps/{app}/deployments/{deployment}/vars` | yes | yes | yes |
 
-The secret half is taken from the last three rows only, because the organization's and the platform's facts are plain. A later path wins where two hold the same key, and the two world rungs cannot hold the same key, because every key under a world's rung starts with that world's prefix, which the blueprint refuses otherwise. **Nothing is merged and nothing is given a second name**: the deployment loads both layers as they are, and the application's own settings join them, as a second queue connection that points at the platform's queue by reference.
+The secret half is taken from every path below `/platform/vars` that the deployment is given, because the organization's and the platform's facts are plain. A later path wins where two hold the same key, and the two world rungs cannot hold the same key, because every key under a world's rung starts with that world's prefix, which the blueprint refuses otherwise. **Nothing is merged and nothing is given a second name**: the deployment loads both layers as they are, and the application's own settings join them, as a second queue connection that points at the platform's queue by reference.
 
 **A fact is published once, at the path that describes it, and never copied to the consumers that read it.** Many applications on one database read one entry, and rotating it is one write; copying a fact per application turns every rotation into a fan-out and every staleness into a quiet defect nothing connects to the others.
 
@@ -205,7 +205,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **The gateway's rate limit store is published beside them** (`RULE.SUPPORT.INFRA.120`). A gateway counts a deployment's rate limit once across all its proxy pods, in the environment's own cache. The platform's world publishes three keys in the secret half of `/environments/{env}/vars`: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL` (the cache's address), `{SPC}_GATEWAY_RATE_LIMIT_STORE_AUTH` (the cache user the gateway counts as, with its password) and `{SPC}_GATEWAY_RATE_LIMIT_STORE_TLS` (whether the connection is encrypted). The gateway reads them and no service does. A deployment given the environment's settings receives them with the rest.
 
-**An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. A published key never spells the product a module renders, and never spells an application's token either.
+**An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. The consumer token in a per-consumer minted key is the app's kind code, uppercase, in the slot where the resource grammar's world token sits; decomposition stays unambiguous because module codes and kind codes are closed, disjoint vocabularies. A published key never spells the product a module renders, and apart from that consumer token never spells an application's token.
 
 **A published key carries no module of the code that reads it — MUST** (`RULE.SUPPORT.INFRA.111`). The estate publishes a fact under a name for the thing the fact is about. A module reads a setting under its own prefix, `{SPC}_{MODULE}_*`, and nothing outside it. The service's own settings join the two: the module's key is written as a `${…}` reference to the published key. The tenant edge is the example, and the job scheduler has the same shape:
 

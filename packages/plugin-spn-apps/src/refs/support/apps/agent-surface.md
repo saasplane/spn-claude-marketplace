@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/08-agent-surface.md",
-      "seen": "29c9d1d3"
+      "seen": "2d24d3ee"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/",
-      "seen": "37e4814e"
+      "seen": "bfe3f734"
     }
   ]
 }
@@ -25,8 +25,8 @@ Install a package and its source stays behind. You still owe whoever works again
 
 - **Generated at build, carried in the package.** The artifact travels inside the archive it describes, so the artifact and the code are the same version by construction. Never regenerate one yourself from an installed package — regenerating a description from installed output is inferring a surface, not reading one.
 - **Generation never fails a build.** A source file that cannot be read costs its own entries and nothing else. The one thing the generator refuses to do is emit something that fails its own schema — an invalid artifact reaching a consumer is worse than no artifact at all.
-- **Correctness is a count.** What was published and what the artifact describes are the same set, every entry exactly once. A mismatch is a defect the generator reports about itself; it is never something you are expected to notice by reading the surface by eye.
-- **A generated file protects its hand-earned regions.** Where a document or a barrel has room for something a developer wrote, that room is marked, and the generator owns everything outside the markers and nothing inside them.
+- **A generator signals by absence and by findings, never by a count** (RULE.SUPPORT.APPS.070). What was published and what the artifact describes are the same set, every entry exactly once. No count is emitted and no gate reads one; findings ride beside the artifact rather than inside it, and a package that could not be described ships no artifact, which is the signal.
+- **A generated file protects its hand-earned regions.** Where a document or a barrel has room for something a developer wrote, that room is marked, and the generator owns everything outside the markers and nothing inside them. In a generated document the region sits between `<!-- spnutils:keep:begin -->` and `<!-- spnutils:keep:end -->`; a keep region holds content and never structure, and regions never nest (RULE.DEVEX.WORKSPACE.077). The symbol index, the label manifest, the validators and a derived barrel reserve no such room, and a hand edit inside one is refused rather than reviewed (RULE.SUPPORT.APPS.051).
 
 A hand-written index is correct the day it is written and wrong the day the code moves on without it — and it fails silently: a consumer finds out by writing code against something no longer true. Deriving it moves that failure to build time, in front of whoever caused it.
 
@@ -99,7 +99,7 @@ UTIL · TYPE · CONFIG
 
 Four signals classify a symbol, each deciding a different thing: **shape** decides `role`; the **top-level folder** decides `group`; **path** decides `internal`, because two identical shapes differ only by location; and **kind** decides how the path is read — a module's `app/` is its implementation, a support package's `app/` is the framework its consumers extend.
 
-**`group` is the first published path segment under the source root, normalized** — a layer name for a module, a capability folder's own name for a support package. It is a plain string, not a closed list. A symbol at the source root belongs to the node's frame; a private segment publishes nothing and produces no group; a re-exported symbol keeps the group of the file that **defines** it, never the barrel's — a barrel is an address, not an owner.
+**`group` is the first published path segment under the source root, normalized** — a layer name for a module, a capability folder's own name for a support package. It is a plain string, not a closed list. A symbol at the source root belongs to the node's frame; a private segment publishes nothing and produces no group; a re-exported symbol keeps the group of the file that **defines** it, never the barrel's — a barrel is an address, not an owner. In the index the group is upper case (`cache/redis/SPCacheProviderRedis` is `CACHE`, a source-root symbol is `ROOT`), and a document that expands a group resolves it by the mapping the docs tree states, never by transforming the key (RULE.SUPPORT.APPS.052).
 
 **`internal` is the measure of a gap, not a second privacy mechanism.** A kind carrying module layers keeps `app/` out of the published index, with entities and utils excepted. A package excludes what it does not publish through a private path segment, an unexported declaration, or a private member — `internal` marks the case where something is published while the layer model says otherwise. A package whose barrel is correct emits none of it.
 
@@ -122,7 +122,7 @@ A future role's needs arrive as one more `roleMeta` variant, never as a key ever
 
 The index is generated during the package's own build and travels inside the archive it describes. A consuming repository builds its own merged index by **concatenating** every installed package's entry into one envelope — nothing re-derived, one schema validating the part and the whole.
 
-**Publishing means emitting an index, with no exception.** Every installable kind emits one, including the command-line tool and the API client — the client matters most, since a consumer frequently installs it and nothing else of the service it mirrors. A kind that deploys rather than installs emits nothing; an empty artifact would claim a surface that does not exist.
+**Publishing means emitting an index, with one exception.** Every installable kind emits one, including the command-line tool and the API client; `TOOLCHAIN` emits none, because it publishes configuration files consumed by path rather than an API (RULE.SUPPORT.APPS.049). The client matters most, since a consumer frequently installs it and nothing else of the service it mirrors. A kind that deploys rather than installs emits nothing; an empty artifact would claim a surface that does not exist.
 
 **Only `signature` is stack-spelled.** Every other field — `role`, `intent`, `seam`, everything riding `roleMeta` — is a platform fact, identical across stacks, which is what lets one merged index hold packages built by different toolchains.
 

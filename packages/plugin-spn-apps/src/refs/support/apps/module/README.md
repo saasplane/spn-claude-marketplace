@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "f7fd61a4"
+      "seen": "8a303873"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "f2386178"
+      "seen": "bcd5a1ee"
     }
   ]
 }
@@ -187,7 +187,7 @@ Every adapter you write is the same equation: **parse** the transport's input in
 
 **The set of server transports is closed at three** — HTTP API, queue listener, CLI. Do not treat a scheduler as a fourth: it fires and calls an entry, as any caller does, so a cron-triggered run arrives as `CLI` and a durable job as `QUEUE`. Which of a module's declared entries actually start is deployment configuration, not something you decide in code.
 
-Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-entity}][/{suffix}]` — module-prefixed, singular kebab-case nouns, GET for every read, POST for every write and every search, no `:id` path params and no version prefix. Stack read levels as suffixes: `/X` (state) · `/X/meta` · `/X/info` · `/X/details`, each with `/bulk`, `/all` or `/search` where the entity needs it.
+Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-entity}][/{suffix}]` — module-prefixed, singular kebab-case nouns, GET for every read, POST for every write and every search, no `:id` path params and no version prefix. Stack read levels as suffixes: `/X` (state) · `/X/meta` · `/X/info` · `/X/details`, each with `/bulk`, `/all` or `/search` where the entity needs it. A Summary search is routed as `POST /{module}/{entity}/summary/search`.
 
 **The API entry also serves a module's contract services to the other services of the platform, on the remote route.** It is the HTTP API and not a fourth entry. The module's manager lists its contract services (name, methods as data, what implements it), boot registers each, and the entry mounts one route for all of them, which reads the module, the service and the method from the request: `POST /remote` with the passport header and the calling service's credential header. The order **MUST** hold: check the calling service first, before the body is read; find the contract service among those registered; find the method among those the methods data lists; validate the command; build the execution context from the passport (a passport that cannot be read or is refused ends the call as unauthenticated, and no passport runs with no caller); run the method; validate the result. The route listens on a port of its own (`{CODE}_API_REMOTE_PORT`; no port, no listener), keeps no list of who may call what (authorization stays on the service method), answers as the public API does, and keeps the passport and the service credential out of logged headers. A contract may hold methods that have no controller, such as one that returns an opened secret to another module, so no public call can reach them. A person's address is counted from the right of the forwarded-address header, by the number of proxies in front of each listener (`{CODE}_API_TRUSTED_PROXIES`, `{CODE}_API_REMOTE_TRUSTED_PROXIES`), and a route's rate limit is counted in the service's shared cache, so it is one limit however many instances serve the route.
 
@@ -235,7 +235,7 @@ A page owns one screen and is the only thing a route lands on. It reads the addr
 - **The menu is the app's own list, and an entry names a route by its key — MUST** (`RULE.SUPPORT.APPS.190`). Its order, groups, labels and icons are the app's.
 - **The entry in view is the one whose address the current address is at or under — MUST** (`RULE.SUPPORT.APPS.191`). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
 - **Declare one route name for a web module, beside its code — MUST** (`RULE.SUPPORT.APPS.204`). The name is a plain word for the module's subject, in lower case, with a hyphen between words. Every address of the module begins with it. The name is fixed, and an app gives a module no other name.
-- **A route is one of two kinds, and the module declares which — MUST.** A page of work is one a person of the organization uses every day, and its address is `/<name>/<rest>`. A page of setup configures the module, and its address is `/settings/<name>/<rest>`. So a module named `identity` gives `/identity/orgs` and `/settings/identity/users`.
+- **A route is one of two kinds, and the module declares which — MUST.** A page of work is one a person of the organization uses every day, and its address is `/<name>/<rest>`. A page of setup configures the module, and its address is `/settings/<name>/<rest>`. So a module named `identity` gives `/identity/orgs` and `/settings/identity/users`. The platform's module names are `identity` for IAM, `customers` for ORG, `masters` for MDM, `translations` for LNG, `entities` for ENT, `notifications` for NTF, `documents` for DOC, `compliance` for CMP and `jobs` for JOB.
 - **A route gives its kind and the rest of its path, and never a whole address — MUST.** The function that builds an address puts the name in front, and the word `settings` in front of that for a page of setup. `settings` is a fixed word, and no module takes it as its name.
 - **A check compares every address of a module with the name the module declares — MUST.** An app that joins two modules with one name is refused when it starts.
 - **An app's own page, such as Home, takes a plain word of the app's own.** It may not use the name of a module it has mounted, or `settings` followed by such a name.

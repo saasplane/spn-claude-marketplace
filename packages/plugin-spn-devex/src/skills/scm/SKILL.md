@@ -7,11 +7,11 @@ description: The repository and project standard - what a project must declare, 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "c7702f71"
+      "seen": "9c999d7f"
     }
   ]
 }

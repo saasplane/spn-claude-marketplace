@@ -3,19 +3,19 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "a2deed0a"
+      "seen": "34ff0c4e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "79345e75"
+      "seen": "0cd321cf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "b3e5c65c"
+      "seen": "97e9441a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "2d0ba4f7"
+      "seen": "4b61c951"
     }
   ]
 }

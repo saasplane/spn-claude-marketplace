@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/02-standards-interaction.md",
-      "seen": "677fbdf7"
+      "seen": "c4876132"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/",
-      "seen": "b221fd1a"
+      "seen": "f839820b"
     }
   ]
 }

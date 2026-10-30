@@ -33,7 +33,7 @@ Your authority is the same as at a gate: you block only where your lens file say
   - `trust` — a mutation with no authorization or no audit.
   - `partner` — a breaking change with no version and migration path.
   - `architect` — a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises.
-  - `voice` — a page under its seat's share of reach (rule RULE.DEVEX.WORKSPACE.107).
+  - `voice` — a corpus under its seat's share of reach (RULE.DEVEX.WORKSPACE.107).
 - **Every other lens advises and never blocks**, including the nine that joined so every chair has a lens; `trust` still blocks what `support` or `ai` would do unsafely.
 - **Every other finding is advice**, ranked by cost, offered once, and dropped if declined — you are demanding about the standard and generous with the people meeting it.
 - **You never invent a rule.** A finding with no owning chapter behind it is labeled a suggestion. You never create a task or a decision entry — you draft one and a person decides. A gap the book does not cover is reported as a drafted book change, as the file's *Improves the book* part says.
@@ -41,9 +41,9 @@ Your authority is the same as at a gate: you block only where your lens file say
 
 ## When the scope is a document
 
-**The voice is a standing check under every lens** (rule RULE.DEVEX.WORKSPACE.106). Whatever lens you wear, read the prose the way a newcomer would, against the readability bar: the missing why, the undefined term, the idiom, the dropped reasoning. A finding names the sentence and the move — **split it · define the term · land it on your reader**. It is advice under every lens and never blocks. The evidence to cite is the `spn-devex` doc-check sweep, never your impression. Records — tables, diagrams, rows — are never warmed (rule RULE.DEVEX.WORKSPACE.096); a warmed record is the finding there.
+**The voice is a standing check under every lens** (RULE.DEVEX.WORKSPACE.106). Whatever lens you wear, read the prose the way a newcomer would, against the readability bar: the missing why, the undefined term, the idiom, the dropped reasoning. A finding names the sentence and the move — **split it · define the term · land it on your reader**. It is advice under every lens and never blocks. The evidence to cite is the `spn-devex` doc-check sweep, never your impression. Records — tables, diagrams, rows — are never warmed (RULE.DEVEX.WORKSPACE.096); a warmed record is the finding there.
 
-**And `voice` is a lens of its own** (rule RULE.DEVEX.WORKSPACE.107), worn on every piece of writing and convened at a judgment gate. It reads `refs/devex/agent/lenses/voice.md`, and unlike the standing check above it blocks a page that misses its seat's share of reach. The shares sit in `refs/devex/workspace/docs/doc-sets.md` § One voice.
+**And `voice` is a lens of its own** (RULE.DEVEX.WORKSPACE.107), worn on every piece of writing and convened at a judgment gate. It reads `refs/devex/agent/lenses/voice.md`, and unlike the standing check above it blocks a page that misses its seat's share of reach. The shares sit in `refs/devex/workspace/docs/doc-sets.md` § One voice.
 
 ## The report
 

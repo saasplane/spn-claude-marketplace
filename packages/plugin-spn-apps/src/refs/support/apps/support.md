@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/02-support.md",
-      "seen": "0701a167"
+      "seen": "1e435ba1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/",
-      "seen": "2317d1bd"
+      "seen": "b2cb0efe"
     }
   ]
 }
@@ -76,7 +76,7 @@ src/
 - **Ship a local implementation for every capability where you can** — an in-memory lock, file-backed email, directory-backed storage — answering the same interface with real classified results, so local development runs one set of implementations and the cloud another against unchanged consumers. Select a local implementation by a caller-side debug flag or local configuration, never by a stored provider type, and never add it as a member of an organization-facing provider catalog.
 - **Use the two role names as written.** Name a swappable implementation, chosen by configuration, answering an interface, `Provider`. Name a lifecycle class — construct, wire, boot, dispose — `Manager`, and never swap one by data.
 
-**Earn a seam; do not assume one.** Add it only where a genuine choice sits behind a capability — ask yourself whether two deployments could reasonably want different behaviour here. If yes, give the group a seam from its first implementation, because retrofitting one later means changing every consumer. If no, leave the group plain however large it grows — publish and index a `utils`, `types`, `constants` or `errors` group with no interface and nothing to select. Where you do add a seam, document it on the capability interface's own comment so it is harvested into the package's generated symbol index, and the composition contract travels with the package.
+**Earn a seam; do not assume one.** Add it only where a genuine choice sits behind a capability — ask yourself whether two deployments could reasonably want different behaviour here. If yes, give the group a seam from its first implementation, because retrofitting one later means changing every consumer. If no, leave the group plain however large it grows — publish and index a `utils`, `types`, `constants` or `errors` group with no interface and nothing to select. The line between a capability group and a plain group is a judgment, so a checker may flag a suspicious group but must never fail a build on it. Where you do add a seam, document it on the capability interface's own comment so it is harvested into the package's generated symbol index, and the composition contract travels with the package.
 
 ## The six server and universal groups
 

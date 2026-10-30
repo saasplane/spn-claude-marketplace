@@ -4,17 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "4934e2a5"
+      "seen": "8ad5914a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "e575dc2d"
+      "seen": "0e29bb4e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "873b5641"
+      "seen": "a3a482bc"
     }
   ]
 }
@@ -102,7 +102,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **Views** | Short. One line says who spoke, why those views, and how each was made. Then each view has its name in bold and its reason in one or two plain sentences that a developer can follow without opening the code. A view says only what Why and What do not already say. It names no option by its letter, because the options come after it. A harder question may take a sentence or two more. Views with nothing to add are named together in one line. Two views that disagree still stand as two lines. Such as: **Views** — four fresh views: the architect, the server developer, the partner and product. **Architect:** The job module finds a schedule only by its exact key. If the version is in the key, the module must remember every key it has used. **Product:** A person never sees the request key, so a version kept there tells them nothing. **Server developer and Partner:** No objection. You shorten a view's words for the card, and keep its name and its meaning. Keep what a fresh view wrote in full in the arc's notes, `notes/N<nnn>/views/`, and do not link it from the card. The voice is unchanged: a colleague speaking, in short full sentences, never a slogan, and never a summary of what "the views" thought (`RULE.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it. It may name the views it rests on, in a clause |
-| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked and answered in the card on the approach page; the preview may show the questions it raises in its own `Open`, which is the same card rendered from the same record (`question show`). A code fragment is written to its stack's own naming and code standards (rule RULE.DEVEX.WORKSPACE.235) |
+| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked and answered in the card on the approach page; the preview may show the questions it raises in its own `Open`, which is the same card rendered from the same record (`question show`). A code fragment is written to its stack's own naming and code standards (RULE.DEVEX.WORKSPACE.235) |
 
 **The parts come in that order — MUST** (`RULE.DEVEX.WORKSPACE.242`): the number and summary, Why, What,
 Views, Options, the recommendation, and the preview. Every page already runs Why, What, How, so a card

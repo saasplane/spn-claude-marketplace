@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "7869a2ce"
+      "seen": "83b9036e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "dbf273eb"
+      "seen": "80f70315"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "8afb2f28"
+      "seen": "d9f7a931"
     }
   ]
 }

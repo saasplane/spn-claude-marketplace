@@ -12,7 +12,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/docs-tree.ts
+// packages/plugin-support-lib/src/lib/docs-tree.ts
 import { join, sep } from "node:path";
 function isWorkspaceDevex(entries) {
   return !(entries.length === 1 && entries[0] === DEVEX_DEBUG);
@@ -91,7 +91,7 @@ function workstreamDirOf(path) {
 }
 var DEVEX, DEVEX_DEBUG, DOCS, SEAT, SEATS, POCKET, ARTIFACT, ARTIFACT_FOLDERS, CONSTRUCT_PAGES, TEMPLATES, FACE, DECISIONS, CONSTRUCT_PAGE_SUFFIX, OVERVIEW_PAGE_SUFFIX, GUIDE_PAGE_SUFFIX, HUB, slashes, segment, BOOK_TEMPLATES, PLUGIN_TEMPLATES, BOOK_PATTERNS, PLUGIN_PATTERNS, BOOK_SITE_PATTERNS, PLUGIN_SITE_PATTERNS, WORKSTREAMS, DEVEX_WORKSTREAMS, SESSIONS, WORKSTREAM_STATES, ARCS, APPROACH_SUFFIX, APPROACH_PAGE, escape, STATE_GROUP;
 var init_docs_tree = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/docs-tree.ts"() {
+  "packages/plugin-support-lib/src/lib/docs-tree.ts"() {
     DEVEX = ".spndevex";
     DEVEX_DEBUG = ".debug";
     DOCS = "docs";
@@ -134,7 +134,7 @@ var init_docs_tree = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/payload.ts
+// packages/plugin-spn-devex/src/scripts/lib/payload.ts
 var payload_exports = {};
 __export(payload_exports, {
   emit: () => emit,
@@ -223,7 +223,7 @@ function runAlone(name) {
 }
 var ENTITIES;
 var init_payload = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/payload.ts"() {
+  "packages/plugin-spn-devex/src/scripts/lib/payload.ts"() {
     init_docs_tree();
     ENTITIES = {
       amp: "&",
@@ -272,30 +272,30 @@ var init_payload = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/events/pretooluse.ts
+// packages/plugin-spn-devex/src/scripts/events/pretooluse.ts
 init_payload();
 import { readFileSync as readFileSync17, statSync as statSync9 } from "node:fs";
 import { basename as basename14, resolve as resolve18 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/workstream.ts
+// packages/plugin-spn-devex/src/scripts/lib/workstream.ts
 import { appendFileSync, mkdirSync, readFileSync as readFileSync2, renameSync, rmSync, writeFileSync } from "node:fs";
 import { basename as basename2, dirname as dirname2, join as join3, relative, resolve as resolve2, sep as sep2 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/arc-status.ts
+// packages/plugin-spn-devex/src/scripts/checks/arc-status.ts
 var STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "LANDED", "CARRIED", "DROPPED"];
 var TERMINAL = /* @__PURE__ */ new Set(["LANDED", "CARRIED", "DROPPED"]);
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/workstream.ts
+// packages/plugin-spn-devex/src/scripts/lib/workstream.ts
 init_payload();
 init_docs_tree();
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/workstream-schema.ts
+// packages/plugin-spn-devex/src/scripts/lib/workstream-schema.ts
 var ARC_ID = /^N\d+[a-z]?$/;
 function parentIds(rows2) {
   return new Set(rows2.map((row) => row.parent).filter((parent) => typeof parent === "string"));
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/workstream.ts
+// packages/plugin-spn-devex/src/scripts/lib/workstream.ts
 var NOTES = "notes";
 var STATE_FILE = "state.json";
 var LOG_FILE = "log.jsonl";
@@ -483,15 +483,15 @@ function workstreamWord(ws, statuses) {
   return statuses.some((status) => status === "RUNNING" || status === "LANDED") ? "IMPLEMENTING" : "PLANNING";
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/window.ts
+// packages/plugin-spn-devex/src/scripts/lib/window.ts
 import { existsSync as existsSync4, mkdirSync as mkdirSync4, readFileSync as readFileSync5, renameSync as renameSync4, statSync as statSync4, writeFileSync as writeFileSync4 } from "node:fs";
 import { basename as basename3, dirname as dirname4, isAbsolute, join as join6, relative as relative2, resolve as resolve3, sep as sep3 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/debug-store.ts
+// packages/plugin-support-lib/src/lib/debug-store.ts
 import { appendFileSync as appendFileSync2, existsSync as existsSync3, mkdirSync as mkdirSync3, readFileSync as readFileSync4, readdirSync as readdirSync2, renameSync as renameSync3, rmSync as rmSync3, statSync as statSync3, writeFileSync as writeFileSync3 } from "node:fs";
 import { dirname as dirname3, join as join5 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/workspace-state.ts
+// packages/plugin-support-lib/src/lib/workspace-state.ts
 init_docs_tree();
 import { existsSync as existsSync2, mkdirSync as mkdirSync2, readFileSync as readFileSync3, renameSync as renameSync2, rmSync as rmSync2, statSync as statSync2, writeFileSync as writeFileSync2 } from "node:fs";
 import { join as join4 } from "node:path";
@@ -523,7 +523,7 @@ function readDebugNode(root) {
   return readWorkspaceState(root)?.debug ?? null;
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/debug-store.ts
+// packages/plugin-support-lib/src/lib/debug-store.ts
 var DEVEX2 = ".spndevex";
 var DEBUG = ".debug";
 var debugDir = (root) => join5(root, DEVEX2, DEBUG);
@@ -557,7 +557,7 @@ function appendLog(file, line, cap = LOG_CAP) {
 }
 var SESSION_KEEP_MS = 14 * 24 * 3600 * 1e3;
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/window.ts
+// packages/plugin-spn-devex/src/scripts/lib/window.ts
 init_docs_tree();
 init_payload();
 var empty = () => ({ workstreams: {}, wrote: {}, told: {}, repos: {} });
@@ -733,7 +733,7 @@ function fromWorkspace(root, path) {
   return within && !within.startsWith("..") ? within : basename3(path);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/env-seat.ts
+// packages/plugin-spn-devex/src/scripts/checks/env-seat.ts
 init_payload();
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
@@ -806,13 +806,13 @@ if (runAlone("env-seat.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
+// packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
 init_payload();
 import { readFileSync as readFileSync8, readdirSync as readdirSync6, statSync as statSync6, existsSync as existsSync7 } from "node:fs";
 import { basename as basename6, dirname as dirname9, join as join12, resolve as resolve7, relative as relative6, sep as sep6 } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/item-cells.ts
+// packages/plugin-spn-devex/src/scripts/lib/item-cells.ts
 init_payload();
 var SENTENCE_WORDS = 7;
 var flat = (html) => unescape(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
@@ -824,10 +824,10 @@ function sentenceColumn(cellsHtml) {
   return { long, cells: said.length, sentences: said.length >= 2 && long * 2 >= said.length };
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
+// packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
 init_docs_tree();
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/page-styles.ts
+// packages/plugin-support-lib/src/lib/page-styles.ts
 import { existsSync as existsSync5, readFileSync as readFileSync6 } from "node:fs";
 import { dirname as dirname5, join as join8 } from "node:path";
 var STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
@@ -859,10 +859,10 @@ function cutVersions(styles) {
   return JSON.parse(readFileSync6(file, "utf8"));
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
+// packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
 import { basename as basename5, dirname as dirname8, join as join11, posix, relative as relative5, resolve as resolve6 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
+// packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
 import { readdirSync as readdirSync4, statSync as statSync5 } from "node:fs";
 init_payload();
 init_docs_tree();
@@ -1667,14 +1667,14 @@ if (runAlone("split-plan.ts")) {
   process.exit(sweep(args.length ? args : ["."]));
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
+// packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
 init_payload();
 init_docs_tree();
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/command.ts
+// packages/plugin-support-lib/src/lib/command.ts
 init_docs_tree();
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/timing.ts
+// packages/plugin-support-lib/src/lib/timing.ts
 import { existsSync as existsSync6, mkdirSync as mkdirSync5, readFileSync as readFileSync7, readdirSync as readdirSync5, writeFileSync as writeFileSync5 } from "node:fs";
 import { dirname as dirname7, isAbsolute as isAbsolute3, join as join10, relative as relative4, resolve as resolve5, sep as sep5 } from "node:path";
 init_docs_tree();
@@ -1981,7 +1981,7 @@ function end(exit = null, always = false, run) {
   }
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
+// packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
 var CYCLES_COLUMNS = ["Arc", "Status"];
 var headerOf = (columns) => columns.join(" \xB7 ").toLowerCase();
 var MUST_CARRY = /* @__PURE__ */ new Set(["CARRIED", "DROPPED"]);
@@ -2137,7 +2137,7 @@ function headerStatusRule(folder, text, cycles = cyclesOf(folder)) {
   return { shows, gives };
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
+// packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
 var slashes3 = (path) => path.split(sep6).join("/");
 var CARD = new RegExp(
   "\\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\\s+(decisions|items|questions|findings|blockers|gaps|defects|open items|todos|tasks)\\b",
@@ -3116,7 +3116,7 @@ if (runAlone("doc-check.ts")) {
   process.exit(sweep2(roots.length ? roots : ["."], argv.includes("--summary")));
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/confirmed.ts
+// packages/plugin-spn-devex/src/scripts/checks/confirmed.ts
 import { existsSync as existsSync8, mkdirSync as mkdirSync6, writeFileSync as writeFileSync6 } from "node:fs";
 import { basename as basename7, dirname as dirname10, isAbsolute as isAbsolute4, join as join13, relative as relative7, resolve as resolve8 } from "node:path";
 init_docs_tree();
@@ -3223,7 +3223,7 @@ if (runAlone("confirmed.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/release-go.ts
+// packages/plugin-spn-devex/src/scripts/checks/release-go.ts
 init_payload();
 import { execFileSync } from "node:child_process";
 import { isAbsolute as isAbsolute5, join as join14 } from "node:path";
@@ -3316,7 +3316,7 @@ if (process.argv[1]?.endsWith("release-go.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/comment-check.ts
+// packages/plugin-spn-devex/src/scripts/checks/comment-check.ts
 init_payload();
 function applies2(path) {
   if (!path) return false;
@@ -3503,7 +3503,7 @@ if (runAlone("comment-check.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/mirror.ts
+// packages/plugin-spn-devex/src/scripts/checks/mirror.ts
 init_payload();
 init_docs_tree();
 import { existsSync as existsSync9, mkdirSync as mkdirSync7, writeFileSync as writeFileSync7 } from "node:fs";
@@ -3592,7 +3592,7 @@ if (process.argv[1] && basename8(process.argv[1]) === "mirror.ts") {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/publish.ts
+// packages/plugin-spn-devex/src/scripts/checks/publish.ts
 import { readFileSync as readFileSync9 } from "node:fs";
 import { basename as basename9, dirname as dirname12, join as join16, resolve as resolve10 } from "node:path";
 var PUBLISHER = "Artifact";
@@ -3647,7 +3647,7 @@ function checkPublish(payload2) {
   return { note, deny: `Denied: \`${path}\` loads ${outside.map((address) => `\`${address}\``).join(" \xB7 ")} from outside the page. The publishing host does not load that address, so the published page arrives with no styling. Run \`spn-devex docs sds bundle ${path}\`, which writes a copy with the styles and the script of the page's own version inside it, and publish that copy: \`${join16(dirname12(path), bundledName(path))}\`. A published page may load a stylesheet from ${STYLESHEET_HOSTS.join(" or ")} alone, and a script from ${SCRIPT_HOSTS.join(" or ")} (05-artifacts.md \xA7 What a stored page carries, and what a published one carries; RULE.DEVEX.WORKSPACE.215).` };
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/test-run.ts
+// packages/plugin-spn-devex/src/scripts/checks/test-run.ts
 import { readdirSync as readdirSync7, readFileSync as readFileSync10 } from "node:fs";
 import { dirname as dirname13, isAbsolute as isAbsolute6, join as join17, relative as relative9, resolve as resolve11, sep as sep7 } from "node:path";
 init_payload();
@@ -3751,11 +3751,11 @@ if (runAlone("test-run.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/permanent-branch.ts
+// packages/plugin-spn-devex/src/scripts/checks/permanent-branch.ts
 init_payload();
 import { execFileSync as execFileSync2 } from "node:child_process";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/command-reader.ts
+// packages/plugin-spn-devex/src/scripts/lib/command-reader.ts
 import { readFileSync as readFileSync11 } from "node:fs";
 import { basename as basename10, join as join18, resolve as resolve12 } from "node:path";
 var named2 = (name) => (word) => basename10(word) === name;
@@ -4182,7 +4182,7 @@ function readCommits(command, cwd) {
   return out;
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/permanent-branch.ts
+// packages/plugin-spn-devex/src/scripts/checks/permanent-branch.ts
 var PERMANENT_BRANCHES = ["develop", "qa", "uat", "main"];
 function applies5(_path, command) {
   return /\bgit\b[^|;&\n]*\bcommit\b/.test(command);
@@ -4215,7 +4215,7 @@ if (runAlone("permanent-branch.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/push-tiers.ts
+// packages/plugin-spn-devex/src/scripts/checks/push-tiers.ts
 init_payload();
 import { execFileSync as execFileSync3, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -4497,7 +4497,7 @@ if (runAlone("push-tiers.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/long-run.ts
+// packages/plugin-spn-devex/src/scripts/checks/long-run.ts
 init_payload();
 var LONG_COMMANDS = [
   "pnpm test",
@@ -4538,7 +4538,7 @@ if (runAlone("long-run.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/command-shape.ts
+// packages/plugin-spn-devex/src/scripts/checks/command-shape.ts
 init_payload();
 import { readFileSync as readFileSync12 } from "node:fs";
 import { join as join20 } from "node:path";
@@ -4707,16 +4707,16 @@ if (runAlone("command-shape.ts")) {
   process.exit(0);
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/workstream-owner.ts
+// packages/plugin-spn-devex/src/scripts/checks/workstream-owner.ts
 import { existsSync as existsSync11, readFileSync as readFileSync13 } from "node:fs";
 import { basename as basename12, resolve as resolve14, sep as sep9 } from "node:path";
 init_docs_tree();
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/migration.ts
+// packages/plugin-spn-devex/src/scripts/lib/migration.ts
 init_docs_tree();
 var LEDGER = "migrations.jsonl";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/workstream-owner.ts
+// packages/plugin-spn-devex/src/scripts/checks/workstream-owner.ts
 var WRITERS = {
   "state.json": "`workstream arc edit` and the `workstream row` commands (and `report write`)",
   "log.jsonl": "every `workstream` write, which appends its event",
@@ -4839,7 +4839,7 @@ function checkOwner(payload2) {
 }
 var applies9 = (path, command) => path.includes(`${DEVEX_WORKSTREAMS}/`) || command.includes(`${DEVEX_WORKSTREAMS}/`) || /\.jsonl|state\.json/.test(command) || path.endsWith(LEDGER) || /(?:^|\/)notes\/N\d/.test(path) || /(?:^|[\s'"/])notes\/N\d/.test(command) || /^[^/]/.test(path) && /\.(?:html|json|jsonl)$/.test(path);
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/questions.ts
+// packages/plugin-spn-devex/src/scripts/checks/questions.ts
 import { readFileSync as readFileSync14 } from "node:fs";
 import { basename as basename13, join as join21, resolve as resolve15 } from "node:path";
 function cardsOn(text) {
@@ -4906,7 +4906,7 @@ function checkQuestions(payload2) {
 }
 var applies10 = (path) => path.endsWith(".html");
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/bash-timing.ts
+// packages/plugin-spn-devex/src/scripts/lib/bash-timing.ts
 import { mkdirSync as mkdirSync8, readFileSync as readFileSync15, rmSync as rmSync4, writeFileSync as writeFileSync8 } from "node:fs";
 import { join as join22 } from "node:path";
 init_payload();
@@ -4937,12 +4937,12 @@ function startCommand(payload2) {
   }
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/child-size.ts
+// packages/plugin-spn-devex/src/scripts/checks/child-size.ts
 init_payload();
 import { existsSync as existsSync12, openSync, readFileSync as readFileSync16, readSync, closeSync } from "node:fs";
 import { dirname as dirname15, join as join23, resolve as resolve16 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/usage.ts
+// packages/plugin-spn-devex/src/scripts/lib/usage.ts
 var count = (value) => typeof value === "number" && Number.isFinite(value) ? value : 0;
 function turnsIn(text, before = null) {
   const byId = /* @__PURE__ */ new Map();
@@ -4974,7 +4974,7 @@ function turnsIn(text, before = null) {
   return [...byId.values()];
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/child-size.ts
+// packages/plugin-spn-devex/src/scripts/checks/child-size.ts
 var ORDER_PATH = /[^\s'"`()<>]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()<>]+\.md/g;
 var HEAD_BYTES = 64 * 1024;
 var WRITERS2 = /* @__PURE__ */ new Set(["Write", "Edit", "MultiEdit"]);
@@ -5046,7 +5046,7 @@ function checkChildSize(payload2) {
   return { deny: `This agent is past the stop line of its order ${order.path.split("/").pop()}: ${over}. Do no more work. Save the report the order owes at ${report} with one Write, saying where you stopped, then hand back.` };
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/checks/read-size.ts
+// packages/plugin-spn-devex/src/scripts/checks/read-size.ts
 import { statSync as statSync8 } from "node:fs";
 import { resolve as resolve17 } from "node:path";
 var READ_LIMIT = 20 * 1024;
@@ -5066,7 +5066,7 @@ function checkReadSize(payload2) {
   return { deny: `${input.file_path} is ${Math.round(size / 1024)} KB, over the 20 KB a whole read may take. Search it first (Grep for the heading or the name you need), then Read it with \`offset\` and \`limit\` for the lines wanted.` };
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/events/pretooluse.ts
+// packages/plugin-spn-devex/src/scripts/events/pretooluse.ts
 var PROSE_SUFFIXES = [".md", ".html"];
 var CHECKS = [
   { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },

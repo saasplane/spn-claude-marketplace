@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "919017a1"
+      "seen": "fdf0d9ad"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "b3e5c65c"
+      "seen": "97e9441a"
     }
   ]
 }
@@ -43,7 +43,7 @@ A panel is an optional block. A page uses one when a part of it has a header, co
 
 **The library draws `DSPanelContainer`:** `size`; `fullPage` and `opacity` `TRANSLUCENT` once each; `frames` and the `surface` keys as modes; the parts `.Header`, `.Content` and `.Footer`, each with `flush` as a mode, and the footer with `sticky` once; and, as its usage, a settings page's part with its title at `CONTAINER`. **It draws `DSDataTablePanelContainer`** composed from `DSPanelContainer` with a `DSDataTable`, and, as its usage, a page that is one listing.
 
-The unit is `DSPanelContainer`, the head, content and foot unit, and its look is the theme's `container.panel` (`RULE.SUPPORT.SURFACE.231`). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
+The unit is `DSPanelContainer`, the head, content and foot unit, and *container* is the layer's word, never the unit's, and its look is the theme's `container.panel` (`RULE.SUPPORT.SURFACE.231`). `DSDataTablePanelContainer` is built on it, for a data table, and takes the panel's props as `panel`. **A level of a page is a position and not a unit:** `CONTAINER` of `DSPageLevelType` names where a full-width section stands, whatever unit fills it, and it does not make that unit a `DSPanelContainer`. Only `DSPanelContainer` reads `theme.container.panel`; a card reads `theme.component.card` alone.
 
 | Part | Named | How many | What it takes |
 | --- | --- | --- | --- |

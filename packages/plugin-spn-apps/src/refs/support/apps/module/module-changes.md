@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/01-shape/03-architecture.md",
-      "seen": "cfa4c345"
+      "seen": "8d924b6f"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
-      "seen": "fc01e988"
+      "seen": "3112a585"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "59747715"
+      "seen": "1f3c8b4a"
     }
   ]
 }
@@ -66,7 +66,7 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 
 ## The generation chain
 
-The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client.
+The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client. The generator that produces the methods writes inside the contract folder and nowhere else, and refuses, by name, a method that is not one command in and one state out (RULE.SUPPORT.APPS.169).
 
 **The published specification keeps the ladder — MUST** (`RULE.SUPPORT.APPS.219`). A client generated from a specification that writes every level flat cannot tell that `RoleInfo` is `RoleMeta` and more. So the specification composes each level from the one below it: the level is the reference to its base and its own fields beside it, joined by `allOf`, and a client reads `RoleInfo = RoleMeta & {…}` with the same fields it had before, so no caller changes.
 

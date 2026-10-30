@@ -16,7 +16,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts
+// packages/plugin-support-lib/src/lib/payload.ts
 async function payload() {
   const chunks = [];
   try {
@@ -49,11 +49,11 @@ function runAlone(name) {
   return Boolean(process.argv[1]) && process.argv[1].endsWith(name);
 }
 var init_payload = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts"() {
+  "packages/plugin-support-lib/src/lib/payload.ts"() {
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/source.ts
+// packages/plugin-support-lib/src/lib/source.ts
 import { readFileSync as readFileSync2 } from "node:fs";
 function read(path) {
   try {
@@ -78,11 +78,11 @@ function resultingText(input, path) {
 ${fragment}`, fragment];
 }
 var init_source = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/source.ts"() {
+  "packages/plugin-support-lib/src/lib/source.ts"() {
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/lib/source.ts
+// packages/plugin-spn-apps/src/scripts/lib/source.ts
 import { readdirSync, statSync as statSync3 } from "node:fs";
 function filesUnder(roots) {
   return [...walkUnsorted(roots)].sort();
@@ -128,7 +128,7 @@ function* walkUnsorted(roots) {
 }
 var SKIP;
 var init_source2 = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/lib/source.ts"() {
+  "packages/plugin-spn-apps/src/scripts/lib/source.ts"() {
     init_source();
     SKIP = /* @__PURE__ */ new Set([
       "node_modules",
@@ -143,7 +143,7 @@ var init_source2 = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts
 import { basename } from "node:path";
 function blockAt(text, from) {
   const open = text.indexOf("{", from);
@@ -191,12 +191,12 @@ function excludesOf(text) {
 }
 var isCodeConfig;
 var init_coverage_excludes = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts"() {
+  "packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts"() {
     isCodeConfig = (path) => /^(jest\.config(\.[\w-]+)?\.(c|m)?js|vitest\.config(\.[\w-]+)?\.m?[jt]s)$/.test(basename(path));
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts
+// packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts
 var coverage_excludes_exports = {};
 __export(coverage_excludes_exports, {
   findings: () => findings,
@@ -245,7 +245,7 @@ ${total} finding(s) \u2014 an exclude with no reason`);
 }
 var watched;
 var init_coverage_excludes2 = __esm({
-  async ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts"() {
+  async "packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts"() {
     init_payload();
     init_source();
     init_source2();
@@ -263,14 +263,14 @@ var init_coverage_excludes2 = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
+// packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
 import { join as join3 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/command.ts
+// packages/plugin-support-lib/src/lib/command.ts
 import { existsSync, statSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/docs-tree.ts
+// packages/plugin-support-lib/src/lib/docs-tree.ts
 var DEVEX = ".spndevex";
 var DOCS = "docs";
 var SEAT = {
@@ -301,14 +301,14 @@ function workstreamPrefixSource(legacy = false) {
   return `${escape(DEVEX)}\\/${container}\\/${STATE_GROUP}\\/`;
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/debug-store.ts
+// packages/plugin-support-lib/src/lib/debug-store.ts
 var LOG_CAP = 20 * 1024 * 1024;
 var SESSION_KEEP_MS = 14 * 24 * 3600 * 1e3;
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/timing.ts
+// packages/plugin-support-lib/src/lib/timing.ts
 var IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-]+)((?:\\/[^\\s'"\`)\\]|;&<>]*)?)`, "g");
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/command.ts
+// packages/plugin-support-lib/src/lib/command.ts
 var MANIFEST = "sprepo.json";
 var FAULT = "UsageFault";
 var UsageFault = class extends Error {
@@ -371,7 +371,7 @@ function scopeOf(paths, need, from = process.cwd()) {
   return [repository];
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/stack.ts
+// packages/plugin-support-lib/src/lib/stack.ts
 import { readFileSync, statSync as statSync2 } from "node:fs";
 import { dirname as dirname2, join as join2, resolve as resolve2 } from "node:path";
 var isFile = (path) => {
@@ -399,12 +399,12 @@ function stackOf(path) {
   }
 }
 
-// import("../../../providers/**/*/scripts/checks/_tests/coverage-excludes.ts") in .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
+// import("../../../providers/**/*/scripts/checks/_tests/coverage-excludes.ts") in packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
 var globImport_providers_scripts_checks__tests_coverage_excludes_ts = __glob({
   "../../../providers/ts/scripts/checks/_tests/coverage-excludes.ts": () => init_coverage_excludes2().then(() => coverage_excludes_exports)
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
+// packages/plugin-spn-apps/src/scripts/commands/coverage/check.ts
 var describe = "Scan for a coverage exclude with no comment giving its reason";
 var usage = "[<path>\u2026]";
 async function run2(args) {

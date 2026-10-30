@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "b9c139c2"
+      "seen": "bfec96bb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "4177c6d3"
+      "seen": "c85bae7e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
@@ -15,15 +15,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "dbf273eb"
+      "seen": "80f70315"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "06a4c7c3"
+      "seen": "cef5acd3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "b3e5c65c"
+      "seen": "97e9441a"
     }
   ]
 }
@@ -45,7 +45,7 @@ Read this before you ask which stack builds a block, whether Figma counts as one
 
 A provider holds one design-system package and one showcase, `ts` today and `native` later.
 
-- A provider **MUST** realize every block and vocabulary the constructs name, under the book's own names. A renamed block or prop is a second name nobody else reads by.
+- A provider **MUST** realize every block and vocabulary the constructs name, under the book's own names. A renamed block or prop is a second name nobody else reads by. Every vocabulary a provider realizes is a closed set, stated in the construct that names it and declared once in that construct's capability (`RULE.SUPPORT.SURFACE.005`).
 - A provider **MUST** build the showcase that `delivery-showcase.md` lists, in its own stack's tool.
 - A provider **MUST** say what it does not realize yet. A gap stated in words is a plan; a gap left unstated is a surprise for whoever reaches for it next.
 - A provider **MUST NOT** give a core unit a second name, and **MUST NOT** restate a rule. The name of a core unit and a rule belong to the book, once; a provider that invents either has made a second standard nobody else reads.

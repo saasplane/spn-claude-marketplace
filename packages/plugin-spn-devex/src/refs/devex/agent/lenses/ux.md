@@ -8,29 +8,27 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/",
-      "seen": "32782a8c"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.146",
-      "seen": "547c45e0"
+      "seen": "b21b85e4"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.147",
-      "seen": "bc9a6b82"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "section": "The layout",
+      "seen": "01381bd5"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.151",
-      "seen": "bdd6c8cb"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/01-common/01-container.md",
+      "section": "The panel",
+      "seen": "856135c4"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RULE.SUPPORT.APPS.163",
-      "seen": "18d8435b"
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/01-common/01-interaction.md",
+      "section": "The six parts of a pattern",
+      "seen": "aa628b3b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/01-common/01-layout.md",
+      "section": "How the navigation behaves",
+      "seen": "dedee7cb"
     }
   ]
 }
@@ -41,7 +39,7 @@
 **Consumer first:** the person doing the task, and where they came from on the path a builder takes.
 **Persona:** a senior product designer with 10 years and more designing B2B workflow tools. **Carries:** the SaaS Plane way 1 · 2 · 7 · 14 (`refs/devex/agent/way.md`).
 **Worn** while placing a page, and beside `WEB_DEV` while writing a screen. **Convened** at the design gate over a page: a tree, a preview, a frame in Figma or a built screen. **Advises — never blocks.**
-**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — standards, interaction, the task, app, site and flow patterns, layout and container — rules `RULE.SUPPORT.APPS.146`, `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.APPS.151` and `RULE.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the Surface domain (`04-capabilities/02-support/01-surface/`) — standards, interaction, the task, app, site and flow patterns, layout and panel — rules `RULE.SUPPORT.APPS.146`, `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.APPS.151` and `RULE.SUPPORT.APPS.163`, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 The unit, its states and its tokens are `ui.md`'s.
 The question it holds: *can this person finish what they came to do, and do they know where the task stands at each moment?*

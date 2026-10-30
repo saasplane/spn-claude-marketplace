@@ -16,7 +16,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts
+// packages/plugin-support-lib/src/lib/payload.ts
 async function payload() {
   const chunks = [];
   try {
@@ -49,11 +49,11 @@ function runAlone(name) {
   return Boolean(process.argv[1]) && process.argv[1].endsWith(name);
 }
 var init_payload = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/payload.ts"() {
+  "packages/plugin-support-lib/src/lib/payload.ts"() {
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/source.ts
+// packages/plugin-support-lib/src/lib/source.ts
 import { readFileSync as readFileSync2 } from "node:fs";
 function read(path) {
   try {
@@ -78,11 +78,11 @@ function resultingText(input, path) {
 ${fragment}`, fragment];
 }
 var init_source = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/source.ts"() {
+  "packages/plugin-support-lib/src/lib/source.ts"() {
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/scripts/lib/node.ts
+// packages/plugin-spn-surface/src/scripts/lib/node.ts
 import { readdirSync, statSync as statSync3 } from "node:fs";
 import { dirname as dirname3, join as join3, resolve as resolve3 } from "node:path";
 function nodeKind(path) {
@@ -126,7 +126,7 @@ function filesUnder(roots) {
 }
 var WEB_KINDS, SKIP, isFile2, isDir, isTsxSource, isWebSource;
 var init_node = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/scripts/lib/node.ts"() {
+  "packages/plugin-spn-surface/src/scripts/lib/node.ts"() {
     init_source();
     WEB_KINDS = /* @__PURE__ */ new Set(["APP_WEB", "MODULE_WEB", "SUPPORT_WEB"]);
     SKIP = /* @__PURE__ */ new Set(["node_modules", "dist", "build", ".git", ".nx", "coverage", ".output", "storybook-static"]);
@@ -152,7 +152,7 @@ var init_node = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/jsx.ts
+// packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/jsx.ts
 function readJsx(source) {
   const tags = [];
   const blank = [];
@@ -432,7 +432,7 @@ function lineOf(source, offset) {
 }
 var NAME_START, NAME_CHAR, BEFORE_EXPRESSION, attrOf, spreads;
 var init_jsx = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/jsx.ts"() {
+  "packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/jsx.ts"() {
     NAME_START = /[A-Za-z_$]/;
     NAME_CHAR = /[\w$.:-]/;
     BEFORE_EXPRESSION = /* @__PURE__ */ new Set([
@@ -454,7 +454,7 @@ var init_jsx = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts
+// packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts
 function packageUnits(code, source) {
   const units = /* @__PURE__ */ new Set();
   for (const match of code.matchAll(/\bimport\s+(?:type\s+)?\{([^}]*)\}\s*from\s*(['"])/g)) {
@@ -646,7 +646,7 @@ function lookOf(written) {
 }
 var CONTAINERS, CARDS, SECTIONS, VIEW, PICTURE_TAG, PICTURE_ATTR, OVERLAY, MENU, HUE, last, ancestors, signature, COLOURS, TEXT_NOT_COLOUR, PAGE_OWNS;
 var init_notes = __esm({
-  ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts"() {
+  "packages/plugin-spn-surface/src/providers/ts/scripts/checks/_surface/notes.ts"() {
     init_jsx();
     CONTAINERS = /* @__PURE__ */ new Set(["DSPanelContainer", "DSDataTablePanelContainer", "DSSectionContainer", "DSFeatureGridSectionContainer"]);
     CARDS = /* @__PURE__ */ new Set(["DSCard", "DSCardWidget", "DSItemCard"]);
@@ -680,7 +680,7 @@ var init_notes = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts
+// packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts
 var surface_exports = {};
 __export(surface_exports, {
   findings: () => findings,
@@ -739,7 +739,7 @@ ${files} file(s) read \xB7 ${[...counts.values()].reduce((a, b) => a + b, 0)} no
   return 0;
 }
 var init_surface = __esm({
-  async ".worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts"() {
+  async "packages/plugin-spn-surface/src/providers/ts/scripts/checks/surface.ts"() {
     init_payload();
     init_source();
     init_node();
@@ -757,14 +757,14 @@ var init_surface = __esm({
   }
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
+// packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
 import { join as join4 } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/command.ts
+// packages/plugin-support-lib/src/lib/command.ts
 import { existsSync, statSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/docs-tree.ts
+// packages/plugin-support-lib/src/lib/docs-tree.ts
 var DEVEX = ".spndevex";
 var DOCS = "docs";
 var SEAT = {
@@ -795,14 +795,14 @@ function workstreamPrefixSource(legacy = false) {
   return `${escape(DEVEX)}\\/${container}\\/${STATE_GROUP}\\/`;
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/debug-store.ts
+// packages/plugin-support-lib/src/lib/debug-store.ts
 var LOG_CAP = 20 * 1024 * 1024;
 var SESSION_KEEP_MS = 14 * 24 * 3600 * 1e3;
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/timing.ts
+// packages/plugin-support-lib/src/lib/timing.ts
 var IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-]+)((?:\\/[^\\s'"\`)\\]|;&<>]*)?)`, "g");
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/command.ts
+// packages/plugin-support-lib/src/lib/command.ts
 var MANIFEST = "sprepo.json";
 var FAULT = "UsageFault";
 var UsageFault = class extends Error {
@@ -865,7 +865,7 @@ function scopeOf(paths, need, from = process.cwd()) {
   return [repository];
 }
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-support-lib/src/lib/stack.ts
+// packages/plugin-support-lib/src/lib/stack.ts
 import { readFileSync, statSync as statSync2 } from "node:fs";
 import { dirname as dirname2, join as join2, resolve as resolve2 } from "node:path";
 var isFile = (path) => {
@@ -893,12 +893,12 @@ function stackOf(path) {
   }
 }
 
-// import("../../../providers/**/*/scripts/checks/surface.ts") in .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
+// import("../../../providers/**/*/scripts/checks/surface.ts") in packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
 var globImport_providers_scripts_checks_surface_ts = __glob({
   "../../../providers/ts/scripts/checks/surface.ts": () => init_surface().then(() => surface_exports)
 });
 
-// .worktrees/034-decisions-cleanup/spn-claude-marketplace/packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
+// packages/plugin-spn-surface/src/scripts/commands/check/scan.ts
 var describe = "Scan Surface code for every note the Surface check gives, whole files";
 var usage = "[<path>\u2026]";
 async function run(args) {

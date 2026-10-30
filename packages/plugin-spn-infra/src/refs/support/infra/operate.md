@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/08-operate.md",
-      "seen": "226a1dc5"
+      "seen": "7d2e7fe6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/08-operate/",
-      "seen": "ef9cafc7"
+      "seen": "a471d946"
     }
   ]
 }
@@ -121,7 +121,7 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 ## The serving contract is dynamic
 
-Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RULE.SUPPORT.INFRA.084`). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
+Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RULE.SUPPORT.INFRA.084`). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it. A domain is active only when it is serving: a provider that terminates traffic itself binds the host at issuance, one that only issues certificates binds it on the second call, and the records an owner publishes are the union of what both steps ask for, each carrying its purpose.
 
 **A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
 
@@ -134,7 +134,7 @@ Routing is data: a new customer surface is a row, never a release. **A customer'
 
 Each writer's scope is disjoint, so nothing races on a name (`RULE.SUPPORT.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
 
-**One tenant edge per platform serves every environment's tenant hosts** (`RULE.SUPPORT.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RULE.SUPPORT.INFRA.106`). Every declared domain stands its own pair of zones (`RULE.SUPPORT.INFRA.086`), and the private zone is always the child name, never the apex.
+**One tenant edge per platform serves every environment's tenant hosts** (`RULE.SUPPORT.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts, because a wildcard alias can sit on one distribution only. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RULE.SUPPORT.INFRA.106`). Every declared domain stands its own pair of zones (`RULE.SUPPORT.INFRA.086`), and the private zone is always the child name, never the apex.
 
 **Observability is not something anybody opts into.** An application is observable because it was deployed — the collectors were installed by a layer, and nothing depends on somebody remembering to wire one in.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
-      "seen": "a128ae68"
+      "seen": "8b1c2dd7"
     }
   ]
 }
@@ -92,7 +92,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 - **Logging** takes a provider, and an unset provider fails boot naming the key.
 - **The API entry** carries the provider alone; the listener, CORS, rate-limit and cookie fields live on the provider-specific variant, because a base naming one implementation's needs makes `NONE` unrepresentable. The API reads its token from the authorization header alone, and every cookie a handler writes is host-only and unsigned.
-- **The health listener binds its own port**, read once before any entry starts, and never as routes on the serving port. Unset means no health server, and a deployment receives the published default from the deploy render rather than a code default.
+- **The health listener binds its own port**, read once before any entry starts, and never as routes on the serving port. Unset means no health server, and a deployment receives the published default from the deploy render rather than a code default. Liveness consults no resource; readiness is composition complete and every owed connection open, read passively from client state and never by a per-probe query; and a one-shot mode serves no probes, its exit code being its verdict.
 - **`{CODE}_LOCAL_POSTURE` says the process runs on a developer's machine**, and reads `false` unless set. A laptop's `envs/local.env` sets it to `true`; a deployed environment never does. Boot refuses `{CODE}_RESOURCE_SEAL_APP_PROVIDER=LOCAL` and `{CODE}_REMOTE_CREDENTIAL_PROVIDER=LOCAL` without it, because both stand on a secret written in the code, and the refusal names the selector key, the posture key and what a deployment selects instead (`RULE.SUPPORT.APPS.230`). It is a switch of its own and not debug, because `NODE_ENV` is a build mode and says nothing about where the process runs.
 - **The API entry's remote and proxy settings:** `{CODE}_API_REMOTE_PORT` is the remote listener, which serves the mounted modules' contract services to the platform's other services (unset: no remote listener opens, and the service serves no contract to others); `{CODE}_API_TRUSTED_PROXIES` and `{CODE}_API_REMOTE_TRUSTED_PROXIES` say how many proxies stand in front of each listener, so the person's address is the entry that many places from the right of the forwarded-address header (default `0`).
 - **Auth is in two parts.** Every service reads the first: the auth cache and the sudo-mode freshness windows. Only a service that signs people in sets the issuer's part, read into `config.auth.issuer`: the signing secret (`{CODE}_AUTH_JWT_SECRET`, which signs tokens and every passport's proof), its rotation fallback, the cache prefix and the lifetime. **The four are set together or not at all.** A service that sets none has `config.auth.issuer` as `null`: it signs no token and holds no secret. A service that builds `SPAuthProviderIAMIssuer` refuses to start by the key's name when it is `null`; one that builds the Verifier or the default provider sets none of them.

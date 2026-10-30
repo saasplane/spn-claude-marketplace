@@ -8,15 +8,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
-      "seen": "901e5d1e"
+      "seen": "be8650d5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
-      "seen": "b8efb097"
+      "seen": "d4008a1e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "59747715"
+      "seen": "1f3c8b4a"
     }
   ]
 }

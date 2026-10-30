@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
       "section": "A design a partner brings, and a page they point at",
-      "seen": "37fbe934"
+      "seen": "3a2d5a95"
     },
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
