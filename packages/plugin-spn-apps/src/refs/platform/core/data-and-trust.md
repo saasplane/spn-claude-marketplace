@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "7f87578d"
+      "seen": "5014c243"
     }
   ]
 }

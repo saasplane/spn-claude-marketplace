@@ -23,7 +23,7 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 import { withOffset } from "../../lib/clock.ts";
 import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
   artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
-  docsRootOf, isApproachPage, isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
+  docsRootOf, isApproachPage, isOverview, isProducedPage, isSeatFile, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
   stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -1839,7 +1839,9 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
   const linked = (text: string, seat: string): string => text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_all, label: string, target: string) => {
     if (/^(?:[a-z][a-z0-9+.-]*:|#|\/)/i.test(target)) return `<a href="${target}">${label}</a>`;
     const [path, fragment] = target.split("#");
-    const address = relative(dirname(overviewFile), resolve(dirname(seat), path)).replace(/\\/g, "/");
+    // A LINK TO A CONSTRUCT SEAT IS A LINK TO THE PAGE THAT SEAT IS PRODUCED AS (Q234), wherever it sits in the page.
+    const linkedFile = resolve(dirname(seat), path);
+    const address = relative(dirname(overviewFile), isSeatFile(linkedFile) ? pageForSeat(linkedFile) : linkedFile).replace(/\\/g, "/");
     return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
   });
   const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);

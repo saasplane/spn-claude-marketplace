@@ -8,11 +8,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "c1787112"
+      "seen": "c6390a47"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "9bbbc342"
+      "seen": "9a0e1257"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",

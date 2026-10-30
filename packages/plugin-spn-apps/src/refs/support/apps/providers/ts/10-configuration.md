@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/10-configuration.md",
-      "seen": "4eca2759"
+      "seen": "a128ae68"
     }
   ]
 }
@@ -93,6 +93,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **Logging** takes a provider, and an unset provider fails boot naming the key.
 - **The API entry** carries the provider alone; the listener, CORS, rate-limit and cookie fields live on the provider-specific variant, because a base naming one implementation's needs makes `NONE` unrepresentable. The API reads its token from the authorization header alone, and every cookie a handler writes is host-only and unsigned.
 - **The health listener binds its own port**, read once before any entry starts, and never as routes on the serving port. Unset means no health server, and a deployment receives the published default from the deploy render rather than a code default.
+- **`{CODE}_LOCAL_POSTURE` says the process runs on a developer's machine**, and reads `false` unless set. A laptop's `envs/local.env` sets it to `true`; a deployed environment never does. Boot refuses `{CODE}_RESOURCE_SEAL_APP_PROVIDER=LOCAL` and `{CODE}_REMOTE_CREDENTIAL_PROVIDER=LOCAL` without it, because both stand on a secret written in the code, and the refusal names the selector key, the posture key and what a deployment selects instead (`RD.SUPPORT.APPS.230`). It is a switch of its own and not debug, because `NODE_ENV` is a build mode and says nothing about where the process runs.
 - **The API entry's remote and proxy settings:** `{CODE}_API_REMOTE_PORT` is the remote listener, which serves the mounted modules' contract services to the platform's other services (unset: no remote listener opens, and the service serves no contract to others); `{CODE}_API_TRUSTED_PROXIES` and `{CODE}_API_REMOTE_TRUSTED_PROXIES` say how many proxies stand in front of each listener, so the person's address is the entry that many places from the right of the forwarded-address header (default `0`).
 - **Auth is in two parts.** Every service reads the first: the auth cache and the sudo-mode freshness windows. Only a service that signs people in sets the issuer's part, read into `config.auth.issuer`: the signing secret (`{CODE}_AUTH_JWT_SECRET`, which signs tokens and every passport's proof), its rotation fallback, the cache prefix and the lifetime. **The four are set together or not at all.** A service that sets none has `config.auth.issuer` as `null`: it signs no token and holds no secret. A service that builds `SPAuthProviderIAMIssuer` refuses to start by the key's name when it is `null`; one that builds the Verifier or the default provider sets none of them.
 - **`{CODE}_REMOTE_*` is remote calls**, the service's own block under no entry, so a service whose `{CODE}_API_PROVIDER` is `NONE` reads it too: `_CREDENTIAL_PROVIDER` (`KUBERNETES` · `LOCAL`; unset means the service makes no remote call and serves none, and there is no `NONE`), `_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` (`spn-remote`) · `_NAMESPACES` (`prd,plt,vnd`) · `_ISSUER` (all required under `KUBERNETES`), `_CREDENTIAL_LOCAL_SERVICE` (the application's `kindCode`, required under `LOCAL`), `_TIMEOUT_MS` (default `10000`), `_REMOTE_SERVICE_{NAME}_ENDPOINTS` (published by the estate) and `{CODE}_{MODULE}_REMOTE_ENDPOINTS` (where a module held remotely lives; required for each, and refused when it lists more than one address). A missing fact is refused at boot by the key's name. A service that publishes its modules' contracts sets the remote port; one that consumes another's sets one `_REMOTE_ENDPOINTS` line for each module it holds remotely, written as a reference to what the estate publishes (`DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`), so moving a module to another service is a change of one settings line and no code (`RD.SUPPORT.INFRA.111`). A worker that only reads the queue sets `{CODE}_API_PROVIDER=NONE` and no remote port. On a machine the provider is `LOCAL` and the address is plain HTTP on the service's local host and remote port.
@@ -111,6 +112,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **The queue's client id derives from the declared code, and a queue connection lists no topics** — no environment variable names either. Each module makes its topics by its own `*-queue-topics` migration, and each topic the migration makes gets a paired error topic. No setting turns automatic topic creation on: the service app's boot builds the provider with it off, so publishing or subscribing to a topic that does not exist is an error that names the topic (RD.SUPPORT.APPS.178).
 - **Each store has its own storage block**: `{CODE}_RESOURCE_STORAGE_{NAME}_ENDPOINTS` is the signed path, browser-reachable under every hosting, and `APP` is the default store; `{CODE}_RESOURCE_STORAGE_{NAME}_PUBLIC_ENDPOINTS` is the public read base, and only a PUBLIC store, such as `DOCS`, has one.
 - **No bucket fact publishes for storage.** The bucket is the store's derived name, and a key never names one.
+- **Encryption is the default** (`RD.SUPPORT.APPS.231`). `_POSTGRESQL_SSL`, `_REDIS_TLS` and `_KAFKA_SSL` read `true` when the key is absent, so only a key written `false` connects in the clear. With TLS on, the server's certificate and its name are always checked, against the `…_CA_FILE` authority where the estate published one (`RD.SUPPORT.INFRA.126`).
 
 **The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved.
 
@@ -122,7 +124,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 ```
 
 - **The key id is published, never typed.** The environment apply reads it from the cloud and publishes it (`RD.SUPPORT.INFRA.109`). On a machine the block is one line in the service's own `envs/local.env`.
-- **No credential pair and no endpoints key publish.** In the cloud the service calls the key service as its own workload role; `LOCAL` uses a fixed constant inside the local provider.
+- **No credential pair and no endpoints key publish.** In the cloud the service calls the key service as its own workload role; `LOCAL` uses a fixed constant inside the local provider, and boots only beside `{CODE}_LOCAL_POSTURE=true`.
 - **The block is opened only for a service that lists `SEAL` in its `connections`.** A service that lists it and has no block fails boot by the missing key's name.
 - **A wrong setting stops boot** — a selector outside the accepted set, a missing `KEY_ID` under `AWS_KMS`, or a key the service's role may not use. Boot checks that the service can use its key before the service takes traffic.
 

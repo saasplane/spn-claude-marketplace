@@ -39,6 +39,7 @@ const root = repo({
   "apps/api/tests/.output/unit/runs/p2.json": body("p2", "UNIT", "2026-10-01T03:00:00Z"),
   "apps/api/tests/.output/unit/runs/broken.json": "{ not json",
   "apps/api/tests/.output/unit/runs/full-1.runner.json": "{ a raw report still being folded",
+  "apps/api/tests/.output/unit/runs/full-1.stamp.json": JSON.stringify({ run: "full-1", tier: "UNIT", content: "c0ffee", commit: "abc123" }),
 });
 
 console.log("=== one named run");
@@ -51,6 +52,8 @@ ok("a named run is every file of that name, its phases and every node included",
     "tests/.output/journey/runs/full-1.json",
   ]), JSON.stringify(full.runs.map((one) => one.from)));
 ok("a runner's raw report beside the run is never read as one of its files", full.findings.length === 0, JSON.stringify(full.findings));
+ok("a run's reuse record beside it is never read as one of its files", !full.runs.some((one) => one.from.endsWith(".stamp.json")) && full.findings.length === 0,
+  JSON.stringify(full.runs.map((one) => one.from)));
 ok("a run whose name only starts with the named one is left out", !full.runs.some((one) => one.run === "full-1.x"));
 ok("each file carries its node, tier and phase", full.runs.every((one) => one.run === "full-1")
   && full.runs.find((one) => one.node === "apps/web")?.phase === "SERIALIZED" && full.runs.find((one) => one.node === ".")?.tier === "JOURNEY",
