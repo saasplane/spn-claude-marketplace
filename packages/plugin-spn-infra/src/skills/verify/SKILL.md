@@ -7,11 +7,11 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "36c99f62"
+      "seen": "c61a000e"
     }
   ]
 }
@@ -23,7 +23,7 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
 
 **Green before any review is asked for.** These two commands are the whole of the mechanical gate; everything they do not cover is a judgment call and belongs to the `review` skill.
 
-**Read the repository's Test and verify guide first** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RD.DEVEX.WORKSPACE.181`). It holds this estate's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset of the machine, and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the loop below and name the missing guide in your report.
+**Read the repository's Test and verify guide first** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RULE.DEVEX.WORKSPACE.181`). It holds this estate's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset of the machine, and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the loop below and name the missing guide in your report.
 
 ## The loop
 
@@ -64,7 +64,7 @@ Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/
 
 **A harness reports cases, never only an exit code.** `ok`, `not ok` or `skip`, per `<TIER> <BEHAVIOUR-ID> <title>` — a harness that prints no case line has proven nothing, whatever it exits. A `skip` line is recorded `PENDING`, and a tier whose only cases were skipped reads as *no cases*, never as a pass.
 
-**The tier decides which cases carry an id** (`RD.DEVEX.FUNCTION.064`). At `CONTRACT` every case does. At `INTEGRATION` every case proving a guarantee does, and a case there with none is a finding. At `UNIT` only a case proving a `UNIT` row carries one; a case over a private rule names the rule instead, and it is counted and reported but stamps no row. **A row's tier equals the tier of the case that proves it**, because a run writes only the rows that declare the tier it ran. **A run over the whole repository fixes what keeps a row unproved** — a row whose tier is not its case's, a runner that wrote no result file, a case its tier binds that carries no id, a red case — runs that tier again, and only then writes its report, naming anything it could not fix and why.
+**The tier decides which cases carry an id** (`RULE.DEVEX.FUNCTION.064`). At `CONTRACT` every case does. At `INTEGRATION` every case proving a guarantee does, and a case there with none is a finding. At `UNIT` only a case proving a `UNIT` row carries one; a case over a private rule names the rule instead, and it is counted and reported but stamps no row. **A row's tier equals the tier of the case that proves it**, because a run writes only the rows that declare the tier it ran. **A run over the whole repository fixes what keeps a row unproved** — a row whose tier is not its case's, a runner that wrote no result file, a case its tier binds that carries no id, a red case — runs that tier again, and only then writes its report, naming anything it could not fix and why.
 
 ## What green proves, and what it does not
 

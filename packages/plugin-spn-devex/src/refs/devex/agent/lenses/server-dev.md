@@ -12,7 +12,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/README.md",
-      "seen": "f997e7cb"
+      "seen": "ed86c6a1"
     }
   ]
 }
@@ -88,4 +88,4 @@
 
 ## Improves the book
 
-- A pattern a service needs that the catalog lacks is drafted into the module server chapter with its register row, put to the developer.
+- A pattern a service needs that the catalog lacks is drafted into the module server chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.281 — a check refuses an agent's push when no whole, green run covers exactly the tree it pushes.
+// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.281 — a check refuses an agent's push when no whole, green run covers exactly the tree it pushes.
 //
 // Refuses a `git push` that carries changes to a node whose offline tiers have no whole, green run, stamped by
 // spnutils, on the tree at HEAD, or that carries a changed file of a TypeScript node the repository's own pinned
@@ -298,12 +298,12 @@ export function checkPushTiers(payload: Payload): Verdict {
   if (prettierMissing) {
     refusals.push(
       `Denied: this push changes files of a TypeScript node and the repository's own Prettier is not installed, so their formatting ` +
-      `cannot be checked (RD.DEVEX.WORKSPACE.281).\nRun \`pnpm install\` in the repository, then push again.`);
+      `cannot be checked (RULE.DEVEX.WORKSPACE.281).\nRun \`pnpm install\` in the repository, then push again.`);
   }
   if (unformatted.length) {
     const quoted = unformatted.map((file) => (/\s/.test(file) ? `"${file}"` : file));
     refusals.push(
-      `Denied: this push changes files the repository's Prettier would reformat (RD.DEVEX.WORKSPACE.281).\n` +
+      `Denied: this push changes files the repository's Prettier would reformat (RULE.DEVEX.WORKSPACE.281).\n` +
       `${unformatted.map((file) => `- \`${file}\``).join("\n")}\n` +
       `Run \`pnpm exec prettier --write ${quoted.join(" ")}\`, commit the result, then push again.`);
   }
@@ -324,7 +324,7 @@ export function checkPushTiers(payload: Payload): Verdict {
   return {
     deny: [
       `Denied: this push carries changes to a node whose offline tiers have no whole, green run on the tree at HEAD ` +
-      `(RD.DEVEX.WORKSPACE.281).\n${lines.join("\n")}\n` +
+      `(RULE.DEVEX.WORKSPACE.281).\n${lines.join("\n")}\n` +
       `Run each command from \`${repo}\`, then push again. A run narrowed by files, names or a phase, a run with no stamp ` +
       `file and a run made on other content do not count; a file another window left in the node changes the content too.`,
       ...refusals,

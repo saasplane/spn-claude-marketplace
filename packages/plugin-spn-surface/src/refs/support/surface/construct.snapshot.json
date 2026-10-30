@@ -372,7 +372,7 @@
           },
           "collection": null,
           "name": "the main action, which neither deletes nor ends anything · the content of the view, outside a feature, or in no box",
-          "rule": "RD.SUPPORT.SURFACE.370"
+          "rule": "RULE.SUPPORT.SURFACE.370"
         },
         {
           "kind": "CHOICE",
@@ -383,7 +383,7 @@
           },
           "collection": null,
           "name": "the main action, which neither deletes nor ends anything · a footer",
-          "rule": "RD.SUPPORT.SURFACE.370"
+          "rule": "RULE.SUPPORT.SURFACE.370"
         },
         {
           "kind": "CHOICE",
@@ -393,7 +393,7 @@
           },
           "collection": null,
           "name": "the main action, which neither deletes nor ends anything · a header",
-          "rule": "RD.SUPPORT.SURFACE.390"
+          "rule": "RULE.SUPPORT.SURFACE.390"
         },
         {
           "kind": "CHOICE",
@@ -404,7 +404,7 @@
           },
           "collection": null,
           "name": "the main action, which deletes or ends something",
-          "rule": "RD.SUPPORT.SURFACE.370"
+          "rule": "RULE.SUPPORT.SURFACE.370"
         },
         {
           "kind": "CHOICE",
@@ -414,7 +414,7 @@
           },
           "collection": null,
           "name": "an action of a feature · a feature",
-          "rule": "RD.SUPPORT.SURFACE.234"
+          "rule": "RULE.SUPPORT.SURFACE.234"
         },
         {
           "kind": "CHOICE",
@@ -447,7 +447,7 @@
           },
           "collection": null,
           "name": "an icon alone · the end of a row, a toolbar, or the content",
-          "rule": "RD.SUPPORT.SURFACE.370"
+          "rule": "RULE.SUPPORT.SURFACE.370"
         },
         {
           "kind": "CHOICE",
@@ -458,7 +458,7 @@
           },
           "collection": null,
           "name": "another action · the end of a row, or a toolbar",
-          "rule": "RD.SUPPORT.SURFACE.370"
+          "rule": "RULE.SUPPORT.SURFACE.370"
         },
         {
           "kind": "CHOICE",
@@ -469,7 +469,7 @@
           },
           "collection": null,
           "name": "another action · a header or a footer",
-          "rule": "RD.SUPPORT.SURFACE.376"
+          "rule": "RULE.SUPPORT.SURFACE.376"
         },
         {
           "kind": "CHOICE",
@@ -480,7 +480,7 @@
           },
           "collection": null,
           "name": "another action · the content, or no box",
-          "rule": "RD.SUPPORT.SURFACE.376"
+          "rule": "RULE.SUPPORT.SURFACE.376"
         }
       ],
       "usage": {
@@ -1915,7 +1915,7 @@
           },
           "collection": null,
           "name": "a state · an item line from WIDGET to INLINE",
-          "rule": "RD.SUPPORT.SURFACE.153"
+          "rule": "RULE.SUPPORT.SURFACE.153"
         },
         {
           "kind": "CHOICE",
@@ -1926,7 +1926,7 @@
           },
           "collection": null,
           "name": "a state · an item line at PAGE or CONTAINER",
-          "rule": "RD.SUPPORT.SURFACE.153"
+          "rule": "RULE.SUPPORT.SURFACE.153"
         },
         {
           "kind": "CHOICE",
@@ -1936,7 +1936,7 @@
           },
           "collection": null,
           "name": "a state · over a picture",
-          "rule": "RD.SUPPORT.SURFACE.378"
+          "rule": "RULE.SUPPORT.SURFACE.378"
         },
         {
           "kind": "CHOICE",
@@ -1947,7 +1947,7 @@
           },
           "collection": null,
           "name": "a state · a table cell",
-          "rule": "RD.SUPPORT.SURFACE.391"
+          "rule": "RULE.SUPPORT.SURFACE.391"
         },
         {
           "kind": "CHOICE",
@@ -1958,7 +1958,7 @@
           },
           "collection": null,
           "name": "a state · on its own",
-          "rule": "RD.SUPPORT.SURFACE.380"
+          "rule": "RULE.SUPPORT.SURFACE.380"
         },
         {
           "kind": "CHOICE",
@@ -1989,7 +1989,7 @@
           },
           "collection": null,
           "name": "a label a person coloured, such as a tenant's tag",
-          "rule": "RD.SUPPORT.SURFACE.382"
+          "rule": "RULE.SUPPORT.SURFACE.382"
         },
         {
           "kind": "CHOICE",
@@ -2000,7 +2000,7 @@
           },
           "collection": null,
           "name": "a kind or a type · the facts, the end of a row, a table, anywhere",
-          "rule": "RD.SUPPORT.SURFACE.065"
+          "rule": "RULE.SUPPORT.SURFACE.065"
         }
       ],
       "usage": {
@@ -2254,7 +2254,7 @@
           },
           "collection": null,
           "name": "a block of a page with content of its own, such as a settings card: an item line in its header over a list · a column of a page, a cell of a grid, a panel's content",
-          "rule": "RD.SUPPORT.SURFACE.221"
+          "rule": "RULE.SUPPORT.SURFACE.221"
         },
         {
           "kind": "CHOICE",
@@ -2264,7 +2264,7 @@
           },
           "collection": null,
           "name": "the same block over a picture or a band the app paints, where the band should show through · over the picture or the band",
-          "rule": "RD.SUPPORT.SURFACE.192"
+          "rule": "RULE.SUPPORT.SURFACE.192"
         }
       ],
       "usage": {
@@ -3377,7 +3377,7 @@
           },
           "collection": null,
           "name": "the head of a record, or of a listing that is the page · the head of the page",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -3391,7 +3391,7 @@
           },
           "collection": null,
           "name": "the title of a panel, a dialog, a sheet or a drawer · the box's header",
-          "rule": "RD.SUPPORT.SURFACE.107"
+          "rule": "RULE.SUPPORT.SURFACE.107"
         },
         {
           "kind": "CHOICE",
@@ -3405,7 +3405,7 @@
           },
           "collection": null,
           "name": "the title of a card or a widget · the box's header",
-          "rule": "RD.SUPPORT.SURFACE.107"
+          "rule": "RULE.SUPPORT.SURFACE.107"
         },
         {
           "kind": "CHOICE",
@@ -3419,7 +3419,7 @@
           },
           "collection": null,
           "name": "the head of an inner part of a box, such as a part of a card · the part's header, or over the part where no header stands",
-          "rule": "RD.SUPPORT.SURFACE.107"
+          "rule": "RULE.SUPPORT.SURFACE.107"
         },
         {
           "kind": "CHOICE",
@@ -3447,7 +3447,7 @@
           },
           "collection": null,
           "name": "a value inside another unit: a row of a menu or of a popover, a cell · inside that unit",
-          "rule": "RD.SUPPORT.APPS.218"
+          "rule": "RULE.SUPPORT.APPS.218"
         },
         {
           "kind": "CHOICE",
@@ -3460,7 +3460,7 @@
           },
           "collection": null,
           "name": "a tile whose picture stands over its words: a card of a grid, an app in a launcher · a cell of a grid",
-          "rule": "RD.SUPPORT.SURFACE.216"
+          "rule": "RULE.SUPPORT.SURFACE.216"
         },
         {
           "kind": "CHOICE",
@@ -3474,7 +3474,7 @@
           },
           "collection": null,
           "name": "a comment or a post, where who wrote it and when come before the words · a row of a thread",
-          "rule": "RD.SUPPORT.SURFACE.242"
+          "rule": "RULE.SUPPORT.SURFACE.242"
         },
         {
           "kind": "CHOICE",
@@ -3487,7 +3487,7 @@
           },
           "collection": null,
           "name": "a row whose words run to three lines or more · a row",
-          "rule": "RD.SUPPORT.SURFACE.219"
+          "rule": "RULE.SUPPORT.SURFACE.219"
         }
       ],
       "usage": {
@@ -3677,7 +3677,7 @@
           },
           "collection": null,
           "name": "a list row's one line of facts, with no title · a row of a list",
-          "rule": "RD.SUPPORT.SURFACE.132"
+          "rule": "RULE.SUPPORT.SURFACE.132"
         },
         {
           "kind": "CHOICE",
@@ -3687,7 +3687,7 @@
           },
           "collection": null,
           "name": "the facts of a value inside another unit, such as a cell · inside that unit",
-          "rule": "RD.SUPPORT.SURFACE.132"
+          "rule": "RULE.SUPPORT.SURFACE.132"
         }
       ],
       "usage": {
@@ -4607,7 +4607,7 @@
           },
           "collection": null,
           "name": "a text: a name, a title, a code · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         },
         {
           "kind": "CHOICE",
@@ -4618,7 +4618,7 @@
           },
           "collection": null,
           "name": "an email address · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         },
         {
           "kind": "CHOICE",
@@ -5687,7 +5687,7 @@
           },
           "collection": null,
           "name": "one of a few options a person reads, each with its label and perhaps a line under it · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         },
         {
           "kind": "CHOICE",
@@ -5847,7 +5847,7 @@
           },
           "collection": null,
           "name": "one of a few options a person reads, each with its label and perhaps a line under it · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         },
         {
           "kind": "CHOICE",
@@ -6130,7 +6130,7 @@
           },
           "collection": null,
           "name": "a setting of what a person edits: bold, italic · a toolbar or a bar over what it changes",
-          "rule": "RD.SUPPORT.SURFACE.146"
+          "rule": "RULE.SUPPORT.SURFACE.146"
         }
       ],
       "usage": {
@@ -6269,7 +6269,7 @@
           },
           "collection": null,
           "name": "one view among two to four, or one short value of a form · a bar over what it switches, or a field",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         }
       ],
       "usage": {
@@ -6408,7 +6408,7 @@
           },
           "collection": null,
           "name": "several of a few short values: the days of a week, the channels of a message · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.299"
+          "rule": "RULE.SUPPORT.SURFACE.299"
         }
       ],
       "usage": {
@@ -8137,7 +8137,7 @@
           },
           "collection": null,
           "name": "a reminder's time, a meeting's start · a field of a form",
-          "rule": "RD.SUPPORT.SURFACE.123"
+          "rule": "RULE.SUPPORT.SURFACE.123"
         },
         {
           "kind": "CHOICE",
@@ -11598,7 +11598,7 @@
           },
           "collection": null,
           "name": "marks a thing a person coloured, such as a type of their own · beside its name",
-          "rule": "RD.SUPPORT.SURFACE.382"
+          "rule": "RULE.SUPPORT.SURFACE.382"
         }
       ],
       "usage": {
@@ -11921,7 +11921,7 @@
           },
           "collection": null,
           "name": "an item line from WIDGET to INLINE · the kind of the thing, as the line's picture · —",
-          "rule": "RD.SUPPORT.SURFACE.385"
+          "rule": "RULE.SUPPORT.SURFACE.385"
         },
         {
           "kind": "CHOICE",
@@ -11933,7 +11933,7 @@
           },
           "collection": null,
           "name": "an item line at PAGE or CONTAINER · the kind of the thing, as the line's picture · —",
-          "rule": "RD.SUPPORT.SURFACE.385"
+          "rule": "RULE.SUPPORT.SURFACE.385"
         },
         {
           "kind": "CHOICE",
@@ -11945,7 +11945,7 @@
           },
           "collection": null,
           "name": "the app's own mark, beside its name · —",
-          "rule": "RD.SUPPORT.SURFACE.387"
+          "rule": "RULE.SUPPORT.SURFACE.387"
         },
         {
           "kind": "CHOICE",
@@ -11956,7 +11956,7 @@
           },
           "collection": null,
           "name": "a run of marks, such as a rail shut to its icons · the chosen one",
-          "rule": "RD.SUPPORT.SURFACE.387"
+          "rule": "RULE.SUPPORT.SURFACE.387"
         },
         {
           "kind": "CHOICE",
@@ -11967,7 +11967,7 @@
           },
           "collection": null,
           "name": "a run of marks · every other one",
-          "rule": "RD.SUPPORT.SURFACE.388"
+          "rule": "RULE.SUPPORT.SURFACE.388"
         },
         {
           "kind": "CHOICE",
@@ -11978,7 +11978,7 @@
           },
           "collection": null,
           "name": "a thing a setup holds, in a row of marks, such as a channel · set up",
-          "rule": "RD.SUPPORT.SURFACE.386"
+          "rule": "RULE.SUPPORT.SURFACE.386"
         },
         {
           "kind": "CHOICE",
@@ -11990,7 +11990,7 @@
           },
           "collection": null,
           "name": "a thing a setup holds, in a row of marks · not set up",
-          "rule": "RD.SUPPORT.SURFACE.386"
+          "rule": "RULE.SUPPORT.SURFACE.386"
         },
         {
           "kind": "CHOICE",
@@ -12002,7 +12002,7 @@
           },
           "collection": null,
           "name": "a symbol of one to three characters: a step's number, or a file's type · —",
-          "rule": "RD.SUPPORT.SURFACE.385"
+          "rule": "RULE.SUPPORT.SURFACE.385"
         },
         {
           "kind": "CHOICE",
@@ -12014,7 +12014,7 @@
           },
           "collection": null,
           "name": "a thing, beside a title or a heading of a builder's own unit · —",
-          "rule": "RD.SUPPORT.SURFACE.385"
+          "rule": "RULE.SUPPORT.SURFACE.385"
         }
       ],
       "usage": {
@@ -13671,7 +13671,7 @@
           },
           "collection": null,
           "name": "the sub-pages of a page · under the page's head",
-          "rule": "RD.SUPPORT.SURFACE.224"
+          "rule": "RULE.SUPPORT.SURFACE.224"
         },
         {
           "kind": "CHOICE",
@@ -13683,7 +13683,7 @@
           },
           "collection": null,
           "name": "the sub-pages of a record of an app, where the app keeps the line · under the record's head",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13694,7 +13694,7 @@
           },
           "collection": null,
           "name": "the parts of a panel · the panel's header or a flush part",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13705,7 +13705,7 @@
           },
           "collection": null,
           "name": "the parts of a card · the card's header or a flush part",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13716,7 +13716,7 @@
           },
           "collection": null,
           "name": "two ways to show one thing · over what they switch",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13727,7 +13727,7 @@
           },
           "collection": null,
           "name": "two ways to show one value · inside another unit",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13738,7 +13738,7 @@
           },
           "collection": null,
           "name": "the tabs of a site's page · a band of the site",
-          "rule": "RD.SUPPORT.SURFACE.209"
+          "rule": "RULE.SUPPORT.SURFACE.209"
         },
         {
           "kind": "CHOICE",
@@ -13748,7 +13748,7 @@
           },
           "collection": null,
           "name": "the sections of a settings page, down its side · a column at the start",
-          "rule": "RD.SUPPORT.SURFACE.213"
+          "rule": "RULE.SUPPORT.SURFACE.213"
         }
       ],
       "usage": {
@@ -14007,7 +14007,7 @@
           },
           "collection": null,
           "name": "the steps of a sign-up or a setup, each named · over the step in view",
-          "rule": "RD.SUPPORT.SURFACE.314"
+          "rule": "RULE.SUPPORT.SURFACE.314"
         },
         {
           "kind": "CHOICE",
@@ -14019,7 +14019,7 @@
           },
           "collection": null,
           "name": "the steps of a long form, down its side · a column at the start",
-          "rule": "RD.SUPPORT.SURFACE.314"
+          "rule": "RULE.SUPPORT.SURFACE.314"
         },
         {
           "kind": "CHOICE",
@@ -14031,7 +14031,7 @@
           },
           "collection": null,
           "name": "steps a person tells apart by their kind, such as a checklist of a setup · over the steps",
-          "rule": "RD.SUPPORT.SURFACE.314"
+          "rule": "RULE.SUPPORT.SURFACE.314"
         },
         {
           "kind": "CHOICE",
@@ -14043,7 +14043,7 @@
           },
           "collection": null,
           "name": "a short run of steps with no names, such as the pages of an introduction · under the step in view",
-          "rule": "RD.SUPPORT.SURFACE.314"
+          "rule": "RULE.SUPPORT.SURFACE.314"
         },
         {
           "kind": "CHOICE",
@@ -14322,7 +14322,7 @@
           },
           "collection": null,
           "name": "a link alone in a row of a list · a row of a DSList",
-          "rule": "RD.SUPPORT.SURFACE.294"
+          "rule": "RULE.SUPPORT.SURFACE.294"
         },
         {
           "kind": "CHOICE",
@@ -14588,7 +14588,7 @@
           },
           "collection": null,
           "name": "a small entry: up to about five fields in one group · over the page it belongs to",
-          "rule": "RD.SUPPORT.SURFACE.075"
+          "rule": "RULE.SUPPORT.SURFACE.075"
         },
         {
           "kind": "CHOICE",
@@ -14610,7 +14610,7 @@
           },
           "collection": null,
           "name": "a wide thing a person works in: a picture to crop, a preview, a set to choose from · over the page",
-          "rule": "RD.SUPPORT.SURFACE.190"
+          "rule": "RULE.SUPPORT.SURFACE.190"
         },
         {
           "kind": "CHOICE",
@@ -14621,7 +14621,7 @@
           },
           "collection": null,
           "name": "a thing that sets its own width, such as a code shown once · over the page",
-          "rule": "RD.SUPPORT.SURFACE.245"
+          "rule": "RULE.SUPPORT.SURFACE.245"
         }
       ],
       "usage": {
@@ -14809,7 +14809,7 @@
           },
           "collection": null,
           "name": "deletes or ends something: delete a project, deactivate a record · over the page",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         },
         {
           "kind": "CHOICE",
@@ -14820,7 +14820,7 @@
           },
           "collection": null,
           "name": "starts or turns on something: activate a record · over the page",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         },
         {
           "kind": "CHOICE",
@@ -14831,7 +14831,7 @@
           },
           "collection": null,
           "name": "changes nothing a person keeps, such as leaving a page with changes unsaved · over the page",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         }
       ],
       "usage": {
@@ -15009,7 +15009,7 @@
           },
           "collection": null,
           "name": "a filter bar's fields on a phone · the foot of the screen",
-          "rule": "RD.SUPPORT.SURFACE.245"
+          "rule": "RULE.SUPPORT.SURFACE.245"
         },
         {
           "kind": "CHOICE",
@@ -15178,7 +15178,7 @@
           },
           "collection": null,
           "name": "a medium entry: one column, a few groups, up to about a dozen fields · at the side of the page it belongs to",
-          "rule": "RD.SUPPORT.SURFACE.075"
+          "rule": "RULE.SUPPORT.SURFACE.075"
         },
         {
           "kind": "CHOICE",
@@ -15200,7 +15200,7 @@
           },
           "collection": null,
           "name": "settings a person works by turns with the page, whose result shows on it · beside the page, which stays usable",
-          "rule": "RD.SUPPORT.SURFACE.093"
+          "rule": "RULE.SUPPORT.SURFACE.093"
         }
       ],
       "usage": {
@@ -15543,7 +15543,7 @@
           },
           "collection": null,
           "name": "a row's or a header's other actions, behind \"⋯\" · the end of the row or the header",
-          "rule": "RD.SUPPORT.SURFACE.390"
+          "rule": "RULE.SUPPORT.SURFACE.390"
         },
         {
           "kind": "CHOICE",
@@ -16033,7 +16033,7 @@
           },
           "collection": null,
           "name": "deletes or ends something: remove a member, deactivate a record · from the button that does it",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         },
         {
           "kind": "CHOICE",
@@ -16044,7 +16044,7 @@
           },
           "collection": null,
           "name": "starts or turns on something: activate a record · from the button that does it",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         },
         {
           "kind": "CHOICE",
@@ -16055,7 +16055,7 @@
           },
           "collection": null,
           "name": "changes nothing a person keeps · from the button",
-          "rule": "RD.SUPPORT.SURFACE.384"
+          "rule": "RULE.SUPPORT.SURFACE.384"
         }
       ],
       "usage": {
@@ -16163,7 +16163,7 @@
           },
           "collection": null,
           "name": "an icon-only button's label · over the button",
-          "rule": "RD.SUPPORT.SURFACE.144"
+          "rule": "RULE.SUPPORT.SURFACE.144"
         },
         {
           "kind": "CHOICE",
@@ -16380,7 +16380,7 @@
           },
           "collection": null,
           "name": "a label a person reads to learn what a value is, or a fact · beside its value, among facts",
-          "rule": "RD.SUPPORT.SURFACE.166"
+          "rule": "RULE.SUPPORT.SURFACE.166"
         },
         {
           "kind": "CHOICE",
@@ -16390,7 +16390,7 @@
           },
           "collection": null,
           "name": "a description that stands a step back under a title the page draws itself · under the title",
-          "rule": "RD.SUPPORT.SURFACE.143"
+          "rule": "RULE.SUPPORT.SURFACE.143"
         },
         {
           "kind": "CHOICE",
@@ -16410,7 +16410,7 @@
           },
           "collection": null,
           "name": "a sentence that reports a state: a count gone wrong, a check that passed · in the part it reports on",
-          "rule": "RD.SUPPORT.SURFACE.369"
+          "rule": "RULE.SUPPORT.SURFACE.369"
         },
         {
           "kind": "CHOICE",
@@ -16675,7 +16675,7 @@
           },
           "collection": null,
           "name": "a day that is a fact of the record: a due date, a start date · a reading or a cell",
-          "rule": "RD.SUPPORT.SURFACE.123"
+          "rule": "RULE.SUPPORT.SURFACE.123"
         },
         {
           "kind": "CHOICE",
@@ -16685,7 +16685,7 @@
           },
           "collection": null,
           "name": "the day a thing last changed, where the hour does not matter · a line of a list",
-          "rule": "RD.SUPPORT.SURFACE.122"
+          "rule": "RULE.SUPPORT.SURFACE.122"
         }
       ],
       "usage": {
@@ -16802,7 +16802,7 @@
           },
           "collection": null,
           "name": "when a thing last changed: a version, a record, a comment · a line of a list, or a head",
-          "rule": "RD.SUPPORT.SURFACE.122"
+          "rule": "RULE.SUPPORT.SURFACE.122"
         },
         {
           "kind": "CHOICE",
@@ -16812,7 +16812,7 @@
           },
           "collection": null,
           "name": "when a thing happened, on a page a person reads to learn when: an audit log, the notifications sent, a job's runs, the sign-ins · a row of the log",
-          "rule": "RD.SUPPORT.SURFACE.122"
+          "rule": "RULE.SUPPORT.SURFACE.122"
         },
         {
           "kind": "CHOICE",
@@ -18259,7 +18259,7 @@
           },
           "collection": null,
           "name": "a hero: the claim of a page, with its media beside it · the top of a site's page, or a band",
-          "rule": "RD.SUPPORT.SURFACE.234"
+          "rule": "RULE.SUPPORT.SURFACE.234"
         },
         {
           "kind": "CHOICE",
@@ -18362,7 +18362,7 @@
           },
           "collection": null,
           "name": "a feature whose facts say what it is before its sentence, such as a plan's price",
-          "rule": "RD.SUPPORT.SURFACE.242"
+          "rule": "RULE.SUPPORT.SURFACE.242"
         }
       ],
       "usage": {
@@ -18620,7 +18620,7 @@
           },
           "collection": null,
           "name": "a head over parts it draws from data: recent orders, a record's activity · a column or a grid of a page",
-          "rule": "RD.SUPPORT.SURFACE.221"
+          "rule": "RULE.SUPPORT.SURFACE.221"
         },
         {
           "kind": "CHOICE",
@@ -18630,7 +18630,7 @@
           },
           "collection": null,
           "name": "the same, over a picture or a band the app paints · over the picture or the band",
-          "rule": "RD.SUPPORT.SURFACE.192"
+          "rule": "RULE.SUPPORT.SURFACE.192"
         }
       ],
       "usage": {
@@ -21271,19 +21271,19 @@
         },
         {
           "value": "QUIET",
-          "cases": "the place's: a header draws them as its main action's look at its level (decision RD.SUPPORT.SURFACE.379)"
+          "cases": "the place's: a header draws them as its main action's look at its level (rule RULE.SUPPORT.SURFACE.379)"
         },
         {
           "value": "SUBTLE",
-          "cases": "the place's: a header draws them as its main action's look at its level (decision RD.SUPPORT.SURFACE.379)"
+          "cases": "the place's: a header draws them as its main action's look at its level (rule RULE.SUPPORT.SURFACE.379)"
         },
         {
           "value": "SUBTLE_OUTLINE",
-          "cases": "the place's: a header draws them as its main action's look at its level (decision RD.SUPPORT.SURFACE.379)"
+          "cases": "the place's: a header draws them as its main action's look at its level (rule RULE.SUPPORT.SURFACE.379)"
         },
         {
           "value": "OUTLINE",
-          "cases": "every other action, in a header, a footer or the content; an icon alone in the head of a page; a feature's other actions. It is the unit's own default outside a header or a footer (decision RD.SUPPORT.SURFACE.376)"
+          "cases": "every other action, in a header, a footer or the content; an icon alone in the head of a page; a feature's other actions. It is the unit's own default outside a header or a footer (rule RULE.SUPPORT.SURFACE.376)"
         },
         {
           "value": "GHOST",
@@ -21305,7 +21305,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "draws DEFAULT: a button takes no customColor (decision RD.SUPPORT.SURFACE.384)"
+          "cases": "draws DEFAULT: a button takes no customColor (rule RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "PRIMARY",
@@ -21313,15 +21313,15 @@
         },
         {
           "value": "INFO",
-          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (decision RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (rule RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "SUCCESS",
-          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (decision RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (rule RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "WARNING",
-          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (decision RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a hue says a state, and a button is an act, so a page that writes one says a state on an act (rule RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "ERROR",
@@ -21375,7 +21375,7 @@
       "values": [
         {
           "value": "HIDE",
-          "cases": "an action a person may not take is left out, as a move a state does not allow is (RD.SUPPORT.SURFACE.390). It is the unit's own default"
+          "cases": "an action a person may not take is left out, as a move a state does not allow is (RULE.SUPPORT.SURFACE.390). It is the unit's own default"
         },
         {
           "value": "DISABLE",
@@ -21389,71 +21389,71 @@
       "values": [
         {
           "value": "NUDGE_UP",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_90",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_180",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "SPIN_ONCE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "WIGGLE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "LIFT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RD.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: NUDGE_START on a back arrow, NUDGE_END on a next arrow, and NUDGE_UP_END set by the unit on a link that leaves the site (RULE.SUPPORT.SURFACE.285). A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         }
       ]
     },
@@ -21621,7 +21621,7 @@
         },
         {
           "value": "TRANSLUCENT",
-          "cases": "a card over a picture or a band the app paints (RD.SUPPORT.SURFACE.192)"
+          "cases": "a card over a picture or a band the app paints (RULE.SUPPORT.SURFACE.192)"
         }
       ]
     },
@@ -21697,27 +21697,27 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         },
         {
           "value": "PRIMARY",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         },
         {
           "value": "INFO",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         },
         {
           "value": "SUCCESS",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         },
         {
           "value": "WARNING",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         },
         {
           "value": "ERROR",
-          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RD.SUPPORT.SURFACE.065); a state beside them is a badge"
+          "cases": "no case written yet: a person or an organization has no state and no brand of their own to say (RULE.SUPPORT.SURFACE.065); a state beside them is a badge"
         }
       ]
     },
@@ -22185,7 +22185,7 @@
         },
         {
           "value": "NUMBER",
-          "cases": "no case written yet: a number fits a DSInputNumber, which holds number | null (RD.SUPPORT.SURFACE.299)"
+          "cases": "no case written yet: a number fits a DSInputNumber, which holds number | null (RULE.SUPPORT.SURFACE.299)"
         },
         {
           "value": "PASSWORD",
@@ -22275,7 +22275,7 @@
       "values": [
         {
           "value": "ERROR",
-          "cases": "the field's, which DSForm.Field gives from the field's check (RD.SUPPORT.SURFACE.189)"
+          "cases": "the field's, which DSForm.Field gives from the field's check (RULE.SUPPORT.SURFACE.189)"
         }
       ]
     },
@@ -22285,7 +22285,7 @@
       "values": [
         {
           "value": "DEFAULT",
-          "cases": "every choice. Its pressed toggle keeps a fill a person can see (RD.SUPPORT.SURFACE.146)"
+          "cases": "every choice. Its pressed toggle keeps a fill a person can see (RULE.SUPPORT.SURFACE.146)"
         },
         {
           "value": "CUSTOM",
@@ -22505,7 +22505,7 @@
       "values": [
         {
           "value": "DEFAULT",
-          "cases": "every toggle. It is the unit's own default (RD.SUPPORT.SURFACE.146)"
+          "cases": "every toggle. It is the unit's own default (RULE.SUPPORT.SURFACE.146)"
         },
         {
           "value": "CUSTOM",
@@ -22645,31 +22645,31 @@
       "values": [
         {
           "value": "US_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_DASH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "ISO_8601",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "GERMAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "SHORT_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "FULL_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -22715,31 +22715,31 @@
       "values": [
         {
           "value": "US_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_DASH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "ISO_8601",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "GERMAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "SHORT_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "FULL_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -22785,11 +22785,11 @@
       "values": [
         {
           "value": "TWENTY_FOUR_HOUR",
-          "cases": "the app's clock: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's clock: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "TWELVE_HOUR",
-          "cases": "the app's clock: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's clock: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -22853,11 +22853,11 @@
       "values": [
         {
           "value": "TWENTY_FOUR_HOUR",
-          "cases": "the app's clock: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's clock: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "TWELVE_HOUR",
-          "cases": "the app's clock: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's clock: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -22967,19 +22967,19 @@
       "values": [
         {
           "value": "INFO",
-          "cases": "each by its case, in the hue a badge gives the same state (RD.SUPPORT.SURFACE.369)"
+          "cases": "each by its case, in the hue a badge gives the same state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "SUCCESS",
-          "cases": "each by its case, in the hue a badge gives the same state (RD.SUPPORT.SURFACE.369)"
+          "cases": "each by its case, in the hue a badge gives the same state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "WARNING",
-          "cases": "each by its case, in the hue a badge gives the same state (RD.SUPPORT.SURFACE.369)"
+          "cases": "each by its case, in the hue a badge gives the same state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "ERROR",
-          "cases": "each by its case, in the hue a badge gives the same state (RD.SUPPORT.SURFACE.369)"
+          "cases": "each by its case, in the hue a badge gives the same state (RULE.SUPPORT.SURFACE.369)"
         }
       ]
     },
@@ -23169,19 +23169,19 @@
         },
         {
           "value": "INFO",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "SUCCESS",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "WARNING",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "ERROR",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         }
       ]
     },
@@ -23229,19 +23229,19 @@
         },
         {
           "value": "INFO",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "SUCCESS",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "WARNING",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "ERROR",
-          "cases": "a measure whose level says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "a measure whose level says that state (RULE.SUPPORT.SURFACE.369)"
         }
       ]
     },
@@ -23505,27 +23505,27 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "a thing a person coloured, with customColor (RD.SUPPORT.SURFACE.382)"
+          "cases": "a thing a person coloured, with customColor (RULE.SUPPORT.SURFACE.382)"
         },
         {
           "value": "PRIMARY",
-          "cases": "no case written yet: an icon in the brand is the app's own mark, a DSMark (RD.SUPPORT.SURFACE.387)"
+          "cases": "no case written yet: an icon in the brand is the app's own mark, a DSMark (RULE.SUPPORT.SURFACE.387)"
         },
         {
           "value": "INFO",
-          "cases": "an icon that says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "an icon that says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "SUCCESS",
-          "cases": "an icon that says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "an icon that says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "WARNING",
-          "cases": "an icon that says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "an icon that says that state (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "ERROR",
-          "cases": "an icon that says that state (RD.SUPPORT.SURFACE.369)"
+          "cases": "an icon that says that state (RULE.SUPPORT.SURFACE.369)"
         }
       ]
     },
@@ -23535,19 +23535,19 @@
       "values": [
         {
           "value": "DEFAULT",
-          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RD.SUPPORT.SURFACE.304)"
+          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RULE.SUPPORT.SURFACE.304)"
         },
         {
           "value": "QUIET",
-          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RD.SUPPORT.SURFACE.304)"
+          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RULE.SUPPORT.SURFACE.304)"
         },
         {
           "value": "MUTED",
-          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RD.SUPPORT.SURFACE.304)"
+          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RULE.SUPPORT.SURFACE.304)"
         },
         {
           "value": "SUBTLE",
-          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RD.SUPPORT.SURFACE.304)"
+          "cases": "the tone of the words beside it; a bare icon of an item line draws muted (RULE.SUPPORT.SURFACE.304)"
         },
         {
           "value": "INVERSE",
@@ -23611,71 +23611,71 @@
       "values": [
         {
           "value": "NUDGE_UP",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_90",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_180",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "SPIN_ONCE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "WIGGLE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "LIFT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it (RULE.SUPPORT.SURFACE.201)"
         }
       ]
     },
@@ -23755,19 +23755,19 @@
         },
         {
           "value": "INFO",
-          "cases": "no case written yet: a hue says a state (RD.SUPPORT.SURFACE.065), and a link is a place to go"
+          "cases": "no case written yet: a hue says a state (RULE.SUPPORT.SURFACE.065), and a link is a place to go"
         },
         {
           "value": "SUCCESS",
-          "cases": "no case written yet: a hue says a state (RD.SUPPORT.SURFACE.065), and a link is a place to go"
+          "cases": "no case written yet: a hue says a state (RULE.SUPPORT.SURFACE.065), and a link is a place to go"
         },
         {
           "value": "WARNING",
-          "cases": "no case written yet: a hue says a state (RD.SUPPORT.SURFACE.065), and a link is a place to go"
+          "cases": "no case written yet: a hue says a state (RULE.SUPPORT.SURFACE.065), and a link is a place to go"
         },
         {
           "value": "ERROR",
-          "cases": "no case written yet: a hue says a state (RD.SUPPORT.SURFACE.065), and a link is a place to go"
+          "cases": "no case written yet: a hue says a state (RULE.SUPPORT.SURFACE.065), and a link is a place to go"
         }
       ]
     },
@@ -23891,15 +23891,15 @@
       "values": [
         {
           "value": "LINE",
-          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RD.SUPPORT.SURFACE.209)"
+          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RULE.SUPPORT.SURFACE.209)"
         },
         {
           "value": "SWITCH",
-          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RD.SUPPORT.SURFACE.209)"
+          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RULE.SUPPORT.SURFACE.209)"
         },
         {
           "value": "PILL",
-          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RD.SUPPORT.SURFACE.209)"
+          "cases": "left out, the level's; PILL on a site; LINE where an app keeps it at PAGE (RULE.SUPPORT.SURFACE.209)"
         }
       ]
     },
@@ -23909,15 +23909,15 @@
       "values": [
         {
           "value": "BASE",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
         },
         {
           "value": "DEFAULT",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
         },
         {
           "value": "PRIMARY",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214); a row writes one only to match a surface it stands on"
         }
       ]
     },
@@ -23927,23 +23927,23 @@
       "values": [
         {
           "value": "SOLID",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214)"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214)"
         },
         {
           "value": "QUIET",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214)"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214)"
         },
         {
           "value": "SUBTLE",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214)"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214)"
         },
         {
           "value": "LINE",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214)"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214)"
         },
         {
           "value": "PLAIN",
-          "cases": "the navigation's (RD.SUPPORT.SURFACE.214)"
+          "cases": "the navigation's (RULE.SUPPORT.SURFACE.214)"
         }
       ]
     },
@@ -23957,7 +23957,7 @@
         },
         {
           "value": "VERTICAL",
-          "cases": "sections down a side (RD.SUPPORT.SURFACE.213)"
+          "cases": "sections down a side (RULE.SUPPORT.SURFACE.213)"
         }
       ]
     },
@@ -23967,23 +23967,23 @@
       "values": [
         {
           "value": "XS",
-          "cases": "the place's; the level counts its steps from it (RD.SUPPORT.SURFACE.315)"
+          "cases": "the place's; the level counts its steps from it (RULE.SUPPORT.SURFACE.315)"
         },
         {
           "value": "SM",
-          "cases": "the place's; the level counts its steps from it (RD.SUPPORT.SURFACE.315)"
+          "cases": "the place's; the level counts its steps from it (RULE.SUPPORT.SURFACE.315)"
         },
         {
           "value": "MD",
-          "cases": "the place's; the level counts its steps from it (RD.SUPPORT.SURFACE.315)"
+          "cases": "the place's; the level counts its steps from it (RULE.SUPPORT.SURFACE.315)"
         },
         {
           "value": "LG",
-          "cases": "the place's; the level counts its steps from it (RD.SUPPORT.SURFACE.315)"
+          "cases": "the place's; the level counts its steps from it (RULE.SUPPORT.SURFACE.315)"
         },
         {
           "value": "XL",
-          "cases": "the place's; the level counts its steps from it (RD.SUPPORT.SURFACE.315)"
+          "cases": "the place's; the level counts its steps from it (RULE.SUPPORT.SURFACE.315)"
         }
       ]
     },
@@ -23993,27 +23993,27 @@
       "values": [
         {
           "value": "PAGE",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "CONTAINER",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "WIDGET",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "GROUP",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "CONTENT",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "INLINE",
-          "cases": "the level of the box it stands in (RD.SUPPORT.SURFACE.314)"
+          "cases": "the level of the box it stands in (RULE.SUPPORT.SURFACE.314)"
         }
       ]
     },
@@ -24049,7 +24049,7 @@
         },
         {
           "value": "PRIMARY",
-          "cases": "every flow a person takes. It is the unit's own default (RD.SUPPORT.SURFACE.385)"
+          "cases": "every flow a person takes. It is the unit's own default (RULE.SUPPORT.SURFACE.385)"
         },
         {
           "value": "INFO",
@@ -24089,23 +24089,23 @@
       "values": [
         {
           "value": "XS",
-          "cases": "the place's; the level raises it (RD.SUPPORT.SURFACE.314)"
+          "cases": "the place's; the level raises it (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "SM",
-          "cases": "the place's; the level raises it (RD.SUPPORT.SURFACE.314)"
+          "cases": "the place's; the level raises it (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "MD",
-          "cases": "the place's; the level raises it (RD.SUPPORT.SURFACE.314)"
+          "cases": "the place's; the level raises it (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "LG",
-          "cases": "the place's; the level raises it (RD.SUPPORT.SURFACE.314)"
+          "cases": "the place's; the level raises it (RULE.SUPPORT.SURFACE.314)"
         },
         {
           "value": "XL",
-          "cases": "the place's; the level raises it (RD.SUPPORT.SURFACE.314)"
+          "cases": "the place's; the level raises it (RULE.SUPPORT.SURFACE.314)"
         }
       ]
     },
@@ -24261,23 +24261,23 @@
       "values": [
         {
           "value": "XS",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "SM",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "MD",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "LG",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "XL",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         }
       ]
     },
@@ -24299,7 +24299,7 @@
         },
         {
           "value": "LG",
-          "cases": "no case written yet: an entry that needs more room than MD fits a sheet (RD.SUPPORT.SURFACE.075), and a wide thing takes XL"
+          "cases": "no case written yet: an entry that needs more room than MD fits a sheet (RULE.SUPPORT.SURFACE.075), and a wide thing takes XL"
         },
         {
           "value": "XL",
@@ -24307,7 +24307,7 @@
         },
         {
           "value": "FIT",
-          "cases": "a thing that sets its own width (RD.SUPPORT.SURFACE.245). Not drawn"
+          "cases": "a thing that sets its own width (RULE.SUPPORT.SURFACE.245). Not drawn"
         }
       ]
     },
@@ -24331,23 +24331,23 @@
       "values": [
         {
           "value": "XS",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "SM",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "MD",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "LG",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "XL",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         }
       ]
     },
@@ -24399,7 +24399,7 @@
         },
         {
           "value": "FIT",
-          "cases": "fields at the foot, which open whole (RD.SUPPORT.SURFACE.245)"
+          "cases": "fields at the foot, which open whole (RULE.SUPPORT.SURFACE.245)"
         }
       ]
     },
@@ -24409,23 +24409,23 @@
       "values": [
         {
           "value": "XS",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "SM",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "MD",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "LG",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         },
         {
           "value": "XL",
-          "cases": "the place's. It sets the padding and never the width (RD.SUPPORT.SURFACE.190)"
+          "cases": "the place's. It sets the padding and never the width (RULE.SUPPORT.SURFACE.190)"
         }
       ]
     },
@@ -24439,7 +24439,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "PRIMARY",
@@ -24447,15 +24447,15 @@
         },
         {
           "value": "INFO",
-          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "SUCCESS",
-          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "WARNING",
-          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: a confirmation's colour is its action's, and a button has no case for them (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "ERROR",
@@ -24503,7 +24503,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "no case written yet: its colour is its action's (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: its colour is its action's (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "PRIMARY",
@@ -24511,15 +24511,15 @@
         },
         {
           "value": "INFO",
-          "cases": "no case written yet: its colour is its action's (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: its colour is its action's (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "SUCCESS",
-          "cases": "no case written yet: its colour is its action's (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: its colour is its action's (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "WARNING",
-          "cases": "no case written yet: its colour is its action's (RD.SUPPORT.SURFACE.384)"
+          "cases": "no case written yet: its colour is its action's (RULE.SUPPORT.SURFACE.384)"
         },
         {
           "value": "ERROR",
@@ -24957,7 +24957,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "no case written yet: a colour a person chose fits a badge (RD.SUPPORT.SURFACE.382) or DSColorView"
+          "cases": "no case written yet: a colour a person chose fits a badge (RULE.SUPPORT.SURFACE.382) or DSColorView"
         },
         {
           "value": "PRIMARY",
@@ -24965,19 +24965,19 @@
         },
         {
           "value": "INFO",
-          "cases": "a sentence that reports that state, in the hue a badge gives it (RD.SUPPORT.SURFACE.369)"
+          "cases": "a sentence that reports that state, in the hue a badge gives it (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "SUCCESS",
-          "cases": "a sentence that reports that state, in the hue a badge gives it (RD.SUPPORT.SURFACE.369)"
+          "cases": "a sentence that reports that state, in the hue a badge gives it (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "WARNING",
-          "cases": "a sentence that reports that state, in the hue a badge gives it (RD.SUPPORT.SURFACE.369)"
+          "cases": "a sentence that reports that state, in the hue a badge gives it (RULE.SUPPORT.SURFACE.369)"
         },
         {
           "value": "ERROR",
-          "cases": "a sentence that reports that state, in the hue a badge gives it (RD.SUPPORT.SURFACE.369)"
+          "cases": "a sentence that reports that state, in the hue a badge gives it (RULE.SUPPORT.SURFACE.369)"
         }
       ]
     },
@@ -24991,11 +24991,11 @@
         },
         {
           "value": "QUIET",
-          "cases": "a description a step back (RD.SUPPORT.SURFACE.143)"
+          "cases": "a description a step back (RULE.SUPPORT.SURFACE.143)"
         },
         {
           "value": "MUTED",
-          "cases": "a label, a fact; a short label over a title (RD.SUPPORT.SURFACE.166)"
+          "cases": "a label, a fact; a short label over a title (RULE.SUPPORT.SURFACE.166)"
         },
         {
           "value": "SUBTLE",
@@ -25063,31 +25063,31 @@
       "values": [
         {
           "value": "US_STANDARD",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_STANDARD",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_DASH",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "ISO_8601",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "GERMAN_STANDARD",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "SHORT_MONTH",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "FULL_MONTH",
-          "cases": "the app's: no case writes one, so the unit reads the person's own (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one, so the unit reads the person's own (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -25097,19 +25097,19 @@
       "values": [
         {
           "value": "HH_MM",
-          "cases": "the app's, as dateFormat is (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's, as dateFormat is (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_SS",
-          "cases": "the app's, as dateFormat is (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's, as dateFormat is (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_DAY_FORMAT",
-          "cases": "the app's, as dateFormat is (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's, as dateFormat is (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_SS_DAY_FORMAT",
-          "cases": "the app's, as dateFormat is (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's, as dateFormat is (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -25123,7 +25123,7 @@
         },
         {
           "value": "AGO",
-          "cases": "the day a thing last changed (RD.SUPPORT.SURFACE.122)"
+          "cases": "the day a thing last changed (RULE.SUPPORT.SURFACE.122)"
         }
       ]
     },
@@ -25133,31 +25133,31 @@
       "values": [
         {
           "value": "US_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "EUROPEAN_DASH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "ISO_8601",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "GERMAN_STANDARD",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "SHORT_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "FULL_MONTH",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -25259,19 +25259,19 @@
       "values": [
         {
           "value": "HH_MM",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_SS",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_DAY_FORMAT",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         },
         {
           "value": "HH_MM_SS_DAY_FORMAT",
-          "cases": "the app's: no case writes one (RD.SUPPORT.SURFACE.123)"
+          "cases": "the app's: no case writes one (RULE.SUPPORT.SURFACE.123)"
         }
       ]
     },
@@ -25349,7 +25349,7 @@
       "values": [
         {
           "value": "DROPDOWN",
-          "cases": "a row's actions behind one \"⋯\" (RD.SUPPORT.SURFACE.390)"
+          "cases": "a row's actions behind one \"⋯\" (RULE.SUPPORT.SURFACE.390)"
         },
         {
           "value": "ICONS",
@@ -25481,7 +25481,7 @@
         },
         {
           "value": "AFTER_TITLE",
-          "cases": "facts that say what the feature is before its sentence (RD.SUPPORT.SURFACE.242)"
+          "cases": "facts that say what the feature is before its sentence (RULE.SUPPORT.SURFACE.242)"
         }
       ]
     },
@@ -25525,7 +25525,7 @@
         },
         {
           "value": "VERTICAL",
-          "cases": "a tile whose picture stands over its words (RD.SUPPORT.SURFACE.216)"
+          "cases": "a tile whose picture stands over its words (RULE.SUPPORT.SURFACE.216)"
         }
       ]
     },
@@ -25539,7 +25539,7 @@
         },
         {
           "value": "AFTER_TITLE",
-          "cases": "a comment or a post (RD.SUPPORT.SURFACE.242)"
+          "cases": "a comment or a post (RULE.SUPPORT.SURFACE.242)"
         }
       ]
     },
@@ -25567,7 +25567,7 @@
       "values": [
         {
           "value": "TOP",
-          "cases": "a comment; a row of three lines or more; a tile, as the unit keeps it (RD.SUPPORT.SURFACE.219)"
+          "cases": "a comment; a row of three lines or more; a tile, as the unit keeps it (RULE.SUPPORT.SURFACE.219)"
         },
         {
           "value": "CENTER",
@@ -25585,7 +25585,7 @@
       "values": [
         {
           "value": "SOLID",
-          "cases": "a state over a picture (decision RD.SUPPORT.SURFACE.378)"
+          "cases": "a state over a picture (rule RULE.SUPPORT.SURFACE.378)"
         },
         {
           "value": "QUIET",
@@ -25605,11 +25605,11 @@
         },
         {
           "value": "GHOST",
-          "cases": "no case written yet: a word with no fill is a fact in words (decision RD.SUPPORT.SURFACE.377)"
+          "cases": "no case written yet: a word with no fill is a fact in words (rule RULE.SUPPORT.SURFACE.377)"
         },
         {
           "value": "LINK",
-          "cases": "no case written yet: a link fits a DSLink (decision RD.SUPPORT.SURFACE.377)"
+          "cases": "no case written yet: a link fits a DSLink (rule RULE.SUPPORT.SURFACE.377)"
         }
       ]
     },
@@ -25623,7 +25623,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "a label a person coloured, with customColor (decision RD.SUPPORT.SURFACE.382). Not for a state the system names"
+          "cases": "a label a person coloured, with customColor (rule RULE.SUPPORT.SURFACE.382). Not for a state the system names"
         },
         {
           "value": "PRIMARY",
@@ -25653,11 +25653,11 @@
       "values": [
         {
           "value": "XS",
-          "cases": "a state in an item line at CONTENT and INLINE; a state in a table cell (decision RD.SUPPORT.SURFACE.391); several values where their place is SM or XS"
+          "cases": "a state in an item line at CONTENT and INLINE; a state in a table cell (rule RULE.SUPPORT.SURFACE.391); several values where their place is SM or XS"
         },
         {
           "value": "SM",
-          "cases": "a state in an item line at WIDGET and GROUP; a state on its own (decision RD.SUPPORT.SURFACE.380); several values where their place is MD"
+          "cases": "a state in an item line at WIDGET and GROUP; a state on its own (rule RULE.SUPPORT.SURFACE.380); several values where their place is MD"
         },
         {
           "value": "MD",
@@ -25679,7 +25679,7 @@
       "values": [
         {
           "value": "SOLID",
-          "cases": "the app's own mark; the chosen one of a run of marks (decision RD.SUPPORT.SURFACE.387)"
+          "cases": "the app's own mark; the chosen one of a run of marks (rule RULE.SUPPORT.SURFACE.387)"
         },
         {
           "value": "QUIET",
@@ -25691,19 +25691,19 @@
         },
         {
           "value": "SUBTLE_OUTLINE",
-          "cases": "no case written yet: no level rings a mark, and a mark is no link (decision RD.SUPPORT.SURFACE.389)"
+          "cases": "no case written yet: no level rings a mark, and a mark is no link (rule RULE.SUPPORT.SURFACE.389)"
         },
         {
           "value": "OUTLINE",
-          "cases": "a thing that is not set up yet (decision RD.SUPPORT.SURFACE.386)"
+          "cases": "a thing that is not set up yet (rule RULE.SUPPORT.SURFACE.386)"
         },
         {
           "value": "GHOST",
-          "cases": "the marks of a run that are not chosen (decision RD.SUPPORT.SURFACE.388)"
+          "cases": "the marks of a run that are not chosen (rule RULE.SUPPORT.SURFACE.388)"
         },
         {
           "value": "LINK",
-          "cases": "no case written yet: no level rings a mark, and a mark is no link (decision RD.SUPPORT.SURFACE.389)"
+          "cases": "no case written yet: no level rings a mark, and a mark is no link (rule RULE.SUPPORT.SURFACE.389)"
         }
       ]
     },
@@ -25717,7 +25717,7 @@
         },
         {
           "value": "CUSTOM",
-          "cases": "draws DEFAULT: a mark has no colour of its own to draw from (decision RD.SUPPORT.SURFACE.385)"
+          "cases": "draws DEFAULT: a mark has no colour of its own to draw from (rule RULE.SUPPORT.SURFACE.385)"
         },
         {
           "value": "PRIMARY",
@@ -25725,19 +25725,19 @@
         },
         {
           "value": "INFO",
-          "cases": "a mark that says a state, by the hue table (decision RD.SUPPORT.SURFACE.385)"
+          "cases": "a mark that says a state, by the hue table (rule RULE.SUPPORT.SURFACE.385)"
         },
         {
           "value": "SUCCESS",
-          "cases": "a mark that says a state, by the hue table (decision RD.SUPPORT.SURFACE.385)"
+          "cases": "a mark that says a state, by the hue table (rule RULE.SUPPORT.SURFACE.385)"
         },
         {
           "value": "WARNING",
-          "cases": "a mark that says a state, by the hue table (decision RD.SUPPORT.SURFACE.385)"
+          "cases": "a mark that says a state, by the hue table (rule RULE.SUPPORT.SURFACE.385)"
         },
         {
           "value": "ERROR",
-          "cases": "a mark that says a state, by the hue table (decision RD.SUPPORT.SURFACE.385)"
+          "cases": "a mark that says a state, by the hue table (rule RULE.SUPPORT.SURFACE.385)"
         }
       ]
     },
@@ -25841,71 +25841,71 @@
       "values": [
         {
           "value": "NUDGE_UP",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_UP_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_START",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "NUDGE_DOWN_END",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "ZOOM_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_IN",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "FADE_OUT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_90",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "TURN_180",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "SPIN_ONCE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "WIGGLE",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         },
         {
           "value": "LIFT",
-          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RD.SUPPORT.SURFACE.201)"
+          "cases": "by the icon's meaning, as the motion of an icon gives it: LIFT on a mark of a tile that opens. A page writes one only for an icon the table names (RULE.SUPPORT.SURFACE.201)"
         }
       ]
     },
@@ -25919,7 +25919,7 @@
         },
         {
           "value": "TRANSLUCENT",
-          "cases": "a widget over a picture or a band (RD.SUPPORT.SURFACE.192)"
+          "cases": "a widget over a picture or a band (RULE.SUPPORT.SURFACE.192)"
         }
       ]
     },

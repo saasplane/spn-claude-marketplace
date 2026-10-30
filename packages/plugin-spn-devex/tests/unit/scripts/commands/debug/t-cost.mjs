@@ -1,5 +1,5 @@
-// `debug cost show <target>` — what a target cost, read from `usage.jsonl` alone (RD.DEVEX.AGENT.082,
-// RD.DEVEX.WORKSPACE.323): the five targets, each reply once, the rotated log and the live one, money from the
+// `debug cost show <target>` — what a target cost, read from `usage.jsonl` alone (RULE.DEVEX.AGENT.082,
+// RULE.DEVEX.WORKSPACE.323): the five targets, each reply once, the rotated log and the live one, money from the
 // price table and null for a model it lacks, and the window the command runs in found from its start file.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";

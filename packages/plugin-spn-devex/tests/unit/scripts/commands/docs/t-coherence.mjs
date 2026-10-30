@@ -1,19 +1,24 @@
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-// `coherence` CITATION — does every decision id cited in a repository resolve to a row?
+// `coherence` CITATION — does every id cited resolve to exactly one place in the workspace?
 //
 // The question exists because `N76` found two ids cited in the foundation book with no row behind
-// them, and neither had ever been reported. A citation to a missing row is the one register failure
+// them, and neither had ever been reported. A citation to a missing place is the one register failure
 // a reader cannot work around: every other finding leaves two answers to choose between, and this
-// one leaves none. It is also silent — `RD.APPS.020` reads exactly like a row that exists until
-// somebody opens the register and searches.
+// one leaves none. It is also silent — `DEC.SUPPORT.APPS.020` reads exactly like a row that exists
+// until somebody opens the register and searches.
 //
-// These cases fix the three answers that matter, because the check ships SOFT and a SOFT check
-// nobody trusts is a SOFT check nobody reads:
+// An id is `RULE.<AREA>.<DOMAIN>.<NNN>`, written once as `(rule RULE.…)` on the rule's sentence in a
+// chapter, or `DEC.<AREA>.<DOMAIN>.<NNN>`, written once as a register row's first cell or as the
+// heading of the open card that row will compress from. These cases
+// fix the answers that matter, because the check ships SOFT and a SOFT check nobody trusts is a SOFT
+// check nobody reads:
 //
 //   a clean tree reports nothing        — otherwise the finding is noise and gets filtered away
 //   one dangling id reports once        — naming the id AND the file, because the file is the fix
-//   a repo with no register is silent   — the marketplace and the estate repos have none, and a
-//                                         tool that fires there would be red everywhere by default
+//   an id that resolves twice, an id written as a link, and any `RD.` id are findings too
+//   a workspace holding no rule and no row is silent — a partner holds the plugins and neither the
+//                                         book nor its register, and a tool that fired there would be
+//                                         red everywhere by default
 //
 // The fixture is written rather than copied from the corpus on purpose. A test whose input is the
 // live book passes for whatever reason the book happens to be in today.
@@ -36,8 +41,9 @@ function one(label, ok) {
 }
 
 /** One `docs coherence check` of a path through the entry, with what follows the path. A refusal's text is handed back with the rest. */
+let WORKSPACE = null;
 function run(root, ...more) {
-  try { return execFileSync(process.execPath, [TOOL, "docs", "coherence", "check", root, ...more], { encoding: "utf8", stdio: "pipe" }); }
+  try { return execFileSync(process.execPath, [TOOL, "docs", "coherence", "check", root, ...more], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: WORKSPACE ?? resolve(root) } }); }
   catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 
@@ -48,7 +54,7 @@ function tree(name, pageBody, withRegister = true) {
   if (withRegister)
     writeFileSync(join(root, "docs", POCKET.registers, "decisions.md"),
       "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
-      "| RD.DEVEX.WORKSPACE.155 | A thing is so. | Because a fixture needs a row that exists. | 2026-09 |\n");
+      "| DEC.DEVEX.WORKSPACE.155 | A thing is so. | Because a fixture needs a row that exists. | 2026-09 |\n");
   writeFileSync(join(root, "docs", SEAT.constructs, "a.md"), pageBody);
   return root;
 }
@@ -60,29 +66,90 @@ function mk(root, relative, body) {
   writeFileSync(at, body);
 }
 
+// 0 — the new shape: a RULE id resolves to its sentence, a DEC id to its row, each exactly once.
+const ruleSentence = "A page MUST choose by its size (rule RULE.SUPPORT.SURFACE.075).\n";
+const rules = tree("rules", "# A page\n\nIt cites RULE.SUPPORT.SURFACE.075 and DEC.DEVEX.WORKSPACE.155.\n");
+mk(rules, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);
+one("a RULE id with its sentence and a DEC id with its row report no CITATION finding", !run(rules).includes("CITATION"));
+
+const noSentence = tree("no-sentence", "# A page\n\nIt cites RULE.SUPPORT.SURFACE.076.\n");
+mk(noSentence, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);
+const noSentenceOut = run(noSentence);
+one("a RULE id no chapter carries is reported as resolving nowhere",
+  /CITATION\s+1 id\(s\)/.test(noSentenceOut) && noSentenceOut.includes("RULE.SUPPORT.SURFACE.076 — resolves nowhere"));
+
+const twice = tree("twice", "# A page\n\nIt cites RULE.SUPPORT.SURFACE.075.\n");
+mk(twice, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);
+mk(twice, `docs/${SEAT.constructs}/c.md`, `# C\n\n${ruleSentence}`);
+one("a RULE id two sentences carry is reported as resolving twice", run(twice).includes("RULE.SUPPORT.SURFACE.075 — resolves 2 times"));
+
+const decTwice = tree("dec-twice", "# A page\n\nIt cites DEC.DEVEX.WORKSPACE.155.\n");
+writeFileSync(join(decTwice, "docs", POCKET.registers, "decisions.md"),
+  readFileSync(join(decTwice, "docs", POCKET.registers, "decisions.md"), "utf8") +
+  "| DEC.DEVEX.WORKSPACE.155 | The same row again. | Because a fixture needs a duplicate. | 2026-09 |\n");
+one("a DEC id two rows carry is reported as resolving twice", run(decTwice).includes("DEC.DEVEX.WORKSPACE.155 — resolves 2 times"));
+
+// An open card headed with the id its row will take is that id's place until it compresses to the row.
+const card = "### DEC.DEVEX.WORKSPACE.156 — Is the thing so?\n\n- **Context:** a fixture needs an open card.\n\n";
+const opened = tree("card", "# A page\n\nIt cites DEC.DEVEX.WORKSPACE.156.\n");
+writeFileSync(join(opened, "docs", POCKET.registers, "decisions.md"),
+  "# Decisions\n\n## Open\n\n" + card + readFileSync(join(opened, "docs", POCKET.registers, "decisions.md"), "utf8").replace("# Decisions\n\n", ""));
+one("a DEC id an open card is headed with resolves to that card", !run(opened).includes("CITATION"));
+
+const standing = tree("card-standing", "# A page\n\nIt cites DEC.DEVEX.WORKSPACE.155.\n");
+writeFileSync(join(standing, "docs", POCKET.registers, "decisions.md"),
+  "# Decisions\n\n## Open\n\n" + card.replace("156", "155") +
+  readFileSync(join(standing, "docs", POCKET.registers, "decisions.md"), "utf8").replace("# Decisions\n\n", ""));
+one("a card left standing beside its row is reported as resolving twice",
+  run(standing).includes("DEC.DEVEX.WORKSPACE.155 — resolves 2 times"));
+
+const linked = tree("linked", "# A page\n\nIt cites [RULE.SUPPORT.SURFACE.075](../registers/decisions.md).\n");
+mk(linked, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);
+one("an id written as a link is reported", run(linked).includes("RULE.SUPPORT.SURFACE.075 — written as a link"));
+
+const retired = tree("retired", "# A page\n\nIt cites RD.SUPPORT.SURFACE.075.\n");
+one("an RD id is reported, whatever the workspace holds", run(retired).includes("RD.SUPPORT.SURFACE.075 — an `RD.` id"));
+
+{
+  // The book states the rule and a second repository cites it: the id resolves across the workspace.
+  const ws = join(BASE, "cross");
+  const book = join(ws, "spn-foundation");
+  mk(book, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);
+  mk(book, "sprepo.json", '{"type":"FOUNDATION","name":"spn-foundation","config":null}');
+  const marketplace = join(ws, "spn-claude-marketplace");
+  mk(marketplace, "sprepo.json", '{"type":"GENERAL","name":"m","config":null}');
+  mk(marketplace, `docs/${SEAT.constructs}/a.md`, "# A\n\nIt cites RULE.SUPPORT.SURFACE.075 and RULE.SUPPORT.SURFACE.999.\n");
+  WORKSPACE = ws;
+  const crossOut = run(marketplace);
+  WORKSPACE = null;
+  one("a RULE id the book states resolves from a sibling repository, and one nothing states does not",
+    /CITATION\s+1 id\(s\)/.test(crossOut) && crossOut.includes("RULE.SUPPORT.SURFACE.999 — resolves nowhere")
+      && !crossOut.includes("RULE.SUPPORT.SURFACE.075 —"));
+}
+
 // 1 — every citation resolves, so the check says nothing at all.
-const clean = tree("clean", "# A page\n\nThis cites RD.DEVEX.WORKSPACE.155, which the register carries.\n");
+const clean = tree("clean", "# A page\n\nThis cites DEC.DEVEX.WORKSPACE.155, which the register carries.\n");
 one("a tree whose citations all resolve reports no CITATION finding",
   !run(clean).includes("CITATION"));
 
 // 2 — one dangling id, reported once, naming the id and the file that cites it.
 const dangling = tree("dangling",
-  "# A page\n\nThis cites RD.DEVEX.WORKSPACE.155, which exists, and RD.GOV.999, which does not.\n");
+  "# A page\n\nThis cites DEC.DEVEX.WORKSPACE.155, which exists, and DEC.SUPPORT.GOV.999, which does not.\n");
 const out = run(dangling);
 one("a dangling id is reported", out.includes("CITATION"));
-one("the finding names the dangling id", out.includes("RD.GOV.999"));
+one("the finding names the dangling id", out.includes("DEC.SUPPORT.GOV.999"));
 one("the finding names the file citing it", out.includes(`docs/${SEAT.constructs}/a.md`));
-one("a resolving id in the same file is not reported", !out.includes("RD.DEVEX.WORKSPACE.155 —"));
-one("one dangling id counts as one", /CITATION\s+1 decision id\(s\)/.test(out));
+one("a resolving id in the same file is not reported", !out.includes("DEC.DEVEX.WORKSPACE.155 —"));
+one("one dangling id counts as one", /CITATION\s+1 id\(s\)/.test(out));
 
 // 3 — a repository with no register is not this question's business. The marketplace and the
 //     estate repos carry none, and a tool that fired there would be red everywhere by default.
-const noRegister = tree("no-register", "# A page\n\nThis cites RD.GOV.999.\n", false);
+const noRegister = tree("no-register", "# A page\n\nThis cites DEC.SUPPORT.GOV.999.\n", false);
 one("a repository with no register reports nothing", !run(noRegister).includes("CITATION"));
 
 // 4 — the id must be a whole id. A three-digit sequence is the register's own grammar, and a
-//     looser match would report prose like "RD.GOV.1" that no reader would call a citation.
-const partial = tree("partial", "# A page\n\nThis mentions RD.GOV.1 and RD.DEVEX.WORKSPACE.155.\n");
+//     looser match would report prose like "DEC.GOV.1" that no reader would call a citation.
+const partial = tree("partial", "# A page\n\nThis mentions DEC.GOV.1 and DEC.DEVEX.WORKSPACE.155.\n");
 one("a short id is not read as a citation", !run(partial).includes("CITATION"));
 
 // ── the RULING question ───────────────────────────────────────────────────────────────────────
@@ -103,12 +170,12 @@ function rulingTree(name, id) {
   return root;
 }
 
-// 5 — a three-part id (`RD.<DOMAIN>.<NNN>`).
-const rulingThree = rulingTree("ruling-three", "RD.GOV.100");
-one("a buried ruling under a three-part id is reported", run(rulingThree).includes("RULING"));
+// 5 — the retired form (`RD.<DOMAIN>.<NNN>`) is no decision id, so its row is not read as a ruling.
+const rulingRetired = rulingTree("ruling-retired", "RD.SUPPORT.GOV.100");
+one("a buried ruling under a retired id is not read as a ruling", !run(rulingRetired).includes("RULING"));
 
-// 6 — a four-part id (`RD.<DOMAIN>.<SUBDOMAIN>.<NNN>`), same shape.
-const rulingFour = rulingTree("ruling-four", "RD.DEVEX.WORKSPACE.201");
+// 6 — a decision id (`DEC.<AREA>.<DOMAIN>.<NNN>`), same shape.
+const rulingFour = rulingTree("ruling-four", "DEC.DEVEX.WORKSPACE.201");
 one("a buried ruling under a four-part id is reported", run(rulingFour).includes("RULING"));
 
 // 7 — one ruling, nothing buried: the header read locates the real Decision cell rather than
@@ -117,7 +184,7 @@ const rulingClean = join(BASE, "ruling-clean");
 mkdirSync(join(rulingClean, "docs", POCKET.registers), { recursive: true });
 writeFileSync(join(rulingClean, "docs", POCKET.registers, "decisions.md"),
   "# Decisions\n\n| # | Construct | Decision | Why | Date |\n| --- | --- | --- | --- | --- |\n" +
-  "| RD.GOV.101 | ideate | A single plain ruling with nothing bolded past it. | because | 2026-09 |\n");
+  "| DEC.SUPPORT.GOV.101 | ideate | A single plain ruling with nothing bolded past it. | because | 2026-09 |\n");
 one("a register with no buried ruling reports no RULING finding", !run(rulingClean).includes("RULING"));
 
 // ── the capability-chapter question ───────────────────────────────────────────────────────────
@@ -310,17 +377,18 @@ one("a placeholder inside a segment is not read as a truncated name", !run(partS
 {
 /** What one run through the entry printed, and its exit code, from the folder given. */
 function typed(cwd, ...words) {
-  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "coherence", ...words], { encoding: "utf8", stdio: "pipe", cwd }) }; }
+  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "coherence", ...words], { encoding: "utf8", stdio: "pipe", cwd, env: { ...process.env, SPN_WORKSPACE: WORKSPACE ?? cwd } }) }; }
   catch (e) { return { code: e.status, out: String(e.stdout ?? "") + String(e.stderr ?? "") }; }
 }
 const USAGE = "usage: spn-devex docs coherence check [<path>] [--finding <name>]\n";
 const repository = tree("repository",
-  "# A page\n\nThis cites RD.GOV.999, which no row carries. It names the three kinds of page.\n");
+  "# A page\n\nThis cites DEC.SUPPORT.GOV.999, which no row carries. It names the three kinds of page.\n");
 mk(repository, "sprepo.json", '{"type":"APPS","name":"t","config":null}');
 mk(repository, `docs/${SEAT.constructs}/01-core/b.md`,
-  "# B\n\nThis cites RD.DEVEX.WORKSPACE.155, which the register carries, and RD.GOV.998, which it does not.\n");
+  "# B\n\nThis cites DEC.DEVEX.WORKSPACE.155, which the register carries, and DEC.SUPPORT.GOV.998, which it does not.\n");
 mk(repository, `docs/${SEAT.behaviors}/c.md`, "# C\n\nIt lists the four skills of the plugin.\n");
 const CORE = `docs/${SEAT.constructs}/01-core`;
+WORKSPACE = repository;
 
 const bare = typed(repository);
 one("[MKT.SCRIPTS.111] with no action the entry prints the usage line, says an action is owed and exits 2",
@@ -333,19 +401,19 @@ one("a second path is refused with exit 2", typed(repository, "check", ".", "doc
 
 const whole = typed(repository, "check", ".");
 one("known-bad: the repository, checked, reports both ids and both counts",
-  /CITATION\s+2 decision id\(s\)/.test(whole.out) && whole.out.includes("RD.GOV.999") && whole.out.includes("RD.GOV.998")
+  /CITATION\s+2 id\(s\)/.test(whole.out) && whole.out.includes("DEC.SUPPORT.GOV.999") && whole.out.includes("DEC.SUPPORT.GOV.998")
     && whole.out.includes("the three kinds") && whole.out.includes("the four skills"));
 one("and its exit code is the number of findings it reports: one citation finding and two counts", whole.code === 3);
 one("the closing line of a whole run names no path", /documents compared against each other — 2 cardinality · 1 citation\n$/.test(whole.out));
 
 const narrow = typed(repository, "check", CORE);
 one("[MKT.SCRIPTS.135] a run narrowed to one folder reports the id cited under it, and no finding from a file beside it",
-  /CITATION\s+1 decision id\(s\)/.test(narrow.out) && narrow.out.includes("RD.GOV.998") && !narrow.out.includes("RD.GOV.999")
+  /CITATION\s+1 id\(s\)/.test(narrow.out) && narrow.out.includes("DEC.SUPPORT.GOV.998") && !narrow.out.includes("DEC.SUPPORT.GOV.999")
     && !narrow.out.includes("the three kinds") && !narrow.out.includes("the four skills"));
 // THE REGISTER SITS OUTSIDE THE PATH. A run that read only its path would find no register, so it
 // would report no citation at all, and a run that found one would report the id the register carries.
 one("[MKT.SCRIPTS.135] the narrow run still reads the register outside its path: the id the register carries is not reported",
-  narrow.out.includes("CITATION") && !narrow.out.includes("RD.DEVEX.WORKSPACE.155 —"));
+  narrow.out.includes("CITATION") && !narrow.out.includes("DEC.DEVEX.WORKSPACE.155 —"));
 one("[MKT.SCRIPTS.135] its exit code is the number of findings under the path", narrow.code === 1);
 one("[MKT.SCRIPTS.135] and its closing line counts every document read, and names the path", narrow.out.endsWith(`1 citation under ${CORE}\n`)
   && narrow.out.match(/^(\d+) documents compared/m)?.[1] === whole.out.match(/^(\d+) documents compared/m)?.[1]);

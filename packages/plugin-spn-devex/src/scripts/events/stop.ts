@@ -30,14 +30,14 @@
 // arc is named by its data folder, `<workstream>/arcs/N<nnn>`, which is also how the window's note
 // records an arc the window wrote.
 //
-// A CHECK SPEAKS ONCE IN A TURN, AND ONLY ABOUT THIS SESSION'S OWN WORK (RD.DEVEX.WORKSPACE.198). The
+// A CHECK SPEAKS ONCE IN A TURN, AND ONLY ABOUT THIS SESSION'S OWN WORK (RULE.DEVEX.WORKSPACE.198). The
 // reply that follows a finding is the answer to it, so a check that spoke at this session's last Stop
 // is not run against that answer. The checks that read a page, its arcs and its cards read the
 // workstreams bound to this window by the path of its writes, its first prompt or a handover
-// (RD.DEVEX.WORKSPACE.197 and .236, `lib/window.ts`); a workstream another window is still writing is
+// (RULE.DEVEX.WORKSPACE.197 and .236, `lib/window.ts`); a workstream another window is still writing is
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
-// WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RD.DEVEX.WORKSPACE.244):
+// WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
 // `needs-you`, `reply-shape`, `handover` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
@@ -213,7 +213,7 @@ const idOf = (arc: string): string => basename(arc);
 /** An arc's data, from its `state.json`, or null where it has none. */
 const dataOf = (arc: string): ArcData | null => readArc(homeOf(arc), idOf(arc));
 /** An arc's status, or "" where it has no data. */
-/** An arc's status as it reads, from the one owner (RD.DEVEX.WORKSPACE.307), or "" where its data does not read. */
+/** An arc's status as it reads, from the one owner (RULE.DEVEX.WORKSPACE.307), or "" where its data does not read. */
 const statusOf = (arc: string): string => { const data = dataOf(arc); return data ? arcStatus(data) : ""; };
 /** The cards still open in a workstream's `questions.jsonl`. */
 const openQuestionsOf = (ws: string): Question[] => readQuestions(ws).filter((one) => one.state === "open");
@@ -234,7 +234,7 @@ export function rowsMark(data: ArcData | null): string {
  * The rows of an arc ready to run, as the runnable check names them: `row 2 — build it`. They are the
  * rows `workstream rows show --ready` lists (`readyRows`): work rows waiting or ready whose every
  * blocker has resolved, so a row waiting on a card that is open is not one, and is one again once the
- * card is answered (RD.DEVEX.WORKSPACE.188). A running row is not ready; `runningRows` names it.
+ * card is answered (RULE.DEVEX.WORKSPACE.188). A running row is not ready; `runningRows` names it.
  *
  * @param questions  the workstream's question records; read from its `questions.jsonl` when not given
  */
@@ -258,7 +258,7 @@ function runningSince(lines: readonly unknown[], row: string): Date | null {
 
 /**
  * The rows of an arc that are `running`, each with how long ago its log line moved it there
- * (RD.DEVEX.WORKSPACE.184). A row whose order is out with an agent is left out: the agent is on it,
+ * (RULE.DEVEX.WORKSPACE.184). A row whose order is out with an agent is left out: the agent is on it,
  * and its report is what ends the wait.
  *
  * @param out  the rows of this arc whose order is out; read from the arc's orders folder when not given
@@ -274,7 +274,7 @@ export function runningRows(arc: string, now = Date.now(), out: Set<string> = or
 
 /**
  * Whether work still runs in this window: a row of an arc in one of its workstreams is `running`
- * (RD.DEVEX.WORKSPACE.189). The Stop event says nothing about whether the agent now waits, so the
+ * (RULE.DEVEX.WORKSPACE.189). The Stop event says nothing about whether the agent now waits, so the
  * state is how a progress reply is told from a reply that waits.
  *
  * A row whose order is out with an agent counts here, though `runningRows` leaves it out: that agent
@@ -386,7 +386,7 @@ export function writeBaseline(root: string, session: string, baseline: Baseline,
   } catch { /* the check must never fail because it could not write its own note */ }
 }
 
-/** The folders a check reads: the ones this window works on, and no others (RD.DEVEX.WORKSPACE.236). */
+/** The folders a check reads: the ones this window works on, and no others (RULE.DEVEX.WORKSPACE.236). */
 function scoped(folders: string[], mine: Set<string>): string[] {
   return folders.filter((folder) => mine.has(basename(folder)));
 }
@@ -462,7 +462,7 @@ const answeredCard = (line: LogLine): string | null =>
   line.kind === "answered" ? /^(q\d+)\b/i.exec(String(line.note ?? ""))?.[1].toLowerCase() ?? null : null;
 
 /**
- * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the lines an arc's `log.jsonl` gained
+ * The `notes` and `carried` checks (RULE.DEVEX.WORKSPACE.193), over the lines an arc's `log.jsonl` gained
  * since this session's last Stop, in the arcs this window wrote.
  *
  * `notes`: a soft note, not a refusal. An `answered` line whose card a preview shows (the card's `shownIn`),
@@ -502,14 +502,14 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
       out.push({ check: "notes", message: named(workstreamOf(arc),
         `A note, not a refusal: \`${fromWorkspace(root, arc)}\` logged an answer this turn to a card a preview shows, and its ` +
         `notes did not move — ${where}. A preview changes only where it shows the card that was answered ` +
-        `(RD.DEVEX.WORKSPACE.193). If the answer changed what that preview shows, bring the section current and name it ` +
+        `(RULE.DEVEX.WORKSPACE.193). If the answer changed what that preview shows, bring the section current and name it ` +
         `in a log line: \`spn-devex workstream arc edit ${arcRef(arc)} --note "…"\`; if it did not, nothing is owed.`, tie(arc)) });
     }
     const status = statusOf(arc);
     if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(String(line.note ?? ""))))
       out.push({ check: "carried", message: named(workstreamOf(arc),
         `\`${fromWorkspace(root, arc)}\` is PROPOSED and its log carries a review point to a later row of itself. A proposed ` +
-        `arc never does: nothing is built on its spec yet, so the point changes the spec now (RD.DEVEX.WORKSPACE.193). ` +
+        `arc never does: nothing is built on its spec yet, so the point changes the spec now (RULE.DEVEX.WORKSPACE.193). ` +
         `Write it into the preview and the plan this turn.`, tie(arc)) });
   }
   return out;
@@ -556,7 +556,7 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
       // and an arc it wrote whose rows moved since its own last Stop is the arc it is executing.
       if (TERMINAL.has(arcStatus(data))) continue;     // its unfinished rows are history, not work
       // AN ARC NOBODY AGREED, OR ONE HELD BY THE DEVELOPER'S WAIT, IS NOT RUNNABLE, whoever touched it: no step
-      // starts until the arc is DECIDED with no wait (RD.DEVEX.WORKSPACE.278).
+      // starts until the arc is DECIDED with no wait (RULE.DEVEX.WORKSPACE.278).
       if (!stepsMayStart(data)) continue;
       // NO BASELINE MEANS NO INFERENCE. A session's first Stop has nothing of its own to compare
       // against, and a headless window has only a first Stop, so it stays quiet.
@@ -625,7 +625,7 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
  *
  * So a future or conditional mention is not a pass-on. A direction is.
  */
-// A DIRECTION NAMES WHAT TO DO WITH THE SESSION; A MENTION ONLY NAMES ONE (RD.DEVEX.WORKSPACE.198).
+// A DIRECTION NAMES WHAT TO DO WITH THE SESSION; A MENTION ONLY NAMES ONE (RULE.DEVEX.WORKSPACE.198).
 // The pattern was the noun phrase alone, so "another window closed the workstream" and "a release and
 // a new window in each session" read as passing work on. On 2026-10-01 that fired on status replies
 // in three sessions. A pass-on now needs the verb that sends the work there, or the next session as
@@ -771,7 +771,7 @@ function handoverFences(reply: string): Fence[] {
 
 /**
  * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
- * keeps this, so the block is asked for once (RD.DEVEX.WORKSPACE.189).
+ * keeps this, so the block is asked for once (RULE.DEVEX.WORKSPACE.189).
  */
 export function givesHandover(reply: string): boolean {
   const block = handoverFences(reply).find((fence) => !quotesTemplate(fence));
@@ -804,12 +804,12 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   // next window for after the answer.
   if (carriesCard(reply)) return [];
 
-  // THE BLOCK IS OWED ONCE (RD.DEVEX.WORKSPACE.189). A later reply names the handover in one line, and
+  // THE BLOCK IS OWED ONCE (RULE.DEVEX.WORKSPACE.189). A later reply names the handover in one line, and
   // so does the reply that answers a finding on the handover reply. A block printed again is still read.
   const shaped = handoverFences(reply);
   if (given && !shaped.length) return [];
 
-  // AN OPEN CARD IS NAMED IN ONE LINE, NEVER PUT IN FULL (RD.DEVEX.WORKSPACE.189). The next window must
+  // AN OPEN CARD IS NAMED IN ONE LINE, NEVER PUT IN FULL (RULE.DEVEX.WORKSPACE.189). The next window must
   // know the question is there, and the block's `open:` line is where it looks. This comes before the
   // wiring check because it is the cheaper truth.
   const where = cardsByWorkstream(root, mine);
@@ -820,7 +820,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
       `This reply passes work on while ${cardList(unnamed, where)} ${many ? "are" : "is"} open, and it does not name ` +
       `${many ? "them" : "it"}. Name each open card in one line on the block's \`open:\` line: its number and its question. ` +
       `Do not put the whole card in the reply: it is on the approach page, and the next window reads it there ` +
-      `(RD.DEVEX.WORKSPACE.189).` }];
+      `(RULE.DEVEX.WORKSPACE.189).` }];
   }
 
   // THE SECOND HALF FIRST, because it is the one that costs a window. A reply that tells somebody to
@@ -829,7 +829,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string>, gi
   // green, and stopped. The next window then ran the release, the release changed the wiring, and
   // changed wiring costs a window: one sitting's work became three windows, every note correct.
   //
-  // `RD.DEVEX.AGENT.057` says the tool that changed the wiring owes the note. It says what the note must
+  // `RULE.DEVEX.AGENT.057` says the tool that changed the wiring owes the note. It says what the note must
   // CONTAIN and never what must be TRUE before one is offered, so a note naming un-installed wiring
   // satisfies it completely. This is that missing precondition (N39 step 4).
   // ROOT IS PASSED IN, never read from `process.cwd()`. That is the fault this file already carries
@@ -980,7 +980,7 @@ const REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
 // Stripping fences does not weaken the real check: a card's options are a markdown TABLE, never a
 // fence, so every genuine card survives this unchanged.
 //
-// THE ONE LINE OF AN OLDER CARD IS A REFERENCE TOO (RD.DEVEX.WORKSPACE.189). It may name the letter
+// THE ONE LINE OF AN OLDER CARD IS A REFERENCE TOO (RULE.DEVEX.WORKSPACE.189). It may name the letter
 // the agent recommends, and reading that as an ask demanded the whole card the **Needs you** check
 // forbids. So a line that names a card open before this turn is set aside whole, and the rest is read.
 const asking = (reply: string, older: string[] = []) =>
@@ -1024,7 +1024,7 @@ function missingParts(reply: string): string[] {
   return out;
 }
 
-// THE REPLY OPENS WITH WHAT NEEDS YOU IN TWO CASES (RD.DEVEX.WORKSPACE.189): it raises a card, or the
+// THE REPLY OPENS WITH WHAT NEEDS YOU IN TWO CASES (RULE.DEVEX.WORKSPACE.189): it raises a card, or the
 // agent waits while a card is open. Its first non-blank line is then `## Needs you`, `**Needs you**`
 // or a plain `Needs you:` line. A progress reply owes no such part, and neither does a reply with no
 // card open.
@@ -1062,7 +1062,7 @@ function putsInFull(text: string, card: string): boolean {
 
 /**
  * The reply's shape: a decision it puts carries the whole card, and **Needs you** opens a reply in
- * two cases only (RD.DEVEX.WORKSPACE.189). A reply that raises a card holds it there in full, once.
+ * two cases only (RULE.DEVEX.WORKSPACE.189). A reply that raises a card holds it there in full, once.
  * A reply that waits names each card still open from an earlier reply in one line. A progress reply
  * owes nothing for a card already read.
  *
@@ -1096,12 +1096,12 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
         `${cardList(fresh, where)} ${many(fresh) ? "were" : "was"} raised in this reply, and the reply does not open with **Needs you**. ` +
         `Put ${many(fresh) ? "each" : "it"} in full under **Needs you** at the top, once` +
         (owed.length ? `, and name ${cardList(owed.slice(0, 4), where)} there in one line each` : "") +
-        ` (RD.DEVEX.WORKSPACE.189).` });
+        ` (RULE.DEVEX.WORKSPACE.189).` });
     else if (owed.length)
       out.push({ check: "needs-you", message:
         `No row of this window's arcs is in progress, so this reply waits, and it does not open with **Needs you** while ` +
         `${cardList(owed.slice(0, 4), where)} ${many(owed) ? "are" : "is"} open. Open the reply with **Needs you** and name each ` +
-        `open card in one line: its number, its question, and where it is (RD.DEVEX.WORKSPACE.189).` });
+        `open card in one line: its number, its question, and where it is (RULE.DEVEX.WORKSPACE.189).` });
   } else if (open.length) {
     const part = needsYouPart(reply);
     const notWhole = fresh.filter((card) => !putsInFull(part, card));
@@ -1109,13 +1109,13 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
       out.push({ check: "needs-you", message:
         `${cardList(notWhole, where)} ${many(notWhole) ? "were" : "was"} raised in this reply and ${many(notWhole) ? "are" : "is"} not ` +
         `in full under **Needs you** at its top. A card goes there in full once; do not repeat it now, and from the next ` +
-        `reply that waits it is one line (RD.DEVEX.WORKSPACE.189).` });
+        `reply that waits it is one line (RULE.DEVEX.WORKSPACE.189).` });
     const unnamed = owed.filter((card) => !namesCard(part, card));
     if (unnamed.length)
       out.push({ check: "needs-you", message:
         `${cardList(unnamed.slice(0, 4), where)} ${many(unnamed) ? "are" : "is"} still open and the **Needs you** part does not ` +
         `name ${many(unnamed) ? "them" : "it"}. Add one line for each: its number, its question, and where it is; the full ` +
-        `card stays on the approach page (RD.DEVEX.WORKSPACE.189).` });
+        `card stays on the approach page (RULE.DEVEX.WORKSPACE.189).` });
   }
   if (!asking(reply, older)) return out;
   const missing = missingParts(reply);
@@ -1142,7 +1142,7 @@ export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
 // ---------------------------------------------------------------------------- the page and the arcs
 
 /**
- * A page left stale by an arc this session wrote (RD.DEVEX.WORKSPACE.204). The parts of a page that
+ * A page left stale by an arc this session wrote (RULE.DEVEX.WORKSPACE.204). The parts of a page that
  * the arcs decide are the Cycles table, the header's status and the heading of `Open`. The write-time
  * check sees them only when the whole page is written, so an arc that moves leaves the page behind
  * and this is where it is said. A page with no Cycles table is left alone, because the command named
@@ -1170,7 +1170,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
   return [{ check: "page-stale", message:
     `An arc you wrote this turn left its page behind — ` +
     behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
-    `. The parts of a page that the arcs decide are produced, never typed (RD.DEVEX.WORKSPACE.204). Run ` +
+    `. The parts of a page that the arcs decide are produced, never typed (RULE.DEVEX.WORKSPACE.204). Run ` +
     behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
     `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
     `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
@@ -1316,7 +1316,7 @@ export function checkWelcome(firstTurn: string): Warning[] {
   return [{ check: "welcome", message:
     `This session's first reply left out ${missing.join(" · ")} of the welcome. The first reply opens with ` +
     `the welcome word for word, whatever the prompt — a question and a pasted handover included — then ` +
-    `the status line, then the answer (RD.DEVEX.WORKSPACE.045). Do not print it again: a second welcome ` +
+    `the status line, then the answer (DEC.DEVEX.WORKSPACE.045). Do not print it again: a second welcome ` +
     `shows the developer a short one and then a long one. Say once, in one line, that the first reply ` +
     `missed it, then go on.` }];
 }
@@ -1328,7 +1328,7 @@ export function checkWelcome(firstTurn: string): Warning[] {
 const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "handover", "welcome", "window"]);
 
 /**
- * The findings a turn end says now, and the ones it holds (RD.DEVEX.WORKSPACE.244). While a row of this
+ * The findings a turn end says now, and the ones it holds (RULE.DEVEX.WORKSPACE.244). While a row of this
  * window's arcs is in progress, only a finding about the reply sends the agent back. Every other one
  * is held, and the hook then leaves its baseline's marks where they were, so the checks find it again
  * at the first turn end where no row is in progress.
@@ -1351,7 +1351,7 @@ const ALWAYS_POINT = 450_000;
 const STEP = 50_000;
 
 /**
- * THE WINDOW CHECK (RD.DEVEX.AGENT.103): from 200k, at a clean point and in any phase, the turn is told to
+ * THE WINDOW CHECK (RULE.DEVEX.AGENT.103): from 200k, at a clean point and in any phase, the turn is told to
  * offer a new window; past 450k it is told always. Clean is what can be computed: no row of this window's arcs
  * runs, no helper launched in the background is out, and `workstream state check` finds nothing for the
  * window's workstreams. That every open point is written first cannot be computed, so the message asks for it.
@@ -1449,7 +1449,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // write, a prompt or a handover and never from text. The baseline's own old `workstreams` list is not
   // read: it was bound by names found anywhere in a write, and a log line mentioning another workstream
   // bound it for ever. A window with no binding gets the empty set and hears nothing about a card, a page,
-  // an arc or a row (RD.DEVEX.WORKSPACE.236).
+  // an arc or a row (RULE.DEVEX.WORKSPACE.236).
   // A CHILD AGENT SHARES THE WINDOW'S session_id, so it keeps its own baseline file and never reads or
   // writes the window's: its view (no steps, no arcs) must not stand for the window's last turn.
   const baseline = readBaseline(root, session, event.agent_id ?? null);
@@ -1475,7 +1475,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const visits = visitedWorkstreams(root, session);
   const wroteAnywhere = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc)) || visits.has(workstreamOf(arc))));
   // WHETHER WORK STILL RUNS, read once: it tells a progress reply from a reply that waits, and it
-  // decides which findings are said now (RD.DEVEX.WORKSPACE.189 and .244).
+  // decides which findings are said now (RULE.DEVEX.WORKSPACE.189 and .244).
   const running = workRuns(root, mine);
   // A WHOLE HANDOVER BLOCK IS OWED ONCE. The baseline holds the step rows as they read when this window
   // wrote one, and while they read the same no second block is asked for.
@@ -1500,7 +1500,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
       try { return checkWindow(root, readFileSync(event.transcript_path, "utf8"), mine, running); } catch { return []; }
     }),
   ];
-  // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RD.DEVEX.WORKSPACE.244).
+  // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RULE.DEVEX.WORKSPACE.244).
   const { said, held } = splitFindings(found.filter((warning) => !spoken.has(warning.check)), running);
   // A page is named once in a session, so the pages named now join the ones named before.
   const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),

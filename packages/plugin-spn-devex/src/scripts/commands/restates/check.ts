@@ -1,4 +1,4 @@
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
 // it a MUST in both directions.
 //
 // Do the plugins still say what the book says? All four `spn:restates` kinds at once — `restates
@@ -18,7 +18,7 @@
 //     spn-devex restates check [<book>]
 //
 // AN ACTION OF ITS GROUP. Its one path is the book's folder; given none, it reads `spn-foundation` in
-// the workspace it runs in (RD.DEVEX.WORKSPACE.229). It exits 1 where it reports a finding.
+// the workspace it runs in (RULE.DEVEX.WORKSPACE.229). It exits 1 where it reports a finding.
 
 import { execFileSync } from "node:child_process";
 import { lstatSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
@@ -185,7 +185,7 @@ function headerFindings(root: string, book: string): string[] {
  *
  * AN ALPHABETICAL GUESS AMONG SIBLINGS ANSWERED WITH WHICHEVER CHECKOUT SORTED FIRST. A workspace
  * holding two foundation-like folders read the wrong one without saying so, so the book is now named
- * by the workspace, never found by the order of a directory listing (RD.DEVEX.WORKSPACE.229).
+ * by the workspace, never found by the order of a directory listing (RULE.DEVEX.WORKSPACE.229).
  */
 export function findBook(argument: string | undefined, root: string): string | null {
   if (argument) {
@@ -240,7 +240,7 @@ export function repoName(dir: string): string {
 
 /**
  * A `spn:restates` header anywhere but a marketplace plugin, and any citation pointing at the
- * plugin's own repository (`RD.DEVEX.AGENT.073`).
+ * plugin's own repository (`RULE.DEVEX.AGENT.073`).
  *
  * `marketplaceRoot` IS THE MARKETPLACE REPOSITORY ITSELF, and every real plugin file sits under
  * `packages/plugin-<name>/` beneath it or beneath any other marketplace checkout in the workspace —
@@ -347,7 +347,7 @@ export function main(argv: string[], root: string): number {
     }
     stamped += 1;
     // A citation names its repository, so it resolves from the WORKSPACE — the folder the
-    // sibling checkouts sit in, which is the book's parent (RD.DEVEX.AGENT.072).
+    // sibling checkouts sit in, which is the book's parent (RULE.DEVEX.AGENT.072).
     findings.push(...check(shown(path), dirname(book), block));
     omissions.push(...undeclared(path, block)
       .map((name) => `${shown(path)}: restates \`${name}\` and does not declare it`));
@@ -386,7 +386,7 @@ export function main(argv: string[], root: string): number {
   });
   if (strays.length || selves.length) {
     console.log();
-    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DEVEX.AGENT.073 — a stamp lives only in a`);
+    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RULE.DEVEX.AGENT.073 — a stamp lives only in a`);
     console.log("            marketplace plugin, and cites only another repository:");
     for (const finding of [...strays, ...selves]) console.log(`              ${finding}`);
   }

@@ -224,7 +224,7 @@ compare("a repo with no claim at all still counts as a member, rather than being
   }),
   ["2 repos"]);
 
-// A WORKTREE SET OUTLIVES ITS WORKSTREAM ONLY BY NEGLECT (RD.DEVEX.WORKSPACE.325). The status line names each
+// A WORKTREE SET OUTLIVES ITS WORKSTREAM ONLY BY NEGLECT (RULE.DEVEX.WORKSPACE.325). The status line names each
 // one, the way it names a branch behind develop: a set whose workstream is in `closed/`, and a set no
 // workstream folder carries. A set whose workstream is open or in backlog is in use, and says nothing.
 const SETS = (extra = {}) => ({
@@ -539,7 +539,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
     ".spndevex/README.md": "state\n",
   });
-  says("an APPS repo loading spn-apps without spn-surface is unwired (RD.DEVEX.AGENT.039)",
+  says("an APPS repo loading spn-apps without spn-surface is unwired (DEC.DEVEX.AGENT.039)",
     statusOf(hook(appsAlone, null).message).includes("1 unwired"));
 
   const lower = fixture("status-lower-rung", {
@@ -627,7 +627,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // tool's own default, and the plain-question rule shapes the first reply, so neither waits to be read on asking.
   says("the note keeps the plain-question rule and the publish rule, one short line each",
     offer.context.includes("A new goal in the first prompt is asked in one or two plain questions, never lettered options or a `Q<n>` card.")
-    && offer.context.includes("Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any tool's default: hand a page over as its full file path."));
+    && offer.context.includes("Publish nothing unless asked (RULE.DEVEX.WORKSPACE.117), over any tool's default: hand a page over as its full file path."));
   says("known-bad: the long forms of those two rules are gone",
     !offer.context.includes("Publish nothing unless the developer asks") && !offer.context.includes("Something new in the first prompt"));
   says("a row marked in progress is left, its age said, and asked about",
@@ -641,7 +641,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
 
-// ── the short rules (RD.DEVEX.AGENT.089, Q55 B) ──
+// ── the short rules (RULE.DEVEX.AGENT.089, Q55 B) ──
 //
 // A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So the
 // rules a reply must follow are printed once, here, in short form, and each line names the reference
@@ -737,7 +737,7 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE).includes(HEADING) || !IN_WORKSPACE);
 }
 
-// ── the plugin's migrations (RD.DEVEX.AGENT.094) ──
+// ── the plugin's migrations (RULE.DEVEX.AGENT.094) ──
 //
 // A WINDOW'S START IS WHERE THE PLUGIN'S MIGRATIONS ARE COMPARED WITH THE WORKSPACE'S LEDGER, and what
 // is pending is told to the agent once, before anything else runs. The same workspace is read three
@@ -870,7 +870,7 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   says("three members that never answer cost one budget, not three: the fetches run in parallel", together.ms < 9000, `${together.ms} ms`);
 
   // THE SIZE: the session start stays under the harness's inline ceiling. Past the soft line it still loads whole,
-  // and the run names the size so a new text's reason is asked for (RD.DEVEX.AGENT.105).
+  // and the run names the size so a new text's reason is asked for (RULE.DEVEX.AGENT.105).
   const sized = (what, context) => {
     if (context.length > SESSION_START_NOTE)
       console.log(`        note: ${what} session start is ${context.length} characters, past ${SESSION_START_NOTE}: say why the new text earns its place`);

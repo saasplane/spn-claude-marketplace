@@ -123,7 +123,7 @@ one("a page's scope rows and the arcs' step rows are one plan",
   `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "2 rows landed", parity: false, why: "the Python reads only a page" });
 
-// RD.DEVEX.WORKSPACE.184 — A RUNNING ROW IS NOT LANDED. The gate refuses it before the move, so a
+// RULE.DEVEX.WORKSPACE.184 — A RUNNING ROW IS NOT LANDED. The gate refuses it before the move, so a
 // row found here was moved past the gate, and the line must not count it or cheer.
 {
   const root = workspace("m7-cl-in-progress", {
@@ -139,7 +139,7 @@ one("a page's scope rows and the arcs' step rows are one plan",
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ts: ${said.slice(0, 250)}`}`); }
 }
 
-// RD.DEVEX.WORKSPACE.188 — A ROW WAITING ON A CARD IS NOT LANDED EITHER. The gate refuses it before
+// RULE.DEVEX.WORKSPACE.188 — A ROW WAITING ON A CARD IS NOT LANDED EITHER. The gate refuses it before
 // the move (the refusal is proved in `t-split-plan.mjs`), so a held row found here was moved past the gate.
 for (const [label, state] of [["waiting", "waiting"], ["ready", "ready"]]) {
   const root = workspace(`m11-cl-held-${state}`, {

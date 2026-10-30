@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/05-app.md",
-      "seen": "d898aad9"
+      "seen": "36a3f49d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/05-app/",
-      "seen": "7ca53f0a"
+      "seen": "bf368f69"
     }
   ]
 }
@@ -226,11 +226,11 @@ Never build a second variant of the application for a second deployment shape. A
 SPKindAppModeType  ALL · API · QUEUE · MIGRATE · CLI
 ```
 
-Declare the full entry set in code regardless of how the application is deployed — a serving mode never changes what was composed; the mode filters only which entries phase 3 starts. Choose which entries a deployment activates with configuration, never with a code change. The same build ships as, for example, the `api` and `lst` deployments of the `{app}-{stype}` pattern, each scaled and sized for its own workload:
+Declare the full entry set in code regardless of how the application is deployed — a serving mode never changes what was composed; the mode filters only which entries phase 3 starts. Choose which entries a deployment activates with configuration, never with a code change. The same build ships as, for example, the `api` and `processor` deployments of the `{app}-{stype}` pattern, each scaled and sized for its own workload:
 
 ```text
 one build {app} → {app}-api   HTTP entry, scaled for request load
-                → {app}-lst   queue listeners, scaled for queue load
+                → {app}-processor   queue listeners, scaled for queue load
 ```
 
 **Every deployment shape runs the same artifact.** An API deployment and its queue sibling cannot drift: one build, one contract, one boot. An application runtime keeps no state in process memory, so any instance is replaceable and a shape scales by adding instances — failover is a restart, not a recovery procedure. Vertical scaling **MAY** cover a short-term need; a shape **MUST** stay horizontally scalable as the plan.
@@ -297,7 +297,7 @@ public/   copies verbatim → dist root     stable names — the author's chrome
 
 `_assets/` is reserved so the cache contract can depend on only hashed names living there; `public/` is chrome — well-known files and small media — never product content, which belongs to the platform's own document store.
 
-**The bundle carries its environment.** It is built once per environment, and the two addresses a page needs are build-time values: one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `RD.SUPPORT.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
+**The bundle carries its environment.** It is built once per environment, and the two addresses a page needs are build-time values: one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `DEC.SUPPORT.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
 
 ## What an application owns that a module never does
 

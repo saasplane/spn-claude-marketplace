@@ -12,7 +12,7 @@ import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 // Every workstream open in a fixture, as the set of a window that works on all of them. The checks take
-// the workstreams their window works on and read no others (RD.DEVEX.WORKSPACE.236).
+// the workstreams their window works on and read no others (RULE.DEVEX.WORKSPACE.236).
 const everyone = (root) => { try { return new Set(readdirSync(join(root, ".spndevex", "workstreams", "open"))); } catch { return new Set(); } };
 
 const HOOKS = PLUGIN;
@@ -66,7 +66,7 @@ const CARD = `  <div class="sds-open">
     <div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>
   </div>`;
 
-// A reply given while a card is open opens with **Needs you** (RD.DEVEX.WORKSPACE.189), so every
+// A reply given while a card is open opens with **Needs you** (RULE.DEVEX.WORKSPACE.189), so every
 // case that expects silence over an open card opens its reply with it.
 const NEEDS = "## Needs you\n\nQ1 · a real question — it is on the approach page.\n\n## Progress\n\n";
 
@@ -93,7 +93,7 @@ const said = (out) => {
 let n = 0, failed = 0;
 function one(label, root, expect, { says, reply = "done", parity = true, why = "", session, edit, extra = {} } = {}) {
   n += 1;
-  // EVERY CASE IS A WINDOW THAT WORKS ON THE FIXTURE'S OPEN WORKSTREAMS (RD.DEVEX.WORKSPACE.236): a hook
+  // EVERY CASE IS A WINDOW THAT WORKS ON THE FIXTURE'S OPEN WORKSTREAMS (RULE.DEVEX.WORKSPACE.236): a hook
   // speaks only of the workstreams its window is bound to, so the case says whose window it is.
   const sid = session ?? `t-stop-${n}`;
   bindOpen(root, sid);
@@ -185,7 +185,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     const { root, ws } = await dataWorkspace("d17-ready-on-card");
     editData(ws, (data) => { data.rows[0].state = "landed"; data.rows[1].blockedBy = ["q1"]; });
     const open = [{ id: "q1", state: "open" }], answered = [{ id: "q1", state: "answered" }];
-    check("a row waiting on a card that is open is not ready (RD.DEVEX.WORKSPACE.188)", readyRowsOf(arcAt(ws), open).length === 0, readyRowsOf(arcAt(ws), open));
+    check("a row waiting on a card that is open is not ready (RULE.DEVEX.WORKSPACE.188)", readyRowsOf(arcAt(ws), open).length === 0, readyRowsOf(arcAt(ws), open));
     check("known-bad: once the card is answered the row is ready, by its id and its What",
       JSON.stringify(readyRowsOf(arcAt(ws), answered)) === JSON.stringify(["row 2 — build it"]), readyRowsOf(arcAt(ws), answered));
   }
@@ -194,7 +194,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     cli(root, ["workstream", "row", "state", "031/N001", "1", "running"]);
     const arc = arcAt(ws);
     const found = checkRunnable(root, Date.now() - 60_000, { [arc]: "a-different-mark" }, new Set([arc]), everyone(root));
-    check("known-bad: a running row is named with how long it has run (RD.DEVEX.WORKSPACE.184)",
+    check("known-bad: a running row is named with how long it has run (RULE.DEVEX.WORKSPACE.184)",
       found.length === 1 && /has a row running: row 1 — write the book \(running for (?:under a minute|\d+ min)\)/.test(found[0].message), JSON.stringify(found));
     check("and it is never called runnable", found.every((warning) => !/stopped with runnable work/.test(warning.message)));
     const orders = join(ws, "notes", "N001", "orders");
@@ -221,7 +221,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
       stepsMark(root, everyone(root)) !== mark && rowsMark(JSON.parse(readFileSync(join(arcAt(ws), "state.json"), "utf8"))) !== before);
   }
 
-  console.log("\n  --- a wait: a decided arc held by the developer's words has nothing runnable (RD.DEVEX.WORKSPACE.311)");
+  console.log("\n  --- a wait: a decided arc held by the developer's words has nothing runnable (RULE.DEVEX.WORKSPACE.311)");
   {
     const { root, ws } = await dataWorkspace("d17-wait");
     editData(ws, (data) => { data.wait = "the developer: approved, but wait"; });
@@ -243,7 +243,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     };
     const red = await answered("d17-notes-red");
     check("known-bad: an answer to a card the preview shows, logged while the preview did not move, is named once as a note, with the card and the preview",
-      /\[notes\] .*A note, not a refusal/.test(red) && red.includes("Q1 on `notes/N001/preview.html`") && red.includes("RD.DEVEX.WORKSPACE.193"), red);
+      /\[notes\] .*A note, not a refusal/.test(red) && red.includes("Q1 on `notes/N001/preview.html`") && red.includes("RULE.DEVEX.WORKSPACE.193"), red);
     check("the card leaving the preview's Open, which the command writes, is not the preview brought current", /\[notes\]/.test(red), red);
     check("the same answer with the preview moved in the same turn is silent", !/\[notes\]/.test(await answered("d17-notes-green", { movePreview: true })));
     check("an answer to a card no preview shows owes the preview nothing", !/\[notes\]/.test(await answered("d17-notes-unshown", { shown: false })));
@@ -287,7 +287,7 @@ console.log("\n=== stop — an arc is read from its data: state.json, log.jsonl 
     editData(ws, (data) => { data.status = "LANDED"; });
     const out = stopAt(root, "d17-landed");
     check("a stored LANDED arc with a step not landed is named by [state]: a landed arc is never reopened",
-      /\[state\].*N001 is LANDED and step 1 is waiting — a landed arc is never reopened.*RD\.DEVEX\.WORKSPACE\.261/.test(out), out);
+      /\[state\].*N001 is LANDED and step 1 is waiting — a landed arc is never reopened.*RULE\.DEVEX\.WORKSPACE\.261/.test(out), out);
   }
   {
     const { root, ws } = await dataWorkspace("d17-card-off-page");
@@ -382,7 +382,7 @@ one("a reply that asks nothing is still silent, whatever parts it lacks",
 
 // F20 — A HANDOVER OVER AN OPEN CARD. The developer caught this twice in one session: the agent
 // offered a new window with two cards open and neither one named. The next window must know the
-// question is there. CHANGED ON PURPOSE (RD.DEVEX.WORKSPACE.189): the card is named in one line on the
+// question is there. CHANGED ON PURPOSE (RULE.DEVEX.WORKSPACE.189): the card is named in one line on the
 // block's `open:` line, and the check no longer asks for it in full before any handover.
 one("a handover whose block says `open: none` while a card is open is told to name the card in one line",
   build("stop-handover-open-card", { pageOpts: { cards: CARD } }),
@@ -522,7 +522,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
     const quiet = checkHandover(reply, CARDED, everyone(CARDED)).length === 0;
     n += 1; if (!quiet) failed += 1;
     console.log(`  ${quiet ? "PASS" : "FAIL"}  a reply putting the open card in full is not refused for a handover`);
-    // CHANGED ON PURPOSE (RD.DEVEX.WORKSPACE.189). This asked for the open card in full before any
+    // CHANGED ON PURPOSE (RULE.DEVEX.WORKSPACE.189). This asked for the open card in full before any
     // handover. A card open at a handover is one line now, so the direction is told to name the card.
     const bare = checkHandover("Open a new window after you answer.", CARDED, everyone(CARDED));
     const still = bare.length === 1 && bare[0].message.includes("Q329") && /in one line/.test(bare[0].message)
@@ -710,7 +710,7 @@ console.log("\n=== reply-shape — a sentence that reports an answer is not aski
        console.log(`  ${ok ? "PASS" : "FAIL"}  reports — ${what}`); }
 }
 
-console.log("\n=== reply-shape — a reply given while a card is open opens with Needs you (RD.DEVEX.WORKSPACE.189)");
+console.log("\n=== reply-shape — a reply given while a card is open opens with Needs you (RULE.DEVEX.WORKSPACE.189)");
 {
   const { checkReplyShape, opensWithNeedsYou } = await import("../../../../src/scripts/events/stop.ts");
   const PROGRESS = "Row 6d landed: the reply check reads Needs you.\n\n```diff\n+ if (open.length && !opensWithNeedsYou(reply))\n```";
@@ -731,7 +731,7 @@ console.log("\n=== reply-shape — a reply given while a card is open opens with
        console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
 }
 
-console.log("\n=== reply-shape — Needs you is owed in two cases only: a card raised, or the agent waits (RD.DEVEX.WORKSPACE.189, Q49 B)");
+console.log("\n=== reply-shape — Needs you is owed in two cases only: a card raised, or the agent waits (RULE.DEVEX.WORKSPACE.189, Q49 B)");
 {
   const { checkReplyShape } = await import("../../../../src/scripts/events/stop.ts");
   const PROGRESS = "Row 6d landed: the reply check reads the arcs' rows.";
@@ -807,7 +807,7 @@ one("a card carrying its decision is not open, so the reply is not read for Need
   build("m13-needs-you-answered", { pageOpts: { cards: CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-29.") } }),
   "silent", { reply: "Row 6d landed.", parity: false, why: "a new check" });
 
-console.log("\n=== 2m — a card is put in full once, at the top of the reply that raises it, then named in one line (RD.DEVEX.WORKSPACE.189)");
+console.log("\n=== 2m — a card is put in full once, at the top of the reply that raises it, then named in one line (RULE.DEVEX.WORKSPACE.189)");
 {
   const { checkReplyShape } = await import("../../../../src/scripts/events/stop.ts");
   const PROGRESS = "## Progress\n\nRow 2m landed: the reply check reads a raised card once.";
@@ -919,7 +919,7 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
   console.log(`  ${kept ? "PASS" : "FAIL"}  a child's Stop leaves the window's baseline as it was and writes its own`);
 }
 
-console.log("\n=== stop — a check speaks once in a turn, and only about this session's work (RD.DEVEX.WORKSPACE.198)");
+console.log("\n=== stop — a check speaks once in a turn, and only about this session's work (RULE.DEVEX.WORKSPACE.198)");
 {
   const { passingOn } = await import("../../../../src/scripts/events/stop.ts");
   const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
@@ -933,7 +933,7 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
     [`${B}/approach.html`]: page({ cards: CARD }),
     [`${B}/arcs/N001/state.json`]: ARC_DATA,
   });
-  // THE WINDOW'S NOTE IS THE ONLY RECORD OF WHICH WORKSTREAMS IT WORKS ON (RD.DEVEX.WORKSPACE.236): a write
+  // THE WINDOW'S NOTE IS THE ONLY RECORD OF WHICH WORKSTREAMS IT WORKS ON (RULE.DEVEX.WORKSPACE.236): a write
   // whose path is inside the folder binds it, as PreToolUse records it.
   const wroteTo = (root, session, path) => recordWrites(root, session, root, [join(root, path)]);
   const check = (label, ok) => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`); };
@@ -1147,7 +1147,7 @@ ${tableOf(cyclesOf(folder))}
   };
   const toolCalls = (calls) => calls.map((call) => JSON.stringify({ type: "assistant", message: { role: "assistant",
     content: [{ type: "tool_use", id: "t", name: call.name, input: call.input }] } })).join("\n") + "\n";
-  // THE WINDOW OWNS WORKSTREAM A (RD.DEVEX.WORKSPACE.236): its prompt named it, and the case then says what it wrote.
+  // THE WINDOW OWNS WORKSTREAM A (RULE.DEVEX.WORKSPACE.236): its prompt named it, and the case then says what it wrote.
   const stop = (built, session) => {
     bindNamed(built.root, session, "001-a-subject", "prompt");
     built.session = session;
@@ -1273,7 +1273,7 @@ ${tableOf(cyclesOf(folder))}
   }
 }
 
-// ── while work runs, only a finding about the reply sends the agent back (RD.DEVEX.WORKSPACE.244) ──
+// ── while work runs, only a finding about the reply sends the agent back (RULE.DEVEX.WORKSPACE.244) ──
 //
 // EVERY FINDING MADE THE AGENT REPLY AGAIN, and the developer saw that reply. While a row is running,
 // a finding about a page, the notes or a docs tree is held: the hook exits 0. It is not kept as text.
@@ -1321,7 +1321,7 @@ ${tableOf(cyclesOf(folder))}
   const movePreview = (root) => writeFileSync(join(root, W, "notes", "N001", "preview.html"), `${PREVIEW}<!-- the check reads setup only, as the developer chose -->\n`, "utf8");
   const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
 
-  console.log("\n=== stop — while a row is running, a finding that is not about the reply is held (RD.DEVEX.WORKSPACE.244)");
+  console.log("\n=== stop — while a row is running, a finding that is not about the reply is held (RULE.DEVEX.WORKSPACE.244)");
   {
     const root = await built("n009-held-page", { named: false });
     const running = stop(root, "held-page");
@@ -1343,7 +1343,7 @@ ${tableOf(cyclesOf(folder))}
     land(root, "held-notes");
     const waiting = stop(root, "held-notes");
     check("nothing held is lost: the notes finding is found again, whole, when the agent waits",
-      /\[notes\]/.test(waiting) && waiting.includes("notes/N001/preview.html") && waiting.includes("RD.DEVEX.WORKSPACE.193"), waiting);
+      /\[notes\]/.test(waiting) && waiting.includes("notes/N001/preview.html") && waiting.includes("RULE.DEVEX.WORKSPACE.193"), waiting);
     const after = stop(root, "held-notes", "Done.", { stop_hook_active: true });
     check("and once said, the marks move on: the reply that answers it is not told again", !/\[notes\]/.test(after), after);
     const later = stop(root, "held-notes");
@@ -1389,7 +1389,7 @@ ${tableOf(cyclesOf(folder))}
     check("with no row running, every finding is said and none is held", names(waiting.said) === names(all) && waiting.held.length === 0, names(waiting.held));
   }
 
-  // ── a handover block is owed once, and an open card in a handover is one line (RD.DEVEX.WORKSPACE.189, .198) ──
+  // ── a handover block is owed once, and an open card in a handover is one line (RULE.DEVEX.WORKSPACE.189, .198) ──
   console.log("\n=== handover — the block is owed once, and a card that is open is named in one line, never asked for in full");
   const WHOLE = ["```text",
     "continue:     workstream `031-probe`, arc `N001`, row 2, in a `spn-x` window",
@@ -1462,7 +1462,7 @@ ${tableOf(cyclesOf(folder))}
   }
 }
 
-// A MIGRATION THE LEDGER LACKS THAT STILL FINDS OLD SHAPES IS OWED WORK (RD.DEVEX.AGENT.094), in any
+// A MIGRATION THE LEDGER LACKS THAT STILL FINDS OLD SHAPES IS OWED WORK (RULE.DEVEX.AGENT.094), in any
 // window, because the workspace's files are what it moves. Every other case here runs in a fixture that
 // has applied every migration, so it hears nothing of this one.
 console.log("\n=== migration — a pending plugin migration holds the turn");

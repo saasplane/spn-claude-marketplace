@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/11-generation.md",
-      "seen": "e55ea6ae"
+      "seen": "060533b4"
     }
   ]
 }
@@ -14,7 +14,7 @@
 
 **Read this before you write anything**, because what is generated decides what you may not edit.
 
-**A generated file is never hand-edited. Change the source it is derived from, then re-run its generator.** This is the one rule that governs everything below, and it has no exception — a hand edit survives until the next generation and then disappears, taking whatever it was fixing with it.
+**A generated file is never hand-edited. Change the source it is derived from, then re-run its generator.** This is the one rule that governs everything below, and it has no exception — a hand edit survives until the next generation and then disappears, taking whatever it was fixing with it. A manifest is a declared input, not a generated output, so it carries no `spn-` prefix and is edited by hand: `sprepo.json`, `spkind.json`, `spinfrapkg.json` and `src/spestate.json`.
 
 | Generator | Re-run it when | It writes |
 | --- | --- | --- |
@@ -30,7 +30,7 @@
 
 **Run `gen-validators` and `gen-barrel` before you commit**, not at the end of the day. A stale validator does not fail quietly — it takes the service down at boot, and the failure names a schema rather than the edit that caused it.
 
-**`gen-validators` records each state's base, so the published specification keeps the read ladder** (`RD.SUPPORT.APPS.219`). A schema built with `.merge()` no longer says what it was merged from, so without one more fact the specification could only write every level flat. The generator writes `export const RoleInfoSchemaBase = RoleMetaSchema;` beside the schema.
+**`gen-validators` records each state's base, so the published specification keeps the read ladder** (`RULE.SUPPORT.APPS.219`). A schema built with `.merge()` no longer says what it was merged from, so without one more fact the specification could only write every level flat. The generator writes `export const RoleInfoSchemaBase = RoleMetaSchema;` beside the schema.
 
 - **A state that extends exactly one interface gets `<State>SchemaBase`, set to its base's schema.** A variant of a polymorphic family names its morph base: `<Variant>SchemaBase = <Base>MorphBaseSchema`. A state with no `extends`, or with more than one, gets none.
 - **The name does not end in `Schema`**, so the schema registry passes over it and the specification never makes it a component.

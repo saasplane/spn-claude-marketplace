@@ -1,5 +1,5 @@
 // `debug window show <session|this>` and `debug window sweep` — the notes one window keeps in its folder, and the
-// removal of each window folder nobody has written to for 14 days (RD.DEVEX.WORKSPACE.322, .323).
+// removal of each window folder nobody has written to for 14 days (RULE.DEVEX.WORKSPACE.322, .323).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

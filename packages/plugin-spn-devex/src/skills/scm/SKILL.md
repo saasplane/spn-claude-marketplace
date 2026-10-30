@@ -7,11 +7,11 @@ description: The repository and project standard - what a project must declare, 
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "c7702f71"
+      "seen": "9c999d7f"
     }
   ]
 }
@@ -109,7 +109,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 **Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
 
-**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/devex/workspace/workspace.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
+**Then update the agent and reload before you execute anything — MUST** (RULE.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/devex/workspace/workspace.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
 
 ## The lines that hold
 
@@ -122,7 +122,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 ## Branches, promotion and releases
 
 - **A workstream commits on `feat/<NNN>-<subject>` in its worktree set, and one pull request per repository carries it into `develop`.** A commit on `develop`, `qa`, `uat` or `main` is refused, and the branch takes `origin/develop` at the start of each pass and again before each push and each pull request, rebasing where `develop` moved.
-- **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RD.DEVEX.FUNCTION.069`). They say what changed for someone using the code, in the words of the approach page and the preview, and name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
+- **A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub** (`RULE.DEVEX.FUNCTION.069`). They say what changed for someone using the code, in the words of the approach page and the preview, and name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
 - **Each check runs at the first step that can run it.** The push check runs the offline tiers; the stack tiers run on the pull request into `develop`; a promotion reruns nothing.
 - **The path to `main` is chosen at each promotion** with `spnutils repo promote <to> [--from <branch>]`, a merge commit each time. `main` takes merges from `develop`, `qa`, `uat` or a `hotfix/*`, never from a feature branch. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`, a fork's included, and names `spnutils repo promote`. The agent names the path and asks which branch a change goes to when the developer has not said.
 - **A fix takes its own path.** `hotfix/<subject>` is cut from `main`, `uat` or `qa`, never `develop`, is tested in its own pull request back into its source, and `spnutils repo backmerge <branch>` merges it down to `develop`.

@@ -20,7 +20,7 @@ const SCRIPTS = resolve(HOOKS, "scripts");
 const EVENTS = resolve(HOOKS, "src", "scripts", "events");
 
 // An arc's data as the `workstream` commands keep it: `state.json` at `status`, and `log.jsonl` holding the
-// developer's go where `go` says so (RD.DEVEX.WORKSPACE.278) — the state `confirmed` reads.
+// developer's go where `go` says so (RULE.DEVEX.WORKSPACE.278) — the state `confirmed` reads.
 function arcFiles(status, go) {
   // RUNNING is worked out from the steps, never stored: an arc that runs stores the developer's DECIDED, and a step runs.
   const data = { schemaVersion: 2, arc: "N001", subject: "probe", title: "the probe", goal: null, status: status === "RUNNING" ? "DECIDED" : status, reason: null,
@@ -106,7 +106,7 @@ one("generated build output is refused too",
   { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "dist", "generated", "thing.ts"), content: "x" } },
   "deny", { says: "generated build output" });
 
-// ONCE FOR A FILE IN A WINDOW (RD.DEVEX.AGENT.092): the same doc finding about one file is said once
+// ONCE FOR A FILE IN A WINDOW (RULE.DEVEX.AGENT.092): the same doc finding about one file is said once
 // to a window with a session id, a second file is said, and a second window hears it again.
 function onceForAFile(shown) {
   const session = `t-once-${process.pid}-${Date.now()}`;
@@ -124,7 +124,7 @@ function onceForAFile(shown) {
 }
 
 {
-  // WHO A LINE IS FOR (RD.DEVEX.AGENT.092). `systemMessage` is the developer's pane: advice never
+  // WHO A LINE IS FOR (RULE.DEVEX.AGENT.092). `systemMessage` is the developer's pane: advice never
   // reaches it, and a refusal does.
   const shown = (payload) => {
     const out = execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`],
@@ -340,7 +340,7 @@ one("editing an ordinary source file",
   { tool_name: "Edit", tool_input: { file_path: join(PROBE_REPO, "src", "thing.ts"), new_string: "export const x = 2;" } }, "silent");
 one("a malformed payload allows", {}, "silent");
 
-console.log("\n=== 2l — a publish is met by a reminder (RD.DEVEX.WORKSPACE.117), and refused for a page that loads its styles from outside (RD.DEVEX.WORKSPACE.215)");
+console.log("\n=== 2l — a publish is met by a reminder (RULE.DEVEX.WORKSPACE.117), and refused for a page that loads its styles from outside (RULE.DEVEX.WORKSPACE.215)");
 
 const APPROACH = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "probe-approach.html");
 one("2l: publishing an approach page reminds that nothing is published unless the developer asks",
@@ -351,7 +351,7 @@ one("2l: the reminder names the full path to hand over instead",
   { says: APPROACH, parity: false, why: "a new check" });
 one("2l: a publish of a report reminds too",
   { tool_name: "Artifact", tool_input: { file_path: join(PROBE_REPO, "docs", "artifacts", "reports", "coverage-report.html") } }, "note",
-  { says: "RD.DEVEX.WORKSPACE.117", parity: false, why: "a new check" });
+  { says: "RULE.DEVEX.WORKSPACE.117", parity: false, why: "a new check" });
 one("2l: reading an artifact is not a publish, so it is silent",
   { tool_name: "Artifact", tool_input: { action: "read", url: "https://claude.ai/artifact/x" } }, "silent",
   { parity: false, why: "a new check" });

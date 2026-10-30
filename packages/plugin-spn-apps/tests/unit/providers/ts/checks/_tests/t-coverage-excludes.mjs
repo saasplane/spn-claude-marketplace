@@ -1,4 +1,4 @@
-// `coverage-excludes` — an exclude says why, and no percentage is ever enforced (RD.SUPPORT.APPS.133).
+// `coverage-excludes` — an exclude says why, and no percentage is ever enforced (RULE.SUPPORT.APPS.133).
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { one, done, tree, PLUGIN } from "../../../../../helpers/harness.mjs";

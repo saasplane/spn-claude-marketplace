@@ -64,7 +64,7 @@
 
 ### `test` reports coverage and enforces none
 
-**Why** — *a percentage used as a gate gets met the cheapest way* — by lowering the number, or by writing cases that run code without checking what it does (`RD.SUPPORT.APPS.133`).
+**Why** — *a percentage used as a gate gets met the cheapest way* — by lowering the number, or by writing cases that run code without checking what it does (`RULE.SUPPORT.APPS.133`).
 **What** — the skill states coverage as measured and reported, never enforced: no configuration carries a threshold, an exclude carries its reason beside it, and a journey configuration collects none. It also carries the per-tier id rule — which cases must carry the id of the row they prove, and which may instead name a fixture or a private rule — and the full-run rule: a whole-repository run fixes a row proven at the wrong tier, a runner that wrote no result, a case with no id, or a red case, before the report is written.
 **How** — `packages/plugin-spn-devex/src/skills/test/SKILL.md` § Code coverage is reported, never enforced · § Which case carries an id.
 

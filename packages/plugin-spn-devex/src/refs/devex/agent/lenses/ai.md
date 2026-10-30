@@ -8,12 +8,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
-      "seen": "b8efb097"
+      "seen": "d4008a1e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
       "section": "What a partner follows, by what they build and deliver",
-      "seen": "fddec161"
+      "seen": "2acae3b9"
     }
   ]
 }
@@ -82,4 +82,4 @@
 
 ## Improves the book
 
-- An agent rule every partner needs and no chapter states is drafted into the agent surface chapter with its register row, put to the developer.
+- An agent rule every partner needs and no chapter states is drafted into the agent surface chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

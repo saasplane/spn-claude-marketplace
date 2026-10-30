@@ -163,7 +163,7 @@ const ITEM_SHAPES: { head: RegExp[]; columns: string[]; row: (cells: string[]) =
 ];
 
 /**
- * Any other table, where a column after the first holds sentences (RD.DEVEX.WORKSPACE.259): that column is a level of
+ * Any other table, where a column after the first holds sentences (RULE.DEVEX.WORKSPACE.259): that column is a level of
  * the first column's cell, under its title. One such column is the line; where several are, each is a paragraph led by
  * its column's name. Every other column stays, as written. A table with no column of sentences has no shape here.
  */
@@ -381,7 +381,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
     `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
 
   // The Subtitle is the seat block's `subtitle` field, one plain sentence under the title; the lead's
-  // first paragraph stays the Description (RD.DEVEX.WORKSPACE.187).
+  // first paragraph stays the Description (RULE.DEVEX.WORKSPACE.187).
   const subtitle = block.subtitle ? `  <p class="sds-subtitle">${esc(String(block.subtitle))}</p>\n` : "";
 
   const masthead =

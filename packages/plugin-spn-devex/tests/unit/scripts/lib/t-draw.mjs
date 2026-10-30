@@ -840,7 +840,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a view measures a share exactly: a third beside the rest fits a desktop", draw({ kind: "skeleton", views: [{ viewport: "DESKTOP", frame: frameOf("x", beside) }] }).findings, none);
   one("a spec with one frame draws at the grid's width, as before views existed", outer(draw({ kind: "skeleton", frame: frameOf("x") }).svg)[0][2], 1052);
 
-  // 13b · a view for each task state its blocks show (RD.DEVEX.WORKSPACE.230)
+  // 13b · a view for each task state its blocks show (RULE.DEVEX.WORKSPACE.230)
   const stated = draw({ kind: "skeleton", views: [
     { viewport: "MOBILE", state: "EMPTY", frame: frameOf("Phone empty") }, { viewport: "DESKTOP", state: "DENIED", frame: frameOf("Desk denied") },
     { viewport: "MOBILE", frame: frameOf("Phone") }, { viewport: "DESKTOP", state: "EMPTY", frame: frameOf("Desk empty") }, { viewport: "DESKTOP", frame: frameOf("Desk") }] });
@@ -922,7 +922,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("a card's head is lower than the head of a frame with a title", rect(titled.svg, "sds-box")[0][3] < rect(card({ tag: "x", label: "Sign-in", rows: [{ items: [{ text: "Account" }] }] }).svg, "sds-box")[0][3] - 16, true);
   one("a card with neither a title nor a tag is a finding", card({ look: "card", rows: [] }).findings, says("carries no name"));
 
-  // 15c · a container on a surface: one thin outline holding its header, its content and its footer (RD.DEVEX.WORKSPACE.268)
+  // 15c · a container on a surface: one thin outline holding its header, its content and its footer (RULE.DEVEX.WORKSPACE.268)
   const boxed = card({ look: "container", label: "Sign-in", note: "By app", actions: [{ control: "button", text: "Set our own" }],
     rows: [{ items: [{ text: "Account" }] }], footer: [{ items: [{ note: "Follows the default" }] }] });
   const outline = (g) => [...g.matchAll(/<rect class="sds-skel-control" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)" rx="8"/g)].map((m) => m.slice(1).map(Number));
@@ -933,14 +933,14 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   one("its title stands inside its outline, in the heavy weight, with the line under it quiet", [texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in"), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app"), extent(boxed.svg)],
     (g) => g[0][1] > g[2][1] && g[1][1] > g[0][1] && g[0][0] === g[2][0] + 16);
   one("its actions stand at the end of its header, inside the outline", rect(boxed.svg, "sds-skel-control").find((r) => r[3] === 32 && r[2] > 60), (g) => g[0] + g[2] === extent(boxed.svg)[0] + extent(boxed.svg)[2] - 16 && g[1] > extent(boxed.svg)[1]);
-  // The default frame of a container (RD.DEVEX.WORKSPACE.269): a dotted extent, an unframed header, and one rounded box under the header.
+  // The default frame of a container (RULE.DEVEX.WORKSPACE.269): a dotted extent, an unframed header, and one rounded box under the header.
   one("its extent is a dotted outline, and no line stands under the header: the one line is the footer's, inside the box", [rect(boxed.svg, "sds-skel-guide").length, lineYs(boxed.svg), outline(boxed.svg)[0]], (g) => g[0] === 1 && g[1].length === 1 && g[1][0] > g[2][1] + 16);
   one("its content and its footer stand in one thin rounded box under the header, to the extent's bottom and sides",
     [extent(boxed.svg), outline(boxed.svg), texts(boxed.svg, "sds-note").find((t) => t[2] === "By app")],
     ([ext, boxes, note]) => boxes.length === 1 && boxes[0][0] === ext[0] && boxes[0][2] === ext[2] && boxes[0][1] + boxes[0][3] === ext[1] + ext[3] && boxes[0][1] > note[1]);
   one("no box goes round the header: the box begins under its words", [outline(boxed.svg)[0], texts(boxed.svg, "sds-title").find((t) => t[2] === "Sign-in")], ([box, title]) => box[1] > title[1]);
   one("its content stands inside the outline", texts(boxed.svg, "sds-label").find((t) => t[2] === "Account"), (g) => g[1] > outline(boxed.svg)[0][1] && g[0] === outline(boxed.svg)[0][0] + 16);
-  // 15c · a footer sits under a line, inside the same box (RD.DEVEX.WORKSPACE.272)
+  // 15c · a footer sits under a line, inside the same box (RULE.DEVEX.WORKSPACE.272)
   one("its footer stands in the same box as its content, under a line that crosses the box", boxed.svg,
     (g) => lineYs(g).length === 1 && outline(g).length === 1 && texts(g, "sds-code").some((t) => t[2] === "Follows the default" && t[1] > lineYs(g)[0] && t[1] < outline(g)[0][1] + outline(g)[0][3]) && lineYs(g)[0] > outline(g)[0][1]);
   // 15c · the content of a container is one or more parts, a line between every two, and no dotted boundary on a part
@@ -959,7 +959,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     (g) => lineYs(g).length === 0 && texts(g, "sds-note").filter((t) => t[2] === "Group").length === 2);
   one("a container with no header is its outline alone, and needs no name", card({ look: "container", rows: [{ items: [{ text: "x" }] }] }), (g) => g.findings.length === 0 && outline(g.svg).length === 1);
   one("a frame at the end of a container's header is a finding", card({ look: "container", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a container's header"));
-  // 15c · content that is only cards stands flush (RD.DEVEX.WORKSPACE.269)
+  // 15c · content that is only cards stands flush (RULE.DEVEX.WORKSPACE.269)
   const cardsOnly = card({ look: "container", label: "Sign-in", rows: [{ items: [
     { frame: { look: "card", label: "Account", rows: [{ items: [{ text: "x" }] }] } }, { frame: { look: "card", label: "Platform", rows: [{ items: [{ text: "y" }] }] } }] }] });
   one("a container whose content is only cards draws no box round them, and the cards reach its edges",
@@ -976,7 +976,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     ([found, button, box, title]) => found.length === 0 && button !== undefined && button[0] + button[2] === box[0] + box[2] - 16 && button[1] < title[1] && title[1] < button[1] + button[3]);
   one("a card with an action stands taller than one without", [withAction, withoutAction].map((c) => outline(c.svg)[0][3]), (g) => g[0] > g[1]);
   one("a card's action that is a frame is a finding", card({ look: "card", label: "x", actions: [{ frame: { rows: [] } }], rows: [] }).findings, says("the actions of a card's header"));
-  // 15c · a brand pressed to set it up is a tile (RD.DEVEX.WORKSPACE.269)
+  // 15c · a brand pressed to set it up is a tile (RULE.DEVEX.WORKSPACE.269)
   const tile = (on) => card({ look: "card", label: "Social sign-in", rows: [{ items: [{ icon: "default", mark: false, ...(on === undefined ? {} : { on }) }] }] });
   one("an icon with `mark: false` and `on` is a square action as tall as a control, and not a circle", [tile(true).findings, rect(tile(true).svg, "sds-skel-control").filter((r) => r[2] === 32 && r[3] === 32).length, (tile(false).svg.match(/<circle class="sds-skel-(?:bar|control)"/g) ?? []).length],
     ([found, squares, circles]) => found.length === 0 && squares === 1 && circles === 0);
@@ -1037,7 +1037,7 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const shared = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", width: "1/4", rows: [{ items: [{ standin: "list", fill: true }] }] } }, { frame: { tag: "b", rows: [{ items: [{ control: "field", text: "x" }, { control: "button", text: "Go" }] }] } }] }] } };
   one("a spec with one frame is no wider than the grid where its shares fit it", outer(draw(shared).svg)[0][2], 1052);
 
-  // 17 · a page's skeleton draws every level: the layout, the page level and each block's unit (RD.DEVEX.WORKSPACE.260)
+  // 17 · a page's skeleton draws every level: the layout, the page level and each block's unit (RULE.DEVEX.WORKSPACE.260)
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
   const listing = (extra = {}) => ({ look: "container", unit: "DSPanelContainer", rows: [], ...extra,
     sections: [{ unit: "DSFilterBar", rows: [{ items: [{ control: "field", text: "Search", fill: true }, { icon: "close" }] }] },
@@ -1230,7 +1230,7 @@ console.log("=== SKELETON — which unit, when: taught by the book, refused by t
   one("`open` that is not true or false is a finding", page(body, { ...RAIL, navigation: { ...RAIL.navigation, open: "yes" } }).findings, says("only a `RAIL` takes `open`"));
 }
 
-console.log("=== SKELETON — a feature's head, in DSFeature's own names (RD.DEVEX.WORKSPACE.284)");
+console.log("=== SKELETON — a feature's head, in DSFeature's own names (RULE.DEVEX.WORKSPACE.284)");
 {
   const SENTENCE = "Each order shows where it stands and what waits on it, from paid to shipped.";
   const headed = (head, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ head: { title: "Watch every order move", ...head }, ...extra }] }] } });
@@ -1307,7 +1307,7 @@ console.log("=== SKELETON — a feature's head, in DSFeature's own names (RD.DEV
     createHash("sha256").update(draw(LOOSE).svg).digest("hex"), "5dad41d636d8f5b8ece28d801e51e4df6adcede2b6863539b049a57d74494a24");
 }
 
-console.log("=== SKELETON — a section's fill and room, a feature's frames, and every field read (RD.DEVEX.WORKSPACE.285 to .288)");
+console.log("=== SKELETON — a section's fill and room, a feature's frames, and every field read (RULE.DEVEX.WORKSPACE.285 to .288)");
 {
   /** Every rect of one class, as [x, y, width, height, corner]. */
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
@@ -1424,7 +1424,7 @@ console.log("=== SKELETON — a section's fill and room, a feature's frames, and
     createHash("sha256").update(draw(PLAIN).svg).digest("hex"), "45e92a0ba59ce1114ff1ad250657ca422a65eb0ff970dcfd29563b23231bbafd");
 }
 
-console.log("=== SKELETON — lines, numbers and alignment, and a grid section's fill (RD.DEVEX.WORKSPACE.289 to .293)");
+console.log("=== SKELETON — lines, numbers and alignment, and a grid section's fill (RULE.DEVEX.WORKSPACE.289 to .293)");
 {
   /** Every rect of one class, as [x, y, width, height, corner]. */
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
@@ -1576,7 +1576,7 @@ console.log("=== SKELETON — lines, numbers and alignment, and a grid section's
     createHash("sha256").update(draw(AS_BEFORE).svg).digest("hex"), "c59e5a3e39549f0f1f202dbf5fcc598c4d65cefa57a0db1d6742d290af2db362");
 }
 
-console.log("=== SKELETON — an item's and a head's parts, and a grid's columns (RD.DEVEX.WORKSPACE.294 to .299)");
+console.log("=== SKELETON — an item's and a head's parts, and a grid's columns (RULE.DEVEX.WORKSPACE.294 to .299)");
 {
   /** Every rect of one class, as [x, y, width, height, corner]. */
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
@@ -1701,7 +1701,7 @@ console.log("=== SKELETON — an item's and a head's parts, and a grid's columns
     createHash("sha256").update(draw(PARTS_BEFORE).svg).digest("hex"), "13af0699d5bb3cd2c98af0c36360558e6dd69867283fea8b2a761d059d930cf3");
 }
 
-console.log("=== SKELETON — statistics, an accordion's entries and the tabs' own type (RD.DEVEX.WORKSPACE.300 to .302)");
+console.log("=== SKELETON — statistics, an accordion's entries and the tabs' own type (RULE.DEVEX.WORKSPACE.300 to .302)");
 {
   /** Every rect of one class, as [x, y, width, height, corner]. */
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
@@ -1807,7 +1807,7 @@ console.log("=== SKELETON — statistics, an accordion's entries and the tabs' o
     createHash("sha256").update(draw(LOOKS_BEFORE).svg).digest("hex"), "5b5a9173fd518a9865d63b1fe4f42c0c396662365e85628ae55004b4415a57c7");
 }
 
-console.log("=== SKELETON — text that fits: words that wrap, code and tabs that scroll, a picture behind the words (RD.DEVEX.WORKSPACE.303 to .305)");
+console.log("=== SKELETON — text that fits: words that wrap, code and tabs that scroll, a picture behind the words (RULE.DEVEX.WORKSPACE.303 to .305)");
 {
   const boxes = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)" rx="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
   const unescape = (s) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");

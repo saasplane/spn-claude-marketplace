@@ -7,11 +7,11 @@ description: Walk an empty folder to a platform running locally - the door first
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "0ada37d2"
+      "seen": "6a02b07f"
     }
   ]
 }
@@ -266,7 +266,7 @@ The organization layer is already up from act 5, and the platform layer reads wh
 spnutils infra platform up <spc>
 ```
 
-`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RD.DEVEX.UTILS.072`). No environment entry selects a platform.
+`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RULE.DEVEX.UTILS.072`). No environment entry selects a platform.
 
 - **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either. This is the same rule act 9's `repo create` already follows, so nothing new is being excused here.
 - **Stop after each and say what it produced.** A partner watching an estate appear has no way to tell a slow layer from a stuck one unless you say.

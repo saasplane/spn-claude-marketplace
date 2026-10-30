@@ -1,6 +1,6 @@
 // RESTATES: `docs/02-constructs/02-support/02-apps/10-providers.md` § The claim, and what grants it — the
-// stack is the repository's own claim; RD.DEVEX.AGENT.066 — a gate never names an instance; and
-// RD.DEVEX.AGENT.107 — the Surface check reaches its stack's reader.
+// stack is the repository's own claim; RULE.DEVEX.AGENT.066 — a gate never names an instance; and
+// RULE.DEVEX.AGENT.107 — the Surface check reaches its stack's reader.
 //
 // The reader sits at `providers/<stack>/scripts/checks/surface.ts`.
 //

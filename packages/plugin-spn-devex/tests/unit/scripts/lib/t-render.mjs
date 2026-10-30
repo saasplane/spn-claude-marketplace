@@ -102,7 +102,7 @@ ok("a Boundary keeps Owns beside Refuses, and who owns the refused part is a fac
 const other = rowsOf(produced(table(["Key", "Example", "Why"], ["`a`", "`b`", "c"])), "<thead>");
 ok("any other table of short values keeps its columns, as written",
   other.includes("<thead><tr><th>Key</th><th>Example</th><th>Why</th></tr></thead>") && other.includes("<tr><td><code>a</code></td><td><code>b</code></td><td>c</td></tr>"), other);
-// RD.DEVEX.WORKSPACE.259: a column whose cells hold sentences is a level of the item cell, never a column.
+// RULE.DEVEX.WORKSPACE.259: a column whose cells hold sentences is a level of the item cell, never a column.
 const one = rowsOf(produced(table(["Gate", "Why there", "Weight"],
   ["the release", "it is the last point where a change can still be stopped cheaply", "MUST"],
   ["the commit", "a change is smallest there, so a finding costs the least to answer", "SHOULD"])), "<thead>");

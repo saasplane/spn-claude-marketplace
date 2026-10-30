@@ -1,4 +1,4 @@
-// `lib/model-prices.ts` — the price table `debug cost show` reads (RD.DEVEX.AGENT.082): dollars per million tokens,
+// `lib/model-prices.ts` — the price table `debug cost show` reads (RULE.DEVEX.AGENT.082): dollars per million tokens,
 // a base id matched through its date or context suffix, and null for a model the table lacks.
 import { MODEL_PRICES, priceOf } from "../../../../src/scripts/lib/model-prices.ts";
 

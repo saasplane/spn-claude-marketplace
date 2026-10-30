@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/01-services.md",
-      "seen": "8e197811"
+      "seen": "b3d73608"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/02-app/02-repositories.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "b39478e2"
+      "seen": "baf37dca"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/07-data.md",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
-      "seen": "5ab26963"
+      "seen": "606ce385"
     }
   ]
 }
@@ -54,9 +54,9 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 ## Cross-cutting
 
 - **Decorator order** (top → bottom): `@SPAuthorize` → `@SPReauth` → `@SPCachePurge`/`@SPCacheBuild` → `@SPTransaction()`. Add `@SPTransaction()` from `@saasplane/support-server-service-ts` to every DB-touching method (delegating one-liners omit it); a step that must commit on its own takes `@SPTransaction({ propagation: SPDatabaseTransactionPropagationType.REQUIRES_NEW })`. Never import `typeorm-transactional` or `typeorm` in a service (CON.TOOL.26, CON.TOOL.27): work that must wait for the commit or the rollback goes through `runOnTransactionCommit`, `runBeforeTransactionCommit`, `runOnTransactionRollback` or `runOnTransactionComplete` from the same package.
-- **Authz**: per-module `<MOD>_AUTHZ` table in `app/utils/authz.ts`. A gate is an `SPIAMAuthConfig` with two terms. `appPermissions` are ways in, and any one passes; inside an entry `any`/`all` over codes, `appScope` narrows it. `enablements` sit on the CONFIG — codes the caller's org TYPE must be offered. Both hold. The offer sits beside the ways in, never inside one, so a second way in cannot reach past it (RD.PLATFORM.CORE.033). A gate pins `appScope: PLATFORM` only to guard a platform master, and **never names an app id** — an id is minted per install (RD.PLATFORM.CORE.034). Authenticated-only is `{ appPermissions: [] }`. Cumulative tiers encoded **at the gate** (a `_VIEW` gate lists VIEW+MANAGE+ADMIN — forgetting the higher tiers locks out admins). Put the gate on the **service** method, not the controller. `resolveScopeOrgId(appScope, orgId)` pins non-PLATFORM sessions to their own org **inside** the method. `@SPReauth` only for the most sensitive self-service flows — system actors can never satisfy it.
+- **Authz**: per-module `<MOD>_AUTHZ` table in `app/utils/authz.ts`. A gate is an `SPIAMAuthConfig` with two terms. `appPermissions` are ways in, and any one passes; inside an entry `any`/`all` over codes, `appScope` narrows it. `enablements` sit on the CONFIG — codes the caller's org TYPE must be offered. Both hold. The offer sits beside the ways in, never inside one, so a second way in cannot reach past it (RULE.PLATFORM.CORE.033). A gate pins `appScope: PLATFORM` only to guard a platform master, and **never names an app id** — an id is minted per install (RULE.PLATFORM.CORE.034). Authenticated-only is `{ appPermissions: [] }`. Cumulative tiers encoded **at the gate** (a `_VIEW` gate lists VIEW+MANAGE+ADMIN — forgetting the higher tiers locks out admins). Put the gate on the **service** method, not the controller. `resolveScopeOrgId(appScope, orgId)` pins non-PLATFORM sessions to their own org **inside** the method. `@SPReauth` only for the most sensitive self-service flows — system actors can never satisfy it.
 - **Cache**: key grammar `namespace:prefix:params[:suffix]` (suffixes: MT/IF/DT/AL/BE); tenant-scoped keys lead with `[null,'authUser.orgId']`; cache the prepared read model, never the entity; TTL one module constant (60s tenant data, 3600s master data). A purge must reproduce the build key exactly.
-- **Queues**: cross-module writes ride the three request queues (notification / audit / job) via the `request*` helpers. **Publish on commit** (`_publishOnCommit`), never inside the transaction window, and never construct the event base by hand. **RequestKey idempotency**: consumer short-circuits on `getByRequestKey`; semantic keys for once-per-fact sends, `ulid()` when each attempt is its own fact. Queue re-entry is a deliberately **ungated** public `handle*Event` (documented as queue-only, no route). Listeners rehydrate the originating actor from the event's auth passport. `subscriberId` is part of the consumption contract — renaming it replays the backlog. A topic is made first by the consuming module's `*-queue-topics` migration; nothing creates a missing topic, so a publish or a subscribe to one is an error that names the topic (RD.SUPPORT.APPS.178).
+- **Queues**: cross-module writes ride the three request queues (notification / audit / job) via the `request*` helpers. **Publish on commit** (`_publishOnCommit`), never inside the transaction window, and never construct the event base by hand. **RequestKey idempotency**: consumer short-circuits on `getByRequestKey`; semantic keys for once-per-fact sends, `ulid()` when each attempt is its own fact. Queue re-entry is a deliberately **ungated** public `handle*Event` (documented as queue-only, no route). Listeners rehydrate the originating actor from the event's auth passport. `subscriberId` is part of the consumption contract — renaming it replays the backlog. A topic is made first by the consuming module's `*-queue-topics` migration; nothing creates a missing topic, so a publish or a subscribe to one is an error that names the topic (RULE.SUPPORT.APPS.178).
 - **Audit**: every authenticated mutation calls `recordAuditLog` **after** the fresh read (WHAT/RESULT/TARGET only; WHO/WHERE derive from context; `requestKey: ulid()`); no-session paths use the explicit-actor `requestAuditLog` — never fake a context. Full-State read models expose `createdBy`/`updatedBy` as resolved Metas, batched and deduped via the terminal (non-recursing) resolvers.
 - **System actors**: gated work with no session runs under `runAsOrgSystem(orgId, fn)` / `runAsPlatformSystem(fn)` — batch sub-writes inside one callback. A function cannot cross between services, so in a service that holds the identity module remotely ask for the caller with `iamModule.services.contract.principalService.getSystemAuthUser(command)` and run under it locally.
 - **Mounted or remote**: `services.impl` exists only where the module is mounted; a service that holds a module remotely has `services.contract` alone, so a module's inner services are reachable in the same process only. A module has a runtime manager `<MOD>RuntimeModuleManager` (nine methods, `getAPIRemoteServices` lists each contract service as `{ name, methods, impl }`) and a remote manager `<MOD>RemoteModuleManager` in `remote/`, importing from `@saasplane/module-server-<code>-ts/remote`; the methods data under `contract/methods/` is produced by `spnutils apps gen-validators`, never by hand.

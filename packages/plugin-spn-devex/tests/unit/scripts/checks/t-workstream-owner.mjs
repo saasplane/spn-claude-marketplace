@@ -102,7 +102,7 @@ console.log("\n=== the migrations ledger is appended to only by `plugin migratio
   ok("green: the command reads it", command.code === 0 && /^001 · /.test(command.out), command.out);
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.262 — a write that would make a sixth entry in an arc's notes folder");
+console.log("\n=== RULE.DEVEX.WORKSPACE.262 — a write that would make a sixth entry in an arc's notes folder");
 {
   const notes = join(ws, "notes", "N001");
   const [shot, why] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(notes, "shots", "rail.png"), content: "png" } }, root);
@@ -128,7 +128,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.262 — a write that would make a sixth en
   ok("green: a closed workstream is never judged", ownedRefusal(closed) === null && notesTreeRefusal(closed) === null);
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.262 and .264 — notes/ and arcs/ hold arc folders, and the name file is the commands'");
+console.log("\n=== RULE.DEVEX.WORKSPACE.262 and .264 — notes/ and arcs/ hold arc folders, and the name file is the commands'");
 {
   const [loose, looseWhy] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: join(ws, "notes", "ideation.md"), content: "# x\n" } }, root);
   ok("red: a note loose at notes/ is refused, and sent to an arc's plan", loose === "deny" && looseWhy.includes("`notes/ideation.md`") && looseWhy.includes("`plan.md`"), `${loose}: ${looseWhy.slice(0, 300)}`);

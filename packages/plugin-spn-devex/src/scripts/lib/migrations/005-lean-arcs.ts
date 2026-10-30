@@ -2,9 +2,9 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Migration 005, in open and backlog workstreams kept as data: a row 0 that writes `plan.md` and has not landed
-// leaves its arc as `row discard` takes a row out (RD.DEVEX.WORKSPACE.227). A Cycles row current under the stamp
+// leaves its arc as `row discard` takes a row out (RULE.DEVEX.WORKSPACE.227). A Cycles row current under the stamp
 // of its rows is restamped from the arc's goal, title and repositories, and one behind stays behind
-// (RD.DEVEX.WORKSPACE.251). Migration 001 applies first, and `closed/` is never read.
+// (RULE.DEVEX.WORKSPACE.251). Migration 001 applies first, and `closed/` is never read.
 
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -71,7 +71,7 @@ function writeAll(root: string): string[] {
       try { writeArcAsIs(ws, data); } catch (thrown) {
         return `${one.name}: not written — ${thrown instanceof Error ? thrown.message : String(thrown)}`;
       }
-      logEvent(ws, data.arc, "discarded", "0", `plugin migration 005: no row writes a plan (RD.DEVEX.WORKSPACE.227) · the row read: ${title}`);
+      logEvent(ws, data.arc, "discarded", "0", `plugin migration 005: no row writes a plan (RULE.DEVEX.WORKSPACE.227) · the row read: ${title}`);
       said.push("row 0 discarded");
     }
     if (one.restamp) {

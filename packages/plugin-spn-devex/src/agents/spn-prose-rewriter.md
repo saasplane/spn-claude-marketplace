@@ -50,7 +50,7 @@ for another. Write one passage that both read the same way.
 ## The masthead follows a stricter rule
 
 **A page's masthead — its Title, its Subtitle and its Description — is held to the plain-language
-rule, and there the rules above change** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187).
+rule, and there the rules above change** (rules RULE.DEVEX.WORKSPACE.182 · RULE.DEVEX.WORKSPACE.187).
 The Title is the `h1`. The Subtitle is the one sentence under it; in a construct seat it is the
 `subtitle` field of the `spn:doc` block. The Description is the one paragraph in the standfirst's
 place; in a construct seat it is the first lead paragraph.
@@ -68,7 +68,7 @@ place; in a construct seat it is the first lead paragraph.
   registers the section above warns about.
 - **Never write a new Title or Subtitle.** Both speak for the product, so the developer approves
   each one before it is written. Write only a line your order carries as approved; otherwise draft
-  it in your report. The foundation hub's Title and Subtitle are fixed by RD.DEVEX.WORKSPACE.143 and
+  it in your report. The foundation hub's Title and Subtitle are fixed by DEC.DEVEX.WORKSPACE.143 and
   are never touched.
 
 ## The test, after every paragraph

@@ -6,10 +6,10 @@
 // the order the arcs run, in two columns. Arc holds the title, the description and the facts as links
 // separated by middots: the preview by its fixed name, each sample, and for CARRIED and DROPPED the reason, and for a decided arc its wait
 // the reason. Status holds the badge. The arc's number is the row's id, so `approach.html#N013` opens it
-// (RD.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the row; a rewrite keeps the stamp, which
+// (RULE.DEVEX.WORKSPACE.263), with `data-arc` and its stamp on the row; a rewrite keeps the stamp, which
 // only `workstream arc stamp write` writes. `write` also writes
-// each arc's name file, `arcs/N<nnn>/<subject>.md` (RD.DEVEX.WORKSPACE.264), and the status in the
-// header of each arc's preview, read from the arc (RD.DEVEX.WORKSPACE.266).
+// each arc's name file, `arcs/N<nnn>/<subject>.md` (RULE.DEVEX.WORKSPACE.264), and the status in the
+// header of each arc's preview, read from the arc (RULE.DEVEX.WORKSPACE.266).
 //
 //   spn-devex docs cycles show <workstream> [--json]   print the table, or the rows as data
 //   spn-devex docs cycles write <workstream>           write the parts of the page the arcs decide
@@ -18,8 +18,8 @@
 // (`016-provider-secret-storage`), looked up in `.spndevex/workstreams/{open,backlog,closed}/`.
 //
 // A SUBJECT WITH TWO ACTIONS. `show` writes no file. `write` writes the parts of the page that the
-// arcs decide (RD.DEVEX.WORKSPACE.204): the header's status, the places of `How` with their `Arcs:`
-// lines, read from the rows' `repo` (RD.DEVEX.WORKSPACE.251), the Cycles table and the heading of
+// arcs decide (RULE.DEVEX.WORKSPACE.204): the header's status, the places of `How` with their `Arcs:`
+// lines, read from the rows' `repo` (RULE.DEVEX.WORKSPACE.251), the Cycles table and the heading of
 // `Open`. `doc-check` compares a page with the same reading, through `tableDifferences` and
 // `headerStatusRule`.
 //
@@ -100,7 +100,7 @@ export function cycleOfData(folder: string, arc: string): Cycle | null {
   let data: { title?: unknown; decides?: unknown; status?: unknown; reason?: unknown; wait?: unknown; preview?: unknown; rows?: unknown } | null = null;
   try { data = JSON.parse(read(file)); } catch { return null; }
   if (!data || typeof data !== "object") return null;
-  // The status as it reads, from the one owner: the developer's words, or worked out from the steps (RD.DEVEX.WORKSPACE.307).
+  // The status as it reads, from the one owner: the developer's words, or worked out from the steps (RULE.DEVEX.WORKSPACE.307).
   const status = typeof data.status === "string" && (STATUSES as readonly string[]).includes(data.status) && Array.isArray(data.rows)
     ? arcStatus(data as Parameters<typeof arcStatus>[0]) : null;
   const wait = typeof data.wait === "string" && data.wait.trim() ? `wait: ${data.wait.trim()}` : "";

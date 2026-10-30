@@ -1,6 +1,6 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md § What
 // names a plugin, and what a version means, and § The place you are standing decides the install
-// mode (RD.DEVEX.AGENT.110). The chapter is the source of truth; a rule change is edited there
+// mode (RULE.DEVEX.AGENT.110). The chapter is the source of truth; a rule change is edited there
 // first, then here, in the same change.
 //
 // What the release command and the plugins' own tests both read: where the four manifests are, the

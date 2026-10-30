@@ -1,5 +1,5 @@
 // `checks/test-run.ts` — a write under a repository's `src` or `tests` waits while a test run for that
-// repository is going (the book's RD.DEVEX.WORKSPACE.207).
+// repository is going (the book's RULE.DEVEX.WORKSPACE.207).
 //
 // The guard knows a run only by its start file, `.spndevex/.debug/sessions/<id>/pending/<tool_use_id>.json`,
 // which `lib/bash-timing.ts` writes before a timed command and removes after it. Each case writes a

@@ -18,7 +18,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/02-app-patterns.md",
       "section": "An overview",
-      "seen": "a933c624"
+      "seen": "374c636f"
     }
   ]
 }
@@ -76,8 +76,8 @@
   - **Defaults are filled values**, so a person starts without configuring.
   - **Growth is measured where it ships**: a claim names the event, the cohort and the run that showed it (principle 11).
 - **First value in the app** — held by this lens worn, beside `UX`, who places each page.
-  - **A new member reaches first value by the flow First run.** The Home, An overview, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's entry over the page → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RD.SUPPORT.SURFACE.360`).
-  - **For Everyday users, a greeting and one card with the one next thing, never a row of zero counts.** An overview says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app patterns § An overview · `RD.SUPPORT.SURFACE.365`).
+  - **A new member reaches first value by the flow First run.** The Home, An overview, shows the welcome once and, while the place holds nothing, one card that names the first step with its action → that step's entry over the page → its list, with the first record in it and a message. The flow ends at the first record made, and the card shows on every visit until the place holds what it asks for (flow patterns § First run · `RULE.SUPPORT.SURFACE.360`).
+  - **For Everyday users, a greeting and one card with the one next thing, never a row of zero counts.** An overview says what it shows before anything is counted; the numbers appear once there is something to count, each loading and failing by itself, with Try again (app patterns § An overview · `RULE.SUPPORT.SURFACE.365`).
 
 ## Gates
 

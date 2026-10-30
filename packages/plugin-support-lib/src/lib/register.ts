@@ -10,7 +10,7 @@
 // it is the only way to be right in both the per-node layout and the one-tree-per-repository layout
 // that follows it.
 //
-// **A column is found by its HEADING and never by its position** (the book's RD.DEVEX.WORKSPACE.139). The row
+// **A column is found by its HEADING and never by its position** (the book's RULE.DEVEX.WORKSPACE.139). The row
 // grammar has three widths: eight cells in the older registers, nine where `Where` or `Realizes`
 // joins them, and ten where `Names` does. A reader pinned to one width sees a wider register as no
 // register at all and reports a confident zero, which is the worst answer a tool can give.
@@ -104,10 +104,10 @@ export const statusOf = (row: RegisterRow): string =>
  *
  * The domain is two to seven letters, so `COMPOSE.BUILD.01` and `SERVICE.HEALTH.01` are read. The
  * middle segment admits a digit after its first letter, because `WEB.A11Y.01` is a row this estate
- * declares. `RD.` and `PD.` are the book's register ids, which titles cite and no row declares, and
+ * declares. `RULE.`, `DEC.` and `PD.` are the book's ids, which titles cite and no row declares, and
  * nothing is read from inside one: an id never follows a letter, a digit or a dot.
  */
-export const BEHAVIOUR_ID = /(?<![A-Za-z0-9.])(?!RD\.|PD\.)([A-Z]{2,7}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
+export const BEHAVIOUR_ID = /(?<![A-Za-z0-9.])(?!RULE\.|DEC\.|PD\.)([A-Z]{2,7}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
 
 /** Every behaviour id a piece of text cites. */
 export const idsIn = (text: string): string[] => [...text.matchAll(BEHAVIOUR_ID)].map((match) => match[1]);

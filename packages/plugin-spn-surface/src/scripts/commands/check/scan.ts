@@ -1,4 +1,4 @@
-// RESTATES: RD.DEVEX.AGENT.107 — a note may refuse in a later version only once a scan of the three
+// RESTATES: RULE.DEVEX.AGENT.107 — a note may refuse in a later version only once a scan of the three
 // TypeScript repositories finds no note on correct code. This command is that scan; it names no rule.
 //
 // `spn-surface check scan` — every Surface note in every `.tsx` of a web node's `src/`, whole files.

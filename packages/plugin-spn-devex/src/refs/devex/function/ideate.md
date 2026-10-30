@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "32bc2649"
+      "seen": "8df77438"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "c03daadd"
+      "seen": "1f0cef86"
     }
   ]
 }
@@ -38,7 +38,7 @@ The DevEx stages are eight: `BOOTSTRAP · SCM · IDEATE · DEVELOP · TEST · PR
 
 ## A partner platform starts from its industry
 
-**On a partner platform, before the boundary is drawn, the lenses write the industry brief in the partner's own purpose part — MUST** (`RD.DEVEX.AGENT.099`). A partner builds for an industry, such as health, payments or logistics, and never has to learn the constructs to describe its business: that bridge is the lenses' job. The brief holds the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems, and each fact carries its source and the date it was read. Each lens learns its share for its own discipline and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. Every lens convenes for it, each for its own discipline.
+**On a partner platform, before the boundary is drawn, the lenses write the industry brief in the partner's own purpose part — MUST** (`RULE.DEVEX.AGENT.099`). A partner builds for an industry, such as health, payments or logistics, and never has to learn the constructs to describe its business: that bridge is the lenses' job. The brief holds the industry, its people and buyers, its workflows and words, its data and exchange standards, its rules and its usual systems, and each fact carries its source and the date it was read. Each lens learns its share for its own discipline and maps it onto the constructs: the domain model becomes modules, a rule becomes controls, a workflow becomes journeys. Every lens convenes for it, each for its own discipline.
 
 **The brief is a source, never an agreement.** What the concept takes from it is still shown and agreed one block at a time. Where the industry and the SaaS Plane way meet badly, the lens raises it rather than bending either one. A later lens reads the brief before it researches again, and refreshes the part it owns when that part is stale. SaaS Plane is the first case, and its own industry is software engineering. `refs/devex/agent/lenses.md` says which lens learns what, and where each lands.
 
@@ -55,14 +55,14 @@ The DevEx stages are eight: `BOOTSTRAP · SCM · IDEATE · DEVELOP · TEST · PR
 
 ## Classify the altitude before you classify the change
 
-You classify twice, and the order matters. First the **nature of the work**, which decides where you enter. Then the size of the change — new capability, additive, breaking, or fix — which runs inside the altitude you already chose. Reverse the two and you patch at the lowest rung, then meet the construct three rounds later.
+You classify twice, and the order matters. First the **nature of the work**, which decides where you enter. Then the size of the change — new capability, additive, breaking, or fix — which runs inside the altitude you already chose. Reverse the two and you patch at the lowest rung, then meet the construct three rounds later. A change to a repository outside the workspace is an order, never an edit made from here: markdown stating the outcome, the constraints and the acceptance, executed in that repository's own window. Inside the workspace the declaration governs, so working across siblings is ordinary.
 
 | Nature of the work | Enter at | The highest thing that must re-align |
 | --- | --- | --- |
 | a new project or platform | the concept | nothing above it — the concept is the top |
 | a new capability inside a module | that module's construct | the module's own seats |
 | a new idea inside a module | where it fits in the construct, before any mechanics | the module's construct section |
-| an idea spanning modules | the repository's concept, and this book where it states a rule | the concept, and a register row |
+| an idea spanning modules | the repository's concept, and this book where it states a rule | the concept, and a register row only where a choice was weighed, an answer reversed or a conflict settled |
 
 **The answer is a path, not a category.** If you cannot name the highest document that must change, you have not classified the work yet. Everything below that document is implementation; everything above it is untouched by what gets built.
 
@@ -73,7 +73,7 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 | upward | what is the highest document that must change? | rows, a chapter, and a handover where it reaches the book. No release |
 | downward | what is the lowest shared package the change reaches? | a release and a pin bump in every consumer — and every other platform on the stack inherits it, asked for or not |
 
-**A design is not classified until both ends are named.** The downward question is the modularity check: the lower a change reaches, the more products it commits to it.
+**A design is not classified until both ends are named.** The downward question is the modularity check: the lower a change reaches, the more products it commits to it. A change whose blast radius crosses a boundary is a design decision routed to the architect lens before any fix is proposed, whether it arrives as a compiler error, a repair breaking many call sites, a change to generated output or a change across a package or repository boundary, and options that all share one noun are one idea rather than several (`RULE.DEVEX.AGENT.026`).
 
 **The altitude is discovered, so escalate rather than absorb.** Work entered at module level routinely turns out to need the rung above — settle the higher document first, because a row written against a construct that is about to move is a row written twice. The top rung is not one document either: this book holds a construct per subject, so name *which* construct owns the idea before you climb into it, or the writing lands in the wrong chapter.
 
@@ -115,7 +115,7 @@ The last row is the one that silently bakes a product decision into code. Settle
 
 **The failure cases, as error codes rather than prose.** Which are the caller's fault and which are the system's decides the response class, and it cannot be retrofitted cheaply.
 
-- **A structural addition needs a recorded decision.** Where the platform's own documented structure has a ceiling — a new top-level chapter, a new module, a new kind — the design produces a register row, never a fait accompli.
+- **A structural addition needs a recorded decision.** Where the platform's own documented structure has a ceiling — a new top-level chapter, a new module, a new kind — the design produces the chapter that states it, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled; never a fait accompli.
 - **Contracts are the only cross-module surface.** If the design needs another module's internals or its storage, the design is wrong, not the rule.
 - **Additive by default.** A breaking change is a planned, versioned event with a migration path — if the design contains one, that is the headline, never a footnote.
 - **The phase does not design the implementation.** Naming files, choosing loop structures or writing pseudo-code here is wasted, because the standards decide most of it. A design says *what* and *where*, never *how*.
@@ -169,7 +169,7 @@ An argument closes by being consumed: the half that outlives it is a register ro
 
 ### Structure comes before content, and outside knowledge is marked
 
-**Before the agent produces content, it designs the structure that content will live in and shows it to the developer — MUST** (`RD.DEVEX.AGENT.088`). Content is what fills a structure: screens, modules, pages. The structure is the units, their names and their grouping, and the pattern each unit follows. Content made first fixes a structure nobody designed.
+**Before the agent produces content, it designs the structure that content will live in and shows it to the developer — MUST** (`RULE.DEVEX.AGENT.088`). Content is what fills a structure: screens, modules, pages. The structure is the units, their names and their grouping, and the pattern each unit follows. Content made first fixes a structure nobody designed.
 
 **While a shape is discussed, the agent says how known platforms solve the same problem, and it marks each such statement.** It brings this without being asked, and it uses the words of the platform's own domain.
 

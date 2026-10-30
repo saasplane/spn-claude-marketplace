@@ -101,8 +101,8 @@ This page answers which subjects the estate's cards cover and what a card may co
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.WORKSPACE.118` | a card is a restatement, carrying its sources and adding no rule | MUST |
-| `RD.SUPPORT.INFRA.026` | which manifest declares which kind of estate node, which the manifest card restates | MUST |
-| `RD.DEVEX.UTILS.019` | a card carries rules it does not own and adds none | MUST |
+| `RULE.DEVEX.WORKSPACE.118` | a card is a restatement, carrying its sources and adding no rule | MUST |
+| `RULE.SUPPORT.INFRA.026` | which manifest declares which kind of estate node, which the manifest card restates | MUST |
+| `RULE.DEVEX.UTILS.019` | a card carries rules it does not own and adds none | MUST |
 
 Try it: `spn-devex restates check`

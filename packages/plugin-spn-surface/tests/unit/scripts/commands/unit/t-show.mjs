@@ -104,10 +104,10 @@ console.log("=== unit show — a unit with a table, from the fixture");
   ok("the usage is the snapshot's", out.includes("usage   a medium entry at the side of its page"), out);
   ok("the table is a guide, and a partner's choice stands", out.includes("a guide: start from the first case that matches, and a partner's choice stands"), out);
   ok("a case gives its words, its rule, and its props with what the page writes",
-    /a medium entry · at the side of the page\s+RD\.SUPPORT\.SURFACE\.075/.test(out)
+    /a medium entry · at the side of the page\s+RULE\.SUPPORT\.SURFACE\.075/.test(out)
       && out.includes("placement RIGHT (the unit's) · size the place's · the page writes nothing"), out);
   ok("a case that draws another unit sends the reader there, with its rule",
-    /a small entry → not a sheet: a DSDialog\s+RD\.SUPPORT\.SURFACE\.075/.test(out), out);
+    /a small entry → not a sheet: a DSDialog\s+RULE\.SUPPORT\.SURFACE\.075/.test(out), out);
   ok("the limits across a view are printed", out.includes("The limits across a view. A sheet over a page is a view of its own."), out);
   ok("the index joins the values that share their cases", out.includes("the index by value: prop · value · its cases") && out.includes("size       SM MD · the place's"), out);
   ok("the next unit's table is not read into this one", !out.includes("something else"), out);

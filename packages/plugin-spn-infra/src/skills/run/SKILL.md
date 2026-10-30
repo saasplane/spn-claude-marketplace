@@ -7,11 +7,11 @@ description: Realize the estate - bring a layer up, take it down, read its statu
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "2b989141"
+      "seen": "810ac3e8"
     }
   ]
 }
@@ -26,7 +26,7 @@ description: Realize the estate - bring a layer up, take it down, read its statu
 ## Two flags decide everything
 
 - **`--local` is the default; `--cloud` is never implicit.** The target that provisions real accounts must be named.
-- **Every `up` and `down` names its mode, and there is no default** (RD.SUPPORT.INFRA.094). Say exactly one of `--plan` or `--apply`. Naming neither, or both, is refused. A command that plans when you forget a flag is a command doing another command's job.
+- **Every `up` and `down` names its mode, and there is no default** (RULE.SUPPORT.INFRA.094). Say exactly one of `--plan` or `--apply`. Naming neither, or both, is refused. A command that plans when you forget a flag is a command doing another command's job.
 - **A cloud apply also takes `--approve`** — deliberately not the default.
 
 Run `--plan` first, hand the output to the `review` skill, and only then `--apply`.
@@ -51,7 +51,7 @@ spnutils infra app up   <package>
 spnutils infra app down <package> [--clean]
 ```
 
-**A platform-scoped command names its platform first, as an argument** (`RD.DEVEX.UTILS.072`): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
+**A platform-scoped command names its platform first, as an argument** (`RULE.DEVEX.UTILS.072`): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
 
 | Noun | Locally | In the cloud |
 | --- | --- | --- |

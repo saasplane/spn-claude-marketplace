@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § A flow file orders a flow's pages
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
-// The flow file reader: `<flow>.flow.json` draws nothing, and is read against the specs it names (RD.DEVEX.WORKSPACE.230).
+// The flow file reader: `<flow>.flow.json` draws nothing, and is read against the specs it names (RULE.DEVEX.WORKSPACE.230).
 // Reading a spec from disk is the caller's, so this module is given a function that returns one, or null.
 
 import { SKEL_TASK_STATES } from "./draw.ts";

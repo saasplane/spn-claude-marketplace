@@ -1,5 +1,5 @@
 // Write what one named run found into the behaviour rows, and nothing else — the one writer of
-// `Status` and `Updated at` in every repository (the book's RD.DEVEX.UTILS.071: the CLI writes the
+// `Status` and `Updated at` in every repository (the book's RULE.DEVEX.UTILS.071: the CLI writes the
 // run's file and never a row). It reads the registers under `docs/`, and only the files of the run
 // it is told to read: `<run>.json` and every `<run>.<phase>.json` under each node's
 // `tests/.output/<tier>/runs/`.
@@ -85,7 +85,7 @@ function apply(source: string, name: string, runs: Run[], reachIsRepository: boo
     } else {
       continue;                                                      // silence is not evidence of absence
     }
-    // `Updated at` moves only with the status: a run that confirms a row re-dates nothing (RD.DEVEX.WORKSPACE.306).
+    // `Updated at` moves only with the status: a run that confirms a row re-dates nothing (RULE.DEVEX.WORKSPACE.306).
     if (status === was) continue;
 
     const cells = [...row.cells];

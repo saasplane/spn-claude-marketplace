@@ -3,97 +3,72 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "14d06850"
+      "seen": "4dba48e6"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "79b3c27a"
+      "seen": "342d87d8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "68c1e693"
+      "seen": "b94b30ff"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "c0ba7e1b"
+      "seen": "3dd16e2b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status is one of six, stored or worked out",
-      "seen": "656a5e70"
+      "seen": "2dcea68f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A landed arc is never reopened",
-      "seen": "14638107"
+      "seen": "39c20c64"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "5a817634"
+      "seen": "eda6566b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "f2a8cb33"
+      "seen": "988f3333"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The worktree set",
-      "seen": "b74a817b"
+      "seen": "7ed4af7f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
-      "seen": "b1bdbbce"
+      "seen": "73890b8d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Restatement discipline",
-      "seen": "2586b987"
+      "seen": "abe4bd6f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
+      "section": "DevEx Workspace — One Window, Laws by Declaration",
+      "seen": "f81e3645"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "section": "Five regions, one writer each",
+      "seen": "49d90178"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.058",
-      "seen": "9875bea1"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.261",
-      "seen": "d9b77fe5"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.020",
-      "seen": "3661c8a9"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.UTILS.044",
-      "seen": "9814cdcb"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.UTILS.048",
-      "seen": "32c30358"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.AGENT.049",
-      "seen": "6dce9417"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.118",
-      "seen": "baf42b07"
-    },
-    {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.324",
-      "seen": "fe694315"
+      "row": "DEC.DEVEX.UTILS.044",
+      "seen": "f30e3970"
     }
   ]
 }
@@ -101,7 +76,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. The state file is `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The state file has a node for each owner**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.WORKSPACE.020, RD.DEVEX.UTILS.044, RD.DEVEX.UTILS.048, RD.DEVEX.AGENT.049, RD.DEVEX.WORKSPACE.118 and RD.DEVEX.WORKSPACE.324. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. The state file is `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The state file has a node for each owner**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RULE.DEVEX.WORKSPACE.020, DEC.DEVEX.UTILS.044, RULE.DEVEX.UTILS.048, RULE.DEVEX.AGENT.049, RULE.DEVEX.WORKSPACE.118 and RULE.DEVEX.WORKSPACE.324. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -118,7 +93,7 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.saasplane`** on purpose. `rm -rf ~/.saasplane/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (RULE.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.saasplane`** on purpose. `rm -rf ~/.saasplane/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
@@ -229,7 +204,7 @@ A run writes what it can see, and it stops there. **It never deletes a key becau
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
 
-**While a workstream is open, the folder also carries its worktree set, which is no home and no member (RD.DEVEX.WORKSPACE.315).** A workstream works in a folder of its own, so two workstreams never share a checkout and a main checkout never holds work. The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root — MUST. `spnutils workspace worktree add <NNN>` fetches every member and makes it, and a `--repo` option adds one repository more. A fix that production or one environment needs is cut from that branch: `--from <branch>` cuts the workstream's branch from `main`, `uat` or `qa` in place of `develop`, and writes `branch.<name>.spnBase` for it.
+**While a workstream is open, the folder also carries its worktree set, which is no home and no member (RULE.DEVEX.WORKSPACE.315).** A workstream works in a folder of its own, so two workstreams never share a checkout and a main checkout never holds work. The set is the folder `.worktrees/<NNN>-<subject>/` in the workspace root — MUST. `spnutils workspace worktree add <NNN>` fetches every member and makes it, and a `--repo` option adds one repository more. A fix that production or one environment needs is cut from that branch: `--from <branch>` cuts the workstream's branch from `main`, `uat` or `qa` in place of `develop`, and writes `branch.<name>.spnBase` for it.
 
 | In the set | What it is |
 | --- | --- |
@@ -243,7 +218,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 - **The set needs no new permission.** The workspace's settings already allow reads and edits under the root.
 - **The main checkouts stay on `develop`, fetched, and the agent never commits in one — MUST.** A release is the one time a main checkout is switched to `main`.
 - **`spnutils workspace worktree remove <NNN>` removes the set and refuses work that is not on origin — MUST.** It refuses while any worktree holds a commit that is not on origin or a change that is not committed. Once the repository's pull requests are merged, it deletes the branch on origin too.
-- **The set is removed before its workstream closes, and a set left behind is named at session start — MUST** (`RD.DEVEX.WORKSPACE.325`). The close gate refuses while the set is on disk, and the session's status line names each set whose workstream is in `closed/`, or whose name no workstream folder carries, with the command that removes it.
+- **The set is removed before its workstream closes, and a set left behind is named at session start — MUST** (`RULE.DEVEX.WORKSPACE.325`). The close gate refuses while the set is on disk, and the session's status line names each set whose workstream is in `closed/`, or whose name no workstream folder carries, with the command that removes it.
 
 **The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about. Its `.gitignore` carries two lines, `.debug/` and `.state.*`, so neither the machinery's notes nor the state file's lock and temporary file reach the history, and a re-run of `workspace init` adds a line it finds missing. `state.json` is in the history on purpose: a record of when telemetry was on is worth having beside the cost figures it explains. No command commits, so a change to it is in whatever commit is made there next.
 
@@ -287,7 +262,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 **`workstreams/` and `.debug/` are the only two containers, and `state.json` sits beside them.** `workstreams/` holds one folder per scope of work, `.debug/` holds what the machinery keeps and costs: its notes about each window and its logs, and `state.json` holds what the commands record that the tree cannot show. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries. **`.debug/` holds three containers, and each has one lifetime rule — MUST.** `sessions/<session-id>/` is one folder for each Claude Code window, holding its notes (`name.json`, `window.json` for its bound workstreams, `stop.json` for the Stop baseline and `stop.<agent>.json` for each child's own, so a child and its window never write one file, `confirmed.json`, `mirror` for the mirrors already named to this window, one per line, `tags.json`, `usage-offsets.json` and `pending/`); it is swept whole, 14 days after the folder's newest write, at session start and by `debug window sweep`, and no store prunes on its own. `workspace/` is kept and holds what spans windows, `filter.json`. `telemetry/` holds `hooks.jsonl` and `usage.jsonl`; a log past 20 MB is renamed `<name>.1.jsonl`, replacing the previous one, and starts anew, and a reader reads both. **The plugin is the only writer of `.debug/`.** The switch that starts the recording is not there: it is the `debug` node of `state.json`. Read it with `spn-devex debug cost show`, `debug hooks show`, `debug window show`, `debug window sweep`, `debug switch show|on|off` and `debug store show`. Beside them sits one file, `migrations.jsonl`: the ledger of the plugin migrations applied here, appended to only by `spn-devex plugin migration write` (`refs/devex/agent/plugins.md` § A release carries its migration, and a window applies what is pending first).
 
-**`.spndevex/state.json` is the one file where the workspace's commands record what they need to remember, with one node for each owner — MUST** (RD.DEVEX.WORKSPACE.324). Only commands write it, and nobody edits it by hand:
+**`.spndevex/state.json` is the one file where the workspace's commands record what they need to remember, with one node for each owner — MUST** (RULE.DEVEX.WORKSPACE.324). Only commands write it, and nobody edits it by hand:
 
 ```json
 {
@@ -329,7 +304,7 @@ A node joins the file only when the folder tree cannot show its fact — MUST; a
 
 **There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and each arc's data carries its own rows and status.
 
-**The workstream is kept as data, and every file has one owner** (`RD.DEVEX.WORKSPACE.249`). The `.jsonl`
+**The workstream is kept as data, and every file has one owner** (`RULE.DEVEX.WORKSPACE.249`). The `.jsonl`
 files and each arc's folder under `arcs/` are written only by the `spn-devex workstream` commands, and the
 PreToolUse hook refuses a direct edit to them. The approach page, the preview, the samples, the plan and the
 orders are yours to write by hand, and no command writes them. Two marked regions of the page are the
@@ -338,9 +313,9 @@ named by its number, `N<nnn>`, and its short subject, its title and its goal are
 number names its two folders, and `notes/` and `arcs/` hold nothing but arc folders. Its address is its row
 on the approach page, `approach.html#N<nnn>`, and every link to an arc points there. The commands, the formats and the life of an arc are in [`workstream.md`](workstream.md). Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is never part of the state of the work** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation. The plugin keeps a note of its own for hooks, `window.json` in that window's folder under `.debug/sessions/`, and the note never says which state a workstream is in: the folder tree says that.
 
-**A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RD.DEVEX.WORKSPACE.274`). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RD.DEVEX.AGENT.104`). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RD.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RD.DEVEX.WORKSPACE.275`).
+**A change to how something looks is made in the arc's preview first, as often as the developer likes, and built once in one order after their go** (`RULE.DEVEX.WORKSPACE.274`). A written order runs on Sonnet, shaping, cards and previews stay on the largest model, and every launch names its model (`RULE.DEVEX.AGENT.104`). An order quotes the facts it needs, each with its commit, and points to the rules it follows (`RULE.DEVEX.WORKSPACE.276`). The log gets one note per milestone (`RULE.DEVEX.WORKSPACE.275`).
 
-**Every arc stands on its workstream's approach page** (`RD.DEVEX.WORKSPACE.263`). Its row in *Cycles* is its address, `approach.html#N<nnn>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
+**Every arc stands on its workstream's approach page** (`RULE.DEVEX.WORKSPACE.263`). Its row in *Cycles* is its address, `approach.html#N<nnn>`, so a subject with an arc and no page is a gap, and `workstream state check` names it. A page that argues nothing yet still carries the masthead and the Cycles row.
 
 - **Scope belongs to the developer, and you only ever propose.** A workstream holds as much as they want it to hold. Widening is the default; splitting is the exception you raise, and never a folder you open on your own initiative.
 - **One release train at a time.** That is mechanical and it holds. Any number of arcs in one workstream is their judgement, and you do not overrule it.
@@ -364,11 +339,11 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `lastNumber` in the `workstreams` node of `.spndevex/state.json` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
 
-**The `workstreams` node holds only what the folder tree cannot show — MUST** (`RD.DEVEX.WORKSPACE.190`). Today that is one key, `lastNumber`: once a closed folder is deleted, no folder carries the highest number any more. A value the tree already shows, such as which state a workstream is in or how many arcs it has, never goes in the node, and a new key is added only with the reason the tree cannot hold it. `spnutils workspace init` and `workspace agent-sync` fold an older `workstreams/state.json` and `workstreams/.last-number` into the node, the higher number winning, and delete the old files.
+**The `workstreams` node holds only what the folder tree cannot show — MUST** (`RULE.DEVEX.WORKSPACE.190`). Today that is one key, `lastNumber`: once a closed folder is deleted, no folder carries the highest number any more. A value the tree already shows, such as which state a workstream is in or how many arcs it has, never goes in the node, and a new key is added only with the reason the tree cannot hold it. `spnutils workspace init` and `workspace agent-sync` fold an older `workstreams/state.json` and `workstreams/.last-number` into the node, the higher number winning, and delete the old files.
 
 ### Which state a new workstream starts in
 
-**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, **you propose one and say why**. You never pick silently, and you never leave it as an open question either. Scope belongs to the developer and you only ever propose — decision RD.DEVEX.WORKSPACE.038 — so they confirm or override your reason in one word.
+**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, **you propose one and say why**. You never pick silently, and you never leave it as an open question either. Scope belongs to the developer and you only ever propose — rule RULE.DEVEX.WORKSPACE.038 — so they confirm or override your reason in one word.
 
 | Propose | When | The tell |
 | --- | --- | --- |
@@ -388,7 +363,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 ## Open a workstream with the agent update, and execute after
 
-**A workstream opens with the agent update and the reload — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
+**A workstream opens with the agent update and the reload — MUST** (RULE.DEVEX.AGENT.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
 
 **Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the commands, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
 
@@ -422,15 +397,15 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | You changed | It starts at | It reaches a session through |
 | --- | --- | --- |
 | a contradiction, or a new law | the concept, then the chapter carrying it | step 4, and nothing before it |
-| a decision worth citing later | a register row, `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` | the chapter and the plugins restating it |
+| a decision worth citing later | a register row, `DEC.<AREA>.<DOMAIN>.<NNN>`, where a choice was weighed, an answer reversed or a conflict settled | the chapter and the plugins restating it |
 | a realization true of one stack | that stack's provider seat | that stack's own plugin |
 | a command, a gate, or the floor | the deterministic tool | its release, then step 6 |
 
 **The book is not loaded in a session, and that is why step 4 exists.** You read the installed plugins, so a rule living only in a chapter reaches nobody at all. Carry it into the core plugin where it is stack-agnostic, and into the stack's plugin where it is not — as a skill, a reference card, or a lens bullet.
 
-**A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. **The owning document changes first, and every restatement follows it** (`RD.DEVEX.WORKSPACE.229`): every reference a plugin ships restates the book, whatever it holds, so a builder edits the book, then runs `restates docs write` for a prose reference or `restates files write` for a folder restated as files. A restatement edited ahead of its source is undone by the next write from that source. Run `spn-devex restates check` to see which stamps your edit moved: it reads the path it is given, else `spn-foundation` in the workspace it runs in, and names that book on its first line. **It reports and writes nothing for a `docs` or `files` citation**, so you correct each of those `seen` values yourself once you have re-read the source and corrected any disagreement; `restates decisions write <ref>` restamps a `decisions` citation the same way, after the same re-read.
+**A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. **The owning document changes first, and every restatement follows it** (`RULE.DEVEX.WORKSPACE.229`): every reference a plugin ships restates the book, whatever it holds, so a builder edits the book, then runs `restates docs write` for a prose reference or `restates files write` for a folder restated as files. A restatement edited ahead of its source is undone by the next write from that source. Run `spn-devex restates check` to see which stamps your edit moved: it reads the path it is given, else `spn-foundation` in the workspace it runs in, and names that book on its first line. **It reports and writes nothing for a `docs` or `files` citation**, so you correct each of those `seen` values yourself once you have re-read the source and corrected any disagreement; `restates decisions write <ref>` restamps a `decisions` citation the same way, after the same re-read.
 
-**A citation names a file, a section of a file, or a whole folder** (`RD.DEVEX.AGENT.072`). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
+**A citation names a file, a section of a file, or a whole folder** (`RULE.DEVEX.AGENT.072`). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
 
 **A partner receives none of this until the marketplace is published.** Publishing is pushing that repository, and a plugin's installed cache is keyed by its version. So the version bump and the push belong to this loop rather than to whatever follows it. The marketplace's own instruction file rules when that count moves.
 
@@ -503,7 +478,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 | empty | nobody decided. **The gate refuses it** | — |
 | `in progress` | somebody is on it now. **The gate refuses it** | `in progress 2026-09-29 14:32 +05:30` |
 | `◐ stopped` | begun and put down. **The gate refuses it too** — half an edit sits in the tree and only the agent that stopped knows where | `stopped → Q8 answered · did the chapter · left the row · unsafe decisions.md` |
-| `⏸ held on Q<n>` | waits for the answer to card `Q<n>`, because that answer can change it (`RD.DEVEX.WORKSPACE.188`). **The gate refuses it** | `⏸ held on Q12` |
+| `⏸ held on Q<n>` | waits for the answer to card `Q<n>`, because that answer can change it (`RULE.DEVEX.WORKSPACE.188`). **The gate refuses it** | `⏸ held on Q12` |
 
 **A stopped row is finished, or split honestly.** The half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred. Never retype the mark and leave the done half unrecorded.
 
@@ -525,8 +500,8 @@ Plan one change across repos as an **arc**: ordered rows, one per step, each car
 
 ### An arc carries a status, and it is one of six
 
-**The set is closed (`RD.DEVEX.WORKSPACE.058`), and the developer's words are stored while the rest is
-worked out (`RD.DEVEX.WORKSPACE.307`).** Every check reads the status through one owner, `arcStatus` in the
+**The set is closed (`RULE.DEVEX.WORKSPACE.058`), and the developer's words are stored while the rest is
+worked out (`RULE.DEVEX.WORKSPACE.307`).** Every check reads the status through one owner, `arcStatus` in the
 plugin's workstream library, so no two of them disagree.
 
 | Status | Stored or worked out | Runnable work? | Terminal | Must also carry |
@@ -544,7 +519,7 @@ plugin's workstream library, so no two of them disagree.
 steps work out; `HELD` is `DECIDED` with the developer's words as its wait. The pattern is a word for a
 **stage** rather than a word for a **state**.
 
-**No step starts before the go, and reading is never a step — MUST** (`RD.DEVEX.WORKSPACE.278`). Reading and
+**No step starts before the go, and reading is never a step — MUST** (`RULE.DEVEX.WORKSPACE.278`). Reading and
 drafting are planning jobs, which record no step. Steps may be written before the go; `row add` and `row state` refuse
 one written `running` or `landed` on an arc not `DECIDED`, or holding a wait. **The go is its own write, and
 it carries the developer's words**: `arc edit <ws>/<arc> --status DECIDED --note "<the developer's words>"`,
@@ -564,7 +539,7 @@ check` names a `state.json` that holds one. A file at `schemaVersion` 1 is broug
 
 ### A landed arc is never reopened
 
-**The kind of change decides what moves (`RD.DEVEX.WORKSPACE.261`).**
+**The kind of change decides what moves (`RULE.DEVEX.WORKSPACE.261`).**
 
 | Moment | What moves |
 | --- | --- |
@@ -592,7 +567,7 @@ runs for this window's workstreams.
 | name a marketplace PATH as a value to set | name `SPN_DEVEX_AGENT_WORKSPACE`, which names a place rather than a source. Set, and the repos inside it are a **builder**'s; unset — what every partner has — and the marketplace is the published one. Nothing may set it for somebody |
 
 **No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
-the command — `--plan` or `--apply`, exactly one, with no default (`RD.SUPPORT.INFRA.094`). `--plan` reaches
+the command — `--plan` or `--apply`, exactly one, with no default (`RULE.SUPPORT.INFRA.094`). `--plan` reaches
 no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
 it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
@@ -611,7 +586,7 @@ One constraint decides where every common rule lives. **A product repo built on 
 
 **Common rules are carried by the plugin, never by a link into a peer repo.** Cite by name any document that must be cited across repos, and let the plugin carry the substance.
 
-**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. The workspace's `CLAUDE.md` is generated too and names no checkout, so it needs no exception. And a repository's instruction file states what is true of that repository, never what other repositories may do.
+**The rule reaches every file that ships inside a repository, agent instruments included** (RULE.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. The workspace's `CLAUDE.md` is generated too and names no checkout, so it needs no exception. And a repository's instruction file states what is true of that repository, never what other repositories may do.
 
 ## Skills are what a consumer acts on; the book is why
 

@@ -65,4 +65,4 @@
 
 ## Improves the book
 
-- {{how a finding with no owning rule becomes a drafted docs change and register row, put to the developer}}
+- {{how a finding with no owning rule becomes a drafted docs change, with the rule's id on the rule and a register row only where a choice was weighed, put to the developer}}

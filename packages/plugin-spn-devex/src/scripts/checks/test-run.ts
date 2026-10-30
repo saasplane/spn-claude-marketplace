@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
+// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.207 — no source or test file changes while a test run for
 // that repository is in flight.
 //
 // Refuses a write under a repository's `src` or `tests` while a test command for that repository has
@@ -127,7 +127,7 @@ export function checkTestRun(payload: Payload, now = Date.now()): Verdict {
         `Denied: a test run for \`${repo}\` is going — \`${run.command}\`, started ` +
         `${markAge(new Date(run.startedAt), now)} ago — and \`${relative(root, path)}\` is under that ` +
         `repository's \`src\` or \`tests\`. No source or test file changes while a test run for that ` +
-        `repository is in flight (RD.DEVEX.WORKSPACE.207): the run reads the tree it started on, so an ` +
+        `repository is in flight (RULE.DEVEX.WORKSPACE.207): the run reads the tree it started on, so an ` +
         `edit made now costs the run again. Wait for the run to end, then make the edit. A document, ` +
         `another folder and another repository are open to you meanwhile. The run is known by its start ` +
         `file, \`${relative(root, run.file)}\`; one that no call closed stops counting ` +

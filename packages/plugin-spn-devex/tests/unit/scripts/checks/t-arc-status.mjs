@@ -1,5 +1,5 @@
-// `arc-status` — an arc's status is one of six (RD.DEVEX.WORKSPACE.058): the developer's words stored, and RUNNING
-// and LANDED worked out from the steps by one owner (RD.DEVEX.WORKSPACE.307).
+// `arc-status` — an arc's status is one of six (RULE.DEVEX.WORKSPACE.058): the developer's words stored, and RUNNING
+// and LANDED worked out from the steps by one owner (RULE.DEVEX.WORKSPACE.307).
 //
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that
 // never does, wearing the other sign. The set is stated once, in `arc-status.ts`, and what holds an arc to it is the
@@ -31,7 +31,7 @@ for (const word of ["RUNNING", "HELD", "PART-LANDED", "IMPLEMENTING", "PLANNING"
     arcFaults(arc(word)).some((fault) => fault.includes("`status`") && fault.includes(STORED_STATUSES.join(" · "))));
 ok("the six are the stored set and RUNNING", STATUSES.join() === "PROPOSED,DECIDED,RUNNING,LANDED,CARRIED,DROPPED");
 
-console.log("\n=== the one owner works RUNNING and LANDED out from the steps (RD.DEVEX.WORKSPACE.307)");
+console.log("\n=== the one owner works RUNNING and LANDED out from the steps (RULE.DEVEX.WORKSPACE.307)");
 {
   ok("a decided arc with no step started reads DECIDED", arcStatus(arc("DECIDED", [step("1", "waiting"), step("2", "ready")])) === "DECIDED");
   ok("red: a step started reads RUNNING", arcStatus(arc("DECIDED", [step("1", "running"), step("2", "waiting")])) === "RUNNING");

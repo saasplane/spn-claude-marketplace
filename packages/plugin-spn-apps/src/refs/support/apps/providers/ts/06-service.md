@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
-      "seen": "b39478e2"
+      "seen": "baf37dca"
     }
   ]
 }
@@ -79,7 +79,7 @@
 
 **Command binding follows the verb** — a read binds from the querystring, a write from the body. An array field on a read has two wire forms, so test both.
 
-**A pre-auth route carries no authorization**, so nothing charges the caller for reaching it. Declare rate limiting and a captcha challenge on the route instead, as counts of seconds rather than phrases. The count is kept by `SPFastifyRateLimitCacheStore`, over the service's default cache, so a declared limit is one limit however many pods serve the route, and a count the store could not make lets the call through.
+**A pre-auth route carries no authorization**, so nothing charges the caller for reaching it. Declare rate limiting and a captcha challenge on the route instead, as counts of seconds rather than phrases. The count is kept by `SPFastifyRateLimitCacheStore`, over the service's default cache, so a declared limit is one limit however many pods serve the route, and a count the store could not make lets the call through. Declare the number that is right in production: `{CODE}_API_RATE_LIMIT_THRESHOLD_FACTOR` scales every declared threshold per deployment (never a window), so a threshold is never edited to reach a browser or a test suite; the factor may be below or above one, and the scaled count rounds up.
 
 **Declaring a captcha obliges your application's IAM handler to answer `getCaptchaConfig(request)`**, which is required and returns an `SPCaptchaConfig`, never `null`. The server refuses to start when a route asks for a protection the application never wired, so you find out at boot. **The framework counts; a service verifies.** On a challenge the manager throws `throwErrorCaptchaRequired(config)` (`COMMON_CAPTCHA_REQUIRED`, `ERROR.STD.409`); the client resends the command with `captcha` populated; the method that receives it asks the service that owns the captcha to check the solution — for the platform's captcha, `iamModule.services.contract.sessionService.verifyCaptchaInput({ captchaInput: command.captcha })`, which works from any service. The solution's `mtype` chooses the verifier, and a kind the deployment has no verifier for throws `CAPTCHA_INVALID`. The person's address is read from the call's own context and is not a member of the command. A partner's own captcha is chosen in the handler by route, and its own method checks the solution. `SPCaptchaConfig`, `SPCaptchaInput` and `SPCaptchaResult` each carry `mtype` alone, and a module extends all three with its own vendor enum, base plus `mtype`, never a union alias.
 
@@ -229,7 +229,7 @@ A server app is given its sign-in support as one provider, `serviceApp.providers
 
 **Let the listener rehydrate the originating actor** through the auth provider's `prepareAuthUser`, so authorization, context reads and audit stamping behave as they do online. The queue carries the base passport, so either kind of caller travels, a person acting in an organization or a person outside any, and a passport the identity module does not vouch for throws. Use the plain listener for a system topic with no actor.
 
-**A topic is made first by the consuming module's `*-queue-topics` migration, as a table is.** The service app's boot builds the queue provider with `allowAutoTopicCreation` set to `false`, and the broker does not create a topic either, so nothing makes a missing topic. Publishing or subscribing to a topic that does not exist is an error that names the connection and the topic (RD.SUPPORT.APPS.178). The subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
+**A topic is made first by the consuming module's `*-queue-topics` migration, as a table is.** The service app's boot builds the queue provider with `allowAutoTopicCreation` set to `false`, and the broker does not create a topic either, so nothing makes a missing topic. Publishing or subscribing to a topic that does not exist is an error that names the connection and the topic (RULE.SUPPORT.APPS.178). The subscriber id is part of the consumption contract — renaming it redelivers the retained backlog to a new group.
 
 **The queue re-enters the module through a deliberately ungated handler** that delegates to the private implementation, because the producer already authorized at request time. Keep it off the API surface, and say in a comment why it is ungated — an unexplained ungated public method reads as a security bug.
 

@@ -114,7 +114,7 @@ export function readPayload(): Payload {
  *
  * `additionalContext` is what the agent reads and `systemMessage` is the developer's pane. A note is
  * advice the agent acts on, so it goes to the agent alone; a refusal stops the developer's work, so
- * it is the one thing their pane shows (RD.DEVEX.AGENT.092).
+ * it is the one thing their pane shows (RULE.DEVEX.AGENT.092).
  */
 export function emit(verdict: Verdict): void {
   if (!verdict) return;

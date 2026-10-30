@@ -37,7 +37,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 ## Retired ids
 
-**A promise is re-issued under the construct that now makes it, and the id it used to carry is never reused.** The floor is gone: coverage is measured and reported, never enforced, and no ratchet raises a number nobody checked (`RD.SUPPORT.APPS.133`, amended 2026-09-29).
+**A promise is re-issued under the construct that now makes it, and the id it used to carry is never reused.** The floor is gone: coverage is measured and reported, never enforced, and no ratchet raises a number nobody checked (`RULE.SUPPORT.APPS.133`, amended 2026-09-29).
 
 | Retired | Re-issued as |
 | --- | --- |

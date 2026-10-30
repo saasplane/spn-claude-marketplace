@@ -100,7 +100,7 @@
   <h3 id="the-manifest">The manifest</h3>
   <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.</p>
   <h3 id="the-version-names-what-is-published">The version names what is published</h3>
-  <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. The four plugins carry one version and move together: a release moves all four, changed or not (RD.DEVEX.007).</p>
+  <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. The four plugins carry one version and move together: a release moves all four, changed or not (rule RULE.MARKETPLACE.DEVEX.007).</p>
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
   <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.</p>
   <h3 id="the-installed-copy-and-what-a-wired-path">The installed copy, and what a wired path names</h3>
@@ -128,10 +128,10 @@
   <div class="sds-scroll"><table>
     <thead><tr><th>Rule</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td><p><code>RD.DEVEX.UTILS.019</code></p><p>the plugins are authored and delivered in one public repository, and publishing is pushing it</p></td><td>MUST</td></tr>
-      <tr><td><p><code>RD.DEVEX.WORKSPACE.176</code></p><p>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RULE.DEVEX.UTILS.019</code></p><p>the plugins are authored and delivered in one public repository, and publishing is pushing it</p></td><td>MUST</td></tr>
+      <tr><td><p><code>RULE.DEVEX.WORKSPACE.176</code></p><p>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</p></td><td>MUST</td></tr>
       <tr><td><p>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</p><p>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</p></td><td>MUST</td></tr>
-      <tr><td><p><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></p><p>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</p></td><td>MUST</td></tr>
+      <tr><td><p>DEC.MARKETPLACE.DEVEX.006</p><p>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</p></td><td>MUST</td></tr>
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>

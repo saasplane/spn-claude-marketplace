@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/01-kinds.md",
-      "seen": "b60c44c6"
+      "seen": "0a63a40b"
     }
   ]
 }
@@ -94,7 +94,7 @@ So a release touches no manifest in git, and what the repository holds is the co
 
 **A template file carries the suffix `.tmpl` and is written out without it.** A dotfile template carries the prefix `dot-` and is written out as `.`, because npm strips a literal `.gitignore` from a published tarball. Both spellings belong to this stack.
 
-**You add a template when you add the kind it scaffolds, never before.** Coverage decides which templates a stack owns, so a stack joining with no web runtime needs none for the web kinds.
+**You add a template when you add the kind it scaffolds, never before.** Coverage decides which templates a stack owns, so a stack joining with no web runtime needs none for the web kinds. **A template is proven by scaffolding a repository from it and building the result, never by inspecting the template**, because a structural check passes a template that cannot build.
 
 ## What each kind contributes to the repository's docs
 

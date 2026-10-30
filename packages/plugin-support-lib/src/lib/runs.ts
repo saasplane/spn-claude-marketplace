@@ -1,6 +1,6 @@
 // What a run left behind: every run is named by its caller and writes
 // `<node>/tests/.output/<tier>/runs/<run>.json`, or `<run>.<phase>.json` for a journey phase, and a
-// reader is always told which run to read (the book's RD.DEVEX.UTILS.071). This file lives once, in
+// reader is always told which run to read (the book's RULE.DEVEX.UTILS.071). This file lives once, in
 // the shared support-lib folder; spn-devex and spn-apps each import it by relative path.
 
 import { readdirSync, readFileSync, statSync } from "node:fs";

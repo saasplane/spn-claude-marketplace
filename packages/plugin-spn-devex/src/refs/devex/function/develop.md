@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "2b989141"
+      "seen": "810ac3e8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/04-develop.md",
-      "seen": "b28d121b"
+      "seen": "22190bbb"
     }
   ]
 }
@@ -32,7 +32,7 @@
 | `app` | hold the logic — authorization, transactions, the repository | be reached from outside its module |
 | `entry` | adapt one way in — `api` · `queue` · `cli` on the server, `ui` on the web | hold logic of its own |
 
-**Documents come first, because documents lead code (`RD.DEVEX.WORKSPACE.081`).** The seat says what will be true before any source is written, so the code is written against a page.
+**Documents come first, because documents lead code (`DEC.DEVEX.WORKSPACE.081`).** The seat says what will be true before any source is written, so the code is written against a page.
 
 **Steps two to four — contract, regenerate, implementation — are ordered by dependency and cannot be reordered.** Not a preference — the later steps read what the earlier ones generated.
 

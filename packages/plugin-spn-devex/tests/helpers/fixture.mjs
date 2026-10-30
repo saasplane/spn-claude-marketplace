@@ -43,7 +43,7 @@ export function clean() { rmSync(BASE, { recursive: true, force: true }); }
 
 /**
  * Bind a session to every workstream that is open in a fixture, the way a window that wrote into each of
- * them is bound (RD.DEVEX.WORKSPACE.236). A hook now speaks only of the workstreams its window works on,
+ * them is bound (RULE.DEVEX.WORKSPACE.236). A hook now speaks only of the workstreams its window works on,
  * so a case about what a check says must first say whose window it is.
  */
 export function bindOpen(root, session) {

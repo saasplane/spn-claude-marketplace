@@ -1,9 +1,9 @@
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
 // The `decisions`-kind restatement alone: a plugin document citing a register row by id, and whether
 // that row still exists. `restates check` runs all four kinds together; this narrows to one, so a
-// drift names its owed act — a `decisions` drift is re-read, never rewritten or copied (RD.DEVEX.AGENT.072).
+// drift names its owed act — a `decisions` drift is re-read, never rewritten or copied (RULE.DEVEX.AGENT.072).
 //
 //     spn-devex restates decisions check [<book>]      is every cited row current?
 //     spn-devex restates decisions write <ref>         restamp one ref's decisions citations
@@ -16,10 +16,10 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative } from "node:path";
 import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../lib/payload.ts";
-import { BLOCK_COMMENT, DECISION_ID_SRC, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
+import { BLOCK_COMMENT, DEC_ID_SRC, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
 import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
-const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
+const IS_ROW = new RegExp(`^${DEC_ID_SRC}$`);
 
 /**
  * Restamp one ref's `decisions` citations after the developer has re-read each row and corrected

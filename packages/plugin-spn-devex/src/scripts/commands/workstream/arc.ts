@@ -6,9 +6,9 @@
 //   spn-devex workstream arc delete <workstream>/N<nnn> --note "<the developer's words>"
 //
 // `arc edit` is the one writer of an arc's header; a row's field is `row edit`'s. Given an arc that does not exist, it opens it as PROPOSED with
-// `--title`, `--subject` and `--goal`, and leaves the page whole (RD.DEVEX.WORKSPACE.254). The stored status is the developer's words
-// (RD.DEVEX.WORKSPACE.307, .311): every move of it, a wait and a start need `--note`. `stamp` is the stamp's only writer, and `delete` takes
-// out an arc never decided; one ever decided is dropped (RD.DEVEX.WORKSPACE.311).
+// `--title`, `--subject` and `--goal`, and leaves the page whole (RULE.DEVEX.WORKSPACE.254). The stored status is the developer's words
+// (RULE.DEVEX.WORKSPACE.307, .311): every move of it, a wait and a start need `--note`. `stamp` is the stamp's only writer, and `delete` takes
+// out an arc never decided; one ever decided is dropped (RULE.DEVEX.WORKSPACE.311).
 
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -71,7 +71,7 @@ function header(data: ArcData, words: Words): string[] {
 const hasWords = (note: string | null): note is string => !!note?.trim();
 
 /**
- * RD.DEVEX.WORKSPACE.307 and .311: the stored status is the developer's words. Throws where a write would store a
+ * RULE.DEVEX.WORKSPACE.307 and .311: the stored status is the developer's words. Throws where a write would store a
  * status, a wait or a start against them: any move of the stored status, a wait or a start without `--note`; a wait
  * or a start on an arc that is not DECIDED; a start with no wait; LANDED stored on any arc but the review-fixes arc;
  * DROPPED on an arc never decided, which `arc delete` deletes instead.
@@ -82,18 +82,18 @@ function wordsGuard(arc: string, data: ArcData | null, decidedBefore: boolean, w
   const moves = !!status && status !== was;
   const said = hasWords(words.value("note"));
   if (moves && !said)
-    throw new UsageFault(`keeps ${arc} at ${was}: a status is the developer's words, so it moves only with them in the same write — \`--status ${status} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.307).`);
+    throw new UsageFault(`keeps ${arc} at ${was}: a status is the developer's words, so it moves only with them in the same write — \`--status ${status} --note "<the developer's words>"\` (RULE.DEVEX.WORKSPACE.307).`);
   if (moves && status === "LANDED" && data?.reviewFixes !== true)
-    throw new UsageFault(`keeps ${arc} at ${was}: its steps work out LANDED when the last one and its proof land, and only the review-fixes arc stores it, at the close (RD.DEVEX.WORKSPACE.307).`);
+    throw new UsageFault(`keeps ${arc} at ${was}: its steps work out LANDED when the last one and its proof land, and only the review-fixes arc stores it, at the close (RULE.DEVEX.WORKSPACE.307).`);
   if (moves && status === "DROPPED" && !decidedBefore)
-    throw new UsageFault(`keeps ${arc}: an arc never decided is deleted, not dropped — \`workstream arc delete ${arc} --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.311).`);
+    throw new UsageFault(`keeps ${arc}: an arc never decided is deleted, not dropped — \`workstream arc delete ${arc} --note "<the developer's words>"\` (RULE.DEVEX.WORKSPACE.311).`);
   const after = status ?? was;
   if ((words.value("wait") !== null || words.given("start")) && after !== "DECIDED")
-    throw new UsageFault(`holds or starts only a decided arc, and ${arc} is ${after} (RD.DEVEX.WORKSPACE.311).`);
+    throw new UsageFault(`holds or starts only a decided arc, and ${arc} is ${after} (RULE.DEVEX.WORKSPACE.311).`);
   if ((words.value("wait") !== null || words.given("start")) && !said)
-    throw new UsageFault(`keeps ${arc} as it is: a wait and a start are the developer's words — add \`--note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.311).`);
+    throw new UsageFault(`keeps ${arc} as it is: a wait and a start are the developer's words — add \`--note "<the developer's words>"\` (RULE.DEVEX.WORKSPACE.311).`);
   if (words.given("start") && !data?.wait)
-    throw new UsageFault(`finds no wait on ${arc} to clear: it starts as soon as a step does (RD.DEVEX.WORKSPACE.311).`);
+    throw new UsageFault(`finds no wait on ${arc} to clear: it starts as soon as a step does (RULE.DEVEX.WORKSPACE.311).`);
 }
 
 /** What one run of the page pieces did: each piece of an arc's opening, written or kept. */
@@ -136,7 +136,7 @@ function foresee(ws: string, data: ArcData, under: string | null): void {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.254: the three pieces an arc owes beside its data, each written only where it is missing, in the
+ * RULE.DEVEX.WORKSPACE.254: the three pieces an arc owes beside its data, each written only where it is missing, in the
  * order the page needs them: the preview from the template at its fixed place, the What entry `N<nnn>-what`, and the
  * Cycles row with its stamp. Nothing that is there is changed. An arc carried elsewhere keeps its preview where its
  * `preview` field names it, and its What entry links it there. Throws, before it writes anything, where `under` names
@@ -183,7 +183,7 @@ function edit(args: string[]): number {
   const note = words.value("note");
   const subject = words.value("subject");
   const short = subject === null ? null : subjectFault(subject);
-  if (short) throw new UsageFault(`takes a short subject: \`${subject}\` ${short}, such as \`layout-model\` (RD.DEVEX.WORKSPACE.265).`);
+  if (short) throw new UsageFault(`takes a short subject: \`${subject}\` ${short}, such as \`layout-model\` (RULE.DEVEX.WORKSPACE.265).`);
   let data = readArc(ws, arc);
   const said: string[] = [];
   const before = arcSignatures(ws);
@@ -197,12 +197,12 @@ function edit(args: string[]): number {
   if (!data) {
     const title = words.value("title");
     if (!title || !subject || !words.value("goal")?.trim())
-      throw new UsageFault(`opens ${arc} with \`--title\`, \`--subject\` and \`--goal\`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254).`);
+      throw new UsageFault(`opens ${arc} with \`--title\`, \`--subject\` and \`--goal\`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254).`);
     const reviewFixes = words.given("review-fixes");
     if (reviewFixes) {
       const other = arcIdsOf(ws).find((one) => readArc(ws, one)?.reviewFixes === true);
-      if (other) throw new UsageFault(`keeps one review-fixes arc: ${other} takes every fix to a landed arc (RD.DEVEX.WORKSPACE.261).`);
-      if (!hasWords(note)) throw new UsageFault(`opens the review-fixes arc on the developer's words: \`--note "<their words>"\` (RD.DEVEX.WORKSPACE.261).`);
+      if (other) throw new UsageFault(`keeps one review-fixes arc: ${other} takes every fix to a landed arc (RULE.DEVEX.WORKSPACE.261).`);
+      if (!hasWords(note)) throw new UsageFault(`opens the review-fixes arc on the developer's words: \`--note "<their words>"\` (RULE.DEVEX.WORKSPACE.261).`);
     }
     data = newArc(arc, subject, title);
     if (reviewFixes) { data.reviewFixes = true; data.status = "DECIDED"; }
@@ -265,7 +265,7 @@ function edit(args: string[]): number {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.273: the go's write lists each line of the arc's preview whose text still says "proposed",
+ * RULE.DEVEX.WORKSPACE.273: the go's write lists each line of the arc's preview whose text still says "proposed",
  * outside the masthead's status badge, so the agent brings it current, with the preview's `Open`, in the same turn.
  * It lists them and checks nothing.
  */
@@ -307,12 +307,12 @@ function remove(args: string[]): number {
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
   const note = words.value("note");
-  if (!note?.trim()) throw new UsageFault("deletes an arc on the developer's words: `--note \"<their words>\"` (RD.DEVEX.WORKSPACE.311).");
+  if (!note?.trim()) throw new UsageFault("deletes an arc on the developer's words: `--note \"<their words>\"` (RULE.DEVEX.WORKSPACE.311).");
   const { ws, arc } = arcNamed(ref);
   const data = readArc(ws, arc);
   if (!data) throw new UsageFault(`finds no ${arc}.`);
   if (everDecided(data, logLinesOf(ws, arc)))
-    throw new UsageFault(`keeps ${arc}: it was decided, so it is dropped, never deleted — \`arc edit ${arc} --status DROPPED --reason "…" --note "<the developer's words>"\` (RD.DEVEX.WORKSPACE.311).`);
+    throw new UsageFault(`keeps ${arc}: it was decided, so it is dropped, never deleted — \`arc edit ${arc} --status DROPPED --reason "…" --note "<the developer's words>"\` (RULE.DEVEX.WORKSPACE.311).`);
   rmSync(arcDataDir(ws, arc), { recursive: true, force: true });
   rmSync(notesDirOf(ws, arc), { recursive: true, force: true });
   const { views } = refreshViews(ws);

@@ -25,8 +25,11 @@ ok("[MKT.SCRIPTS.78] a first part of two letters is still read", JSON.stringify(
   JSON.stringify(idsIn("WEB.A11Y.01 and UI.LIST.03")));
 ok("a first part of eight letters is not an id", idsIn("PLATFORM.BOOT.01").length === 0, JSON.stringify(idsIn("PLATFORM.BOOT.01")));
 ok("a first part of one letter is not an id", idsIn("X.BOOT.01").length === 0, JSON.stringify(idsIn("X.BOOT.01")));
-ok("the book's register ids are never read as behaviour ids", idsIn("RD.DEVEX.UTILS.071 and PD.AGENT.01").length === 0,
-  JSON.stringify(idsIn("RD.DEVEX.UTILS.071 and PD.AGENT.01")));
+ok("the book's RULE and DEC ids are never read as behaviour ids",
+  idsIn("RULE.DEVEX.UTILS.071, DEC.DEVEX.UTILS.071 and PD.AGENT.01").length === 0,
+  JSON.stringify(idsIn("RULE.DEVEX.UTILS.071, DEC.DEVEX.UTILS.071 and PD.AGENT.01")));
+ok("a three-part id that opens with RULE or DEC is not read as a behaviour id",
+  idsIn("RULE.WEB.01 and DEC.UI.03").length === 0, JSON.stringify(idsIn("RULE.WEB.01 and DEC.UI.03")));
 
 console.log("\n=== an id that more than one row declares");
 
