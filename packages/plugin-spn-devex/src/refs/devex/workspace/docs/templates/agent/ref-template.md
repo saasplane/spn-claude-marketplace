@@ -8,8 +8,8 @@
      the rules a skill acts from, in the chapter's own terms. Copied from ref-template.md. -->
 # {{Chapter title}} — restated
 
-{{The rules, as MUST / MAY lines in the chapter's terms, grouped as the chapter groups them. Facts and terms, never the
+{{The rules, one line each with the chapter's parenthesis, in the chapter's terms, grouped as the chapter groups them. Facts and terms, never the
 chapter's phrasing. Where the model is needed, point at `refs/constructs/…` instead of repeating it.}}
 
-- **MUST** {{…}} — `{{RD.X.NNN}}`
-- **MAY** {{…}}
+- {{…}} (`{{RULE.X.NNN}}` · {{level}} · {{holder}})
+- {{…}} (`{{RULE.X.NNN}}` · GUIDE)
