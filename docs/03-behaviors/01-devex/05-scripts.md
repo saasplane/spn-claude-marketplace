@@ -144,6 +144,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.186 | Engineering leader | see what the debug store holds | `debug store show` prints the three containers of `.spndevex/.debug/`, each with its files, its bytes and its lifetime rule, and the switch as the `debug` node it is read from | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.192 | Editor | know which book a restatement check read | Each `restates` command reads the path it is given, else `spn-foundation` in the workspace it runs in, never a sibling picked by name order; its first line names the book, its commit and whether the path was given, and a workspace with no `spn-foundation` is refused by name | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.193 | Editor | run the restates gate from any checkout of the marketplace | `restates check` takes every folder holding `.claude-plugin/marketplace.json` as a marketplace, so a stamp in a second checkout is not misplaced, and a checkout's own name is read from its `origin` remote, not its folder | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.194 | Editor | follow a link in an overview's glossary to the page it names | `docs face write` writes a link in a term's meaning to a construct seat, in this domain or another, as the construct page that seat is drawn as, its fragment kept; no `.md` seat address is left in the glossary | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
