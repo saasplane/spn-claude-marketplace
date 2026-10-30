@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/04-resources/",
-      "seen": "29e509f9"
+      "seen": "92260be1"
     }
   ]
 }
@@ -128,7 +128,7 @@ The seal has one interface with two operations. `seal` takes a value and a conte
 - **Treat an `open` that answers nothing as an absent secret.** A changed string, another context, an unknown form, or a refused key all answer nothing — no value and no error. Never fall back to a value stored in plain. `open` throws only when the key holder cannot be reached, because a retry may succeed.
 - **Readiness is reachability of the key holder.** A wrong setting — an unknown provider, a missing key id, a key the service's role may not use — fails boot by name, never through readiness.
 - **Only a service that lists the family opens it.** Boot builds the provider for a service that names the seal among its families, and the estate grants the key to those services' roles alone.
-- **The cloud and the local implementation write the same stored form.** In the cloud the cloud's key service holds the master key, apart from the key that encrypts the database. On a machine the key is a fixed constant in the implementation; it is not a secret, and it protects test data only.
+- **The cloud and the local implementation write the same stored form.** In the cloud the cloud's key service holds the master key, apart from the key that encrypts the database. On a machine the key is a fixed constant in the implementation; it is not a secret, and it protects test data only. So only a developer's machine may boot it: boot refuses the local implementation unless the service's local-posture setting says the process runs on one, and a deployed environment never sets it (`RD.SUPPORT.APPS.230`).
 
 **What the family refuses:** it stores nothing and has no read by name, so it is no vault; it is not the configuration store that hands a deployment its own secrets; it does not replace a hash for a secret that is never read back; and it does not replace the mask — every contract read still masks a sealed value. If you need a secret back from an API, the seal does not give it to you.
 
