@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/13-providers.md",
-      "seen": "bfec96bb"
+      "seen": "aabdbffa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/",
-      "seen": "c85bae7e"
+      "seen": "f51df29d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/13-providers/ts/01-design-system.md",
@@ -15,15 +15,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "80f70315"
+      "seen": "98829f23"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "cef5acd3"
+      "seen": "e34ccd2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "97e9441a"
+      "seen": "36949f42"
     }
   ]
 }

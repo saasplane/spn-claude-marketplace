@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/08-architecture-containers.md",
-      "seen": "fdf0d9ad"
+      "seen": "11e8446d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "97e9441a"
+      "seen": "36949f42"
     }
   ]
 }

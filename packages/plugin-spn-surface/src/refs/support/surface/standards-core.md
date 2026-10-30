@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/01-standards-core.md",
-      "seen": "5bf4f80c"
+      "seen": "b787cc6d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/01-standards-core/",
-      "seen": "7d4e34c7"
+      "seen": "d13500ac"
     }
   ]
 }
@@ -74,13 +74,14 @@ The first five rules say what a page shows, and where.
 | A label | A value **MUST** take a label only where a person cannot tell what the value is without one (`RULE.SUPPORT.SURFACE.056` · GUIDE). A name, a picture, a state and an email need none. An address, an owner, a date and a limit each keep their label. This rule is proposed | cover the label and look at the value alone. If you can still tell what the value is, the label is a finding |
 | A frame | A part of a page **MUST** take a frame of its own only when it has a title of its own, and also an action of its own or data it loads by itself (`RULE.SUPPORT.SURFACE.057` · GUIDE). The record a page is about is the header of the page, and it **MUST NOT** take a frame. This rule is proposed | for each framed part, find its title, and then its own action or its own loading. A frame with no title, or with neither of the other two, is a finding |
 | A state | A state **MUST** be shown as a badge (`RULE.SUPPORT.SURFACE.058` · GUIDE). It stands on the line of facts under the title, before the other facts, or at the end of the line, and the page chooses by the room the screen gives. It **MUST NOT** stand after the title. The normal state **MUST** show no badge: an active person shows none, and an inactive one shows *Inactive* | find each badge. One that stands after a title is a finding, and so is a badge for the normal state |
-| The end of a line | What stands at the end of a line is data: a badge, a count, a status, or the arrow (`RULE.SUPPORT.SURFACE.059` · GUIDE) (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design). A line **MUST NOT** hold an action at its end: the actions of a line stand in the header, the row or the table that holds it. A line that leads to a page **MUST** show the arrow where its row holds no action. A row that has an action **MUST** give it at the end of the row, and it shows no arrow (`RULE.SUPPORT.SURFACE.087` · GUIDE). The arrow is off unless the page asks for it | read the end of each line. A line that leads to a page and shows neither an action nor the arrow is a finding, and so is an arrow on a line that leads nowhere |
+| The end of a line | The end of a line holds what the page puts there: the line's actions, a badge, or both. A line that leads to a page usually shows the arrow where its end holds no action (`RULE.SUPPORT.SURFACE.059` · GUIDE) (`RULE.SUPPORT.SURFACE.178` · MUST · skill:spn-surface/design). A row that has an action **MUST** give it at the end of the row, and it shows no arrow (`RULE.SUPPORT.SURFACE.087` · GUIDE). The arrow is off unless the page asks for it | read the end of each line. A line that leads to a page and shows neither an action nor the arrow is a finding, and so is an arrow on a line that leads nowhere |
 | A count | An app pattern **MUST NOT** depend on a count (`RULE.SUPPORT.SURFACE.050` · MUST · skill:spn-surface/design). A group **MUST** show how many items it has only where the server gives that number together with the groups | read the page as if no count had come. A part that is then empty or wrong is a finding |
 
 - **A badge that says what kind of thing a record is MUST follow the rule of a state.** It stands on the line of facts, as one of the facts, and never after the title.
 - **Why a label and a frame are held back.** A label that tells a person nothing new takes room from the value. A frame says that what is inside it stands apart, and a frame around every part says that of nothing.
 - **Why a state stands where it does.** A state is one of the facts of a thing, so it is read with them, or at the end of the line where the line is short. A badge on every line would hide the few lines a person has to look at.
 - **Why the end of a line is kept so.** A person finds the actions of every line in the same place, and a line with no action still says that it leads somewhere.
+- **In a drawn row, a state usually stands on the line of facts, and the end of the row holds the row's actions** (`RULE.SUPPORT.SURFACE.404` · GUIDE). A person then reads what a thing is on one line and finds what to do with it in one place.
 
 The last four rules say how a field, a set of choices and a list are laid out.
 
@@ -266,8 +267,9 @@ This ref states what a surface is built in, what one page is for, and what a pag
 | `RULE.SUPPORT.SURFACE.050` | no app pattern depends on a count |
 | `RULE.SUPPORT.SURFACE.056` | when a value takes a label. The rule is proposed |
 | `RULE.SUPPORT.SURFACE.057` | when a part of a page takes a frame of its own. The rule is proposed |
-| `RULE.SUPPORT.SURFACE.058` | a state and a kind are badges on the line of facts, and the normal state shows none |
-| `RULE.SUPPORT.SURFACE.059` | what stands at the end of a line is data, a badge, a count, a status or the arrow, never an action, and when a line shows its arrow |
+| `RULE.SUPPORT.SURFACE.058` | a state is a badge on the line of facts or at the end of the line, never after the title, and the normal state shows none |
+| `RULE.SUPPORT.SURFACE.059` | the end of a line holds what the page puts there, the line's actions, a badge or both, and when a line shows its arrow |
+| `RULE.SUPPORT.SURFACE.404` | in a drawn row a state usually stands on the line of facts, and the end of the row holds the row's actions |
 | `RULE.SUPPORT.SURFACE.133` | a unit in a narrow place of a wide window may arrange itself by the width of its place. It is a MAY |
 | `RULE.SUPPORT.SURFACE.087` | the arrow of a line that leads somewhere may stand after its actions. It is a MAY |
 | `RULE.SUPPORT.SURFACE.060` | a field a person enters has its title above its control, with one line under it |

@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/10-architecture-app.md",
-      "seen": "b5882a34"
+      "seen": "1cd14a74"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/10-architecture-app/",
-      "seen": "7c8f16af"
+      "seen": "22c4ee38"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/08-web.md",
       "section": "Generated primitives are never hand-edited",
-      "seen": "1b2ea22c"
+      "seen": "1230564a"
     }
   ]
 }
@@ -42,6 +42,7 @@ Exactly two contexts cross between an app and its design system, one direction e
 - **Navigation**: declare a `navigate` seam in the design system, and bind the application's router to it once. Never import a router, read a route or touch history from a design-system component.
 - **Media**: resolve variant, size and density into an address. Require a placeholder and an error image. Never assemble a URL by hand in a screen.
 - **Overlays**: request dialogs, confirmations and sheets through one imperative seam. Never mount them from the component that needs them.
+- **Styling and sizing**: style and size a unit through its container, its context and its tokens, never page by page and never with a forced override (`RULE.SUPPORT.SURFACE.395` · MUST · check:app-style). The app's class, the surface context and the page-level variants reach every page at once, and an override on one page holds only until the unit next changes.
 - **Gated rendering**: treat it as presentation only. Hiding a control is courtesy, and the refusal is the server's.
 
 A conforming design system answers a fixed set of groups (`architecture-components.md`). The set sits in six layers, on every stack (`architecture-names.md`): core, components, widgets, containers, layouts and app. A layer uses only the layers named before it.
@@ -241,6 +242,7 @@ This ref states what an app hands a surface, once, and in what order a block res
 | `RULE.SUPPORT.SURFACE.196` | the theme holds no font family and no face for a part of the text, and every text, the facts included, takes the design system's font: the typeface is the app's font file, bound to `DSThemeSans` with `@font-face`, and `--font-theme` stays `DSThemeSans` |
 | `RULE.SUPPORT.SURFACE.169` | `DSForm.Field` takes `labelEndNode` after the info mark, only its label shrinks, and its message line is kept where the field can fail or has a description (`RULE.SUPPORT.SURFACE.171` · MUST · skill:spn-surface/design); the theme's form is built on it |
 | `RULE.SUPPORT.SURFACE.123` | the app holds the time format as a required fact, and a block holds no time format of its own |
+| `RULE.SUPPORT.SURFACE.395` | a unit is styled and sized through its container, its context and its tokens, never page by page or with a forced override |
 | `RULE.SUPPORT.APPS.156` | the screen still shows a call working, and that it is done |
 
 ## Proof

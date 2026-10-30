@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/11-delivery-library.md",
-      "seen": "13ac01d1"
+      "seen": "3ca7a909"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "34ff0c4e"
+      "seen": "a9a1fdcf"
     }
   ]
 }
@@ -87,7 +87,7 @@ A snapshot has four parts and three levels:
 | `tokens` | 2 | the ramps, the roles for light and for dark, the scale, the type steps and the theme |
 | `measures` | 3 | for each unit and each size: the height, paddings, gap, radii, border and text size, each as a value and, where the side can say it, the token it is bound to |
 
-A `MODE` entry names its `collection`, by the one name "Color is a mode, and the rest are properties" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column, and a unit with a choice table takes both from its table (`RULE.SUPPORT.SURFACE.375` · MUST · skill:spn-surface/design): the cases are what it draws once, its modes, its texts and its swaps, and a choice table's cases are among them; the usage is the table's first case that draws the unit, and names the instances the plugin places, with their props.
+A `MODE` entry names its `collection`, by the one name "Color is a mode" gives it; an entry without it fails the schema. `levelForms` lists a unit's allowed pairs of a level and a form, read from the book. `cases` and `usage` are read from the unit's column, and a unit with a choice table takes both from its table (`RULE.SUPPORT.SURFACE.375` · MUST · skill:spn-surface/design): the cases are what it draws once, its modes, its texts and its swaps, and a choice table's cases are among them; the usage is the table's first case that draws the unit, and names the instances the plugin places, with their props.
 
 Level 1 finds most gaps. Level 2 finds a value that differs. Level 3 is read only for the units that levels 1 and 2 flag, because it is the largest. The category, the showcase layout and what a unit has are tags of the showcase only: they are never in a snapshot and never a gap.
 

@@ -3,19 +3,19 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "34ff0c4e"
+      "seen": "a9a1fdcf"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "0cd321cf"
+      "seen": "af87c320"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "97e9441a"
+      "seen": "36949f42"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "4b61c951"
+      "seen": "94f9832a"
     }
   ]
 }
@@ -96,7 +96,7 @@ The design library holds one file for each layer of the design system that is dr
 - **An entry over the page is one container inside its overlay.** Draw the `DSDialog` or the `DSSheet` instance over a `DSBackdrop`, and place the container of the tree inside it. A container in an overlay is not a container inside a container.
 - **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a title or beside running text takes the scale size of that text's own step name and shares its centre line: an `XS` icon beside `XS` text. `scaleSize` is a property, as `size` is, and the mark, the avatar and the avatar group carry it with every step from `XXS` to `XXL5`.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
-- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts; at `INLINE`, with facts and no description, the facts follow the title on its own line after a dot (`RULE.SUPPORT.SURFACE.223` · MUST · skill:spn-surface/design). A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` or `INLINE`, and it alone decides the type of the text, the size of a badge among the facts and the box of the picture, so no text style is set by hand. The item line has no size. A row of tabs takes `pageLevel` too, and the level decides its look: the pill at `PAGE`, the line at `CONTAINER` and `WIDGET`, the switch at `GROUP`, `CONTENT` and `INLINE` (`RULE.SUPPORT.SURFACE.224` · MUST · skill:spn-surface/design). The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. The picture is the kind the tree gives `media`, and what stands at the end of the line is what the tree gives `endNode`. `showArrow` is the chevron at the end of a line that leads to a page and has no action there.
+- **Draw an item line from what the tree gives `DSItem`.** Under the picture stand the title, the description, then the line of facts, with a dot between each two facts; at `INLINE`, with facts and no description, the facts follow the title on its own line after a dot (`RULE.SUPPORT.SURFACE.223` · MUST · skill:spn-surface/design). A fact is words, a `TEXT`, a `BADGE` or a `CUSTOM` block, and a `label` stands before its words with a colon. `pageLevel` is `PAGE`, `CONTAINER`, `WIDGET`, `GROUP`, `CONTENT` or `INLINE`, and it alone decides the type of the text, the size of a badge among the facts and the box of the picture, so no text style is set by hand. The item line has no size. A row of tabs takes `pageLevel` too, and the level decides its look: the pill at `PAGE`, the line at `CONTAINER` and `WIDGET`, the switch at `GROUP`, `CONTENT` and `INLINE` (`RULE.SUPPORT.SURFACE.224` · MUST · skill:spn-surface/design). The book states these before the library draws them, so a level the component lacks is handled as *When the library does not hold a block* says. The picture is the kind the tree gives `media`, and what stands at the end of the line is what the tree gives `endNode`. `showArrow` is the chevron that a line which leads to a page usually shows at its end, where the end holds no action.
 - **In a list, set the chosen fill, the link and the arrow on the row.** `selected`, `anchor`, `showArrow` and `endIconMotion` are the row's, `DSList.Item`, and `DSItem` takes no `selected`. A chosen row of a list is a fill of the soft step of the primary role across the row, with no check. A list may carry a `title`, which starts where the rows' words start; anything stacked is a `DSList`. `hoverable` on `DSList` is a yes-or-no property that is no by default; the hover itself is a shown state and stays at rest.
 
 ## How a block is drawn

@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/03-standards-patterns.md",
-      "seen": "83b9036e"
+      "seen": "2bb43eb4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "80f70315"
+      "seen": "98829f23"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "`SKELETON` — a mock of a layout",
-      "seen": "d9f7a931"
+      "seen": "9b434b73"
     }
   ]
 }
@@ -92,6 +92,7 @@ An action that needs a confirmation first asks the person for it. A confirmation
 
 - **A confirmation fits as a popover for an act a person can undo, and as a dialog for an act that cannot be undone.** A dialog for every small act teaches a person to confirm without reading. Then the dialog no longer stops them on the one act that matters.
 - **Both blocks stay open while the act runs.** A failure is then shown where the person confirmed, and the act is never sent twice.
+- **A form shows each default as its real value, marked Default, and never as a faded placeholder** (`RULE.SUPPORT.SURFACE.405` · MUST · short). A faded placeholder reads as an empty field, so a person cannot tell a value the form will save from a hint.
 
 ### On the web: the keys, the pointer and hover
 
@@ -127,6 +128,8 @@ Adding an intent checks that a new task is not an old one under another name. A 
 ## The data and the person decide — 🔮
 
 **How a thing is shown follows from the data and from the person who uses it** (`RULE.SUPPORT.SURFACE.047` · MUST · skill:spn-surface/design). A page is not arranged by how another page looks, or by which block is at hand. Two pages that look alike may hold data that grows in different ways. They may also serve people who come for different reasons. The same arrangement would then be right for one page and wrong for the other.
+
+**A page is shaped from how people use it and from the nature of its data, through the UX lens, before it is built** (`RULE.SUPPORT.SURFACE.396` · MUST · short). One thing is one page, a bounded set is cards, and a set that grows is a list with its detail. A page built first and shaped after keeps the shape of its first draft.
 
 **The person is read twice.** The kind of person the app is for is read once, before any page, and it decides between two patterns that fit the same data. Who comes to this page, how often and to do what is read for each page.
 
@@ -265,7 +268,7 @@ The rule adds no unit and no prop. A card that opens its fold grows taller, and 
 - **The values in a spec are samples.** They show what kind of data a part holds: a title and a line under it, a picture, a state, an action at the end. Which unit shows that data on a real page is the choice of step 2.
 - **A spec holds a view for each screen class its pattern differs at.** So one file shows the page at a desktop, at a tablet and on a phone.
 - **A spec draws every level of its page.** It names its `layout` (the sketch's setting, never part of the pattern), each view's page level as `page`, and the `unit` of each container, widget and card.
-- **A mock draws each page once** (`RULE.DEVEX.WORKSPACE.230` · MUST · check:doc-check · due:036/N008). The page is drawn with its data, and the errors a person meets on it are drawn where they appear, such as a form's alert and a field's message. The other task states, working, empty and denied, are the tree's task lines, in words: drawing every state cost many tokens, and the words of a state already carry it. A view takes `state`, a value of `DSTaskStateType`, only for a page that needs a state drawn to be understood. A view with no `state` shows the page with its data and its errors in place; a view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. A phone gets a view of its own only where its arrangement differs, such as a table that becomes a list. The views of one screen class stand together, the one with no `state` first and the others in the order of `DSTaskStateType`, and a `state` that is no value of `DSTaskStateType` is a finding.
+- **A mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once** (`RULE.DEVEX.WORKSPACE.454` · MUST · check:doc-check · due:036/N008). The page is drawn with its data, and the errors a person meets on it are drawn where they appear, such as a form's alert and a field's message. The other task states, working, empty and denied, are the tree's task lines, in words: drawing every state cost many tokens, and the words of a state already carry it. A view takes `state`, a value of `DSTaskStateType`, only for a page that needs a state drawn to be understood. A view with no `state` shows the page with its data and its errors in place; a view with a `state` shows the same page in that state, as a whole frame, with only what the state changes drawn differently. A phone gets a view of its own only where its arrangement differs, such as a table that becomes a list. The views of one screen class stand together, the one with no `state` first and the others in the order of `DSTaskStateType`, and a `state` that is no value of `DSTaskStateType` is a finding.
 - **A flow's pages are listed in a flow file, in the order a person meets them, each with where its moves lead** (`RULE.DEVEX.WORKSPACE.230` · MUST · check:doc-check · due:036/N008). A skeleton draws one page and no path, so loose skeletons leave a reader to guess which page follows which, and where a refusal sends a person. The file is `<flow>.flow.json`, beside the specs of its pages. `flow` is its name, the name of the flow pattern where it follows one (`flow-patterns.md`). `pages` lists the pages in order, each with `page`, a word the file is unique by, `spec`, the skeleton that draws it, and `moves`. A move names what a person does and where it leads: `on` is the words of the action or the event, `to` is a page of the file or `end` where the flow is done, and `state` is the task state of the view it lands on, where it lands on one.
 - **The flow file draws nothing.** Each page is drawn by its own spec, and the file is read against them: a `to` that names no page of the file, a page no move reaches but the first, a `spec` that is not there, and a `state` the page's spec does not draw are each a finding.
 
@@ -633,6 +636,7 @@ This ref states the four groups of the surface patterns, which task pattern cove
 | `RULE.SUPPORT.SURFACE.373` | a plan holds one eyebrow. It is advice |
 | `RULE.SUPPORT.SURFACE.393` | a partner's design, a page to follow, both or neither are read into one design tree, checked at each step and shown before any code, and a kept choice stands. It is advice |
 | `RULE.SUPPORT.SURFACE.394` | a rule about how a page is designed and uses a unit is guidance and says its reason; MUST stays for what the design system and a stack build, the floor a person is owed, the library and showcase process, and true claims |
+| `RULE.DEVEX.WORKSPACE.454` | a mock of a layout is a `SKELETON` figure drawn by its helper, with a flow file ordering the pages and each page drawn once |
 | `RULE.DEVEX.WORKSPACE.230` | a mock draws each page once, its errors in place and its other task states in words, and a flow file orders a flow's pages with where each move leads |
 
 ## Proof

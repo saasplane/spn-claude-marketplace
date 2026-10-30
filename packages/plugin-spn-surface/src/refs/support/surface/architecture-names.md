@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/04-architecture-names.md",
-      "seen": "fe2e8637"
+      "seen": "2e8468bd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/04-architecture-names/",
-      "seen": "0cd321cf"
+      "seen": "af87c320"
     }
   ]
 }

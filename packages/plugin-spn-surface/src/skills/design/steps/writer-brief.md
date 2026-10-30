@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
-      "seen": "a4cf4083"
+      "seen": "e18dec3c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "915dfe1d"
+      "seen": "6cdfcf70"
     }
   ]
 }
@@ -87,6 +87,7 @@ The book states a unit, the library draws it, and a stack builds it. You change 
 ## What you do not do
 
 - **Send no `align.js` and no scan part.** A closer does both when the drawing is done.
+- **Hand the developer no Figma step to draw, rebind, delete or tick** (`RULE.SUPPORT.SURFACE.400` · MUST · short). The developer's part is to publish and to run the plugin; you fix the rest, or report it.
 - Change nothing that your order does not name. Write a fault you meet in your report, and leave it.
 - Try nothing out in a library file. If you must learn how the API behaves and a read cannot tell you, stop that unit and report the question.
 - Draw nothing of a pattern, and no unit that a stack provides on its own.

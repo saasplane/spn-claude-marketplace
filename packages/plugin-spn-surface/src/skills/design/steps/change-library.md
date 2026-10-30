@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "34ff0c4e"
+      "seen": "a9a1fdcf"
     }
   ]
 }
@@ -92,7 +92,7 @@ Read this walk when a unit has a spec (one JSON file for the unit: `unit`, `setI
 
 ## The measure and the pace
 
-- **A library is brought to the web by its properties, its values, its defaults and its states, and by nothing clipped or overlapping.** This is the book's own rule: "A property that changes what is visibly there MUST be drawn", and a state a unit can be in MUST be drawn (step 8). Anything finer than that is listed in the report and not drawn. The developer decided this on 2026-10-09.
+- **A library is brought to the web by its properties, its values, its defaults and its states, and by nothing clipped or overlapping.** This is the book's own rule: "A property that changes what is visibly there is drawn", and a state a unit can be in is drawn (step 8). Anything finer than that is listed in the report and not drawn. The developer decided this on 2026-10-09.
 - **One writer takes a page whole, and a page is scanned once, when it is finished.** Two agents never change one library file at once. Scanning after each set costs a read of the page each time and proves what the last set's proof already returned. A page that is changed in two rounds, by its specs and then by hand, is finished after the second: `align.js` and the scan run once then, and the first round is proven by the hash of each set and a picture of each changed section.
 - **The cost of a page is its calls, not its sets.** A writer writes each call's text out, so a script sent once for each set is paid for once for each set. Measured on DS 2-Components on 2026-10-09: a page sent set by set, with its alignment and scan, about 300 thousand tokens; the same work as bundled calls, with the alignment and the scan left to the page's end, about 100 thousand, in ten calls.
 - **Closing a page costs the same whatever the page holds, and composing costs by the line.** Closing a page (the alignment twice and the four scan parts, about 150 thousand characters sent whole) costs about 100 to 200 thousand tokens, so one agent composes a page and another closes it. A composed line or look costs 15 to 30 thousand tokens. Measured on DS 2-Components on 2026-10-10.

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "cef5acd3"
+      "seen": "e34ccd2d"
     }
   ]
 }
