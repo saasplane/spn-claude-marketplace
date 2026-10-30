@@ -237,5 +237,23 @@ one("known-bad: the same idiom with no quotation marks is still flagged",
     typed(["paragraphs", join(home, "docs", "01-construct.md"), join(home, "docs", "02-report.md")], BASE).code === 2);
 }
 
+// ── the compressed fault is one the report counts, and a plugin's own files are left alone ──
+{
+  const compressedRepo = join(BASE, "compressed");
+  mkdirSync(join(compressedRepo, "docs"), { recursive: true });
+  const text = "# A page\n\n**One endpoint per access path.** The store holds the rows, and the endpoint reads them for the caller.\n\n" +
+    "Posture comes from `{workload}`; capacity comes from size; a label carries neither.\n";
+  writeFileSync(join(compressedRepo, "docs", "01-page.md"), text);
+  const found = run([compressedRepo], BASE);
+  // The report scores a paragraph's plain prose, where a bold run is already plain, so the lead is the page check's to find.
+  one("three clauses joined by semicolons are listed as a compressed fault",
+    found.out.includes("01-page.md") && /compressed/.test(found.out) && candidates(found.out)?.paragraphs === 1 && /compressed 1/.test(found.out), found.out);
+  const lists = join(BASE, "lists");
+  mkdirSync(join(lists, "docs"), { recursive: true });
+  writeFileSync(join(lists, "docs", "01-list.md"), "# A page\n\nThe checks are: the first, which reads; the second, which writes; the third, which waits.\n");
+  const listed = run([lists], BASE).out;
+  one("a semicolon list after a colon is not listed", /compressed 0/.test(listed) && !listed.includes("01-list.md"), listed);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -855,6 +855,65 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   return out;
 }
 
+// ---------------------------------------------------------------------------- compressed sentences
+
+// A verb in its base form or a regular form of it, or a word that only a verb phrase carries. An imperative is a
+// sentence, so "Lead by example." passes.
+const BASE_VERBS = ("accept act add agree allow answer apply arrive ask assign become begin belong bind block break bring " +
+  "build call carry catch change check choose cite claim close come compare count cover create cross cut decide declare define " +
+  "delete deliver depend derive describe design do drop earn edit end enter exist expect explain fail fall feel fill find finish " +
+  "differ die govern match nest launch select capture validate draw demand admit gate store " +
+  "fit fix flag follow forget gain get give go grant grow hand happen have hear help hide hold keep know land lead learn leave let " +
+  "lift link list live load look lose make mark matter mean meet merge miss move name need note open order own parse pass pay pick " +
+  "place point post print promote propose prove publish pull push put raise reach read record refuse release remove render replace " +
+  "report require rest restate return reuse review rewrite rise rule run say see seem sell send serve set settle share ship show sit " +
+  "skip sort speak split stand start state stay stop suit take talk teach tell test think touch treat try turn use wait walk want warn " +
+  "win work wrap write").split(" ");
+const IRREGULAR_VERBS = ("is are was were be been being am has had does did done made said told took taken gave given went gone came " +
+  "saw seen knew known wrote written ran held kept left led lost met paid shown sent spent stood thought understood won built bought " +
+  "brought caught chose chosen fell felt found got grew grown heard laid meant rose sat sold spoke spoken taught can could will would " +
+  "shall should may might must").split(" ");
+const VERB_FORMS = new Set(IRREGULAR_VERBS);
+for (const verb of BASE_VERBS)
+  for (const form of [verb, `${verb}s`, `${verb}es`, `${verb}ed`, `${verb}d`, `${verb}ing`, verb.replace(/y$/, "ies"), verb.replace(/y$/, "ied")])
+    VERB_FORMS.add(form);
+// A word ending in -s after a noun reads as a verb ("The tree folds."), and after a determiner or a number as a plural
+// ("The limits across a view."). Short of a parser, that one distinction carries most of what the list misses.
+const NOUN_BEFORE = new Set(("the a an this that these those each every one two three four five no some any its their our your " +
+  "of in on at by for with to from per across under over and or both all").split(" "));
+const hasVerb = (text: string): boolean => {
+  if (/\b(?:don't|doesn't|never|not)\b/i.test(text)) return true;
+  const words = text.toLowerCase().match(/[a-z'-]+/g) ?? [];
+  return words.some((word, at) => VERB_FORMS.has(word)
+    || (at > 0 && /[^su']s$/.test(word) && !NOUN_BEFORE.has(words[at - 1])));
+};
+
+/** A paragraph that opens with a bold run ending its own sentence, in markdown or on a page. */
+const BOLD_LEAD_MD = /^(?:[-*] |\d+\. )?\*\*([^*\n]+?[.!?])\*\*/gm;
+const BOLD_LEAD_HTML = /<(?:p|li|td)[^>]*>\s*<strong>([^<]+?[.!?])<\/strong>/g;
+
+/**
+ * The compressed sentences of one page (RULE.DEVEX.WORKSPACE.096): a bold lead that holds no verb, and three or more
+ * clauses joined by semicolons. Semicolons that follow a colon separate a list's items, and are not counted.
+ */
+export function compressedSentences(text: string, isHtml: boolean): string[] {
+  const out: string[] = [];
+  for (const [, lead] of text.matchAll(isHtml ? BOLD_LEAD_HTML : BOLD_LEAD_MD))
+    if (!hasVerb(lead.replace(/`[^`]*`/g, " "))) out.push(`a bold lead with no verb, "${lead.trim()}"`);
+  for (const [sentence] of sentences(proseOf(text, isHtml)))
+    if ((sentence.match(/;/g) ?? []).length >= 2 && !sentence.split(";")[0].includes(":"))
+      out.push(`three clauses joined by semicolons, "${opening(sentence, 8)}"`);
+  return out;
+}
+
+/** The compressed fault as one finding, on a page a person reads. It notes and refuses nothing. */
+export function compressedRule(text: string, isHtml: boolean): Finding[] {
+  const found = compressedSentences(text, isHtml);
+  if (!found.length) return [];
+  return [["SOFT", `${found.length} compressed sentence(s) — RULE.DEVEX.WORKSPACE.096 talks to the reader in whole sentences: ` +
+    `${found.slice(0, 3).join(" · ")} · give the lead its verb, and join one clause to the next with a word`]];
+}
+
 // ---------------------------------------------------------------------------- registers
 
 /**
@@ -1162,6 +1221,8 @@ export function check(path: string, text: string, fragment = false): Finding[] {
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
+  // A plugin file is the agent's to act on, and the compressed fault reads only the places a person reads.
+  if (!isOperative(path) && !isRegister(path)) out.push(...compressedRule(text, isHtml));
   if (isRegister(path)) out.push(...rows(text)[0]);
   if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace(), workspaceRoot(dirname(path)))).map((f) => ["RULE", f] as Finding));
   return out;
