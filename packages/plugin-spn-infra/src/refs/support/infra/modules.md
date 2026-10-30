@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/06-modules/",
-      "seen": "0836705e"
+      "seen": "c6abea3e"
     }
   ]
 }
@@ -180,6 +180,8 @@ Every resource key follows one shape, and the middle token names the **connectio
 **Every block exports one credential pair per purpose its engine stands** — `USER_*`/`PASSWORD_*`, full-word purposes. **Which pair a connection opens is the service's own choice at boot; `ADM` stays ledger-held, published to no application.** Provider-specific facts nest under the product that answered, so each variant carries exactly its own; provider tokens come from a closed list, decomposed by matching known values rather than by splitting on a separator.
 
 **The seal publishes a block of the same shape, with less in it** (`RD.SUPPORT.INFRA.109`). The seal is the family a service calls to encrypt a stored secret before it saves the row, and its key is the environment's key for stored secrets. Its block carries `{SPC}_RESOURCE_SEAL_APP_PROVIDER`, which key holder answered, and `{SPC}_RESOURCE_SEAL_APP_{PROVIDER}_KEY_ID`, the id of that key. The id is not a secret, so it sits on the plain half, and nobody types it: the environment apply reads it from the cloud and publishes it. The block exports no credential pair, because the service calls the key holder as its own workload identity, and no endpoints key, because the estate owns no record for a key holder. **The environment's blueprint publishes the seal block when it stands the key.**
+
+**A block whose engine's certificate the estate issued names the authority it chains to** (`RD.SUPPORT.INFRA.126`). The keys are `{SPC}_RESOURCE_DB_{WORLD}_POSTGRESQL_SSL_CA_FILE`, `{SPC}_RESOURCE_CACHE_{WORLD}_REDIS_TLS_CA_FILE` and `{SPC}_RESOURCE_QUEUE_{WORLD}_KAFKA_SSL_CA_FILE`, each beside its family's `_SSL` or `_TLS` key, and each holds a path inside the pod, `/var/run/secrets/spn/engines-ca/ca.pem`. They publish under `CLUSTER`, where the engines step issues each engine's certificate from the environment's own authority and every deployment but a web row mounts that authority at the path. Under `MANAGED` none publishes, because the provider's certificates chain to an authority the client already trusts. The value is a path and not a secret, so it lands in the plain half.
 
 **Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone. `SEAL` is one of the family tokens: an application whose estate row lists the `SEAL` grant receives the seal block, and its workload role receives the right to use the environment's key for stored secrets (`RD.SUPPORT.INFRA.110`); an application whose row does not list it receives neither.
 
