@@ -37,7 +37,7 @@ export const PREVIEW_FILE = "preview.html";
 export const HELD_STATES: readonly WorkstreamState[] = ["open", "backlog"];
 
 /**
- * What an arc's notes folder holds, and nothing else (RD.DEVEX.WORKSPACE.262): each entry's name and
+ * What an arc's notes folder holds, and nothing else (RULE.DEVEX.WORKSPACE.262): each entry's name and
  * whether it is a file or a folder. `samples/` and `work/` may hold folders of their own; the others are flat.
  */
 export const NOTES_ENTRIES: ReadonlyMap<string, "file" | "folder"> = new Map([
@@ -108,7 +108,7 @@ export function strayNotes(notesDir: string, skipPreviews = false): Array<[strin
 
 /**
  * Each entry directly under a workstream's `notes/` or `arcs/` that is not an arc's folder, with where
- * it belongs, as `[entry, home]` (RD.DEVEX.WORKSPACE.262). A note loose at `notes/` is a section of the
+ * it belongs, as `[entry, home]` (RULE.DEVEX.WORKSPACE.262). A note loose at `notes/` is a section of the
  * plan of the arc it names, or of `firstOpen`, the workstream's first open arc, where it names none.
  * A workstream that still keeps its arcs as Markdown under `arcs/` is migration 001's, so `arcs/` is
  * read only where `markdownArcs` is false. A dot-name is no one's entry and is passed.
@@ -163,13 +163,13 @@ export function previewPathFault(value: string): string | null {
   return null;
 }
 export const questionsFileOf = (ws: string): string => join(ws, QUESTIONS_FILE);
-/** The arc's name file beside its data, named for its subject (RD.DEVEX.WORKSPACE.264). */
+/** The arc's name file beside its data, named for its subject (RULE.DEVEX.WORKSPACE.264). */
 export const nameFileOf = (ws: string, arc: string, subject: string): string => join(arcDataDir(ws, arc), `${subject}.md`);
 /** The data files of an arc's folder; with the one name file, `arcs/N<nnn>/` holds these and nothing else. */
 export const DATA_FILES: readonly string[] = [STATE_FILE, LOG_FILE, FACTS_FILE, SHEET_FILE];
 
 /**
- * The arc's address on the approach page: its Cycles row, by its number (RD.DEVEX.WORKSPACE.263).
+ * The arc's address on the approach page: its Cycles row, by its number (RULE.DEVEX.WORKSPACE.263).
  * `from` is the path from the folder the link is written in back to the workstream's folder.
  */
 export const arcAddress = (arc: string, from = ""): string => `${from}${APPROACH_PAGE}#${arc}`;
@@ -368,7 +368,7 @@ export const markdownIn = (ws: string, arc: string): string[] =>
   listdir(arcDataDir(ws, arc)).filter((entry) => entry.endsWith(".md") && isFile(join(arcDataDir(ws, arc), entry)));
 
 /**
- * The arc's name file as the commands write it (RD.DEVEX.WORKSPACE.264): the title, the goal, the
+ * The arc's name file as the commands write it (RULE.DEVEX.WORKSPACE.264): the title, the goal, the
  * status with its reason, what it decides, its repositories, then links to its row on the approach
  * page, its preview, its plan and its samples, each linked only where it is on disk. No rows, no log.
  */
@@ -463,7 +463,7 @@ export function doneOf(data: ArcData, which: (row: ArcRow) => boolean = () => tr
   return { done: leaves.filter((row) => DONE_STATES.has(row.state ?? "")).length, total: leaves.length };
 }
 
-/** Steps done of steps, which a chip and *Overall* count: every row is a build step (RD.DEVEX.WORKSPACE.278). */
+/** Steps done of steps, which a chip and *Overall* count: every row is a build step (RULE.DEVEX.WORKSPACE.278). */
 export const builtOf = (data: ArcData): { done: number; total: number } => doneOf(data);
 
 // ---------------------------------------------------------------------------- the status: stored, or worked out
@@ -474,7 +474,7 @@ const UNCOUNTED: ReadonlySet<string> = new Set(["deferred", "carried", "replaced
 const STARTED: ReadonlySet<string> = new Set(["running", "stopped", "replaced", "landed"]);
 
 /**
- * THE ONE OWNER OF AN ARC'S STATUS (RD.DEVEX.WORKSPACE.307). The developer's words are stored: `PROPOSED`,
+ * THE ONE OWNER OF AN ARC'S STATUS (RULE.DEVEX.WORKSPACE.307). The developer's words are stored: `PROPOSED`,
  * `DECIDED` with any wait, `CARRIED`, `DROPPED`, and `LANDED` where the close stored it. A stored `DECIDED` is worked
  * out from the steps each time it is read: `RUNNING` once a step has started, and `LANDED` once every step counted
  * has landed, the deferred, carried and replaced ones left out. The review-fixes arc reads `RUNNING` until the close
@@ -502,7 +502,7 @@ export function statusOfData(ws: string, arc: string): Status | null {
 
 /**
  * Whether the arc was ever decided: its stored status is past `PROPOSED`, or its log holds a move to `DECIDED` or an
- * opening at it. An arc never decided is deleted rather than dropped (RD.DEVEX.WORKSPACE.311).
+ * opening at it. An arc never decided is deleted rather than dropped (RULE.DEVEX.WORKSPACE.311).
  */
 export function everDecided(data: Pick<ArcData, "status">, lines: readonly unknown[]): boolean {
   if (data.status !== "PROPOSED") return true;
@@ -754,7 +754,7 @@ export function progressStep(done: number, total: number): string {
 /**
  * One arc's chip in the sticky card, two lines: its number without the N and its short name, with its count on
  * the right, and a thin bar. Its border colour says its status, worked out by `arcStatus`, and the status is in its
- * tooltip and accessible name. A chip counts its arc's steps (RD.DEVEX.WORKSPACE.278): the bar's shade is the chip's
+ * tooltip and accessible name. A chip counts its arc's steps (RULE.DEVEX.WORKSPACE.278): the bar's shade is the chip's
  * third class, `sds-step-1` to `sds-step-5` by steps landed and `sds-step-done` at the end. An arc with no step yet
  * says its status, with no bar to fill. A wait or a reason is in the tooltip. The chip links the arc's Cycles row.
  */
@@ -811,7 +811,7 @@ function arcChip(data: ArcData, ws: string, questions: readonly Question[]): str
  * is on the right, a highlighted section of two lines like a chip: Overall with steps landed, and a full-width bar;
  * the workstream's status is its left edge's colour and its tooltip, and it is the workstream's own word, the one
  * the page's header shows (`workstreamWord`), so the two never disagree; its bar counts build rows only
- * (RD.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each arc is a chip from
+ * (RULE.DEVEX.WORKSPACE.278). It is written as soon as the workstream has its first arc, and each arc is a chip from
  * then on.
  */
 function statusBar(ws: string, arcs: readonly ArcData[], closed: number): string[] {
@@ -887,7 +887,7 @@ export function previewState(arc: string, status: string): string {
 }
 
 /**
- * A preview's page with its header naming its arc and showing the arc's status (RD.DEVEX.WORKSPACE.266): the header
+ * A preview's page with its header naming its arc and showing the arc's status (RULE.DEVEX.WORKSPACE.266): the header
  * line keeps its other facts, loses any `Arc:` or `Arc file:` fact of its own and the status it showed, gains the
  * arc fact `previewArc` writes right after the type, and ends in the state `previewState` writes. The page as it
  * was where it has no header line.
@@ -916,7 +916,7 @@ export function previewWithStatus(text: string, arc: string, status: string): st
 
 /**
  * Each line of a preview whose text says "proposed", in any case, with its number and its text: what the go's write
- * lists so the agent brings it current (RD.DEVEX.WORKSPACE.273). The text is the line with its tags taken out, so a
+ * lists so the agent brings it current (RULE.DEVEX.WORKSPACE.273). The text is the line with its tags taken out, so a
  * class such as `sds-proposed` is no text; a comment, the page's `spn:doc` block among them, is none either, and the
  * masthead's status badge is left out. Nothing checks these lines: which of them is still a proposal is the agent's
  * to read.
@@ -1192,7 +1192,7 @@ function headingWords(text: string, head: Heading): string {
 }
 
 /**
- * An arc's entry in What (RD.DEVEX.WORKSPACE.254): the heading carrying its id, or the subject heading that holds the id as
+ * An arc's entry in What (RULE.DEVEX.WORKSPACE.254): the heading carrying its id, or the subject heading that holds the id as
  * an anchor, to the next heading of the same level or higher. Null where What holds neither.
  */
 export function whatEntryOf(text: string, arc: string): { from: number; to: number; kind: "entry" | "anchor" } | null {
@@ -1242,7 +1242,7 @@ const entryHtml = (data: Pick<ArcData, "arc" | "title" | "goal" | "preview">): s
 ].join("\n");
 
 /**
- * The approach page with an arc's What entry written (RD.DEVEX.WORKSPACE.254), and how: under a domain heading, `h3`,
+ * The approach page with an arc's What entry written (RULE.DEVEX.WORKSPACE.254), and how: under a domain heading, `h3`,
  * `under` names, at the end of that heading's part; as an anchor, `<span id="N<nnn>-what"></span>`, on a subject heading,
  * `h4` or lower, that `under` names; or at the end of What where `under` is null. Throws where What holds no such heading.
  */
@@ -1301,7 +1301,7 @@ function lastCommitOf(places: readonly string[], shas: readonly string[]): { at:
 const SHOWN: Record<string, string> = { FAILED: "FAILURE", PENDING: "PENDING", SUCCESS: "SUCCESS" };
 
 /**
- * Whether a row may land on a run (RD.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
+ * Whether a row may land on a run (RULE.DEVEX.WORKSPACE.326–.331): null where it may, else the words of the refusal.
  * An arc with no sheet, and a row that is neither CODE nor PROOF, are judged as before sheets and get null.
  */
 export function landingFault(ws: string, arc: string, data: ArcData, row: ArcRow, run: string | null): string | null {

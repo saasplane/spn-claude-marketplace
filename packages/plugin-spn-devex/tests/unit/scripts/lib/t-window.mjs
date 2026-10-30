@@ -1,5 +1,5 @@
 import { PLUGIN } from "../../../helpers/harness.mjs";
-// `window` — which workstreams a window works on, and what a hook says to it (RD.DEVEX.WORKSPACE.236).
+// `window` — which workstreams a window works on, and what a hook says to it (RULE.DEVEX.WORKSPACE.236).
 //
 // The fault this proves gone: a window on workstream 021 was asked for the cards of workstream 024,
 // because the Stop hook bound a window to any folder whose NAME appeared in the text of a write, and the

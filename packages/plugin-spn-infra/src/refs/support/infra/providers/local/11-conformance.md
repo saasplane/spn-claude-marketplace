@@ -28,11 +28,11 @@
 
 ## What only a local run proves
 
-**A grammar cannot be tested; only a host that resolves can.** The tenancy fixtures exist for that, and the custom-domain half is the one property nothing else establishes, because it is the only name outside the estate's own zone (`RD.SUPPORT.INFRA.082`).
+**A grammar cannot be tested; only a host that resolves can.** The tenancy fixtures exist for that, and the custom-domain half is the one property nothing else establishes, because it is the only name outside the estate's own zone (`RULE.SUPPORT.INFRA.082`).
 
-**The two-way join between a declared domain and its local rendering** is proven by the Support repository's own unit cases (`RD.SUPPORT.INFRA.087`).
+**The two-way join between a declared domain and its local rendering** is proven by the Support repository's own unit cases (`RULE.SUPPORT.INFRA.087`).
 
-**A space's ports are derived by the CLI and written out by hand in the blueprint package's acceptance fixture** (`RD.SUPPORT.INFRA.062`). The acceptance run compares that fixture's render with the Support sample's committed environment file, which the CLI rendered, so a change to the layout of a platform's five hundred ports shows up as a difference there rather than on a laptop.
+**A space's ports are derived by the CLI and written out by hand in the blueprint package's acceptance fixture** (`RULE.SUPPORT.INFRA.062`). The acceptance run compares that fixture's render with the Support sample's committed environment file, which the CLI rendered, so a change to the layout of a platform's five hundred ports shows up as a difference there rather than on a laptop.
 
 ## What exists today, and what a pass does not say
 

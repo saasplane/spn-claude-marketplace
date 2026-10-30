@@ -1,9 +1,9 @@
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
 // The `decisions`-kind restatement alone: a plugin document citing a register row by id, and whether
 // that row still exists. `restates check` runs all four kinds together; this narrows to one, so a
-// drift names its owed act — a `decisions` drift is re-read, never rewritten or copied (RD.DEVEX.AGENT.072).
+// drift names its owed act — a `decisions` drift is re-read, never rewritten or copied (RULE.DEVEX.AGENT.072).
 //
 //     spn-devex restates decisions check [<book>]      is every cited row current?
 //     spn-devex restates decisions write <ref>         restamp one ref's decisions citations

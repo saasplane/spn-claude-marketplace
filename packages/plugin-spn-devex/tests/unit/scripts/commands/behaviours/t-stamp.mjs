@@ -267,7 +267,7 @@ console.log("\n=== behaviours stamp — the rules a writer keeps");
 }
 
 {
-  // RD.DEVEX.WORKSPACE.306: `Updated at` says when a row reached its status, so a run that confirms it re-dates nothing.
+  // RULE.DEVEX.WORKSPACE.306: `Updated at` says when a row reached its status, so a run that confirms it re-dates nothing.
   const { root, doc } = stand([
     { id: "IAM.LOGIN.01", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null },
     { id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null },

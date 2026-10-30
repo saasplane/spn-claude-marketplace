@@ -53,7 +53,7 @@ Today the plugin runs two checks, one on a connector script and one on Surface c
 
 ### A lookup reads every member at the root, or the one `--repo` names
 
-**Why** — *the root installs every member's plugins so one window can work across them* (`RD.DEVEX.AGENT.112`), and a fresh window starts there.
+**Why** — *the root installs every member's plugins so one window can work across them* (`RULE.DEVEX.AGENT.112`), and a fresh window starts there.
 **What** — with no `--repo`, a lookup reads the repository it runs in, or each member from the root, and a name several members carry prints from one with a line naming the rest. `--repo` takes a path inside a repository, else a member's name in the workspace above.
 **How** — `indexFor` in `scripts/commands/unit/show.ts` serves both commands; a named repository's entries carry its name, so the line says `--repo` named it.
 

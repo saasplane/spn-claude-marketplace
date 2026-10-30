@@ -12,7 +12,7 @@
 //
 // THE SPLIT PLAN is not a section somebody writes. It is the rows of the workstream's arcs, kept as
 // data in `arcs/N<nnn>/state.json`: each row with no row under it, read by its `repo`, which is the
-// scope, and its `state` (RD.DEVEX.WORKSPACE.038). An approach page written before that rule carried
+// scope, and its `state` (RULE.DEVEX.WORKSPACE.038). An approach page written before that rule carried
 // the plan as `How` tables with a SCOPE column, and those tables are still read, so a workstream
 // argued in the older shape closes under the shape it was written in.
 //
@@ -65,13 +65,13 @@ const ACCOUNTED = ["landed", "carried", "deferred"];
 // reason `✅` is: a cell reading `◐ 2026-09-08 …` strips to a date and would otherwise classify as
 // pending, which closes clean.
 const STOPPED = ["stopped", "◐"];
-// `in progress <date> <time> <offset>` is the row somebody is on right now (RD.DEVEX.WORKSPACE.184).
+// `in progress <date> <time> <offset>` is the row somebody is on right now (RULE.DEVEX.WORKSPACE.184).
 // Landing replaces the mark. Until then the row is neither landed nor accounted for, so the close
 // refuses it like an empty or a stopped row, and the Stop hook names it with its age rather than
 // calling it runnable: a second window leaves it alone and asks the developer.
 const IN_PROGRESS = /^in[ -]progress\b/i;
 // `⏸ held on Q<n>` is the row that waits for card `Q<n>`'s answer, because that answer can change it
-// (RD.DEVEX.WORKSPACE.188). It is not accounted for, so the close refuses it like a stopped row, and
+// (RULE.DEVEX.WORKSPACE.188). It is not accounted for, so the close refuses it like a stopped row, and
 // the Stop hook leaves it out of the runnable rows while the card is open. The glyph is optional
 // because a hand-typed mark can drop it; `LEAD` strips it when it is there.
 const HELD = /^held on (q\d+)\b/i;
@@ -218,8 +218,8 @@ export function dataArcsOf(folder: string): string[] {
  * The split-plan rows of the arcs a workstream keeps as data (01-workstream.md § The formats): each
  * row with no row under it, labelled `N001 row 2 — <What>`, by its repository and its state. A carried
  * row's proof says where it went. A running row carries the time its log line moved it there, as
- * `in progress <time>` (RD.DEVEX.WORKSPACE.184), and a row waiting on a card reads `held on Q<n>`
- * (RD.DEVEX.WORKSPACE.188).
+ * `in progress <time>` (RULE.DEVEX.WORKSPACE.184), and a row waiting on a card reads `held on Q<n>`
+ * (RULE.DEVEX.WORKSPACE.188).
  */
 export function dataRowsOf(folder: string): Row[] {
   const out: Row[] = [];
@@ -643,7 +643,7 @@ export function closing(destination: string): boolean {
 //
 // THE PAGE ALONE CANNOT TELL whether a card is answered, so this reads the workstream's records beside
 // it: every question is one record in `questions.jsonl`, and `question answer` and `withdraw` settle it
-// (RD.DEVEX.WORKSPACE.253).
+// (RULE.DEVEX.WORKSPACE.253).
 //
 // AND THE PAGE CAN SAY SO ITSELF, which is finding F5. A card whose own `sds-recommended` block carries
 // a `Decision:` with an answer in it has been answered ON THE PAGE, and the arc may never mention it.
@@ -653,7 +653,7 @@ export function closing(destination: string): boolean {
 // Reported as a WARNING rather than a refusal. The page is mid-edit for exactly as long as it takes
 // to fold a card, and refusing a write during that would refuse the fix itself.
 
-// ONE CARD SHAPE (RD.DEVEX.WORKSPACE.147). `approach-template.html` writes a card as
+// ONE CARD SHAPE (RULE.DEVEX.WORKSPACE.147). `approach-template.html` writes a card as
 // `<div class="sds-open">` wrapping `<h4 id="q<n>">`, and this reader looks for the `h4` alone. The
 // `.sds-open` block carries the amber edge that marks a card undecided, and the rail's count badge is
 // `s4.querySelectorAll('.sds-open').length`, so a card written any other way is invisible to the page
@@ -833,7 +833,7 @@ export function unfoldedCards(folder: string, pages: string[]): Array<[string, s
 // ---------------------------------------------------------------------------- gate: documents-first
 
 /**
- * The open workstreams THIS WINDOW works on, and the pages that argue each (RD.DEVEX.WORKSPACE.236).
+ * The open workstreams THIS WINDOW works on, and the pages that argue each (RULE.DEVEX.WORKSPACE.236).
  * The empty map for a window with no binding: a gate reading this says nothing about a card, a page or
  * a row. It is the one way a hook reads a workstream's pages, so none reads every open one.
  */
@@ -844,7 +844,7 @@ export function ownWorkstreams(root: string, session: string | undefined): Map<s
 
 /**
  * Whether a PreToolUse note was already said to this window, and so stays silent. A note speaks once for
- * one finding and again only when the finding changes (RD.DEVEX.WORKSPACE.198). A call a child makes
+ * one finding and again only when the finding changes (RULE.DEVEX.WORKSPACE.198). A call a child makes
  * is told no card or page note at all, because a child cannot fold a card or answer one.
  */
 function silent(payload: Payload, root: string, slot: string, finding: string, forChild = false): boolean {
@@ -893,7 +893,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
         const more = misshapen.length > 6 ? ` and ${misshapen.length - 6} more` : "";
         return { note: named(subject,
           `A card in \`Open\` is not in the open-card shape — ${shapeLine}${more}. An open card is a ` +
-          `\`<div class="sds-open">\` wrapping \`<h4 id="q<n>">\` (RD.DEVEX.WORKSPACE.147); \`div.sds-card\` is ` +
+          `\`<div class="sds-open">\` wrapping \`<h4 id="q<n>">\` (RULE.DEVEX.WORKSPACE.147); \`div.sds-card\` is ` +
           `the decided shape, so the page shows the question as settled and the rail does not count ` +
           `it. Fold an answered card into the section that states its decision, and rewrite a ` +
           `question still open in the open shape (05-artifacts.md, A card).`) };
@@ -1150,7 +1150,7 @@ export function gateClose(payload: Payload): Verdict {
     // left and names where, `DROPPED` says it was abandoned and why. Any other word means somebody
     // has to decide which of those three it is, and a receipt written before that decision records
     // a state nobody checked. Each arc's status is read through the one owner, `statusOfData`, so an
-    // arc PROPOSED or DECIDED, which nothing built, refuses the close (RD.DEVEX.WORKSPACE.313).
+    // arc PROPOSED or DECIDED, which nothing built, refuses the close (RULE.DEVEX.WORKSPACE.313).
     const unfinished: string[] = [];
     const arcDirs = [...new Set([...folders, ...pages.map(dirname)].map((f) => join(f, "arcs")))];
     for (const dir of arcDirs.filter(isDir)) {
@@ -1177,9 +1177,9 @@ export function gateClose(payload: Payload): Verdict {
       };
     }
 
-    // THE THIRD CHECK, AFTER THE MASTHEAD AND THE ROWS: THE WORKTREE SET IS NOT ON DISK (RD.DEVEX.WORKSPACE.325).
+    // THE THIRD CHECK, AFTER THE MASTHEAD AND THE ROWS: THE WORKTREE SET IS NOT ON DISK (RULE.DEVEX.WORKSPACE.325).
     // The gate names the command and never removes, because a plugin script never runs `spnutils`
-    // (RD.DEVEX.UTILS.076). There is no override; the way through is the command.
+    // (RULE.DEVEX.UTILS.076). There is no override; the way through is the command.
     if (!empty.length && !stopped.length && !running.length && !held.length && isDir(join(setsRoot(root), WORKTREES, subject))) {
       const number = /^(\d+)-/.exec(subject)?.[1] ?? subject;
       return {
@@ -1224,14 +1224,14 @@ export function gateClose(payload: Payload): Verdict {
       ...(held.length ? [`${held.length} row(s) held on a card`] : []),
     ];
     // A ROW IN PROGRESS IS WORK SOMEBODY IS DOING NOW, or did and never marked landed. Either way the
-    // close cannot tell which, and the mark's age is what lets the developer decide (RD.DEVEX.WORKSPACE.184).
+    // close cannot tell which, and the mark's age is what lets the developer decide (RULE.DEVEX.WORKSPACE.184).
     const runningBlock = running.length
       ? `\n\nRows still marked in progress:\n` +
         running.slice(0, 10).map((r) => `  - ${r.scope} — ${r.label.slice(0, 70)} (${markedAgo(r.state)})`).join("\n") +
         `\n\nLanding replaces the mark with what the row reached and its commit. If the window that ` +
         `marked it is gone, ask the developer before you take the row over.`
       : "";
-    // A HELD ROW WAITS ON A CARD'S ANSWER (RD.DEVEX.WORKSPACE.188). Closing over it would record a
+    // A HELD ROW WAITS ON A CARD'S ANSWER (RULE.DEVEX.WORKSPACE.188). Closing over it would record a
     // scope as finished while the question that can change it is still open.
     const heldBlock = held.length
       ? `\n\nRows held on a card:\n` +

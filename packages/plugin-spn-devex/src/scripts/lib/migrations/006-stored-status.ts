@@ -2,7 +2,7 @@
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Migration 006: each arc of an open or backlog workstream kept as data comes to `schemaVersion` 2
-// (RD.DEVEX.WORKSPACE.307). `HELD` becomes `DECIDED` with its reason kept as the wait; `RUNNING` and `PART-LANDED`
+// (RULE.DEVEX.WORKSPACE.307). `HELD` becomes `DECIDED` with its reason kept as the wait; `RUNNING` and `PART-LANDED`
 // become `DECIDED`, which the steps work out as `RUNNING`. Every design row becomes a `change`, a step written before
 // the go that starts at it; `closed/` is never read.
 
@@ -32,7 +32,7 @@ function brought(data: ArcData): { next: ArcData; said: string[] } | null {
     next.status = "DECIDED";
     said.push(`${data.status} → DECIDED, which the steps work out as ${arcStatus({ ...next, status: "DECIDED" })}`);
   }
-  // A STEP MAY BE WRITTEN BEFORE THE GO (RD.DEVEX.WORKSPACE.278), and version 1 gave the design kind to every row
+  // A STEP MAY BE WRITTEN BEFORE THE GO (RULE.DEVEX.WORKSPACE.278), and version 1 gave the design kind to every row
   // added while its arc was `PROPOSED`, the build steps among them. So no row leaves: each is a `change`, and none of
   // them starts until the go.
   for (const row of next.rows) if (row.kind === DESIGN_KIND) row.kind = "change";

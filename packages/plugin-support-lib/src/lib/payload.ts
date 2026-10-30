@@ -62,7 +62,7 @@ export function emit(verdict: Verdict): void {
   }
   if (verdict.note) {
     // A note is advice the agent acts on: it goes to the agent alone, and the developer's pane
-    // shows a refusal and nothing else (RD.DEVEX.AGENT.092).
+    // shows a refusal and nothing else (RULE.DEVEX.AGENT.092).
     process.stdout.write(JSON.stringify({
       hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: verdict.note },
     }));

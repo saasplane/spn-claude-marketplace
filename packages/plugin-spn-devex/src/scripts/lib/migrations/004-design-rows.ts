@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status is one of six, stored or worked out · § The formats · § Open and backlog workstreams follow the standard as it moves
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// Migration 004: rows that were design work take the kind `design` (RD.DEVEX.WORKSPACE.278), as the command gives it
+// Migration 004: rows that were design work take the kind `design` (RULE.DEVEX.WORKSPACE.278), as the command gives it
 // to a row added from now on, in open and backlog workstreams kept as data. That is every row of an arc at PROPOSED,
 // and every row of any other arc that landed while it read PROPOSED, before it first left PROPOSED, read from the
 // arc's log; an arc whose log shows no move out of PROPOSED keeps its kinds. Nothing else in an arc changes. A workstream still keeping

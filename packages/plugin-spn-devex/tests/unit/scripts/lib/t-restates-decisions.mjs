@@ -89,7 +89,7 @@ console.log("\n=== check() — the four decisions findings, known-bad first");
     (g) => g.length === 1 && /not a register row/.test(g[0]) && g[0].includes("tests.md \u00a7 What a run owes") && /`docs` citation/.test(g[0]));
 
   one("an old RD id is no longer a row the register can carry",
-    findingsFor([{ repo: "spn-foundation", row: "RD.SUPPORT.APPS.086", seen: "x" }]),
+    findingsFor([{ repo: "spn-foundation", row: "RULE.SUPPORT.APPS.086", seen: "x" }]),
     (g) => g.length === 1 && /does not carry/.test(g[0]));
 
   one("a citation missing repo or row is refused",

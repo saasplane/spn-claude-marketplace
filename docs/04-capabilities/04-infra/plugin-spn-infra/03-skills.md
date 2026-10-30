@@ -54,7 +54,7 @@ The folders under `packages/plugin-spn-infra/src/skills/` are `new`, `implement`
 
 ### A platform-scoped command names its platform first
 
-**Why** — *an argument's position is part of its grammar*, and a session copying a command from one skill into another carries the order along with the words (`RD.DEVEX.UTILS.072`).
+**Why** — *an argument's position is part of its grammar*, and a session copying a command from one skill into another carries the order along with the words (`RULE.DEVEX.UTILS.072`).
 **What** — every command naming a platform puts `<spc>` straight after the verb, and `<env>` after that where the layer is the environment. The organization layer takes neither, because a repository has at most one organization, and in an apps repository the `<spc>` given is checked against the `sprepo.json` pin.
 **How** — `run`, `review`, `verify` and `release` all spell it the same way: `infra platform up <spc> --plan`, `infra environment up <spc> <env> --cloud --plan`. `packages/plugin-spn-infra/src/skills/run/SKILL.md`.
 

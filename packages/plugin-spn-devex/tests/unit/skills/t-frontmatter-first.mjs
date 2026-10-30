@@ -1,4 +1,4 @@
-// Every `SKILL.md` of the four plugins opens with its frontmatter (RD.DEVEX.AGENT.108). The runtime
+// Every `SKILL.md` of the four plugins opens with its frontmatter (RULE.DEVEX.AGENT.108). The runtime
 // reads frontmatter only at the start of the file, and a plugin skill whose description it cannot
 // read stays a typed command that is never offered to the session, so no ask in plain words reaches
 // it. The stamp of what a skill restates comes right after the frontmatter. Only this marketplace's

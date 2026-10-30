@@ -6,7 +6,7 @@
 // **THESE THREE ARE THE SHAPES A SECRET ACTUALLY TAKES IN A FILE**, and each is unmistakable: an
 // ARN carries its own scheme, an access key id has a fixed prefix and a fixed length, and a private
 // key announces itself in a header. An access key id and a private key have no innocent form. An ARN
-// has exactly one: S3's resource-name form with an empty region and an empty account (RD.SUPPORT.INFRA.123),
+// has exactly one: S3's resource-name form with an empty region and an empty account (RULE.SUPPORT.INFRA.123),
 // which names only a bucket the same file already names and carries nothing copied in. Every other ARN,
 // and an S3 name carrying a region or an account, is refused at every path.
 //

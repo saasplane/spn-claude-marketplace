@@ -3,7 +3,7 @@
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Migration 003: every preview of an arc kept as data, in open and backlog workstreams, shows the arc's status in
-// its header (RD.DEVEX.WORKSPACE.266), written by the same writer every `workstream` write calls. A workstream
+// its header (RULE.DEVEX.WORKSPACE.266), written by the same writer every `workstream` write calls. A workstream
 // still keeping its arcs as Markdown is migration 001's, which applies first, and `closed/` is never read.
 
 import { readFileSync } from "node:fs";

@@ -48,7 +48,7 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 
 ## How a deployment is exposed
 
-**An environment has one load balancer and one gateway for each reach, and a deployment is a route on a gateway — MUST** (`RD.SUPPORT.INFRA.115`). A deployment has no load balancer of its own.
+**An environment has one load balancer and one gateway for each reach, and a deployment is a route on a gateway — MUST** (`RULE.SUPPORT.INFRA.115`). A deployment has no load balancer of its own.
 
 | Exposure | Load balancer | Gateway, inside the cluster | Registered as |
 | --- | --- | --- | --- |
@@ -61,15 +61,15 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 - **HTTPS ends at the load balancer**, with the zone's wildcard certificate, which covers the internal hosts too.
 - **One cluster serves one environment**, with namespaces `prd`, `plt` and `vnd`.
 - **Hosting does not change the pair.** Under `CLUSTER` the storage engine's own address is one more route.
-- **Each gateway has a host of its own**, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`. A route's host is given a record that points at it, so no route names a load balancer, and the label `gateway` is never a deployment's (`RD.SUPPORT.INFRA.119`).
+- **Each gateway has a host of its own**, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`. A route's host is given a record that points at it, so no route names a load balancer, and the label `gateway` is never a deployment's (`RULE.SUPPORT.INFRA.119`).
 - **The estate publishes how many proxies stand in front of each listener.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3` for every remote port: the calling service, the internal load balancer and the private gateway.
 - **The book names no gateway product where it states the rule.** The provider's chapter says what is installed (`providers/aws/08-environment.md`).
 
-**A remote port is always `PRIVATE` — MUST** (`RD.SUPPORT.INFRA.114`). `expose` describes the main port only; the remote port's reach is a rule and not a field. Its address is `https://{env}-{app}-remote.internal.{spd}`, where `{app}` is the application's `kindCode`, so no deployment's label may end `-remote`. A calling pod reaches it by the same private HTTPS host an operator's machine uses, which is why the internal load balancer admits the cluster's nodes.
+**A remote port is always `PRIVATE` — MUST** (`RULE.SUPPORT.INFRA.114`). `expose` describes the main port only; the remote port's reach is a rule and not a field. Its address is `https://{env}-{app}-remote.internal.{spd}`, where `{app}` is the application's `kindCode`, so no deployment's label may end `-remote`. A calling pod reaches it by the same private HTTPS host an operator's machine uses, which is why the internal load balancer admits the cluster's nodes.
 
-**A deployment may ask three things of its route** (`RD.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address. Its window is `1`, `60`, `3600` or `86400` seconds, and it is one count across every proxy pod, kept in the environment's own cache (`RD.SUPPORT.INFRA.118` · `RD.SUPPORT.INFRA.120`). A route's own limit is declared in code and counts calls to one route from one caller.
+**A deployment may ask three things of its route** (`RULE.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address. Its window is `1`, `60`, `3600` or `86400` seconds, and it is one count across every proxy pod, kept in the environment's own cache (`RULE.SUPPORT.INFRA.118` · `RULE.SUPPORT.INFRA.120`). A route's own limit is declared in code and counts calls to one route from one caller.
 
-**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), covering every public deployment behind it. The blueprint builds it on every cluster's public load balancer, as it builds the two gateways and the two load balancers. It stands in every environment, and no estate file declares it. It holds three rule groups, each counting only. Nothing is attached to the internal load balancer, and a public web application is not covered.
+**The public load balancer carries one web firewall** (`RULE.SUPPORT.INFRA.117`), covering every public deployment behind it. The blueprint builds it on every cluster's public load balancer, as it builds the two gateways and the two load balancers. It stands in every environment, and no estate file declares it. It holds three rule groups, each counting only. Nothing is attached to the internal load balancer, and a public web application is not covered.
 
 ## Namespace is a blast radius; exposure is declared with the namespace as its ceiling
 
@@ -105,7 +105,7 @@ An image is built exactly once, from one commit, and the same digest is what rea
 
 **A rebuild is a new artifact, and a new artifact invalidates every test that ran against the old one — an image MUST NOT be rebuilt per environment.** Tags are labels applied to a digest over time; they never change what the artifact is. So *what is running in production* gets a one-word answer, and that word traces to one commit, one build, one test run and one approval — the same chain the trust model states.
 
-**A `WEB` bundle is the exception.** It carries its environment's values, built in (`RD.SUPPORT.APPS.063`), so it is built once per environment. A web promotion moves a build rather than a name, and the bundle that passed non-production is not the bundle production runs.
+**A `WEB` bundle is the exception.** It carries its environment's values, built in (`DEC.SUPPORT.APPS.063`), so it is built once per environment. A web promotion moves a build rather than a name, and the bundle that passed non-production is not the bundle production runs.
 
 ## Promotion is declared, not worked out
 
@@ -121,7 +121,7 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 ## The serving contract is dynamic
 
-Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.SUPPORT.INFRA.084`). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
+Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RULE.SUPPORT.INFRA.084`). The application that owns identity lists the `EDGE` grant on its row, in `grants`, and the estate grants it a scoped identity at the edge. The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
 
 **A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
 
@@ -132,9 +132,9 @@ Routing is data: a new customer surface is a row, never a release. **A customer'
 | the running platform | `sites/{host}` — the route `{env, app, orgCode, orgName}` |
 | the deploy | `releases/{env}/{app}` — the release one application serves in one environment |
 
-Each writer's scope is disjoint, so nothing races on a name (`RD.SUPPORT.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
+Each writer's scope is disjoint, so nothing races on a name (`RULE.SUPPORT.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
 
-**One tenant edge per platform serves every environment's tenant hosts** (`RD.SUPPORT.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RD.SUPPORT.INFRA.106`). Every declared domain stands its own pair of zones (`RD.SUPPORT.INFRA.086`), and the private zone is always the child name, never the apex.
+**One tenant edge per platform serves every environment's tenant hosts** (`RULE.SUPPORT.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RULE.SUPPORT.INFRA.106`). Every declared domain stands its own pair of zones (`RULE.SUPPORT.INFRA.086`), and the private zone is always the child name, never the apex.
 
 **Observability is not something anybody opts into.** An application is observable because it was deployed — the collectors were installed by a layer, and nothing depends on somebody remembering to wire one in.
 

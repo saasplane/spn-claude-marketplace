@@ -4,7 +4,7 @@
 //
 // Refuses a write to a Jest or Vitest configuration that adds a coverage exclude with no comment
 // giving its reason (conformance requirement 34). It reads no percentage: code coverage is measured
-// and reported, never enforced (RD.SUPPORT.APPS.133).
+// and reported, never enforced (RULE.SUPPORT.APPS.133).
 //
 //   hook :  coverage-excludes.ts --stdin
 //   scan :  coverage-excludes.ts <path> …      (every exclude with no reason, in the files named)
@@ -37,7 +37,7 @@ export function verdict(path: string, source: string | null, _added: string | nu
       found.map((item) => `  - ${item}`).join("\n") +
       "\n  An exclude names code no automatic case can reach, such as a proof-of-person challenge or a " +
       "vendor round trip. Put a comment on its entry, or on the line above it, giving that reason, so a " +
-      "reader can tell code that cannot be tested from code nobody tested (RD.SUPPORT.APPS.133).",
+      "reader can tell code that cannot be tested from code nobody tested (RULE.SUPPORT.APPS.133).",
   };
 }
 

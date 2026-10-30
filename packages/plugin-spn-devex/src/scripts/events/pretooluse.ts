@@ -70,7 +70,7 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
   { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
-  // The token levers (RD.DEVEX.AGENT.111): refusals, so they run before the checks that only advise. A call
+  // The token levers (RULE.DEVEX.AGENT.111): refusals, so they run before the checks that only advise. A call
   // from the main window pays one test of `agent_id`; a `Read` pays one `stat`.
   { name: { group: "child-size", action: "child-size" }, run: checkChildSize, needs: ["any"], applies: () => true },
   { name: { group: "read-size", action: "read-size" }, run: checkReadSize, needs: ["file_path"], applies: (path) => Boolean(path) },
@@ -272,7 +272,7 @@ export function bindingPaths(payload: Payload): string[] {
 
 /**
  * Whether this window has already heard this doc-standard finding about this file
- * (RD.DEVEX.AGENT.092). The same finding about one file is said once; a changed finding is said again.
+ * (RULE.DEVEX.AGENT.092). The same finding about one file is said once; a changed finding is said again.
  * A call that names no file, or a window with no session id, is never silenced.
  */
 function docFindingHeard(payload: Payload, path: string, finding: string): boolean {
@@ -386,7 +386,7 @@ export function checkOrderPicture(payload: Payload): Verdict {
   for (const line of written.split("\n")) {
     if (/^#{1,6}\s/.test(line)) forbidden = /\b(do not|never|no)\b/i.test(line);
     if (!forbidden && PICTURE.test(line) && !NO_PICTURE.test(line)) {
-      return { deny: `A step of ${basename(path)} asks for a screenshot ("${line.trim().slice(0, 60)}"). An order checks a page by its computed values: use \`spn-devex browser probe <url> --select <css> --props …\`. A picture is taken only where the developer asked to see a look, and the order cites it with a line containing "the developer asked to see" (RD.DEVEX.WORKSPACE.277).` };
+      return { deny: `A step of ${basename(path)} asks for a screenshot ("${line.trim().slice(0, 60)}"). An order checks a page by its computed values: use \`spn-devex browser probe <url> --select <css> --props …\`. A picture is taken only where the developer asked to see a look, and the order cites it with a line containing "the developer asked to see" (RULE.DEVEX.WORKSPACE.277).` };
     }
   }
   return null;
@@ -411,8 +411,8 @@ export function dispatch(payload: Payload): Verdict {
   }
 
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
-  // reminder (RD.DEVEX.WORKSPACE.117), and a refusal where the page it names loads its styles from
-  // outside (RD.DEVEX.WORKSPACE.215). The refusal leaves here as any other check's does.
+  // reminder (RULE.DEVEX.WORKSPACE.117), and a refusal where the page it names loads its styles from
+  // outside (RULE.DEVEX.WORKSPACE.215). The refusal leaves here as any other check's does.
   if (payload.tool_name === PUBLISHER) {
     try { return span({ group: "publish", action: "publish" }, () => checkPublish(payload)); } catch { return null; }
   }
@@ -429,7 +429,7 @@ export function dispatch(payload: Payload): Verdict {
   try { blocked = agentBlockRefusal(payload); } catch { blocked = null; }
   if (blocked) return { deny: blocked };
 
-  // THE WINDOW'S BINDING IS WRITTEN HERE, from the paths this call writes (RD.DEVEX.WORKSPACE.236), and
+  // THE WINDOW'S BINDING IS WRITTEN HERE, from the paths this call writes (RULE.DEVEX.WORKSPACE.236), and
   // before the checks read it: the first write into a workstream makes it this window's. A child's call
   // carries its window's session id, so its writes bind the window that dispatched it.
   try {

@@ -363,7 +363,7 @@ ${linesFor("1.0.0").script}
   rmSync(TMP, { recursive: true, force: true });
 }
 
-console.log("\n=== the places of How, produced from the rows' repo (RD.DEVEX.WORKSPACE.251)");
+console.log("\n=== the places of How, produced from the rows' repo (RULE.DEVEX.WORKSPACE.251)");
 {
   const { placedPage, placesOf } = cyclesModule;
   const { approachPage, arcData, cli: runCli, dataWorkspace } = await import("../../../../helpers/workstream-fixture.mjs");

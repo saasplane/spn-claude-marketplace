@@ -1,5 +1,5 @@
 // This file OWNS these rules — the switch, the line's shape, the size cap and the carried tags — and
-// restates the book's RD.DEVEX.WORKSPACE.185 (spn-foundation `04-capabilities/01-devex/03-utils/
+// restates the book's RULE.DEVEX.WORKSPACE.185 (spn-foundation `04-capabilities/01-devex/03-utils/
 // 01-spnutils/01-utils.md` § the `timings` paragraph).
 //
 // What a plugin's checks, its commands and the agent's Bash commands cost, written only while the
@@ -269,7 +269,7 @@ type Carried = Record<string, Work>;
 
 /**
  * The work a line is written under: its own tags, or the ones carried from the same session and
- * agent's last tagged call (RD.DEVEX.WORKSPACE.185).
+ * agent's last tagged call (RULE.DEVEX.WORKSPACE.185).
  *
  * - **A call that touches no workstream path inherits** the carried tags.
  * - **A call inside the carried work keeps what it does not name**: the same workstream, and the same

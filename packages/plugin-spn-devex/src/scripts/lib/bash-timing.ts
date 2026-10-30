@@ -1,4 +1,4 @@
-// The Bash commands the agent runs, timed (RD.DEVEX.WORKSPACE.185). No hook sees a command's
+// The Bash commands the agent runs, timed (RULE.DEVEX.WORKSPACE.185). No hook sees a command's
 // duration, so the hooks before and after the call pair on its `tool_use_id`:
 //
 // - `startCommand`, from `PreToolUse`: while recording is on, the command is read (`command-reader.ts`)

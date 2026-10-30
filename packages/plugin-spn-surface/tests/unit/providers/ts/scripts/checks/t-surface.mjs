@@ -76,34 +76,34 @@ console.log("=== the reader — the shapes that break a pattern");
 
 // Each note: [rule, its book row, the seeded wrong body, the same body corrected].
 const PAIRS = [
-  ["badge-kind-look", "RD.SUPPORT.SURFACE.368",
+  ["badge-kind-look", "RULE.SUPPORT.SURFACE.368",
     "    <DSBadge label=\"Admin\" variant={DSVariantType.OUTLINE} color={DSColorType.SUCCESS} />",
     "    <DSBadge label=\"Admin\" variant={DSVariantType.OUTLINE} color={DSColorType.DEFAULT} />"],
-  ["state-hue-table", "RD.SUPPORT.SURFACE.369",
+  ["state-hue-table", "RULE.SUPPORT.SURFACE.369",
     "    {null}\n  </div>\n);\nconst ROLE_STATUS_COLOR: Record<RoleStatusType, DSColorType> = {\n  [RoleStatusType.ACTIVE]: DSColorType.SUCCESS,\n  [RoleStatusType.PENDING]: DSColorType.INFO,\n};\nconst Other = () => (\n  <div>",
     "    {null}\n  </div>\n);\nconst ROLE_STATUS_COLOR: Record<RoleStatusType, DSColorType> = {\n  [RoleStatusType.ACTIVE]: DSColorType.SUCCESS,\n  [RoleStatusType.PENDING]: DSColorType.WARNING,\n};\nconst Other = () => (\n  <div>"],
-  ["badge-solid", "RD.SUPPORT.SURFACE.374",
+  ["badge-solid", "RULE.SUPPORT.SURFACE.374",
     "    <DSBadge label=\"Live\" variant={DSVariantType.SOLID} color={DSColorType.SUCCESS} />",
     "    <DSBadge label=\"Live\" color={DSColorType.SUCCESS} />"],
-  ["button-one-solid", "RD.SUPPORT.SURFACE.370",
+  ["button-one-solid", "RULE.SUPPORT.SURFACE.370",
     "    <DSButton variant={DSVariantType.SOLID} color={DSColorType.PRIMARY} label=\"Save\" />\n    <DSButton variant={DSVariantType.SOLID} label=\"Cancel\" />",
     "    <DSButton variant={DSVariantType.SOLID} color={DSColorType.PRIMARY} label=\"Save\" />\n    <DSButton label=\"Cancel\" />"],
-  ["container-in-container", "RD.SUPPORT.APPS.147",
+  ["container-in-container", "RULE.SUPPORT.APPS.147",
     "    <DSPanelContainer>\n      <DSPanelContainer.Content>\n        <DSPanelContainer>inner</DSPanelContainer>\n      </DSPanelContainer.Content>\n    </DSPanelContainer>",
     "    <DSPanelContainer>\n      <DSPanelContainer.Content>outer</DSPanelContainer.Content>\n    </DSPanelContainer>\n    <DSPanelContainer>inner</DSPanelContainer>"],
-  ["hand-set-look", "RD.SUPPORT.APPS.150",
+  ["hand-set-look", "RULE.SUPPORT.APPS.150",
     "    <DSButton className=\"ds:mt-2 ds:px-4 ds:bg-red-500 ds:rounded-lg\" label=\"Go\" />",
     "    <DSButton className=\"ds:mt-2\" label=\"Go\" />"],
-  ["custom-no-colour", "RD.SUPPORT.SURFACE.382",
+  ["custom-no-colour", "RULE.SUPPORT.SURFACE.382",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} />",
     "    <DSBadge label=\"VIP\" color={DSColorType.CUSTOM} customColor={tag.color} />"],
-  ["header-one-main", "RD.SUPPORT.SURFACE.390",
+  ["header-one-main", "RULE.SUPPORT.SURFACE.390",
     header(["<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />", "<DSButton label=\"Approve merchant\" color={DSColorType.PRIMARY} />"]),
     header(["<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />", "<DSButton label=\"Approve merchant\" />"])],
-  ["header-error-beside-main", "RD.SUPPORT.SURFACE.390",
+  ["header-error-beside-main", "RULE.SUPPORT.SURFACE.390",
     header(["<DSButton label=\"Reject\" color={DSColorType.ERROR} />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"]),
     header(["<DSButton label=\"Reject\" />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"])],
-  ["header-secondaries", "RD.SUPPORT.SURFACE.390",
+  ["header-secondaries", "RULE.SUPPORT.SURFACE.390",
     header(["<DSButton label=\"Mark onboarding in progress\" />", "<DSButton label=\"Reject\" />", "<DSButton label=\"Deactivate\" />", "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"]),
     header(["<DSButton label=\"Mark onboarding in progress\" />", "<DSButton label=\"Reject\" />", MORE, "<DSButton label=\"Start review\" color={DSColorType.PRIMARY} />"])],
 ];
@@ -123,7 +123,7 @@ console.log("\n=== the shipped bundle reaches the stack's reader and says what t
   const input = JSON.stringify({ tool_name: "Write", tool_input: { file_path: join(WEB, "Bundle.tsx"), content: page(PAIRS[3][2]) }, cwd: root });
   const run = (entry) => execFileSync("node", [entry], { input, encoding: "utf8", env: { ...process.env, SPN_TELEMETRY: "off" } }).trim();
   const bundled = run(BUNDLE);
-  ok("the bundle gives the note, word for word as the source", bundled.includes("RD.SUPPORT.SURFACE.370") && bundled === run(ENTRY), bundled.slice(0, 200));
+  ok("the bundle gives the note, word for word as the source", bundled.includes("RULE.SUPPORT.SURFACE.370") && bundled === run(ENTRY), bundled.slice(0, 200));
 }
 
 console.log("\n=== the cases a note must not reach");
@@ -158,7 +158,7 @@ console.log("\n=== only what this write adds");
   ok("an edit beside a slip that was already there says nothing about it", unrelated.kind === "", unrelated.text.slice(0, 200));
   writeFileSync(file, page("    <DSButton variant={DSVariantType.SOLID} label=\"Save\" />\n    <p>old</p>"), "utf8");
   const second = hook({ file_path: file, old_string: "<p>old</p>", new_string: "<DSButton variant={DSVariantType.SOLID} label=\"Cancel\" />" }, "Edit");
-  ok("an edit that adds the second SOLID gets the note", second.kind === "note" && second.text.includes("RD.SUPPORT.SURFACE.370"), second.text.slice(0, 200));
+  ok("an edit that adds the second SOLID gets the note", second.kind === "note" && second.text.includes("RULE.SUPPORT.SURFACE.370"), second.text.slice(0, 200));
   ok("a note is advice, never a refusal", second.kind !== "deny");
 }
 

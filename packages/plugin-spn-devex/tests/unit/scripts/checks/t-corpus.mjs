@@ -294,7 +294,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   check("a workspace carrying no docs tree is silent and does not crash", !warned, out.slice(0, 300));
 }
 
-// ---- A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT WROTE UNDER IT (RD.DEVEX.WORKSPACE.236)
+// ---- A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT WROTE UNDER IT (RULE.DEVEX.WORKSPACE.236)
 {
   emptyStore();
   const root = fixture("window-repos", { "repo-a/docs/bad.md": BAD, "repo-b/docs/bad.md": BAD }, ["repo-a", "repo-b"]);

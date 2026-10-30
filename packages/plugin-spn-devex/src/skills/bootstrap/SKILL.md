@@ -266,7 +266,7 @@ The organization layer is already up from act 5, and the platform layer reads wh
 spnutils infra platform up <spc>
 ```
 
-`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RD.DEVEX.UTILS.072`). No environment entry selects a platform.
+`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RULE.DEVEX.UTILS.072`). No environment entry selects a platform.
 
 - **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either. This is the same rule act 9's `repo create` already follows, so nothing new is being excused here.
 - **Stop after each and say what it produced.** A partner watching an estate appear has no way to tell a slow layer from a stuck one unless you say.

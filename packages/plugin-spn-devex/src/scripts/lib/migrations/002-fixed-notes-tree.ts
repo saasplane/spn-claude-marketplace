@@ -2,7 +2,7 @@
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// Migration 002: every open and backlog workstream gets the fixed tree (RD.DEVEX.WORKSPACE.262), the
+// Migration 002: every open and backlog workstream gets the fixed tree (RULE.DEVEX.WORKSPACE.262), the
 // arc's goal and name file (.264), its short subject (.265) and its address on the approach page (.263).
 // Folding a note or reading a goal is judgement, so the agent applies it by its steps; the check is
 // mechanical and never reads `closed/`.

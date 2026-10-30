@@ -1,5 +1,5 @@
 // The spn-apps PreToolUse hook's telemetry lines: the one shape every plugin writes, under
-// `script: "spn-apps"`, with the work tags of the call (RD.DEVEX.WORKSPACE.185, N8 row 2p).
+// `script: "spn-apps"`, with the work tags of the call (RULE.DEVEX.WORKSPACE.185, N8 row 2p).
 //
 // A temporary workspace with `.spndevex/.debug/switches.json` is pointed at the recorder, in a child
 // with `SPN_TELEMETRY` removed; nothing is written into a real workspace.

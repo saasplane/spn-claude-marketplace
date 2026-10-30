@@ -1,4 +1,4 @@
-// RESTATES: RD.SUPPORT.SURFACE.392 — spn-surface carries the CONSTRUCT snapshot of each release's
+// RESTATES: RULE.SUPPORT.SURFACE.392 — spn-surface carries the CONSTRUCT snapshot of each release's
 // book, and what reads it in the plugin reads that copy alone.
 //
 // `spn-surface unit show <Unit>` — one unit, for the agent: its props, their values and defaults,
@@ -31,7 +31,7 @@
 // every other member that carries the name, and inside a repository nothing changes.
 //
 // `--repo <name or path>` READS ONE REPOSITORY, from anywhere: a member's name, found in the
-// workspace above the working folder, or a path inside a repository (RD.DEVEX.AGENT.112).
+// workspace above the working folder, or a path inside a repository (RULE.DEVEX.AGENT.112).
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -74,9 +74,9 @@ type Index = { packages: IndexEntry[]; workspace: boolean; named?: string };
 /** One component found in an index: its symbol, its package, the file, and the member it came from. */
 type Found = { symbol: IndexSymbol; pkg: IndexPackage; file: string; repository: string | null };
 
-// RESTATES: RD.SUPPORT.APPS.207 — a unit that is one design-system block made specific ends in that
+// RESTATES: RULE.SUPPORT.APPS.207 — a unit that is one design-system block made specific ends in that
 // block's word, and leaves to that block's choice table everything its data does not decide. A badge
-// is one enum's or one state's `DSBadge` (RD.SUPPORT.APPS.206), `Step` is one step of a flow and a
+// is one enum's or one state's `DSBadge` (RULE.SUPPORT.APPS.206), `Step` is one step of a flow and a
 // `DSForm`, `Entry` is an entry's content opened by `DSEntryOverlay`, and a `Container` follows the
 // container patterns rather than one block. A word several blocks share lists them, and the one the
 // unit's name ends in is chosen, else the first: `TagColorPicker` is a `DSColorPicker`.

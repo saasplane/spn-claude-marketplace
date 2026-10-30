@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
 // it a MUST in both directions.
 //
 // The `spn:restates` block: how it is written, and what a hash covers.
@@ -18,7 +18,7 @@
 //         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
 //         { "path": "docs/04-capabilities/02-support/02-apps/06-tests/README.md", "seen": "b204d81c" }
 //       ],
-//       "decisions": ["RD.SUPPORT.APPS.086"]
+//       "decisions": ["RULE.SUPPORT.APPS.086"]
 //     }
 //     -->
 //
@@ -93,7 +93,7 @@ export type DecisionCitation = { repo?: string; row?: string; seen?: string };
  * What a ref stands on. **Three kinds, because each names a different obligation** — a moved `docs`
  * entry means somebody rewrites a paragraph, `files` means somebody copies a file again, and
  * `decisions` moves when a row is rewritten. One list would report that something changed and not
- * what you owe (RD.DEVEX.AGENT.072).
+ * what you owe (RULE.DEVEX.AGENT.072).
  *
  * A FOURTH KIND, `commands`, WAS TRIED AND DROPPED (2026-09-28). The command surface has one
  * source — the book — and a ref restates it the same way it restates anything else the book states:
@@ -289,8 +289,8 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
  */
 export function rowText(register: string, row: string): string | null {
   // ANCHORED TO THE ROW'S OWN FIRST CELL, never a bare search over every line. A register row
-  // routinely cross-references another row inside its own prose — `RD.DEVEX.WORKSPACE.096`'s row cites
-  // `RD.DEVEX.WORKSPACE.106` in its own text, earlier in the file than `RD.DEVEX.WORKSPACE.106`'s own row — so a search
+  // routinely cross-references another row inside its own prose — `RULE.DEVEX.WORKSPACE.096`'s row cites
+  // `RULE.DEVEX.WORKSPACE.106` in its own text, earlier in the file than `RULE.DEVEX.WORKSPACE.106`'s own row — so a search
   // for "does this line mention the id anywhere" returns the wrong row's text, and two different
   // citations can silently hash to the same line.
   // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- pattern built from this script's own constants and escaped text, never outside input
@@ -390,7 +390,7 @@ export function check(
       continue;
     }
     // A CITATION STARTS AT THE REPOSITORY, so it resolves from the WORKSPACE rather than from
-    // whichever checkout the reader happens to be standing in (RD.DEVEX.AGENT.072). That is what lets one
+    // whichever checkout the reader happens to be standing in (RULE.DEVEX.AGENT.072). That is what lets one
     // ref cite the book, the CLI's own source and a blueprint in three different repositories
     // without the checker needing to be told which tree each lives in.
     const cited = join(workspace, citation.path);

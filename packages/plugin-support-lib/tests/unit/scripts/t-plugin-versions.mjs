@@ -1,5 +1,5 @@
 // The shared reader under `scripts/lib/plugin-versions.mjs` — what the release command and the
-// plugins' own tests both use to say the four plugins carry one version (RD.DEVEX.AGENT.110).
+// plugins' own tests both use to say the four plugins carry one version (RULE.DEVEX.AGENT.110).
 import { fileURLToPath } from "node:url";
 import { compareVersions, agreedVersion, newestReleaseNumber, readVersions, releaseTags, versionIn, withVersion }
   from "../../../../../scripts/lib/plugin-versions.mjs";

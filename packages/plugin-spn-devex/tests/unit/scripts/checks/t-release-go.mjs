@@ -3,7 +3,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 //
 // It guards the one act that cannot be taken back: a major release the developer never agreed to.
 // Minor and patch are the standing authorization in `N39`, so the check reads the bump size and
-// looks for the go of an arc in an open workstream whose words name the version (RD.DEVEX.WORKSPACE.069).
+// looks for the go of an arc in an open workstream whose words name the version (RULE.DEVEX.WORKSPACE.069).
 // The go is read as `confirmed.ts` reads it, from the arc's `state.json` and `log.jsonl`: the arc reads
 // `DECIDED`, `RUNNING` or `LANDED`, and its log holds the line that moved it out of `PROPOSED` with words.
 //
@@ -70,7 +70,7 @@ const goFor = (version) => ({ at: AT, kind: "status", row: null, note: `PROPOSED
 const runs = { at: AT, kind: "status", row: null, note: "DECIDED → RUNNING · row 1 running" };
 const reopened = { at: AT, kind: "status", row: null, note: "RUNNING → PROPOSED · rows 4 to 6 are new scope" };
 const noteNaming = (version) => ({ at: AT, kind: "note", row: null, note: `the release will be ${version}` });
-// An arc opened straight at DECIDED on the developer's words, as one go opens every step's arc (RD.DEVEX.WORKSPACE.280).
+// An arc opened straight at DECIDED on the developer's words, as one go opens every step's arc (RULE.DEVEX.WORKSPACE.280).
 const openedOnAGoFor = (version) => ({ at: AT, kind: "opened", row: null, note: `decided on N001's go, the developer: 'release it as ${version}'` });
 
 /** An arc's data and log in an open workstream, as the `workstream` commands write them. */

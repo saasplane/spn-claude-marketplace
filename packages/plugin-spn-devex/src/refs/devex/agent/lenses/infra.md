@@ -26,12 +26,12 @@
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RD.SUPPORT.APPS.121",
+      "row": "RULE.SUPPORT.APPS.121",
       "seen": "9a7146e7"
     },
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.FUNCTION.060",
+      "row": "RULE.DEVEX.FUNCTION.060",
       "seen": "b3753049"
     }
   ]
@@ -94,9 +94,9 @@
   - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
   - **Promotion is the branch map's.** Where a change deploys is manifest data (each environment row's `deploy` trigger), by pull request along a path chosen at each promotion, and a pull request merges only once every check its world requires passes. A required job, `promotion-source`, refuses any other head into `qa`, `uat` or `main`.
   - **A check that cannot fail is not written.** An estate with no modules gets no `lint` and no `cis-scan`, because a check over nothing proves nothing; a tier that needs a running stack joins CI with the job that stands it, never `test`.
-  - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RD.DEVEX.FUNCTION.065`).
-  - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RD.DEVEX.FUNCTION.060`).
-  - **A repo-scoped script stays, is promoted or retires**, and a script that probes the estate for a fact a manifest declares only retires — promoting it makes the workaround permanent (`RD.SUPPORT.APPS.121`).
+  - **Every workflow pins its actions by commit and its images by digest**, and installs `spnutils` at a named release; a tag can be moved after it was reviewed (`RULE.DEVEX.FUNCTION.065`).
+  - **Ask who invokes a script before you ask where it belongs.** A person or a pipeline reaches for a `tasks/` script or a CLI command; the agent's own loop reaches for a hook under `hooks/` or `hooks/tools/`. The bar there is foundational, proposed and built only once approved, and a hook degrades to silence (`RULE.DEVEX.FUNCTION.060`).
+  - **A repo-scoped script stays, is promoted or retires**, and a script that probes the estate for a fact a manifest declares only retires — promoting it makes the workaround permanent (`RULE.SUPPORT.APPS.121`).
   - **Destructive operations are named and gated**: teardown, reset and migration confirm before they mutate and report what they did.
   - Bring-up and teardown belong to the `up` and `down` commands, invoked deliberately, never on this lens's own initiative.
 

@@ -84,7 +84,7 @@ Every node you build from `contract` / `app` / `entry` follows the same three la
 
 If you invoke `release` on a node, expect a refusal — versioning is lockstep within a repository: every publishable project releases at one version, the source carries a placeholder, and the real number is stamped at publish. A node's own release line is the repository's per-package step; do not invoke it alone.
 
-**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RD.SUPPORT.APPS.214`). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
+**Every published package carries the repository's licence notice, and the notices of code it ships from others** (`RULE.SUPPORT.APPS.214`). The release writes the repository's `LICENSE` into every package it publishes, and the repository's `THIRD-PARTY-NOTICES.md` into each package whose folder a `Where:` line of that file names. It verifies both as it verifies the version, and refuses a repository with publishable packages and no `LICENSE`, or a `Where:` path that is no folder.
 
 ### Test tiers
 
@@ -147,7 +147,7 @@ Check each level on its own — folders are what is standardized, never the file
 
 ### Kind-fixed skeletons versus a library's own groups
 
-Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RD.SUPPORT.APPS.031`). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
+Kinds divide in two by how you decide their `src/` interior. Where the **layer model fixes the folder set** (`MODULE_SERVER`, `MODULE_WEB`, `APP_SERVER`, `APP_WEB`, `APP_UTILITY`, `CLIENT_API`), every node of the kind gets the same folders — start a new node from the scaffold's own tree, and treat a scaffold asset as bound by its kind's rules exactly as a built node is. Scaffold a `MODULE_SERVER` with `contract/{states,validators,services,methods}`, `app/{entities,repositories,services,support,utils}`, `entry/api/controllers`, `migrations/`, its second door, and a `tests/` folder per tier it owes. The second door is two folders: `src/remote/`, which holds what another service takes to call the module's contract, and `remote/` at the root, which is the door's own entry. Scaffold a `MODULE_WEB` with only `entry/ui/{components,hooks,pages,utils}` — **the browser is a transport, so you put a web module's surface under an entry** (`RULE.SUPPORT.APPS.031`). Give `APP_SERVER` and `APP_WEB` the same `modules/` folder at the source root, and add `public/`, `src/assets/styles/` for its stylesheets, and a component harness for the web kind. Build `APP_UTILITY` like a module, entering it only through `entry/cli/`. Scaffold `CLIENT_API` like any package, and leave its `src/` empty until you generate the client into it.
 
 Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), the groups belong to the package and you grow them as it grows — a `TOOLCHAIN` publishes one folder per configuration area (`eslint/`, `jest/`, `vite/`, …) and no barrel at all; a `SUPPORT_*` library publishes one folder per capability it offers (`cache/`, `queue/`, `auth/`, …). Read each tree you find here as an example rather than a standard — the groups are the library's own to name.
 
@@ -171,7 +171,7 @@ A platform's server code takes one of four shapes, and a module is written the s
 
 ## The four ways a partner builds on the web
 
-On the server the choice is how many services run. On the web it is how much of a SaaS Plane screen a partner takes. A partner builds on the web in one of four ways, and the ways can be mixed in one app, page by page (`RD.SUPPORT.APPS.180`). **The four as a set are proposed**: the developer has not confirmed the set by name.
+On the server the choice is how many services run. On the web it is how much of a SaaS Plane screen a partner takes. A partner builds on the web in one of four ways, and the ways can be mixed in one app, page by page (`RULE.SUPPORT.APPS.180`). **The four as a set are proposed**: the developer has not confirmed the set by name.
 
 | The way | What the partner takes from a SaaS Plane web module | What the partner writes |
 | --- | --- | --- |
@@ -180,35 +180,35 @@ On the server the choice is how many services run. On the web it is how much of 
 | Place a widget or a smaller piece | the widgets a container is built from, and the hooks that load and save | containers of their own, and the page that places them |
 | Build their own | nothing of the module | everything on the page, from the design system and the service's client |
 
-**A web module MUST export its pages, its containers, its widgets, its hooks, and its routes as data** (`RD.SUPPORT.APPS.181`). A module that leaves one out takes that way from a partner. The platform's own web modules export pages, widgets and hooks today, and no container yet.
+**A web module MUST export its pages, its containers, its widgets, its hooks, and its routes as data** (`RULE.SUPPORT.APPS.181`). A module that leaves one out takes that way from a partner. The platform's own web modules export pages, widgets and hooks today, and no container yet.
 
 Hold a web module to these rules when you write or review one. A rule marked proposed is one the developer has not confirmed, so say so when you apply it.
 
 | Rule | Id | State |
 | --- | --- | --- |
-| A page is assembled from one or more containers. The page knows the address: the values in its path, its query, and where to go next. It takes no props | `RD.SUPPORT.APPS.182` | decided |
-| A container takes its data, or an id it loads by, as props, and holds no path. A link to a screen of its own module is built from that screen's route, by its key. A link to any other screen is a prop the page passes | `RD.SUPPORT.APPS.183` | decided |
-| An edit container takes an optional callback that runs after a save. With none, it goes where it goes today | `RD.SUPPORT.APPS.184` | proposed |
-| A SaaS Plane container takes data only. It is handed no unit of a partner's | `RD.SUPPORT.APPS.185` | decided |
-| A route is declared once, as data, by the module that owns its page. It is a key and a path. It holds no place in a menu, no older address and no router | `RD.SUPPORT.APPS.186` | decided |
-| A route says which permissions and enablements it needs | `RD.SUPPORT.APPS.187` | proposed |
-| A module ships a default path for each route, and an app may replace a path by its key | `RD.SUPPORT.APPS.188` | proposed |
-| An address is built from a route and its values, by one function, and never written as text. That a missing value is an error is proposed | `RD.SUPPORT.APPS.189` | decided |
-| The menu is the app's own list, and an entry names a route by its key | `RD.SUPPORT.APPS.190` | decided |
-| The entry of the menu in view is the one whose address the current address is at or under. That the longest address wins among several is proposed | `RD.SUPPORT.APPS.191` | decided |
-| The first word of an address is the module's, and an address does not carry its place in the menu | `RD.SUPPORT.APPS.192` | decided |
-| An address that changes answers with a redirect, which is the app's own | `RD.SUPPORT.APPS.193` | decided |
-| The path names the page, and the part after `#` names an overlay any page can have | `RD.SUPPORT.APPS.194` | decided |
-| An overlay is shown through the overlay context, and never placed in the page's own tree | `RD.SUPPORT.APPS.195` | decided |
-| An overlay that has an address is shown while the address matches, and removed when it does not | `RD.SUPPORT.APPS.196` | proposed |
-| The app's navigation seam changes only the part after `#` where an address begins with `#` | `RD.SUPPORT.APPS.197` | proposed |
-| How a screen is shown is the choice of whoever builds the page, and nothing is configured for it | `RD.SUPPORT.APPS.198` | decided |
-| A partner places a SaaS Plane container by mounting one small provider beside the design system's context. It has no router, no layout and no sign-in screen | `RD.SUPPORT.APPS.199` | decided |
-| The provider finds the signed-in person itself, keeps the answer fresh, and tells its containers when nobody is signed in | `RD.SUPPORT.APPS.200` | decided |
-| A page, a container and a hook reach a service through that service's client. A second service means a second client | `RD.SUPPORT.APPS.201` | decided |
-| A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RD.SUPPORT.APPS.204` | decided |
+| A page is assembled from one or more containers. The page knows the address: the values in its path, its query, and where to go next. It takes no props | `RULE.SUPPORT.APPS.182` | decided |
+| A container takes its data, or an id it loads by, as props, and holds no path. A link to a screen of its own module is built from that screen's route, by its key. A link to any other screen is a prop the page passes | `RULE.SUPPORT.APPS.183` | decided |
+| An edit container takes an optional callback that runs after a save. With none, it goes where it goes today | `RULE.SUPPORT.APPS.184` | proposed |
+| A SaaS Plane container takes data only. It is handed no unit of a partner's | `RULE.SUPPORT.APPS.185` | decided |
+| A route is declared once, as data, by the module that owns its page. It is a key and a path. It holds no place in a menu, no older address and no router | `RULE.SUPPORT.APPS.186` | decided |
+| A route says which permissions and enablements it needs | `RULE.SUPPORT.APPS.187` | proposed |
+| A module ships a default path for each route, and an app may replace a path by its key | `RULE.SUPPORT.APPS.188` | proposed |
+| An address is built from a route and its values, by one function, and never written as text. That a missing value is an error is proposed | `RULE.SUPPORT.APPS.189` | decided |
+| The menu is the app's own list, and an entry names a route by its key | `RULE.SUPPORT.APPS.190` | decided |
+| The entry of the menu in view is the one whose address the current address is at or under. That the longest address wins among several is proposed | `RULE.SUPPORT.APPS.191` | decided |
+| The first word of an address is the module's, and an address does not carry its place in the menu | `RULE.SUPPORT.APPS.192` | decided |
+| An address that changes answers with a redirect, which is the app's own | `RULE.SUPPORT.APPS.193` | decided |
+| The path names the page, and the part after `#` names an overlay any page can have | `RULE.SUPPORT.APPS.194` | decided |
+| An overlay is shown through the overlay context, and never placed in the page's own tree | `RULE.SUPPORT.APPS.195` | decided |
+| An overlay that has an address is shown while the address matches, and removed when it does not | `RULE.SUPPORT.APPS.196` | proposed |
+| The app's navigation seam changes only the part after `#` where an address begins with `#` | `RULE.SUPPORT.APPS.197` | proposed |
+| How a screen is shown is the choice of whoever builds the page, and nothing is configured for it | `RULE.SUPPORT.APPS.198` | decided |
+| A partner places a SaaS Plane container by mounting one small provider beside the design system's context. It has no router, no layout and no sign-in screen | `RULE.SUPPORT.APPS.199` | decided |
+| The provider finds the signed-in person itself, keeps the answer fresh, and tells its containers when nobody is signed in | `RULE.SUPPORT.APPS.200` | decided |
+| A page, a container and a hook reach a service through that service's client. A second service means a second client | `RULE.SUPPORT.APPS.201` | decided |
+| A web module declares one route name beside its code, and each route says whether it is a page of work or a page of setup. A page of work is at `/<name>/<rest>`, and a page of setup is at `/settings/<name>/<rest>` | `RULE.SUPPORT.APPS.204` | decided |
 
-Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RD.SUPPORT.SURFACE.079`).
+Four choices beside the provider are proposed: it stands outside the design system's app root, it is not handed the service's client, a container shows its denied state when nobody is signed in, and the provider tells the app once that a sign-in is needed. On a page of groups and their items, the swap of the items for the groups changes the address (`RULE.SUPPORT.SURFACE.079`).
 
 The TypeScript names for these are in `providers/ts/08-web.md` and `providers/ts/02-naming.md` in this plugin. The page chapter's rules are restated in `module/README.md`.
 

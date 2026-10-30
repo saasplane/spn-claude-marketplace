@@ -12,7 +12,7 @@
 // These suites ARE its runner. Every case whose title carries a behaviour id in brackets —
 // `[MKT.DOCS.01]`, the book's rule that an id is carried by a test title — becomes a result. Given a
 // run name, the results become `tests/.output/unit/runs/<run>.json`, the file every stack's runner
-// writes (RD.DEVEX.UTILS.071), and `--write-status` stamps the rows from that run. Given none, the
+// writes (RULE.DEVEX.UTILS.071), and `--write-status` stamps the rows from that run. Given none, the
 // suites run and no run file is written, because a reader is always told which run to read. A case
 // with no id in its title proves nothing to the register and is counted only here.
 
@@ -110,7 +110,7 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 // THE RUN FILE IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
 // about the run — the register then says PLANNED for rows this tier covers and nothing named, which is
 // true and is what a reader needs. It lives where every other stack's runner puts one, beside the
-// pocket and never in it (RD.DEVEX.WORKSPACE.149): a file rewritten by every run is not a document.
+// pocket and never in it (RULE.DEVEX.WORKSPACE.149): a file rewritten by every run is not a document.
 if (runName !== null) {
   const file = writeRunFile(REPO, runName, TIER, results);
   console.log(`  ${results.length} case(s) carry a behaviour id -> ${file.slice(REPO.length + 1)}`);

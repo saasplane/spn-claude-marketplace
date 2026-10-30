@@ -1,5 +1,5 @@
 // `lib/bash-timing.ts` — the Bash commands the agent runs, timed by pairing the hooks before and
-// after the call on `tool_use_id` (RD.DEVEX.WORKSPACE.185, N8 row 2p).
+// after the call on `tool_use_id` (RULE.DEVEX.WORKSPACE.185, N8 row 2p).
 //
 // Driven through the real entries: `events/pretooluse.ts` writes `sessions/<session>/pending/<id>.json` for a
 // matched command while recording is on, and `events/closed.ts` — registered for `PostToolUse` and

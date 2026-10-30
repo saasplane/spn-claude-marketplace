@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A major release is agreed while the arc is planned (RD.DEVEX.WORKSPACE.069)
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A major release is agreed while the arc is planned (RULE.DEVEX.WORKSPACE.069)
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // WHAT IT CATCHES. A release the developer never agreed to, at a version that cannot be taken back.
@@ -17,7 +17,7 @@
 // version nobody agreed to.
 //
 // WHAT A GO LOOKS LIKE. The go `confirmed.ts` reads, plus the version, because a blanket go for an arc
-// is not a go for an irreversible number (RD.DEVEX.WORKSPACE.069). The go is the write that moves the arc
+// is not a go for an irreversible number (RULE.DEVEX.WORKSPACE.069). The go is the write that moves the arc
 // that needs the release out of `PROPOSED`, and the developer's words in it name the version:
 //
 //     workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming 2.0.0>"
@@ -29,7 +29,7 @@
 // not a record.
 //
 // EVERY OPEN WORKSTREAM, NOT THIS WINDOW'S. A version belongs to a repository rather than to a window,
-// so the go may sit in any open workstream (RD.DEVEX.WORKSPACE.236 names this check among those that
+// so the go may sit in any open workstream (RULE.DEVEX.WORKSPACE.236 names this check among those that
 // stay across the workspace).
 //
 // WHY THE FLOOR CANNOT DO THIS. A permission pattern matches a command PREFIX, and
@@ -160,7 +160,7 @@ export function checkReleaseGo(payload: Payload): Verdict {
       `    spn-devex workstream arc edit <ws>/<arc> --status DECIDED --note "<the developer's words, naming ${version}>"\n\n` +
       `It counts once the arc reads DECIDED, RUNNING or LANDED and its log holds that line. Write the card, ` +
       `get it answered, then record the answer as the arc's go. A go that lives only in this window ends ` +
-      `with this window, which is why nothing else counts (RD.DEVEX.WORKSPACE.069).`,
+      `with this window, which is why nothing else counts (RULE.DEVEX.WORKSPACE.069).`,
   };
 }
 

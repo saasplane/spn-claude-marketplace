@@ -2,7 +2,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // `confirmed` — the known-bad is a repository write while no arc holds the developer's go; the untouched is
 // the same write once an arc does. A go is read where an arc keeps it: the arc's status in `state.json`
 // (`DECIDED`, `RUNNING` or `LANDED`) and the status line in `log.jsonl` that moved it out of `PROPOSED`
-// with the developer's words beside the move (RD.DEVEX.WORKSPACE.278).
+// with the developer's words beside the move (RULE.DEVEX.WORKSPACE.278).
 //
 // EVERY WARNING IS READ FOR WHAT IT ASKS. A note that still asks for the retired `- **<date> — go.**` line
 // sends the agent to write a form nothing reads, so a warning case passes only when its note names the
@@ -25,7 +25,7 @@ const runs = { at: AT, kind: "status", row: null, note: "DECIDED → RUNNING · 
 const lands = { at: AT, kind: "status", row: null, note: "RUNNING → LANDED" };
 const reopened = { at: AT, kind: "status", row: null, note: "DECIDED → PROPOSED · rows 4 to 6 are new scope" };
 const added = { at: AT, kind: "added", row: "1", note: "write the book" };
-// An arc opened straight at DECIDED, as one go opens every step's arc (RD.DEVEX.WORKSPACE.280): the opening
+// An arc opened straight at DECIDED, as one go opens every step's arc (RULE.DEVEX.WORKSPACE.280): the opening
 // write's `--note` replaces the command's own `opened as <status>`, so the words are the go.
 const openedOnAGo = { at: AT, kind: "opened", row: null, note: "decided on N001's go, the developer, 24 Oct: 'all arcs are ready'" };
 const openedDecidedBare = { at: AT, kind: "opened", row: null, note: "opened as DECIDED" };
@@ -73,7 +73,7 @@ function one(label, { status = "PROPOSED", lines = [opened], other, own, path = 
   n += 1;
   const root = build(`confirmed-${n}`, { status, lines, other });
   const session = `s${n}`;
-  // A window that works on one workstream is bound to it, as a prompt naming it binds it (RD.DEVEX.WORKSPACE.236).
+  // A window that works on one workstream is bound to it, as a prompt naming it binds it (RULE.DEVEX.WORKSPACE.236).
   if (own) bindNamed(root, session, own, "prompt");
   const payload = { tool_name: tool, cwd: root, session_id: session,
                     tool_input: tool === "Bash" ? { command: "ls" } : { file_path: path, content: "x" } };

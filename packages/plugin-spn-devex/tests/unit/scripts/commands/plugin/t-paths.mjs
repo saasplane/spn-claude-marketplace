@@ -1,4 +1,4 @@
-// `plugin paths check` (RD.DEVEX.AGENT.070) — a `${CLAUDE_PLUGIN_ROOT}` path a skill, a ref or `hooks.json`
+// `plugin paths check` (RULE.DEVEX.AGENT.070) — a `${CLAUDE_PLUGIN_ROOT}` path a skill, a ref or `hooks.json`
 // names must resolve to a file the plugin actually ships. Built with a known-bad case first, per
 // `N101` step 6b's acceptance: a broken path is reported, and every current plugin path resolves.
 import { execFileSync } from "node:child_process";

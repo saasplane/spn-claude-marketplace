@@ -24,7 +24,7 @@
 
 **So two skills with nearly the same description compete**, and the matching gets worse as the pair grows. A skill answering several close asks keeps one description and routes inside itself.
 
-**A match needs the description in front of the session, so a `SKILL.md` opens with its frontmatter** (`RD.DEVEX.AGENT.108`). Its first line is `---`, then `name` and `description`; the `spn:restates` stamp and anything else come after it. The runtime reads frontmatter only at the start of the file, and a skill that opens with anything else is still a command you can type, but the session is never offered it, so no ask in plain words reaches it.
+**A match needs the description in front of the session, so a `SKILL.md` opens with its frontmatter** (`RULE.DEVEX.AGENT.108`). Its first line is `---`, then `name` and `description`; the `spn:restates` stamp and anything else come after it. The runtime reads frontmatter only at the start of the file, and a skill that opens with anything else is still a command you can type, but the session is never offered it, so no ask in plain words reaches it.
 
 ## A value spells its owner, and a folder never does
 
@@ -55,4 +55,4 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 **No plugin may name another plugin's file path.** A cross-plugin address is a name, never a path — a partner's install has no sibling directory to reach into.
 
-**A path written in a plugin file names a file the installed plugins carry — MUST** (`RD.DEVEX.AGENT.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.
+**A path written in a plugin file names a file the installed plugins carry — MUST** (`RULE.DEVEX.AGENT.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.

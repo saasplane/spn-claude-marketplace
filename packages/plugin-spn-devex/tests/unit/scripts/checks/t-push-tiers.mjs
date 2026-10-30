@@ -1,5 +1,5 @@
 // `checks/push-tiers.ts` — a `git push` waits for a whole, green, stamped run of the tree at HEAD
-// (the book's RD.DEVEX.WORKSPACE.281).
+// (the book's RULE.DEVEX.WORKSPACE.281).
 //
 // Each case builds a throwaway git repository with a node in it, marks `origin/develop` at its first commit,
 // lands changes as commits, writes run files and stamps beside them the way spnutils does, and calls the

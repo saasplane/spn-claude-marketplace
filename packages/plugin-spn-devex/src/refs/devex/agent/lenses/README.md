@@ -6,12 +6,12 @@
 
 ## The shape, in its order
 
-Every file takes the same parts, in this order (`RD.DEVEX.AGENT.097`): the real-world title in its heading; **Consumer first**, named before anything else; **Persona**; **Carries**, the principles of the way by number; how it is worn, convened, and whether it blocks; its **Source of truth**; then **Asks it owns**, **Mastery**, **Industry bridge**, **Mentoring** (junior, mid-level, senior), **Behaviour** (notices first, pushes back on, says yes when), **Blind spots**, **By stage** with the decisions it thinks hard about, **Produces to** with the hook or check that holds each chapter, **Gates**, **Sweeps** and **Improves the book**. A file stays within about 150 lines, because it is read whole for one task.
+Every file takes the same parts, in this order (`RULE.DEVEX.AGENT.097`): the real-world title in its heading; **Consumer first**, named before anything else; **Persona**; **Carries**, the principles of the way by number; how it is worn, convened, and whether it blocks; its **Source of truth**; then **Asks it owns**, **Mastery**, **Industry bridge**, **Mentoring** (junior, mid-level, senior), **Behaviour** (notices first, pushes back on, says yes when), **Blind spots**, **By stage** with the decisions it thinks hard about, **Produces to** with the hook or check that holds each chapter, **Gates**, **Sweeps** and **Improves the book**. A file stays within about 150 lines, because it is read whole for one task.
 
 ## Decide what they settle, and ask only what they leave open
 
 **The agent decides what the book, the plugin references and the lenses settle — MUST**
-(`RD.DEVEX.WORKSPACE.193`). A lens is one of the three, so a finding a lens settles is decided and
+(`RULE.DEVEX.WORKSPACE.193`). A lens is one of the three, so a finding a lens settles is decided and
 logged with its reason, never raised as a card. A card is only for what they leave open: a boundary
 that shifts, information nobody can read or measure, or a choice that is people's
 (`refs/devex/workspace/workstream.md` § A card is only for what the rules leave open).
@@ -20,15 +20,15 @@ that shifts, information nobody can read or measure, or a choice that is people'
 
 ## Built right while it is made, and convened only where judgment decides
 
-**There is no reviewer lens, and no review after the fact** (`RD.DEVEX.AGENT.100`). Quality is held in three layers:
+**There is no reviewer lens, and no review after the fact** (`RULE.DEVEX.AGENT.100`). Quality is held in three layers:
 
 1. **The machine refuses at write time** — the plugin's hooks, lint and type checks, `spnutils apps check`. A rule a machine can check lives there and nowhere else.
 2. **The owning lens is worn while producing**, so there is nothing to catch afterwards. Wearing a lens is never a review: the context that drafted something already agrees with its own reasoning.
 3. **A fresh reading only at a judgment gate** — the design gate, a change to the published surface, and a release. The lenses that own the decision are convened through `spn-panel`, and `LEAD` picks which. Code is never convened over as a routine.
 
-**Every lens also speaks as a view in a discussion about a shape**, before anything is built (`RD.DEVEX.AGENT.084`). `refs/devex/agent/lenses.md` says which views speak, how many, and when a view is the one agent reading the file and when it is a fresh agent. A view the one agent makes is a worn lens, so it is advice whatever the file says it blocks.
+**Every lens also speaks as a view in a discussion about a shape**, before anything is built (`RULE.DEVEX.AGENT.084`). `refs/devex/agent/lenses.md` says which views speak, how many, and when a view is the one agent reading the file and when it is a fresh agent. A view the one agent makes is a worn lens, so it is advice whatever the file says it blocks.
 
-**A sweep finds what no single change shows** (`RD.DEVEX.AGENT.101`). Each file names its sweep, run as a report before a major release or when a lead asks, never per change.
+**A sweep finds what no single change shows** (`RULE.DEVEX.AGENT.101`). Each file names its sweep, run as a report before a major release or when a lead asks, never per change.
 
 ## What a panel may and may not do
 

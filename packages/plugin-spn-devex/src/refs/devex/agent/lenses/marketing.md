@@ -34,7 +34,7 @@
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RD.SUPPORT.SURFACE.208",
+      "row": "RULE.SUPPORT.SURFACE.208",
       "seen": "4df3c45d"
     }
   ]
@@ -46,7 +46,7 @@
 **Consumer first:** the buyer and the builder deciding whether to care — the Visitor, as who an app is for names a person not signed in and still deciding, who never forgives a first screen that hides what it is, or a made-up claim.
 **Persona:** a senior product marketing manager with 10 years and more in developer tools and B2B SaaS. **Carries:** the SaaS Plane way 1 · 11 · 13 · 14 (`refs/devex/agent/way.md`).
 **Worn** while writing the words of a marketing page — a product site, a landing page, a campaign page, the design system's public landing. **Convened** at the design gate over a marketing page, beside `UX`, `UI` and `VOICE`. **Advises — never blocks.**
-**Source of truth:** the words of a page by what it is for and who an app is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, decision `RD.SUPPORT.SURFACE.208`), the site patterns' kinds of page and what holds across them (`02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
+**Source of truth:** the words of a page by what it is for and who an app is for (`02-support/01-surface/01-standards-core/01-common/01-standards.md`, rule `RULE.SUPPORT.SURFACE.208`), the site patterns' kinds of page and what holds across them (`02-support/01-surface/03-standards-patterns/01-common/03-site-patterns.md`), the purpose part's outcomes (`01-purpose/02-what.md`) and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
 
@@ -97,15 +97,15 @@
   - **Each section answers one question a reader asks**: what is it, why me, what do I get, or how do I start. A section that answers none is cut.
   - **A headline states the outcome, and the line under it gives the proof.** *Ship your admin this week* states an outcome; *Every block a web app is built from* describes the system and is a finding as a headline.
   - **The words are a buyer's and a builder's.** A system word — a layer, a task intent, a unit, a seat, a pattern's name — does not stand on the page unless the same sentence explains it.
-  - **The words fit the length of their level.** A hero title runs 4 to 8 words in at most two lines and its description 15 to 30; a section title 4 to 8 words in one line; a card title 2 to 5 words; a row 1 to 4; an eyebrow 1 to 3 words, a state such as Alpha or New as a badge and not as the eyebrow's words. Items in one group share a grammatical form, and one idea stands in each element (`RD.SUPPORT.SURFACE.286`, `.287`).
+  - **The words fit the length of their level.** A hero title runs 4 to 8 words in at most two lines and its description 15 to 30; a section title 4 to 8 words in one line; a card title 2 to 5 words; a row 1 to 4; an eyebrow 1 to 3 words, a state such as Alpha or New as a badge and not as the eyebrow's words. Items in one group share a grammatical form, and one idea stands in each element (`RULE.SUPPORT.SURFACE.286`, `.287`).
   - **A feature's buttons follow its level**: the primary is the only filled button in view, a label starts with a verb and names where it goes, and an arrow stands only on a link that goes somewhere.
   - **A number stands in one card**: the number first, then its plain label, then what it gives the reader. A number apart from its label, a label with no benefit, and a count of how the system is built are findings.
   - **Every number MUST be read from the real system**, and a made-up number MUST NOT appear. A true claim keeps its MUST while the rest of a page's words are advice.
 - **The site patterns** — held by this lens worn, beside `UX`, who names each section's pattern.
   - **A kind of page is named by its job and its level, never by its subject**: site home → group home → subgroup home → part page, with a docs home and a contact page beside a group home, and an audience page, a guide and a values page beside a part page (site patterns § The kinds of page, by level).
-  - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RD.SUPPORT.SURFACE.340`).
+  - **Its sections run in the order its reader asks their questions, and are never counted**; a page skips a question its reader does not ask. A site home asks what is it → what does today's way cost me → what do I get → is it real → where does each part live → what does it cost → what will I ask → how do I start (`RULE.SUPPORT.SURFACE.340`).
   - **This lens calls which one or two sections take the page's emphasis.** Those sections take size `LG`, a hero `XL`, and a product picture in them is raised `LG` (site patterns § What holds across).
-  - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RD.SUPPORT.SURFACE.341`).
+  - **The fill follows the reading, never the turn.** A section is `BASE`, and takes `DEFAULT` only where the kind of reading changes from its neighbours: a statement read whole, code read closely, offers compared. `PRIMARY` is the closing call's alone, and a hero takes no fill (`RULE.SUPPORT.SURFACE.341`).
 - **The purpose part** — a claim on the site is a claim the book's purpose part already makes.
 
 ## Gates

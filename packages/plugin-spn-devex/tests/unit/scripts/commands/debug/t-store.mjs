@@ -1,5 +1,5 @@
 // `debug store show` — each container of `.spndevex/.debug/`, its files, its bytes and its lifetime rule as the book's
-// table states it (RD.DEVEX.WORKSPACE.322, .323).
+// table states it (RULE.DEVEX.WORKSPACE.322, .323).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

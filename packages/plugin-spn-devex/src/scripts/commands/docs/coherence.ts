@@ -1,4 +1,4 @@
-// RESTATES: RD.DEVEX.WORKSPACE.162, RD.DEVEX.WORKSPACE.080, RD.DEVEX.WORKSPACE.088, RD.DEVEX.WORKSPACE.118, `04-discipline.md` and
+// RESTATES: RULE.DEVEX.WORKSPACE.162, RULE.DEVEX.WORKSPACE.080, RULE.DEVEX.WORKSPACE.088, RULE.DEVEX.WORKSPACE.118, `04-discipline.md` and
 // `06-registers.md`. The chapters are the source of truth; a rule change is edited there first.
 //
 // The corpus checked against itself, rather than against its own form.
@@ -59,7 +59,7 @@ const SKIP_WORDS = new Set(["what", "this", "that", "with", "from", "they", "the
   "never", "every", "which", "where", "their", "there", "once"]);
 
 // Prose that is deliberately historical: an artifact describes the moment it was produced
-// (RD.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
+// (RULE.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
 //
 // This once said a superseded ruling keeps its old words on purpose. It does not. `06-registers.md`
 // rules that a row is never annotated, struck through, or left standing with a note, and `doc-check`
@@ -210,7 +210,7 @@ function registerTableRows(text: string): Array<Map<string, string>> {
  *
  * The register has a `Why` column, so the decision column carries no reasoning and no second answer.
  * A row that holds two rulings is two rows: the one a reader meets first is the one they act on, and
- * the other is invisible until somebody reads the whole cell. `RD.PLATFORM.CORE.035` carried a MUST two
+ * the other is invisible until somebody reads the whole cell. `RULE.PLATFORM.CORE.035` carried a MUST two
  * hundred words in, which is the case this was written for.
  *
  * BOLD IS ORDINARY EMPHASIS IN A ROW, so its absence proves nothing and is not checked. What is
@@ -253,7 +253,7 @@ function ownership(root: string, sources: string[], reported: Reported): string[
   const out: string[] = [];
   const owners = new Map<string, string[]>();
   for (const path of sources) {
-    // The concept may not cite a seat or a chapter at all — it links only outward (RD.DEVEX.WORKSPACE.080), so
+    // The concept may not cite a seat or a chapter at all — it links only outward (RULE.DEVEX.WORKSPACE.080), so
     // it can never satisfy this check and is not in scope for it.
     if (path === "CONCEPT.md") continue;
     if (path.includes(`${POCKET.registers}/${DECISIONS}`)) continue;
@@ -288,13 +288,13 @@ function ownership(root: string, sources: string[], reported: Reported): string[
   return out;
 }
 
-// RD.DEVEX.WORKSPACE.162 keeps a count where it carries the ruling: adding a member would be a redesign, not an
+// RULE.DEVEX.WORKSPACE.162 keeps a count where it carries the ruling: adding a member would be a redesign, not an
 // ordinary register entry. These are those sets — the test is whether the number IS the decision,
 // not whether the set happens to be closed today.
 const LOAD_BEARING = new Set(["seats", "passes", "layers", "entries", "principals", "pockets",
   "stages", "runtimes", "directions", "disciplines", "families"]);
 
-/** A count written into prose for a set that is free to grow (RD.DEVEX.WORKSPACE.162). */
+/** A count written into prose for a set that is free to grow (RULE.DEVEX.WORKSPACE.162). */
 function cardinality(root: string, sources: string[], reported: Reported): string[] {
   const WORDS = "(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
   const GROWABLE = "(?:kinds?|constructs?|skills?|lenses|domains?|tiers?|artifacts?|" +
@@ -302,7 +302,7 @@ function cardinality(root: string, sources: string[], reported: Reported): strin
   const pattern = new RegExp(`\\bthe ${WORDS} (${GROWABLE})\\b`, "gi");
   const out: string[] = [];
   for (const path of sources) {
-    if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
+    if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RULE.DEVEX.WORKSPACE.088)
     if (!reported(path)) continue;
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
@@ -320,7 +320,7 @@ function cardinality(root: string, sources: string[], reported: Reported): strin
  * Every concept section owes a section in its readable face.
  *
  * A face renders a live seat, so unlike an argument or a measurement it CAN be checked against
- * current state (RD.DEVEX.WORKSPACE.088). `concept-overview.html` is the concept's readable face rather than a
+ * current state (RULE.DEVEX.WORKSPACE.088). `concept-overview.html` is the concept's readable face rather than a
  * record of a moment: a workstream that changes the model owes the face with it, and a section the
  * face never expands is a model somebody added and stopped.
  *
@@ -515,7 +515,7 @@ function capabilityChapters(root: string, reported: Reported): string[] {
 /**
  * A provider folder whose file list does not match the contract beside it.
  *
- * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RD.DEVEX.WORKSPACE.179`), and the set is
+ * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RULE.DEVEX.WORKSPACE.179`), and the set is
  * stated in `02-contract.md` next to the instance folders. An instance with no capability for an
  * entry **writes the file anyway** and says what to do instead — so a missing file is a missing
  * answer rather than an absent capability, and the two used to look identical.

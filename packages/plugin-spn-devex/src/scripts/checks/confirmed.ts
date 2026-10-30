@@ -8,7 +8,7 @@
 // sides: the agent believes the plan is agreement, and the developer believes the plan is a plan.
 //
 // WHAT A GO LOOKS LIKE, so this can be checked at all. A go is the write that stores `DECIDED` on an
-// arc, and it carries the developer's words (RD.DEVEX.WORKSPACE.278 and .307):
+// arc, and it carries the developer's words (RULE.DEVEX.WORKSPACE.278 and .307):
 //
 //     workstream arc edit <arc> --status DECIDED --note "<the developer's words>"
 //
@@ -17,7 +17,7 @@
 // `PROPOSED`, the words beside the move (`PROPOSED → DECIDED · <their words>`). A status alone is not
 // enough, and neither is a move with no words: a plan the agent wrote must not pass as an agreement.
 // An arc opened straight at `DECIDED` on the developer's words, as the review-fixes arc is
-// (RD.DEVEX.WORKSPACE.261), holds its go in the `opened` line. An arc moved back to `PROPOSED` needs a
+// (RULE.DEVEX.WORKSPACE.261), holds its go in the `opened` line. An arc moved back to `PROPOSED` needs a
 // go again, so only the last move out of it counts.
 //
 // Nothing else counts, because nothing else is written down. A conversation is not a record: the
@@ -78,10 +78,10 @@ function openedAt(lines: readonly unknown[], at: number, status: string): string
 /**
  * The developer's words of the go an arc's log holds, or null where it holds none. The go is the last move out of
  * `PROPOSED` that carries words: a status line with words beside its move, or an `opened` line whose note carries
- * them on an arc opened past `PROPOSED`, as the review-fixes arc opens at `DECIDED` (RD.DEVEX.WORKSPACE.261).
+ * them on an arc opened past `PROPOSED`, as the review-fixes arc opens at `DECIDED` (RULE.DEVEX.WORKSPACE.261).
  * The log is read in order, as `statusMoves` reads it; a status line naming no move moves from the status the log
  * last showed, and a move back to `PROPOSED` needs a go again. `release-go` reads a major release's version in
- * these words (RD.DEVEX.WORKSPACE.069), so the two checks read one go.
+ * these words (RULE.DEVEX.WORKSPACE.069), so the two checks read one go.
  */
 export function goWordsOf(lines: readonly unknown[], status: string): string | null {
   let shown: string | null = PROPOSED;
@@ -176,7 +176,7 @@ export function checkConfirmed(payload: Payload): Verdict {
     const root = workspaceRoot(cwd);
     if (!root) return null;
     if (!isRepoWrite(root, resolve(cwd, written))) return null;
-    // THE GO MUST BE IN A WORKSTREAM THIS WINDOW WORKS ON (RD.DEVEX.WORKSPACE.236). A go in another
+    // THE GO MUST BE IN A WORKSTREAM THIS WINDOW WORKS ON (RULE.DEVEX.WORKSPACE.236). A go in another
     // window's workstream licenses nothing here. A window that works on none has no workstream to
     // name, so it is asked about the workspace as a whole and the note names no workstream.
     const own = new Set(windowWorkstreams(root, payload.session_id));

@@ -108,8 +108,8 @@ This page answers what a restatement is, where one belongs in the folder, and ho
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.WORKSPACE.118` | a file carrying a rule it does not own is a restatement, and the verb is `restates` | MUST |
+| `RULE.DEVEX.WORKSPACE.118` | a file carrying a rule it does not own is a restatement, and the verb is `restates` | MUST |
 | the foundation's `04-discipline.md` § Restatement discipline | repetition is allowed only as a declared restatement, carrying its source and never a new rule | MUST |
-| [RD.DEVEX.003](../../registers/decisions.md) | a ref that carries no block is unstamped, and a marker no tool reads is not a declaration | MUST |
+| DEC.MARKETPLACE.DEVEX.003 | a ref that carries no block is unstamped, and a marker no tool reads is not a declaration | MUST |
 
 Try it: `spn-devex restates check`

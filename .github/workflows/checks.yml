@@ -10,7 +10,7 @@
 # skips there where the head is a permanent branch of this repository, and a skipped job meets its
 # check. Any other head runs every job, and promotion-source refuses it.
 #
-# The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070). Every job is written as it
+# The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070). Every job is written as it
 # runs, and its own `if: false` skips it: a skipped job meets its check, so no runner starts and no
 # merge waits. The switch in spnutils turns them back on, and each job then runs as written.
 name: checks
@@ -34,7 +34,7 @@ jobs:
   # Any head into develop passes. The head is read from the event, never from text a contributor types
   # into the script, and a fork's head never passes.
   promotion-source:
-    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    if: false # The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -76,7 +76,7 @@ jobs:
 
   # The `test` script the root package.json declares.
   test:
-    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    if: false # The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -94,7 +94,7 @@ jobs:
 
   # Semgrep CE, its default rules, failing on any finding.
   code-scan:
-    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    if: false # The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
@@ -106,7 +106,7 @@ jobs:
 
   # OSV-Scanner: every lockfile in the tree, against the OSV database, failing on any advisory.
   dependency-scan:
-    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    if: false # The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -118,7 +118,7 @@ jobs:
 
   # TruffleHog: the commits this change adds, failing on a secret that is verified or cannot be ruled out.
   secret-scan:
-    if: false # The checks are off until the cloud runs them (RD.DEVEX.FUNCTION.070).
+    if: false # The checks are off until the cloud runs them (RULE.DEVEX.FUNCTION.070).
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

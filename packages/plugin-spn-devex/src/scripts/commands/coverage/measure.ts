@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The coverage report — written, built and proved
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What a Where row declares
 //           docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md § What a Where Row May Name
-//           docs/registers/decisions.md RD.DEVEX.WORKSPACE.191
+//           docs/registers/decisions.md RULE.DEVEX.WORKSPACE.191
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // The coverage report's measurement: how much of a repository is written, built and proved, and
@@ -13,7 +13,7 @@
 // measures all of it, because a package's numbers are joined from the documents of the whole tree.
 // Handed a folder inside the repository, it prints the packages, apps and domains under that folder.
 //
-// It never writes the page (RD.DEVEX.WORKSPACE.149); the units, the gaps and what a Where row
+// It never writes the page (RULE.DEVEX.WORKSPACE.149); the units, the gaps and what a Where row
 // declares are in the capability chapter "Scripts in spn-devex", § The coverage measurement reads
 // the Where tables against a seat table.
 
@@ -30,7 +30,7 @@ import {
   readChapters, whereRoot, whyNotBuilt, type Chapter, type Seat, type StatedNotBuilt,
 } from "./_join.ts";
 
-/** Where the coverage report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
+/** Where the coverage report lands in a repository's pocket, named by its kind (RULE.DEVEX.WORKSPACE.149). */
 export const COVERAGE_REPORT = join(reportsDir(DOCS), "coverage-report.html");
 
 const digestOf = (value: unknown): string =>

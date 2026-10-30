@@ -146,7 +146,7 @@ console.log("\n=== the generated blocks — progress and open");
   ok("progress: the summary is a highlighted section of two lines — Overall with steps landed, then its bar in the same step shade — with the workstream's status in its class, tooltip and accessible name",
     /<div class="sds-footbar-summary sds-implementing sds-step-3" tabindex="0" aria-label="Workstream IMPLEMENTING, 1 of 2 steps landed, 0 of 1 arcs closed">\s*<span class="sds-chip-line"><span class="sds-chip-name">Overall<\/span><span class="sds-arc-count">1\/2<\/span><\/span>\s*<span class="sds-chip-bar"><i style="width:50%"><\/i><\/span>\s*<span class="sds-tip"><span class="sds-badge sds-status sds-implementing">IMPLEMENTING<\/span><strong>Overall<\/strong><span>0 of 1 arcs closed<\/span><span>1 of 2 steps landed<\/span><\/span>\s*<\/div>/.test(inside), inside);
   {
-    // RD.DEVEX.WORKSPACE.278: every row is a build step; a chip and Overall count steps, and an arc with none shows its status.
+    // RULE.DEVEX.WORKSPACE.278: every row is a build step; a chip and Overall count steps, and an arc with none shows its status.
     const build = (id, state) => ({ id, parent: "N001", title: `build ${id}`, kind: "change", state });
     const arc = (id, status, rows) => ({ ...arcData(rows), arc: id, subject: `arc-${id.toLowerCase()}`, status });
     const chipOf = (html, id) => new RegExp(`<a class="sds-chip [^"]*" href="#${id}"[\\s\\S]*?</a>`).exec(html)?.[0] ?? "";
@@ -209,7 +209,7 @@ console.log("\n=== the generated blocks — progress and open");
       landedAt.get("1") === 2 && landedAt.get("5") === 5 && !landedAt.has("7"), JSON.stringify([...landedAt]));
   }
   {
-    // RD.DEVEX.WORKSPACE.273: the go's write lists each line of the preview that still says proposed, and checks none.
+    // RULE.DEVEX.WORKSPACE.273: the go's write lists each line of the preview that still says proposed, and checks none.
     const preview = [
       '<!-- spn:doc {"summary": "what is proposed here"} -->',
       '<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-state"><span class="sds-label">Status:</span> <a class="sds-badge sds-status sds-proposed" href="../../approach.html#N001">PROPOSED</a></span></span></div></header>',
@@ -298,7 +298,7 @@ console.log("\n=== the folder — what a script owns, and where a reference poin
   ok("and a second write finds it current", lib.writeProgress(ws) === "progress current");
 }
 
-console.log("\n=== the name file — RD.DEVEX.WORKSPACE.264");
+console.log("\n=== the name file — RULE.DEVEX.WORKSPACE.264");
 {
   const { ws } = await dataWorkspace("t-workstream-name");
   const data = arcData();
@@ -318,7 +318,7 @@ console.log("\n=== the name file — RD.DEVEX.WORKSPACE.264");
     lib.markdownIn(ws, "N001").join() === "renamed.md" && readFileSync(join(ws, "arcs", "N001", "renamed.md"), "utf8").includes("[samples](../../notes/N001/samples/)"));
 }
 
-console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266");
+console.log("\n=== a preview's one status, the arc's — RULE.DEVEX.WORKSPACE.266");
 {
   const eyebrow = (line) => `<header class="sds-masthead">\n  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 031 &nbsp;|&nbsp; Probe</span>${line}</div>\n  <h1>Probe</h1>\n</header>\n`;
   const type = `<span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span>`;
@@ -359,7 +359,7 @@ console.log("\n=== a preview's one status, the arc's — RD.DEVEX.WORKSPACE.266"
     moved.code === 0 && readFileSync(preview, "utf8").includes(`${status("RUNNING")}</span></div>`), `${moved.out}\n${readFileSync(preview, "utf8")}`);
 }
 
-console.log("\n=== a short subject — RD.DEVEX.WORKSPACE.265");
+console.log("\n=== a short subject — RULE.DEVEX.WORKSPACE.265");
 {
   const { subjectFault } = schema;
   ok("one to three words of at most 24 characters hold", ["lenses", "web-stack", "surface-app-patterns"].every((one) => subjectFault(one) === null));

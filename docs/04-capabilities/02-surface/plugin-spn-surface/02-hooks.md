@@ -28,18 +28,18 @@ Each note reads named design-system tags and literal values, and stays silent wh
 
 | Note | What it says | Book row |
 | --- | --- | --- |
-| `badge-kind-look` | an `OUTLINE` badge in a hue other than `DEFAULT` names a kind, and a kind draws `OUTLINE` in `DEFAULT` | `RD.SUPPORT.SURFACE.368`, `.369` |
-| `badge-solid` | a badge is `SOLID` only over a picture | `RD.SUPPORT.SURFACE.374`, `.378` |
-| `custom-no-colour` | `CUSTOM` on a badge needs its `customColor`, and on a button or a mark it draws `DEFAULT` | `RD.SUPPORT.SURFACE.382`, `.384`, `.385` |
-| `button-one-solid` | a view holds one `SOLID` button, its main action, the branches of a condition apart | `RD.SUPPORT.SURFACE.370` |
-| `header-one-main` | a header shows one `PRIMARY` button | `RD.SUPPORT.SURFACE.390` |
-| `header-error-beside-main` | beside a `PRIMARY`, an `ERROR` button in a header is a secondary and takes `DEFAULT` | `RD.SUPPORT.SURFACE.384`, `.390` |
-| `header-secondaries` | a header shows one or two secondary buttons, and the rest stand behind "⋯" | `RD.SUPPORT.SURFACE.390` |
-| `state-hue-table` | a state's hue written in the file differs from the hue table | `RD.SUPPORT.SURFACE.369` |
-| `container-in-container` | a container takes no container or card inside it | `RD.SUPPORT.APPS.147`, `RD.SUPPORT.SURFACE.263` |
-| `hand-set-look` | a design-system unit takes its colour, padding, radius and gap from its props and the theme, never from a class | `RD.SUPPORT.APPS.150` |
+| `badge-kind-look` | an `OUTLINE` badge in a hue other than `DEFAULT` names a kind, and a kind draws `OUTLINE` in `DEFAULT` | `RULE.SUPPORT.SURFACE.368`, `.369` |
+| `badge-solid` | a badge is `SOLID` only over a picture | `RULE.SUPPORT.SURFACE.374`, `.378` |
+| `custom-no-colour` | `CUSTOM` on a badge needs its `customColor`, and on a button or a mark it draws `DEFAULT` | `RULE.SUPPORT.SURFACE.382`, `.384`, `.385` |
+| `button-one-solid` | a view holds one `SOLID` button, its main action, the branches of a condition apart | `RULE.SUPPORT.SURFACE.370` |
+| `header-one-main` | a header shows one `PRIMARY` button | `RULE.SUPPORT.SURFACE.390` |
+| `header-error-beside-main` | beside a `PRIMARY`, an `ERROR` button in a header is a secondary and takes `DEFAULT` | `RULE.SUPPORT.SURFACE.384`, `.390` |
+| `header-secondaries` | a header shows one or two secondary buttons, and the rest stand behind "⋯" | `RULE.SUPPORT.SURFACE.390` |
+| `state-hue-table` | a state's hue written in the file differs from the hue table | `RULE.SUPPORT.SURFACE.369` |
+| `container-in-container` | a container takes no container or card inside it | `RULE.SUPPORT.APPS.147`, `RULE.SUPPORT.SURFACE.263` |
+| `hand-set-look` | a design-system unit takes its colour, padding, radius and gap from its props and the theme, never from a class | `RULE.SUPPORT.APPS.150` |
 
-**Every note is advice, and none refuses a write** (`RD.DEVEX.AGENT.107`). One note is held back from ever refusing: `button-one-solid`. A showcase draws every variant of a button on purpose, so two written `SOLID` buttons in one file can be correct, and the scan of our apps finds that one false note. The other nine are held back only until a scan finds no note on correct code.
+**Every note is advice, and none refuses a write** (`RULE.DEVEX.AGENT.107`). One note is held back from ever refusing: `button-one-solid`. A showcase draws every variant of a button on purpose, so two written `SOLID` buttons in one file can be correct, and the scan of our apps finds that one false note. The other nine are held back only until a scan finds no note on correct code.
 
 ## Follows the pattern
 

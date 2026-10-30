@@ -9,12 +9,12 @@
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RD.PLATFORM.CORE.033",
+      "row": "RULE.PLATFORM.CORE.033",
       "seen": "c395af4b"
     },
     {
       "repo": "spn-foundation",
-      "row": "RD.PLATFORM.CORE.034",
+      "row": "RULE.PLATFORM.CORE.034",
       "seen": "3735ef74"
     }
   ]
@@ -25,7 +25,7 @@
 
 **For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a command nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
 
-Source of truth: the foundation book's people-and-access chapter and decisions RD.PLATFORM.CORE.033 · RD.PLATFORM.CORE.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
+Source of truth: the foundation book's people-and-access chapter and rules RULE.PLATFORM.CORE.033 · RULE.PLATFORM.CORE.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
 
 ## The first question
 
@@ -44,7 +44,7 @@ Two of these rows carry a trap. A plan feature looks like an org type when the e
 
 ### A gate's `appScope` is neither, and pins one value only
 
-Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (RD.PLATFORM.CORE.034).
+Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (RULE.PLATFORM.CORE.034).
 
 ## If it is an enablement
 
@@ -146,7 +146,7 @@ if (!SUBDOMAIN_OWNER_ORG_TYPES.has(org.orgType)) {
 }
 ```
 
-That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RD.PLATFORM.CORE.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
+That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RULE.PLATFORM.CORE.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
 
 The fix folded the method under `IAM_MANAGE_APP_SITES` and deleted the set. A product that later sells subdomains to merchants flips a cell instead of buying a release.
 

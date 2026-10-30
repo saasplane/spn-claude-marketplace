@@ -8,9 +8,9 @@
 // page's digest is the whole repository's.
 //
 // It reads the stamped rows only: each row's `Status`, and the run its `Updated at` cites. It opens
-// no run file, so what it counts is what the stamp wrote (the book's RD.DEVEX.UTILS.071). It measures
+// no run file, so what it counts is what the stamp wrote (the book's RULE.DEVEX.UTILS.071). It measures
 // and never writes a page: a report is written by the agent and produced by no command (the book's
-// RD.DEVEX.WORKSPACE.149). Every tier the repository owes appears, and the same tree measures to the
+// RULE.DEVEX.WORKSPACE.149). Every tier the repository owes appears, and the same tree measures to the
 // same bytes — the instant is the newest `Updated at` it read, in the local zone with its offset, and
 // the digest hashes the measurement alone.
 //
@@ -34,7 +34,7 @@ const isFile = (path: string): boolean => { try { return statSync(path).isFile()
 
 type Finding = { project: string; kind: null; severity: string; ftype: string; message: string };
 
-/** Where the tests report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
+/** Where the tests report lands in a repository's pocket, named by its kind (RULE.DEVEX.WORKSPACE.149). */
 export const TESTS_REPORT = join(reportsDir(DOCS), "tests-report.html");
 
 const finding = (file: string, message: string, ftype = "BEHAVIOUR_ROW"): Finding =>
@@ -89,7 +89,7 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
     repository: name,
     measuredAt: null,
     absence:
-      `${name} declares FOUNDATION: its behaviour rows are promises, with no Status and no Tier (RD.SUPPORT.APPS.129), ` +
+      `${name} declares FOUNDATION: its behaviour rows are promises, with no Status and no Tier (DEC.SUPPORT.APPS.129), ` +
       `and it runs no proving tier. There is nothing to measure, so no tests report is owed — an empty one ` +
       `would read as a failure rather than as an absence.`,
     tiers: [],
@@ -320,7 +320,7 @@ export function measure(root: string, scope: string[] | null = null): Record<str
   const aboutTheRepository = rows.filter((row) => domainOf(row.file) === null);
   const wholeRepository = { files: [...new Set(aboutTheRepository.map((row) => row.file))].sort(), ...tally(aboutTheRepository) };
 
-  // When the numbers were true: the newest instant among the rows it read (RD.DEVEX.WORKSPACE.192).
+  // When the numbers were true: the newest instant among the rows it read (RULE.DEVEX.WORKSPACE.192).
   const ranAt = rows.map((row) => row.ranAt).filter((at): at is string => at !== null).sort().slice(-1)[0] ?? null;
   const measured = {
     repository: basename(root),

@@ -7,7 +7,7 @@
 // a write to the workspace's migrations ledger, which `plugin migration write` alone appends to, and
 // a write that would create a sixth entry in an arc's notes folder of an open or backlog workstream, or
 // anything but an arc's folder directly under its `notes/` or `arcs/`. Every file in an arc's data
-// folder, its name file `<subject>.md` too, is the commands' (RD.DEVEX.WORKSPACE.264).
+// folder, its name file `<subject>.md` too, is the commands' (RULE.DEVEX.WORKSPACE.264).
 // A command writes these through the library, never through a tool call, so nothing here refuses it.
 
 import { existsSync, readFileSync } from "node:fs";
@@ -49,7 +49,7 @@ const NOTES_ENTRY = new RegExp(`^(.*/${DEVEX_WORKSTREAMS.replace(/\./g, "\\.")}/
 
 /**
  * Why a write may not make this path, or null: one that would create an entry beside the six in an
- * arc's notes folder (RD.DEVEX.WORKSPACE.262). An entry already on disk is not refused, so the tidy
+ * arc's notes folder (RULE.DEVEX.WORKSPACE.262). An entry already on disk is not refused, so the tidy
  * that folds a stray away can still rewrite its links first. A closed workstream is never read.
  */
 export function notesTreeRefusal(path: string, makesFolder = false): string | null {
@@ -64,14 +64,14 @@ export function notesTreeRefusal(path: string, makesFolder = false): string | nu
   const home = kind ? wrongKind(entry, kind) : strayHome(entry, folder);
   return `Denied: this write makes \`${NOTES}/${arc}/${entry}${folder ? "/" : ""}\`, and an arc's notes folder holds \`preview.html\`, ` +
     `\`samples/\`, \`plan.md\`, \`orders/\`, \`scripts/\` and \`work/\`, and nothing else (01-workstream.md § An arc carries its specification, ` +
-    `or names the note that holds it; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
+    `or names the note that holds it; RULE.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }
 
 const LEVEL_ENTRY = new RegExp(`^(.*/${DEVEX_WORKSTREAMS.replace(/\./g, "\\.")}/(?:open|backlog)/[^/]+)/(${NOTES}|arcs)/([^/]+)(/.*)?$`);
 
 /**
  * Why a write may not make this path, or null: one that would create anything but an arc's folder,
- * `N<nnn>/`, directly under a workstream's `notes/` or `arcs/` (RD.DEVEX.WORKSPACE.262). An entry
+ * `N<nnn>/`, directly under a workstream's `notes/` or `arcs/` (RULE.DEVEX.WORKSPACE.262). An entry
  * already on disk is not refused, so a loose note can still be folded into a plan. A closed workstream
  * is never read.
  */
@@ -86,7 +86,7 @@ export function levelRefusal(path: string, makesFolder = false): string | null {
     ? "a section of the `plan.md` of the arc it belongs to, or of the workstream's first open arc where it names none"
     : "nowhere by hand: the `workstream` commands write `arcs/N<nnn>/`";
   return `Denied: this write makes \`${level}/${entry}${folder ? "/" : ""}\`, and \`notes/\` and \`arcs/\` hold only arc folders, ` +
-    `\`N<nnn>/\` (01-workstream.md § The folder; RD.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
+    `\`N<nnn>/\` (01-workstream.md § The folder; RULE.DEVEX.WORKSPACE.262). It belongs in ${home}.`;
 }
 
 /** The folders a `mkdir` in a command makes, as written. */

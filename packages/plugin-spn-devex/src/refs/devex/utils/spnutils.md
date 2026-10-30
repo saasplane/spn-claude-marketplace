@@ -13,22 +13,22 @@
   "decisions": [
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.180",
+      "row": "DEC.DEVEX.WORKSPACE.180",
       "seen": "f5c6cb20"
     },
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.UTILS.072",
+      "row": "RULE.DEVEX.UTILS.072",
       "seen": "eb25b0de"
     },
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.UTILS.075",
+      "row": "RULE.DEVEX.UTILS.075",
       "seen": "0ee01e40"
     },
     {
       "repo": "spn-foundation",
-      "row": "RD.DEVEX.WORKSPACE.324",
+      "row": "RULE.DEVEX.WORKSPACE.324",
       "seen": "fe694315"
     }
   ]
@@ -47,7 +47,7 @@ rewritten.
 **This file lists no command by hand.** A list typed here drifts from the program the day a command
 gains an argument. Each repository's generated `.claude/saasplane/rules.md` carries § *Commands you
 run here*: the `spnutils` commands that repository's world and stack use, each with its arguments,
-read from the command tree itself (`RD.DEVEX.WORKSPACE.180`). `repo agent-sync` rewrites it, so it
+read from the command tree itself (`DEC.DEVEX.WORKSPACE.180`). `repo agent-sync` rewrites it, so it
 matches the installed release. Read it before you run a command in a repository.
 
 - **For every command, and every option**, run `spnutils help --json` or `spnutils <command> --help`.
@@ -109,7 +109,7 @@ status` reads `debug.telemetry` for its recording line, or `.debug/switches.json
 `debug` node yet, and writes nothing to the file.
 
 **`spnutils workspace init [name]` takes the workspace's name as its one argument, and a name is given
-once — MUST** (RD.DEVEX.WORKSPACE.324). The name is positional, written to the `workspace` node, and is
+once — MUST** (RULE.DEVEX.WORKSPACE.324). The name is positional, written to the `workspace` node, and is
 lower-case letters, digits and hyphens, starting with a letter, at most 40 characters. A partner runs
 init before opening a window, so they type it themselves. Init meets four cases:
 
@@ -156,7 +156,7 @@ no workstream path inherits them, and a call that names other work replaces them
 `spnutils`, reads these lines**: `spn-devex debug hooks show` prints the time per check and per event,
 and `spn-devex debug cost show` prints the tokens spent per workstream, per arc and per order from the
 usage lines, which count each reply once, keyed by the message id. A window's cost is read from this
-telemetry and never from a transcript — MUST (`RD.DEVEX.AGENT.082`).
+telemetry and never from a transcript — MUST (`RULE.DEVEX.AGENT.082`).
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
 command or on a group of commands, and a plugin declares the tiers of its own command groups.
@@ -182,7 +182,7 @@ The `gen-*` chain is never hand-edited: validators are what the API enforces, sy
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
 routed by each package's own scope. A dry run runs every tier and lists every failure. A tier whose exact
 inputs a past green verdict covers is not run again unless `--run-gates` is given, and the tag names the run
-behind each tier (`RD.SUPPORT.APPS.228`). `infra release` answers the same way.
+behind each tier (`RULE.SUPPORT.APPS.228`). `infra release` answers the same way.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
@@ -204,7 +204,7 @@ carry, and it differs on every run because it holds when the book was read. In F
 reads a library file with the developer's read-only token, and it changes nothing there. Every other file is
 under `~/.saasplane/state/surface/`, in folders that say who writes there, and none enters a repository.
 
-**`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
+**`spnutils` never reads or writes a document — MUST** (`RULE.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing
 else; `infra test <run> [package]` does the same for the estate. **The caller names every run, and the
 name is required**: build one while you work, such as `full-1001`, and give every tier of one sitting
@@ -220,7 +220,7 @@ Layer nouns are the vocabulary: `organization` · `platform` · `environment` ·
 whole-estate command**, because *all layers* of an unstated subject is a context nothing can resolve.
 
 **A command names its platform as an argument, always and first — never through the environment**
-(`RD.DEVEX.UTILS.072`). Every platform-scoped command takes `<spc>` straight after its verb:
+(`RULE.DEVEX.UTILS.072`). Every platform-scoped command takes `<spc>` straight after its verb:
 `infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`,
 `show`, `logs`, `web` and `domain register`. The organization layer takes none, because a repository
 has at most one organization. In an apps repository the `<spc>` is checked against the
@@ -308,7 +308,7 @@ organization. Everything under `cache/` may be deleted at any time at the cost o
 providers, and `plugins/{plugin}/` what one plugin caches; the DevEx plugin keeps its corpus at
 `plugins/spn-devex/corpus/`.
 
-**Each tool writes only its own rooms** (`RD.DEVEX.UTILS.076`). A tool that needs data from another tool's
+**Each tool writes only its own rooms** (`RULE.DEVEX.UTILS.076`). A tool that needs data from another tool's
 room asks that tool's command for it and never reads the folder. The one exception is the browser profile,
 which the agent drives as a running program.
 
@@ -318,7 +318,7 @@ line that names the `spnutils` command that makes it, and a hook says nothing: t
 `spnutils workspace init`; `docs look` does not stop, prints that the browser profile is missing and names
 `spnutils infra organization up --apply`; the stop event stays silent.
 
-**The tool's home folder is the tool's own — MUST** (`RD.DEVEX.UTILS.075`). A developer and an agent are
+**The tool's home folder is the tool's own — MUST** (`RULE.DEVEX.UTILS.075`). A developer and an agent are
 never asked to add or change a file in `~/.saasplane`. What the tool needs from outside is taken in by a
 command, which checks the file and copies it into place, so a file is prepared elsewhere and never left
 in the folder by hand.
@@ -328,7 +328,7 @@ automation on a person's default profile, so `infra organization up` provisions 
 holds live credentials for real accounts: never commit it, copy it or print from it.
 
 **Look at a page you built before you hand it over, through one action of the plugin, and never through
-a repository — MUST** (`RD.DEVEX.UTILS.074`). The action is `spn-devex docs look <page>`. It loads the page
+a repository — MUST** (`RULE.DEVEX.UTILS.074`). The action is `spn-devex docs look <page>`. It loads the page
 from disk in this profile, in light and in dark, with the global Playwright, and reports what the browser
 computed: failed requests, console errors, sideways scroll, and a screenshot. It reports *not checked*
 where no browser is installed. A partner holds the plugin and `spnutils`, and no application repository

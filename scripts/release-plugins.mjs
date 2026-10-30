@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md § The
 // place you are standing decides the install mode, and § What names a plugin, and what a version
-// means (RD.DEVEX.AGENT.109, RD.DEVEX.AGENT.110). The chapter is the source of truth; a rule change
+// means (RULE.DEVEX.AGENT.109, RULE.DEVEX.AGENT.110). The chapter is the source of truth; a rule change
 // is edited there first, then here, in the same change.
 //
 // The plugins' one release command. The four plugins release in lockstep at one version, and the

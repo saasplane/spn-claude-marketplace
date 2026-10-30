@@ -58,7 +58,7 @@ For each passage, compare before and after:
 ## A masthead is judged by a stricter rule
 
 **A page's Title, Subtitle and Description are plain language, and a rewrite of them is judged on
-that too** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). Where the sample holds a
+that too** (rules RULE.DEVEX.WORKSPACE.182 · RULE.DEVEX.WORKSPACE.187). Where the sample holds a
 masthead, answer three more questions:
 
 1. **Plain.** Everyday words, one idea a sentence, no number, no slogan, no figure of speech, and no
@@ -68,7 +68,7 @@ masthead, answer three more questions:
    into the first section rather than disappear?
 3. **Approval.** Is every new or changed Title and Subtitle one the developer approved, as the order
    records? One that was not is a **block**. The foundation hub's pair, fixed by
-   RD.DEVEX.WORKSPACE.143, never changes at all.
+   DEC.DEVEX.WORKSPACE.143, never changes at all.
 
 **A shorter Description is not a finding by itself**, and a plain Description above a technical body
 is the designed shape rather than two stacked registers. The finding is a claim that left the page

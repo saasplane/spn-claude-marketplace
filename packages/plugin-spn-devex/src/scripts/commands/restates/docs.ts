@@ -1,10 +1,10 @@
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
 // The `docs`-kind restatement alone: a plugin document that rewrote a chapter's rule in its own
 // words, and whether that rewrite still says what the chapter says. `restates check` runs all four
 // kinds together; this narrows to one, so a drift names its owed act — a `docs` drift is rewritten,
-// never copied or re-run (RD.DEVEX.AGENT.072).
+// never copied or re-run (RULE.DEVEX.AGENT.072).
 //
 //     spn-devex restates docs check [<book>]      is every citation current?
 //     spn-devex restates docs write <ref>         restamp one ref's docs citations

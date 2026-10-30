@@ -1,5 +1,5 @@
 // `debug hooks show` — every hook check's runs, time, notes and refusals, then every event's runs, time and bytes put
-// into the context, always both (RD.DEVEX.WORKSPACE.323), read from the rotated log and the live one.
+// into the context, always both (RULE.DEVEX.WORKSPACE.323), read from the rotated log and the live one.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

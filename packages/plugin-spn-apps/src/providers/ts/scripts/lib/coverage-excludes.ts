@@ -2,7 +2,7 @@
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 //
 // Reading the coverage excludes out of a Jest or Vitest configuration, as text. Coverage is
-// measured and reported, never enforced (RD.SUPPORT.APPS.133), so the one thing read here is
+// measured and reported, never enforced (RULE.SUPPORT.APPS.133), so the one thing read here is
 // whether each exclude carries a comment giving its reason.
 
 import { basename } from "node:path";

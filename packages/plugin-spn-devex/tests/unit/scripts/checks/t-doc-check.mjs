@@ -189,7 +189,7 @@ one("an Open card carrying no options table",
   write(APPROACH, CLEAN + `<section id="s4"><h2>Open</h2><div class="sds-open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>`),
   "reports", "carries no options table");
 
-// A card in an approach page's Open carries a part named Views (RD.DEVEX.WORKSPACE.242, Q50 B). The
+// A card in an approach page's Open carries a part named Views (RULE.DEVEX.WORKSPACE.242, Q50 B). The
 // check reads that the labelled block is there, and never what it says.
 {
   const VIEWS = `<span class="sds-key">Views</span>\n<p>Architect and partner, because the choice changes what a partner builds on. Architect: the platform must not name a service built on it. Partner: no objection.</p>`;
@@ -227,7 +227,7 @@ one("a register row that says you",
   "reports", "says *you*");
 
 // N27 step 12 — a row that QUOTES somebody saying `you` is evidence, not the row warming its reader.
-// RD.DEVEX.WORKSPACE.112 says the marking is how a check tells the two apart, and the exemption used to cover
+// RULE.DEVEX.WORKSPACE.112 says the marking is how a check tells the two apart, and the exemption used to cover
 // only the bare word in italics, so a quoted PHRASE still fired. Four real rows carried one.
 one("a register row quoting a person saying you — the marking is the exemption",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
@@ -254,7 +254,7 @@ one("a register row that says you beside bold — still reports",
   "reports", "says *you*");
 
 // N27 step 13 — `one` is a pronoun as often as it is an impersonal subject, and only the obligation
-// form is the construction RD.DEVEX.WORKSPACE.096 is named after.
+// form is the construction RULE.DEVEX.WORKSPACE.096 is named after.
 one("one as a pronoun, not an impersonal subject",
   write(CHAPTER, "# A probe\n\n`For: Architect` \u00b7 `Status: \ud83d\udd2e PLANNING`\n\n" +
     "Modules are separated precisely because a change to one must not force a redeploy of another, " +
@@ -282,8 +282,8 @@ one("a register row that rules over another row",
 // cited id gained a domain segment, and a stale ruling would have gone unreported.
 one("a register row that rules over a four-part id",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n" +
-    "| RD.SUPPORT.APPS.099 | Supersedes RD.SUPPORT.APPS.008 |\n"),
-  "reports", "rules over RD.SUPPORT.APPS.008");
+    "| RULE.SUPPORT.APPS.099 | Supersedes RULE.SUPPORT.APPS.008 |\n"),
+  "reports", "rules over RULE.SUPPORT.APPS.008");
 
 // The repository-letter form (`PD1`, `SD23`) is retired — no id in the corpus is written that way
 // any more, and accepting it here would let a real, current supersession clause hide behind a shape
@@ -316,7 +316,7 @@ one("a rule may quote the mistake it bans",
   write(CHAPTER, "# A chapter\n\nYou never write *five decisions* into a sentence. You name the set by its rule.\n"),
   "silent");
 
-console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst (RD.DEVEX.WORKSPACE.187)");
+console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst (RULE.DEVEX.WORKSPACE.187)");
 
 // The same function `docs audit` runs, so a page is judged alike when it is saved and when it is audited.
 const CONSTRUCT = join(domainConstructsDir(PROBE_DOMAIN), "probe-construct.html");
@@ -341,7 +341,7 @@ one("a second paragraph after the Description is SOFT until every tree is retrof
   write(CONSTRUCT, page(MAST + "\n  <p>You also read this, and it should be in the first section.</p>")),
   "reports", "[SOFT] the header carries 1 paragraph past the Subtitle and the Description");
 // MEASURED on a domain's README construct page, 2026-10-26: its table of constructs sits in the header, and each item
-// cell holds two paragraphs of its own (RD.DEVEX.WORKSPACE.259), which are the table's and never the header's.
+// cell holds two paragraphs of its own (RULE.DEVEX.WORKSPACE.259), which are the table's and never the header's.
 one("a table's item cells in the header are not paragraphs of the header, so only the one paragraph is counted",
   write(CONSTRUCT, page(MAST + "\n  <p>You also read this.</p>\n  <table><thead><tr><th>Construct</th></tr></thead><tbody>" +
     "<tr><td><p><strong>One</strong></p><p>The first piece of the model.</p></td></tr><tr><td><p><strong>Two</strong></p><p>The second piece.</p></td></tr></tbody></table>")),
@@ -414,7 +414,7 @@ one("a Subtitle under the Description is out of place",
       write(hubIn("spn-unreadable", "| DEC.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), mast("x y z", "You build on one base.")),
       "reports", "could not be read from the row");
     one("another repository's hub, whose register has no .143 row, is not held to the pair",
-      write(hubIn("spn-support-ts", "| RD.SUPPORT.APPS.001 | a | b | c | d |\n"), mast("Ship it faster.", "You build on one base.")),
+      write(hubIn("spn-support-ts", "| RULE.SUPPORT.APPS.001 | a | b | c | d |\n"), mast("Ship it faster.", "You build on one base.")),
       "silent");
     one("a partner's workspace with no register at all skips the pair silently",
       write(hubIn("partner-docs", null), mast("Ship it faster.", "You build on one base.")),
@@ -759,12 +759,12 @@ console.log("\n=== doc-check — every path a Bash command writes");
   console.log(`  ${ok ? "PASS" : "FAIL"}  redirect with a heredoc body, sed -i, cp and tee all found\n        ts [${ts.split("\n").join(" · ")}]\n        py [${py === null ? "not installed" : py.split("\n").join(" · ")}]`);
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.259 — a column whose cells hold sentences is a level of the item cell, as a note");
+console.log("\n=== RULE.DEVEX.WORKSPACE.259 — a column whose cells hold sentences is a level of the item cell, as a note");
 {
   const { check: checkPage, columnRule, itemCellPage } = await import("../../../../src/scripts/checks/doc-check.ts");
   const { readFileSync } = await import("node:fs");
   const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
-  const notes = (findings) => findings.filter(([grade, text]) => grade === "SOFT" && text.includes("RD.DEVEX.WORKSPACE.259"));
+  const notes = (findings) => findings.filter(([grade, text]) => grade === "SOFT" && text.includes("RULE.DEVEX.WORKSPACE.259"));
   // The shape workstream 030's N010 preview held before 26 Oct: three columns, every cell a sentence.
   const sentences = `<table><thead><tr><th>Finding</th><th>What it says</th><th>What it causes</th></tr></thead><tbody>
     <tr><td>Planning</td><td>A planning arc whose reading and drafting are rows, turned into build rows at the go.</td><td>An arc reads RUNNING while nothing is built, then flips back.</td></tr>

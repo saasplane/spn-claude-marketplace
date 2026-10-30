@@ -65,7 +65,7 @@ A large skill therefore costs nothing on a turn that never needed it, which is w
 
 A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines.
 
-**The frontmatter is the file's first line, and the stamp comes after it** (RD.DEVEX.AGENT.108). The runtime reads frontmatter only at the start of the file. A skill that opens with anything else, its `spn:restates` stamp included, is still a command a person can type, but the session is never offered it, so no ask in plain words reaches it. A suite case reads every `SKILL.md` of the four plugins and fails on one whose first line is not `---`. It reads no partner's file.
+**The frontmatter is the file's first line, and the stamp comes after it** (RULE.DEVEX.AGENT.108). The runtime reads frontmatter only at the start of the file. A skill that opens with anything else, its `spn:restates` stamp included, is still a command a person can type, but the session is never offered it, so no ask in plain words reaches it. A suite case reads every `SKILL.md` of the four plugins and fails on one whose first line is not `---`. It reads no partner's file.
 
 ### A skill that outgrows one file
 
@@ -108,7 +108,7 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 | --- | --- | --- |
 | the foundation's DevEx Skills construct | a skill is a named unit of work, and its value spells the domain of the plugin that ships it | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
-| `RD.DEVEX.UTILS.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
-| `RD.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
+| `RULE.DEVEX.UTILS.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
+| `RULE.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
 
 Try it: `spn-devex restates check`

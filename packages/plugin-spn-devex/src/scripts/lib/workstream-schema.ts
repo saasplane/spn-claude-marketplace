@@ -18,7 +18,7 @@ export type RowState = (typeof ROW_STATES)[number];
 export const DONE_STATES: ReadonlySet<string> = new Set(["landed", "replaced", "carried", "deferred"]);
 /**
  * What kind of build step a row is: a small correction, a change, or a wait on a card. Reading and drafting are
- * planning jobs and are never recorded, so every row is a build step (RD.DEVEX.WORKSPACE.278).
+ * planning jobs and are never recorded, so every row is a build step (RULE.DEVEX.WORKSPACE.278).
  */
 export const ROW_KINDS = ["fix", "change", "question"] as const;
 /** A step row's altitude (§ A step row says where, at what altitude, and how). */
@@ -32,14 +32,14 @@ export const OUTCOMES = ["landed", "stopped", "needs-you"] as const;
 
 /** An arc's id, `N007`, with an optional letter. */
 export const ARC_ID = /^N\d+[a-z]?$/;
-/** The longest an arc's subject may be (RD.DEVEX.WORKSPACE.265). */
+/** The longest an arc's subject may be (RULE.DEVEX.WORKSPACE.265). */
 export const SUBJECT_MAX = 24;
 /** An arc's subject: one to three words in kebab-case, lower case letters and digits. */
 const SUBJECT_FORM = /^[a-z0-9]+(?:-[a-z0-9]+){0,2}$/;
 
 /**
  * What is wrong with an arc's subject, as the words a refusal or a finding ends with, or null where it
- * is short: one to three words of at most 24 characters, in kebab-case (RD.DEVEX.WORKSPACE.265).
+ * is short: one to three words of at most 24 characters, in kebab-case (RULE.DEVEX.WORKSPACE.265).
  */
 export function subjectFault(subject: string): string | null {
   if (!SUBJECT_FORM.test(subject)) {

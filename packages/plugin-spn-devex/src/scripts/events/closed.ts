@@ -71,10 +71,10 @@ export function closingMessage(payload: Payload): string | null {
     const landed = states.filter((s) => s === "landed").length;
     const carried = states.filter((s) => s === "carried").length;
     const deferred = states.filter((s) => s === "deferred").length;
-    // `in progress <time>` is never landed (RD.DEVEX.WORKSPACE.184). The close gate refuses such a
+    // `in progress <time>` is never landed (RULE.DEVEX.WORKSPACE.184). The close gate refuses such a
     // row before the move, so one found here was moved past the gate, and the line says so.
     const running = states.filter((s) => s === "in-progress").length;
-    // `⏸ held on Q<n>` waits on a card's answer (RD.DEVEX.WORKSPACE.188), and the gate refuses it the
+    // `⏸ held on Q<n>` waits on a card's answer (RULE.DEVEX.WORKSPACE.188), and the gate refuses it the
     // same way, so a held row found here was moved past the gate too.
     const held = states.filter((s) => s === HELD_STATE).length;
 

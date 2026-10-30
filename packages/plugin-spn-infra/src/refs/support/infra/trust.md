@@ -59,7 +59,7 @@ Every provisioning run names its own mode, and there is no default.
 
 - A **plan** reaches no account and changes nothing, so it needs no credential. Rehearse the riskiest path — the first cloud walk a new company takes — before any account exists.
 - An **apply** performs the change; against a cloud realization it also takes an explicit approval.
-- A run naming neither mode, or naming both, **MUST** be refused (`RD.SUPPORT.INFRA.094`).
+- A run naming neither mode, or naming both, **MUST** be refused (`RULE.SUPPORT.INFRA.094`).
 
 **The credential check reads the provider the estate declared**, expects that provider's own session variables, and refuses by naming the provider when they are absent. Nothing in the driver names a vendor — a session holding a different provider's credentials reads as holding none. That fails safe, not dangerously, but it is still worth surfacing as a defect if you see it happen.
 
@@ -121,7 +121,7 @@ Scanners are stood up by the platform layer, into whichever cloud the organizati
 
 Findings, audit trails and configuration history flow into the observing accounts continuously, so compliance is a query rather than a project. The accounts that receive them can deploy nothing, which is what makes the record worth trusting.
 
-**The audit trail is declared, and it records each use of the key for stored secrets** (`RD.SUPPORT.INFRA.109`). An environment holds one key that protects the secrets a product must read back. A running service asks the key service for a data key when it stores such a secret, and asks it to unwrap one when it uses the secret; each call names the organization and the row the secret belongs to. The trail records every such call with those names, into the log archive the estate already has — append-only, and no operator may delete from it. So *when was this organization's secret opened* is a query over that archive, and the service that opened the secret cannot edit the answer. The trail is designed and not declared yet.
+**The audit trail is declared, and it records each use of the key for stored secrets** (`RULE.SUPPORT.INFRA.109`). An environment holds one key that protects the secrets a product must read back. A running service asks the key service for a data key when it stores such a secret, and asks it to unwrap one when it uses the secret; each call names the organization and the row the secret belongs to. The trail records every such call with those names, into the log archive the estate already has — append-only, and no operator may delete from it. So *when was this organization's secret opened* is a query over that archive, and the service that opened the secret cannot edit the answer. The trail is designed and not declared yet.
 
 **What is unproven MUST say so.** A claim with no evidence behind it is reported as unproven rather than quietly left out, because a report that hides its gaps is worse than no report — it gets believed. When you cannot establish a fact about what is running, state that you could not establish it. Never fill the gap with an inference and present it as a finding.
 

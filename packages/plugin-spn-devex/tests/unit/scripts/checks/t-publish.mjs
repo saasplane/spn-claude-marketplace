@@ -52,7 +52,7 @@ console.log("\n=== publish — a page that loads its styles from outside is refu
   ok("[MKT.HOOKS.46] it names each address the page loads from outside, the stylesheet's and the script's",
     verdict?.deny?.includes("/1.0.0/sds-docs.css`") && verdict?.deny?.includes("/1.0.0/sds-docs.js`"), verdict?.deny);
   ok("[MKT.HOOKS.46] the reminder about the developer's ask is still given beside the refusal",
-    verdict?.note?.includes("RD.DEVEX.WORKSPACE.117") && verdict?.note?.includes(stored), verdict?.note);
+    verdict?.note?.includes("RULE.DEVEX.WORKSPACE.117") && verdict?.note?.includes(stored), verdict?.note);
   ok("the copy's name is the page's name with `.bundled` before its ending", bundledName("/x/approach.html") === "approach.bundled.html");
 
   // The same page named by a path from the call's own folder is read from that folder.
