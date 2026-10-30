@@ -7,21 +7,21 @@ description: Write one of the five reports on a repository — coverage (how muc
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/05-report.md",
-      "seen": "cc6822e2"
+      "seen": "df3535ad"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "acd56ab4"
+      "seen": "1a0d2100"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "aa830046"
+      "seen": "09c6fe57"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -31,7 +31,7 @@ description: Write one of the five reports on a repository — coverage (how muc
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "427495e0"
+      "seen": "9af225b3"
     }
   ]
 }

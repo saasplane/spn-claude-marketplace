@@ -7,11 +7,11 @@ description: Walk an empty folder to a platform running locally - the door first
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md",
-      "seen": "6a02b07f"
+      "seen": "c4169e54"
     }
   ]
 }

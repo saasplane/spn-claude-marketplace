@@ -7,11 +7,11 @@ description: What proves a behaviour, at which tier, and what a passing suite do
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "c61a000e"
+      "seen": "2ffa2fa3"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -20,28 +20,28 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "section": "What the phase owes when it closes",
-      "seen": "8f12c198"
+      "section": "What the phase owes",
+      "seen": "630b9bd2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "A case title carries the id and the sentence",
-      "seen": "303946ab"
+      "seen": "ff839024"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "Code coverage is reported, never enforced",
-      "seen": "3e80db4e"
+      "seen": "64be0e7c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "65eee50c"
+      "seen": "11502ff4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
-      "seen": "a8036183"
+      "seen": "621a1a2c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/02-tests.md",
@@ -51,17 +51,17 @@ description: What proves a behaviour, at which tier, and what a passing suite do
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "section": "How — guides: steps, and nothing proven",
-      "seen": "7e4485b1"
+      "seen": "65b1d929"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "286f9045"
+      "seen": "63bbe16f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/06-tests/README.md",
       "section": "When a whole tier runs",
-      "seen": "90292e0a"
+      "seen": "e7e72e51"
     }
   ]
 }
@@ -169,7 +169,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 | integration | every case proving a guarantee only the real resource can hold, which in practice is every real case | a fixture or a helper's own check names what it checks |
 | unit | a case proving a row whose `Tier` is `UNIT` | a case over a private rule names the rule, because nothing outside the node can see it |
 
-**A row's `Tier` equals the tier of the case that proves it — MUST.** A run writes only the rows that declare the tier it ran. So a row declaring one tier, whose only case runs at another, is written by neither run and never reads as proven. Where the two differ, read the case and correct the side that is wrong: change the row when the case proves it at the tier that owns the claim, and move the case when it sits in the wrong tier.
+**A row's `Tier` equals the tier of the case that proves it.** A run writes only the rows that declare the tier it ran. So a row declaring one tier, whose only case runs at another, is written by neither run and never reads as proven. Where the two differ, read the case and correct the side that is wrong: change the row when the case proves it at the tier that owns the claim, and move the case when it sits in the wrong tier.
 
 **Where the id sits is the runner's to say**, and each runner has one place for it:
 
@@ -220,7 +220,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 
 **Stamp from the freshly named run, and never with `--reach repository`.** The stamp writes the rows that run names whose status changed, and leaves every other row as it is: a row the run only confirms keeps its `Updated at` (`RULE.DEVEX.WORKSPACE.306` · MUST · check:workstream-state · due:036/N008). `--reach repository` says the run was the whole of its tiers, and it sets every row the run did not name back to `PLANNED`. So a `SUCCESS` row says that its own case passed when that case last ran, and `Updated at` says when it reached that status.
 
-**State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
+**State acceptance as named behaviour ids, read as `SUCCESS` from the run file.** It is never an exit code: the runner exits clean when a selection matches no case, so a mistyped selection passes. It is never a count of a whole tier, which only a whole run can meet. **Report a selection that matched no case as *nothing proves this*.**
 
 ## When a whole tier runs
 
@@ -264,7 +264,7 @@ The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.js
 **Code coverage is measured and reported, never enforced** (`RULE.SUPPORT.APPS.133` · MUST · skill:spn-apps/implement). The rows answer *what was claimed and proven*; coverage answers a different question, *how much of the code does any suite run at all?* A run that collects it prints its summary — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report.
 
 - **No configuration carries a threshold, and nothing fails a run on a percentage.** A percentage used as a gate gets met the cheapest way: by editing the number down, or by writing cases that run code without checking what it does.
-- **An exclude carries its reason beside it — MUST.** Code no automatic test can reach, such as a proof-of-person challenge or a vendor round trip, is excluded by name with a comment on the same entry saying why. A reader can then tell code that cannot be tested from code nobody tested.
+- **An exclude carries its reason beside it.** Code no automatic test can reach, such as a proof-of-person challenge or a vendor round trip, is excluded by name with a comment on the same entry saying why. A reader can then tell code that cannot be tested from code nobody tested.
 - **A journey configuration collects no coverage.** It drives a browser against a running stack, and a code-coverage number there measures nothing a person reads.
 
 ## Lenses
