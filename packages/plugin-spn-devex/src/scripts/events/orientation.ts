@@ -55,6 +55,7 @@ import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { arcIdsOf } from "../lib/workstream.ts";
+import type { RulesIndex } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { sweepSessions } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { windowStartLines } from "../lib/migration.ts";
@@ -526,27 +527,20 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
  * A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So a
  * rule held only in a reference does not reach that reply. These lines are what carries it there.
  *
- * EACH LINE IS A POINTER, NEVER A SECOND COPY. It says what to do in one or two sentences and ends with
- * `→`, the path of its reference from the plugin's root, `§`, and the heading that holds the rule whole.
- * The test opens every file and looks for every heading, so a renamed section fails there.
+ * THE LINES ARE READ FROM THE RULES INDEX, NEVER TYPED HERE. A rule whose parenthesis carries `short` has one
+ * line: the sentence its devex ref restates it with, then `§` and the heading that holds it whole, under the
+ * ref's path. The build writes `refs/rules.json` from the book, and the restates check holds each ref to the
+ * book, so a line follows the book. A missing index costs the block and never the window.
  *
- * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to
- * judge, and the last line says so.
+ * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to judge.
  */
 export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply; each line points at its rule in full";
 
-export const SHORT_RULES: string[] = [
-  "Lenses take part in any discussion about a shape, mid-run too. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
-  "Three signs set how many views speak: it crosses a repository, changes what a partner builds on, or sets a pattern. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
-  "No sign: the owning view, one sentence. One: the architect's and the owner's. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
-  "Each view speaks in its own voice, as a colleague, never a slogan; on a card, one or two sentences, no option by letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
-  "Reply as one person to another: full sentences, tables only for facts, one meaning-icon first; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-  "A decision setting a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
-  "Structure before content: show the units, names and grouping first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
-  "**Needs you** opens a reply only to raise a card (in full, once) or to end or stop the work (a line per open card). → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
-  "Arcs are yours to manage; a new workstream is the developer's call. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
-  "No script flags a discussion about a shape; you judge. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
-];
+/** The index the build writes from the book, or null where it is missing or does not parse. */
+export function rulesIndex(): RulesIndex | null {
+  try { return JSON.parse(read(fileURLToPath(new URL("../../refs/rules.json", import.meta.url)))) as RulesIndex; }
+  catch { return null; }
+}
 
 /**
  * THE CEILING IS THE HARNESS'S. Claude Code saves any hook output string past 10,000 characters to a file and shows
@@ -587,9 +581,17 @@ function startParts(): StartPart[] {
   ];
 }
 
-/** The short rules as the block the agent reads: the heading, then one list line for each rule. */
-export function shortRules(): string {
-  return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
+/** The short rules as the block the agent reads: the heading, then each ref's path and a list line for each of its rules. */
+export function shortRules(index: RulesIndex | null = rulesIndex()): string {
+  const groups = new Map<string, string[]>();
+  for (const rule of index?.rules ?? []) {
+    if (!rule.params.short || !rule.line) continue;
+    const lines = groups.get(rule.line.ref) ?? [];
+    lines.push(`- ${rule.line.text} § ${rule.line.heading}`);
+    groups.set(rule.line.ref, lines);
+  }
+  if (!groups.size) return "";
+  return [SHORT_RULES_HEADING, "", ...[...groups].flatMap(([ref, lines]) => [`**\`${ref}\`**`, ...lines])].join("\n") + "\n";
 }
 
 /**

@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, workstreams } from "../../../../src/scripts/events/orientation.ts";
+import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, shortRules, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -663,23 +663,37 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
       return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
     } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
   };
-  const ordinary = hook(fixture("short-rules", {
-    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
-    "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
-  }));
+  // THE LINES COME FROM THE RULES INDEX THE BUILD WRITES FROM THE BOOK, never from words typed in the hook. A fixture
+  // index stands in for it: one entry for each `short` rule, with the sentence its ref restates it with.
+  const entry = (id, text, ref, heading, short = true) =>
+    ({ id, level: "MUST", params: short ? { short: true } : { check: "x" }, class: short ? "stated" : "checked",
+      ...(short ? { line: { text, ref, heading } } : {}) });
+  const A = "refs/devex/agent/agent.md", L = "refs/devex/agent/lenses.md", W = "refs/devex/workspace/workstream.md";
+  const index = { schemaVersion: 1, book: { repository: "spn-foundation", commit: "abc" }, rules: [
+    entry("RULE.DEVEX.AGENT.001", "Lenses take part in any discussion about a shape, mid-run too.", A, "One agent, and the lenses take part as views"),
+    entry("RULE.DEVEX.AGENT.002", "Three signs set how many views speak: it crosses a repository, changes what a partner builds on, or sets a pattern.", L, "Which views speak, and how many"),
+    entry("RULE.DEVEX.AGENT.003", "No sign: the owning view, one sentence. One: the architect's and the owner's. Two or more: the starting group with product and partner, each a fresh agent.", L, "How a view is made"),
+    entry("RULE.DEVEX.AGENT.004", "Each view speaks in its own voice, as a colleague, never a slogan; on a card, one or two sentences, no option by letter.", L, "A view is shown in its own voice"),
+    entry("RULE.DEVEX.AGENT.005", "Reply as one person to another: full sentences, tables only for facts, one meaning-icon first; a failure opens straight.", A, "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"),
+    entry("RULE.DEVEX.AGENT.006", "A decision setting a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it.", A, "Every prompt is read before anything moves"),
+    entry("RULE.DEVEX.AGENT.007", "Structure before content: show the units, names and grouping first.", "refs/devex/function/ideate.md", "Structure comes before content, and outside knowledge is marked"),
+    entry("RULE.DEVEX.AGENT.008", "**Needs you** opens a reply only to raise a card (in full, once) or to end or stop the work (a line per open card).", W, "The reply while work runs shows what needs you, then what moved"),
+    entry("RULE.DEVEX.AGENT.009", "Arcs are yours to manage; a new workstream is the developer's call.", W, "A new subject: another arc, or a workstream of its own"),
+    entry("RULE.DEVEX.AGENT.010", "No script flags a discussion about a shape; you judge.", A, "The rules of a reply reach you at session start, in short form"),
+    entry("RULE.DEVEX.AGENT.011", "A checked rule is held by its check, so it has no line.", A, "x", false),
+  ] };
   const HEADING = "## The short rules";
-  const at = ordinary.context.indexOf(HEADING);
-  const block = at < 0 ? "" : ordinary.context.slice(at);
+  const block = shortRules(index);
   const lines = block.split("\n").filter((line) => line.startsWith("- "));
 
-  says("the agent's context holds the short rules, after the note",
-    at > ordinary.context.indexOf("The ground is read on asking") && ordinary.context.indexOf("The ground is read on asking") > 0);
-  says("the developer's pane does not show them", !ordinary.message.includes(HEADING) && !ordinary.message.includes("in its own voice"));
-  says("they are about ten lines: the heading and no more than ten rules",
-    lines.length >= 7 && lines.length <= 10, `got ${lines.length} rule lines`);
+  says("the block opens with the heading", block.startsWith(HEADING));
+  says("it is one line for each `short` rule, and a rule held by a check has none",
+    lines.length === 10, `got ${lines.length} rule lines`);
+  says("each ref's path stands once above the lines it holds, and each line ends with the heading that holds its rule whole",
+    (block.match(/^\*\*`refs\/[^`]+\.md`\*\*$/gm) ?? []).length === 4 && lines.every((line) => / § .+$/.test(line)));
   says("known-bad: no line asks for a person at the table, the wording the developer's correction replaced",
     block.length > 0 && !block.includes("person at the table") && !block.includes("one or two plain sentences"));
+  says("without an index there is no block, and the window still starts", shortRules(null) === "");
 
   for (const [what, words] of [
     ["lenses take part in any discussion about a shape, mid-run too",
@@ -709,32 +723,41 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     says(`a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
   }
 
-  // EACH LINE POINTS AT A REFERENCE THAT EXISTS, AND AT A SECTION THAT FILE REALLY HAS.
-  const pointer = /→ `(refs\/[^`]+\.md)` § (.+)$/;
-  const unpointed = lines.filter((line) => !pointer.test(line));
-  says("every line ends with the path of its reference and the section that holds the rule",
-    lines.length > 0 && unpointed.length === 0, `no pointer: ${unpointed.map((line) => line.slice(0, 60)).join(" | ")}`);
+  // EVERY SECTION A LINE NAMES IS A HEADING THE REF REALLY HAS.
   const broken = [];
-  for (const line of lines) {
-    const found = pointer.exec(line);
-    if (!found) continue;
-    const file = resolve(HOOKS, "src", found[1]);
+  for (const rule of index.rules.filter((one) => one.line)) {
     let text = "";
-    try { text = readFileSync(file, "utf8"); } catch { broken.push(`${found[1]} is not a file`); continue; }
-    if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === found[2].trim()))
-      broken.push(`${found[1]} has no section "${found[2]}"`);
+    try { text = readFileSync(resolve(HOOKS, "src", rule.line.ref), "utf8"); } catch { broken.push(`${rule.line.ref} is not a file`); continue; }
+    if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
+      broken.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
   }
-  says("every reference named is a file of the plugin, and every section named is a heading in it",
-    lines.length > 0 && broken.length === 0, broken.join(" | "));
+  says("every reference named is a file of the plugin, and every section named is a heading in it", broken.length === 0, broken.join(" | "));
 
-  // KNOWN-BAD: the same reader must reject a line that points nowhere.
-  says("known-bad: a line with no reference fails the pointer test", !pointer.test("- Show each view in its own voice."));
+  // THE INDEX THE BUILD WRITES IS HELD TO THE SAME READER, where this checkout has one: a `short` entry with no line fails.
+  const written = join(HOOKS, "src", "refs", "rules.json");
+  if (existsSync(written)) {
+    const real = JSON.parse(readFileSync(written, "utf8"));
+    const unlined = real.rules.filter((rule) => rule.params.short && !rule.line).map((rule) => rule.id);
+    says("every `short` rule in the written index has a line", unlined.length === 0, `no line: ${unlined.join(" | ")}`);
+    const lost = [];
+    for (const rule of real.rules.filter((one) => one.line)) {
+      let text = "";
+      try { text = readFileSync(resolve(HOOKS, "src", rule.line.ref), "utf8"); } catch { lost.push(`${rule.line.ref} is not a file`); continue; }
+      if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
+        lost.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
+    }
+    says("and every heading it names exists in its ref", lost.length === 0, lost.join(" | "));
+  }
+  const noLine = { ...index, rules: [{ id: "RULE.DEVEX.AGENT.099", level: "MUST", params: { short: true }, class: "stated" }] };
+  says("known-bad: a `short` entry with no line is found by the reader the index is held to",
+    noLine.rules.filter((rule) => rule.params.short && !rule.line).length === 1 && shortRules(noLine) === "");
 
-  const zero = hook(fixture("short-rules-day-zero", { ".spndevex/README.md": "state\n" }));
-  says("day zero carries the same rules, after its note",
-    zero.context.includes(HEADING) && zero.context.indexOf(HEADING) > zero.context.indexOf("Day-0 mode") && !zero.message.includes(HEADING));
-  says("the by-hand form prints them too, since it prints what the agent reads",
-    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE).includes(HEADING) || !IN_WORKSPACE);
+  // THE START STAYS UNDER ITS CEILING WITH THIRTY-TWO LINES.
+  const many = { ...index, rules: Array.from({ length: 32 }, (_, at) =>
+    entry(`RULE.DEVEX.AGENT.${String(200 + at)}`, `${"A short sentence that stands alone and says what to do. ".repeat(3).trim()}`, `refs/devex/agent/r${at % 8}.md`, "Heading")) };
+  const full = fitSessionStart("H".repeat(2500), [{ text: shortRules(many), rank: 1, readAt: "the short rules" }]);
+  says(`a fixture start with thirty-two short lines stays under ${SESSION_START_CEILING} characters (${full.length})`,
+    full.length <= SESSION_START_CEILING && full.includes("A short sentence"));
 }
 
 // ── the plugin's migrations (RULE.DEVEX.AGENT.094) ──
