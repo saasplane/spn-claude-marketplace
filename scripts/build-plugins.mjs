@@ -34,6 +34,10 @@
 // command failed with ERR_MODULE_NOT_FOUND in a fresh window (008 N119). One bundle per command
 // keeps `cli.mjs` the size of the dispatcher, so a run pays for the one command it calls.
 //
+// IT RUNS ON THE ESBUILD THE LOCKFILE PINS, OR NOT AT ALL. Two checkouts holding two esbuild versions build
+// two sets of bundles from the same sources, and a byte-for-byte comparison cannot say why. So the build
+// reads the version `pnpm-lock.yaml` pins and stops, naming the install, when the one it imports differs.
+//
 // THE RULES INDEX AND THE SKILL BLOCKS ARE WRITTEN HERE TOO. Once spn-devex is bundled, its restates bundle
 // writes `refs/rules.json` and each skill step's rules block from the book beside this checkout, the way
 // `refs/commands.md` is written from `cli.mjs`. With no book there, both stay as committed.
@@ -46,6 +50,19 @@ import { bannerFor, pluginSourceHash } from "./lib/source-hash.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = dirname(HERE);
+
+/** The esbuild version the lockfile pins for the root package, or null where the lockfile names none. */
+function pinnedEsbuild() {
+  const lock = readFileSync(join(ROOT, "pnpm-lock.yaml"), "utf8");
+  const found = /\n      esbuild:\n        specifier: [^\n]+\n        version: ([^\s(]+)/.exec(lock);
+  return found ? found[1] : null;
+}
+const PINNED = pinnedEsbuild();
+if (PINNED !== esbuild.version) {
+  console.error(`esbuild ${esbuild.version} is installed and the lockfile pins ${PINNED ?? "none"}: ` +
+    `run \`pnpm install --frozen-lockfile\` in ${ROOT}, then build again`);
+  process.exit(2);
+}
 const PACKAGES = join(ROOT, "packages");
 const SUPPORT_LIB_DIR = join(PACKAGES, "plugin-support-lib");
 const ALL_PLUGINS = ["plugin-spn-devex", "plugin-spn-surface", "plugin-spn-apps", "plugin-spn-infra"];
