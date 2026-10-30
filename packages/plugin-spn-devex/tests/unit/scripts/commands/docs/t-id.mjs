@@ -17,7 +17,9 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 let n = 0, failed = 0;
 const one = (label, ok) => {
   n += 1;
-  if (!ok) { failed += 1; console.log(`  FAIL  ${label}`); }
+  if (ok) { console.log(`  PASS  ${label}`); return; }
+  failed += 1;
+  console.log(`  FAIL  ${label}`);
 };
 
 const mk = (root, path, body) => {
