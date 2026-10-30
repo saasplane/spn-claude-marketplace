@@ -7,6 +7,7 @@
 
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { holderFaults, readMarks } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
 /** What a holder may name: the checks and the skills the plugins ship, and the open arcs a `due:` may wait on. */
@@ -32,7 +33,7 @@ export function knownHolders(marketplace: string, workspace: string | null): Kno
     for (const skill of list(join(src, "skills"))) if (isDir(join(src, "skills", skill))) skills.add(`${plugin.slice("plugin-".length)}/${skill}`);
   }
   let openArcs: Set<string> | null = null;
-  const open = workspace === null ? null : join(workspace, ".spndevex", "workstreams", "open");
+  const open = workspace === null ? null : workstreamsDir(workspace, "open");
   if (open !== null && isDir(open)) {
     openArcs = new Set();
     for (const folder of list(open)) {

@@ -26,7 +26,10 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, workspaceRoot } from "../../lib/payload.ts";
 import { capabilitiesDir, decisionsRegister, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
+import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared, writeRulesIndex } from "../../lib/restates.ts";
+
+/** The build writes the rules index through this bundle, as it writes `refs/commands.md` through `cli.mjs`. */
+export { writeRulesIndex };
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 

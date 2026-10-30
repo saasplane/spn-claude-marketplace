@@ -190,6 +190,23 @@ console.log("\n=== tag prints five tags without --push, and cuts nothing");
   } finally { f.cleanup(); }
 }
 
+console.log("\n=== prepare refuses a book with a parenthesis that does not read");
+{
+  const f = fixture();
+  try {
+    const dir = join(f.work, "packages", "plugin-spn-devex", "src", "dist", "commands", "restates");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "check.mjs"),
+      'export const findBook = () => "/book";\n' +
+      'export const writeRulesIndex = () => ({ commit: "abc", rules: 1, written: [], faults: ["x.md:3: RULE.DEVEX.AGENT.113 \u2014 names no level"] });\n', "utf8");
+    f.git(f.work, "add", "-A");
+    f.git(f.work, "commit", "-q", "-m", "a stub restates bundle");
+    const result = f.release("prepare", "0.76.0");
+    ok("the release stops and names the fault", result.status !== 0 && /RULE\.DEVEX\.AGENT\.113 \u2014 names no level/.test(said(result)), said(result));
+    ok("the manifests are restored", f.versionOf("spn-devex") === "0.75.0");
+  } finally { f.cleanup(); }
+}
+
 console.log("\n=== tag --push puts all five on origin, annotated, on main's commit");
 {
   const f = fixture();

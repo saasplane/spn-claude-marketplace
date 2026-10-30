@@ -33,6 +33,10 @@
 // the unbundled source reached the installed plugin with its imports pointing outside it, and every
 // command failed with ERR_MODULE_NOT_FOUND in a fresh window (008 N119). One bundle per command
 // keeps `cli.mjs` the size of the dispatcher, so a run pays for the one command it calls.
+//
+// THE RULES INDEX AND THE SKILL BLOCKS ARE WRITTEN HERE TOO. Once spn-devex is bundled, its restates bundle
+// writes `refs/rules.json` and each skill step's rules block from the book beside this checkout, the way
+// `refs/commands.md` is written from `cli.mjs`. With no book there, both stay as committed.
 
 import * as esbuild from "esbuild";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -126,6 +130,20 @@ async function writeCommandsRef(pluginName, outdir) {
   return Buffer.byteLength(text);
 }
 
+/**
+ * `spn-devex/src/refs/rules.json` and each skill step's rules block, written by the restates bundle from the book
+ * the restates commands read from here. A rule whose parenthesis does not read is left out and counted, and
+ * `release-plugins.mjs` refuses a book that has one.
+ */
+async function writeRules() {
+  const bundle = join(PACKAGES, "plugin-spn-devex", "src", "dist", "commands", "restates", "check.mjs");
+  if (!isFile(bundle)) return null;
+  const { findBook, writeRulesIndex } = await import(pathToFileURL(bundle).href);
+  const book = findBook(undefined, ROOT);
+  if (book === null) return { book: null };
+  return { book, ...writeRulesIndex(book, ROOT) };
+}
+
 /** `dist/` rebuilt from nothing every time, so a renamed or removed source leaves no orphan bundle. */
 function cleanDist(outdir) {
   if (existsSync(outdir)) rmSync(outdir, { recursive: true, force: true });
@@ -152,6 +170,12 @@ async function buildOnce() {
     for (const file of built) console.log(`          ${file}`);
     const refBytes = await writeCommandsRef(pluginName, plan.outdir);
     if (refBytes !== null) console.log(`          src/refs/commands.md (${refBytes} bytes)`);
+  }
+  const rules = await writeRules();
+  if (rules?.book === null) console.log("  keep  refs/rules.json and the skill blocks — no spn-foundation beside this checkout");
+  else if (rules) {
+    console.log(`  ok    rules index  (${rules.rules} rules, book at ${rules.commit}${rules.faults.length ? `, ${rules.faults.length} that do not read` : ""})`);
+    for (const file of rules.written) console.log(`          ${file}`);
   }
   return builtAny;
 }
