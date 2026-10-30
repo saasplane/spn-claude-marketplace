@@ -127,6 +127,21 @@ one("an RD id is reported, whatever the workspace holds", run(retired).includes(
       && !crossOut.includes("RULE.SUPPORT.SURFACE.075 —"));
 }
 
+{
+  // The marked parenthesis `(rule ID · LEVEL · short)` is the id's place, the same as the bare form.
+  const ws = join(BASE, "marked");
+  const book = join(ws, "spn-foundation");
+  mk(book, `docs/${SEAT.constructs}/b.md`, "# B\n\n## Marked\n\nA rule MUST hold (rule RULE.SUPPORT.SURFACE.075 · MUST · short).\n\nA second MUST hold (rule RULE.SUPPORT.SURFACE.076).\n");
+  mk(book, "sprepo.json", '{"type":"FOUNDATION","name":"spn-foundation","config":null}');
+  const marketplace = join(ws, "spn-claude-marketplace");
+  mk(marketplace, "sprepo.json", '{"type":"GENERAL","name":"m","config":null}');
+  mk(marketplace, `docs/${SEAT.constructs}/a.md`, "# A\n\nIt cites RULE.SUPPORT.SURFACE.075.\n");
+  WORKSPACE = ws;
+  const markedOut = run(marketplace);
+  WORKSPACE = null;
+  one("a RULE id the book marks as `(rule ID · MUST · short)` resolves", !markedOut.includes("RULE.SUPPORT.SURFACE.075 —"));
+}
+
 // 1 — every citation resolves, so the check says nothing at all.
 const clean = tree("clean", "# A page\n\nThis cites DEC.DEVEX.WORKSPACE.155, which the register carries.\n");
 one("a tree whose citations all resolve reports no CITATION finding",

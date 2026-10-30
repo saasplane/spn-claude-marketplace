@@ -52,6 +52,7 @@ import { readdirSync, statSync } from "node:fs";
 import { join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
 import { decisionsRegister, docsOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { readMarks } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
 /** The whole `spn:restates` comment, for a writer that replaces it with a re-serialized block. */
@@ -323,14 +324,9 @@ function ruleSection(repository: string, rule: string): string | null {
         const found = walk(full);
         if (found) return found;
       } else if (entry.endsWith(".md")) {
-        const lines = read(full).split("\n");
-        const at = lines.findIndex((line) => line.includes(`(rule ${rule})`));
-        if (at < 0) continue;
-        for (let up = at; up >= 0; up -= 1) {
-          const heading = /^#{1,6}[ \t]+(.+?)[ \t]*$/.exec(lines[up]);
-          if (heading) return `${name}/${full.slice(repository.length + 1)} § ${heading[1]}`;
-        }
-        return `${name}/${full.slice(repository.length + 1)}`;
+        const found = readMarks(read(full), "book").marks.find((mark) => mark.id === rule);
+        if (!found) continue;
+        return `${name}/${full.slice(repository.length + 1)}${found.heading ? ` § ${found.heading}` : ""}`;
       }
     }
     return null;

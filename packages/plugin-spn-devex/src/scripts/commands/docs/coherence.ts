@@ -43,11 +43,11 @@ import { isDir, isFile, read } from "../../lib/payload.ts";
 import { type Action, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT, DECISIONS, POCKET, artifactDocsDir, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
   hasSegment, hubPage, isOverview } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { DEC_ID_SRC, ID_SRC, RULE_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { DEC_ID_SRC, ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { readMarks } from "../../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { resolveWorkspace } from "./_lib.ts";
 
 const ANY_ID = new RegExp(`\\b${ID_SRC}\\b`, "g");
-const RULE_SENTENCE = new RegExp(`\\(rule (${RULE_ID_SRC})\\)`, "g");
 const ID_LINK = new RegExp(`\\[(${ID_SRC})\\]\\(`, "g");
 const OLD_ID = /\bRD\.[A-Z]+(?:\.[A-Z]+)?\.\d{3}\b/g;
 const IS_DEC_ID = new RegExp(`^${DEC_ID_SRC}$`);
@@ -418,7 +418,7 @@ function citations(root: string, reported: Reported): string[] {
   const place = (id: string): void => { places.set(id, (places.get(id) ?? 0) + 1); };
   for (const repository of repositories) {
     for (const path of sourcesOf(repository))
-      for (const hit of read(join(repository, path)).matchAll(RULE_SENTENCE)) place(hit[1]);
+      for (const mark of readMarks(read(join(repository, path)), "book").marks) place(mark.id);
     for (const line of read(decisionsRegister(docsOf(repository))).split("\n")) {
       const row = IS_DEC_ID_ROW.exec(line) ?? IS_DEC_ID_CARD.exec(line);
       if (row) place(row[1]);
