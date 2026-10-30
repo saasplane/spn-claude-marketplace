@@ -268,3 +268,9 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
     return !entry || hashes[at] !== entryHash(entry);
   });
 }
+
+/** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `ready` part with a wait open is waiting. */
+export function readyParts(plan: GoPlan): GoPart[] {
+  const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));
+  return plan.parts.filter((one) => one.state === "ready" && one.waitsOn.every((id) => landed.has(id)));
+}

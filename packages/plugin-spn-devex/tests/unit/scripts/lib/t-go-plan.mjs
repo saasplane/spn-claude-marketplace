@@ -8,7 +8,7 @@ import { join, resolve } from "node:path";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 
 const lib = resolve(PLUGIN, "src", "scripts", "lib");
-const { deriveGo, ratesOf, boundOf, testFilesOf, entryHash, changedEntries } = await import(join(lib, "go-plan.ts"));
+const { deriveGo, readyParts, ratesOf, boundOf, testFilesOf, entryHash, changedEntries } = await import(join(lib, "go-plan.ts"));
 const { goFaults, entryAltitude } = await import(join(lib, "workstream-schema.ts"));
 
 let total = 0, failed = 0;
@@ -89,6 +89,11 @@ same("[MKT.SCRIPTS.311] a part held twice fails the schema", goFaults({ ...plan,
 same("[MKT.SCRIPTS.311] a signature that misses an entry fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], signature: "a.b" }] }).length, 1);
 same("[MKT.SCRIPTS.311] a pass that is a number fails the schema", goFaults({ ...plan, parts: [{ ...plan.parts[0], pass: 1 }] }).length > 0, true);
 same("[MKT.SCRIPTS.303] a plan of another version fails the schema", goFaults({ ...plan, schemaVersion: 9 }).length, 1);
+
+const ready = (states) => readyParts({ ...plan, parts: plan.parts.map((p) => ({ ...p, state: states[p.id] ?? "ready" })) }).map((p) => p.id);
+same("[MKT.SCRIPTS.304] a ready part whose waits are open is not in the ready list", ready({}).slice(0, 2), ["docs-lib-repo-1", "baseline-lib-repo"]);
+same("[MKT.SCRIPTS.304] a part is ready once every part it waits on has landed", ready({ "baseline-lib-repo": "landed", "docs-lib-repo-1": "landed" }).includes("code-lib-repo-1"), true);
+same("[MKT.SCRIPTS.304] a held or running part is never in the ready list", ready({ "docs-lib-repo-1": "held", "baseline-lib-repo": "running" }), ["baseline-app-repo"]);
 
 console.log(`\n${total - failed}/${total} passed`);
 process.exit(failed ? 1 : 0);
