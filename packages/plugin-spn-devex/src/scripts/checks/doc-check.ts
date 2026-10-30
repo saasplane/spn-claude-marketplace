@@ -480,7 +480,7 @@ export function mastheadKind(path: string): MastheadKind | null {
 const spoken = (html: string): string => flat(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
 
 /**
- * The foundation hub's Title and Subtitle, read from `RD.DEVEX.WORKSPACE.143` in the register that
+ * The foundation hub's Title and Subtitle, read from `DEC.DEVEX.WORKSPACE.143` in the register that
  * sits beside the page. Null, and the pair is not checked, where that register carries no such row
  * (every other repository) or where no register is found at all (a partner's workspace).
  * The row writes the Title in backticks and the Subtitle in italics after *reads*; the Subtitle
@@ -491,7 +491,7 @@ export function hubPair(path: string): { title: string; subtitle: string } | "un
   for (;;) {
     const register = decisionsRegister(folder);
     if (exists(register)) {
-      const row = /^\|\s*RD\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
+      const row = /^\|\s*DEC\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
       if (!row) return null;
       const title = /`([^`\n]+)`/.exec(row[0])?.[1];
       const statement = /\breads\s+\*([^*\n]+)\*/.exec(row[0])?.[1];
@@ -554,14 +554,14 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   if (kind === "hub") {
     const pair = hubPair(path);
     if (pair === "unreadable")
-      out.push([MASTHEAD, "RD.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
+      out.push([MASTHEAD, "DEC.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
         "the row writes the Title in backticks and the Subtitle in italics after *reads*"]);
     else if (pair) {
       const h1 = parts.find((p) => p.role === "h1");
       if (!h1 || spoken(h1.html) !== pair.title)
-        out.push([MASTHEAD, `the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
+        out.push([MASTHEAD, `the foundation hub's Title is not DEC.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
       if (!subtitles.length || spoken(subtitles[0].html) !== pair.subtitle)
-        out.push([MASTHEAD, `the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
+        out.push([MASTHEAD, `the foundation hub's Subtitle is not DEC.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
     }
   }
   return out;

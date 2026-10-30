@@ -18,12 +18,12 @@ import { dirname, join, relative } from "node:path";
 import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isFile, read, workspaceRoot } from "../../lib/payload.ts";
 import {
-  BLOCK_COMMENT, DECISION_ID_SRC, type Citation, check as checkKind, isDir, parse,
+  BLOCK_COMMENT, DEC_ID_SRC, type Citation, check as checkKind, isDir, parse,
   sectionText, seenHash, treeHash, undeclared,
 } from "../../lib/restates.ts";
 import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
-const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
+const IS_ROW = new RegExp(`^${DEC_ID_SRC}$`);
 
 /**
  * Restamp one ref's `docs` citations after the developer has re-read each source and corrected any

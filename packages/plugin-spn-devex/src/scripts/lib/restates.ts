@@ -61,14 +61,21 @@ export const BLOCK_COMMENT = BLOCK;
 // — a sentence about the defect, matched as a declaration by a looser rule.
 const SOURCE_LINE = /^.*Source of truth\s*:?\*{0,2}\s*:.*$|^.*\*\*Source of truth:\*\*.*$/gim;
 /**
- * A decision id's grammar: `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` — one area segment naming a domain, an
- * optional second naming a sub-area inside it (a repository a domain spans, or a narrower seat),
- * then a three-digit sequence. Exported so the other sites that parse a decision id — `coherence.ts`
- * and the two `restates/*` commands — read the same grammar rather than a second copy that drifts.
+ * An id's grammar: `RULE.<AREA>.<DOMAIN>.<NNN>` or `DEC.<AREA>.<DOMAIN>.<NNN>` — a kind, the place the
+ * thing lives (the area and the domain in the book, a repository's token and its group elsewhere,
+ * either may carry an underscore), then a three-digit number it keeps. A `RULE.` id sits on its
+ * sentence in a chapter; a `DEC.` id is a register row's first cell. Exported so the other sites that
+ * parse an id — `coherence.ts` and the two `restates/*` commands — read the same grammar rather than
+ * a second copy that drifts.
  */
-export const DECISION_ID_SRC = "RD\\.[A-Z]+(?:\\.[A-Z]+)?\\.\\d{3}";
-const ROW_ID = new RegExp(`\\b${DECISION_ID_SRC}\\b`, "g");
-const IS_ROW_ID = new RegExp(`^${DECISION_ID_SRC}$`);
+export const ID_SRC = "(?:RULE|DEC)\\.[A-Z_]+\\.[A-Z_]+\\.\\d{3}";
+/** A rule's id: read in its chapter. */
+export const RULE_ID_SRC = "RULE\\.[A-Z_]+\\.[A-Z_]+\\.\\d{3}";
+/** A decision's id: read in the register, as a row's first cell. */
+export const DEC_ID_SRC = "DEC\\.[A-Z_]+\\.[A-Z_]+\\.\\d{3}";
+const IS_ROW_ID = new RegExp(`^${ID_SRC}$`);
+const IS_DEC_ANYWHERE = new RegExp(`\\b${DEC_ID_SRC}\\b`, "g");
+const IS_RULE_ID = new RegExp(`^${RULE_ID_SRC}$`);
 const HEADING = /^(#{1,6})[ \t]+(.+?)[ \t]*$/gm;
 
 export type Citation = { path?: string; section?: string; seen?: string };
@@ -262,7 +269,7 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
   const unclassified = new Set<string>();
   SOURCE_LINE.lastIndex = 0;
   for (const line of text.match(SOURCE_LINE) ?? []) {
-    for (const row of line.match(ROW_ID) ?? []) rows.add(row);
+    for (const row of line.match(IS_DEC_ANYWHERE) ?? []) rows.add(row);
     for (const found of line.matchAll(PROSE_PATH)) {
       const token = found[1].trim();
       if (!token || NOT_A_DOCUMENT.has(token) || IS_ROW_ID.test(token)) continue;
@@ -297,6 +304,38 @@ export function rowText(register: string, row: string): string | null {
 export function rowHash(register: string, row: string): string | null {
   const line = rowText(register, row);
   return line === null ? null : seenHash(line);
+}
+
+/**
+ * The chapter and section a rule sits in, as `<path> § <heading>`, read from the repository's docs by
+ * the `(rule <id>)` that ends the rule's sentence. Null where no chapter carries it.
+ */
+function ruleSection(repository: string, rule: string): string | null {
+  const name = repository.split("/").pop();
+  const walk = (dir: string): string | null => {
+    let entries: string[];
+    try { entries = readdirSync(dir).sort(); } catch { return null; }
+    for (const entry of entries) {
+      const full = join(dir, entry);
+      let stat;
+      try { stat = statSync(full); } catch { continue; }
+      if (stat.isDirectory()) {
+        const found = walk(full);
+        if (found) return found;
+      } else if (entry.endsWith(".md")) {
+        const lines = read(full).split("\n");
+        const at = lines.findIndex((line) => line.includes(`(rule ${rule})`));
+        if (at < 0) continue;
+        for (let up = at; up >= 0; up -= 1) {
+          const heading = /^#{1,6}[ \t]+(.+?)[ \t]*$/.exec(lines[up]);
+          if (heading) return `${name}/${full.slice(repository.length + 1)} § ${heading[1]}`;
+        }
+        return `${name}/${full.slice(repository.length + 1)}`;
+      }
+    }
+    return null;
+  };
+  return walk(join(repository, "docs"));
 }
 
 /** Where a `decisions` citation's register lives — fixed, because every register sits at this path. */
@@ -397,6 +436,13 @@ export function check(
         findings.push(`${path}: a decisions citation must be an object with a \`repo\` and a \`row\``);
         continue;
       }
+      // A `decisions` CITATION HOLDS A `DEC.` ID ONLY. A rule is read in its chapter and the register
+      // carries no row for it, so the citation is a `docs` one on the section the rule sits in.
+      if (IS_RULE_ID.test(citation.row)) {
+        const where = ruleSection(join(workspace, citation.repo), citation.row);
+        findings.push(`${path}: cites \`${citation.row}\` as a decision, and a rule is not a register row — cite ${where ? `\`${where}\`` : "the section the rule sits in"} as a \`docs\` citation`);
+        continue;
+      }
       const register = registerPath(workspace, citation.repo);
       // A REGISTER PATH THAT RESOLVES TO NOTHING IS A BROKEN CITATION, NEVER SKIPPED — the same
       // rule a `docs`/`files` citation already follows, read here for the repo naming the register
@@ -421,7 +467,7 @@ export function check(
 /** Every decision id the register declares. Empty where there is no register to read. */
 export function registerRows(register: string): Set<string> {
   if (!isFile(register)) return new Set();
-  return new Set(read(register).match(ROW_ID) ?? []);
+  return new Set(read(register).match(IS_DEC_ANYWHERE) ?? []);
 }
 
 // ---------------------------------------------------------------- a code file's own header

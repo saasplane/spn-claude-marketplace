@@ -223,24 +223,24 @@ one("a Deferred card naming no trigger",
   "reports", "names no trigger");
 
 one("a register row that says you",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | you may not do it |\n"),
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | you may not do it |\n"),
   "reports", "says *you*");
 
 // N27 step 12 — a row that QUOTES somebody saying `you` is evidence, not the row warming its reader.
 // RD.DEVEX.WORKSPACE.112 says the marking is how a check tells the two apart, and the exemption used to cover
 // only the bare word in italics, so a quoted PHRASE still fired. Four real rows carried one.
 one("a register row quoting a person saying you — the marking is the exemption",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
     "Asked by the developer: *\"you can call revoke signed-in if other tests are working\"* |\n"),
   "silent");
 
 one("a register row citing another document's phrase in italics",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
     "A number written **four ways**, and the section's own *seven yours and two the agent's* again |\n"),
   "silent");
 
 one("a register row quoting a string in double quotes",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
     "The hub shows a neutral \"taking you to your provider\" state until the redirect leaves |\n"),
   "silent");
 
@@ -249,7 +249,7 @@ one("a register row quoting a string in double quotes",
 // marked span pairs it with the opening `*` of a later `*you*` and exposes the word it was meant to
 // protect. Anchoring the exemption on the word is what makes this case pass.
 one("a register row that says you beside bold — still reports",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
     "A row keeps its **shape**, and you should install the plugin before you open a window |\n"),
   "reports", "says *you*");
 
@@ -267,14 +267,14 @@ one("one as an impersonal subject — still reports",
   "reports", "written about the reader");
 
 one("a register row past twenty-five words",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | " +
     "A row states one clause a sentence and never more than that, and this particular row keeps " +
     "going well past the bar the chapter sets for it in every direction. |\n"),
   "reports", "a row states one clause a sentence");
 
 one("a register row that rules over another row",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes RD.EVENTS.008 |\n"),
-  "reports", "rules over RD.EVENTS.008");
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | Supersedes DEC.SUPPORT.EVENTS.008 |\n"),
+  "reports", "rules over DEC.SUPPORT.EVENTS.008");
 
 // A decision id names its domain now (`RD.<DOMAIN>.<SUBDOMAIN>.<NNN>`), and the id inside a
 // supersession clause must be read with the same grammar as a register row's own id — this is the
@@ -289,7 +289,7 @@ one("a register row that rules over a four-part id",
 // any more, and accepting it here would let a real, current supersession clause hide behind a shape
 // that reads as an id but is not one.
 one("the retired repository-letter form is not read as a register id",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes PD1 |\n"),
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| DEC.SUPPORT.EVENTS.099 | Supersedes PD1 |\n"),
   "silent");
 
 // The rule fires on a `CONCEPT.md` with a node manifest beside it and no `sprepo.json`, so the probe
@@ -379,7 +379,7 @@ one("a Subtitle under the Description is out of place",
 }
 
 // THE HUB CASES ARE HERMETIC. The pair is read from the register beside the page, so each case
-// builds its own workspace holding a stub RD.DEVEX.WORKSPACE.143 row, and the suite never depends
+// builds its own workspace holding a stub DEC.DEVEX.WORKSPACE.143 row, and the suite never depends
 // on what the real foundation's register says today.
 {
   const HUB_WS = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-hub-")));
@@ -394,21 +394,24 @@ one("a Subtitle under the Description is out of place",
       }
       return hubPage(docs);
     };
-    const STUB = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `A stub title for the probe.`, and the " +
+    const STUB = "| DEC.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `A stub title for the probe.`, and the " +
       "statement beside it does not change.** The statement below it reads *the stub subtitle, read from the row*. | why | 2026-09 |\n";
     const foundationHub = hubIn("spn-foundation", STUB);
     const mast = (h1, sub) => page(`  <h1>${h1}</h1>\n  <p class="sds-subtitle">${sub}</p>\n  <p class="sds-standfirst">This page is where you start. Read it first.</p>`);
 
+    one("a register still holding the retired RD form of the row is not read as the pair",
+      write(hubIn("spn-retired", STUB.replace("DEC.DEVEX", "RD.DEVEX")), mast("Ship it faster.", "You build on one base.")),
+      "silent");
     one("the foundation hub with the stub row's pair, word for word",
       write(foundationHub, mast("A stub title for the probe.", "The stub subtitle, read from the row.")), "silent");
     one("the foundation hub with a Title of its own",
       write(foundationHub, mast("Ship it faster.", "The stub subtitle, read from the row.")),
-      "reports", "[SOFT] the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — \"A stub title for the probe.\"");
+      "reports", "[SOFT] the foundation hub's Title is not DEC.DEVEX.WORKSPACE.143's, word for word — \"A stub title for the probe.\"");
     one("the foundation hub with a Subtitle of its own",
       write(foundationHub, mast("A stub title for the probe.", "You build on one base.")),
-      "reports", "[SOFT] the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's");
+      "reports", "[SOFT] the foundation hub's Subtitle is not DEC.DEVEX.WORKSPACE.143's");
     one("a .143 row the check cannot read is said, never passed",
-      write(hubIn("spn-unreadable", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), mast("x y z", "You build on one base.")),
+      write(hubIn("spn-unreadable", "| DEC.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), mast("x y z", "You build on one base.")),
       "reports", "could not be read from the row");
     one("another repository's hub, whose register has no .143 row, is not held to the pair",
       write(hubIn("spn-support-ts", "| RD.SUPPORT.APPS.001 | a | b | c | d |\n"), mast("Ship it faster.", "You build on one base.")),

@@ -43,11 +43,15 @@ import { isDir, isFile, read } from "../../lib/payload.ts";
 import { type Action, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT, DECISIONS, POCKET, artifactDocsDir, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
   hasSegment, hubPage, isOverview } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { DEC_ID_SRC, ID_SRC, RULE_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { resolveWorkspace } from "./_lib.ts";
 
-const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");
-const IS_DECISION_ID = new RegExp(`^${DECISION_ID_SRC}$`);
-const IS_DECISION_ID_ROW = new RegExp(`^\\|\\s*(${DECISION_ID_SRC})\\s*\\|`);
+const ANY_ID = new RegExp(`\\b${ID_SRC}\\b`, "g");
+const RULE_SENTENCE = new RegExp(`\\(rule (${RULE_ID_SRC})\\)`, "g");
+const ID_LINK = new RegExp(`\\[(${ID_SRC})\\]\\(`, "g");
+const OLD_ID = /\bRD\.[A-Z]+(?:\.[A-Z]+)?\.\d{3}\b/g;
+const IS_DEC_ID = new RegExp(`^${DEC_ID_SRC}$`);
+const IS_DEC_ID_ROW = new RegExp(`^\\|\\s*(${DEC_ID_SRC})\\s*\\|`);
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 // Heading words too common to identify a section on their own.
@@ -222,7 +226,7 @@ function rulings(root: string, reported: Reported): string[] {
   for (const row of registerTableRows(read(register))) {
     const rid = row.get("#");
     const text = row.get("Decision");
-    if (!rid || !IS_DECISION_ID.test(rid) || text === undefined) continue;
+    if (!rid || !IS_DEC_ID.test(rid) || text === undefined) continue;
     const rest = text.replace(/^\*\*.+?\*\*/, "");  // the opening claim is the ruling
     const buried = [...rest.matchAll(BURIED)].map((m) => m[1]);
     if (buried.length) split.push([buried.length, rid, buried[0].split(/\s+/).join(" ").slice(0, 80)]);
@@ -378,54 +382,71 @@ function restatementDrift(root: string, reported: Reported): string[] {
 }
 
 /**
- * CITATION — does every decision id cited in this repository resolve to a row?
+ * CITATION — does every id cited in this repository resolve to exactly one place in the workspace?
  *
- * **A citation to a row that does not exist is the one register failure a reader cannot work
- * around.** Every other finding here leaves a reader with two answers to choose between. This one
- * leaves them with none, and it is silent: `RD.APPS.020` reads exactly like a row that exists until
- * somebody opens the register and searches for it.
+ * **An id names one thing, and its first word says where to read it.** A `RULE.` id stands on the
+ * sentence that states the rule, written `(rule RULE.…)` in a chapter. A `DEC.` id is the first cell of
+ * one register row. The check reads the workspace (`resolveWorkspace`), because a repository cites a
+ * rule the book states and the book is a sibling checkout: a `RULE` id resolves to exactly one
+ * `(rule RULE.…)` across the workspace's repositories, and a `DEC` id to exactly one register row's
+ * first cell.
  *
- * It is cheap because both halves are already on disk — the cited ids and the rows are in the same
- * tree. `N76` found two ids that had dangled since before that arc, and nothing had ever asked.
+ * IT FAILS FOUR THINGS. An id that resolves nowhere, which answers nothing and says so to nobody; an
+ * id that resolves twice, which leaves two answers; an id written as a link (`[RULE.…](`), because
+ * the id alone survives any chapter move and a path beside it is the part that goes stale; and any
+ * `RD.` id, the form this one replaced, so a half-finished run is always visible.
  *
- * SOFT WHILE THE COUNT IS ABOVE ZERO. A gate that is red on the day it ships is one nobody reads,
- * which is this corpus's own argument arriving as a constraint (see `checks/corpus.ts`). It joins
- * the wired set on the day it is silent on a clean corpus.
+ * SILENT WHERE THE WORKSPACE HOLDS NO RULE AND NO ROW. A partner holds the plugins and neither the
+ * book nor its register, so there is nothing for a citation to resolve against, and that is a fact
+ * about the workspace rather than a finding about this repository.
  *
- * WHAT IT DELIBERATELY DOES NOT READ: a workstream folder. An arc log cites the row that governed
- * an act when the act happened, and a row removed later does not make that log wrong — it makes it
+ * WHAT IT DELIBERATELY DOES NOT READ: a workstream folder. An arc log cites the id that governed an
+ * act when the act happened, and a row removed later does not make that log wrong — it makes it
  * history. Rewriting it would state something that never happened.
  */
 function citations(root: string, reported: Reported): string[] {
-  const register = decisionsRegister(docsOf(root));
-  const registerText = read(register);
-  if (!registerText) return [];                    // no register here — not this repo's question
-  const rows = new Set<string>();
-  for (const line of registerText.split("\n")) {
-    const row = IS_DECISION_ID_ROW.exec(line);
-    if (row) rows.add(row[1]);
+  const workspace = resolveWorkspace();
+  const repositories = new Set<string>([resolve(root)]);
+  for (const entry of readdirSync(workspace).sort()) {
+    const full = join(workspace, entry);
+    if (isDir(join(full, "docs"))) repositories.add(resolve(full));
   }
-  if (!rows.size) return [];
+  const places = new Map<string, number>();
+  const place = (id: string): void => { places.set(id, (places.get(id) ?? 0) + 1); };
+  for (const repository of repositories) {
+    for (const path of sourcesOf(repository))
+      for (const hit of read(join(repository, path)).matchAll(RULE_SENTENCE)) place(hit[1]);
+    for (const line of read(decisionsRegister(docsOf(repository))).split("\n")) {
+      const row = IS_DEC_ID_ROW.exec(line);
+      if (row) place(row[1]);
+    }
+  }
+  if (!places.size) return [];
 
-  const dangling = new Map<string, string[]>();
+  const problems = new Map<string, string[]>();
+  const note = (what: string, path: string): void => {
+    const where = problems.get(what) ?? [];
+    if (!where.includes(path)) where.push(path);
+    problems.set(what, where);
+  };
   for (const path of sourcesOf(root)) {
     if (!reported(path)) continue;
     const text = read(join(root, path));
-    for (const hit of text.matchAll(DECISION_ID)) {
-      const id = hit[0];
-      if (rows.has(id)) continue;
-      const where = dangling.get(id) ?? [];
-      if (!where.includes(path)) where.push(path);
-      dangling.set(id, where);
+    for (const hit of text.matchAll(OLD_ID)) note(`${hit[0]} — an \`RD.\` id, which no longer names anything`, path);
+    for (const hit of text.matchAll(ID_LINK)) note(`${hit[1]} — written as a link, and an id stands alone`, path);
+    for (const hit of text.matchAll(ANY_ID)) {
+      const found = places.get(hit[0]) ?? 0;
+      if (found === 0) note(`${hit[0]} — resolves nowhere`, path);
+      else if (found > 1) note(`${hit[0]} — resolves ${found} times`, path);
     }
   }
-  if (!dangling.size) return [];
-  let out = `CITATION    ${dangling.size} decision id(s) cited here resolve to no row.`;
-  out += "\n            A citation with no row answers nothing and says so to nobody:";
-  for (const [id, where] of [...dangling].slice(0, 8))
-    out += `\n              ${id} — cited in ${where.slice(0, 3).join(", ")}` +
+  if (!problems.size) return [];
+  let out = `CITATION    ${problems.size} id(s) cited here do not resolve to exactly one place.`;
+  out += "\n            A citation with no place answers nothing, and one with two leaves a choice:";
+  for (const [what, where] of [...problems].slice(0, 8))
+    out += `\n              ${what} — cited in ${where.slice(0, 3).join(", ")}` +
            (where.length > 3 ? ` and ${where.length - 3} more` : "");
-  if (dangling.size > 8) out += `\n              … and ${dangling.size - 8} more`;
+  if (problems.size > 8) out += `\n              … and ${problems.size - 8} more`;
   return [out];
 }
 

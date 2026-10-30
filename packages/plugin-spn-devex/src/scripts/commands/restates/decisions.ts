@@ -16,10 +16,10 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative } from "node:path";
 import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../lib/payload.ts";
-import { BLOCK_COMMENT, DECISION_ID_SRC, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
+import { BLOCK_COMMENT, DEC_ID_SRC, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
 import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
-const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
+const IS_ROW = new RegExp(`^${DEC_ID_SRC}$`);
 
 /**
  * Restamp one ref's `decisions` citations after the developer has re-read each row and corrected
