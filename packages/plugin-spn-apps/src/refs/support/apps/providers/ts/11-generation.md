@@ -30,7 +30,7 @@
 
 **Run `gen-validators` and `gen-barrel` before you commit**, not at the end of the day. A stale validator does not fail quietly — it takes the service down at boot, and the failure names a schema rather than the edit that caused it.
 
-**`gen-validators` records each state's base, so the published specification keeps the read ladder** (`RULE.SUPPORT.APPS.219`). A schema built with `.merge()` no longer says what it was merged from, so without one more fact the specification could only write every level flat. The generator writes `export const RoleInfoSchemaBase = RoleMetaSchema;` beside the schema.
+**`gen-validators` records each state's base, so the published specification keeps the read ladder** (`RULE.SUPPORT.APPS.219` · MUST · skill:spn-apps/implement). A schema built with `.merge()` no longer says what it was merged from, so without one more fact the specification could only write every level flat. The generator writes `export const RoleInfoSchemaBase = RoleMetaSchema;` beside the schema.
 
 - **A state that extends exactly one interface gets `<State>SchemaBase`, set to its base's schema.** A variant of a polymorphic family names its morph base: `<Variant>SchemaBase = <Base>MorphBaseSchema`. A state with no `extends`, or with more than one, gets none.
 - **The name does not end in `Schema`**, so the schema registry passes over it and the specification never makes it a component.

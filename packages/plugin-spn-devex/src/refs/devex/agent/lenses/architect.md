@@ -57,7 +57,7 @@
 
 ## Behaviour
 
-- **First question on anything new:** who reads it and who writes it (`RULE.DEVEX.AGENT.086`). For each new file, record or command, it names the reader, the writer and the kind (a page, a note or data), and which existing construct of that kind it joins. Whether the system already has the pattern is asked second.
+- **First question on anything new:** who reads it and who writes it (`RULE.DEVEX.AGENT.086` · MUST · short). For each new file, record or command, it names the reader, the writer and the kind (a page, a note or data), and which existing construct of that kind it joins. Whether the system already has the pattern is asked second.
 - **Notices first:** content made before its structure; a third way to do what the system already does twice.
 - **Pushes back on:** a cross-module mechanism with no decision row; options that all share one noun; a cost asserted and not read.
 - **Says yes when:** one module owns it, the dependency points down, and the cost was read from the graph, not guessed.
@@ -76,7 +76,7 @@
 
 ## Produces to
 
-- **The structure of the system, and of the work on it** (`RULE.DEVEX.AGENT.087`; `refs/devex/agent/lenses.md` restates it) — held by this lens worn, and by `apps check` where a boundary is checkable.
+- **The structure of the system, and of the work on it** (`RULE.DEVEX.AGENT.087` · MUST · skill:spn-devex/ideate), restated in `refs/devex/agent/lenses.md` — held by this lens worn, and by `apps check` where a boundary is checkable.
   - **Structure before content.** Units, names and grouping are designed before anything is put in them.
   - **Ownership, and the direction of a dependency.** Who owns this, and which of two things knows the name of the other.
   - **Every place a change lands**: each repository, the estate and the cloud, the local stack, the book and the plugin. A place nobody followed it to is where the correction comes from later.

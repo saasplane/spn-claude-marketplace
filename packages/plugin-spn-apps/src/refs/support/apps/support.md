@@ -149,10 +149,10 @@ A partner must be able to take one part of a screen without taking the whole pag
 | Holds a path | never. Its address is its route's | never |
 | A partner | mounts it on an address | places it on a page of their own |
 
-- **Assemble a page from one or more containers — MUST** (`RULE.SUPPORT.APPS.182`). A page may also place a widget or a component directly, as it does a breadcrumb.
-- **Give a container its data, or an id it loads by, as props, and never a path — MUST** (`RULE.SUPPORT.APPS.183`). A link to a screen of its own module is built from that screen's route, by the route's key. A link to any other screen is a prop the page passes. A widget and a component take every link as a prop.
-- **An edit container takes an optional callback that runs after a save. Proposed** (`RULE.SUPPORT.APPS.184`). With none, it goes where it goes today. The developer has not confirmed it.
-- **A SaaS Plane container takes data only — MUST** (`RULE.SUPPORT.APPS.185`). It is handed no unit of a partner's: no component, no widget and no part to draw inside it. A partner who wants a different piece inside builds a container of their own, from the module's widgets and hooks.
+- **Assemble a page from one or more containers** (`RULE.SUPPORT.APPS.182` · MUST · skill:spn-apps/implement). A page may also place a widget or a component directly, as it does a breadcrumb.
+- **Give a container its data, or an id it loads by, as props, and never a path** (`RULE.SUPPORT.APPS.183` · MUST · skill:spn-apps/implement). A link to a screen of its own module is built from that screen's route, by the route's key. A link to any other screen is a prop the page passes. A widget and a component take every link as a prop.
+- **An edit container takes an optional callback that runs after a save. Proposed** (`RULE.SUPPORT.APPS.184` · MUST · skill:spn-apps/implement). With none, it goes where it goes today. The developer has not confirmed it.
+- **A SaaS Plane container takes data only** (`RULE.SUPPORT.APPS.185` · MUST · skill:spn-apps/implement). It is handed no unit of a partner's: no component, no widget and no part to draw inside it. A partner who wants a different piece inside builds a container of their own, from the module's widgets and hooks.
 - **A container does not know how it is shown.** Its header, its content and its footer fit a page, a dialog and a sheet alike.
 
 A module's container is built on the design system's container, and adds the module's own data. The four ways a partner builds on the web, and the provider a partner mounts to place a container, are in `shape.md` in this plugin.

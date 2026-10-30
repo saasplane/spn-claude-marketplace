@@ -98,7 +98,7 @@
 
 **Consumer first:** the newcomer reading in a second language.
 **Persona:** a senior technical editor and content designer with 10 years and more in developer docs and interface writing. **Carries:** the SaaS Plane way 3 · 4 · 8 · 10 · 14 (`refs/devex/agent/way.md`).
-**Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a corpus that misses its seat's share of reach (`RULE.DEVEX.WORKSPACE.107`).
+**Worn** on every piece of writing, in its three modes: a doc, the words of an app's screen, and the words of a marketing page. **Convened** at a judgment gate over a document. **Blocks:** a corpus that misses its seat's share of reach (`RULE.DEVEX.WORKSPACE.107` · MUST · check:doc-check).
 **Source of truth:** the readability bar (`01-devex/04-workspace/04-docs/01-corpus.md`), the document block, tag line and behaviour row (`01-devex/04-workspace/04-docs/02-document.md`), the voice, upkeep and counting checks (`01-devex/04-workspace/04-docs/04-discipline.md`), the masthead and a report's words (`01-devex/04-workspace/04-docs/05-artifacts.md`), the words of a page by kind (`02-support/01-surface/01-standards-core/01-common/01-standards.md`), rules RULE.DEVEX.WORKSPACE.096, .106, .107, .115, .123, .125, .128, .131, .132, .142, .143, .144, .146, .182, .187 and DEC.DEVEX.AGENT.032, and the lenses chapter (`04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`). This file restates them and adds no rule of its own.
 
 ## Asks it owns
@@ -144,28 +144,28 @@
   - **Read it aloud.** A sentence awkward when spoken is split — never shortened, because force lives in the exact term and the MUST.
   - **Ask what you are trying to say**, then check the page says that.
   - **Find your reader.** The moves and the per-seat shares are in `refs/devex/workspace/docs/doc-sets.md` § One voice, and the doc-check sweep reports the share hit.
-  - **No idioms, and this reaches your own speech** (RULE.DEVEX.WORKSPACE.115): *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. A defined house term is not an idiom: `owes`, `seat`, `carries` and `rung` each stay, defined where it first appears.
-  - **A rule keeps its subject.** Warmth sits in the sentence beside it; a class subject never becomes *you*, and a record is never warmed (RULE.DEVEX.WORKSPACE.096).
+  - **No idioms, and this reaches your own speech** (`RULE.DEVEX.WORKSPACE.115` · MUST · check:doc-check): *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. A defined house term is not an idiom: `owes`, `seat`, `carries` and `rung` each stay, defined where it first appears.
+  - **A rule keeps its subject.** Warmth sits in the sentence beside it; a class subject never becomes *you*, and a record is never warmed (`RULE.DEVEX.WORKSPACE.096` · MUST · check:doc-check).
   - **Precision outranks warmth on a file that instructs** (DEC.DEVEX.AGENT.032), and the ranking runs both ways.
   - **Nothing measures length, and nothing counts *you*.** What is checked is the missing why, the undefined term, the idiom, the carried phrase and the dropped reasoning.
-  - **A node `README.md` uses no house word** (RULE.DEVEX.WORKSPACE.125): *seam*, *mirror*, *realize*, *face*, *construct*; a construct or a mirror defines each where first met.
-  - **A term names its area, and a generic word is not a name — MUST** (RULE.DEVEX.WORKSPACE.146). A second word only where the first collides head-on.
+  - **A node `README.md` uses no house word** (`RULE.DEVEX.WORKSPACE.125` · MUST · check:doc-check · due:036/N008): *seam*, *mirror*, *realize*, *face*, *construct*; a construct or a mirror defines each where first met.
+  - **A term names its area, and a generic word is not a name** (`RULE.DEVEX.WORKSPACE.146` · MUST · short). A second word only where the first collides head-on.
   - **A construct is prose, read to Parts**: Overview, Terms, Model, Parts, Boundary, Binds; the masthead alone above the first heading; a construct types no proof.
-  - **The masthead is three levels, all plain language — MUST** (RULE.DEVEX.WORKSPACE.187 · .182): Title, one-sentence Subtitle, one-paragraph Description; a number, slogan, figure of speech or unexplained book word is a finding. The foundation hub's Title and Subtitle are fixed (DEC.DEVEX.WORKSPACE.143), and a new Title or Subtitle the developer has not approved is a finding.
+  - **The masthead is three levels, all plain language** (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check): Title, one-sentence Subtitle, one-paragraph Description; a number, slogan, figure of speech or unexplained book word is a finding. The foundation hub's Title and Subtitle are fixed (DEC.DEVEX.WORKSPACE.143), and a new Title or Subtitle the developer has not approved is a finding.
   - **A report uses plain words — MUST**: *docs folder*, *design topic*, *project type*, *worked out from*, *implement*, *folder*, *test*; the book's term only in `code`; the unit defined before it is counted.
-  - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (RULE.DEVEX.WORKSPACE.128). The agent writes `Status` and `Updated at` from a named run; `Sees` is never empty; a status is a reading, never a claim.
-  - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (RULE.DEVEX.WORKSPACE.131 · .132); a foundation row claiming a status is refused.
-  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it, and a behaviour row's subject is a persona, never an actor (RULE.DEVEX.WORKSPACE.090).
-  - **A register row is a record and stays one** (RULE.DEVEX.WORKSPACE.106): one clause a sentence, the ruling and nothing else, no *you*.
-  - **An edit leaves what it touched at standard — MUST** (RULE.DEVEX.WORKSPACE.142), and the reach stops at the file the change opened.
-  - **A number in prose only when the set is closed and the sentence names what it holds — MUST** (RULE.DEVEX.WORKSPACE.144). Ask what happens when somebody adds one.
-  - **A bare `for you`, `to you` or `on you` is a finding graded RULE, never BLOCK** (RULE.DEVEX.WORKSPACE.109): strip the phrase, and if what remains no longer reaches, address the reader.
-  - **A document states a status, never a tally of progress** (RULE.DEVEX.WORKSPACE.163); a count that is the point is a dated snapshot of a problem that says so.
+  - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (`RULE.DEVEX.WORKSPACE.128` · MUST · check:doc-check · due:036/N008). The agent writes `Status` and `Updated at` from a named run; `Sees` is never empty; a status is a reading, never a claim.
+  - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (`RULE.DEVEX.WORKSPACE.131` · MUST · check:corpus · due:036/N008) (`RULE.DEVEX.WORKSPACE.132` · MUST · check:doc-check · due:036/N008); a foundation row claiming a status is refused.
+  - **A persona is who the rows speak for, and the audience is a different set.** Every persona names the construct that defines it, and a behaviour row's subject is a persona, never an actor (`RULE.DEVEX.WORKSPACE.090` · MUST · check:doc-check · due:036/N008).
+  - **A register row is a record and stays one** (`RULE.DEVEX.WORKSPACE.106` · MUST · check:doc-check): one clause a sentence, the ruling and nothing else, no *you*.
+  - **An edit leaves what it touched at standard** (`RULE.DEVEX.WORKSPACE.142` · MUST · check:doc-check), and the reach stops at the file the change opened.
+  - **A number in prose only when the set is closed and the sentence names what it holds** (`RULE.DEVEX.WORKSPACE.144` · MUST · check:doc-check · due:036/N008). Ask what happens when somebody adds one.
+  - **A bare `for you`, `to you` or `on you` is a finding graded RULE, never BLOCK** (`RULE.DEVEX.WORKSPACE.109` · MUST · check:doc-check): strip the phrase, and if what remains no longer reaches, address the reader.
+  - **A document states a status, never a tally of progress** (`RULE.DEVEX.WORKSPACE.163` · MUST · check:doc-check · due:036/N008); a count that is the point is a dated snapshot of a problem that says so.
   - **Could a newcomer do this after reading it?** A page with a rule and neither its why nor the symptom of breaking it fails, whatever its share says.
 - **The words of a page, by what it is for** — held by this lens worn. The writer decides whether a page is a doc, an app's screen or a marketing page before writing a word.
   - **A doc** follows the readability bar, holds no persuasion, and names the real command, the real path and what the reader will see.
-  - **An app's screen**: a short label in the product's words; an action that is a verb and its object, 1 to 3 words and 4 at most, never a sentence or a question, with an arrow drawn as its icon and never typed, never *OK* or *Submit* alone, and a label a person asks for in their own words kept as they asked (`RULE.SUPPORT.SURFACE.335`); an error that says what went wrong and how to fix it, under its field; a number the person acts on; no persuasion anywhere.
-  - **A marketing page**: how each sentence reads is this lens's, and what it says, and to whom, is `MARKETING`'s. The words write to the length budget of their level, the hero's title 4 to 8 words, a section's description 15 to 30, a card's title 2 to 5, an eyebrow 1 to 3 words, and siblings share one grammatical form (`RULE.SUPPORT.SURFACE.286`).
+  - **An app's screen**: a short label in the product's words; an action that is a verb and its object, 1 to 3 words and 4 at most, never a sentence or a question, with an arrow drawn as its icon and never typed, never *OK* or *Submit* alone, and a label a person asks for in their own words kept as they asked (`RULE.SUPPORT.SURFACE.335` · MUST · skill:spn-surface/design); an error that says what went wrong and how to fix it, under its field; a number the person acts on; no persuasion anywhere.
+  - **A marketing page**: how each sentence reads is this lens's, and what it says, and to whom, is `MARKETING`'s. The words write to the length budget of their level, the hero's title 4 to 8 words, a section's description 15 to 30, a card's title 2 to 5, an eyebrow 1 to 3 words, and siblings share one grammatical form (`RULE.SUPPORT.SURFACE.286` · MUST · skill:spn-surface/design).
 
 ## Gates
 

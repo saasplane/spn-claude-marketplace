@@ -19,7 +19,7 @@
 
 The one way into this plugin's Surface refs. Find your job below, and read its route from the top. Every Surface ref sits on exactly one route; a route that needs another route's refs names that route and never lists its files again.
 
-**Every route runs in one order, the design skill's: the person, the flow, the pattern, the panels, the tasks, and only then the blocks.** A page is decided in four steps with a block chosen last (`RULE.SUPPORT.SURFACE.052`), so no job starts from a unit's table. A choice table gives a block its props once the page has placed it, and never decides which block stands where.
+**Every route runs in one order, the design skill's: the person, the flow, the pattern, the panels, the tasks, and only then the blocks.** A page is decided in four steps with a block chosen last (`RULE.SUPPORT.SURFACE.052` · MUST · skill:spn-surface/design), so no job starts from a unit's table. A choice table gives a block its props once the page has placed it, and never decides which block stands where.
 
 **Another plugin points here, and at no other Surface file.** spn-apps' implement, verify and review steps name this file, because every world that loads spn-apps loads this plugin too. This plugin names nothing in spn-apps.
 
