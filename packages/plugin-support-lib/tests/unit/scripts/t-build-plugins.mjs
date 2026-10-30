@@ -42,8 +42,8 @@ console.log("=== the build runs on the esbuild the lockfile pins");
   const root = checkout("0.24.2");
   try {
     const result = build(root);
-    ok("another version installed: the build exits 2", result.status === 2, `${result.status} ${result.stderr}`);
-    ok("and it names the installed version, the pinned one and the install that fixes it",
+    ok("[MKT.SCRIPTS.210] another version installed: the build exits 2", result.status === 2, `${result.status} ${result.stderr}`);
+    ok("[MKT.SCRIPTS.210] and it names the installed version, the pinned one and the install that fixes it",
       result.stderr.includes("esbuild 0.24.2 is installed and the lockfile pins 0.25.12") && result.stderr.includes("pnpm install --frozen-lockfile"), result.stderr);
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
@@ -51,7 +51,7 @@ console.log("=== the build runs on the esbuild the lockfile pins");
   const root = checkout("0.25.12");
   try {
     const result = build(root);
-    ok("the pinned version installed: the build goes on and exits 0", result.status === 0, `${result.status} ${result.stderr} ${result.stdout}`);
+    ok("[MKT.SCRIPTS.210] the pinned version installed: the build goes on and exits 0", result.status === 0, `${result.status} ${result.stderr} ${result.stdout}`);
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
 

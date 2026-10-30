@@ -39,7 +39,7 @@ console.log("\n=== commandsRef — the plugin's own commands, one line each, fro
   ok("a line carries the bin, the words, the usage and what it does", ref.split("\n").some((line) => line.startsWith("spn-devex workstream row discard <workstream>/N<nnn> <row> --note") && line.includes(" — take a row found invalid")), ref);
   ok("the retired `row write` is in neither help nor the ref", !ref.includes("row write") && !cli(root, ["help"]).out.includes("row write"));
   const edit = ref.split("\n").find((line) => line.startsWith("spn-devex workstream row edit ")) ?? "";
-  ok("`row edit` names `--proof` in its usage, in the ref the build writes", edit.includes("[--proof …]"), edit);
+  ok("[MKT.SCRIPTS.209] `row edit` names `--proof` in its usage, in the ref the build writes", edit.includes("[--proof …]"), edit);
   ok("the subject-less and subject lines both appear", ref.includes("spn-devex workstream rows show"));
 }
 

@@ -44,26 +44,26 @@ put(join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "S
 console.log("=== the index");
 const first = restates.writeRulesIndex(book, market);
 const index = JSON.parse(readFileSync(join(market, "packages", "plugin-spn-devex", "src", "refs", "rules.json"), "utf8"));
-ok("one entry for each rule that reads", first.rules === 3 && index.rules.length === 3 && first.faults.length === 0, JSON.stringify(first));
+ok("[MKT.SCRIPTS.204] one entry for each rule that reads", first.rules === 3 && index.rules.length === 3 && first.faults.length === 0, JSON.stringify(first));
 const short = index.rules.find((rule) => rule.id === "RULE.DEVEX.AGENT.901");
-ok("a `short` entry carries the ref's sentence as its line, with the ref and the heading",
+ok("[MKT.SCRIPTS.204] a `short` entry carries the ref's sentence as its line, with the ref and the heading",
   short.class === "stated" && short.line?.text === "A reply starts with the answer." && short.line.ref === "refs/agent.md" && short.line.heading === "The rules of a reply",
   JSON.stringify(short));
-ok("a rule with a register row names the row, and one without has none",
+ok("[MKT.SCRIPTS.204] a rule with a register row names the row, and one without has none",
   short.decision === "DEC.DEVEX.AGENT.901" && index.rules.find((rule) => rule.id === "RULE.DEVEX.AGENT.903").decision === null);
-ok("the entry names the plugin file that restates the rule",
+ok("[MKT.SCRIPTS.204] the entry names the plugin file that restates the rule",
   short.restated.length === 1 && short.restated[0].plugin === "spn-devex");
-ok("the index names the book's commit", typeof index.book.commit === "string" && index.book.repository === "spn-foundation");
+ok("[MKT.SCRIPTS.204] the index names the book's commit", typeof index.book.commit === "string" && index.book.repository === "spn-foundation");
 
 console.log("\n=== the skill blocks");
 const stepPath = join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "steps", "contract.md");
 const step = readFileSync(stepPath, "utf8");
-ok("a `skill:` rule lands in the step whose block cites its chapter, under the step's title",
+ok("[MKT.SCRIPTS.205] a `skill:` rule lands in the step whose block cites its chapter, under the step's title",
   step.includes("## The rules this step holds") && step.includes("**A contract names its states** (`RULE.SUPPORT.APPS.902` · MUST · skill:spn-apps/implement)")
     && step.indexOf("# Contract") < step.indexOf("## The rules this step holds"));
-ok("a step that cites nothing gets no block", !readFileSync(join(stepPath, "..", "ui.md"), "utf8").includes("The rules this step holds"));
+ok("[MKT.SCRIPTS.205] a step that cites nothing gets no block", !readFileSync(join(stepPath, "..", "ui.md"), "utf8").includes("The rules this step holds"));
 const skillPath = join(market, "packages", "plugin-spn-apps", "src", "skills", "implement", "SKILL.md");
-ok("a `skill:` rule no step cites lands in SKILL.md instead",
+ok("[MKT.SCRIPTS.205] a `skill:` rule no step cites lands in SKILL.md instead",
   (() => {
     put(join(book, "docs", SEAT.constructs, "02-more.md"), "# More\n\n**A page names its audience** (rule RULE.SUPPORT.APPS.904 · MUST · skill:spn-apps/implement).\n");
     restates.writeRulesIndex(book, market);
@@ -75,9 +75,9 @@ console.log("\n=== a second run");
 // run after that has nothing left to change.
 restates.writeRulesIndex(book, market);
 const again = restates.writeRulesIndex(book, market);
-ok("once settled, a run writes nothing", again.written.length === 0, JSON.stringify(again.written));
+ok("[MKT.SCRIPTS.206] once settled, a run writes nothing", again.written.length === 0, JSON.stringify(again.written));
 put(join(book, "docs", SEAT.constructs, "03-bad.md"), "# Bad\n\n**A bare one** (rule RULE.DEVEX.AGENT.905).\n");
-ok("a rule whose parenthesis does not read is left out and named",
+ok("[MKT.SCRIPTS.204] a rule whose parenthesis does not read is left out and named",
   (() => { const bad = restates.writeRulesIndex(book, market); return bad.faults.length === 1 && bad.faults[0].includes("RULE.DEVEX.AGENT.905"); })());
 
 console.log("\n=== the parentheses, field by field");
@@ -85,14 +85,14 @@ console.log("\n=== the parentheses, field by field");
   const stated = restates.ruleMarks(ws);
   const ref = "# Ref\n\n**A reply starts with the answer.** (`RULE.DEVEX.AGENT.901`)\n";
   const found = restates.parenFindings("refs/agent.md", ref, stated);
-  ok("a ref that drops the book's level and holder is one finding for each field",
+  ok("[MKT.SCRIPTS.207] a ref that drops the book's level and holder is one finding for each field",
     found.length === 2 && found[0] === "refs/agent.md:3: `RULE.DEVEX.AGENT.901` — level: the book says MUST, this says none"
       && found[1] === "refs/agent.md:3: `RULE.DEVEX.AGENT.901` — short: the book says short, this says nothing", JSON.stringify(found));
-  ok("a parenthesis equal to the book's has no finding",
+  ok("[MKT.SCRIPTS.207] a parenthesis equal to the book's has no finding",
     restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.901` · MUST · short)\n", stated).length === 0);
-  ok("a rule no member of the workspace states is named",
+  ok("[MKT.SCRIPTS.207] a rule no member of the workspace states is named",
     restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.777` · MUST · short)\n", stated)[0].includes("no member of the workspace states this rule"));
-  ok("a parenthesis citing two ids is refused, one id to a parenthesis",
+  ok("[MKT.SCRIPTS.207] a parenthesis citing two ids is refused, one id to a parenthesis",
     restates.parenFindings("refs/agent.md", "**A.** (`RULE.DEVEX.AGENT.901`, `RULE.DEVEX.AGENT.903`)\n", stated).length === 1);
 }
 
@@ -106,13 +106,13 @@ console.log("\n=== the nearest book up");
   registers(join(w, ".worktrees", "s", "spn-foundation"));
   put(join(w, ".worktrees", "s", "spn-claude-marketplace", "sprepo.json"), "{}");
   put(join(w, "spn-claude-marketplace", "sprepo.json"), "{}");
-  ok("from a worktree set's marketplace, the set's own book is read",
+  ok("[MKT.SCRIPTS.208] from a worktree set's marketplace, the set's own book is read",
     findBook(undefined, join(w, ".worktrees", "s", "spn-claude-marketplace")) === join(w, ".worktrees", "s", "spn-foundation"));
-  ok("from the workspace's marketplace, the workspace's book is read",
+  ok("[MKT.SCRIPTS.208] from the workspace's marketplace, the workspace's book is read",
     findBook(undefined, join(w, "spn-claude-marketplace")) === join(w, "spn-foundation"));
   const lonely = join(BASE, "lonely", "somewhere");
   mkdirSync(lonely, { recursive: true });
-  ok("with no book anywhere up, there is none and the reason names where the walk began",
+  ok("[MKT.SCRIPTS.208] with no book anywhere up, there is none and the reason names where the walk began",
     findBook(undefined, lonely) === null && noBookReason(lonely).includes(lonely));
 }
 

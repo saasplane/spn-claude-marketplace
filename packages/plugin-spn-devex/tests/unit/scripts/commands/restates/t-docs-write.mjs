@@ -143,7 +143,7 @@ console.log("\n=== a ref beside no book is refused with exit 1, and its bytes st
   const body = '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/ghost.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# a ref\n';
   writeFileSync(refPath, body);
   const result = write(refPath);
-  one("a ref with no book above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("holds an spn-foundation with a decisions register")], (g) => g.join() === "1,true");
+  one("[MKT.SCRIPTS.208] a ref with no book above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("holds an spn-foundation with a decisions register")], (g) => g.join() === "1,true");
   one("and it is left byte-identical", readFileSync(refPath, "utf8"), body);
 }
 

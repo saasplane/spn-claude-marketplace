@@ -246,13 +246,13 @@ one("known-bad: the same idiom with no quotation marks is still flagged",
   writeFileSync(join(compressedRepo, "docs", "01-page.md"), text);
   const found = run([compressedRepo], BASE);
   // The report scores a paragraph's plain prose, where a bold run is already plain, so the lead is the page check's to find.
-  one("three clauses joined by semicolons are listed as a compressed fault",
+  one("[MKT.SCRIPTS.212] three clauses joined by semicolons are listed as a compressed fault",
     found.out.includes("01-page.md") && /compressed/.test(found.out) && candidates(found.out)?.paragraphs === 1 && /compressed 1/.test(found.out), found.out);
   const lists = join(BASE, "lists");
   mkdirSync(join(lists, "docs"), { recursive: true });
   writeFileSync(join(lists, "docs", "01-list.md"), "# A page\n\nThe checks are: the first, which reads; the second, which writes; the third, which waits.\n");
   const listed = run([lists], BASE).out;
-  one("a semicolon list after a colon is not listed", /compressed 0/.test(listed) && !listed.includes("01-list.md"), listed);
+  one("[MKT.SCRIPTS.212] a semicolon list after a colon is not listed", /compressed 0/.test(listed) && !listed.includes("01-list.md"), listed);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

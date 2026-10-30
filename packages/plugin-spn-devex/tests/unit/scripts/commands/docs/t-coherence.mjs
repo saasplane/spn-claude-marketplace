@@ -139,7 +139,7 @@ one("an RD id is reported, whatever the workspace holds", run(retired).includes(
   WORKSPACE = ws;
   const markedOut = run(marketplace);
   WORKSPACE = null;
-  one("a RULE id the book marks as `(rule ID · MUST · short)` resolves", !markedOut.includes("RULE.SUPPORT.SURFACE.075 —"));
+  one("[MKT.SCRIPTS.203] a RULE id the book marks as `(rule ID · MUST · short)` resolves", !markedOut.includes("RULE.SUPPORT.SURFACE.075 —"));
 }
 
 // 1 — every citation resolves, so the check says nothing at all.

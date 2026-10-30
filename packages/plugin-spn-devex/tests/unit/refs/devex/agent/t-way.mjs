@@ -52,7 +52,7 @@ try {
   check("the agent's context holds the index", at > 0);
   // THE SHORT RULES ARE READ FROM THE RULES INDEX THE BUILD WRITES, so where this checkout has none there is no block to stand after.
   const blockAt = context.indexOf("## The short rules");
-  check("the index stands before the short rules, so their count is unchanged",
+  check("[MKT.HOOKS.91] the index stands before the short rules, so their count is unchanged",
     at > 0 && (blockAt < 0 ? !existsSync(join(PLUGIN, "src", "refs", "rules.json")) : at < blockAt));
   check("the developer's pane does not show it", !parsed.systemMessage.includes("The SaaS Plane way, and the ask router"));
   check("no lens file is loaded at the start of a window",

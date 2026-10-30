@@ -202,8 +202,8 @@ console.log("\n=== prepare refuses a book with a parenthesis that does not read"
     f.git(f.work, "add", "-A");
     f.git(f.work, "commit", "-q", "-m", "a stub restates bundle");
     const result = f.release("prepare", "0.76.0");
-    ok("the release stops and names the fault", result.status !== 0 && /RULE\.DEVEX\.AGENT\.113 \u2014 names no level/.test(said(result)), said(result));
-    ok("the manifests are restored", f.versionOf("spn-devex") === "0.75.0");
+    ok("[MKT.SCRIPTS.211] the release stops and names the fault", result.status !== 0 && /RULE\.DEVEX\.AGENT\.113 \u2014 names no level/.test(said(result)), said(result));
+    ok("[MKT.SCRIPTS.211] the manifests are restored", f.versionOf("spn-devex") === "0.75.0");
   } finally { f.cleanup(); }
 }
 

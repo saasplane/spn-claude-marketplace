@@ -686,14 +686,14 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
   const block = shortRules(index);
   const lines = block.split("\n").filter((line) => line.startsWith("- "));
 
-  says("the block opens with the heading", block.startsWith(HEADING));
-  says("it is one line for each `short` rule, and a rule held by a check has none",
+  says("[MKT.HOOKS.90] the block opens with the heading", block.startsWith(HEADING));
+  says("[MKT.HOOKS.90] it is one line for each `short` rule, and a rule held by a check has none",
     lines.length === 10, `got ${lines.length} rule lines`);
-  says("each ref's path stands once above the lines it holds, and each line ends with the heading that holds its rule whole",
+  says("[MKT.HOOKS.90] each ref's path stands once above the lines it holds, and each line ends with the heading that holds its rule whole",
     (block.match(/^\*\*`refs\/[^`]+\.md`\*\*$/gm) ?? []).length === 4 && lines.every((line) => / § .+$/.test(line)));
   says("known-bad: no line asks for a person at the table, the wording the developer's correction replaced",
     block.length > 0 && !block.includes("person at the table") && !block.includes("one or two plain sentences"));
-  says("without an index there is no block, and the window still starts", shortRules(null) === "");
+  says("[MKT.HOOKS.90] without an index there is no block, and the window still starts", shortRules(null) === "");
 
   for (const [what, words] of [
     ["lenses take part in any discussion about a shape, mid-run too",
@@ -720,7 +720,7 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     ["no script judges whether a prompt is such a discussion", ["No script flags a discussion about a shape"]],
   ]) {
     const missing = words.filter((word) => !block.includes(word));
-    says(`a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
+    says(`[MKT.HOOKS.90] a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
   }
 
   // EVERY SECTION A LINE NAMES IS A HEADING THE REF REALLY HAS.
@@ -731,14 +731,14 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
       broken.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
   }
-  says("every reference named is a file of the plugin, and every section named is a heading in it", broken.length === 0, broken.join(" | "));
+  says("[MKT.HOOKS.90] every reference named is a file of the plugin, and every section named is a heading in it", broken.length === 0, broken.join(" | "));
 
   // THE INDEX THE BUILD WRITES IS HELD TO THE SAME READER, where this checkout has one: a `short` entry with no line fails.
   const written = join(HOOKS, "src", "refs", "rules.json");
   if (existsSync(written)) {
     const real = JSON.parse(readFileSync(written, "utf8"));
     const unlined = real.rules.filter((rule) => rule.params.short && !rule.line).map((rule) => rule.id);
-    says("every `short` rule in the written index has a line", unlined.length === 0, `no line: ${unlined.join(" | ")}`);
+    says("[MKT.HOOKS.90] every `short` rule in the written index has a line", unlined.length === 0, `no line: ${unlined.join(" | ")}`);
     const lost = [];
     for (const rule of real.rules.filter((one) => one.line)) {
       let text = "";
@@ -746,17 +746,17 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
       if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
         lost.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
     }
-    says("and every heading it names exists in its ref", lost.length === 0, lost.join(" | "));
+    says("[MKT.HOOKS.90] and every heading it names exists in its ref", lost.length === 0, lost.join(" | "));
   }
   const noLine = { ...index, rules: [{ id: "RULE.DEVEX.AGENT.099", level: "MUST", params: { short: true }, class: "stated" }] };
-  says("known-bad: a `short` entry with no line is found by the reader the index is held to",
+  says("[MKT.HOOKS.90] known-bad: a `short` entry with no line is found by the reader the index is held to",
     noLine.rules.filter((rule) => rule.params.short && !rule.line).length === 1 && shortRules(noLine) === "");
 
   // THE START STAYS UNDER ITS CEILING WITH THIRTY-TWO LINES.
   const many = { ...index, rules: Array.from({ length: 32 }, (_, at) =>
     entry(`RULE.DEVEX.AGENT.${String(200 + at)}`, `${"A short sentence that stands alone and says what to do. ".repeat(3).trim()}`, `refs/devex/agent/r${at % 8}.md`, "Heading")) };
   const full = fitSessionStart("H".repeat(2500), [{ text: shortRules(many), rank: 1, readAt: "the short rules" }]);
-  says(`a fixture start with thirty-two short lines stays under ${SESSION_START_CEILING} characters (${full.length})`,
+  says(`[MKT.HOOKS.90] a fixture start with thirty-two short lines stays under ${SESSION_START_CEILING} characters (${full.length})`,
     full.length <= SESSION_START_CEILING && full.includes("A short sentence"));
 }
 

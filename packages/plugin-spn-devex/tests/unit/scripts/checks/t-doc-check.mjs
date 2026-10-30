@@ -819,16 +819,16 @@ console.log("\n=== doc-check — a compressed sentence is a note on a page a per
   const lead = "# A page\n\n**One endpoint per access path.** The store holds the rows.\n";
   const semi = "# A page\n\nPosture comes from `{workload}`; capacity comes from size; a label carries neither.\n";
   const compressed = (findings) => findings.filter(([, text]) => text.includes("compressed sentence"));
-  say("red: a bold lead with no verb is found", compressedSentences(lead, false).length === 1 && compressedSentences(lead, false)[0].includes("a bold lead with no verb"), JSON.stringify(compressedSentences(lead, false)));
-  say("red: three clauses joined by semicolons are found", compressedSentences(semi, false).length === 1 && compressedSentences(semi, false)[0].includes("three clauses joined by semicolons"), JSON.stringify(compressedSentences(semi, false)));
-  say("green: a bold lead with its verb is not found", compressedSentences("# A\n\n**A store holds the rows.** More.\n", false).length === 0);
-  say("green: a bold lead that ends in a plural noun after a determiner is a label and is still found, one that follows a noun with -s is a verb and is not",
+  say("[MKT.HOOKS.88] red: a bold lead with no verb is found", compressedSentences(lead, false).length === 1 && compressedSentences(lead, false)[0].includes("a bold lead with no verb"), JSON.stringify(compressedSentences(lead, false)));
+  say("[MKT.HOOKS.88] red: three clauses joined by semicolons are found", compressedSentences(semi, false).length === 1 && compressedSentences(semi, false)[0].includes("three clauses joined by semicolons"), JSON.stringify(compressedSentences(semi, false)));
+  say("[MKT.HOOKS.88] green: a bold lead with its verb is not found", compressedSentences("# A\n\n**A store holds the rows.** More.\n", false).length === 0);
+  say("[MKT.HOOKS.88] green: a bold lead that ends in a plural noun after a determiner is a label and is still found, one that follows a noun with -s is a verb and is not",
     compressedSentences("# A\n\n**The index by value.** It holds.\n", false).length === 1 && compressedSentences("# A\n\n**The tree folds.** It holds.\n", false).length === 0);
-  say("green: a semicolon list after a colon is not found",
+  say("[MKT.HOOKS.88] green: a semicolon list after a colon is not found",
     compressedSentences("# A\n\nThe checks are: the first, which reads; the second, which writes; the third, which waits.\n", false).length === 0);
   const doc = "/d/docs/02-constructs/a.md";
-  say("a write to a page a person reads is told, as a note", compressed(checkPage(doc, lead)).length === 1 && compressed(checkPage(doc, lead))[0][0] === "SOFT", JSON.stringify(checkPage(doc, lead)));
-  say("green: a plugin ref holding the same text is not told", compressed(checkPage("/d/plugins/spn-devex/refs/devex/x.md", lead)).length === 0,
+  say("[MKT.HOOKS.89] a write to a page a person reads is told, as a note", compressed(checkPage(doc, lead)).length === 1 && compressed(checkPage(doc, lead))[0][0] === "SOFT", JSON.stringify(checkPage(doc, lead)));
+  say("[MKT.HOOKS.89] green: a plugin ref holding the same text is not told", compressed(checkPage("/d/plugins/spn-devex/refs/devex/x.md", lead)).length === 0,
     JSON.stringify(checkPage("/d/plugins/spn-devex/refs/devex/x.md", lead)));
 }
 

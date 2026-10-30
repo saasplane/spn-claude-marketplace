@@ -30,33 +30,33 @@ put(join(ROOT, ".spndevex", "workstreams", "open", "036-agent-follows-rules", "a
 
 console.log("=== the holders the plugins ship");
 const known = knownHolders(marketplace, ROOT);
-ok("a check is a file of checks/ or events/, without .ts", known.checks.has("page-path") && known.checks.has("stop"));
-ok("a skill is <plugin>/<skill>", known.skills.has("spn-apps/implement"));
-ok("an open arc is <workstream number>/<arc>", known.openArcs.has("036/N008"));
-ok("no workspace gives no open arcs to check against", knownHolders(marketplace, null).openArcs === null);
+ok("[MKT.HOOKS.85] a check is a file of checks/ or events/, without .ts", known.checks.has("page-path") && known.checks.has("stop"));
+ok("[MKT.HOOKS.85] a skill is <plugin>/<skill>", known.skills.has("spn-apps/implement"));
+ok("[MKT.HOOKS.85] an open arc is <workstream number>/<arc>", known.openArcs.has("036/N008"));
+ok("[MKT.HOOKS.85] no workspace gives no open arcs to check against", knownHolders(marketplace, null).openArcs === null);
 
 console.log("\n=== the faults, each in words a writer can act on");
 const faults = (line) => bookClassFaults(`## H\n\n${line}\n`, known);
-ok("a clean checked rule, a stated rule and a guidance rule have no fault",
+ok("[MKT.HOOKS.86] a clean checked rule, a stated rule and a guidance rule have no fault",
   faults("A MUST (rule RULE.DEVEX.AGENT.113 · MUST · check:page-path).").length === 0 &&
   faults("A MUST (rule RULE.DEVEX.AGENT.114 · MUST · short).").length === 0 &&
   faults("A MAY (rule RULE.DEVEX.AGENT.115 · GUIDE).").length === 0);
-ok("a bare parenthesis names no level",
+ok("[MKT.HOOKS.86] a bare parenthesis names no level",
   faults("A MUST (rule RULE.DEVEX.AGENT.113).")[0]?.startsWith("line 3: RULE.DEVEX.AGENT.113 — ") && faults("A MUST (rule RULE.DEVEX.AGENT.113).")[0].includes("names no level"));
-ok("a MUST that nothing holds is refused", faults("A (rule RULE.DEVEX.AGENT.113 · MUST).").some((f) => f.includes("names what holds it")));
-ok("a param key outside the list is refused with line and raw text",
+ok("[MKT.HOOKS.86] a MUST that nothing holds is refused", faults("A (rule RULE.DEVEX.AGENT.113 · MUST).").some((f) => f.includes("names what holds it")));
+ok("[MKT.HOOKS.86] a param key outside the list is refused with line and raw text",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · since:2026).")[0] === "line 3: (rule RULE.DEVEX.AGENT.113 · MUST · since:2026) — `since` is not a param key — the list is `check`, `due`, `short`, `skill`");
-ok("a check no plugin ships is refused, with the way out",
+ok("[MKT.HOOKS.86] a check no plugin ships is refused, with the way out",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · check:nothing).").some((f) => f.includes("`check:nothing` names no check the plugins ship") && f.includes("`due:`")));
-ok("a check that is built takes its due: off",
+ok("[MKT.HOOKS.86] a check that is built takes its due: off",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · check:page-path · due:036/N008).").some((f) => f.includes("is built, so `due:036/N008` comes off")));
-ok("a skill no plugin ships is refused",
+ok("[MKT.HOOKS.86] a skill no plugin ships is refused",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · skill:spn-apps/nothing).").some((f) => f.includes("`skill:spn-apps/nothing` names no skill the plugins ship")));
-ok("a due: waiting on a check that is not built reads clean while its arc is open",
+ok("[MKT.HOOKS.86] a due: waiting on a check that is not built reads clean while its arc is open",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · check:later · due:036/N008).").length === 0);
-ok("a due: naming an arc that is not open is refused",
+ok("[MKT.HOOKS.86] a due: naming an arc that is not open is refused",
   faults("A (rule RULE.DEVEX.AGENT.113 · MUST · check:later · due:036/N099).").some((f) => f.includes("`due:036/N099` names no open arc")));
-ok("with no workspace, a due: is not judged",
+ok("[MKT.HOOKS.86] with no workspace, a due: is not judged",
   bookClassFaults("A (rule RULE.DEVEX.AGENT.113 · MUST · check:later · due:036/N099).\n", knownHolders(marketplace, null)).length === 0);
 
 console.log("\n=== the write check reaches it");
@@ -71,9 +71,9 @@ console.log("\n=== the write check reaches it");
     catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
   };
   const run = (content) => runAt(chapter, content);
-  ok("a write of a chapter under spn-foundation/docs/ with a bare parenthesis is told", run("# X\n\nA MUST (rule RULE.DEVEX.AGENT.113).\n").includes("names no level"));
+  ok("[MKT.HOOKS.87] a write of a chapter under spn-foundation/docs/ with a bare parenthesis is told", run("# X\n\nA MUST (rule RULE.DEVEX.AGENT.113).\n").includes("names no level"));
   chapter2 = join(ROOT, "elsewhere", "docs", "04-capabilities", "x.md");
-  ok("the same text in another repository's docs is not told",
+  ok("[MKT.HOOKS.87] the same text in another repository's docs is not told",
     !runAt(chapter2, "# X\n\nA MUST (rule RULE.DEVEX.AGENT.113).\n").includes("names no level"));
 }
 
