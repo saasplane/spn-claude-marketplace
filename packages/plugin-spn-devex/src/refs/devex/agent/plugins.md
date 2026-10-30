@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "a5411128"
+      "seen": "0d454108"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
-      "seen": "7aacfe3a"
+      "seen": "00e8ac37"
     }
   ]
 }
@@ -131,7 +131,7 @@ Plugins are named `spn-devex` plus `spn-<domain>`, one per domain, and a plugin 
 | `spn-apps` | the apps domain, stack-agnostic with its stacks inside it | the apps commands, the build-loop step files and standards under `providers/<stack>/`, and the write-time checks: the rule stated once and parsed per stack |
 | `spn-infra` | the estate, every provider | the estate commands, the manifest and layer references, the estate laws, and the hook that refuses secrets, account identifiers and hand edits to built output |
 
-**There are four plugins, one per domain, and the set is closed** (`RULE.DEVEX.AGENT.002` · MUST · check:restates · due:036/N008) (`DEC.DEVEX.AGENT.015`). The plugin's name is the domain, with nothing suffixed onto it. `SPDevExAgentPluginType` holds the four as `DEVEX`, `SURFACE`, `APPS` and `INFRA`, in that order. `DEVEX` names the domain the stack-agnostic plugin serves, how you work, and never the repository that writes the standards.
+**There are four plugins, one per domain, and the set is closed** (`RULE.DEVEX.AGENT.002` · MUST · check:restates · due:036/N008) (`RULE.DEVEX.AGENT.015` · MUST · skill:spn-devex/deliver). The plugin's name is the domain, with nothing suffixed onto it. `SPDevExAgentPluginType` holds the four as `DEVEX`, `SURFACE`, `APPS` and `INFRA`, in that order. `DEVEX` names the domain the stack-agnostic plugin serves, how you work, and never the repository that writes the standards.
 
 **A domain earns a plugin when the agent does a different act in it, and so needs different instructions.** Writing TypeScript and writing Python are one act in two languages, so a stack is a `providers/<name>/` folder inside its domain's plugin (`spn-apps`'s `providers/ts/`), with its own parser and its own steps checking the rule stated once beside them. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a cloud is a blueprint library and a provider folder (`spn-infra`'s `providers/aws/`) with no skill of its own. A cloud's rendering is read by a parser under the estate plugin's `providers/<cloud>/`, and a blueprint library is selected at apply time, so the install never chooses a cloud. Neither earns a plugin. **A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time, which is the defect the whole restatement discipline exists to stop.
 
@@ -190,6 +190,8 @@ The listing is the only file that knows all four plugins exist, and nothing gene
 **The two modes differ in what you may edit and in nothing else.** A partner's workspace is a full workspace, worked the same way — its repositories carry their own concept, their own documents, their own code and their own tests. What it does not hold is the book and the marketplace, so the book is cited by name and the plugins arrive installed.
 
 **A partner reports a standard that is wrong or missing; they never edit the plugin they installed — MUST.** That edit sits in one plugin cache, reaches nobody else, and the next install replaces it. The ask crosses upward instead, as a written request, because a rule you cannot get from a plugin or a package is a gap in what the foundation publishes — and naming it is how it closes.
+
+**A lesson for the agent goes into the book and the plugin, never only into memory** (`RULE.DEVEX.AGENT.143` · MUST · check:restates · due:036/N008). A memory reaches one person's windows on one machine. The book and the plugin reach every window, the builder's and every partner's, and the next install keeps them.
 
 **On a partner workspace the install fetches over the network**, and what it fetches is executable: hooks and the scripts behind them. The workspace floor allows that without asking, because the act writes a plugin cache and the workspace's own settings rather than publishing anything.
 
@@ -271,11 +273,15 @@ spn-devex plugin migration write <id>… [--steps-done]   apply and record, in i
 
 **Alpha does not change the retrofit rule.** A standard change still brings every existing open and backlog file to it in the same change (`RULE.DEVEX.WORKSPACE.255` · MUST · check:workstream-state · due:036/N008). The migration is how a workspace *elsewhere* — a partner's — gets that change when it takes the release: the builder's workspace is migrated before the cut, and its ledger says so.
 
+**In alpha, a change is made everywhere at once and leaves no legacy** (`RULE.DEVEX.AGENT.142` · MUST · check:comment-check). No old name, alias, redirect, *formerly* or forward-only exception stays behind. The change removes what its decision made obsolete, and brings every existing file and chapter to the new form. A kept alias is a second answer every reader has to learn and nobody removes.
+
 ## What a hook runs, and where its cache lives
 
 **A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
 
 **A plugin's cache lives in the machine store, under `~/.saasplane/cache/plugins/<name>/`, keyed by content, and never in the shared workspace folder — MUST.** `.spndevex/` is shared by every parallel window and every workstream, so a mutable file written there is overwritten by whichever window finishes second, and neither session did anything wrong — they only disagree about which verdict is current. A cache kept in the machine store and keyed by content sidesteps the race rather than resolving it: two windows either compute the identical verdict or never touch the same key at all.
+
+**A plugin script and its tests build a docs path through one layout module, never as a literal** (`RULE.DEVEX.AGENT.146` · MUST · check:restates · due:036/N008). When the docs tree moves a folder, one module changes and every script follows. A literal path breaks quietly, in whichever script nobody thought to search.
 
 **The Stop hook's `window` check offers a new window.** It reads the last call's context from the transcript. From 200k, at a clean point (no row running, no helper out, `workstream state check` whole), in any phase, it asks the turn to write every open point and offer a new window, and to tell the person in their own words why a new window helps, that the handover keeps every open point, and how to open one; past 450k it asks always, and again only after another 50k (`RULE.DEVEX.AGENT.103` · MUST · check:stop · due:036/N008).
 

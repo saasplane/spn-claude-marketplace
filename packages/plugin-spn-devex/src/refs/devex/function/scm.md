@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "9c999d7f"
+      "seen": "451c0af5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "ae9375a4"
+      "seen": "29a2c878"
     }
   ]
 }
@@ -202,7 +202,7 @@ Some work belongs to one repository and nowhere else: the scripted release its p
 | The task opens with what it is — purpose, invocation, arguments, gates, and what it changes — so a reader or an agent chooses it without reading the body | MUST |
 | Gates run before anything changes: build, test and validation first | MUST |
 | A destructive step asks for confirmation, with an explicit approval flag as the only way past it, and the run reports what it did | MUST |
-| A task can be run again — safe to repeat, or it refuses and says why | SHOULD |
+| A task can be run again where it can be — safe to repeat, or it refuses and says why | MUST |
 | The repository's own agent instructions name each task and when it applies; an unlisted task is invisible, and an agent that rebuilds a task's steps instead of invoking it has bypassed every gate inside it | MUST |
 | A task is created by a person's decision, never an agent's initiative. Propose what you would do, what you would gate on and what you would change, and create it only once that is approved | MUST |
 
