@@ -3,72 +3,65 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "4dba48e6"
+      "seen": "5a840071"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "342d87d8"
+      "seen": "256903bc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "b94b30ff"
+      "seen": "63707e78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "3dd16e2b"
+      "seen": "35c186cc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An arc's status is one of six, stored or worked out",
-      "seen": "2dcea68f"
+      "seen": "2289987e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A landed arc is never reopened",
-      "seen": "39c20c64"
+      "seen": "520d3ac6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "Two dot-homes",
-      "seen": "eda6566b"
+      "seen": "00b12471"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The state file has a node for each owner",
-      "seen": "988f3333"
+      "seen": "9950ee87"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "The worktree set",
-      "seen": "7ed4af7f"
+      "seen": "119b158a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
-      "seen": "73890b8d"
+      "seen": "bfe8a38d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
       "section": "Restatement discipline",
-      "seen": "abe4bd6f"
+      "seen": "5e2dc4df"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md",
       "section": "DevEx Workspace — One Window, Laws by Declaration",
-      "seen": "f81e3645"
+      "seen": "577d7403"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "section": "Five regions, one writer each",
-      "seen": "49d90178"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "DEC.DEVEX.UTILS.044",
-      "seen": "f30e3970"
+      "seen": "d6bd560c"
     }
   ]
 }
@@ -76,7 +69,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. The state file is `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The state file has a node for each owner**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RULE.DEVEX.WORKSPACE.020, DEC.DEVEX.UTILS.044, RULE.DEVEX.UTILS.048, RULE.DEVEX.AGENT.049, RULE.DEVEX.WORKSPACE.118 and RULE.DEVEX.WORKSPACE.324. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. The state file is `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The state file has a node for each owner**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RULE.DEVEX.WORKSPACE.020, RULE.DEVEX.UTILS.044, RULE.DEVEX.UTILS.048, RULE.DEVEX.AGENT.049, RULE.DEVEX.WORKSPACE.118 and RULE.DEVEX.WORKSPACE.324. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -190,7 +183,7 @@ A developer's own key keeps its prefix too. `DMO_MY_THING` belongs to DMO becaus
 
 ### Two cautions before you run a workspace command
 
-- **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, and it trades away the exposure this file avoids: every value exported to every process. **You never edit a shell profile yourself.**
+- **The tool never writes a shell profile** (`RULE.DEVEX.UTILS.044` · MUST · check:env-seat · due:036/N008). `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, and it trades away the exposure this file avoids: every value exported to every process. **You never edit a shell profile yourself.**
 - **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `agent-sync` for a demo. The command is `workspace agent-sync` — the floor, then `repo agent-sync` in every discovered member.
 
 ### A run manages only what it can observe
