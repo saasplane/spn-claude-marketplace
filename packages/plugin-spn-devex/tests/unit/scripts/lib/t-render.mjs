@@ -116,5 +116,18 @@ ok("red: several columns of sentences are a paragraph each, led by the column's 
   two.includes("<thead><tr><th>Direction</th></tr></thead>")
   && two.includes("<tr><td><p><code>UP</code></p><p><strong>The question:</strong> does the plan still hold when the estate grows by one ring</p><p><strong>What it costs:</strong> one more pass of every check over the new ring</p></td></tr>"), two);
 
+// A rule's parenthesis on a book page is a chip, and a parenthesis that does not read stays as written.
+{
+  const chipped = produced("A page is handed over whole (rule RULE.DEVEX.AGENT.113 · MUST · check:page-path).\n");
+  ok("a checked rule's parenthesis renders as the chip, the id as its anchor and the holder on hover",
+    chipped.includes('<a class="sds-badge" id="RULE.DEVEX.AGENT.113" href="#RULE.DEVEX.AGENT.113" title="check:page-path">MUST \u00b7 checked</a>'), chipped);
+  ok("a guidance rule renders as Guidance",
+    produced("A table may carry badges (rule RULE.SUPPORT.SURFACE.059 · GUIDE).\n").includes('>Guidance</a>'));
+  const bare = produced("A page is handed over whole (rule RULE.DEVEX.AGENT.113).\n");
+  ok("a bare parenthesis stays text", bare.includes("(rule RULE.DEVEX.AGENT.113)") && !bare.includes('id="RULE.DEVEX.AGENT.113"'));
+  ok("a parenthesis that does not read stays text",
+    produced("A page (rule RULE.DEVEX.AGENT.113 · MUST · since:2026).\n").includes("(rule RULE.DEVEX.AGENT.113 · MUST · since:2026)"));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — t-render` : `\n  all ${total} passed — t-render`);
 process.exit(failed ? 1 : 0);
