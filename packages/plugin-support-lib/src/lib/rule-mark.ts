@@ -83,8 +83,15 @@ const BOOK_MARK = new RegExp(`\\(rule (${RULE_ID_SRC})(${BODY})\\)`, "g");
 // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- built from this file's constants
 const REF_MARK = new RegExp(`\\(\`(${RULE_ID_SRC})\`(${BODY})\\)`, "g");
 const TOKEN = /^[a-z0-9][a-z0-9-]*(?:\/[A-Za-z0-9][A-Za-z0-9-]*)?$/;
+// A check named for a repository's own test file is held by that test: `t-<name>.mjs` or `<name>.spec.ts`.
+const TEST_HOLDER = /^(?:t-[a-z0-9][a-z0-9-]*\.mjs|[a-z0-9][a-z0-9-]*\.spec\.ts)$/;
 const HEADING = /^#{1,6}[ \t]+(.+?)[ \t]*$/;
 const BOLD_BEFORE = /\*\*((?:(?!\*\*)[^\n])+?)\*\*\s*$/;
+
+/** Whether a `check:` names a repository's own test file rather than a hook check, so no plugin ships it. */
+export function isTestHolder(check: string): boolean {
+  return TEST_HOLDER.test(check);
+}
 
 /**
  * The fields after the id, read in order: the level, then each param. The id is read by the caller.
@@ -109,7 +116,8 @@ export function parseFields(rest: string): { level: RuleLevel | null; params: Ru
       params.short = true;
       continue;
     }
-    if (!TOKEN.test(token)) return { fault: `\`${key}:\` takes one token, with no spaces and no quotes` };
+    if (!TOKEN.test(token) && !(key === "check" && TEST_HOLDER.test(token)))
+      return { fault: `\`${key}:\` takes one token, with no spaces and no quotes` };
     params[key as Exclude<ParamKey, "short">] = token;
   }
   return { level, params };
