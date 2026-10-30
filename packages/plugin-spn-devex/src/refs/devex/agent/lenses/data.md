@@ -80,4 +80,4 @@
 
 ## Improves the book
 
-- An event or metric convention every partner needs is drafted into the data chapter with its register row, put to the developer.
+- An event or metric convention every partner needs is drafted into the data chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

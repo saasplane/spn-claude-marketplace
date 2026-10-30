@@ -130,4 +130,4 @@
 
 ## Improves the book
 
-- A tier rule that let a row go unproved is drafted into the tests group with its register row, put to the developer.
+- A tier rule that let a row go unproved is drafted into the tests group with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

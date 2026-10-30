@@ -115,4 +115,4 @@ The spn-surface plugin restates Surface as `refs/support/surface/architecture-ap
 
 ## Improves the book
 
-- A web standard the Surface chapters omit, such as the share tags, is drafted into the standards chapter's site section with its register row.
+- A web standard the Surface chapters omit, such as the share tags, is drafted into the standards chapter's site section with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled.

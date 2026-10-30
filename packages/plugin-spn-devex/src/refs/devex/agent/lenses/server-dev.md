@@ -88,4 +88,4 @@
 
 ## Improves the book
 
-- A pattern a service needs that the catalog lacks is drafted into the module server chapter with its register row, put to the developer.
+- A pattern a service needs that the catalog lacks is drafted into the module server chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

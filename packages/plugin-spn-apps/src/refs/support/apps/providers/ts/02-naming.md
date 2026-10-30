@@ -231,7 +231,7 @@ The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (
 
 ### Personal name forms
 
-A field's name says whether it holds a person's data, as `_id` and `_at` say what a field is. A key is personal when it is one of these forms or ends with one, and it is ordinary everywhere else. The set is closed: it grows by a register row, never by one field (`RULE.SUPPORT.APPS.225`).
+A field's name says whether it holds a person's data, as `_id` and `_at` say what a field is. A key is personal when it is one of these forms or ends with one, and it is ordinary everywhere else. The set is closed: it grows by a change to this rule in its chapter, never by one field (`RULE.SUPPORT.APPS.225`).
 
 | Form | Ends a key such as | Holds |
 | --- | --- | --- |

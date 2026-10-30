@@ -110,4 +110,4 @@
 
 ## Improves the book
 
-- A fact probed at runtime that a manifest could declare is drafted into the infra design of record with its register row.
+- A fact probed at runtime that a manifest could declare is drafted into the infra design of record with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled.

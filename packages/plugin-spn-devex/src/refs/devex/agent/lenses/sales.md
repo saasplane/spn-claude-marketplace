@@ -82,4 +82,4 @@
 
 ## Improves the book
 
-- An enterprise ask no chapter answers is drafted into the trust or the lifecycle chapter with its register row, put to the developer.
+- An enterprise ask no chapter answers is drafted into the trust or the lifecycle chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

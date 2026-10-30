@@ -148,4 +148,4 @@ The question it holds: *is every unit the right one, built as the library draws 
 
 ## Improves the book
 
-- A prop or value the library and the stack disagree on is drafted into the construct first, then the library, then the stack, with its register row.
+- A prop or value the library and the stack disagree on is drafted into the construct first, then the library, then the stack, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled.

@@ -144,6 +144,6 @@ export interface IDSListProps extends IDSBaseProps, IDSGridColumns {} // ❌ a l
 
 **Never write** narration of the next statement, history prose, commented-out code, an ownerless `TODO`, or a constraint a validation tag already carries. A rationale changes with the line it explains and is deleted when its reason dies.
 
-**A reason a consumer needs is not rationale** — promote it to the intent block. A reason that recurs across files is a decision-register row, cited from the code rather than repeated in it.
+**A reason a consumer needs is not rationale** — promote it to the intent block. A reason that recurs across files belongs in the chapter that states the rule, cited from the code rather than repeated in it.
 
 **What the comment check refuses on a source write**: a history word, a comment repeating its own line, a guess, a line comment where a block is required, and an intent block naming a table its package does not declare. **What it reports without refusing**: a rationale past three sentences, and a rationale naming a constraint a caller would need.

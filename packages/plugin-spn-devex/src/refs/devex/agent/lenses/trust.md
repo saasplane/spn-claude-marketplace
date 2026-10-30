@@ -140,4 +140,4 @@ A fix that will miss its deadline names why and the new date, and a finding kept
 
 ## Improves the book
 
-- A control the guide asks for that no chapter states is drafted into the trust chapter with its register row, put to the developer.
+- A control the guide asks for that no chapter states is drafted into the trust chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

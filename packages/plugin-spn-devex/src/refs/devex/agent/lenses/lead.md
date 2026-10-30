@@ -109,4 +109,4 @@
 
 ## Improves the book
 
-- A workaround easier than the road is a finding against the road: it drafts the change to the paved-road chapter and its register row, and the developer decides.
+- A workaround easier than the road is a finding against the road: it drafts the change to the paved-road chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled; the developer decides.

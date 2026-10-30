@@ -137,4 +137,4 @@ Read the page itself, never a description of it — the frame, the preview, the 
 
 ## Improves the book
 
-- A task no pattern covers is drafted into the patterns chapter with its register row; evidence from an outside source is cited with its date.
+- A task no pattern covers is drafted into the patterns chapter, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled; evidence from an outside source is cited with its date.

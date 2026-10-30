@@ -82,4 +82,4 @@
 
 ## Improves the book
 
-- An agent rule every partner needs and no chapter states is drafted into the agent surface chapter with its register row, put to the developer.
+- An agent rule every partner needs and no chapter states is drafted into the agent surface chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

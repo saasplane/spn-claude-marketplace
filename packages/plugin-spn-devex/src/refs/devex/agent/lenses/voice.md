@@ -200,4 +200,4 @@
 
 ## Improves the book
 
-- A wording fault that keeps coming back becomes a drafted line in the readability bar, with its register row.
+- A wording fault that keeps coming back becomes a drafted line in the readability bar, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled.

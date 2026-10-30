@@ -62,7 +62,7 @@ You classify twice, and the order matters. First the **nature of the work**, whi
 | a new project or platform | the concept | nothing above it — the concept is the top |
 | a new capability inside a module | that module's construct | the module's own seats |
 | a new idea inside a module | where it fits in the construct, before any mechanics | the module's construct section |
-| an idea spanning modules | the repository's concept, and this book where it states a rule | the concept, and a register row |
+| an idea spanning modules | the repository's concept, and this book where it states a rule | the concept, and a register row only where a choice was weighed, an answer reversed or a conflict settled |
 
 **The answer is a path, not a category.** If you cannot name the highest document that must change, you have not classified the work yet. Everything below that document is implementation; everything above it is untouched by what gets built.
 
@@ -115,7 +115,7 @@ The last row is the one that silently bakes a product decision into code. Settle
 
 **The failure cases, as error codes rather than prose.** Which are the caller's fault and which are the system's decides the response class, and it cannot be retrofitted cheaply.
 
-- **A structural addition needs a recorded decision.** Where the platform's own documented structure has a ceiling — a new top-level chapter, a new module, a new kind — the design produces a register row, never a fait accompli.
+- **A structural addition needs a recorded decision.** Where the platform's own documented structure has a ceiling — a new top-level chapter, a new module, a new kind — the design produces the chapter that states it, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled; never a fait accompli.
 - **Contracts are the only cross-module surface.** If the design needs another module's internals or its storage, the design is wrong, not the rule.
 - **Additive by default.** A breaking change is a planned, versioned event with a migration path — if the design contains one, that is the headline, never a footnote.
 - **The phase does not design the implementation.** Naming files, choosing loop structures or writing pseudo-code here is wasted, because the standards decide most of it. A design says *what* and *where*, never *how*.

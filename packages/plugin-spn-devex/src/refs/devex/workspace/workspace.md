@@ -422,7 +422,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | You changed | It starts at | It reaches a session through |
 | --- | --- | --- |
 | a contradiction, or a new law | the concept, then the chapter carrying it | step 4, and nothing before it |
-| a decision worth citing later | a register row, `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` | the chapter and the plugins restating it |
+| a decision worth citing later | a register row, `DEC.<AREA>.<DOMAIN>.<NNN>`, where a choice was weighed, an answer reversed or a conflict settled | the chapter and the plugins restating it |
 | a realization true of one stack | that stack's provider seat | that stack's own plugin |
 | a command, a gate, or the floor | the deterministic tool | its release, then step 6 |
 

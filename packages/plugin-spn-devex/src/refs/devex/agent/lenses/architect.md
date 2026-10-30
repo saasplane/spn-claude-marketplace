@@ -35,7 +35,7 @@
 
 ## Asks it owns
 
-- *Where does this go, who owns it, and how do I name it?* — the owning node and layer, the names, a drafted decision row.
+- *Where does this go, who owns it, and how do I name it?* — the owning node and layer, the names, a drafted chapter change, and a register row only where a choice was weighed, an answer reversed or a conflict settled.
 - *What order should the work run in, and what does each file need?* — the step order, and what each file of the arc holds.
 
 ## Mastery
@@ -111,4 +111,4 @@
 
 ## Improves the book
 
-- A pattern used twice with no chapter becomes a drafted construct section and register row, put to the developer.
+- A pattern used twice with no chapter becomes a drafted construct section, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

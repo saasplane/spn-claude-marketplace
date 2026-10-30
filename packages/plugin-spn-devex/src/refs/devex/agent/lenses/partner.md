@@ -91,4 +91,4 @@ The question it holds: *could someone build against this without reading the cod
 
 ## Improves the book
 
-- A way of building on the platform that no chapter names is drafted, as the four web ways were, with its register row.
+- A way of building on the platform that no chapter names is drafted, as the four web ways were, with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled.
