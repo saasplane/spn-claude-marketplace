@@ -47,8 +47,9 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { sentenceColumn } from "../lib/item-cells.ts";
+import { bookClassFaults, knownHolders } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -1162,7 +1163,18 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
   if (isRegister(path)) out.push(...rows(text)[0]);
+  if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace(), workspaceRoot(dirname(path)))).map((f) => ["RULE", f] as Finding));
   return out;
+}
+
+/** A book chapter: a markdown file under a folder named `spn-foundation/docs/`. */
+const inBook = (path: string): boolean => path.endsWith(".md") && slashes(path).includes("/spn-foundation/docs/");
+
+/** The marketplace this check runs from, found from its own file, in source or in a bundle. */
+function ownMarketplace(): string {
+  let at = dirname(fileURLToPath(import.meta.url));
+  for (; dirname(at) !== at; at = dirname(at)) if (exists(join(at, "packages", "plugin-spn-devex"))) return at;
+  return at;
 }
 
 // ---------------------------------------------------------------------------- a column nobody reads down
