@@ -22,7 +22,7 @@ import { sheetFindings } from "./sheet.ts";
 
 export const describe = "the plan of a go: derive it from the scope's sheets and write each part's brief, show it, check it against the sheets, start a baseline or full run";
 
-const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
+export const save = (ws: string, lead: string, plan: GoPlan): void => writeWhole(goFileOf(ws, lead), `${JSON.stringify(plan, null, 2)}\n`);
 const briefOf = (ws: string, lead: string, part: GoPart): string => join(notesDirOf(ws, lead), "orders", `${part.id}.md`);
 
 function planOf(ws: string, lead: string): GoPlan {
@@ -33,7 +33,7 @@ function planOf(ws: string, lead: string): GoPlan {
 }
 
 /** The step that follows: the first part that may be launched, or what is left. */
-function nextStep(ref: string, ws: string, plan: GoPlan): string {
+export function nextStep(ref: string, ws: string, plan: GoPlan): string {
   const held = plan.parts.filter((one) => one.state === "held");
   if (held.length) return `Next: derive the plan again with \`workstream go write ${ref} --scope ${plan.scope.join(",")}\`; held: ${held.map((one) => one.id).join(", ")}.`;
   const ready = readyParts(plan);
@@ -132,7 +132,7 @@ function show(args: string[]): number {
   return 0;
 }
 
-function check(args: string[]): number {
+export function checkGo(args: string[]): number {
   const words = readWords(args);
   const [ref, ...more] = words.paths;
   if (more.length) throw new UsageFault("takes one arc.");
@@ -185,6 +185,6 @@ function start(args: string[]): number {
 export const actions: Record<string, Action> = {
   write: { describe: "after the go: derive the plan from the scope's sheets and the telemetry, and write every part's brief; run again it keeps landed and running parts", usage: "<workstream>/N<nnn> --scope N<nnn>,…", run: write },
   show: { describe: "print the parts: their files, their tests, their measured time and what each waits on", usage: "<workstream>/N<nnn> [--part <id>] [--json]", run: show },
-  check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: check },
+  check: { describe: "read the plan against the sheets: an entry no part holds, or a part whose entries changed since the plan was written, which it marks held; exits 1 on any", usage: "<workstream>/N<nnn>", run: checkGo },
   start: { describe: "mark a baseline or full run as running, so the test-run check lets the whole suite run", usage: "<workstream>/N<nnn> <part>", run: start },
 };
