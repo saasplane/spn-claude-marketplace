@@ -939,19 +939,21 @@ export function proposedLines(text: string): Array<{ line: number; text: string 
 }
 
 /**
- * Writes the arc's status into the header of each preview of an arc kept as data, from the arc's `state.json`.
- * Every `workstream` write and `docs cycles write` call it, so the status there is never typed. A closed
- * workstream's previews stay as they closed. Returns the previews it changed, from the workstream.
+ * Writes the arc's status into the header of each preview of an arc kept as data, from the arc's `state.json`,
+ * and its `Open` from `questions.jsonl`, so a preview no card is shown on carries no `Open` section, the
+ * template's empty one included. Every `workstream` write and `docs cycles write` call it, so neither is
+ * typed. A closed workstream's previews stay as they closed. Returns the previews it changed, from the workstream.
  */
 export function writePreviewStatus(ws: string): string[] {
   if (basename(dirname(resolve(ws))) === "closed") return [];
   const wrote: string[] = [];
+  const questions = readQuestions(ws);
   for (const arc of arcIdsOf(ws)) {
     const data = readArc(ws, arc);
     const path = previewOf(ws, arc);
     if (!data || typeof data.status !== "string" || !isFile(path)) continue;
     const text = readFileSync(path, "utf8");
-    const next = previewWithStatus(text, arc, arcStatus(data));
+    const next = previewWithOpen(ws, path, previewWithStatus(text, arc, arcStatus(data)), questions);
     if (next !== text) { writeFileSync(path, next, "utf8"); wrote.push(fromWorkstream(ws, path)); }
   }
   return wrote;
