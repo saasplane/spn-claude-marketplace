@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { CARD, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
 
 const { cardsOn, cardsDiffer, checkQuestions, handMadeCards, openWithoutCard } = await import("../../../../src/scripts/checks/questions.ts");
-const { cardHtml, readQuestions } = await import("../../../../src/scripts/lib/workstream.ts");
+const { cardHtml, readQuestions, writePreviewStatus } = await import("../../../../src/scripts/lib/workstream.ts");
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -87,6 +87,33 @@ console.log("\n=== shownIn is read for open cards only (state check)");
   const openNaming = [{ ...clean[0], state: "open", shownIn: [gone] }];
   ok("red: an open card naming a page that is gone is still a finding",
     cardsDiffer(ws, openNaming).includes(`${gone} is named by a card's \`shownIn\` and is not there`), cardsDiffer(ws, openNaming).join(" | "));
+}
+
+console.log("\n=== a preview's Open follows the records on every write");
+{
+  // The template's Open, as `arc edit` copies it into a new preview: the block's markers around slots.
+  const templateOpen = [
+    `<section id="s5" data-block="reasons">`,
+    `  <!-- spn:generated open — do not edit inside these markers; \`workstream question show\` writes it from questions.jsonl -->`,
+    `  <div class="sds-section-head"><h2>Open &mdash; Q{{n}} &middot; Q{{n}}</h2></div>`,
+    `  <div class="sds-open"><h4 id="q{{n}}">Q{{n}} &middot; {{The question}}</h4></div>`,
+    `  <!-- /spn:generated -->`,
+    `</section>`,
+  ].join("\n");
+  const bare = readFileSync(preview, "utf8");
+  ok("the preview holds no Open once its last card is answered", !bare.includes("spn:generated open"));
+  writeFileSync(preview, bare.replace(/<\/div>\s*$/, `${templateOpen}\n</div>\n`));
+  writePreviewStatus(ws);
+  const cleared = readFileSync(preview, "utf8");
+  ok("[MKT.HOOKS.83] red first: a workstream write drops the template's empty Open from a preview no card is shown on",
+    !cleared.includes("spn:generated open") && !cleared.includes("{{"), cleared.slice(-400));
+  put(root, "card2.json", JSON.stringify({ ...CARD, title: "a second probe" }));
+  cli(root, ["workstream", "question", "raise", "031/N001", "--file", "card2.json"]);
+  cli(root, ["workstream", "question", "show", "031/q2", "--in", "notes/N001/preview.html"]);
+  writePreviewStatus(ws);
+  const kept = readFileSync(preview, "utf8");
+  ok("[MKT.HOOKS.83] green: a preview showing an open card keeps its Open through the same write",
+    kept.includes("spn:generated open") && cardsOn(kept).some((card) => card.id === "q2"), JSON.stringify(cardsOn(kept).map((card) => card.id)));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — questions` : `\n  all ${total} passed — questions`);
