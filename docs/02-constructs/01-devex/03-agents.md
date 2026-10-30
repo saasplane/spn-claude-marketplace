@@ -73,7 +73,7 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 ### Where a read-only promise is actually bound
 
-A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
+A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose (rule RULE.MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
 
 ### A fixed persona
 

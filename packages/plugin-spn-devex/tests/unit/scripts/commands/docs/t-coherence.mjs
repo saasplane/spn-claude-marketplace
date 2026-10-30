@@ -8,7 +8,8 @@ import { PLUGIN } from "../../../../helpers/harness.mjs";
 // until somebody opens the register and searches.
 //
 // An id is `RULE.<AREA>.<DOMAIN>.<NNN>`, written once as `(rule RULE.…)` on the rule's sentence in a
-// chapter, or `DEC.<AREA>.<DOMAIN>.<NNN>`, written once as a register row's first cell. These cases
+// chapter, or `DEC.<AREA>.<DOMAIN>.<NNN>`, written once as a register row's first cell or as the
+// heading of the open card that row will compress from. These cases
 // fix the answers that matter, because the check ships SOFT and a SOFT check nobody trusts is a SOFT
 // check nobody reads:
 //
@@ -87,6 +88,20 @@ writeFileSync(join(decTwice, "docs", POCKET.registers, "decisions.md"),
   readFileSync(join(decTwice, "docs", POCKET.registers, "decisions.md"), "utf8") +
   "| DEC.DEVEX.WORKSPACE.155 | The same row again. | Because a fixture needs a duplicate. | 2026-09 |\n");
 one("a DEC id two rows carry is reported as resolving twice", run(decTwice).includes("DEC.DEVEX.WORKSPACE.155 — resolves 2 times"));
+
+// An open card headed with the id its row will take is that id's place until it compresses to the row.
+const card = "### DEC.DEVEX.WORKSPACE.156 — Is the thing so?\n\n- **Context:** a fixture needs an open card.\n\n";
+const opened = tree("card", "# A page\n\nIt cites DEC.DEVEX.WORKSPACE.156.\n");
+writeFileSync(join(opened, "docs", POCKET.registers, "decisions.md"),
+  "# Decisions\n\n## Open\n\n" + card + readFileSync(join(opened, "docs", POCKET.registers, "decisions.md"), "utf8").replace("# Decisions\n\n", ""));
+one("a DEC id an open card is headed with resolves to that card", !run(opened).includes("CITATION"));
+
+const standing = tree("card-standing", "# A page\n\nIt cites DEC.DEVEX.WORKSPACE.155.\n");
+writeFileSync(join(standing, "docs", POCKET.registers, "decisions.md"),
+  "# Decisions\n\n## Open\n\n" + card.replace("156", "155") +
+  readFileSync(join(standing, "docs", POCKET.registers, "decisions.md"), "utf8").replace("# Decisions\n\n", ""));
+one("a card left standing beside its row is reported as resolving twice",
+  run(standing).includes("DEC.DEVEX.WORKSPACE.155 — resolves 2 times"));
 
 const linked = tree("linked", "# A page\n\nIt cites [RULE.SUPPORT.SURFACE.075](../registers/decisions.md).\n");
 mk(linked, `docs/${SEAT.constructs}/b.md`, `# B\n\n${ruleSentence}`);

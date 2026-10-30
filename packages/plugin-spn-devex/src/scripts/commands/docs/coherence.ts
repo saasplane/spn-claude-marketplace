@@ -52,6 +52,8 @@ const ID_LINK = new RegExp(`\\[(${ID_SRC})\\]\\(`, "g");
 const OLD_ID = /\bRD\.[A-Z]+(?:\.[A-Z]+)?\.\d{3}\b/g;
 const IS_DEC_ID = new RegExp(`^${DEC_ID_SRC}$`);
 const IS_DEC_ID_ROW = new RegExp(`^\\|\\s*(${DEC_ID_SRC})\\s*\\|`);
+// An open card headed with the id its row will take: `### DEC.<…> — <the question>`.
+const IS_DEC_ID_CARD = new RegExp(`^###\\s+(${DEC_ID_SRC})\\s+—`);
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 // Heading words too common to identify a section on their own.
@@ -386,10 +388,11 @@ function restatementDrift(root: string, reported: Reported): string[] {
  *
  * **An id names one thing, and its first word says where to read it.** A `RULE.` id stands on the
  * sentence that states the rule, written `(rule RULE.…)` in a chapter. A `DEC.` id is the first cell of
- * one register row. The check reads the workspace (`resolveWorkspace`), because a repository cites a
- * rule the book states and the book is a sibling checkout: a `RULE` id resolves to exactly one
- * `(rule RULE.…)` across the workspace's repositories, and a `DEC` id to exactly one register row's
- * first cell.
+ * one register row, or the heading of the open card that row will compress from. The check reads the
+ * workspace (`resolveWorkspace`), because a repository cites a rule the book states and the book is a
+ * sibling checkout: a `RULE` id resolves to exactly one `(rule RULE.…)` across the workspace's
+ * repositories, and a `DEC` id to exactly one register row's first cell or open card's heading, so a
+ * card left standing beside its row resolves twice (RULE.DEVEX.WORKSPACE.334).
  *
  * IT FAILS FOUR THINGS. An id that resolves nowhere, which answers nothing and says so to nobody; an
  * id that resolves twice, which leaves two answers; an id written as a link (`[RULE.…](`), because
@@ -417,7 +420,7 @@ function citations(root: string, reported: Reported): string[] {
     for (const path of sourcesOf(repository))
       for (const hit of read(join(repository, path)).matchAll(RULE_SENTENCE)) place(hit[1]);
     for (const line of read(decisionsRegister(docsOf(repository))).split("\n")) {
-      const row = IS_DEC_ID_ROW.exec(line);
+      const row = IS_DEC_ID_ROW.exec(line) ?? IS_DEC_ID_CARD.exec(line);
       if (row) place(row[1]);
     }
   }

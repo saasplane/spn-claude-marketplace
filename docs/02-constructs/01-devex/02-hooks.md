@@ -131,7 +131,7 @@ The dispatcher imports every check and calls each in turn. Each check declares w
 
 ### The dispatcher's own refusal
 
-One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read.
+One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.MARKETPLACE.DEVEX.002).
 
 ### Measuring what a run cost
 

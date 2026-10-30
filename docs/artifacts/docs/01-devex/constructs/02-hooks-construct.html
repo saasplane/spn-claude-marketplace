@@ -181,7 +181,7 @@
   ] }
   -->
   <h3 id="the-dispatcher-s-own-refusal">The dispatcher's own refusal</h3>
-  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read.</p>
+  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.MARKETPLACE.DEVEX.002).</p>
   <h3 id="measuring-what-a-run-cost">Measuring what a run cost</h3>
   <p>Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded.</p>
   <h3 id="every-moment-exits-zero">Every moment exits zero</h3>

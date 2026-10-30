@@ -905,7 +905,7 @@ A rule lives in its chapter, with its id on it. A **governing node** carries `re
 
 | Repository | The place | Its ids | For example |
 | --- | --- | --- | --- |
-| The foundation | an area, a domain, then its number | `RULE` or `DEC`, area, domain, number | `RULE.DEVEX.AGENT.049`, `DEC.SUPPORT.APPS.133` |
+| The foundation | an area, a domain, then its number | `RULE` or `DEC`, area, domain, number | `RULE.DEVEX.AGENT.049`, `DEC.SUPPORT.APPS.034` |
 | Every other repository | its own scope token, then a group | `RULE`, scope token, group, number | `RULE.PLATFORM_TS.IAM.004`, `RULE.SUPPORT_TS.SERVER.009` |
 
 - **The place stops at the domain or the group, never the construct or the chapter.** A rule's id is written once, at the end of its sentence in its chapter, as `(rule RULE.<…>)`; everything else cites it bare, never as a link.
