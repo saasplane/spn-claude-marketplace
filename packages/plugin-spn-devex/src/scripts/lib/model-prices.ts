@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The cost of a window is
-// read from telemetry, never from a transcript (RD.DEVEX.AGENT.082). The chapter is the source of truth; a rule
+// read from telemetry, never from a transcript (RULE.DEVEX.AGENT.082). The chapter is the source of truth; a rule
 // change is edited there first, then here, in the same change.
 //
 // The price table `debug cost show` reads. Money is an ESTIMATE, a cache write being priced at the 5-minute rate;

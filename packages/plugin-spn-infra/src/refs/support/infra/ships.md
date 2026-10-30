@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/09-ships.md",
-      "seen": "00aa7c17"
+      "seen": "faf71db9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/09-ships/",
@@ -55,7 +55,7 @@ The layers read each other's published outputs, so a version difference between 
 
 ## It belongs to no stack
 
-**There is no runtime and no language ecosystem beneath the estate half — MUST.** Its declaration sits outside the kind system, for the same reason an estate sits outside it: a kind claims code written in a stack, and nothing here is written in one. That is why nothing in it carries a JavaScript package manifest, and why its artifact is a set of files rather than a compiled thing (`RD.SUPPORT.INFRA.066`).
+**There is no runtime and no language ecosystem beneath the estate half — MUST.** Its declaration sits outside the kind system, for the same reason an estate sits outside it: a kind claims code written in a stack, and nothing here is written in one. That is why nothing in it carries a JavaScript package manifest, and why its artifact is a set of files rather than a compiled thing (`RULE.SUPPORT.INFRA.066`).
 
 A stack claim on the estate half would be a claim about something that does not run, and it would invite a second estate half per stack — exactly the duplication the one-repository rule exists to prevent. If you see a stack-specific assumption creeping into the estate half, that is a defect to name, not a convenience to keep.
 

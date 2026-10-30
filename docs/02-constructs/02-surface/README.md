@@ -38,7 +38,7 @@ Each construct here is the Surface form of one in the core domain, so read its c
 | [a skill](03-skills.md) | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group this domain answers to |
 | [a step](03-skills.md) | `steps/` | one file of a longer walk, read only when the skill's own router names it |
 | [a tree](03-skills.md) | — | one page as every block by the name the book gives it, with its props, in the order the decisions were taken |
-| [the stage](03-skills.md) | `RD.DEVEX.AGENT.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
+| [the stage](03-skills.md) | `RULE.DEVEX.AGENT.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
 | [the value](03-skills.md) | `SURFACE_{SKILL}` | the name the enum carries for that folder, its domain prefix derived from the plugin's own claim |
 | **Scripts** | | |
 | [a check](04-scripts.md) | `figma-connector.ts` | one rule, in its own file, that returns a verdict and can also run alone |
@@ -46,13 +46,17 @@ Each construct here is the Surface form of one in the core domain, so read its c
 | [the bundle](04-scripts.md) | `dist/` | the committed build a hook runs, kept current by a staleness test |
 | [the dispatcher](04-scripts.md) | `pretooluse.ts` | the single process behind the wired entry, which keeps the first refusal and joins the advice |
 | [the entry](04-scripts.md) | `cli.ts` | the one command line the plugin ships, dispatching by group and action |
+| [the read advice](04-scripts.md) | `unit-read.ts` | the note beside a `Read` of a unit's own file, naming `unit show` on the file's name |
 | [the resulting text](04-scripts.md) | `resultingText` | the source as the pending write would leave it, which is what a rule actually reads |
+| [the unit lookup](04-scripts.md) | `unit show` | one unit's props, values, defaults, usage, cases with their rules and index by value, read from the snapshot beside the refs; a unit beyond the core, its props from the repository's symbol index and the core block its name points to |
+| [the unit search](04-scripts.md) | `unit find` | the units whose name or line carries a task's words, best first, from the snapshot and the symbol index `unit show` reads, each with its package, its repository and the core block its name points to |
 | **Refs** | | |
 | [a domain folder](05-refs.md) | `support/` | one folder per book domain, and the only kind of folder this tree holds at its top |
 | [a group](05-refs.md) | `surface/` | a folder under a domain; a file under it is named for a construct the book states |
 | [a ref](05-refs.md) | `refs/` | a self-contained markdown leaf restating a chapter of the book, written out rather than linked to |
 | [a spec copy](05-refs.md) | `app-patterns/` · `site-patterns/` | a folder of skeleton specs, byte-identical to the book's, which a page starts from |
 | [drift](05-refs.md) | — | the state where a stamped hash no longer matches the chapter, which is what a run reports |
+| [the snapshot](05-refs.md) | `construct.snapshot.json` | the CONSTRUCT snapshot written from the book of each release, which `unit show` reads |
 | [the stamp](05-refs.md) | `spn:restates` | the block at the top naming each chapter this file restates and the hash last read from it |
 | **Tests** | | |
 | [a suite](06-tests.md) | `t-<name>.mjs` | one file proving one thing, named for what it proves rather than for where it sits |

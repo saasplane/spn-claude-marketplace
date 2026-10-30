@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/05-apps.md",
-      "seen": "edc798c3"
+      "seen": "11fba2f8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/05-apps/",
@@ -19,7 +19,7 @@
 
 ## An application runs because a row grants it — MUST
 
-There is no file in a code repository that asks the estate for what an application needs. **A grant belongs where it is reviewed, so an application's existence in the cloud is one row of its platform's own declaration** — and the row is not a description of something that already exists, it is the permission for it to (`RD.SUPPORT.INFRA.026`).
+There is no file in a code repository that asks the estate for what an application needs. **A grant belongs where it is reviewed, so an application's existence in the cloud is one row of its platform's own declaration** — and the row is not a description of something that already exists, it is the permission for it to (`RULE.SUPPORT.INFRA.026`).
 
 Two independent statements have to agree before anything runs, made in two different repositories by two different reviews: a code node's kind manifest claims that it is code of a certain shape, and the estate row grants that shape a place to run. **A deployment needs both.** A code change alone can never open production access, and something running with no row behind it is a finding, never a fact.
 
@@ -55,7 +55,7 @@ A code the platform never declared is refused when the declaration is checked. A
 
 ### What an application's row says about its settings
 
-A space and an application are two separate rows. The space owns no application. An application says on its own row what it needs, in three choices (`RD.SUPPORT.INFRA.113`):
+A space and an application are two separate rows. The space owns no application. An application says on its own row what it needs, in three choices (`RULE.SUPPORT.INFRA.113`):
 
 | The application needs | Its row | What its deployment is given |
 | --- | --- | --- |
@@ -72,14 +72,14 @@ These are the last three of the four shapes a platform is built in on the server
 
 ### What the runtime may call as itself — `grants`
 
-A database, a cache and a queue are reached with a user and a password, which arrive as settings. Two cloud services are reached another way: the runtime calls them as itself, with no credential, because the blueprint grants its role the right. A row lists them in `grants` (`RD.SUPPORT.INFRA.110`).
+A database, a cache and a queue are reached with a user and a password, which arrive as settings. Two cloud services are reached another way: the runtime calls them as itself, with no credential, because the blueprint grants its role the right. A row lists them in `grants` (`RULE.SUPPORT.INFRA.110`).
 
 | Grant | What the runtime may do |
 | --- | --- |
 | `SEAL` | use the environment's key for stored secrets, so the application seals secrets of its own in its own rows |
 | `EDGE` | bind a tenant's own domain: request its certificate and write its route |
 
-- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value.
+- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value. The contract states no other key for a grant, and a manifest that writes one is refused.
 - **A grant is not restricted by `space`.** An application that lists one is granted it, on the platform or in a space.
 - **A workload that lists no grant holds none**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow. `EDGE` is true for the application that owns identity and for no other.
 - **A service lists `SEAL` only when a module it mounts stores secrets.** A service that holds that module remotely receives the opened value from it and never touches the seal.
@@ -105,7 +105,7 @@ export interface SPEstateAppDeployment {
 
 ## Exposure is declared, and the namespace is its ceiling — MUST
 
-Which edge a deployment answers on, which zone it sits in, and whether it stands on the public attack surface at all is **one declared fact**, never inferred (`RD.SUPPORT.INFRA.103`).
+Which edge a deployment answers on, which zone it sits in, and whether it stands on the public attack surface at all is **one declared fact**, never inferred (`RULE.SUPPORT.INFRA.103`).
 
 | Value (`SPEstateExposeType`) | The deployment | Reached by |
 | --- | --- | --- |
@@ -117,7 +117,7 @@ Which edge a deployment answers on, which zone it sits in, and whether it stands
 
 `SPEstateExposeType` is an enum rather than a string because the value crosses three boundaries — declared here, handed to a layer whose own variable validates it, and asserted against in a check — and a bare string would type-check at none of them.
 
-**A binding is supplied explicitly or not at all — MUST, no default at the layer that consumes it** (`RD.SUPPORT.INFRA.089`). A driver that stops passing one is reported as awaiting its input, never resolved quietly to no ingress or to the platform domain — a defaulted variable is the one omission nothing reports. A face binding is a choice **inside** the exposure already declared: it can place a public surface on a different apex, and it never widens how far that surface reaches.
+**A binding is supplied explicitly or not at all — MUST, no default at the layer that consumes it** (`RULE.SUPPORT.INFRA.089`). A driver that stops passing one is reported as awaiting its input, never resolved quietly to no ingress or to the platform domain — a defaulted variable is the one omission nothing reports. A face binding is a choice **inside** the exposure already declared: it can place a public surface on a different apex, and it never widens how far that surface reaches.
 
 ## What each shape adds
 
@@ -150,7 +150,7 @@ export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
 
 A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
-**Every port a deployment declares sits inside the five hundred local ports its platform declares — MUST** (`RD.SUPPORT.INFRA.062`). The offsets count from the range's first port.
+**Every port a deployment declares sits inside the five hundred local ports its platform declares — MUST** (`RULE.SUPPORT.INFRA.062`). The offsets count from the range's first port.
 
 | The port | Its part of the range | Rule |
 | --- | --- | --- |
@@ -159,11 +159,11 @@ A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and
 | its `remotePort` | `+200`–`249` | the service's port plus 100 |
 | a web deployment's `port` | `+300`–`399` | in app-row order from `+300` |
 
-`spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. A deployment's `port` and its `remotePort` are also the ports it listens on in the cloud, so each is chosen once. **Its `healthPort` is a machine's number, and a cloud does not read it.** In a cloud the health listener's port is the setting `{SPC}_HEALTH_PORT`, and it is `8010` unless a team wrote another number (`RD.SUPPORT.INFRA.048`). The key sits under the prefix the service starts with, which for a service in a space is the space's whole prefix. The deploy render supplies `8010` where nobody wrote one, writes the number into what the pod is given, and points the pod's probes at it.
+`spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. A deployment's `port` and its `remotePort` are also the ports it listens on in the cloud, so each is chosen once. **Its `healthPort` is a machine's number, and a cloud does not read it.** In a cloud the health listener's port is the setting `{SPC}_HEALTH_PORT`, and it is `8010` unless a team wrote another number (`RULE.SUPPORT.INFRA.048`). The key sits under the prefix the service starts with, which for a service in a space is the space's whole prefix. The deploy render supplies `8010` where nobody wrote one, writes the number into what the pod is given, and points the pod's probes at it.
 
 ### A remote port is always private
 
-A service that serves its modules' contracts to the other services of its platform declares a **remote port** on its API deployment (`RD.SUPPORT.INFRA.114`).
+A service that serves its modules' contracts to the other services of its platform declares a **remote port** on its API deployment (`RULE.SUPPORT.INFRA.114`).
 
 - **A remote port is always `PRIVATE` — MUST.** `expose` describes the main port; the remote listener's reach is a rule and not a field a row can choose, so a wrong value can never put it on the internet.
 - **An application has at most one deployment that declares a remote port — MUST**, so its code names one remote address.
@@ -189,7 +189,7 @@ The cluster gives every application an identity and writes a token marked for re
 
 ### Two load balancers and two gateways
 
-An environment has one pair for each reach, however many services it holds (`RD.SUPPORT.INFRA.115`). A deployment is a route on a gateway and has no load balancer of its own.
+An environment has one pair for each reach, however many services it holds (`RULE.SUPPORT.INFRA.115`). A deployment is a route on a gateway and has no load balancer of its own.
 
 | Exposure | Load balancer | Gateway, inside the cluster | Registered as |
 | --- | --- | --- | --- |
@@ -204,7 +204,7 @@ An environment has one pair for each reach, however many services it holds (`RD.
 - **One cluster serves one environment**, with three namespaces named for what they hold: `prd`, `plt` and `vnd`.
 - **`MANAGED` and `CLUSTER` say who runs a data engine** and do not change this.
 
-**The estate tells each listener how many proxies stand in front of it**, because a service finds the caller's address by counting back from the right of the forwarded-address header (`RD.SUPPORT.APPS.176`):
+**The estate tells each listener how many proxies stand in front of it**, because a service finds the caller's address by counting back from the right of the forwarded-address header (`RULE.SUPPORT.APPS.176`):
 
 | Setting | Value | The proxies it counts |
 | --- | --- | --- |
@@ -214,13 +214,13 @@ An environment has one pair for each reach, however many services it holds (`RD.
 
 A value a team writes for either key wins over the published one.
 
-**A deployment's label is never `gateway`, and never ends `-remote` — MUST** (`RD.SUPPORT.INFRA.119`). The estate's rules refuse each and name the row. Each gateway has a host of its own, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`, which every route's host points at. `{env}-{app}-remote` is the host of an application's remote port.
+**A deployment's label is never `gateway`, and never ends `-remote` — MUST** (`RULE.SUPPORT.INFRA.119`). The estate's rules refuse each and name the row. Each gateway has a host of its own, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`, which every route's host points at. `{env}-{app}-remote` is the host of an application's remote port.
 
 The book says "a gateway" and names no product where it states the rule; the provider's chapter says what is installed (`providers/aws/08-environment.md`).
 
 ### What a deployment asks of its route
 
-A deployment that has a route may state limits for it on its own row; the blueprint turns them into the gateway's settings (`RD.SUPPORT.INFRA.116`).
+A deployment that has a route may state limits for it on its own row; the blueprint turns them into the gateway's settings (`RULE.SUPPORT.INFRA.116`).
 
 ```ts
 export interface SPEstateAppDeploymentGateway {
@@ -239,14 +239,14 @@ export interface SPEstateAppDeploymentGatewayRateLimit {
 - **Each member left out takes the gateway's default.**
 - **The block sits on a deployment that has a route:** an API, or a web deployment that declares a port. It is refused on a web deployment with no port and on one whose `expose` is `INTERNAL`.
 - **It applies to the main route.** A remote route takes the gateway's defaults.
-- **The rate limit's window is one second, one minute, one hour or one day — MUST** (`RD.SUPPORT.INFRA.118`). `windowSeconds` is `1`, `60`, `3600` or `86400`, because a gateway counts in those four units and no other. The estate's rules refuse any other number and name the row.
-- **The count is one count, however many proxy pods a gateway runs.** The gateway keeps it in the environment's own cache (`RD.SUPPORT.INFRA.120`).
+- **The rate limit's window is one second, one minute, one hour or one day — MUST** (`RULE.SUPPORT.INFRA.118`). `windowSeconds` is `1`, `60`, `3600` or `86400`, because a gateway counts in those four units and no other. The estate's rules refuse any other number and name the row.
+- **The count is one count, however many proxy pods a gateway runs.** The gateway keeps it in the environment's own cache (`RULE.SUPPORT.INFRA.120`).
 
-The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing.
+The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing. It takes any window in seconds, where the gateway's takes only the four above.
 
 ### A web firewall on the public load balancer
 
-The internet-facing load balancer of every cluster carries one web firewall, covering every public deployment behind it — MUST (`RD.SUPPORT.INFRA.117`).
+The internet-facing load balancer of every cluster carries one web firewall, covering every public deployment behind it — MUST (`RULE.SUPPORT.INFRA.117`).
 
 - **The blueprint builds it, as it builds the two gateways and the two load balancers.** It stands in every environment, and no estate file declares it: an environment's row holds nothing for it. So no environment can stand an unguarded public load balancer, and two environments never differ in it.
 - **It holds three of the cloud's rule groups** (common rules, known bad inputs, address reputation), **and it counts only.** Each match is recorded with the rule's name and the request is let through. Nothing in an estate file makes the firewall refuse a request.

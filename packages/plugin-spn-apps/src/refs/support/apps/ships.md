@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/09-ships.md",
-      "seen": "a0551321"
+      "seen": "0de6aa31"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/09-ships/",
@@ -100,18 +100,19 @@ The same capability is described at four altitudes on its way from an idea to so
 | Rule | the foundation's capability seat | what any node of this kind must do | nothing concrete |
 | Rendering | a stack's provider set | what the rule *is* in this stack | real folders, file names, generators, patterns |
 | Seam | a capability interface with a choice behind it, harvested into its package's index | the published capability a consumer reaches for | its own surface, guarantee, phrase, proof |
-| Flow | a module's own capability document | the pseudologic of one operation | its states, guards, refusals — in the seam's own words |
+| Flow | a module's own capability chapter, holding only what the package does off the pattern | the pseudologic of the operation that departs from it | its states, guards, refusals — in the seam's own words |
 
+- **A capability chapter holds only what a package does off the pattern**, never the pseudologic of every operation.
 - **Own, do not restate.** A rule lives at exactly one link. Read a document that explains what a gate *does* as a copy of the seam's own entry, drifting already, rather than as a second source to trust.
 - **Name only the seams a node's own dependencies publish** — that turns *is this document allowed to say that* into a check rather than a judgment call, and it is a check worth running before citing a seam a node does not depend on.
-- **The phrase is advisory; the citation and the proof are enforced.** Nothing fails when a node reaches for different wording, as long as it cites the right seam and the proof resolves.
+- **The phrase is advisory and the citation is enforced; proof belongs to the behaviours seat at every link.** Nothing fails when a node reaches for different wording, as long as it cites the right seam, and a capability chapter names no test (RULE.SUPPORT.APPS.024).
 - **A refusal is a form.** Where a flow departs from a published phrase, it names the phrase it is not using and why — usually the most valuable sentence in the document, and the one to write rather than skip when a flow genuinely diverges.
 
 ## The stage this one sits in
 
 Support is one link in a chain of stages, and everything above is what it owes the links after it. Each stage hands the next a versioned package to install and pin, never source to read into: the foundation states the model, the standards and the agent setup and consumes nothing; Support ships the libraries for building any library or application; Platform ships the modules a SaaS platform composes; a Partner stage ships an organization's own platform; and a hosted control plane sits beside the chain rather than at its end, because the open chain works completely without it.
 
-**Every stage below the foundation owes the same things**, and they are exactly the ones stated above: capabilities whose dependencies run one way, conformance answered in writing per requirement, a release contract, and composition proved by a reference application. Read a partner with several product teams as a Platform stage to them, owing those teams the same obligations — a partner with internal consumers and no written conformance answer, no pin, and no reference application has quietly recreated the problem this chain exists to solve, with nothing downstream able to check it.
+**Every stage below the foundation owes the same things**, and they are exactly the ones stated above: capabilities whose dependencies run one way, conformance answered in writing per requirement, a release contract, and composition proved by a reference application. Read a partner with several product teams as a Platform stage to them, owing those teams the same obligations — a partner with internal consumers and no written conformance answer, no pin, and no reference application has quietly recreated the problem this chain exists to solve, with nothing downstream able to check it. The Partner stage is the conformance test of the whole model: anything its own teams cannot get from a published artifact is a gap in what the Foundation publishes.
 
 The direction is enforced rather than merely stated, and each mechanism fails loudly. Consuming only artifacts means a downstream reach into an upstream repository fails on the first import, because the symbol is not in the installed package — treat that failure as the direction working, not as a bug to route around. Pinning rather than ranging means a build never changes without somebody changing it. And a written conformance answer means a stage cannot assume it conforms because nobody asked: a row reading *not met* sits in the stage's own repository, where its own reviewers see it.
 

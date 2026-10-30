@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/01-common/04-flow-patterns.md",
-      "seen": "e427edef"
+      "seen": "51c43104"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/02-web/04-flow-patterns.md",
-      "seen": "c9e36661"
+      "seen": "72a73a8d"
     }
   ]
 }
@@ -31,17 +31,17 @@ Read this before you design a page that is a step of a path, such as signing up,
 
 ## A flow pattern and the patterns it is built from — 🔮
 
-A flow pattern is a path across pages to one outcome (`RD.SUPPORT.SURFACE.360`). Each step of it follows an app pattern or a site pattern, and each task on that step follows its task pattern. A flow is built from the patterns that exist, as an app pattern is built from the units that exist.
+A flow pattern is a path across pages to one outcome (`RULE.SUPPORT.SURFACE.360`). Each step of it follows an app pattern or a site pattern, and each task on that step follows its task pattern. A flow is built from the patterns that exist, as an app pattern is built from the units that exist.
 
-- **A flow MUST be built from the patterns that exist, and MUST add no unit and no page shape of its own** (`RD.SUPPORT.SURFACE.360`). A step that no pattern holds is a page arranged from nothing, and the next flow then copies it.
-- **A flow MUST name its outcome, the kinds of person it is for, its steps by the pattern each follows, where it starts and ends, and what a person sees in each task state** (`RD.SUPPORT.SURFACE.360`). A path that names only its happy steps leaves its waits and its failures to each page.
-- **Each flow opens with its For line** (`RD.SUPPORT.SURFACE.332`): the kinds of person it is for, and how it runs differently for one. A flow can carry a person from one kind to another: a Visitor who signs up is a Team or Everyday users at the Home the flow ends at. The kinds are stated in `standards-core.md`, under *Who an app is for*.
+- **A flow MUST be built from the patterns that exist, and MUST add no unit and no page shape of its own** (`RULE.SUPPORT.SURFACE.360`). A step that no pattern holds is a page arranged from nothing, and the next flow then copies it.
+- **A flow MUST name its outcome, the kinds of person it is for, its steps by the pattern each follows, where it starts and ends, and what a person sees in each task state** (`RULE.SUPPORT.SURFACE.360`). A path that names only its happy steps leaves its waits and its failures to each page.
+- **Each flow opens with its For line** (`RULE.SUPPORT.SURFACE.332`): the kinds of person it is for, and how it runs differently for one. A flow can carry a person from one kind to another: a Visitor who signs up is a Team or Everyday users at the Home the flow ends at. The kinds are stated in `standards-core.md`, under *Who an app is for*.
 
-An arrow, →, leads from one step to the next. The task states are Interaction's (`standards-interaction.md`), and a flow names no state of its own. **Where a flow is an entry in steps, one group of fields at a time in one panel, `DSStepper` shows where the person stands.** Its steps are data, and its task states are the steps' own: `IDLE`, `WORKING`, `DONE` and `FAILED` (`RD.SUPPORT.SURFACE.309`).
+An arrow, →, leads from one step to the next. The task states are Interaction's (`standards-interaction.md`), and a flow names no state of its own. **Where a flow is an entry in steps, one group of fields at a time in one panel, `DSStepper` shows where the person stands.** Its steps are data, and its task states are the steps' own: `IDLE`, `WORKING`, `DONE` and `FAILED` (`RULE.SUPPORT.SURFACE.309`).
 
 ## The flow patterns, by name — 🔮
 
-Ten flow patterns are named (`RD.SUPPORT.SURFACE.360`), in the order a person meets them: from a site to the app, then in, then inside it.
+Ten flow patterns are named (`RULE.SUPPORT.SURFACE.360`), in the order a person meets them: from a site to the app, then in, then inside it.
 
 | Flow pattern | The outcome | For |
 | --- | --- | --- |
@@ -129,7 +129,7 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 | Part | The flow states |
 | --- | --- |
 | Outcome | A new member's empty place shows them the first thing to do, and they do it |
-| Steps | The Home, An overview: the welcome, once, and while the place holds nothing, one card that names the first step with its action, in place of a row of counts (`RD.SUPPORT.SURFACE.365`) → the first step's entry, An entry over the page, such as *Invite members* as a sheet over the list of invitations → that list, by Find in a list, with the first record in it and a message. Every list opened for the first time draws its empty state, with the action that makes its first record |
+| Steps | The Home, An overview: the welcome, once, and while the place holds nothing, one card that names the first step with its action, in place of a row of counts (`RULE.SUPPORT.SURFACE.365`) → the first step's entry, An entry over the page, such as *Invite members* as a sheet over the list of invitations → that list, by Find in a list, with the first record in it and a message. Every list opened for the first time draws its empty state, with the action that makes its first record |
 | Starts | The end of Sign up or Accept an invitation |
 | Ends | The first record made, on its list |
 | Task states | Each count of the overview loads and fails by itself, with Try again. Each list's empty state. A count the person may not see is not drawn |
@@ -187,19 +187,19 @@ Sending an invitation is no flow of its own: it is an entry over the list of inv
 
 Each rule below is one the task or app patterns already state for one page, stated here for the join between two pages. So none needs a unit.
 
-- **A flow ends where the person can carry on, for the site they came from** (`RD.SUPPORT.SURFACE.361`). It never drops a site it was given, and never ends at a front door when a site was named.
-- **One task is drawn one way** (`RD.SUPPORT.SURFACE.361`). A step that reads shows its own shape, the main action shows its own working state, and a page that only passes the person on draws one line.
-- **Done is said by the place the flow arrives at, in one line, once** (`RD.SUPPORT.SURFACE.361`). A screen that says done stands only where nothing follows, such as a window that may now close.
-- **Every step MUST draw every task state its task can reach** (`RD.SUPPORT.SURFACE.361`). A read that cannot finish is a failure with Try again, never a spinner that stays, an empty state or a refusal.
-- **Signing in and signing up are one door with two rooms** (`RD.SUPPORT.SURFACE.361`). Each panel's second content offers the other, where the site takes sign-ups.
-- **The first arrival after joining is greeted once, in every app the flow can end in** (`RD.SUPPORT.SURFACE.361`). A person who joined through one app and lands in another is greeted there too.
+- **A flow ends where the person can carry on, for the site they came from** (`RULE.SUPPORT.SURFACE.361`). It never drops a site it was given, and never ends at a front door when a site was named.
+- **One task is drawn one way** (`RULE.SUPPORT.SURFACE.361`). A step that reads shows its own shape, the main action shows its own working state, and a page that only passes the person on draws one line.
+- **Done is said by the place the flow arrives at, in one line, once** (`RULE.SUPPORT.SURFACE.361`). A screen that says done stands only where nothing follows, such as a window that may now close.
+- **Every step MUST draw every task state its task can reach** (`RULE.SUPPORT.SURFACE.361`). A read that cannot finish is a failure with Try again, never a spinner that stays, an empty state or a refusal.
+- **Signing in and signing up are one door with two rooms** (`RULE.SUPPORT.SURFACE.361`). Each panel's second content offers the other, where the site takes sign-ups.
+- **The first arrival after joining is greeted once, in every app the flow can end in** (`RULE.SUPPORT.SURFACE.361`). A person who joined through one app and lands in another is greeted there too.
 
 ## On the web: Back, a reload, a link and a closed tab — 🔮
 
 In a browser a person can leave any page of a flow by the browser's Back, reload it, send it as a link, or close its tab. An entry over the page is an address (`standards-patterns.md`, *On the web*), and a flow takes that rule as it is.
 
-- **A step that holds a proof from the server MUST be the page's state, kept in its tab across a reload and cleared when a new trip starts** (`RD.SUPPORT.SURFACE.362`). A code sent to a person is such a proof. A step before any proof falls back to the flow's first step, with what was typed kept and never a password. Every other step is an address.
-- **The browser's Back MUST leave a flow's page, and a step's own way back MUST move inside it** (`RD.SUPPORT.SURFACE.362`). The way back inside the panel gives a person the step before, and the browser's Back still does what it does on every other page.
+- **A step that holds a proof from the server MUST be the page's state, kept in its tab across a reload and cleared when a new trip starts** (`RULE.SUPPORT.SURFACE.362`). A code sent to a person is such a proof. A step before any proof falls back to the flow's first step, with what was typed kept and never a password. Every other step is an address.
+- **The browser's Back MUST leave a flow's page, and a step's own way back MUST move inside it** (`RULE.SUPPORT.SURFACE.362`). The way back inside the panel gives a person the step before, and the browser's Back still does what it does on every other page.
 
 A step kept in the tab goes when the tab closes. So a closed tab costs a person what a step held, and never what an address holds.
 
@@ -229,10 +229,10 @@ This ref states the paths across pages to one outcome: each flow's steps by the 
 
 | Rule | What it decides |
 | --- | --- |
-| `RD.SUPPORT.SURFACE.360` | the ten flow patterns, each a path across pages to one outcome, built from the patterns that exist |
-| `RD.SUPPORT.SURFACE.361` | every step of a flow draws every task state its task can reach; that a flow holds the rest at its joins is advice |
-| `RD.SUPPORT.SURFACE.362` | on the web a step holding a proof from the server is the page's state, and every other step an address |
-| `RD.SUPPORT.SURFACE.332` | every flow names the kinds of person it is for, with one line where it runs differently for one |
+| `RULE.SUPPORT.SURFACE.360` | the ten flow patterns, each a path across pages to one outcome, built from the patterns that exist |
+| `RULE.SUPPORT.SURFACE.361` | every step of a flow draws every task state its task can reach; that a flow holds the rest at its joins is advice |
+| `RULE.SUPPORT.SURFACE.362` | on the web a step holding a proof from the server is the page's state, and every other step an address |
+| `RULE.SUPPORT.SURFACE.332` | every flow names the kinds of person it is for, with one line where it runs differently for one |
 
 ## Proof
 

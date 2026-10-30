@@ -3,19 +3,17 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "4bbfb9ad"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "RD.PLATFORM.CORE.033",
-      "seen": "c395af4b"
+      "seen": "5856fbb7"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RD.PLATFORM.CORE.034",
-      "seen": "3735ef74"
+      "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
+      "section": "Enablement: what an organization type is offered",
+      "seen": "61a67756"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/06-service.md",
+      "section": "`@SPAuthorize` + the module `_AUTHZ` table",
+      "seen": "92726a2f"
     }
   ]
 }
@@ -25,7 +23,7 @@
 
 **For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a command nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
 
-Source of truth: the foundation book's people-and-access chapter and decisions RD.PLATFORM.CORE.033 · RD.PLATFORM.CORE.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
+Source of truth: the foundation book's people-and-access chapter and rules RULE.PLATFORM.CORE.033 · RULE.PLATFORM.CORE.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
 
 ## The first question
 
@@ -40,11 +38,13 @@ Ask what the answer varies by. That one question separates the three axes.
 
 Two of these rows carry a trap. A plan feature looks like an org type when the estate has one plan, so you fold it into the enablement and the two dimensions become one. And a read gated by an offer refuses a module doing work on an organization's behalf. That module still stores the file, writes the audit row and sends the notification, whoever the customer is.
 
+Outside identity, what an organization may configure follows ownership and never its type: a thing scoped to the organization is its to change, for every organization type alike (RULE.PLATFORM.CORE.028).
+
 **A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization type is offered at all. A gate passes when both hold.
 
 ### A gate's `appScope` is neither, and pins one value only
 
-Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (RD.PLATFORM.CORE.034).
+Inside one `appPermissions` entry you may also narrow by `appScope` — which application the caller is in. **That is a third thing, and it is never a stand-in for an enablement.** A gate names an app scope for exactly one reason: to pin `PLATFORM`, guarding a platform master. Deciding what an organization type may reach is the enablement cell's job, never the scope's. **A gate never names an app id, ever** — an id is minted per install, so it would mean a different thing in every environment. Nothing is lost by leaving it out: the session already carries `appId` beside `appScope`, and permissions resolve against it at mint (RULE.PLATFORM.CORE.034).
 
 ## If it is an enablement
 
@@ -67,7 +67,7 @@ The test is not a count. IAM owns eight of the estate's codes, because IAM owns 
 
 `MANAGE` in the second position is what tells an enablement from a permission. Hold it and a reader classifies any code on sight.
 
-- **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off.
+- **A boolean names the area.** `IAM_MANAGE_MEMBERS` — on or off. A code is on when its value is a boolean that is true or a selection that is not empty.
 - **A selection names the options.** `NTF_MANAGE_CHANNELS` — a list of channels, narrowed per type.
 - Name a selection after its area and the console shows *Customization* holding a list of entity types. Whoever flips that cell cannot tell what they are choosing.
 - **There is no amount form.** Seats, storage caps and retention limits are billing's, on the axis that composes with org type. A quota written as an enablement puts a plan decision in a cell the console cannot price.
@@ -146,7 +146,7 @@ if (!SUBDOMAIN_OWNER_ORG_TYPES.has(org.orgType)) {
 }
 ```
 
-That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RD.PLATFORM.CORE.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
+That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RULE.PLATFORM.CORE.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
 
 The fix folded the method under `IAM_MANAGE_APP_SITES` and deleted the set. A product that later sells subdomains to merchants flips a cell instead of buying a release.
 

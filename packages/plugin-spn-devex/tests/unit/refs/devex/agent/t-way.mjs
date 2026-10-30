@@ -1,5 +1,5 @@
 // `refs/devex/agent/way.md` — the one index every window carries: the SaaS Plane way, one line for each
-// principle, and the ask router, one line for each kind of ask (RD.DEVEX.AGENT.102). Everything else is
+// principle, and the ask router, one line for each kind of ask (RULE.DEVEX.AGENT.102). Everything else is
 // read on demand, so this index is what a window pays for at its start, and it must stay small.
 //
 // THE LIMIT IS A BUILD FAILURE, NOT A WARNING. Twenty-one lens files loaded at once would crowd the

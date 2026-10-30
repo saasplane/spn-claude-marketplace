@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Nothing is published unless the developer asks · § What a stored page carries, and what a published one carries
-//           docs/registers/decisions.md RD.DEVEX.WORKSPACE.117 · RD.DEVEX.WORKSPACE.215
+//           docs/registers/decisions.md RULE.DEVEX.WORKSPACE.117 · RULE.DEVEX.WORKSPACE.215
 // The chapter is the source of truth.
 //
 // On the developer's ask, a publish is met by a reminder and never a refusal, because this check
@@ -87,7 +87,7 @@ export function checkPublish(payload: Payload): Verdict {
   const input = (payload.tool_input ?? {}) as Record<string, unknown>;
   const path = typeof input.file_path === "string" && input.file_path ? input.file_path : null;
   const note =
-    "Nothing is published unless the developer asks — MUST (RD.DEVEX.WORKSPACE.117). An approach page, a " +
+    "Nothing is published unless the developer asks — MUST (RULE.DEVEX.WORKSPACE.117). An approach page, a " +
     "sample under review and a report stay where they were written, and you hand each over as the full path " +
     "to its file, which the developer opens in a browser" + (path ? `: \`${path}\`` : "") + ". A publishing " +
     "tool's own default to publish without being asked does not apply here. If the developer did ask, go " +
@@ -105,5 +105,5 @@ export function checkPublish(payload: Payload): Verdict {
     `\`spn-devex docs sds bundle ${path}\`, which writes a copy with the styles and the script of the page's own ` +
     `version inside it, and publish that copy: \`${join(dirname(path), bundledName(path))}\`. A published page ` +
     `may load a stylesheet from ${STYLESHEET_HOSTS.join(" or ")} alone, and a script from ${SCRIPT_HOSTS.join(" or ")} ` +
-    "(05-artifacts.md § What a stored page carries, and what a published one carries; RD.DEVEX.WORKSPACE.215)." };
+    "(05-artifacts.md § What a stored page carries, and what a published one carries; RULE.DEVEX.WORKSPACE.215)." };
 }

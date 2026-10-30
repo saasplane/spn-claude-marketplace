@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/02-managed.md",
-      "seen": "be8d8f0f"
+      "seen": "a4cf4083"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/02-figma/04-drawing.md",
-      "seen": "7a8cd98f"
+      "seen": "915dfe1d"
     }
   ]
 }

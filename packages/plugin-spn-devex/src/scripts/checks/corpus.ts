@@ -259,7 +259,7 @@ export function runCorpus(root: string, repos: Set<string> | null = null): { war
   const stopped = storeMissingLine();
   if (stopped) return { warnings: [], runs: [], stopped };
 
-  // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RD.DEVEX.WORKSPACE.236).
+  // A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT HAS WRITTEN UNDER IT (RULE.DEVEX.WORKSPACE.236).
   // `null` is every tree, and only the command run by hand asks for it; the Stop hook always passes the set.
   const trees = docsTrees(root).filter((tree) => !repos || repos.has(basename(dirname(tree))));
   if (!trees.length) return { warnings: [], runs: [] };

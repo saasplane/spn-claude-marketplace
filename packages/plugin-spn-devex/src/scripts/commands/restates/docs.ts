@@ -1,10 +1,10 @@
-// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
+// RESTATES: RULE.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
 // The `docs`-kind restatement alone: a plugin document that rewrote a chapter's rule in its own
 // words, and whether that rewrite still says what the chapter says. `restates check` runs all four
 // kinds together; this narrows to one, so a drift names its owed act — a `docs` drift is rewritten,
-// never copied or re-run (RD.DEVEX.AGENT.072).
+// never copied or re-run (RULE.DEVEX.AGENT.072).
 //
 //     spn-devex restates docs check [<book>]      is every citation current?
 //     spn-devex restates docs write <ref>         restamp one ref's docs citations
@@ -18,12 +18,12 @@ import { dirname, join, relative } from "node:path";
 import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isFile, read, workspaceRoot } from "../../lib/payload.ts";
 import {
-  BLOCK_COMMENT, DECISION_ID_SRC, type Citation, check as checkKind, isDir, parse,
+  BLOCK_COMMENT, DEC_ID_SRC, type Citation, check as checkKind, isDir, parse,
   sectionText, seenHash, treeHash, undeclared,
 } from "../../lib/restates.ts";
 import { bookLine, findBook, noBookReason, pluginDocuments } from "./check.ts";
 
-const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
+const IS_ROW = new RegExp(`^${DEC_ID_SRC}$`);
 
 /**
  * Restamp one ref's `docs` citations after the developer has re-read each source and corrected any

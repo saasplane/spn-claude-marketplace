@@ -79,7 +79,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Fixture rules
 
 - **PII is allowed ONLY in `tests/` fixtures, never in `src/`.** Test personas must stay env-overridable; passwords are never hardcoded anywhere — always the env variable.
-- **Behavior ids in titles — the tier decides which cases carry one** (foundation decision RD.DEVEX.FUNCTION.064, amending RD.DEVEX.FUNCTION.008). The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
+- **Behavior ids in titles — the tier decides which cases carry one** (foundation rule RULE.DEVEX.FUNCTION.064, amending DEC.DEVEX.FUNCTION.008). The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
 
   | Tier | Which cases carry an id | A case with no id |
   | --- | --- | --- |
@@ -92,7 +92,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 
 ## The selective loop — run the cases of what you touched
 
-**While you work, run the cases of what you touched, and no whole tier** (foundation decision RD.DEVEX.WORKSPACE.207). The `test` skill, § The selective loop, states the rule: what counts as touched, the two run names, the stamp, and acceptance as named behaviour ids. This step is how TypeScript writes the selection.
+**While you work, run the cases of what you touched, and no whole tier** (foundation rule RULE.DEVEX.WORKSPACE.207). The `test` skill, § The selective loop, states the rule: what counts as touched, the two run names, the stamp, and acceptance as named behaviour ids. This step is how TypeScript writes the selection.
 
 **The selection follows `--`, and its words are the runner's own.** `spnutils apps test` hands everything after `--` to the runner unchanged, so a selection is written for the runner of that tier.
 

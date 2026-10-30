@@ -1,5 +1,5 @@
 // RESTATES: `docs/02-constructs/02-support/02-apps/10-providers.md` § The claim, and what grants it —
-// the stack sits in the repository's own `sprepo.json`; and RD.DEVEX.AGENT.066 — a gate never names
+// the stack sits in the repository's own `sprepo.json`; and RULE.DEVEX.AGENT.066 — a gate never names
 // an instance. Those are the source of truth; this file states no rule of its own and only performs
 // the read it describes. It lives once, in the shared support-lib folder, and spn-apps and spn-surface
 // each import it by relative path.

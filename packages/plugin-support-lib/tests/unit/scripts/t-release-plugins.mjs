@@ -1,6 +1,6 @@
 // The plugins' release command, `scripts/release-plugins.mjs`, run against a temporary marketplace
 // with a bare repository as its `origin` — never the real one. Every case builds its own pair, so no
-// case reads what another left behind (RD.DEVEX.AGENT.110).
+// case reads what another left behind (RULE.DEVEX.AGENT.110).
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

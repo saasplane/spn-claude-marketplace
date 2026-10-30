@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A check at the end of a turn speaks once, and only about this window's work
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
-// Which workstreams a window works on (RD.DEVEX.WORKSPACE.236), and the one reader every hook uses.
+// Which workstreams a window works on (RULE.DEVEX.WORKSPACE.236), and the one reader every hook uses.
 // A window is bound by the PATH a write goes to, the arc a `workstream` command writes, its first prompt,
 // or a handover; never by text inside a write, and never by a read. The note is
 // `.spndevex/.debug/sessions/<id>/window.json`, swept with the window's folder. The reader returns the empty

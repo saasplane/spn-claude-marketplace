@@ -28,7 +28,7 @@ export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () 
     return span({ group: "figma", action: "connector" }, () => runFigmaConnector(event));
   // A READ OF A UNIT'S FILE GETS ADVICE, on a test of the path's text alone: it reads no file.
   if (event.tool_name === "Read") return span({ group: "unit", action: "read" }, () => runUnitRead(event));
-  // THE SURFACE CHECK (RD.DEVEX.AGENT.107). Every other path leaves here, on a test of the path's own
+  // THE SURFACE CHECK (RULE.DEVEX.AGENT.107). Every other path leaves here, on a test of the path's own
   // text, before a file is read or the check is loaded: start-up and loading were nine tenths of a
   // hook's cost, and most writes are not Surface code.
   const path = event.tool_input?.file_path;

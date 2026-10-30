@@ -8,7 +8,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/01-data.md",
-      "seen": "67c1488b"
+      "seen": "68c36e9f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/08-operate.md",
@@ -80,4 +80,4 @@
 
 ## Improves the book
 
-- An event or metric convention every partner needs is drafted into the data chapter with its register row, put to the developer.
+- An event or metric convention every partner needs is drafted into the data chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

@@ -58,6 +58,8 @@ spn-devex docs guide check <guide.md…> [--name <name>] [--out <file>] — repo
 
 spn-devex docs guide write <guide.md…> [--name <name>] [--out <file>] — write each guide's page from its markdown
 
+spn-devex docs id next <AREA.DOMAIN> [<repository>] — the next RULE. and DEC. id of a place, one past the highest of either kind in the repository's register and chapters
+
 spn-devex docs index check [<path>] [--out <file>] — compare the tree of the index with the pages on disk, and write nothing
 
 spn-devex docs index write <path> [--out <file>] — write the index of the repository the path sits in

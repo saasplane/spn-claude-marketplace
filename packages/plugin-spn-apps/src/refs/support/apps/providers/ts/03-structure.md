@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/ts/03-structure.md",
-      "seen": "5ab26963"
+      "seen": "606ce385"
     }
   ]
 }
@@ -114,17 +114,17 @@ packages/module-server-iam-ts/
 - **A `SUPPORT_WEB` puts `ui/` at the source root**, because there the UI is the published surface rather than a module's adapter to it.
 - **A support package with no contract surface groups by feature folder** — `app/`, `http/`, `log/`, `utils/`. Those groups are the library's own to name.
 - **A `CLIENT_API` holds `src/generated/`, never hand-edited, plus a hand-maintained root barrel** over it.
-- **`src/assets/` sits beside `entry/`, never inside it.** Files reached by URL at runtime belong in the project's `public/`. **A web app keeps every stylesheet in `src/assets/styles/`**: its entry `index.css` stands beside its partials, `index.tsx` imports `./assets/styles/index.css`, and the scaffold writes it there (`RD.SUPPORT.APPS.210`). **Tailwind's utilities are the toolkit's and are written `ds:` in every app**, each app importing Tailwind with `prefix(ds)`; an app names only its own classes and variables, with its own code (`RD.SUPPORT.APPS.209`).
+- **`src/assets/` sits beside `entry/`, never inside it.** Files reached by URL at runtime belong in the project's `public/`. **A web app keeps every stylesheet in `src/assets/styles/`**: its entry `index.css` stands beside its partials, `index.tsx` imports `./assets/styles/index.css`, and the scaffold writes it there (`RULE.SUPPORT.APPS.210`). **Tailwind's utilities are the toolkit's and are written `ds:` in every app**, each app importing Tailwind with `prefix(ds)`; an app names only its own classes and variables, with its own code (`RULE.SUPPORT.APPS.209`).
 
 ### An app's own styles
 
-**Pick the smallest form that fits** (`RD.SUPPORT.APPS.211`):
+**Pick the smallest form that fits** (`RULE.SUPPORT.APPS.211`):
 
 | The case | The form |
 | --- | --- |
 | A one-off | a `ds:` utility in the element's `className` |
 | A pattern repeated across pages | a component of the app's own that composes design-system units; pages use it, never copies of its classes. This is the default answer to repetition |
-| A style many different components share, not itself a component | a plain class named with the app's code, in `@layer components` of the app's `index.css`, used as `className="<code>-<name>"` (RD.SUPPORT.APPS.212); never a Tailwind `@utility`, which would take `ds:`; partials sit beside it |
+| A style many different components share, not itself a component | a plain class named with the app's code, in `@layer components` of the app's `index.css`, used as `className="<code>-<name>"` (RULE.SUPPORT.APPS.212); never a Tailwind `@utility`, which would take `ds:`; partials sit beside it |
 | Class strings shared inside one file | a constant, such as `STAT_CARD_CLASS` |
 
 **Values come from tokens.** Colour, spacing, radius and motion use the design system's variables (`var(--surface-fg)`, `--layout-space`, `--radius`, the motion tokens), never a raw hex, px or ms, so dark mode and the theme keep working. **Never style the design system's insides.** No selector on `[data-slot=…]`, a design-system class or a unit's markup; change a unit through its own `className` or a layout look's `className`. What a unit cannot do is a gap to raise, not a selector to write.

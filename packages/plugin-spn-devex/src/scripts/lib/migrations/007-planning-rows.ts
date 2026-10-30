@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The agent's steps carry their own states
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// Migration 007: a planning job is never a step (RD.DEVEX.WORKSPACE.278). On a decided arc whose build steps have not
+// Migration 007: a planning job is never a step (RULE.DEVEX.WORKSPACE.278). On a decided arc whose build steps have not
 // started, a row that landed ahead of them, whose kind is `question` or whose title names the arc's preview, leaves the
 // arc's steps and becomes one line on its log, so the arc reads `DECIDED`. `closed/` is never read.
 
@@ -68,7 +68,7 @@ function writeAll(root: string): string[] {
       return `${one.name}: not written — ${thrown instanceof Error ? thrown.message : String(thrown)}`;
     }
     for (const row of rows)
-      logEvent(ws, data.arc, "discarded", row.id, `plugin migration 007: a planning job is never a step (RD.DEVEX.WORKSPACE.278) · the row read: ${row.title}`);
+      logEvent(ws, data.arc, "discarded", row.id, `plugin migration 007: a planning job is never a step (RULE.DEVEX.WORKSPACE.278) · the row read: ${row.title}`);
     return `${one.name}: ${rows.map((row) => `row ${row.id}`).join(", ")} → the log`;
   });
 }

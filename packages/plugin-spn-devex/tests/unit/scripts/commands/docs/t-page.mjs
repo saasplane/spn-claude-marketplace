@@ -181,7 +181,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     one("the template's author note never reaches a produced page", footed, (g) => !/AUTHOR-NOTE/.test(g) && !/<footer>/.test(g));
     one("nor does the book template's own footer", page, (g) => !/A template from workstream/.test(g) && !/<footer>/.test(g));
 
-    // THE SUBTITLE IS THE SEAT BLOCK'S `subtitle` FIELD (RD.DEVEX.WORKSPACE.187). A seat that moved its
+    // THE SUBTITLE IS THE SEAT BLOCK'S `subtitle` FIELD (RULE.DEVEX.WORKSPACE.187). A seat that moved its
     // promise line into the field lost it from the page while the producer ignored the key, so the
     // case writes a seat with one and a seat without, and reads both pages.
     const seatSrc = readAt(ws, `docs/${SEAT.constructs}/01-core/thing.md`);

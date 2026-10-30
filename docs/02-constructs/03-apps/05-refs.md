@@ -105,9 +105,9 @@ This page answers what this plugin restates and how the folder is arranged. It d
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.WORKSPACE.118` | a file carrying a rule it does not own is a restatement, and says so under the restates command | MUST |
-| `RD.DEVEX.UTILS.019` | the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own | MUST |
-| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes a stack a claim rather than something detected | MUST |
+| `RULE.DEVEX.WORKSPACE.118` | a file carrying a rule it does not own is a restatement, and says so under the restates command | MUST |
+| `RULE.DEVEX.UTILS.019` | the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own | MUST |
+| `RULE.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes a stack a claim rather than something detected | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a ref is readable only after an install, so an edit here is not live in the open session | MUST |
 
 Try it: `spn-devex restates check`

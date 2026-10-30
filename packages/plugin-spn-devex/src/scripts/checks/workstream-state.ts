@@ -42,7 +42,7 @@ function filesUnder(dir: string, base = dir): string[] {
 
 /**
  * Q99: at most one preview per arc, by its fixed name, and no `previews/` folder. That every arc has its one
- * is `arcPreviewFindings`' (RD.DEVEX.WORKSPACE.254).
+ * is `arcPreviewFindings`' (RULE.DEVEX.WORKSPACE.254).
  */
 export function previewFindings(ws: string, arc: string): string[] {
   const out: string[] = [];
@@ -69,7 +69,7 @@ function pageKind(text: string): string {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.267: a sample is the work's own file, so a page under `samples/` built with the page template —
+ * RULE.DEVEX.WORKSPACE.267: a sample is the work's own file, so a page under `samples/` built with the page template —
  * linking the shared docs stylesheet and opening with a masthead — is named. A sample of a page of the book the
  * work produces passes, by the page kind its masthead names, or as a review copy of a book template named for it.
  */
@@ -89,7 +89,7 @@ export function sampleFindings(ws: string, arc: string): string[] {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`,
+ * RULE.DEVEX.WORKSPACE.262: an arc's notes folder holds `preview.html`, `samples/`, `plan.md`, `orders/`,
  * `scripts/` and `work/`, and nothing else. Each other entry is named with where it belongs. The `previews/`
  * folder and a second preview are left to the one-preview check, which names them in its own words.
  */
@@ -99,7 +99,7 @@ export function notesTreeFindings(ws: string, arc: string): string[] {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.264 and .265: the arc's goal, its subject's length, and its data folder — the three
+ * RULE.DEVEX.WORKSPACE.264 and .265: the arc's goal, its subject's length, and its data folder — the three
  * data files and one name file, which reads as the commands write it from the data.
  */
 export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
@@ -126,7 +126,7 @@ export function nameFindings(ws: string, arc: string, data: ArcData): string[] {
 const previewPathOf = (ws: string, arc: string, data: ArcData): string => resolve(ws, previewHrefOf(arc, data));
 
 /**
- * RD.DEVEX.WORKSPACE.254: every arc has one preview, written when it opens; an arc's preview names another arc by its What,
+ * RULE.DEVEX.WORKSPACE.254: every arc has one preview, written when it opens; an arc's preview names another arc by its What,
  * never by its preview; and once the arc is decided, no slot of the template is left in it.
  */
 export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owners: ReadonlyMap<string, string>): string[] {
@@ -135,7 +135,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
   const href = previewHrefOf(arc, data);
   const number = workstreamName(ws).number;
   if (!isFile(path)) {
-    out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream arc edit ${number}/${arc}\` writes it from the template (RD.DEVEX.WORKSPACE.254)`);
+    out.push(`${arc} has no preview — every arc has one, \`${href}\`, written when it opens; \`spn-devex workstream arc edit ${number}/${arc}\` writes it from the template (RULE.DEVEX.WORKSPACE.254)`);
     return out;
   }
   const text = readFileSync(path, "utf8");
@@ -155,7 +155,7 @@ export function arcPreviewFindings(ws: string, arc: string, data: ArcData, owner
 
 /**
  * S7: the arc's row in Cycles under its address, its stamp against its goal, title and repositories, and its own What
- * entry, `N<nnn>-what`, which links its preview and no other arc's (RD.DEVEX.WORKSPACE.254).
+ * entry, `N<nnn>-what`, which links its preview and no other arc's (RULE.DEVEX.WORKSPACE.254).
  */
 export function pageFindings(ws: string, arc: string, data: ArcData, page: string | null, text: string, owners: ReadonlyMap<string, string> = previewOwners(ws)): string[] {
   if (!page) return [`${arc} has no approach page to stand on`];
@@ -184,7 +184,7 @@ export function pageFindings(ws: string, arc: string, data: ArcData, page: strin
   return out;
 }
 
-/** RD.DEVEX.WORKSPACE.254: a preview is linked from its own arc's What entry, and from no other place in What. One finding for each arc whose preview is so linked. */
+/** RULE.DEVEX.WORKSPACE.254: a preview is linked from its own arc's What entry, and from no other place in What. One finding for each arc whose preview is so linked. */
 export function whatLinkFindings(ws: string, page: string | null, text: string, owners: ReadonlyMap<string, string>): string[] {
   const range = whatRange(text);
   if (!page || !range) return [];
@@ -203,7 +203,7 @@ export function whatLinkFindings(ws: string, page: string | null, text: string, 
 }
 
 /**
- * RD.DEVEX.WORKSPACE.273: the views of an arc's status against its data. The Cycles row's word and badge,
+ * RULE.DEVEX.WORKSPACE.273: the views of an arc's status against its data. The Cycles row's word and badge,
  * and the preview's Status badge, each name the arc, the view and the command that mends it.
  */
 export function viewFindings(ws: string, arc: string, data: ArcData, text: string): string[] {
@@ -225,7 +225,7 @@ export function viewFindings(ws: string, arc: string, data: ArcData, text: strin
 }
 
 /**
- * RD.DEVEX.WORKSPACE.278 and .307: no step runs on an arc that is not decided, or that holds the developer's wait. A
+ * RULE.DEVEX.WORKSPACE.278 and .307: no step runs on an arc that is not decided, or that holds the developer's wait. A
  * stored `PROPOSED` stops what was building, so a step still `running` there is behind the arc. An arc whose `LANDED`
  * is stored, which only the close and version 1 do, with a step neither landed, replaced, carried nor deferred is
  * ahead of its steps: a landed arc is never reopened, so the step's fix goes on the review-fixes arc.
@@ -237,12 +237,12 @@ export function statusFindings(arc: string, data: ArcData): string[] {
   if (running.length && !stepsMayStart(data) && !["LANDED", "CARRIED", "DROPPED"].includes(data.status)) {
     const why = data.status === "DECIDED" ? `holds the developer's wait, "${data.wait}"` : `is ${data.status}`;
     out.push(`${arc} ${why} and step ${running[0].id} is running — a step runs only on a decided arc with no wait: ` +
-      `\`spn-devex workstream row state ${arc} ${running[0].id} stopped\` until the developer's word (RD.DEVEX.WORKSPACE.278)`);
+      `\`spn-devex workstream row state ${arc} ${running[0].id} stopped\` until the developer's word (RULE.DEVEX.WORKSPACE.278)`);
   }
   const open = leaves.filter((row) => !DONE_STATES.has(row.state ?? "waiting"));
   if (data.status === "LANDED" && open.length)
     out.push(`${arc} is LANDED and step ${open[0].id} is ${open[0].state ?? "waiting"} — a landed arc is never reopened: a fix to it is a step ` +
-      `on the review-fixes arc, naming ${arc}, and new scope is a new arc (RD.DEVEX.WORKSPACE.261)`);
+      `on the review-fixes arc, naming ${arc}, and new scope is a new arc (RULE.DEVEX.WORKSPACE.261)`);
   return out;
 }
 
@@ -250,7 +250,7 @@ export function statusFindings(arc: string, data: ArcData): string[] {
 const ALTITUDE_ORDER: readonly string[] = ALTITUDES;
 
 /**
- * RD.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and an altitude, in chain order by repository,
+ * RULE.DEVEX.WORKSPACE.183: an arc's steps, each with a repository and an altitude, in chain order by repository,
  * the foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each, read in the order the arc keeps
  * them. A row whose repository is `—` changes none and takes no place in the chain. `arc edit` prints what this finds and never refuses on it: the chain between two
  * stack repositories is judgement.
@@ -277,7 +277,7 @@ export function stepRowFindings(data: ArcData): string[] {
     if (altitude < lastAltitude) disorder.push(`row ${row.id} is ${ALTITUDE_ORDER[altitude]} after ${ALTITUDE_ORDER[lastAltitude]} in ${rowRepo}`);
     lastAltitude = Math.max(lastAltitude, altitude);
   }
-  const where = "(01-workstream.md § A step row says where, at what altitude, and how; RD.DEVEX.WORKSPACE.183)";
+  const where = "(01-workstream.md § A step row says where, at what altitude, and how; RULE.DEVEX.WORKSPACE.183)";
   const out: string[] = [];
   if (bare.length) out.push(`${data.arc} row(s) ${bare.join(", ")} carry no repo, or no altitude from ${ALTITUDE_ORDER.join(" · ")} ${where}`);
   if (disorder.length) out.push(`${data.arc} rows out of chain order: ${disorder.join(" · ")} — rows run by repository, the foundation ` +
@@ -287,7 +287,7 @@ export function stepRowFindings(data: ArcData): string[] {
 
 /**
  * The files of every step an arc has passed: the report of each landed row with an order. A plan is asked of no
- * arc, because one is kept only where the arc has traps, a set or a move table to hold (RD.DEVEX.WORKSPACE.227).
+ * arc, because one is kept only where the arc has traps, a set or a move table to hold (RULE.DEVEX.WORKSPACE.227).
  */
 export function stepFindings(ws: string, arc: string, data: ArcData): string[] {
   const out: string[] = [];

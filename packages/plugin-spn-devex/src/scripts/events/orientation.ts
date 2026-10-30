@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and RD.DEVEX.WORKSPACE.020, and the
+// RESTATES: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and RULE.DEVEX.WORKSPACE.020, and the
 // workspace-level argument that decided this shape. A change is made there first, then here.
 //
 // The orientation a session opens with — read from the ground, never from a typed list.
@@ -30,7 +30,7 @@
 //
 // `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
 // reads, carries all three, the note that says how to use them, and the short rules a reply must
-// follow (RD.DEVEX.AGENT.089), each with the reference that holds it whole.
+// follow (RULE.DEVEX.AGENT.089), each with the reference that holds it whole.
 //
 // A workstream carries its state in its parent folder, so the three are read and shown together:
 // `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -64,8 +64,8 @@ const MARKETPLACE = "saasplane";
 const CORE = "spn-devex";
 // The derivation `repo agent-sync` already performs, from the manifest and nothing else. A repo with
 // no claim at all — the marketplace itself is one — falls back to the core plugin alone. A stack is a
-// folder inside the domain plugin, so the stack claim selects no plugin (RD.DEVEX.AGENT.015). `APPS`
-// loads `spn-surface` with `spn-apps`, because apps' steps point at Surface's entry ref (RD.DEVEX.AGENT.039).
+// folder inside the domain plugin, so the stack claim selects no plugin (DEC.DEVEX.AGENT.015). `APPS`
+// loads `spn-surface` with `spn-apps`, because apps' steps point at Surface's entry ref (DEC.DEVEX.AGENT.039).
 // Each set reads in domain order: devex, surface, apps, infra.
 const WORLD_PLUGINS: Record<string, string[]> = {
   FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"], APPS: [CORE, "spn-surface", "spn-apps"] };
@@ -355,7 +355,7 @@ function digest(path: string): string {
  * so the path names the version that answered. Running from source there is no such segment, and
  * this returns null rather than guessing — a checkout is not behind an install, it IS the source.
  *
- * `RD.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
+ * `RULE.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
  * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
  */
 function loadedBehind(): { plugin: string; loaded: string; newest: string } | null {
@@ -479,7 +479,7 @@ function developerName(): string | null {
  * The roles line has two variants. Every workspace hears the team's roles grouped by function. Only a
  * builder's workspace — the one `SPN_DEVEX_AGENT_WORKSPACE` names — also hears the partner view, by what
  * it guards: that view speaks for the people who build on what the builders publish, and it is no seat
- * on a partner's team (RD.DEVEX.WORKSPACE.283).
+ * on a partner's team (RULE.DEVEX.WORKSPACE.283).
  */
 export const WELCOME_SPACER = "\n&nbsp;\n";
 
@@ -520,7 +520,7 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
 }
 
 /**
- * The rules a reply must follow, in short form (RD.DEVEX.AGENT.089). They go into what the agent reads
+ * The rules a reply must follow, in short form (RULE.DEVEX.AGENT.089). They go into what the agent reads
  * and never into the developer's pane.
  *
  * A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So a
@@ -554,14 +554,14 @@ export const SHORT_RULES: string[] = [
  * (code.claude.com/docs/en/hooks.md). Counted as Claude Code counts, in string length; 500 is the margin.
  */
 export const SESSION_START_CEILING = 9_500;
-/** Past this the session start still loads whole, and its test asks for the new text's reason (RD.DEVEX.AGENT.105). */
+/** Past this the session start still loads whole, and its test asks for the new text's reason (RULE.DEVEX.AGENT.105). */
 export const SESSION_START_NOTE = 8_000;
 
 /** One part of the session start below its head: its text, the rank it is left out by, and where it is read instead. */
 type StartPart = { text: string; rank: number; readAt: string };
 
 /**
- * The session start in its priority order (RD.DEVEX.AGENT.105). The head (the welcome, the status and the first-reply
+ * The session start in its priority order (RULE.DEVEX.AGENT.105). The head (the welcome, the status and the first-reply
  * note) always goes whole. The parts keep their order on the page, and past the ceiling the highest rank is left out
  * first (the router, then the debug lines), with one line naming where to read what went.
  */
@@ -593,7 +593,7 @@ export function shortRules(): string {
 }
 
 /**
- * The always-loaded index: the ask router, one line for each kind of ask (RD.DEVEX.AGENT.102).
+ * The always-loaded index: the ask router, one line for each kind of ask (RULE.DEVEX.AGENT.102).
  *
  * IT IS READ FROM THE REF, NEVER TYPED HERE. `refs/devex/agent/way.md` restates the way chapter and the
  * router, and `restates check` holds it to the book; a copy in this file would be a second home that
@@ -886,7 +886,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
 
   // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
   // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
-  // reply needs and nothing else (RD.DEVEX.AGENT.105).
+  // reply needs and nothing else (RULE.DEVEX.AGENT.105).
   const lines: string[] = [];
   if (behind)
     lines.push(`⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
@@ -903,7 +903,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "runs until the developer switches or says to go on. Its effort is a note for the picker; nothing compares it. " +
     "If the row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark " +
     "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
-    "never lettered options or a `Q<n>` card. Publish nothing unless asked (RD.DEVEX.WORKSPACE.117), over any " +
+    "never lettered options or a `Q<n>` card. Publish nothing unless asked (RULE.DEVEX.WORKSPACE.117), over any " +
     "tool's default: hand a page over as its full file path.\n";
   return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n", startParts())];
 }
@@ -949,7 +949,7 @@ export const LATE_NAMED = 3;
  * THE LIST IS CAPPED BECAUSE IT GROWS WITH THE WORKSPACE, AND THE SESSION-START TEXT MAY NOT. Every
  * member on a branch behind its base used to add its own clause of about a hundred bytes, the rebase
  * sentence repeated in each. A worktree set holds a member for every worktree, and sixteen of them
- * behind took this text past the 8 KB every window pays for on every turn (RD.DEVEX.AGENT.105). So the
+ * behind took this text past the 8 KB every window pays for on every turn (RULE.DEVEX.AGENT.105). So the
  * sentence is said once for each base, and past the first few the branches are a count and the command
  * that lists them all, which is where the ground is read on asking.
  */

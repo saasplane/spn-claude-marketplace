@@ -10,8 +10,8 @@ A sheet is chosen by what it holds.
 
 | The sheet holds | Where it stands | `placement` | `size` | The page writes | Rule |
 | --- | --- | --- | --- | --- | --- |
-| a medium entry | at the side of the page | `RIGHT` (the unit's) | the place's | nothing | `RD.SUPPORT.SURFACE.075` |
-| a small entry | — | not a sheet: a `DSDialog` | — | — | `RD.SUPPORT.SURFACE.075` |
+| a medium entry | at the side of the page | `RIGHT` (the unit's) | the place's | nothing | `RULE.SUPPORT.SURFACE.075` |
+| a small entry | — | not a sheet: a `DSDialog` | — | — | `RULE.SUPPORT.SURFACE.075` |
 
 **The limits across a view.** A sheet over a page is a view of its own.
 

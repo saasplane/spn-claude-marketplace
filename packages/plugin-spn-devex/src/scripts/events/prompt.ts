@@ -2,7 +2,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A session is named for the work it is on.
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
-// What a session is called (RD.DEVEX.WORKSPACE.222): the hook for `UserPromptSubmit`. The design and
+// What a session is called (RULE.DEVEX.WORKSPACE.222): the hook for `UserPromptSubmit`. The design and
 // its reasons are in `docs/04-capabilities/01-devex/plugin-spn-devex/02-hooks.md` § A session is
 // named for the workstream and the arc it works on.
 //
@@ -163,7 +163,7 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 }
 
 /**
- * The workstreams a prompt makes this window OWN (RD.DEVEX.WORKSPACE.236), and how.
+ * The workstreams a prompt makes this window OWN (RULE.DEVEX.WORKSPACE.236), and how.
  *
  * A handover owns every workstream its `continue:` line names that exists, before any `also open:`: the
  * reload form names two, and a window that continues one while the other waits on it owns both. What

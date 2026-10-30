@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RD.DEVEX.AGENT.082 — a window's cost is read from telemetry by a plugin command, never from a transcript.
+// RESTATES: spn-foundation RULE.DEVEX.AGENT.082 — a window's cost is read from telemetry by a plugin command, never from a transcript.
 //
 // A child's turns, logged when the child stops.
 //

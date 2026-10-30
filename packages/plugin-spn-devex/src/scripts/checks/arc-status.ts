@@ -1,5 +1,5 @@
-// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.058 — an arc carries a status, and it is one of a closed set of six —
-// and RD.DEVEX.WORKSPACE.307, which stores the developer's words and works out the rest from the steps.
+// RESTATES: spn-foundation RULE.DEVEX.WORKSPACE.058 — an arc carries a status, and it is one of a closed set of six —
+// and RULE.DEVEX.WORKSPACE.307, which stores the developer's words and works out the rest from the steps.
 // The register rows are the source of truth. A rule change is edited there first, then here.
 //
 // THE SET, STATED ONCE IN THE PLUGIN. The schema (`lib/workstream-schema.ts`) takes the stored statuses from here,

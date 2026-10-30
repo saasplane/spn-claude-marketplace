@@ -128,7 +128,7 @@ function check(args: string[]): number {
     for (const [file, count] of [...built].sort()) console.log(`· ${tier.toLowerCase()}  ${file}  ${count} case(s) whose id arrives through data — the run's result file is their proof`);
   }
   const summary = [...found].map(([tier, cases]) => `${tier.toLowerCase()} ${cases.filter((c) => !c.hasId).length} of ${cases.length}`).join(" · ");
-  console.log(`\n${missing} case(s) with no id — ${summary}; ${viaData} through data (a contract, component or journey case carries its row's id; RD.DEVEX.FUNCTION.064)`);
+  console.log(`\n${missing} case(s) with no id — ${summary}; ${viaData} through data (a contract, component or journey case carries its row's id; RULE.DEVEX.FUNCTION.064)`);
   return missing ? 1 : 0;
 }
 

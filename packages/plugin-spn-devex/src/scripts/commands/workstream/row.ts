@@ -8,8 +8,8 @@
 //   spn-devex workstream row discard <workstream>/N<nnn> <row> --note "<the developer's words>"
 //
 // One command per target: a positional word is the target and its one value, an option is named, and a required option left out is
-// refused (RD.DEVEX.WORKSPACE.321). An arc's fields are `arc edit`'s. `row write` is retired and refuses, naming the command that fits.
-// `row add` takes the arc's next number and prints it; the rules for a started step and a landed arc are RD.DEVEX.WORKSPACE.278 and .261.
+// refused (RULE.DEVEX.WORKSPACE.321). An arc's fields are `arc edit`'s. `row write` is retired and refuses, naming the command that fits.
+// `row add` takes the arc's next number and prints it; the rules for a started step and a landed arc are RULE.DEVEX.WORKSPACE.278 and .261.
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { arcStatus, doneOf, landingFault, logEvent, readArc, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
@@ -92,7 +92,7 @@ function mayStart(arc: string, data: ArcData, rowId: string, state: string | nul
   if (!["running", "landed"].includes(state ?? "") || stepsMayStart(data)) return;
   const why = data.status !== "DECIDED" ? `${arc} is ${arcStatus(data)}, and a step starts only after the developer's go — \`arc edit ${arc} --status DECIDED --note "<the developer's words>"\``
     : `${arc} holds the developer's wait, "${data.wait}", and starts at their word — \`arc edit ${arc} --start --note "<their words>"\``;
-  throw new UsageFault(`keeps step ${rowId} from starting: ${why} (RD.DEVEX.WORKSPACE.278).`);
+  throw new UsageFault(`keeps step ${rowId} from starting: ${why} (RULE.DEVEX.WORKSPACE.278).`);
 }
 
 /** The one line a row command ends on, then what the write left to say. */
@@ -113,12 +113,12 @@ function add(args: string[]): number {
   const [ref, title, ...more] = words.paths;
   if (!title || more.length) throw new UsageFault("takes an arc and one title: `row add <workstream>/N<nnn> \"<title>\" --repo <repo> --altitude <altitude>`.");
   for (const need of ["repo", "altitude"] as const)
-    if (!words.value(need)?.trim()) throw new UsageFault(`adds a row with \`--repo\` and \`--altitude\`: \`--${need}\` is missing, and a step says where it lands and at what altitude (RD.DEVEX.WORKSPACE.183).`);
+    if (!words.value(need)?.trim()) throw new UsageFault(`adds a row with \`--repo\` and \`--altitude\`: \`--${need}\` is missing, and a step says where it lands and at what altitude (RULE.DEVEX.WORKSPACE.183).`);
   const place = placeOf(words);
   const { ws, arc, data } = arcOf(ref);
   const statusBefore = arcStatus(data);
   if (statusBefore === "LANDED" || statusBefore === "CARRIED" || statusBefore === "DROPPED")
-    throw new UsageFault(`keeps ${arc} as it is: it is ${statusBefore}, and a landed arc is never reopened — a fix to it is a step on the review-fixes arc, naming ${arc}; new scope is a new arc (RD.DEVEX.WORKSPACE.261).`);
+    throw new UsageFault(`keeps ${arc} as it is: it is ${statusBefore}, and a landed arc is never reopened — a fix to it is a step on the review-fixes arc, naming ${arc}; new scope is a new arc (RULE.DEVEX.WORKSPACE.261).`);
   const parent = words.value("parent");
   if (parent !== null && !data.rows.some((row) => row.id === parent)) throw new UsageFault(`finds no row ${parent} in ${arc} to put the row under.`);
   const rowId = nextId(data.rows, parent);
@@ -237,7 +237,7 @@ function discard(args: string[]): number {
   const waiting = data.rows.filter((one) => one.blockedBy?.includes(rowId)).map((one) => one.id);
   if (waiting.length) throw new UsageFault(`keeps row ${rowId}: rows ${waiting.join(", ")} wait on it — rewrite their \`--blocked-by\` first.`);
   if (!DISCARDABLE.has(row.state!))
-    throw new UsageFault(`keeps row ${rowId}: it is ${row.state}, and only a row that never reached its node is discarded — waiting, ready or deferred (RD.DEVEX.WORKSPACE.279).`);
+    throw new UsageFault(`keeps row ${rowId}: it is ${row.state}, and only a row that never reached its node is discarded — waiting, ready or deferred (RULE.DEVEX.WORKSPACE.279).`);
 
   const before = arcSignatures(ws);
   data.rows = data.rows.filter((one) => one !== row);

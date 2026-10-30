@@ -117,7 +117,7 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
     run(root, ["audit", "check", "docs/a.md"]), has("clean — 1 page"));
 }
 {
-  // `UX` is the UX designer's lens (RD.DEVEX.AGENT.079). A page may declare it, and its tag line
+  // `UX` is the UX designer's lens (RULE.DEVEX.AGENT.079). A page may declare it, and its tag line
   // reads the label the register gives the value.
   const root = repo({
     "CONCEPT.md": "# c\n",
@@ -491,7 +491,7 @@ console.log("\n=== the gap scan measures and never fixes");
   const before = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   const rep = run(root, ["audit", "report", "."]);
 
-  // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DEVEX.WORKSPACE.149). A report is written by the agent
+  // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RULE.DEVEX.WORKSPACE.149). A report is written by the agent
   // from what it read; a tool hands over what it measured and writes nothing into a pocket. Before
   // this, the scan wrote the only machine-authored page in a folder of authored ones, and rewrote
   // it on every run whether anybody had asked a question or not.
@@ -627,7 +627,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   const chapter = (title, id, body) =>
     doc({ id: id, parentId: "concept", title: title, variant: "construct", lenses: ["ARCHITECT"],
           status: "PLANNING", dependsOn: [] },
-        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.DEVEX.WORKSPACE.165\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
+        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RULE.DEVEX.WORKSPACE.165\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
         "`For: Architect` · `Status: 🔮 PLANNING`");
 
   const AGREES = "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',    // alone\n  WIRED = 'WIRED',  // against the real thing\n}\n```";
@@ -731,7 +731,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]:
         doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"],
               status: "PLANNING", dependsOn: [] },
-            "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.DEVEX.WORKSPACE.165` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
+            "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RULE.DEVEX.WORKSPACE.165` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
             "`For: Architect` · `Status: 🔮 PLANNING`"),
       [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
     });
@@ -1205,7 +1205,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   one("[MKT.SCRIPTS.108] a page under a workstream's `closed/` folder is not: it draws no `styles` finding", under("closed"), lacks("styles"));
 }
 
-console.log("\n=== a report is a snapshot: no status, and its header says Generated and Commit (RD.DEVEX.WORKSPACE.192)");
+console.log("\n=== a report is a snapshot: no status, and its header says Generated and Commit (RULE.DEVEX.WORKSPACE.192)");
 {
   const at = `docs/${POCKET.artifacts}/${ARTIFACT.reports}/coverage-report.html`;
   const good = { id: "t-coverage-report", variant: "report", reportType: "COVERAGE", title: "Coverage report",
@@ -1257,7 +1257,7 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
 
 // ---------------------------------------------------------------- the masthead's three levels
 
-console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");
+console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst, and nothing after it (RULE.DEVEX.WORKSPACE.187)");
 {
   const page = (inner, file = "01-core/core-overview.html") => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
@@ -1285,13 +1285,13 @@ console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-stand
   one("a Subtitle below the Description is out of place",
     audit(`<h1>Know where you are.</h1>\n<p class="sds-standfirst">This page covers the core.</p>\n<p class="sds-subtitle">The core is the part every other part reads.</p>`),
     has("the Subtitle is out of place"));
-  // The foundation hub's pair is read from RD.DEVEX.WORKSPACE.143 in the register beside the page;
+  // The foundation hub's pair is read from DEC.DEVEX.WORKSPACE.143 in the register beside the page;
   // a register without that row (every other repository) leaves the hub's lines to the author.
   one("a hub in a repository whose register has no .143 row is not held to the pair",
-    audit(GOOD, "concept-overview.html"), lacks("RD.DEVEX.WORKSPACE.143"));
+    audit(GOOD, "concept-overview.html"), lacks("DEC.DEVEX.WORKSPACE.143"));
 }
 {
-  const ROW = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `Only this probe's own title.`, and the statement beside it does not change.** " +
+  const ROW = "| DEC.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `Only this probe's own title.`, and the statement beside it does not change.** " +
     "The statement below it reads *the probe's own subtitle, read from the row*. | why | 2026-09 |\n";
   const hub = (h1, sub, row = ROW) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
@@ -1303,19 +1303,19 @@ console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-stand
   }, { type: "FOUNDATION" });
   const audit = (...a) => run(hub(...a), ["audit", "check", `${POCKET_DOCS}/concept-overview.html`]);
   one("the hub's pair, word for word from the register's row, is silent",
-    audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("RD.DEVEX.WORKSPACE.143"));
+    audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("DEC.DEVEX.WORKSPACE.143"));
   one("a hub Title that is not the row's is SOFT, and quotes the row",
     audit("Your team's time belongs to your product.", "The probe's own subtitle, read from the row."),
-    (g) => g.includes("! SOFT masthead") && g.includes("Title is not RD.DEVEX.WORKSPACE.143's") && g.includes("Only this probe's own title."));
+    (g) => g.includes("! SOFT masthead") && g.includes("Title is not DEC.DEVEX.WORKSPACE.143's") && g.includes("Only this probe's own title."));
   one("a hub Subtitle that is not the row's is SOFT",
-    audit("Only this probe's own title.", "A subtitle somebody typed."), has("Subtitle is not RD.DEVEX.WORKSPACE.143's"));
+    audit("Only this probe's own title.", "A subtitle somebody typed."), has("Subtitle is not DEC.DEVEX.WORKSPACE.143's"));
   one("a .143 row the check cannot read is said, never passed",
-    audit("x", "y", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), has("could not be read from the row"));
+    audit("x", "y", "| DEC.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), has("could not be read from the row"));
 }
 
 // ---------------------------------------------------------------- the two produced kinds of page
 
-console.log("\n=== a guide page and the index of artifacts are pages the audit knows (RD.DEVEX.WORKSPACE.218, .219)");
+console.log("\n=== a guide page and the index of artifacts are pages the audit knows (RULE.DEVEX.WORKSPACE.218, .219)");
 {
   // EACH FIXTURE HAS THE SHAPE THE COMMAND WRITES. `docs guide` and `docs index` were run from source
   // on a real repository, and the two pages below keep what those pages hold: the block's keys, the

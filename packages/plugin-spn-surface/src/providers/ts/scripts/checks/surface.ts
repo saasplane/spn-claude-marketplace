@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.DEVEX.AGENT.107 — `spn-surface` checks Surface code as it is written, and in its first
+// RESTATES: RULE.DEVEX.AGENT.107 — `spn-surface` checks Surface code as it is written, and in its first
 // release every rule is a note. The rows each note restates sit in `_surface/notes.ts`.
 //
 // The TypeScript half of the Surface check: the reader (`_surface/jsx.ts`) over the text a write produces,

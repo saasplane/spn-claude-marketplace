@@ -22,9 +22,9 @@ Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hoo
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
 | [01-plugin.md](01-plugin.md) | `surface-plugin` | How this domain's delivery unit is realized — the manifest that claims its name and describes what it carries, the marketplace entry that names its folder, and the version its first release publishes. | 🔮 |
-| [02-hooks.md](02-hooks.md) | `surface-hooks` | One PreToolUse entry narrowed to the Figma connector's script runner, behind which one process reads the script before the call. | 🔮 |
+| [02-hooks.md](02-hooks.md) | `surface-hooks` | One PreToolUse entry for the Figma connector's script runner and for a write to Surface code, behind which one process reads the script or the file before the call. | 🔮 |
 | [03-skills.md](03-skills.md) | `surface-skills` | The one skill a Surface question answers to — the design skill, its stage, and the two steps it reads only where the window holds the connector. | 🔮 |
-| [04-scripts.md](04-scripts.md) | `surface-scripts` | Everything this plugin executes — the process behind the wired entry, the connector check, the command line that ships no command, and the shared helpers it imports. | 🔮 |
+| [04-scripts.md](04-scripts.md) | `surface-scripts` | Everything this plugin executes — the process behind the wired entry, the connector check, the Surface check, the command line that scans Surface code, and the shared helpers it imports. | 🔮 |
 | [05-refs.md](05-refs.md) | `surface-refs` | What this plugin carries from the foundation book — the Surface standards, patterns, architecture and delivery, and the two folders of specs a page starts from. | 🔮 |
 | [06-tests.md](06-tests.md) | `surface-tests` | How this plugin proves itself — one tier, mirrored on its own source, behind a runner that walks and judges on an exit code. | 🔮 |
 <!-- /spn:generated -->

@@ -7,11 +7,11 @@ description: Stand up a new estate node or a new estate repository with spnutils
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "c7702f71"
+      "seen": "9c999d7f"
     }
   ]
 }
@@ -46,7 +46,7 @@ Nodes sit under `packages/`, one folder each, and the family-first folder name i
 
 ## What the manifest must carry
 
-Two files per node, and no `package.json` anywhere in an estate tree (RD.SUPPORT.INFRA.066) — one appearing is a defect, not metadata.
+Two files per node, and no `package.json` anywhere in an estate tree (RULE.SUPPORT.INFRA.066) — one appearing is a defect, not metadata.
 
 - **`spinfrapkg.json`** names the publishable artifact: `name` (authoritative; its scope routes the publish) · `version` (the artifact's semver) · `description` · `author` · `license`.
 - **`src/spestate.json`** declares the node: `type` opens the file, and `config` is discriminated by its `mtype`. Keep it under `src/`, because what publishes is source.

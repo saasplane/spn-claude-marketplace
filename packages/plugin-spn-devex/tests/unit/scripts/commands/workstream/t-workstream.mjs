@@ -48,7 +48,7 @@ console.log("\n=== arc edit and the row commands — open an arc, change its hea
   const second = json(join(ws, "arcs", "N002", "state.json"));
   ok("its data holds the schema's header", second.schemaVersion === 2 && second.status === "PROPOSED" && second.preview === "preview.html" && second.rows.length === 0);
   const bare = cli(root, ["workstream", "arc", "edit", "031/N003"]);
-  ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254)."), bare.out);
+  ok("red: an arc opened with no title is refused, exit 2", bare.code === 2 && bare.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254)."), bare.out);
   const added = cli(root, ["workstream", "row", "add", "031/N001", "check it", "--kind", "fix", "--repo", "spn-x", "--altitude", "CODE", "--blocked-by", "2", "--touches", "marketplace:b,foundation:c"]);
   ok("a row is added with the arc's next number, and the line prints it", added.code === 0 && /row 3 added/.test(added.out), added.out);
   const three = json(arcFile).rows.find((row) => row.id === "3");
@@ -248,7 +248,7 @@ console.log("\n=== question — raise, show, answer, withdraw");
   ok("the arc's log carries the answer", lines(log).some((line) => line.kind === "answered" && /q8 A · Q8 - A/.test(line.note)));
 }
 
-console.log("\n=== arc edit and row state — a status or a row state moved refreshes every view of it (RD.DEVEX.WORKSPACE.273)");
+console.log("\n=== arc edit and row state — a status or a row state moved refreshes every view of it (RULE.DEVEX.WORKSPACE.273)");
 {
   const views = await dataWorkspace("commands-views");
   const header = (badge) => `<header class="sds-masthead"><div class="sds-eyebrow"><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span>${badge}</span></div><h1>Probe</h1></header>\n`;
@@ -309,7 +309,7 @@ console.log("\n=== state show and state check");
   ok("show: a workstream not moved yet says so", old.out.trim() === "026 · keeps its arcs as Markdown — not moved to the data layout yet", old.out);
 }
 
-console.log("\n=== row state — RUNNING and LANDED are worked out from the steps (RD.DEVEX.WORKSPACE.307)");
+console.log("\n=== row state — RUNNING and LANDED are worked out from the steps (RULE.DEVEX.WORKSPACE.307)");
 {
   const followed = await dataWorkspace("commands-follows");
   const file = join(followed.ws, "arcs", "N001", "state.json");
@@ -332,7 +332,7 @@ console.log("\n=== row state — RUNNING and LANDED are worked out from the step
   ok("a step written ready leaves a decided arc reading DECIDED", json(readyFile).status === "DECIDED" && !lines(join(ready.ws, "arcs", "N001", "log.jsonl")).some((line) => line.kind === "status"));
 }
 
-console.log("\n=== row add and row state — steps may be written before the go, and none starts until DECIDED with no wait (RD.DEVEX.WORKSPACE.278, .311)");
+console.log("\n=== row add and row state — steps may be written before the go, and none starts until DECIDED with no wait (RULE.DEVEX.WORKSPACE.278, .311)");
 {
   const plan = await dataWorkspace("commands-plan");
   const write = (...words) => cli(plan.root, ["workstream", "arc", "edit", ...words]);
@@ -377,7 +377,7 @@ console.log("\n=== row add and row state — steps may be written before the go,
   ok("an arc decided before is dropped, with its reason", dropped.code === 0 && json(second).status === "DROPPED", dropped.out);
 }
 
-console.log("\n=== arc edit and arc delete — several arcs PROPOSED at once; one never decided is deleted (RD.DEVEX.WORKSPACE.280, .311)");
+console.log("\n=== arc edit and arc delete — several arcs PROPOSED at once; one never decided is deleted (RULE.DEVEX.WORKSPACE.280, .311)");
 {
   const many = await dataWorkspace("commands-many");
   const write = (...words) => cli(many.root, ["workstream", "arc", "edit", ...words]);
@@ -394,7 +394,7 @@ console.log("\n=== arc edit and arc delete — several arcs PROPOSED at once; on
   ok("red: an arc decided is never deleted: it is dropped", kept.code === 2 && kept.out.includes("dropped, never deleted") && existsSync(join(many.ws, "arcs", "N001")), kept.out);
 }
 
-console.log("\n=== arc edit --review-fixes — one arc takes every fix to a landed arc, and lands on the developer's word (RD.DEVEX.WORKSPACE.261)");
+console.log("\n=== arc edit --review-fixes — one arc takes every fix to a landed arc, and lands on the developer's word (RULE.DEVEX.WORKSPACE.261)");
 {
   const fixes = await dataWorkspace("commands-review-fixes");
   const write = (...words) => cli(fixes.root, ["workstream", "arc", "edit", ...words]);
@@ -412,7 +412,7 @@ console.log("\n=== arc edit --review-fixes — one arc takes every fix to a land
   ok("the developer's word to close stores its LANDED", closed.code === 0 && json(file).status === "LANDED", closed.out);
 }
 
-console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Cycles row (RD.DEVEX.WORKSPACE.254)");
+console.log("\n=== arc edit — an arc opens whole: its data, its preview, its What entry and its stamped Cycles row (RULE.DEVEX.WORKSPACE.254)");
 {
   const whole = await dataWorkspace("commands-opening");
   const page = join(whole.ws, "approach.html");
@@ -427,7 +427,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
 
   const noGoal = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--under", "d1");
   ok("red: an opening without --goal is refused in the chapter's words, exit 2", noGoal.code === 2
-    && noGoal.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RD.DEVEX.WORKSPACE.254)."), noGoal.out);
+    && noGoal.out.includes("opens N003 with `--title`, `--subject` and `--goal`: an arc opens only when all three are known, and until then its line stays in How (RULE.DEVEX.WORKSPACE.254)."), noGoal.out);
   ok("red: and nothing is written: no data, no preview, the page as it was", !existsSync(arcOf("N003")) && !existsSync(noteOf("N003")) && readFileSync(page, "utf8") === domains);
 
   const unknown = write("031/N003", "--title", "Evidence export", "--subject", "evidence-export", "--goal", goal, "--under", "d9");
@@ -502,7 +502,7 @@ console.log("\n=== arc edit — an arc opens whole: its data, its preview, its W
   ok("and the check finds the carried preview", !/has no preview/.test(reopened.out), reopened.out);
 }
 
-console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RD.DEVEX.WORKSPACE.279)");
+console.log("\n=== row discard — a row found invalid leaves the arc, in the developer's words (RULE.DEVEX.WORKSPACE.279)");
 {
   const base = { kind: "change", repo: "spn-x", altitude: "CODE", blockedBy: [], touches: [] };
   const gone = await dataWorkspace("commands-discard", { rows: [

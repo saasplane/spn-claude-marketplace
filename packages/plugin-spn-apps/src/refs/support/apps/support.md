@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/02-support.md",
-      "seen": "0701a167"
+      "seen": "1e435ba1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/02-support/",
-      "seen": "2317d1bd"
+      "seen": "b2cb0efe"
     }
   ]
 }
@@ -76,7 +76,7 @@ src/
 - **Ship a local implementation for every capability where you can** — an in-memory lock, file-backed email, directory-backed storage — answering the same interface with real classified results, so local development runs one set of implementations and the cloud another against unchanged consumers. Select a local implementation by a caller-side debug flag or local configuration, never by a stored provider type, and never add it as a member of an organization-facing provider catalog.
 - **Use the two role names as written.** Name a swappable implementation, chosen by configuration, answering an interface, `Provider`. Name a lifecycle class — construct, wire, boot, dispose — `Manager`, and never swap one by data.
 
-**Earn a seam; do not assume one.** Add it only where a genuine choice sits behind a capability — ask yourself whether two deployments could reasonably want different behaviour here. If yes, give the group a seam from its first implementation, because retrofitting one later means changing every consumer. If no, leave the group plain however large it grows — publish and index a `utils`, `types`, `constants` or `errors` group with no interface and nothing to select. Where you do add a seam, document it on the capability interface's own comment so it is harvested into the package's generated symbol index, and the composition contract travels with the package.
+**Earn a seam; do not assume one.** Add it only where a genuine choice sits behind a capability — ask yourself whether two deployments could reasonably want different behaviour here. If yes, give the group a seam from its first implementation, because retrofitting one later means changing every consumer. If no, leave the group plain however large it grows — publish and index a `utils`, `types`, `constants` or `errors` group with no interface and nothing to select. The line between a capability group and a plain group is a judgment, so a checker may flag a suspicious group but must never fail a build on it. Where you do add a seam, document it on the capability interface's own comment so it is harvested into the package's generated symbol index, and the composition contract travels with the package.
 
 ## The six server and universal groups
 
@@ -149,10 +149,10 @@ A partner must be able to take one part of a screen without taking the whole pag
 | Holds a path | never. Its address is its route's | never |
 | A partner | mounts it on an address | places it on a page of their own |
 
-- **Assemble a page from one or more containers — MUST** (`RD.SUPPORT.APPS.182`). A page may also place a widget or a component directly, as it does a breadcrumb.
-- **Give a container its data, or an id it loads by, as props, and never a path — MUST** (`RD.SUPPORT.APPS.183`). A link to a screen of its own module is built from that screen's route, by the route's key. A link to any other screen is a prop the page passes. A widget and a component take every link as a prop.
-- **An edit container takes an optional callback that runs after a save. Proposed** (`RD.SUPPORT.APPS.184`). With none, it goes where it goes today. The developer has not confirmed it.
-- **A SaaS Plane container takes data only — MUST** (`RD.SUPPORT.APPS.185`). It is handed no unit of a partner's: no component, no widget and no part to draw inside it. A partner who wants a different piece inside builds a container of their own, from the module's widgets and hooks.
+- **Assemble a page from one or more containers — MUST** (`RULE.SUPPORT.APPS.182`). A page may also place a widget or a component directly, as it does a breadcrumb.
+- **Give a container its data, or an id it loads by, as props, and never a path — MUST** (`RULE.SUPPORT.APPS.183`). A link to a screen of its own module is built from that screen's route, by the route's key. A link to any other screen is a prop the page passes. A widget and a component take every link as a prop.
+- **An edit container takes an optional callback that runs after a save. Proposed** (`RULE.SUPPORT.APPS.184`). With none, it goes where it goes today. The developer has not confirmed it.
+- **A SaaS Plane container takes data only — MUST** (`RULE.SUPPORT.APPS.185`). It is handed no unit of a partner's: no component, no widget and no part to draw inside it. A partner who wants a different piece inside builds a container of their own, from the module's widgets and hooks.
 - **A container does not know how it is shown.** Its header, its content and its footer fit a page, a dialog and a sheet alike.
 
 A module's container is built on the design system's container, and adds the module's own data. The four ways a partner builds on the web, and the provider a partner mounts to place a container, are in `shape.md` in this plugin.

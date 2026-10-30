@@ -56,7 +56,7 @@ console.log("\n=== S7 — the stamp on each arc's Cycles row: its goal, title an
   ok("green: the page put back passes", apart(checkWorkstream(ws)).length === 0, said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.273 — a view of an arc's status that disagrees with the arc is a finding");
+console.log("\n=== RULE.DEVEX.WORKSPACE.273 — a view of an arc's status that disagrees with the arc is a finding");
 {
   const { root, ws } = await dataWorkspace("state-views");
   const page = join(ws, "approach.html");
@@ -80,7 +80,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.273 — a view of an arc's status that dis
   ok("green: the page put back passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.263 — every arc has an address, its Cycles row's id");
+console.log("\n=== RULE.DEVEX.WORKSPACE.263 — every arc has an address, its Cycles row's id");
 {
   const { root, ws } = await dataWorkspace("state-address");
   const page = join(ws, "approach.html");
@@ -93,7 +93,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.263 — every arc has an address, its Cycl
   ok("green: the row under its address passes", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, a short subject");
+console.log("\n=== RULE.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, a short subject");
 {
   const { root, ws } = await dataWorkspace("state-name");
   const file = join(ws, "arcs", "N001", "state.json");
@@ -124,7 +124,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.264 and .265 — the goal, the name file, 
   ok("green: a short subject written, the file renamed with it", short.code === 0 && checkWorkstream(ws).length === 0, short.out + said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.262 — notes/ and arcs/ hold only arc folders");
+console.log("\n=== RULE.DEVEX.WORKSPACE.262 — notes/ and arcs/ hold only arc folders");
 {
   const { ws } = await dataWorkspace("state-levels");
   writeFileSync(join(ws, "notes", "ideation.md"), "# how the idea arrived\n");
@@ -158,7 +158,7 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   const text = readFileSync(page, "utf8");
   writeFileSync(page, text.replace('<a href="notes/N001/preview.html">the probe</a>', "the probe"));
   ok("red: an arc with no preview fails, every arc having one from the write that opens it",
-    has(checkWorkstream(ws), "preview", /N001 has no preview — every arc has one, `notes\/N001\/preview\.html`, written when it opens; `spn-devex workstream arc edit 031\/N001` writes it from the template \(RD\.DEVEX\.WORKSPACE\.254\)/), said(checkWorkstream(ws)));
+    has(checkWorkstream(ws), "preview", /N001 has no preview — every arc has one, `notes\/N001\/preview\.html`, written when it opens; `spn-devex workstream arc edit 031\/N001` writes it from the template \(RULE\.DEVEX\.WORKSPACE\.254\)/), said(checkWorkstream(ws)));
   writeFileSync(page, text);
   renameSync(join(notes, "draft.html"), join(notes, "preview.html"));
   mkdirSync(join(notes, "samples"), { recursive: true });
@@ -166,7 +166,7 @@ console.log("\n=== Q99 — one preview per arc, by its fixed name");
   ok("green: samples stay beside the one preview", checkWorkstream(ws).length === 0, said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.254 — a What entry of its own, and a link to another arc by its What");
+console.log("\n=== RULE.DEVEX.WORKSPACE.254 — a What entry of its own, and a link to another arc by its What");
 {
   const { root, ws } = await dataWorkspace("state-what");
   const page = join(ws, "approach.html");
@@ -229,7 +229,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.254 — a What entry of its own, and a lin
   ok("green: the same slots in a PROPOSED arc's preview are expected", !has(checkWorkstream(ws), "preview", /slot/), said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.267 — a sample is the work's own file, never a page built with the page template");
+console.log("\n=== RULE.DEVEX.WORKSPACE.267 — a sample is the work's own file, never a page built with the page template");
 {
   const { root, ws } = await dataWorkspace("state-samples");
   const samples = join(ws, "notes", "N001", "samples");
@@ -258,7 +258,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.267 — a sample is the work's own file, n
     green.length === 0, said(green));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");
+console.log("\n=== RULE.DEVEX.WORKSPACE.262 — an arc's notes folder holds the five, and nothing else");
 {
   const { root, ws } = await dataWorkspace("state-notes-tree");
   const notes = join(ws, "notes", "N001");
@@ -353,7 +353,7 @@ console.log("\n=== a section of a page, by its heading");
   ok("a page with no such heading gives nothing", sectionText(text, "Why") === "");
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.278 and .307 — no step runs on an arc not decided, or held by a wait");
+console.log("\n=== RULE.DEVEX.WORKSPACE.278 and .307 — no step runs on an arc not decided, or held by a wait");
 {
   const { ws } = await dataWorkspace("state-status");
   const file = join(ws, "arcs", "N001", "state.json");
@@ -375,14 +375,14 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 and .307 — no step runs on an arc no
   data.status = "LANDED";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("red: a stored LANDED arc with a step not landed is named: a landed arc is never reopened",
-    has(checkWorkstream(ws), "status", /N001 is LANDED and step 1 is running — a landed arc is never reopened.*review-fixes arc.*RD\.DEVEX\.WORKSPACE\.261/), said(statusOnly()));
+    has(checkWorkstream(ws), "status", /N001 is LANDED and step 1 is running — a landed arc is never reopened.*review-fixes arc.*RULE\.DEVEX\.WORKSPACE\.261/), said(statusOnly()));
   data.rows[0].state = "landed";
   data.rows[1].state = "landed";
   writeFileSync(file, JSON.stringify(data, null, 2));
   ok("green: LANDED with every step landed passes the status check", statusOnly().length === 0, said(statusOnly()));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.278 — the kind design is gone: reading and drafting are planning jobs");
+console.log("\n=== RULE.DEVEX.WORKSPACE.278 — the kind design is gone: reading and drafting are planning jobs");
 {
   const { ws } = await dataWorkspace("state-design");
   const file = join(ws, "arcs", "N001", "state.json");
@@ -397,7 +397,7 @@ console.log("\n=== RD.DEVEX.WORKSPACE.278 — the kind design is gone: reading a
     !checkWorkstream(ws).some((one) => one.check === "status" || one.check === "schema"), said(checkWorkstream(ws)));
 }
 
-console.log("\n=== RD.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and an altitude, in chain order");
+console.log("\n=== RULE.DEVEX.WORKSPACE.183 — an arc's build rows carry a repository and an altitude, in chain order");
 {
   const { stepRowFindings } = await import("../../../../src/scripts/checks/workstream-state.ts");
   const arcOf = (rows) => ({ ...arcData([]), rows: rows.map(([id, repo, altitude, kind = "change"]) =>

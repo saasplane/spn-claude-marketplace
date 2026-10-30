@@ -101,8 +101,8 @@ Add `providers/<instance>/`, with a `skills/` half for what a skill loads and a 
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it | MUST |
-| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
+| `RULE.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it | MUST |
+| `RULE.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
 
 Try it: `spn-devex docs coherence check`

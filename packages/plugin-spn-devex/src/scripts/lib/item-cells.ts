@@ -1,7 +1,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The shape of a section, on every page kind
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
-// When a table's column holds sentences rather than short values (RD.DEVEX.WORKSPACE.259). `doc-check` names such
+// When a table's column holds sentences rather than short values (RULE.DEVEX.WORKSPACE.259). `doc-check` names such
 // a column on a page written by hand, and `docs page` writes it as a level of the item cell on a construct's page.
 
 import { unescape } from "./payload.ts";

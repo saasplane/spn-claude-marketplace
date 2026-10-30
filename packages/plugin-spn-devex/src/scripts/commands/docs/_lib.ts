@@ -48,7 +48,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 //
 // The five that joined in 2026-09: a FACE is 226 documents of one shape that no kind could name,
 // and 29 of them declared a chapter's variant instead. A DATA_MODEL's table shape is stated in
-// `RD.DEVEX.WORKSPACE.134` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
+// `RULE.DEVEX.WORKSPACE.134` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
 // carry no document yet.
 //
 // DATA_MODEL AND SURFACE_MAP HAVE THEIR OUTLINES NOW, AND THEY REPORT SOFTLY (N37 step 3). Both are
@@ -68,7 +68,7 @@ export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capa
                   "guide", "index"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
-/** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RD.DEVEX.WORKSPACE.266). */
+/** The words a preview's Status chip shows: the arc's status, `PROPOSED` until the design is decided (RULE.DEVEX.WORKSPACE.266). */
 export const PREVIEW_STATES: readonly string[] = STATUSES;
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
@@ -120,9 +120,9 @@ export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: strin
     order: ["Terms", "Why", "What", "How", "Open", "Deferred"],
     optional: ["Terms"],
   },
-  // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RD.DEVEX.WORKSPACE.134). A data model defines no
+  // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RULE.DEVEX.WORKSPACE.134). A data model defines no
   // term; the words are the constructs' `Terms` tables. What seeds and what must run first is
-  // storage knowledge too (RD.DEVEX.WORKSPACE.089), so it closes the file rather than moving elsewhere.
+  // storage knowledge too (RULE.DEVEX.WORKSPACE.089), so it closes the file rather than moving elsewhere.
   data_model: {
     order: ["Tables", "Indexes", "Seeds and order"],
     optional: ["Seeds and order"],
@@ -308,12 +308,12 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   }
 
   // A REPORT CARRIES NO STATUS AND SAYS WHEN IT WAS GENERATED (02-document.md § Metadata,
-  // RD.DEVEX.WORKSPACE.192). `generatedAt` is what lets the next report supersede this one. Only a
+  // RULE.DEVEX.WORKSPACE.192). `generatedAt` is what lets the next report supersede this one. Only a
   // tests report adds `measuredAt`, because only its runs can be older than the page. Where no row
   // cites a run there is no such moment, so the block leaves the key out; `null` is refused.
   if (variant === "report") {
     if ("status" in block)
-      add("RULE", "a report carries no `status` — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+      add("RULE", "a report carries no `status` — it is a snapshot, and its Summary says what was found (RULE.DEVEX.WORKSPACE.192)");
     if (!isMoment(block.generatedAt))
       add("RULE", "a report carries `generatedAt`, the moment the page was generated, as a date and a time with its offset — `2026-09-30T12:57+05:30`");
     if ("measuredAt" in block) {
@@ -420,7 +420,7 @@ export function sectionsWithBodies(src: string): { name: string; body: string }[
  * four incompatible shapes (N37). So a `data-model.md` or a `surface-map.md` that declares no kind
  * is itself a finding: the outline below would otherwise never be read for it.
  *
- * A DATA MODEL AT A DOMAIN'S ROOT SITS ABOVE THE HALF THAT OWNS THE STORAGE (RD.DEVEX.WORKSPACE.134). It sits
+ * A DATA MODEL AT A DOMAIN'S ROOT SITS ABOVE THE HALF THAT OWNS THE STORAGE (RULE.DEVEX.WORKSPACE.134). It sits
  * beside the migrations it mirrors, which is always a package folder: `04-capabilities/<domain>/
  * <package>/data-model.md`. A domain that stores nothing writes none at all.
  *
@@ -440,7 +440,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
 
   const rel = splitAtSeat(file, "capabilities")?.rel;
   if (kind === "data_model" && rel !== undefined && rel.split("/").length < 3)
-    add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DEVEX.WORKSPACE.134)");
+    add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RULE.DEVEX.WORKSPACE.134)");
 
   const heads = TABLE_HEAD[kind];
   if (!heads) return f;
@@ -716,11 +716,11 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   const statusChip = h.match(/class="sds-badge sds-status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
   if (block.variant === "report") {
     // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-artifacts.md § The header,
-    // RD.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
+    // RULE.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
     // removed, because the template explains the lines inside the header itself.
     const shown = h.replace(/<!--[\s\S]*?-->/g, " ");
     if (statusChip || /\bStatus:/.test(shown))
-      add("RULE", "a report shows no status chip — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+      add("RULE", "a report shows no status chip — it is a snapshot, and its Summary says what was found (RULE.DEVEX.WORKSPACE.192)");
     const time = shown.match(/<time\b([^>]*)>/);
     const datetime = time ? /\bdatetime="([^"]*)"/.exec(time[1])?.[1] : undefined;
     if (!/>\s*Generated:\s*</.test(shown) || datetime === undefined)
@@ -734,7 +734,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
   } else if (block.variant === "preview") {
-    // A PREVIEW'S CHIP IS THE ARC'S STATUS, never the block's `status` (RD.DEVEX.WORKSPACE.266). The
+    // A PREVIEW'S CHIP IS THE ARC'S STATUS, never the block's `status` (RULE.DEVEX.WORKSPACE.266). The
     // block's word says how far the workstream's page has come; the chip reads `PROPOSED` until the
     // developer decides the design and the arc's own status after, so the two are not compared.
     if (!statusChip) add("RULE", `no Status chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
@@ -881,7 +881,7 @@ const SERVED_VERSION = new RegExp(
 
 /**
  * A page's furniture is the shared stylesheet's and the shared script's (05-artifacts.md § The page
- * itself, RD.DEVEX.WORKSPACE.214).
+ * itself, RULE.DEVEX.WORKSPACE.214).
  *
  * A PAGE THAT LINKS THE SHARED STYLESHEET IS HELD TO ONE THING: each version its two lines name is
  * a version that exists. `versions.json` lists them. A line that loads from a folder beside the
@@ -1090,7 +1090,7 @@ export function worldOf(file: string): string | null {
  */
 export function carriesStatus(file: string, block: any): boolean {
   if (block?.variant === "overview") return false;
-  // A REPORT IS A SNAPSHOT (RD.DEVEX.WORKSPACE.192). It is true of one moment and the next run
+  // A REPORT IS A SNAPSHOT (RULE.DEVEX.WORKSPACE.192). It is true of one moment and the next run
   // replaces it, so it has no states to move through. A chip on the first coverage page read
   // IMPLEMENTING, and readers took the page to be unfinished when the repository had gaps.
   if (block?.variant === "report") return false;
@@ -1448,7 +1448,7 @@ export function checkDepends(files: string[], blocks: Map<string, any>): Finding
 /**
  * A CLOSED VALUE IS NAMED IN A CHAPTER, AND NOTHING SAID WHAT ITS MEMBERS ARE.
  *
- * `RD.DEVEX.WORKSPACE.165` is a MUST and had zero compliant instances when this was written: *a chapter that
+ * `RULE.DEVEX.WORKSPACE.165` is a MUST and had zero compliant instances when this was written: *a chapter that
  * owns a closed vocabulary states it as a contract block, and every other mention cites it.* A
  * vocabulary named but never listed cannot be implemented from the document, which is the one thing
  * the book is for — somebody building a second stack reads a page and writes the value.
@@ -1597,7 +1597,7 @@ export function checkVocabulary(
  * not the chapter that owns it: `Terms` gives a reader the word, and the declaration gives an
  * implementer the members. Both are correct, and only the second may be absent.
  *
- * A second declaration of one value is the other half of `RD.DEVEX.WORKSPACE.165` — *it is the ONE place the
+ * A second declaration of one value is the other half of `RULE.DEVEX.WORKSPACE.165` — *it is the ONE place the
  * vocabulary is written* — and two pages drifting apart is exactly what the rule prevents.
  */
 // A MEMBER REFERENCE NAMES ITS TYPE, and reading only the bare form missed three of the four stale
@@ -1750,7 +1750,7 @@ export function directFiles(dir: string, keep: (p: string) => boolean): string[]
  * none of 252 rows measured. No correction to those files could have repaired it either: a data
  * model is grouped by table and a glossary row is keyed by term, so even a faithful storage mirror
  * answers *which terms live in this table* while the column asks the opposite. Storage is read in
- * the data model itself, beside the migrations it mirrors (RD.DEVEX.WORKSPACE.134).
+ * the data model itself, beside the migrations it mirrors (RULE.DEVEX.WORKSPACE.134).
  *
  * THE CONSTRUCT IS THE TERM'S LINK RATHER THAN A FOURTH COLUMN. A reader wanting the page that
  * defines the word follows the word.
@@ -2619,7 +2619,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   const { block, error } = readBlock(src);
   if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
 
-  // A construct types no proof (RD.DEVEX.WORKSPACE.132), so the page is the seat and nothing is joined into it.
+  // A construct types no proof (RULE.DEVEX.WORKSPACE.132), so the page is the seat and nothing is joined into it.
   // What proves it is read in the tests report, from the behaviour rows at the construct's own path.
   const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
   const org = "SaaS Plane";
@@ -2800,7 +2800,7 @@ export function duplicateIds(repo: string): Finding[] {
  * id, a folder name to a package name, a persona to a persona.
  *
  * **Three are here and one is not.** Id coverage — every behaviour id cited by a case, and every
- * cited id declared as a row — is the behaviours join's, under `RD.SUPPORT.APPS.084`. It is built in
+ * cited id declared as a row — is the behaviours join's, under `RULE.SUPPORT.APPS.084`. It is built in
  * `spn-apps`, in `scripts/checks/behaviour-join.ts`, and `spn-devex behaviours coverage` lists a case
  * that cites an id no row declares. Building one more here would be two implementations of one
  * idea, disagreeing about the same estate.
@@ -3127,7 +3127,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
     `# Docs Audit — ${name}`,
     "",
-    // A report is a snapshot and carries no status (RD.DEVEX.WORKSPACE.192).
+    // A report is a snapshot and carries no status (RULE.DEVEX.WORKSPACE.192).
     "`For: Architect · Editor`",
     "",
     `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this audit writes one file and touches nothing else.`,
@@ -3182,7 +3182,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
   ].join("\n");
 
-  // THE MEASUREMENT GOES TO THE CALLER, NEVER INTO A DEVELOPER'S POCKET (RD.DEVEX.WORKSPACE.149). A report is
+  // THE MEASUREMENT GOES TO THE CALLER, NEVER INTO A DEVELOPER'S POCKET (RULE.DEVEX.WORKSPACE.149). A report is
   // written by the agent from what it read; a tool that holds a measurement the agent needs hands it
   // over on standard output. Writing one here made this the only machine-authored file in a folder
   // of authored pages, and it regenerated on every run whether anybody had asked for it or not.

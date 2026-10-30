@@ -8,31 +8,29 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/README.md",
-      "seen": "29f0ff87"
+      "seen": "6ca1c307"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "8a47c457"
+      "seen": "08736f20"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
-      "seen": "374280ba"
+      "seen": "91b0a8fa"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "b9bf6ac3"
-    }
-  ],
-  "decisions": [
-    {
-      "repo": "spn-foundation",
-      "row": "RD.SUPPORT.APPS.121",
-      "seen": "9a7146e7"
+      "seen": "f7d50a90"
     },
     {
-      "repo": "spn-foundation",
-      "row": "RD.DEVEX.FUNCTION.060",
-      "seen": "b3753049"
+      "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
+      "section": "A task has three possible fates, and promotion is only one of them",
+      "seen": "459917b3"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
+      "section": "Repo tasks",
+      "seen": "9b3398b1"
     }
   ]
 }
@@ -88,15 +86,15 @@
 ## Produces to
 
 - **The paved road and the repo standard** — held by `spnutils repo`, the branch protections it writes, and the delivery path's checks that no one may bypass.
-  - **Is this the right work, in the right order among other work, at the right size?** The lead orders pieces of work against each other and judges how large one should be (`RD.DEVEX.AGENT.087`). The order of the steps inside one piece of work is `ARCHITECT`'s, so two lenses never order the same thing.
+  - **Is this the right work, in the right order among other work, at the right size?** The lead orders pieces of work against each other and judges how large one should be (`RULE.DEVEX.AGENT.087`). The order of the steps inside one piece of work is `ARCHITECT`'s, so two lenses never order the same thing.
   - **Should this be built at all?** Every need enters the ladder and descends only with justification: use what exists, extend by configuration, generalize into a platform capability, build domain-specific, and customer-specific only as a governed, recorded exception. If a second product would need it, it is platform.
   - **Is this the smallest design that meets the requirement?** Simplicity is a budget: every abstraction and layer spends complexity the team repays forever. Pick the smaller when two designs both work.
   - **Is the paved road still the easiest way?** If a workaround is easier than the golden path, the road is the defect — fix the path, not the developer. An undocumented deviation is a defect regardless of the excuse.
   - **Does the process hold?** Four permanent branches, the path to `main` chosen at each promotion and held by a required `promotion-source` job, everything by pull request, mechanical steps as commands, never instructions. A check that cannot fail is not written: a repository is held only to the checks that can find something in it.
-  - **Where does a repo-scoped script belong, and is anyone asking?** Ask who invokes it before you ask what it must know. A person or a pipeline reaches for a `tasks/` script or a CLI command, and the agent's own loop reaches for a hook, so a check the agent runs belongs in the plugin under `hooks/` or `hooks/tools/`. The bar there is foundational: a check every SaaS Plane repository owes, proposed and built only once approved (`RD.DEVEX.FUNCTION.060`). A `tasks/` script **stays** where the work is this repository's, is **promoted** to a CLI command where it reads what SPN manifests declare, or **retires** where it was a workaround for something the platform did not answer and now does. **Retirement is the outcome people miss, and the most common one** — promote a workaround and you make it permanent (`RD.SUPPORT.APPS.121`).
+  - **Where does a repo-scoped script belong, and is anyone asking?** Ask who invokes it before you ask what it must know. A person or a pipeline reaches for a `tasks/` script or a CLI command, and the agent's own loop reaches for a hook, so a check the agent runs belongs in the plugin under `hooks/` or `hooks/tools/`. The bar there is foundational: a check every SaaS Plane repository owes, proposed and built only once approved (`RULE.DEVEX.FUNCTION.060`). A `tasks/` script **stays** where the work is this repository's, is **promoted** to a CLI command where it reads what SPN manifests declare, or **retires** where it was a workaround for something the platform did not answer and now does. **Retirement is the outcome people miss, and the most common one** — promote a workaround and you make it permanent (`RULE.SUPPORT.APPS.121`).
   - **Is the foundation making the team faster**, not merely more correct? A velocity claim is checked against the engineering outcomes the purpose part names.
 - **The readability bar** — held by the doc hooks at write time.
-  - **Can a leader repeat it?** The opening of a document reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (`RD.DEVEX.WORKSPACE.106`). Length itself is not the finding: no rule measures it.
+  - **Can a leader repeat it?** The opening of a document reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (`RULE.DEVEX.WORKSPACE.106`). Length itself is not the finding: no rule measures it.
 
 ## Gates
 
@@ -109,4 +107,4 @@
 
 ## Improves the book
 
-- A workaround easier than the road is a finding against the road: it drafts the change to the paved-road chapter and its register row, and the developer decides.
+- A workaround easier than the road is a finding against the road: it drafts the change to the paved-road chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled; the developer decides.

@@ -1,4 +1,4 @@
-// `lib/timing.ts` — the one telemetry library every plugin bundles (RD.DEVEX.WORKSPACE.185).
+// `lib/timing.ts` — the one telemetry library every plugin bundles (RULE.DEVEX.WORKSPACE.185).
 //
 // Each line has one shape, key for key: `script`, `group`, `subgroup`, `action`, `args`, `event`,
 // `tool`, `ms`, `exit`, `at`, `repo`, `pid`, `verdict`, `out`, `session`, `agent`, `workstream`, `arc`,

@@ -3,7 +3,7 @@
 // The chapter is the source of truth; a change is made there first, then here, in the same change.
 //
 // The proof check: every `SUCCESS` row against the run its `Updated at` cites, and no other run
-// (the book's RD.DEVEX.UTILS.071). A repository gate — it reads every register, and the files of
+// (the book's RULE.DEVEX.UTILS.071). A repository gate — it reads every register, and the files of
 // each run a row cites, so it runs over a tree, never on one write.
 //
 //     node behaviour-proof.ts [root]

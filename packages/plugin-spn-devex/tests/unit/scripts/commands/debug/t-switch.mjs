@@ -1,4 +1,4 @@
-// `debug switch show|on|off` — the switches of the agent's machinery, from a closed set (RD.DEVEX.WORKSPACE.322, .323).
+// `debug switch show|on|off` — the switches of the agent's machinery, from a closed set (RULE.DEVEX.WORKSPACE.322, .323).
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/10-providers/local/03-session.md",
-      "seen": "f1c5200d"
+      "seen": "ced8bb57"
     }
   ]
 }
@@ -24,7 +24,7 @@
 
 **The trust anchor is the machine's own certificate authority, not a session.** One trust root per machine, deliberately unscoped, trusted once. `spnutils infra organization up` establishes it as part of the trust bootstrap, and `spnutils infra trust-ca` performs the trust half on its own.
 
-**A client reaches a local host because that root is in the machine trust store.** Certificates are minted per world and family, so an engine presents a certificate for the name you actually dial (`RD.SUPPORT.INFRA.079`).
+**A client reaches a local host because that root is in the machine trust store.** Certificates are minted per world and family, so an engine presents a certificate for the name you actually dial (`RULE.SUPPORT.INFRA.079`).
 
 ## Where a credential is still required
 

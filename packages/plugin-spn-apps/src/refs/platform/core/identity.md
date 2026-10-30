@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/02-identity.md",
-      "seen": "f5311982"
+      "seen": "236472e5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/02-identity/",
@@ -154,7 +154,7 @@ Only a public provider (social) registers anybody new. A directory (SAML/OIDC) v
 
 ## What a console shows follows from the rights
 
-When you build an administration screen, treat a section an organization has no right to as absent, not disabled — MUST. A disabled control advertises a capability and then refuses it, which teaches a customer to ask for something they were never offered; absence says the same thing without the invitation.
+When you build an administration screen, treat a section an organization has no right to as absent, not disabled — MUST. A disabled control advertises a capability and then refuses it, which teaches a customer to ask for something they were never offered; absence says the same thing without the invitation. The sections follow the rights: a workforce directory shows wherever an organization employs people, on its own staff surface alone; public providers show only where it owns a customer relationship; and verified domains show wherever a directory appears.
 
 A consumer application is not a second identity portal. Self-service is a corner of it, never its spine — the moment it becomes the spine, there are two places a person's identity is managed, and they drift apart.
 

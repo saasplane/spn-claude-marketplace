@@ -87,7 +87,7 @@ function libraries(workspace: string): Library[] {
 }
 
 function render(found: Library[], bookSeen: string): string {
-  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DEVEX.AGENT.073`). The block stamps
+  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RULE.DEVEX.AGENT.073`). The block stamps
   // the book's rule alone, and never this script: a ref in the marketplace citing a script in the
   // marketplace has no distance to measure, because both move in the same commit. The marker under
   // the block names the command that writes the table.

@@ -1,6 +1,6 @@
 // Where this plugin's own suites leave what a run proved: `tests/.output/<tier>/runs/<run>.json` at
 // the repository root, under the name the caller gave, in the shape every stack's runner writes
-// (the book's RD.DEVEX.UTILS.071). A reused name replaces that one file, and the tier keeps its 20
+// (the book's RULE.DEVEX.UTILS.071). A reused name replaces that one file, and the tier keeps its 20
 // newest.
 
 import { mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";

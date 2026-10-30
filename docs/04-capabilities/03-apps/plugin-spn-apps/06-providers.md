@@ -78,7 +78,7 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 
 ### An exclude carries its reason, and nothing else is enforced
 
-**Why** — *code coverage is measured and reported, never enforced* (`RD.SUPPORT.APPS.133`, amended 2026-09-29 to drop the floor): a percentage used as a gate gets met the cheapest way, by lowering the number or by writing cases that run code without checking what it does.
+**Why** — *code coverage is measured and reported, never enforced* (`RULE.SUPPORT.APPS.133`, amended 2026-09-29 to drop the floor): a percentage used as a gate gets met the cheapest way, by lowering the number or by writing cases that run code without checking what it does.
 **What** — the one rule left reads no percentage at all. A Jest `coveragePathIgnorePatterns` entry or a Vitest `coverage.exclude` entry is refused only where it carries no comment, on its own line or the line above it, saying why that code cannot be reached by a case. An exclude already on disk is not this write's to answer for, and a Playwright configuration is never read.
 **How** — the check reads the file as it stood before the write and as the write would leave it, so only what the pending write adds is judged. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts` and `packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts`, proven in `packages/plugin-spn-apps/tests/unit/providers/ts/checks/_tests/t-coverage-excludes.mjs`.
 

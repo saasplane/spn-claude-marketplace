@@ -1,5 +1,5 @@
 // A Bash command read into the programs it runs, each as `script` › `group` › `subgroup` › `action`
-// and the `args` typed after the action (RD.DEVEX.WORKSPACE.185). What `bash-timing.ts` times.
+// and the `args` typed after the action (RULE.DEVEX.WORKSPACE.185). What `bash-timing.ts` times.
 //
 // THE READING. The command is split on `&&`, `||`, `;`, `|`, `&` and newlines; quotes join a word and
 // hide a separator; redirections and their targets are dropped, and so is a heredoc's body. In each
@@ -68,7 +68,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
   "spn-devex": {
     behaviours: ["coverage", "ids", "stamp"],
     debug: ["cost", "hooks", "store", "switch", "window"],
-    docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "index", "page", "parity", "prose", "sds", "status", "topics"],
+    docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "id", "index", "page", "parity", "prose", "sds", "status", "topics"],
     plugin: ["migration", "partner", "paths"],
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],

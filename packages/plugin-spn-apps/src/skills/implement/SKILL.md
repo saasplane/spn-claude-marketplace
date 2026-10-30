@@ -7,30 +7,28 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "2b989141"
+      "seen": "810ac3e8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/03-standards-patterns/",
-      "seen": "dbf273eb"
+      "seen": "80f70315"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/07-architecture-widgets/",
-      "seen": "06a4c7c3"
+      "seen": "cef5acd3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/08-architecture-containers/",
-      "seen": "b3e5c65c"
-    }
-  ],
-  "decisions": [
+      "seen": "97e9441a"
+    },
     {
-      "repo": "spn-foundation",
-      "row": "RD.SUPPORT.APPS.006",
-      "seen": "35e7b913"
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/01-intent.md",
+      "section": "Where the comment goes",
+      "seen": "c3984457"
     }
   ]
 }
@@ -82,9 +80,9 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 
 **A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
-Order never changes; skip only what the classification skips. **Documents lead code** (`RD.DEVEX.WORKSPACE.081`): before the contract step, the owning seat already says what will be true — the `🔮 planned` rows `ideate` wrote, or rows you write first when it did not run. A part runs its documents, then its source, then its tests, then the close's run, never one function at a time. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
+Order never changes; skip only what the classification skips. **Documents lead code** (`DEC.DEVEX.WORKSPACE.081`): before the contract step, the owning seat already says what will be true — the `🔮 planned` rows `ideate` wrote, or rows you write first when it did not run. A part runs its documents, then its source, then its tests, then the close's run, never one function at a time. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 
-**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
+**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RULE.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
 
 ## A page is built from the tree of its pattern
 
@@ -92,12 +90,12 @@ The `ui` step follows this section for every page a change adds or rearranges. *
 
 - **Start from the tree the `design` skill wrote.** It names the kind of person the app is for, the flow the page is a step of, the facts, the app pattern (or each section's site pattern) and every block by level, with the case each block follows. Where a page has no tree, run the `design` skill first, and show its result before any code. Never arrange a page while you write it, and never build it from a picture: a design the partner brings goes through the given-design mode into the tree first.
 - **Build a kept line as kept.** Where the partner answered *keep yours*, the tree marks the line with the rule, their words and the date. Build it as they chose, and carry the reason into the code as one comment on that line. A review raises nothing on a kept line, and where the Surface check notes one, answer from the comment and leave the code as it is.
-- **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RD.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
-- **Use one panel for each thing a person reads or saves as a whole** (`RD.SUPPORT.SURFACE.116`, advice, as the tree has it). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RD.SUPPORT.SURFACE.115`).
-- **Give the page that reads a record and the page that changes it the same parts in the same order** (`RD.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
+- **Build each line of the tree with the unit it names.** An app pattern is an arrangement of units that exist, and it is never a block of its own (`RULE.SUPPORT.SURFACE.048`). So you write no component for a pattern, and no component named after one. The page composes the panels, the widgets and the components the design system already has.
+- **Use one panel for each thing a person reads or saves as a whole** (`RULE.SUPPORT.SURFACE.116`, advice, as the tree has it). Its sections are content parts, each under its own title, and never panels of their own. Two things that are read or saved apart are two panels. An editor with its preview is one panel, with each thing written beside what it becomes and the actions at the start of the footer (`RULE.SUPPORT.SURFACE.115`).
+- **Give the page that reads a record and the page that changes it the same parts in the same order** (`RULE.SUPPORT.SURFACE.117`). A reading becomes a field, a block of source becomes an editor, and the footer with the actions is added. Nothing else moves.
 - **Read the spec of the pattern for each screen class.** It shows where the parts sit at a desktop, at a tablet and on a phone. Its values are samples, and the page's own data takes their place.
-- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RD.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
-- **Keep a site section's eyebrows as its site pattern states.** A hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts, a grid cell's eyebrow is its group or kind as text and a badge only when it says a state, and a plan holds one eyebrow, with a second word as a `PRIMARY` badge fact (`RD.SUPPORT.SURFACE.371`, `.372`, `.373`).
+- **Keep the choice the tree made for each part.** A part whose query takes a page, a text or a filter is `DSDataTable`, in the layout the tree names. Send its search and its filters to the server, in the read the table asks for (`RULE.SUPPORT.SURFACE.070`). Never filter in the page over the records already loaded.
+- **Keep a site section's eyebrows as its site pattern states.** A hero's state is a `PRIMARY` badge eyebrow and its stack is `OUTLINE` `DEFAULT` badge facts, a grid cell's eyebrow is its group or kind as text and a badge only when it says a state, and a plan holds one eyebrow, with a second word as a `PRIMARY` badge fact (`RULE.SUPPORT.SURFACE.371`, `.372`, `.373`).
 - **Hold each small thing to its rule of content**, and each closed prop to its unit's choice table, through the entry ref's route 3. A state is a badge on the line of facts or at the end of the line, and the normal state shows none. The end of a line holds its actions, a badge, or both. A line that leads to a page shows the arrow where its end holds no action. A field a person enters is `DSForm.Field`, and a field a person reads is `DSDataUnit`.
 - **Style the page with the app's own styles rule** (`refs/support/apps/providers/ts/03-structure.md`, "An app's own styles"). A repeated pattern is a component of the app's own, values come from the design system's tokens, and no selector reaches the design system's insides.
 
@@ -137,7 +135,7 @@ The step files are the `server-dev` and `web-dev` lenses worn — they carry the
 Three more that decide whether a symbol appears at all:
 
 - **Only the barrel is read.** A file under a `_`-prefixed path segment, a declaration without `export`, and a `private`/`protected` member are each excluded. Those are the three ways to keep something out, and they are the *only* ways.
-- **A one-line JSDoc intent is harvested** into the artifact (RD.SUPPORT.APPS.006). No intent means the symbol is in the index with nothing to select it by — the single most common reason an agent cannot find work that already exists.
+- **A one-line JSDoc intent is harvested** into the artifact (RULE.SUPPORT.APPS.006). No intent means the symbol is in the index with nothing to select it by — the single most common reason an agent cannot find work that already exists.
 - **`@deprecated` travels.** Tag a superseded export and every consumer's agent sees it.
 
 **The step files are the standard for anyone reading them** — generate against those, not against a document you may not have. Their provenance is the foundation book's TypeScript provider set — the standards chapters plus the kind registry and lifecycle seats. That set carries the reasoning behind each rule for readers who have it. Nothing in the steps is deferred to it.

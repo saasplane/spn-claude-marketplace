@@ -1,4 +1,4 @@
-// `prompt` — what a session is called (RD.DEVEX.WORKSPACE.222). The script runs on every prompt, so
+// `prompt` — what a session is called (RULE.DEVEX.WORKSPACE.222). The script runs on every prompt, so
 // the known-bad is every prompt that must NOT name the session: one that binds no workstream, one
 // that repeats the name already given, and one the script cannot read. An answer on any of those
 // writes over a name the developer typed, or stands between the developer and their prompt.

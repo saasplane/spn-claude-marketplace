@@ -28,7 +28,7 @@ console.log("=== the tiers each kind owes");
 ok("the ladder is the book's five, in its order", JSON.stringify(TIERS) === JSON.stringify(["UNIT", "INTEGRATION", "CONTRACT", "COMPONENT", "JOURNEY"]));
 ok("every owed tier is a rung of the ladder", Object.values(OWED_TIERS).flat().every((tier) => TIERS.includes(tier)));
 
-// The four cells RD.SUPPORT.APPS.135 settled, held to the book's table whether or not a toolchain sits beside this checkout.
+// The four cells RULE.SUPPORT.APPS.135 settled, held to the book's table whether or not a toolchain sits beside this checkout.
 const owes = (kind, tiers) => JSON.stringify(OWED_TIERS[kind]) === JSON.stringify(tiers);
 ok("CLIENT_API owes CONTRACT, never INTEGRATION — its suite is its service's contract tier", owes("CLIENT_API", ["CONTRACT"]), `${OWED_TIERS.CLIENT_API}`);
 ok("APP_SERVER owes CONTRACT and no journey — it deploys no screen", owes("APP_SERVER", ["CONTRACT"]), `${OWED_TIERS.APP_SERVER}`);

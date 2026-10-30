@@ -1,4 +1,4 @@
-// RESTATES: RD.DEVEX.WORKSPACE.162, RD.DEVEX.WORKSPACE.080, RD.DEVEX.WORKSPACE.088, RD.DEVEX.WORKSPACE.118, `04-discipline.md` and
+// RESTATES: RULE.DEVEX.WORKSPACE.162, RULE.DEVEX.WORKSPACE.080, RULE.DEVEX.WORKSPACE.088, RULE.DEVEX.WORKSPACE.118, `04-discipline.md` and
 // `06-registers.md`. The chapters are the source of truth; a rule change is edited there first.
 //
 // The corpus checked against itself, rather than against its own form.
@@ -43,11 +43,17 @@ import { isDir, isFile, read } from "../../lib/payload.ts";
 import { type Action, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT, DECISIONS, POCKET, artifactDocsDir, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
   hasSegment, hubPage, isOverview } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { DEC_ID_SRC, ID_SRC, RULE_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { resolveWorkspace } from "./_lib.ts";
 
-const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");
-const IS_DECISION_ID = new RegExp(`^${DECISION_ID_SRC}$`);
-const IS_DECISION_ID_ROW = new RegExp(`^\\|\\s*(${DECISION_ID_SRC})\\s*\\|`);
+const ANY_ID = new RegExp(`\\b${ID_SRC}\\b`, "g");
+const RULE_SENTENCE = new RegExp(`\\(rule (${RULE_ID_SRC})\\)`, "g");
+const ID_LINK = new RegExp(`\\[(${ID_SRC})\\]\\(`, "g");
+const OLD_ID = /\bRD\.[A-Z]+(?:\.[A-Z]+)?\.\d{3}\b/g;
+const IS_DEC_ID = new RegExp(`^${DEC_ID_SRC}$`);
+const IS_DEC_ID_ROW = new RegExp(`^\\|\\s*(${DEC_ID_SRC})\\s*\\|`);
+// An open card headed with the id its row will take: `### DEC.<…> — <the question>`.
+const IS_DEC_ID_CARD = new RegExp(`^###\\s+(${DEC_ID_SRC})\\s+—`);
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 // Heading words too common to identify a section on their own.
@@ -55,7 +61,7 @@ const SKIP_WORDS = new Set(["what", "this", "that", "with", "from", "they", "the
   "never", "every", "which", "where", "their", "there", "once"]);
 
 // Prose that is deliberately historical: an artifact describes the moment it was produced
-// (RD.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
+// (RULE.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
 //
 // This once said a superseded ruling keeps its old words on purpose. It does not. `06-registers.md`
 // rules that a row is never annotated, struck through, or left standing with a note, and `doc-check`
@@ -206,7 +212,7 @@ function registerTableRows(text: string): Array<Map<string, string>> {
  *
  * The register has a `Why` column, so the decision column carries no reasoning and no second answer.
  * A row that holds two rulings is two rows: the one a reader meets first is the one they act on, and
- * the other is invisible until somebody reads the whole cell. `RD.PLATFORM.CORE.035` carried a MUST two
+ * the other is invisible until somebody reads the whole cell. `RULE.PLATFORM.CORE.035` carried a MUST two
  * hundred words in, which is the case this was written for.
  *
  * BOLD IS ORDINARY EMPHASIS IN A ROW, so its absence proves nothing and is not checked. What is
@@ -222,7 +228,7 @@ function rulings(root: string, reported: Reported): string[] {
   for (const row of registerTableRows(read(register))) {
     const rid = row.get("#");
     const text = row.get("Decision");
-    if (!rid || !IS_DECISION_ID.test(rid) || text === undefined) continue;
+    if (!rid || !IS_DEC_ID.test(rid) || text === undefined) continue;
     const rest = text.replace(/^\*\*.+?\*\*/, "");  // the opening claim is the ruling
     const buried = [...rest.matchAll(BURIED)].map((m) => m[1]);
     if (buried.length) split.push([buried.length, rid, buried[0].split(/\s+/).join(" ").slice(0, 80)]);
@@ -249,7 +255,7 @@ function ownership(root: string, sources: string[], reported: Reported): string[
   const out: string[] = [];
   const owners = new Map<string, string[]>();
   for (const path of sources) {
-    // The concept may not cite a seat or a chapter at all — it links only outward (RD.DEVEX.WORKSPACE.080), so
+    // The concept may not cite a seat or a chapter at all — it links only outward (RULE.DEVEX.WORKSPACE.080), so
     // it can never satisfy this check and is not in scope for it.
     if (path === "CONCEPT.md") continue;
     if (path.includes(`${POCKET.registers}/${DECISIONS}`)) continue;
@@ -284,13 +290,13 @@ function ownership(root: string, sources: string[], reported: Reported): string[
   return out;
 }
 
-// RD.DEVEX.WORKSPACE.162 keeps a count where it carries the ruling: adding a member would be a redesign, not an
+// RULE.DEVEX.WORKSPACE.162 keeps a count where it carries the ruling: adding a member would be a redesign, not an
 // ordinary register entry. These are those sets — the test is whether the number IS the decision,
 // not whether the set happens to be closed today.
 const LOAD_BEARING = new Set(["seats", "passes", "layers", "entries", "principals", "pockets",
   "stages", "runtimes", "directions", "disciplines", "families"]);
 
-/** A count written into prose for a set that is free to grow (RD.DEVEX.WORKSPACE.162). */
+/** A count written into prose for a set that is free to grow (RULE.DEVEX.WORKSPACE.162). */
 function cardinality(root: string, sources: string[], reported: Reported): string[] {
   const WORDS = "(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
   const GROWABLE = "(?:kinds?|constructs?|skills?|lenses|domains?|tiers?|artifacts?|" +
@@ -298,7 +304,7 @@ function cardinality(root: string, sources: string[], reported: Reported): strin
   const pattern = new RegExp(`\\bthe ${WORDS} (${GROWABLE})\\b`, "gi");
   const out: string[] = [];
   for (const path of sources) {
-    if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
+    if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RULE.DEVEX.WORKSPACE.088)
     if (!reported(path)) continue;
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
@@ -316,7 +322,7 @@ function cardinality(root: string, sources: string[], reported: Reported): strin
  * Every concept section owes a section in its readable face.
  *
  * A face renders a live seat, so unlike an argument or a measurement it CAN be checked against
- * current state (RD.DEVEX.WORKSPACE.088). `concept-overview.html` is the concept's readable face rather than a
+ * current state (RULE.DEVEX.WORKSPACE.088). `concept-overview.html` is the concept's readable face rather than a
  * record of a moment: a workstream that changes the model owes the face with it, and a section the
  * face never expands is a model somebody added and stopped.
  *
@@ -378,54 +384,72 @@ function restatementDrift(root: string, reported: Reported): string[] {
 }
 
 /**
- * CITATION — does every decision id cited in this repository resolve to a row?
+ * CITATION — does every id cited in this repository resolve to exactly one place in the workspace?
  *
- * **A citation to a row that does not exist is the one register failure a reader cannot work
- * around.** Every other finding here leaves a reader with two answers to choose between. This one
- * leaves them with none, and it is silent: `RD.APPS.020` reads exactly like a row that exists until
- * somebody opens the register and searches for it.
+ * **An id names one thing, and its first word says where to read it.** A `RULE.` id stands on the
+ * sentence that states the rule, written `(rule RULE.…)` in a chapter. A `DEC.` id is the first cell of
+ * one register row, or the heading of the open card that row will compress from. The check reads the
+ * workspace (`resolveWorkspace`), because a repository cites a rule the book states and the book is a
+ * sibling checkout: a `RULE` id resolves to exactly one `(rule RULE.…)` across the workspace's
+ * repositories, and a `DEC` id to exactly one register row's first cell or open card's heading, so a
+ * card left standing beside its row resolves twice (RULE.DEVEX.WORKSPACE.334).
  *
- * It is cheap because both halves are already on disk — the cited ids and the rows are in the same
- * tree. `N76` found two ids that had dangled since before that arc, and nothing had ever asked.
+ * IT FAILS FOUR THINGS. An id that resolves nowhere, which answers nothing and says so to nobody; an
+ * id that resolves twice, which leaves two answers; an id written as a link (`[RULE.…](`), because
+ * the id alone survives any chapter move and a path beside it is the part that goes stale; and any
+ * `RD.` id, the form this one replaced, so a half-finished run is always visible.
  *
- * SOFT WHILE THE COUNT IS ABOVE ZERO. A gate that is red on the day it ships is one nobody reads,
- * which is this corpus's own argument arriving as a constraint (see `checks/corpus.ts`). It joins
- * the wired set on the day it is silent on a clean corpus.
+ * SILENT WHERE THE WORKSPACE HOLDS NO RULE AND NO ROW. A partner holds the plugins and neither the
+ * book nor its register, so there is nothing for a citation to resolve against, and that is a fact
+ * about the workspace rather than a finding about this repository.
  *
- * WHAT IT DELIBERATELY DOES NOT READ: a workstream folder. An arc log cites the row that governed
- * an act when the act happened, and a row removed later does not make that log wrong — it makes it
+ * WHAT IT DELIBERATELY DOES NOT READ: a workstream folder. An arc log cites the id that governed an
+ * act when the act happened, and a row removed later does not make that log wrong — it makes it
  * history. Rewriting it would state something that never happened.
  */
 function citations(root: string, reported: Reported): string[] {
-  const register = decisionsRegister(docsOf(root));
-  const registerText = read(register);
-  if (!registerText) return [];                    // no register here — not this repo's question
-  const rows = new Set<string>();
-  for (const line of registerText.split("\n")) {
-    const row = IS_DECISION_ID_ROW.exec(line);
-    if (row) rows.add(row[1]);
+  const workspace = resolveWorkspace();
+  const repositories = new Set<string>([resolve(root)]);
+  for (const entry of readdirSync(workspace).sort()) {
+    const full = join(workspace, entry);
+    if (isDir(join(full, "docs"))) repositories.add(resolve(full));
   }
-  if (!rows.size) return [];
+  const places = new Map<string, number>();
+  const place = (id: string): void => { places.set(id, (places.get(id) ?? 0) + 1); };
+  for (const repository of repositories) {
+    for (const path of sourcesOf(repository))
+      for (const hit of read(join(repository, path)).matchAll(RULE_SENTENCE)) place(hit[1]);
+    for (const line of read(decisionsRegister(docsOf(repository))).split("\n")) {
+      const row = IS_DEC_ID_ROW.exec(line) ?? IS_DEC_ID_CARD.exec(line);
+      if (row) place(row[1]);
+    }
+  }
+  if (!places.size) return [];
 
-  const dangling = new Map<string, string[]>();
+  const problems = new Map<string, string[]>();
+  const note = (what: string, path: string): void => {
+    const where = problems.get(what) ?? [];
+    if (!where.includes(path)) where.push(path);
+    problems.set(what, where);
+  };
   for (const path of sourcesOf(root)) {
     if (!reported(path)) continue;
     const text = read(join(root, path));
-    for (const hit of text.matchAll(DECISION_ID)) {
-      const id = hit[0];
-      if (rows.has(id)) continue;
-      const where = dangling.get(id) ?? [];
-      if (!where.includes(path)) where.push(path);
-      dangling.set(id, where);
+    for (const hit of text.matchAll(OLD_ID)) note(`${hit[0]} — an \`RD.\` id, which no longer names anything`, path);
+    for (const hit of text.matchAll(ID_LINK)) note(`${hit[1]} — written as a link, and an id stands alone`, path);
+    for (const hit of text.matchAll(ANY_ID)) {
+      const found = places.get(hit[0]) ?? 0;
+      if (found === 0) note(`${hit[0]} — resolves nowhere`, path);
+      else if (found > 1) note(`${hit[0]} — resolves ${found} times`, path);
     }
   }
-  if (!dangling.size) return [];
-  let out = `CITATION    ${dangling.size} decision id(s) cited here resolve to no row.`;
-  out += "\n            A citation with no row answers nothing and says so to nobody:";
-  for (const [id, where] of [...dangling].slice(0, 8))
-    out += `\n              ${id} — cited in ${where.slice(0, 3).join(", ")}` +
+  if (!problems.size) return [];
+  let out = `CITATION    ${problems.size} id(s) cited here do not resolve to exactly one place.`;
+  out += "\n            A citation with no place answers nothing, and one with two leaves a choice:";
+  for (const [what, where] of [...problems].slice(0, 8))
+    out += `\n              ${what} — cited in ${where.slice(0, 3).join(", ")}` +
            (where.length > 3 ? ` and ${where.length - 3} more` : "");
-  if (dangling.size > 8) out += `\n              … and ${dangling.size - 8} more`;
+  if (problems.size > 8) out += `\n              … and ${problems.size - 8} more`;
   return [out];
 }
 
@@ -494,7 +518,7 @@ function capabilityChapters(root: string, reported: Reported): string[] {
 /**
  * A provider folder whose file list does not match the contract beside it.
  *
- * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RD.DEVEX.WORKSPACE.179`), and the set is
+ * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RULE.DEVEX.WORKSPACE.179`), and the set is
  * stated in `02-contract.md` next to the instance folders. An instance with no capability for an
  * entry **writes the file anyway** and says what to do instead — so a missing file is a missing
  * answer rather than an absent capability, and the two used to look identical.

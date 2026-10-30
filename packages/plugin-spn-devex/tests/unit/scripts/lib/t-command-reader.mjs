@@ -1,5 +1,5 @@
 // `lib/command-reader.ts` — a Bash command read into the programs it runs, each as script › group ›
-// subgroup › action and the args typed after the action (RD.DEVEX.WORKSPACE.185, N8 row 2p). The
+// subgroup › action and the args typed after the action (RULE.DEVEX.WORKSPACE.185, N8 row 2p). The
 // port of the prototype `classify.py`: split on `&&`, `||`, `;`, `|`; drop `VAR=value`, `cd <dir>`
 // and redirections; know per program how many words make the levels and which options take a value.
 import { readFileSync, readdirSync, statSync } from "node:fs";

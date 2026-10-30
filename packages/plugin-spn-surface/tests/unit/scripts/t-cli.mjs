@@ -61,7 +61,7 @@ console.log("\n=== cli — `check scan` reads Surface code whole, and says what 
   const { out, code } = run("check", "scan", root);
   rmSync(root, { recursive: true, force: true });
   ok("exits clean: a scan reports, it never fails a run", code === 0, out);
-  ok("names the file, the line and the note's book row", out.includes("Page.tsx:5: [button-one-solid]") && out.includes("RD.SUPPORT.SURFACE.370"), out);
+  ok("names the file, the line and the note's book row", out.includes("Page.tsx:5: [button-one-solid]") && out.includes("RULE.SUPPORT.SURFACE.370"), out);
   ok("counts the notes by rule, and says what it cannot see", out.includes("button-one-solid") && out.includes("What it cannot see"), out);
 }
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// RESTATES: the foundation book — 02-document.md rule 9 (RD.DEVEX.WORKSPACE.162), rules 11-12 (RD.DEVEX.WORKSPACE.096, the
-// one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
+// RESTATES: the foundation book — 02-document.md rule 9 (RULE.DEVEX.WORKSPACE.162), rules 11-12 (RULE.DEVEX.WORKSPACE.096, the
+// one voice; RULE.DEVEX.WORKSPACE.106, its reach and its measure; RULE.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
 // and How ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
-// (RD.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RD.DEVEX.WORKSPACE.214)
+// (RULE.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RULE.DEVEX.WORKSPACE.214)
 // and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
@@ -12,7 +12,7 @@
 // holds its own copy of the styles: its prose and its path are read, its markup is not, and it draws
 // one RULE finding that says how to move it.
 //
-// Calibrated to the rule, never to the corpus (RD.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
+// Calibrated to the rule, never to the corpus (RULE.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
 // the corpus's own average). Over prose only — records are exempt, headings and derived chrome are
 // not prose — the numbers are:
 //
@@ -60,7 +60,7 @@ export type Finding = [severity: string, message: string];
 
 const slashes = (path: string) => path.split(sep).join("/");
 
-// Only sets that GROW. RD.DEVEX.WORKSPACE.162 keeps the count where it carries a ruling: "if adding a member
+// Only sets that GROW. RULE.DEVEX.WORKSPACE.162 keeps the count where it carries a ruling: "if adding a member
 // would be an ordinary decision entry, drop the count; if it would be a redesign, keep it." Scopes,
 // kinds, nouns, flows, seats and lenses are closed by a decision — a count there is load-bearing and
 // must not be flagged. Decisions, findings and open items are not.
@@ -68,7 +68,7 @@ const CARD = new RegExp(
   "\\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|" +
   "fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\\s+" +
   "(decisions|items|questions|findings|blockers|gaps|defects|open items|todos|tasks)\\b", "gi");
-// RD.DEVEX.WORKSPACE.112 — a check reads how a phrase is used, never that it appeared. The four idioms here are
+// RULE.DEVEX.WORKSPACE.112 — a check reads how a phrase is used, never that it appeared. The four idioms here are
 // impersonal obligation and have no innocent use. `the reader` is different in kind: it is an
 // ordinary noun phrase, and every one of the ten occurrences this corpus carried was legitimate. So
 // it counts only in the obligation form, which is the construction the rule is named after.
@@ -79,7 +79,7 @@ const ABOUT = new RegExp(
   // module, and read as a breach it asked a page to be rewritten away from what it meant.
   "(?<!\\b(?:to|of|in|on|at|for|from|than|with|and|or|but|is|as|only|than)\\s)one (?:must|should)|" +
   "the user is expected|it is recommended that)\\b", "gi");
-// RD.DEVEX.WORKSPACE.115 — an idiom means something its words do not say, so a reader whose first language is
+// RULE.DEVEX.WORKSPACE.115 — an idiom means something its words do not say, so a reader whose first language is
 // not English cannot guess it. Length limits do not catch one, because an idiom is usually short.
 // The house-term rule does not catch one either, because nobody defines an idiom. Listed rather than
 // inferred: a phrase earns its place here only when its meaning is not its words.
@@ -105,10 +105,10 @@ export const IDIOM = new RegExp(
 const QUOTE_L = "\x02", QUOTE_R = "\x03";
 export const MARKED = /\x02[^\x03\n]{0,200}\x03|\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"/g;
 
-// RD.DEVEX.WORKSPACE.106 — the measure. Second person is whole-word and case-insensitive. Longest form first, or
+// RULE.DEVEX.WORKSPACE.106 — the measure. Second person is whole-word and case-insensitive. Longest form first, or
 // `your` claims the front of `yours` and the rest never matches.
 // A sentence that reaches ONLY because a bare `… <prep> you` was appended to it satisfies the counter
-// and gives the reader nothing (RD.DEVEX.WORKSPACE.109). Detection is exact: strip the phrase and ask whether
+// and gives the reader nothing (RULE.DEVEX.WORKSPACE.109). Detection is exact: strip the phrase and ask whether
 // what remains still reaches.
 const BOLT = /(?:,\s*)?\s(?:for|to|on|with|around|before|beneath)\s+you\b\s*(?=[.!?;]|$)/i;
 // TWO SPELLINGS OF ONE PATTERN, AND THE REASON IS A REAL BUG THIS PORT HAD. A global regex carries a
@@ -120,7 +120,7 @@ const YOU_SOURCE = "\\b(?:you['’](?:re|ll|ve)|yourselves|yourself|yours|your|y
 const YOU = new RegExp(YOU_SOURCE, "i");
 const YOU_ALL = new RegExp(YOU_SOURCE, "gi");
 // A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not warming.
-// RD.DEVEX.WORKSPACE.112 — the marking is how a check tells quotation from breach. This exempted the bare word
+// RULE.DEVEX.WORKSPACE.112 — the marking is how a check tells quotation from breach. This exempted the bare word
 // in italics and any code span, and missed the shape this corpus actually quotes in: a WHOLE PHRASE
 // in italics or quotation marks. Two rows carried one — a developer's own sentence, and another
 // document's phrase cited as the thing the row corrects — and both read as the row warming its
@@ -139,13 +139,13 @@ const YOU_AS_TERM = new RegExp(
 // `ROW_LONG` is the ONE length rule the book kept, and it is a register row's shape rather than a
 // count of prose: one clause a sentence, because a row is a record. The prose measures that stood
 // beside it — an average, a thirty-word cap, and a `you` frequency — were dropped by the book and
-// are gone from here (`RD.DEVEX.WORKSPACE.106` as `01-corpus.md` and `04-discipline.md` now state it).
+// are gone from here (`RULE.DEVEX.WORKSPACE.106` as `01-corpus.md` and `04-discipline.md` now state it).
 const ROW_LONG = 25;
 // Reported in the sweep's statistics table, never as a finding. A number is evidence you cite and
 // never the verdict you reach.
 const PAST_25 = 25, PAST_30 = 30;
 
-// RD.DEVEX.WORKSPACE.107 — reaching the reader has three moves, and a script sees two of them: the reader as
+// RULE.DEVEX.WORKSPACE.107 — reaching the reader has three moves, and a script sees two of them: the reader as
 // subject, which YOU already finds, and the imperative, which opens the sentence with its verb. The
 // beneficiary clause is judgement, so the number a script produces is a FLOOR. The verb list is
 // closed and deliberately short — every member is a word this corpus almost never opens a sentence
@@ -186,15 +186,15 @@ const IMPERATIVE = new RegExp(
 // MUST-grammar is uppercase by rule, so the match is case-sensitive: a lowercase *may* is ordinary
 // prose and excluding it would empty the denominator.
 const NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
-// The bar per seat, as a percentage. A register row has none — it is a record (RD.DEVEX.WORKSPACE.106).
-// RD.DEVEX.WORKSPACE.108 — an artifact is read by the same developers who read a chapter, so it carries a
+// The bar per seat, as a percentage. A register row has none — it is a record (RULE.DEVEX.WORKSPACE.106).
+// DEC.DEVEX.WORKSPACE.108 — an artifact is read by the same developers who read a chapter, so it carries a
 // chapter's share and not a higher one.
 const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 const REACH_MIN_N = 8;
 
 /**
  * The suffix a page of the pocket is held to by its place, and that place as a message names it. Null
- * where the place holds a page to no suffix. RD.DEVEX.WORKSPACE.103: the suffix names the kind, and
+ * where the place holds a page to no suffix. RULE.DEVEX.WORKSPACE.103: the suffix names the kind, and
  * the set is closed. Under the pocket's `docs` folder a page in a `constructs` folder is a construct
  * page and every other page is an overview. A page directly in `guides/` is a guide.
  */
@@ -209,7 +209,7 @@ function pocketKind(parts: string[]): { place: string; suffix: string } | null {
 }
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
-/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RD.DEVEX.WORKSPACE.262). */
+/** An arc's one preview, `.spndevex/workstreams/<state>/<NNN>-<subject>/notes/N<nnn>/preview.html` (RULE.DEVEX.WORKSPACE.262). */
 const ARC_PREVIEW = new RegExp(`\\/${workstreamPrefixSource()}[^/]+\\/notes\\/N\\d+\\/preview\\.html$`);
 
 const MD_LINK = /!?\[([^\]]*)\]\([^)]*\)/g;
@@ -233,18 +233,18 @@ export function structural(path: string): Finding[] {
   const folder = dirname(resolve(path));
   const base = basename(path);
 
-  // RD.DEVEX.WORKSPACE.080 — a concept belongs to a repo root, never to a node.
+  // RULE.DEVEX.WORKSPACE.080 — a concept belongs to a repo root, never to a node.
   if (base === "CONCEPT.md") {
     const hasNode = NODE_MANIFESTS.some((m) => exists(join(folder, m)));
     if (hasNode && !exists(join(folder, "sprepo.json")))
-      out.push(["BLOCK", "CONCEPT.md sits beside a node manifest — RD.DEVEX.WORKSPACE.080: a concept " +
+      out.push(["BLOCK", "CONCEPT.md sits beside a node manifest — RULE.DEVEX.WORKSPACE.080: a concept " +
         "belongs to a repo root. Ideating a node lands as sections of its repo's concept, " +
         "never as a file at the node"]);
   }
 
-  // RD.DEVEX.WORKSPACE.103 — place and suffix must agree. A page under `guides/` ends `-guide.html`
-  // (RD.DEVEX.WORKSPACE.218). The index of artifacts sits directly in the pocket and has no suffix
-  // (RD.DEVEX.WORKSPACE.219), so it is held to none.
+  // RULE.DEVEX.WORKSPACE.103 — place and suffix must agree. A page under `guides/` ends `-guide.html`
+  // (RULE.DEVEX.WORKSPACE.218). The index of artifacts sits directly in the pocket and has no suffix
+  // (RULE.DEVEX.WORKSPACE.219), so it is held to none.
   const parts = slashes(resolve(path)).split("/");
   const kind = base.endsWith(".html") ? pocketKind(parts) : null;
   if (kind !== null && !base.endsWith(kind.suffix)) {
@@ -252,7 +252,7 @@ export function structural(path: string): Finding[] {
     const hint = base.endsWith(APPROACH_SUFFIX)
       ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
       : belongs !== null ? ` — this page belongs at ${belongs}` : "";
-    out.push(["BLOCK", `${base} sits ${kind.place} but does not end ${kind.suffix} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
+    out.push(["BLOCK", `${base} sits ${kind.place} but does not end ${kind.suffix} — RULE.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
   }
   return out;
 }
@@ -353,7 +353,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
   return out;
 }
 
-// The command that writes the parts of a page the arcs decide (RD.DEVEX.WORKSPACE.204).
+// The command that writes the parts of a page the arcs decide (RULE.DEVEX.WORKSPACE.204).
 const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
 
 /**
@@ -372,7 +372,7 @@ export function headerRule(path: string, text: string): Finding[] {
     return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
       "(05-artifacts.md § How ends in Cycles) · stamp the header's status badge, which a closed page keeps by hand"]];
   return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
-    `follows the arcs (05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `follows the arcs (05-artifacts.md § How ends in Cycles; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /**
@@ -386,7 +386,7 @@ export function openHeadingRule(path: string, text: string): Finding[] {
   const gives = openHeadingFor(text);
   if (shows === null || shows === gives) return [];
   return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
-    `(05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+    `(05-artifacts.md § How ends in Cycles; RULE.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /** A page's line that loads the shared script, which builds the rail and folds it. */
@@ -429,7 +429,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RD.DEVEX.WORKSPACE.102 / 040). An approach ` +
+      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RULE.DEVEX.WORKSPACE.102 / 040). An approach ` +
       "is an opening, then Why > What > How > Open > Deferred"]];
   if (exempt) return [];
 
@@ -448,20 +448,20 @@ export function approachShape(text: string, exempt = false): Finding[] {
       `the order is Why > What > How > Open > Deferred ${where}`]);
   if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
     out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
-      "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.182) · start from the approach template"]);
+      "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.182) · start from the approach template"]);
   return out;
 }
 
 // ---------------------------------------------------------------------------- the masthead
 
-// 05-artifacts.md § The masthead, and the opening (RD.DEVEX.WORKSPACE.187, RD.DEVEX.WORKSPACE.182).
+// 05-artifacts.md § The masthead, and the opening (RULE.DEVEX.WORKSPACE.187, RULE.DEVEX.WORKSPACE.182).
 // The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
 // `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
 // while the trees outside the foundation wait for their retrofit (N116 row 9); when every tree
 // audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
 const SECOND_PARAGRAPH = "SOFT";
 const MASTHEAD = "SOFT";
-const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
+const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RULE.DEVEX.WORKSPACE.187)";
 
 /**
  * The page kinds the masthead rule binds, read from a page's file name. The index of artifacts has
@@ -480,7 +480,7 @@ export function mastheadKind(path: string): MastheadKind | null {
 const spoken = (html: string): string => flat(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
 
 /**
- * The foundation hub's Title and Subtitle, read from `RD.DEVEX.WORKSPACE.143` in the register that
+ * The foundation hub's Title and Subtitle, read from `DEC.DEVEX.WORKSPACE.143` in the register that
  * sits beside the page. Null, and the pair is not checked, where that register carries no such row
  * (every other repository) or where no register is found at all (a partner's workspace).
  * The row writes the Title in backticks and the Subtitle in italics after *reads*; the Subtitle
@@ -491,7 +491,7 @@ export function hubPair(path: string): { title: string; subtitle: string } | "un
   for (;;) {
     const register = decisionsRegister(folder);
     if (exists(register)) {
-      const row = /^\|\s*RD\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
+      const row = /^\|\s*DEC\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
       if (!row) return null;
       const title = /`([^`\n]+)`/.exec(row[0])?.[1];
       const statement = /\breads\s+\*([^*\n]+)\*/.exec(row[0])?.[1];
@@ -515,7 +515,7 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   if (!kind) return [];
   const header = /<header\b[^>]*>([\s\S]*?)<\/header>/i.exec(text.replace(/<!--[\s\S]*?-->/g, " "));
   if (!header) return [];
-  // A table's item cells hold paragraphs of their own (RD.DEVEX.WORKSPACE.259), and none of them is the header's.
+  // A table's item cells hold paragraphs of their own (RULE.DEVEX.WORKSPACE.259), and none of them is the header's.
   const body = header[1].replace(/<table\b[\s\S]*?<\/table>/gi, " ");
   const out: Finding[] = [];
   const parts = [...body.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
@@ -554,14 +554,14 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   if (kind === "hub") {
     const pair = hubPair(path);
     if (pair === "unreadable")
-      out.push([MASTHEAD, "RD.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
+      out.push([MASTHEAD, "DEC.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
         "the row writes the Title in backticks and the Subtitle in italics after *reads*"]);
     else if (pair) {
       const h1 = parts.find((p) => p.role === "h1");
       if (!h1 || spoken(h1.html) !== pair.title)
-        out.push([MASTHEAD, `the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
+        out.push([MASTHEAD, `the foundation hub's Title is not DEC.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
       if (!subtitles.length || spoken(subtitles[0].html) !== pair.subtitle)
-        out.push([MASTHEAD, `the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
+        out.push([MASTHEAD, `the foundation hub's Subtitle is not DEC.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
     }
   }
   return out;
@@ -626,7 +626,7 @@ const VIEWS_PART = /<[a-z][a-z0-9]*\b[^>]*class="(?:[^"]*\s)?sds-key(?:\s[^"]*)?
  * Open and Deferred carry cards in the agreed shape (refs/decision-cards.md).
  *
  * A card in Open with no Views part does not say whether any other role read the choice
- * (RD.DEVEX.WORKSPACE.242). A Deferred card is not asked for it.
+ * (RULE.DEVEX.WORKSPACE.242). A Deferred card is not asked for it.
  *
  * A card with no options is a status update; one with no recommendation makes the reader do the
  * analysis twice; a deferred one with no trigger is a question nobody will bring back. All three read
@@ -647,7 +647,7 @@ export function openCards(text: string): Finding[] {
         out.push(["RULE", `Open card "${name}" carries no recommendation — the reader does the analysis twice (refs/decision-cards.md)`]);
       if (!VIEWS_PART.test(rest))
         out.push(["RULE", `Open card "${name}" carries no Views part. Add \`<span class="sds-key">Views</span>\` after What and before the ` +
-          `options: one line on who spoke and why those views, then each view's reason in one or two plain sentences (RD.DEVEX.WORKSPACE.242)`]);
+          `options: one line on who spoke and why those views, then each view's reason in one or two plain sentences (RULE.DEVEX.WORKSPACE.242)`]);
     }
   const deferred = section(text, "Deferred");
   if (deferred !== null)
@@ -662,7 +662,7 @@ export function openCards(text: string): Finding[] {
 // ---------------------------------------------------------------------------- prose
 
 /**
- * Records are exempt — RD.DEVEX.WORKSPACE.096: a warmed record is a defect.
+ * Records are exempt — RULE.DEVEX.WORKSPACE.096: a warmed record is a defect.
  *
  * What comes back is prose with a blank line at every block boundary, so a heading or a list item
  * never runs into the paragraph below it and reads as one long sentence. Headings, an outline rail,
@@ -693,7 +693,7 @@ export function proseOf(text: string, isHtml: boolean): string {
   }
   t = lines.join("\n").replace(MD_LINK, "$1");
   t = t.replace(/\[!(?:NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]/g, " ");
-  // RD.DEVEX.WORKSPACE.112 lets a rule quote the mistake it bans, and the marking is how a check tells quotation
+  // RULE.DEVEX.WORKSPACE.112 lets a rule quote the mistake it bans, and the marking is how a check tells quotation
   // from breach. That marking used to die on the strip below, which removes every `*` and backtick —
   // so `MARKED` was matching a string no longer carrying a marker, and a rule was flagged by itself.
   // Italic and code spans become sentinel-wrapped, which survives the strip. One delimiter in, one
@@ -738,7 +738,7 @@ const countOf = (pattern: RegExp, text: string): number =>
   [...text.matchAll(new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g"))].length;
 
 /**
- * RD.DEVEX.WORKSPACE.107 — how many prose sentences reach the reader, and how many were counted.
+ * RULE.DEVEX.WORKSPACE.107 — how many prose sentences reach the reader, and how many were counted.
  *
  * A chapter and a concept keep their normative sentences out of the denominator: a rule binds a party
  * and its subject may not move, so the reader is reached in the sentence beside it. Every other seat
@@ -791,11 +791,11 @@ export function opening(s: string, n = 6): string {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.106 § Measure, over prose only.
+ * RULE.DEVEX.WORKSPACE.106 § Measure, over prose only.
  *
  * Every check holds on every file, with one exception the book states. On an operative surface the
- * two second-person counts do not apply, and the reach share is the whole measure (RD.DEVEX.WORKSPACE.111).
- * CARD and ABOUT read marked text as quotation, never as prose (RD.DEVEX.WORKSPACE.112).
+ * two second-person counts do not apply, and the reach share is the whole measure (RULE.DEVEX.WORKSPACE.124).
+ * CARD and ABOUT read marked text as quotation, never as prose (RULE.DEVEX.WORKSPACE.112).
  */
 export function voice(prose: string, sents: Sentence[], kind = "chapter", operative = false): Finding[] {
   const out: Finding[] = [];
@@ -804,17 +804,17 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   const cardinality = [...unmarked.matchAll(CARD)];
   if (cardinality.length) {
     const eg = cardinality.slice(0, 4).map((m) => `${m[1]} ${m[2]}`).join(", ");
-    out.push(["RULE", `${cardinality.length} cardinality-in-prose (${eg}) — RD.DEVEX.WORKSPACE.162: name a set by its rule, not its count`]);
+    out.push(["RULE", `${cardinality.length} cardinality-in-prose (${eg}) — RULE.DEVEX.WORKSPACE.162: name a set by its rule, not its count`]);
   }
   const idioms = [...unmarked.matchAll(IDIOM)].map((m) => m[1]);
   if (idioms.length) {
     const eg = [...new Set(idioms)].sort().slice(0, 4).map((i) => `"${i}"`).join(" · ");
-    out.push(["RULE", `${idioms.length} idiom(s) — RD.DEVEX.WORKSPACE.115: an idiom means something its words ` +
+    out.push(["RULE", `${idioms.length} idiom(s) — RULE.DEVEX.WORKSPACE.115: an idiom means something its words ` +
       `do not say, so a second-language reader cannot guess it: ${eg} · write the plain phrase`]);
   }
   const nAbout = [...unmarked.matchAll(ABOUT)].length;
   if (nAbout)
-    out.push(["RULE", `${nAbout} construction(s) written about the reader, not to them — RD.DEVEX.WORKSPACE.096 talks to the reader · say *you*`]);
+    out.push(["RULE", `${nAbout} construction(s) written about the reader, not to them — RULE.DEVEX.WORKSPACE.096 talks to the reader · say *you*`]);
 
   if (!sents.length) return out;
   const n = sents.length;
@@ -835,7 +835,7 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   if (bolted.length) {
     const eg = bolted.slice(0, 3).map((s) => `"${opening(s)}"`).join(" · ");
     out.push(["RULE", `${bolted.length} sentence(s) reach only by a tacked-on "… for you" — ` +
-      `RD.DEVEX.WORKSPACE.109: the measure serves personalization, so a sentence that reaches only by its last ` +
+      `RULE.DEVEX.WORKSPACE.109: the measure serves personalization, so a sentence that reaches only by its last ` +
       `two words reached nobody: ${eg} · rewrite it to address the reader`]);
   }
 
@@ -916,7 +916,7 @@ export function supersession(rid: string, body: string, raw: string): Finding[] 
 }
 
 /**
- * RD.DEVEX.WORKSPACE.106 § Rows — a register row takes the plain substrate and stays a record.
+ * RULE.DEVEX.WORKSPACE.106 § Rows — a register row takes the plain substrate and stays a record.
  *
  * Every table body line is a row: the first cell is its id and is skipped; links collapse to their
  * text; `*` and backtick markup is stripped for the count. A cell sentence past twenty-five words is
@@ -943,13 +943,13 @@ export function rows(text: string): [Finding[], Metrics] {
       // same file and legitimately weighs a supersession as an option.
       out.push(...supersession(rid, body.join(" ").replace(/[*`]/g, " "), cells.slice(1).join(" ")));
     if (YOU.test(body.join(" ").replace(YOU_AS_TERM, " ")))
-      out.push(["RULE", `row ${rid} says *you* — a record is never warmed (RD.DEVEX.WORKSPACE.106 § Rows; 04-discipline § Voice discipline)`]);
+      out.push(["RULE", `row ${rid} says *you* — a record is never warmed (RULE.DEVEX.WORKSPACE.106 § Rows; 04-discipline § Voice discipline)`]);
     for (const cell of body)
       for (const [sent, n] of sentences(cell.replace(/[*`]/g, ""))) {
         sents.push([sent, n]);
         if (n > ROW_LONG)
           out.push(["RULE", `row ${rid}: a sentence of ${n} words, "${opening(sent)}" — a row states ` +
-            `one clause a sentence, none past twenty-five (RD.DEVEX.WORKSPACE.106 § Rows) · split it`]);
+            `one clause a sentence, none past twenty-five (RULE.DEVEX.WORKSPACE.106 § Rows) · split it`]);
       }
   }
   return [out, measure(sents, "register")];
@@ -959,7 +959,7 @@ export function rows(text: string): [Finding[], Metrics] {
 
 // How a stack spells a scaffold template. A stack DERIVES from the repo's own claim — `sprepo.json`
 // `config.stack`. Nothing here may assume one stack: `.tmpl` and `dot-` are TypeScript's, and the
-// `dot-` reason is npm's alone. This table READS the declaration and never authors it (RD.SUPPORT.APPS.077).
+// `dot-` reason is npm's alone. This table READS the declaration and never authors it (RULE.SUPPORT.APPS.077).
 const STACK_TEMPLATES: Record<string, { suffixes: string[]; dotPrefix: string | null }> = {
   TS: { suffixes: [".tmpl"], dotPrefix: "dot-" },
 };
@@ -1003,17 +1003,17 @@ export function asWritten(path: string): string {
 }
 
 /**
- * A surface an agent acts from, rather than one a person reads to learn (RD.DEVEX.WORKSPACE.110).
+ * A surface an agent acts from, rather than one a person reads to learn (RULE.DEVEX.WORKSPACE.110).
  *
  * Two members. The foundation's provider set, matched by its domains rather than by a bare
  * `providers/`, which is an ordinary folder name a consuming repo may use for its own code. And the
  * plugins' own instruction surface, which an agent loads every session and acts on. The scripts
- * beside them are code, never corpus. RD.DEVEX.WORKSPACE.111 exempts this surface from the two second-person
+ * beside them are code, never corpus. RULE.DEVEX.WORKSPACE.124 exempts this surface from the two second-person
  * counts. Reach still binds.
  */
 export function isOperative(path: string): boolean {
   const p = slashes(resolve(path));
-  // TWO DOMAINS, NOT THREE. `providers/devex/` was removed (RD.DEVEX.AGENT.061): devex has one CLI and one
+  // TWO DOMAINS, NOT THREE. `providers/devex/` was removed (RULE.DEVEX.AGENT.061): devex has one CLI and one
   // agent runtime, which are complementary surfaces rather than alternatives, so the seat held nothing
   // its own. An axis exists where a domain has alternatives.
   if (["/providers/apps/", "/providers/infra/"].some((d) => p.includes(d))) return true;
@@ -1021,7 +1021,7 @@ export function isOperative(path: string): boolean {
 }
 
 /**
- * What the hook and the sweep read (RD.DEVEX.WORKSPACE.106 § Reach): every .md under docs/, every README.md,
+ * What the hook and the sweep read (RULE.DEVEX.WORKSPACE.106 § Reach): every .md under docs/, every README.md,
  * CONCEPT.md, every .html under artifacts/, an approach or overview page anywhere, and .html under
  * .spndevex/notes/. A scaffold template counts as the file it writes. Not .md under .spndevex/ —
  * arcs, orders and notes are state, not corpus — and nothing under a build or dependency directory.
@@ -1041,7 +1041,7 @@ export function watched(path: string): boolean {
   if (!base.endsWith(".md")) return false;
   if (p.includes("/docs/")) return true;
   // The operative surface — the provider set and the plugins' instruction files. One predicate,
-  // because RD.DEVEX.WORKSPACE.111 measures that surface differently and must name the same set.
+  // because RULE.DEVEX.WORKSPACE.124 measures that surface differently and must name the same set.
   return isOperative(p);
 }
 
@@ -1167,7 +1167,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
 
 // ---------------------------------------------------------------------------- a column nobody reads down
 
-/** The page kinds whose table cells read in three levels (RD.DEVEX.WORKSPACE.259): a report sets its own tables. */
+/** The page kinds whose table cells read in three levels (RULE.DEVEX.WORKSPACE.259): a report sets its own tables. */
 export function itemCellPage(path: string): boolean {
   const base = basename(path);
   if (isApproachPage(path) || base === HUB) return true;
@@ -1177,7 +1177,7 @@ export function itemCellPage(path: string): boolean {
 }
 
 /**
- * RD.DEVEX.WORKSPACE.259: a table keeps a column only where a reader compares down it. A column, other than the
+ * RULE.DEVEX.WORKSPACE.259: a table keeps a column only where a reader compares down it. A column, other than the
  * first, whose cells mostly hold sentences rather than short values draws a SOFT finding naming the column, saying to
  * make it a level of the item cell: the bold title, the line under it, one `Key: value` line in `sds-small`. A status
  * column, `th.sds-status-col`, is compared by design and never read here.
@@ -1197,7 +1197,7 @@ export function columnRule(text: string): Finding[] {
     if (headers.length === 3 && headers[0].name === "Term" && headers[1].name === "Contract term" && headers[2].name === "Description") continue;
     if (headers.length === 1 && headers[0].name === "Term" && /<h2\b[^>]*>\s*Terms\s*<\/h2>\s*<\/div>\s*(?:<div\b[^>]*>\s*)?$/i.test(text.slice(0, table.index))) {
       out.push(["SOFT", "the Terms table is one column of item cells — a construct's Terms are three columns, `Term` · `Contract term` · " +
-        "`Description`: the word in bold, the contract's spelling in code style, and the meaning (RD.DEVEX.WORKSPACE.259)"]);
+        "`Description`: the word in bold, the contract's spelling in code style, and the meaning (RULE.DEVEX.WORKSPACE.259)"]);
       continue;
     }
     if (width < 2 || !rows.length) continue;
@@ -1209,7 +1209,7 @@ export function columnRule(text: string): Finding[] {
       const first = headers[0]?.name || flat(rows[0][0] ?? "") || "a table";
       out.push(["SOFT", `the table that opens "${first.slice(0, 40)}" has a column, "${name.slice(0, 40)}", whose cells hold sentences ` +
         `(${long} of ${cells}) — a table keeps a column only where a reader compares down it, so make it a level of ` +
-        `the item cell: the title in bold, the line under it, one \`Key: value\` line in \`sds-small\` (RD.DEVEX.WORKSPACE.259)`]);
+        `the item cell: the title in bold, the line under it, one \`Key: value\` line in \`sds-small\` (RULE.DEVEX.WORKSPACE.259)`]);
     }
   }
   return out;
@@ -1380,9 +1380,9 @@ export function checkDoc(payload: Payload): Verdict {
   if (!found.length) return null;
 
   const body = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
-  const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DEVEX.WORKSPACE.096"))
+  const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RULE.DEVEX.WORKSPACE.096"))
     ? "\n  The four moves: split it · say *you* · define the term · land it on your reader — never " +
-      "shorten (`refs/devex/workspace/docs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
+      "shorten (`refs/devex/workspace/docs/doc-sets.md` § One voice; rules RULE.DEVEX.WORKSPACE.106 · RULE.DEVEX.WORKSPACE.107)."
     : "";
   const subject = plural ? "these files miss" : "this file misses";
   // A GATE MUST SAY WHAT IT DID NOT CHECK. On an Edit the hook sees the REPLACEMENT TEXT and not the

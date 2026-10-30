@@ -75,7 +75,7 @@ function write(args: string[]): number {
   for (const followUp of Array.isArray(matter.followUps) ? matter.followUps.map(String) : []) {
     const [id, ...title] = followUp.trim().split(/\s+/);
     if (!ROW_ID.test(id) || !title.length || data.rows.some((one) => one.id === id)) continue;
-    // A follow-up is a build step, a fix (RD.DEVEX.WORKSPACE.278).
+    // A follow-up is a build step, a fix (RULE.DEVEX.WORKSPACE.278).
     const next: ArcRow = { id, parent: row.parent, title: title.join(" "), kind: "fix", state: "waiting" };
     for (const field of ["repo", "altitude", "model"] as const) if (row[field]) next[field] = row[field];
     data.rows.push(next);

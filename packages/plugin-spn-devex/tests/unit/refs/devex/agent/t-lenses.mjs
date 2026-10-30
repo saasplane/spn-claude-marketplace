@@ -1,12 +1,12 @@
 // `refs/devex/agent/lenses/` — every lens file takes the construct's one shape, in its order
-// (RD.DEVEX.AGENT.097), carries its share of the SaaS Plane way by number (RD.DEVEX.AGENT.095), owns at
-// least one kind of ask in the router (RD.DEVEX.AGENT.098), and stays short enough to be read whole for
-// one task (RD.DEVEX.AGENT.102). A file that drifts from the shape leaves the agent unable to tell whose
+// (RULE.DEVEX.AGENT.097), carries its share of the SaaS Plane way by number (RULE.DEVEX.AGENT.095), owns at
+// least one kind of ask in the router (RULE.DEVEX.AGENT.098), and stays short enough to be read whole for
+// one task (RULE.DEVEX.AGENT.102). A file that drifts from the shape leaves the agent unable to tell whose
 // work a lens serves or what it does at a stage, and a file that grows past its limit crowds the one
 // task it was loaded for.
 //
 // The folder also says the agent decides what the book, the references and the lenses settle
-// (N8 row 2n, RD.DEVEX.WORKSPACE.193), and each lens names the outside sources it is fluent in, so a
+// (N8 row 2n, RULE.DEVEX.WORKSPACE.193), and each lens names the outside sources it is fluent in, so a
 // card's options are set against a named practice rather than an opinion.
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";

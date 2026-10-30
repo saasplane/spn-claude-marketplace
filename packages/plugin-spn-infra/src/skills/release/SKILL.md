@@ -7,11 +7,11 @@ description: Publishing an estate package - bump the version field in spinfrapkg
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "6943024a"
+      "seen": "44c80d89"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/07-deliver.md",
-      "seen": "7025e203"
+      "seen": "e359c816"
     }
   ]
 }
@@ -25,7 +25,7 @@ description: Publishing an estate package - bump the version field in spinfrapkg
 
 ## 1 · The bump is the reviewed act
 
-Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag.** An infra tree holds **no `package.json`** — nothing in one is a JavaScript package (RD.SUPPORT.INFRA.066). `spinfrapkg.json` carries the name, the semver and the descriptive fields, and it is the only file a bump touches.
+Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag.** An infra tree holds **no `package.json`** — nothing in one is a JavaScript package (RULE.SUPPORT.INFRA.066). `spinfrapkg.json` carries the name, the semver and the descriptive fields, and it is the only file a bump touches.
 
 ## 2 · Dry-run
 

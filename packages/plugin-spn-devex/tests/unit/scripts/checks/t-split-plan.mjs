@@ -129,7 +129,7 @@ function build(name, { eyebrow, rows = LANDED, cards = "", answered = [], log = 
   });
 }
 
-// THE SPLIT PLAN IS THE ARCS' ROWS (RD.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan is the
+// THE SPLIT PLAN IS THE ARCS' ROWS (RULE.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan is the
 // arcs' step rows): each row's repo is the scope, and its state is read.
 /** A workstream whose only split plan is its arc N2's rows; a page is added only where asked. */
 function buildArcs(name, rows, { page: withPage = false, log = "", extra = {} } = {}) {
@@ -196,7 +196,7 @@ one("a row started and put down refuses too", "close",
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "started and put down" });
 
-// RD.DEVEX.WORKSPACE.184 — `in progress <time>` is somebody's claim on a row, never a landing. It read
+// RULE.DEVEX.WORKSPACE.184 — `in progress <time>` is somebody's claim on a row, never a landing. It read
 // as `pending` before the mark existed, and `pending` closes with a note.
 one("a row still running refuses the close, and the age of its log line is named", "close",
   buildArcs("m7-sp-in-progress", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "running"]],
@@ -204,7 +204,7 @@ one("a row still running refuses the close, and the age of its log line is named
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "still marked in progress", parity: false, why: "the Python predates the mark" });
 
-// RD.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` waits on a card's answer. It is not accounted for, so the
+// RULE.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` waits on a card's answer. It is not accounted for, so the
 // close refuses it as it refuses a stopped row, and names the card it waits on.
 one("a row waiting on a card refuses the close, and the card is named", "close",
   buildArcs("m11-sp-held", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "waiting", { blockedBy: ["q352"] }]], { page: true }),
@@ -258,7 +258,7 @@ one("landed, carried and deferred all pass", "close",
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
 
-// THE THIRD CHECK (RD.DEVEX.WORKSPACE.325): after the masthead and the rows, a worktree set on disk
+// THE THIRD CHECK (RULE.DEVEX.WORKSPACE.325): after the masthead and the rows, a worktree set on disk
 // refuses the close, names the command, and never removes. Each case is the same workstream, with every
 // row landed, so the set is the only thing that can refuse it.
 const SET_REFUSAL = [
@@ -386,10 +386,10 @@ one("2k: an h4 card wrapped in a div.sds-card is refused too", "documents-first"
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
   "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (an `h4` inside a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
-one("2k: the refusal states the book's shape and cites RD.DEVEX.WORKSPACE.147", "documents-first",
+one("2k: the refusal states the book's shape and cites RULE.DEVEX.WORKSPACE.147", "documents-first",
   build("sp-2k-rule", { cards: decidedShape(88) }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/notes/N1/plan.md`, content: "x" },
-  "note", { says: 'An open card is a `<div class="sds-open">` wrapping `<h4 id="q<n>">` (RD.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
+  "note", { says: 'An open card is a `<div class="sds-open">` wrapping `<h4 id="q<n>">` (RULE.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
 
 one("2k: a div.sds-open + h4 open card passes", "documents-first",
   build("sp-2k-open", { cards: card(88, "&mdash;") + card(89, "&mdash;") }),
@@ -536,7 +536,7 @@ one("and it closes once that three-digit arc has landed", "close",
 // workstream moved to `closed/`. Measured across the closed workstreams on 2026-09-24: eight arcs
 // still read `OPEN`, and one of them recorded in its own log that it had landed.
 
-one("a workstream holding a DECIDED arc, agreed and never built, cannot close (RD.DEVEX.WORKSPACE.313)", "close",
+one("a workstream holding a DECIDED arc, agreed and never built, cannot close (RULE.DEVEX.WORKSPACE.313)", "close",
   build("sp-arc-unfinished", { arcStatus: "DECIDED" }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "not terminal" });
@@ -742,7 +742,7 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   check("[MKT.SCRIPTS.108] the shape of a card on such a page is not judged",
     splitPlan.misshapenCards(join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`)).length === 0);
 
-  // THE WINDOW DECIDES WHO IS TOLD, never the call's text (RD.DEVEX.WORKSPACE.236): a window that works on
+  // THE WINDOW DECIDES WHO IS TOLD, never the call's text (RULE.DEVEX.WORKSPACE.236): a window that works on
   // no workstream is told nothing about this page, whatever the call names.
   check("[MKT.SCRIPTS.108] a window that works on no workstream is not told about the page",
     ts("documents-first", { tool_name: "Bash", cwd: unmoved, tool_input: { command: `ls .spndevex/${WORKSTREAMS}/open/001-a-subject` }, session_id: "t-no-workstream" }, unmoved)[0] !== "note");

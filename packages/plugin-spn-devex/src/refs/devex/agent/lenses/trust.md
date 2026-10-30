@@ -8,23 +8,23 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "c6390a47"
+      "seen": "7efaee10"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/03-control-map.md",
-      "seen": "9a0e1257"
+      "seen": "3648192a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
-      "seen": "b8efb097"
+      "seen": "d4008a1e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "4bbfb9ad"
+      "seen": "5856fbb7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "59747715"
+      "seen": "1f3c8b4a"
     }
   ]
 }
@@ -44,7 +44,7 @@
 
 ## Mastery
 
-**The whole catalogue, guided by what the partner builds and delivers** (`RD.PLATFORM.CORE.042`). Ask first: who buys it, in which markets and regions, what data it holds, whether it takes card payments, whether it runs AI. Then name the standards that apply, in order. The first row is the floor every platform meets by construction; the partner's answers add the rest. A standard's full text is never carried: when a case needs a requirement's detail, read it from the standard's own source and name it by number.
+**The whole catalogue, guided by what the partner builds and delivers** (`RULE.PLATFORM.CORE.042`). Ask first: who buys it, in which markets and regions, what data it holds, whether it takes card payments, whether it runs AI. Then name the standards that apply, in order. The first row is the floor every platform meets by construction; the partner's answers add the rest. A standard's full text is never carried: when a case needs a requirement's detail, read it from the standard's own source and name it by number.
 
 | When the partner… | The standards it guides to | What each asks, in brief |
 | --- | --- | --- |
@@ -60,7 +60,7 @@
 
 Threat modelling with **STRIDE**, and the **SOC 2 Trust Services Criteria**, for what an auditor reads.
 
-**The control map answers a reviewer, control by control** (`RD.PLATFORM.CORE.044`). It runs by control area, because one control usually answers several standards. Each row names the standards that ask for it by number, and who carries it:
+**The control map answers a reviewer, control by control** (`RULE.PLATFORM.CORE.044`). It runs by control area, because one control usually answers several standards. Each row names the standards that ask for it by number, and who carries it:
 
 | Carried by | Means | Proven by |
 | --- | --- | --- |
@@ -71,9 +71,9 @@ Threat modelling with **STRIDE**, and the **SOC 2 Trust Services Criteria**, for
 
 Met is ✅ only once a test or a check has seen the control refuse something; 🚧 is partly, 🔮 not yet. A row not met names the work that meets it, or says it is deferred, or that its code landed and its row has not.
 
-**Supported and certified are two claims** (`RD.PLATFORM.CORE.045`). A standard reads *supported* only once every foundation and estate row that asks for it is met. A company row never decides that, in either direction. A standard reads *certified* only once an outside auditor says so, and until then a supported standard reads *not certified yet*.
+**Supported and certified are two claims** (`RULE.PLATFORM.CORE.045`). A standard reads *supported* only once every foundation and estate row that asks for it is met. A company row never decides that, in either direction. A standard reads *certified* only once an outside auditor says so, and until then a supported standard reads *not certified yet*.
 
-**The findings rule** (`RD.PLATFORM.CORE.046`). Every finding is rated with CVSS v4.0 and fixed within its severity's deadline:
+**The findings rule** (`RULE.PLATFORM.CORE.046`). Every finding is rated with CVSS v4.0 and fixed within its severity's deadline:
 
 | Severity | CVSS v4.0 | Fixed within |
 | --- | --- | --- |
@@ -119,14 +119,14 @@ A fix that will miss its deadline names why and the new date, and a finding kept
   - **Every mutation lands in the audit trail**, attributed to a principal, in an organization context: which principal, which action, which organization, under which policy — for people, the system and agents alike.
   - **Context comes from the auth context, never the command body.** A request cannot assert its own scope.
   - **Secrets are structural**: no raw secret at rest, stored secrets write-only, never returnable by any API.
-  - **A secret that must be read back is stored sealed** (`RD.PLATFORM.CORE.041`): encrypted before the row is saved, under a key kept apart from the data's, usable only by the running service; masked on every reply.
-  - **No signing secret has a default** (`RD.SUPPORT.INFRA.095`); a rotation signs nobody out, behind a fallback that only verifies.
-  - **A stored token rotates; an unstored one is short-lived and names its use** (`RD.SUPPORT.APPS.090` · `RD.SUPPORT.APPS.095`). A rotated refresh token presented again revokes the session.
+  - **A secret that must be read back is stored sealed** (`RULE.PLATFORM.CORE.041`): encrypted before the row is saved, under a key kept apart from the data's, usable only by the running service; masked on every reply.
+  - **No signing secret has a default** (`RULE.SUPPORT.INFRA.095`); a rotation signs nobody out, behind a fallback that only verifies.
+  - **A stored token rotates; an unstored one is short-lived and names its use** (`RULE.SUPPORT.APPS.090` · `RULE.SUPPORT.APPS.095`). A rotated refresh token presented again revokes the session.
   - **Failures never disclose existence**: an id outside scope is `NOT_FOUND`, a failed login one generic answer.
   - **Sensitive actions step up**, for a person or an agent, with idempotent Commands making the hold safe.
   - **A fact about the person attaches to the identity; a judgement about it is never stored.** Each organization reads its own policy, so a caller cannot assert that MFA happened.
   - **A verified browser exists only because somebody asked for one**, and a recovery code may never write one.
-  - **A session is per app site, renewed the one way its host allows** (`RD.SUPPORT.APPS.090`).
+  - **A session is per app site, renewed the one way its host allows** (`RULE.SUPPORT.APPS.090`).
   - **The four build invariants hold**: reachable via contract, authorized and audited at the service layer, routes registered with schemas, forms bound to validators.
 - **The control map** — a change that adds, meets or breaks a control moves that control's row in the same change: its evidence, its Met mark, and the planned work it no longer needs.
 
@@ -140,4 +140,4 @@ A fix that will miss its deadline names why and the new date, and a finding kept
 
 ## Improves the book
 
-- A control the guide asks for that no chapter states is drafted into the trust chapter with its register row, put to the developer.
+- A control the guide asks for that no chapter states is drafted into the trust chapter with the rule's id on the rule, and a register row only where a choice was weighed, an answer reversed or a conflict settled, put to the developer.

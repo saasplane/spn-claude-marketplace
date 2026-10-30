@@ -42,7 +42,7 @@ check("5.1: the plain words table maps seat, construct, kind and owed tier",
 check("5.1: the report fixes nothing — an arc for the agent's items, Q cards for the developer's",
   /\*\*The report fixes nothing\.\*\*/.test(SKILL) && /open an arc/.test(SKILL) && /`Q<n>` card/.test(SKILL));
 check("2l: never published unless the developer asks, handed over as the full path",
-  /Never publish a report unless the developer asks — MUST/.test(SKILL) && /full path/.test(SKILL) && /RD\.DEVEX\.WORKSPACE\.117/.test(SKILL));
+  /Never publish a report unless the developer asks — MUST/.test(SKILL) && /full path/.test(SKILL) && /RULE\.DEVEX\.WORKSPACE\.117/.test(SKILL));
 
 console.log("\n=== 5.1 — each report type: its command, its tables and its record groups");
 const TYPES = {
