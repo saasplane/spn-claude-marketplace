@@ -429,6 +429,8 @@ Read this list before you work in a library file by the connector. Each is a fac
 
 A library file is read by people and by scripts. A person reads the grid of a set to see every case at once. A script reads the label of a set to learn how the grid is laid out, and reads the top left of a set to learn its default. So each rule below keeps one thing true that a script or a person relies on.
 
+**The Figma library holds a unit's properties, values, defaults and states rather than its pixels, and it draws the values of each property once** (`RULE.SUPPORT.SURFACE.401` · GUIDE). The showcase shows every combination, so a library that drew them all would hold one picture many times.
+
 ### A file's pages are the showcase's groups, and a unit is one section
 
 A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. A page of a file that holds units is one group of the showcase, so a person who knows the showcase finds the same groups in the file, in the same order.
