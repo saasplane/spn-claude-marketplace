@@ -38,6 +38,8 @@ console.log("\n=== commandsRef — the plugin's own commands, one line each, fro
   ok("it opens with a heading that says it is generated", ref.startsWith("# spn-devex commands") && ref.includes("Never edited by hand"), ref.slice(0, 200));
   ok("a line carries the bin, the words, the usage and what it does", ref.split("\n").some((line) => line.startsWith("spn-devex workstream row discard <workstream>/N<nnn> <row> --note") && line.includes(" — take a row found invalid")), ref);
   ok("the retired `row write` is in neither help nor the ref", !ref.includes("row write") && !cli(root, ["help"]).out.includes("row write"));
+  const edit = ref.split("\n").find((line) => line.startsWith("spn-devex workstream row edit ")) ?? "";
+  ok("`row edit` names `--proof` in its usage, in the ref the build writes", edit.includes("[--proof …]"), edit);
   ok("the subject-less and subject lines both appear", ref.includes("spn-devex workstream rows show"));
 }
 

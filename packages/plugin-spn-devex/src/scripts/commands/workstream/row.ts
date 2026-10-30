@@ -270,8 +270,8 @@ export const actions: Record<string, Action> = {
     run: note,
   },
   edit: {
-    describe: "change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …]",
+    describe: "change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named",
+    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
     run: edit,
   },
   discard: {
