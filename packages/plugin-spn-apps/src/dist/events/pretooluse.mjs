@@ -789,6 +789,7 @@ function findings2(source, added) {
     if (NAMED_FOR_ITS_LIST.test(name)) continue;
     if (added !== null && !new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[<(]`).test(added))
       continue;
+    void whole;
     const line = lineOf(source, match.index);
     found.push(`line ${line}: ${name} returns Promise<${listType}> \u2014 name it ${suggestedName(name, listType)}`);
   }
