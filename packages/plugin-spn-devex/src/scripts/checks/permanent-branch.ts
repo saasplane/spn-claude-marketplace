@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation 02-scm.md — work reaches develop, qa, uat and main only by a pull request.
 //
-// Refuses a `git commit` on a permanent branch. It reads the current branch with git, and nothing else.
+// Refuses a `git commit` on a permanent branch of a SaaS Plane repository, one whose root holds `sprepo.json`.
+// Every other repository is ignored, the workspace's own .spndevex among them: it has no remote and only main.
 
 import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 import { readCommits } from "../lib/command-reader.ts";
 
@@ -22,10 +25,19 @@ function currentBranch(dir: string): string {
   } catch { return ""; }
 }
 
+/** Whether a folder sits in a SaaS Plane repository: the root of its git checkout holds `sprepo.json`. */
+export function isSaasPlaneRepository(dir: string): boolean {
+  try {
+    const root = execFileSync("git", ["-C", dir, "rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return Boolean(root) && existsSync(join(root, "sprepo.json"));
+  } catch { return false; }
+}
+
 export function checkPermanentBranch(payload: Payload): Verdict {
   const command = payload.tool_input?.command ?? "";
   if (!applies("", command)) return null;
   for (const call of readCommits(command, payload.cwd ?? process.cwd())) {
+    if (!isSaasPlaneRepository(call.dir)) continue;
     const branch = currentBranch(call.dir);
     if (!PERMANENT_BRANCHES.includes(branch)) continue;
     return {
