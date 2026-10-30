@@ -11,15 +11,16 @@
 // out an arc never decided; one ever decided is dropped (RULE.DEVEX.WORKSPACE.311).
 
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { STORED_STATUSES } from "../../checks/arc-status.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
 import {
   NOTES, PREVIEW_FILE, approachOf, arcDataDir, arcIdsOf, arcStamp, arcStatus, doneOf, everDecided, logEvent, logLinesOf, newArc, notesDirOf, previewFromTemplate, previewHrefOf, previewOf,
-  previewPathFault, proposedLines, readArc, restamped, sheetFileOf, stampsOn, whatEntryOf, whatId, withEntryLink, withWhatEntry, writeArc, writeWhole,
+  previewPathFault, proposedLines, readArc, readJsonl, restamped, sheetFileOf, stampsOn, suggestionsFileOf, whatEntryOf, whatId, withEntryLink, withWhatEntry, workspaceOf, writeArc, writeJsonl, writeWhole,
 } from "../../lib/workstream.ts";
 import { isFile } from "../../lib/payload.ts";
+import { precedentLines } from "../../lib/precedent.ts";
 import { refreshViews } from "../docs/cycles.ts";
 import { SHEET_SCHEMA_VERSION, subjectFault, type ArcData } from "../../lib/workstream-schema.ts";
 import { sheetFindings } from "./sheet.ts";
@@ -31,8 +32,27 @@ const HEADER_TEXT = ["title", "subject", "goal", "reason", "decides", "cycle", "
 
 const OPTIONS = {
   title: VALUE, subject: VALUE, goal: VALUE, status: STORED_STATUSES, reason: VALUE, wait: VALUE, start: FLAG, "review-fixes": FLAG, decides: VALUE, repos: VALUE, cycle: VALUE, follows: VALUE,
-  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE,
+  model: VALUE, position: VALUE, preview: VALUE, under: VALUE, note: VALUE, carries: VALUE,
 } as const;
+
+const TITLE_WORDS = 5;
+
+/** What is wrong with an arc's title, as the words a refusal ends with, or null where it is a topic name: at most five words, no comma. */
+function titleFault(title: string): string | null {
+  const words = title.split(/\s+/).filter(Boolean).length;
+  if (title.includes(",")) return "holds a comma";
+  return words > TITLE_WORDS ? `is ${words} words` : null;
+}
+
+/** Moves the suggestions an arc carries to a state, in the workstream's suggestions file; the names of those that moved. */
+function moveCarried(ws: string, ids: readonly string[], to: string, only: string | null = null): string[] {
+  const file = suggestionsFileOf(ws);
+  const records = readJsonl(file).filter((line): line is Record<string, unknown> => !!line && typeof line === "object");
+  const moved = records.filter((one) => ids.includes(String(one.id)) && one.state !== to && (only === null || one.state === only));
+  for (const one of moved) one.state = to;
+  if (moved.length) writeJsonl(file, records);
+  return moved.map((one) => String(one.id));
+}
 
 /** The header as the words change it; the names of the fields that changed. */
 function header(data: ArcData, words: Words): string[] {
@@ -43,6 +63,8 @@ function header(data: ArcData, words: Words): string[] {
   }
   const repos = listOf(words, "repos");
   if (repos) { data.repos = repos; changed.push("repos"); }
+  const carries = listOf(words, "carries");
+  if (carries) { data.carries = carries; changed.push("carries"); }
   const position = words.value("position");
   if (position !== null) {
     if (!/^[1-9]\d*$/.test(position)) throw new UsageFault(`takes \`--position\` as a whole number from 1, the arc's place in the planned sequence: \`${position}\` is not one.`);
@@ -174,6 +196,10 @@ function leavePageWhole(ws: string, data: ArcData, under: string | null): Pieces
   return pieces;
 }
 
+/** The words that say which suggestions an arc took up: none where none moved. */
+const movedWords = (ids: string[], to: string): string[] => (ids.length ? [`${ids.join(", ")} ${to}`] : []);
+const shapedWords = (ws: string, ids: readonly string[]): string[] => movedWords(moveCarried(ws, ids, "shaped", "raised"), "shaped");
+
 function edit(args: string[]): number {
   refuseFlags(args, ROW_FLAGS, (name) => `does not take \`--${name}\`: it is a row's field — \`row edit <workstream>/N<nnn> <row> --${name} …\` changes it, and \`row add\` adds the row.`);
   const words = readWords(args, OPTIONS);
@@ -192,7 +218,11 @@ function edit(args: string[]): number {
   let opened: Pieces | null = null;
   let repaired: Pieces | null = null;
   let bare = false;
+  const precedent: string[] = [];
   const under = words.value("under");
+  const titled = words.value("title");
+  const long = titled === null ? null : titleFault(titled);
+  if (long) throw new UsageFault(`takes a topic name of at most five words for an arc's title: \`${titled}\` ${long}. Keep the sentence in the goal.`);
 
   if (!data) {
     const title = words.value("title");
@@ -215,11 +245,20 @@ function edit(args: string[]): number {
     said.push(`${arc} opened · ${data.status}${reviewFixes ? " · review fixes" : ""}`);
     opened = leavePageWhole(ws, data, under);
     said.push("preview", "What entry", "Cycles row");
+    if (data.carries?.length) said.push(...shapedWords(ws, data.carries));
+    for (const line of precedentLines(workspaceOf(), `${title} ${words.value("goal")}`)) precedent.push(line);
   } else {
     const was = data.status;
     wordsGuard(arc, data, everDecided(data, logLinesOf(ws, arc)), words);
     const oldHref = previewHrefOf(arc, data);
     const changed = header(data, words);
+    if (was === "PROPOSED" && data.status === "DECIDED") {
+      const found = sheetFindings(ws, arc);
+      if (found.length) {
+        console.log(`Refused: ${arc} stays PROPOSED while its sheet reads ${found.length} finding${found.length === 1 ? "" : "s"} — bring each current, then give the go: ${found.join(" · ")}. Nothing was written.`);
+        return 1;
+      }
+    }
     // A bare edit, or one with `--under`, leaves the page whole: whatever of the preview, the What entry and the Cycles row is missing.
     const repairs = (!changed.length && !note) || under !== null;
     // A stored PROPOSED wins over the steps: a changed goal stops what the arc was building.
@@ -248,6 +287,9 @@ function edit(args: string[]): number {
     else said.push(changed.length ? `${arc} · ${changed.join(", ")}` : `${arc} · log line written`);
     if (stopped.length) said.push(`stopped until the next go: ${stopped.length} step(s)`);
     if (was === "PROPOSED" && data.status === "DECIDED") goes = true;
+    if (changed.includes("carries")) said.push(...shapedWords(ws, data.carries ?? []));
+    if (goes && data.carries?.length) said.push(...movedWords(moveCarried(ws, data.carries, "decided"), "decided"));
+    if (changed.includes("status") && data.status === "DROPPED" && data.carries?.length) said.push(...movedWords(moveCarried(ws, data.carries, "dropped"), "dropped"));
   }
   // A preview that moved is a view moved: the Cycles row links it in the same write.
   const refreshed = refreshIfMoved(ws, before, previewMoved);
@@ -257,10 +299,8 @@ function edit(args: string[]): number {
   for (const line of [...refreshed.lines, ...afterWrite(ws)]) console.log(line);
   for (const line of stepRowFindings(data)) console.log(`note: ${line}`);
   if (goes) for (const line of previewProposals(ws, arc)) console.log(line);
-  if (goes) {
-    const found = sheetFindings(ws, arc);
-    if (found.length) { console.log(`the sheet reads ${found.length} finding${found.length === 1 ? "" : "s"} — bring each current now the go is given:`); for (const line of found) console.log(`  ${line}`); }
-  }
+  for (const line of precedent) console.log(line);
+  if (goes) console.log(`Next: \`workstream go write ${basename(ws)}/${arc} --scope ${arc}\`.`);
   return 0;
 }
 

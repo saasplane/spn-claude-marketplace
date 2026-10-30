@@ -76,7 +76,7 @@ export type ArcRow = {
 export type ArcData = {
   schemaVersion: number; arc: string; subject: string; title: string; goal?: string | null; status: string; reason: string | null;
   wait?: string | null; reviewFixes?: boolean;
-  decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
+  carries?: string[]; decides?: string | null; repos?: string[]; cycle?: string | null; follows?: string | null; model?: string | null; position?: number | null;
   preview: string; rows: ArcRow[];
   [field: string]: unknown;
 };
@@ -152,6 +152,7 @@ const ARC_FIELDS: Record<string, Rule> = {
   repos: { kind: "strings", required: false },
   cycle: { kind: "text", required: false },
   follows: { kind: "text", required: false },
+  carries: { kind: "strings", required: false, pattern: SUGGESTION_ID },
   model: { kind: "text", required: false },
   position: { kind: "number", required: false },
   preview: { kind: "string", required: true },
