@@ -49,6 +49,7 @@ import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { sentenceColumn } from "../lib/item-cells.ts";
+import { findWorkingDetail } from "../lib/working-detail.ts";
 import { bookClassFaults, knownHolders } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
@@ -566,6 +567,75 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------- what the template leaves behind
+
+/** The plugin's copy of the workstream templates, found up from this file in source or in a bundle; null where absent. */
+function workstreamTemplates(): string | null {
+  for (let dir = dirname(fileURLToPath(import.meta.url)); dirname(dir) !== dir; dir = dirname(dir)) {
+    const found = join(dir, PLUGIN_TEMPLATES, "workstream");
+    if (exists(found)) return found;
+  }
+  return null;
+}
+
+/** An arc's preview, by its fixed name in `notes/N<nnn>/`. */
+const isArcPreview = (path: string): boolean => /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path);
+
+// A comment every page keeps: the restated chapter, the page's `spn:doc` block, and the markers of a generated block.
+const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|\/?spn:generated\b)/;
+const commentsOf = (text: string): string[] =>
+  [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
+
+/**
+ * What an approach page or a preview keeps of its template (RULE.DEVEX.WORKSPACE.187, .228, .233, .238): a `{{…}}`
+ * slot or one of the template's own comments left in, a section the template does not have, or a table in
+ * Overview, all in one finding. An approach page's sections are `approachShape`'s; a page whose template
+ * cannot be read is judged on its slots and its Overview alone.
+ *
+ * @param template  the template's text; read from the plugin's references where not given
+ */
+export function templateShape(path: string, text: string, template: string | null = null): Finding[] {
+  const preview = isArcPreview(path);
+  if (!preview && !isApproachPage(path)) return [];
+  let model = template;
+  if (model === null) {
+    const dir = workstreamTemplates();
+    try { model = dir ? readFileSync(join(dir, preview ? "approach-preview-template.html" : "approach-template.html"), "utf8") : ""; }
+    catch { model = ""; }
+  }
+  const parts: string[] = [];
+  const slots = (text.replace(/<!--[\s\S]*?-->/g, " ").match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
+  if (slots) parts.push(`still holds ${slots} template slot${slots === 1 ? "" : "s"}`);
+  const theirs = new Set(commentsOf(model));
+  const kept = commentsOf(text).filter((one) => theirs.has(one)).length;
+  if (kept) parts.push(`keeps ${kept} of the template's comment${kept === 1 ? "" : "s"}`);
+  if (preview && model) {
+    const allowed = new Set(headings(model));
+    const extra = [...new Set(headings(text).filter((one) => !allowed.has(one)))];
+    if (extra.length) parts.push(`carries ${extra.join(" + ")}, a section its template does not have`);
+  }
+  const overview = section(text, "Overview");
+  if (overview !== null && /<table\b/i.test(overview)) parts.push("its Overview holds a table");
+  if (!parts.length) return [];
+  return [["RULE", `${basename(dirname(dirname(path))) === "notes" ? `notes/${basename(dirname(path))}/${basename(path)}` : basename(path)} ` +
+    `${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.187, .228, .233, .238) · fill every slot, drop the template's comments, ` +
+    "keep to the template's sections, and say Overview in prose"]];
+}
+
+/**
+ * The agent's working detail on an approach page or a preview, by the list the turn's end reads too
+ * (`lib/working-detail.ts`): each sentence that names a row or order number, an order's file, a bare suggestion
+ * number, a rule id or a check's file name is flagged with the sentence to rewrite. A code block, a table, a
+ * heading and a file's frame title are not read.
+ */
+export function workingDetail(path: string, text: string): Finding[] {
+  if (!isArcPreview(path) && !isApproachPage(path)) return [];
+  const prose = proseOf(text.replace(/<figcaption\b[\s\S]*?<\/figcaption>/gi, " "), true);
+  return findWorkingDetail(prose).slice(0, 4).map((one) => ["SOFT",
+    `names the agent's working detail, ${/^[aeiou]/.test(one.kind) ? "an" : "a"} ${one.kind}, in "${one.sentence.slice(0, 160)}" · say it in the goal's words and the ` +
+    "developer's; an arc number, and a card's number beside its words, may stay"] as Finding);
 }
 
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
@@ -1217,6 +1287,11 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   }
   // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
   if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
+  // What the template left in, on the whole page; the working detail in whatever is written.
+  if (isHtml && !exemptWorkstream(path) && !inClosedWorkstream(path)) {
+    if (!fragment) out.push(...templateShape(path, text));
+    out.push(...workingDetail(path, text));
+  }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
 
   const sents = sentences(prose);

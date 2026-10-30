@@ -34,14 +34,13 @@ const files = {
 };
 const build = (name, more = {}) => workspace(`prompt-${name}`, { ...files, ...more });
 
-// The handover block as the template lays it out: nine labels, every value in the column
+// The handover block as the template lays it out: eight labels, every value in the column
 // `do not touch:` sets, and a long value wrapped onto a line indented to that column.
 const handover = (next) => [
   `continue:     ${next}`,
   "model:        Opus 5.5, effort high",
   `read first:   \`/work/${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/state.json\` (fields, and row 3)`,
   "pins:         spn-foundation db1e69f · spn-claude-marketplace 7fc99c1",
-  "state:        rows 1 to 2 ✅ landed; row 3 not started",
   "live now:     no reload",
   "done when:    Commands row `suites` → exit 0",
   "do not touch: nothing",
@@ -313,6 +312,28 @@ console.log("\n=== prompt");
   const wiring = JSON.parse(readFileSync(resolve(PLUGIN, "src", "hooks", "hooks.json"), "utf8")).hooks[EVENT];
   same("[MKT.HOOKS.05] the wiring declares one entry for the prompt: the bundled script, with a 10 second timeout",
     wiring, [{ hooks: [{ type: "command", command: "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/prompt.mjs", timeout: 10 }] }]);
+}
+
+console.log("\n=== prompt — the mid-run reminder, while a go of the window has work running or ready (036 N009)");
+{
+  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+    waitsOn: [], model: "opus", signature: "abc12345", state });
+  const going = (name, parts) => build(name, { [`${DEVEX}/${WORKSTREAMS}/open/${THIS}/${ARCS}/N011/go.json`]:
+    `${JSON.stringify({ schemaVersion: 1, lead: "N011", scope: ["N011"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n` });
+  const reminderOf = (ran) => { try { return JSON.parse(ran.out).hookSpecificOutput?.additionalContext ?? null; } catch { return null; } };
+  const running = going("go-running", [part("code-spn-x-1", "running", "N011/E1"), part("code-spn-x-2", "ready", "N011/E2")]);
+  const told = hook(event(running, "sess-305", `On ${THIS}: the drawer should open on the left.`), running);
+  const said = reminderOf(told);
+  same("[MKT.HOOKS.305] while a go has a part running or ready, the developer's message comes with the mid-run reminder",
+    [told.exit, Boolean(said?.startsWith(`A go is running: ${THIS}/N011 (1 running, 1 ready).`)), Boolean(said?.includes("a change mid-run"))], [0, true, true]);
+  same("[MKT.HOOKS.305] and the session's name is still given beside it", titleOf({ out: JSON.stringify({ hookSpecificOutput: { ...JSON.parse(told.out).hookSpecificOutput, additionalContext: undefined } }) }), THIS);
+  const again = reminderOf(hook(event(running, "sess-305", "And the button reads Save."), running));
+  same("[MKT.HOOKS.305] every message of the bound window carries it while the go runs", Boolean(again?.startsWith("A go is running:")), true);
+  const held = going("go-held", [part("code-spn-x-1", "held", "N011/E1"), part("code-spn-x-2", "landed", "N011/E2")]);
+  same("[MKT.HOOKS.305] a go with only held and landed parts brings no reminder",
+    reminderOf(hook(event(held, "sess-305-held", `On ${THIS}: the drawer should open on the left.`), held)), null);
+  same("[MKT.HOOKS.305] a window bound to no workstream hears nothing",
+    reminderOf(hook(event(running, "sess-305-unbound", "What time is it?"), running)), null);
 }
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);

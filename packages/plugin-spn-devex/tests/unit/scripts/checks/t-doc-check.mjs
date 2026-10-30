@@ -832,5 +832,45 @@ console.log("\n=== doc-check — a compressed sentence is a note on a page a per
     JSON.stringify(checkPage("/d/plugins/spn-devex/refs/devex/x.md", lead)));
 }
 
+// ── what a template leaves behind, and the agent's working detail, on an approach page or a preview ──
+console.log("\n=== doc-check — an approach page or a preview keeps nothing of its template, and speaks in the developer's words");
+{
+  const docCheck = await import("../../../../src/scripts/checks/doc-check.ts");
+  const call = (name, ...args) => (typeof docCheck[name] === "function" ? docCheck[name](...args) : []);
+  const say = (label, pass, detail = "") => { n += 1; if (!pass) failed += 1; console.log(`  ${pass ? "PASS" : "FAIL"}  ${label}${pass || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+  const ws = join(WORKSPACE, ".spndevex", "workstreams", "open", "031-probe");
+  const preview = join(ws, "notes", "N001", "preview.html");
+  const approach = join(ws, "approach.html");
+  const TEMPLATE = `<!-- spn:doc {} -->\n<h2>Overview</h2>\n<!-- Every h2 is its word alone with a standfirst lead under it. -->\n<p>{{the overview}}</p>\n<h2>Today</h2>\n<h2>Proposed</h2>\n<h2>Where it lands</h2>\n`;
+  const page = (overview, extra = "") => `<!-- spn:doc {} -->\n${linesFor("1.0.0").stylesheet}\n<h2>Overview</h2>\n${overview}\n<h2>Today</h2><p>The check reads one file.</p>\n<h2>Proposed</h2><p>It reads two.</p>\n${extra}<h2>Where it lands</h2><p>In the plugin.</p>\n`;
+  const slotted = call("templateShape", preview, page("<p>{{the overview}}</p>\n<!-- Every h2 is its word alone with a standfirst lead under it. -->\n<p>{{why}} and {{what}}</p>"), TEMPLATE);
+  say("[MKT.HOOKS.130] red: a preview keeping three slots and a template comment is refused, by its name",
+    slotted.length === 1 && slotted[0][0] === "RULE" && slotted[0][1].startsWith("notes/N001/preview.html still holds 3 template slots")
+      && slotted[0][1].includes("keeps 1 of the template's comment"), JSON.stringify(slotted));
+  const extra = call("templateShape", preview, page("<p>The checks stop the agent.</p>", "<h2>Terms</h2><p>a word</p>\n"), TEMPLATE);
+  say("[MKT.HOOKS.130] red: a section its template lacks is refused", extra.length === 1 && extra[0][1].includes("carries terms, a section its template does not have"), JSON.stringify(extra));
+  const table = call("templateShape", preview, page("<table><tr><td>a</td></tr></table>"), TEMPLATE);
+  say("[MKT.HOOKS.130] red: a table in Overview is refused", table.length === 1 && table[0][1].includes("its Overview holds a table"), JSON.stringify(table));
+  const whole = call("templateShape", preview, page("<p>The checks stop the agent where it was told before.</p>"), TEMPLATE);
+  say("[MKT.HOOKS.130] green: a preview filled in, in its template's sections, passes", whole.length === 0, JSON.stringify(whole));
+  const onApproach = call("templateShape", approach, "<h2>Why</h2><p>{{why}}</p>", "");
+  say("[MKT.HOOKS.130] red: an approach page keeping a slot is refused too", onApproach.length === 1 && onApproach[0][1].startsWith("approach.html still holds 1 template slot"), JSON.stringify(onApproach));
+  const written = docCheck.check(preview, page("<p>{{the overview}}</p>"));
+  say("[MKT.HOOKS.130] red: a Write of the preview is refused through the doc check, against the plugin's own template",
+    written.some(([grade, text]) => grade === "RULE" && text.includes("still holds 1 template slot")), JSON.stringify(written).slice(0, 300));
+  say("[MKT.HOOKS.130] green: a page that is not an approach page or a preview is not read", call("templateShape", "/d/docs/02-constructs/a.html", "<p>{{x}}</p>", "").length === 0);
+
+  const named = call("workingDetail", preview, page("<p>The order's file orders/3.md says how the check is built.</p>"));
+  say("[MKT.HOOKS.131] red: a preview naming an order's file is flagged, with the sentence",
+    named.length === 1 && named[0][0] === "SOFT" && named[0][1].includes("an order file") && named[0][1].includes("orders/3.md says how"), JSON.stringify(named));
+  const arc = call("workingDetail", preview, page("<p>N006 is decided, and Q3 · which way the probe goes is still open.</p>"));
+  say("[MKT.HOOKS.131] green: an arc number and a card beside its words pass", arc.length === 0, JSON.stringify(arc));
+  const framed = call("workingDetail", preview, page(`<figure><figcaption><span>checks/doc-check.ts</span></figcaption><pre>row 3</pre></figure>`));
+  say("[MKT.HOOKS.131] green: a file's frame title and a code block are not prose", framed.length === 0, JSON.stringify(framed));
+  const viaCheck = docCheck.check(approach, "<p>Row 4 lands the doc check.</p>", true);
+  say("[MKT.HOOKS.131] red: an Edit of the approach page naming a row is flagged through the doc check",
+    viaCheck.some(([grade, text]) => grade === "SOFT" && text.includes("a row, in")), JSON.stringify(viaCheck).slice(0, 300));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

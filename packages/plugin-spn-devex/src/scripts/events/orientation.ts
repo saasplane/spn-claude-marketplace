@@ -54,7 +54,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { arcIdsOf } from "../lib/workstream.ts";
+import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
+import { readGo, readyParts } from "../lib/go-plan.ts";
 import type { RulesIndex } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { sweepSessions } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
@@ -798,6 +799,64 @@ export function migrationLines(root: string): string[] {
 }
 
 /**
+ * Each go of the open workstreams that has a part not landed, read from the lead arc's `go.json`: its parts
+ * running, held and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
+ * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out.
+ */
+export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string;
+  running: string[]; held: string[]; ready: string[]; unfolded: string[]; next: string }> {
+  const out: ReturnType<typeof goStandings> = [];
+  const open = workstreamsDir(root, "open");
+  for (const name of listdir(open).sort()) {
+    const ws = join(open, name);
+    if (!isDir(ws) || (only && !only.has(name))) continue;
+    for (const lead of arcIdsOf(ws)) {
+      let plan;
+      try { plan = readGo(ws, lead); } catch { continue; }
+      if (!plan || plan.parts.every((part) => part.state === "landed")) continue;
+      const orders = join(notesDirOf(ws, lead), "orders");
+      const ids = (state: string) => plan.parts.filter((part) => part.state === state).map((part) => part.id);
+      const running = ids("running");
+      const unfolded = running.filter((id) => isFile(join(orders, `${id}.report.md`)));
+      const launchable = readyParts(plan);
+      const ref = `${name}/${lead}`;
+      const first = launchable[0];
+      const next = unfolded.length
+        ? `fold the report of ${unfolded[0]}: \`spn-devex workstream report write ${name} notes/${lead}/orders/${unfolded[0]}.report.md\`.`
+        : ids("held").length
+          ? `derive the plan again with \`spn-devex workstream go write ${ref} --scope ${plan.scope.join(",")}\`.`
+          : first && (first.pass === "BASELINE" || first.pass === "FULL_RUN")
+            ? `\`spn-devex workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`
+            : first && first.pass === "RELEASE"
+              ? `release ${first.repo}.`
+              : first
+                ? `launch the brief of ${first.id}: \`notes/${lead}/orders/${first.id}.md\`.`
+                : running.length
+                  ? `wait for ${running.join(", ")}, then fold each report with \`spn-devex workstream report write\`.`
+                  : `\`spn-devex workstream go show ${ref}\`.`;
+      out.push({ workstream: name, lead, running, held: ids("held"), ready: launchable.map((part) => part.id), unfolded, next });
+    }
+  }
+  return out;
+}
+
+/** How many running gos the session start names one line each; the rest are a count and the command that lists them. */
+export const GOS_NAMED = 3;
+
+/** The session start's lines for the running gos: one for each, inside the session start's limit. */
+export function goLines(root: string): string[] {
+  let gos: ReturnType<typeof goStandings> = [];
+  try { gos = goStandings(root); } catch { return []; }
+  if (!gos.length) return [];
+  const listed = (label: string, ids: string[]) => (ids.length ? `${label} ${ids.slice(0, 4).join(", ")}${ids.length > 4 ? ` and ${ids.length - 4} more` : ""}` : "");
+  const lines = gos.slice(0, GOS_NAMED).map((go) => `Go ${go.workstream}/${go.lead}: ` +
+    ([listed("running", go.running), listed("held", go.held), listed("ready", go.ready)].filter(Boolean).join(" · ") || "nothing ready yet") +
+    `. Next: ${go.next}`);
+  if (gos.length > GOS_NAMED) lines.push(`And ${gos.length - GOS_NAMED} more running, each shown by \`spn-devex workstream go show\`.`);
+  return [...lines, ""];
+}
+
+/**
  * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
  * status line — and `context` is what the agent reads — the same, then the tables, the closing
  * question and the note.
@@ -895,6 +954,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
       "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
   if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
+  lines.push(...goLines(root));
   lines.push(...closingLines(streams, others));
   const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
     "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
@@ -929,14 +989,15 @@ export type LateBranch = { name: string; branch: string; count: number; base: st
 
 /**
  * A member's branch that is behind its base, or null. The base is `origin/develop` unless the branch's
- * git config records another in `spnBase`. A permanent branch, a detached HEAD and a branch that is not
+ * git config records another in `spnBase`. A checked-out `develop` is counted against `origin/develop`,
+ * because the book is read from it. Another permanent branch, a detached HEAD and a branch that is not
  * behind say nothing.
  */
 export function lateBranch(name: string, path: string): LateBranch | null {
   if (!isCheckout(path)) return null;
   const branch = gitIn(path, ["branch", "--show-current"]);
-  if (!branch || PERMANENT.includes(branch)) return null;
-  const base = `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
+  if (!branch || (PERMANENT.includes(branch) && branch !== "develop")) return null;
+  const base = branch === "develop" ? "origin/develop" : `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
   const count = Number(gitIn(path, ["rev-list", "--count", `HEAD..${base}`]));
   return count > 0 ? { name, branch, count, base } : null;
 }
@@ -956,15 +1017,22 @@ export const LATE_NAMED = 3;
  * that lists them all, which is where the ground is read on asking.
  */
 export function lateClauses(late: LateBranch[]): string[] {
-  const bases = [...new Set(late.map((l) => l.base))].sort();
-  return bases.map((base) => {
-    const behind = late.filter((l) => l.base === base)
-      .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const order = (a: LateBranch, b: LateBranch) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+  const more = (count: number) => (count > LATE_NAMED ? ` and ${count - LATE_NAMED} more, listed by \`spnutils workspace status\`` : "");
+  // A MEMBER ON DEVELOP IS PULLED, NEVER REBASED, and before the book is read: its rule ids may be ones origin has changed.
+  const develop = late.filter((l) => l.branch === "develop").sort(order);
+  const pull = develop.length
+    ? [`${develop.length} ${develop.length === 1 ? "member" : "members"} on develop behind origin/develop, pull before reading the book: ` +
+       develop.slice(0, LATE_NAMED).map((l) => `${l.name} by ${l.count}`).join(", ") + more(develop.length)]
+    : [];
+  const branches = late.filter((l) => l.branch !== "develop");
+  const bases = [...new Set(branches.map((l) => l.base))].sort();
+  return [...pull, ...bases.map((base) => {
+    const behind = branches.filter((l) => l.base === base).sort(order);
     const named = behind.slice(0, LATE_NAMED).map((l) => `${l.name} ${l.branch} by ${l.count}`).join(", ");
-    const more = behind.length - LATE_NAMED;
     return `${behind.length} ${behind.length === 1 ? "branch" : "branches"} behind ${base}, rebase before the next push: ${named}`
-      + (more > 0 ? ` and ${more} more, listed by \`spnutils workspace status\`` : "");
-  });
+      + more(behind.length);
+  })];
 }
 
 /** The longest the session start waits for the members' remotes. */

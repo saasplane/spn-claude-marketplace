@@ -842,11 +842,19 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   writeFileSync(join(other, "b.txt"), "b\n");
   git(other, "add", "-A"); git(other, "commit", "-q", "-m", "ahead"); git(other, "push", "-q", "origin", "develop");
   const late = hookIn(root);
-  says("a member's branch behind origin/develop is named in the status line, after a fetch the window made",
-    statusOf(late.message).includes("1 branch behind origin/develop, rebase before the next push: spn-x feat/031-x by 1"), statusOf(late.message));
+  says("[MKT.HOOKS.145] a member's branch behind origin/develop is named in the status line as today, after a fetch the window made",
+    statusOf(late.message).includes("1 branch behind origin/develop, rebase before the next push: spn-x feat/031-x by 1")
+      && !statusOf(late.message).includes("pull before reading the book"), statusOf(late.message));
   says("the status stays one line, and the welcome is whole above it", late.message.split("\n").filter(Boolean).at(-1) === statusOf(late.message) && late.message.includes("🧭 I work with you through"));
   git(member, "checkout", "-q", "develop");
-  says("a permanent branch is never told to rebase", !statusOf(hookIn(root).message).includes("behind origin"));
+  const onDevelop = statusOf(hookIn(root).message);
+  says("[MKT.HOOKS.144] a member on develop one commit behind origin/develop is told how far, and to pull before reading the book",
+    onDevelop.includes("1 member on develop behind origin/develop, pull before reading the book: spn-x by 1"), onDevelop);
+  says("[MKT.HOOKS.144] and develop is never told to rebase", !onDevelop.includes("rebase"), onDevelop);
+  git(member, "checkout", "-q", "-b", "main");
+  says("another permanent branch says nothing, as today", !statusOf(hookIn(root).message).includes("behind origin"));
+  git(member, "checkout", "-q", "develop"); git(member, "pull", "-q", "--ff-only");
+  says("[MKT.HOOKS.144] a develop that is current says nothing", !statusOf(hookIn(root).message).includes("behind origin"));
   git(member, "checkout", "-q", "feat/031-x"); git(member, "config", "branch.feat/031-x.spnBase", "main");
   says("a branch whose git config records another base is measured from that base, which here is not behind",
     !statusOf(hookIn(root).message).includes("behind origin"));
@@ -956,6 +964,40 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   says("and they sit right after the pointer line to `refs/commands.md`",
     big.context.includes("read it before a window's first write of a command.\n\n" + treeDebug.join("\n") + "\n\n"));
   says("and no other command line is carried", !big.context.includes("spn-devex workstream ") && !big.context.includes("spn-devex docs "));
+}
+
+// ── the session start names each running go: its parts running, held and ready, and the next step (036 N009) ──
+console.log("\n=== orientation — the running go at the session start");
+{
+  const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+    waitsOn: [], model: "opus", signature: "abc12345", state });
+  const plan = (parts) => `${JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`;
+  const member = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+  };
+  const going = (name, count, parts) => {
+    const files = { ...member };
+    for (let at = 0; at < count; at += 1) {
+      const ws = `.spndevex/${WORKSTREAMS}/open/${String(50 + at).padStart(3, "0")}-probe-${at}`;
+      files[`${ws}/arcs/N001/state.json`] = "{}\n";
+      files[`${ws}/arcs/N001/go.json`] = plan(parts);
+    }
+    return fixture(name, files);
+  };
+  const orientAt = (root) => orient(root, root);
+  const [, context] = orientAt(going("go-running", 1, [part("code-spn-x-1", "running", "N001/E1"), part("code-spn-x-2", "held", "N001/E2"),
+    part("code-spn-x-3", "ready", "N001/E3"), part("docs-spn-x-1", "landed", "N001/E4")]));
+  says("[MKT.HOOKS.304] the session start names the running go, its parts running, held and ready, and the next step",
+    context.includes("Go 050-probe-0/N001: running code-spn-x-1 · held code-spn-x-2 · ready code-spn-x-3. Next: derive the plan again"), context.slice(-1200));
+  const [, landed] = orientAt(going("go-landed", 1, [part("code-spn-x-1", "landed", "N001/E1")]));
+  says("[MKT.HOOKS.304] a go whose every part landed is not named", !landed.includes("Go 050-probe-0"));
+  const [, many] = orientAt(going("go-many", 6, [part("code-spn-x-1", "ready", "N001/E1")]));
+  const goes = many.split("\n").filter((line) => line.startsWith("Go "));
+  says("[MKT.HOOKS.304] six gos stay inside the session start's limit: three named, the rest counted",
+    goes.length === 3 && many.includes("And 3 more running") && many.length <= SESSION_START_CEILING, `${goes.length} · ${many.length}`);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

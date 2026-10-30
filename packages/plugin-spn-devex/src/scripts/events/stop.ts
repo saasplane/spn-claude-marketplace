@@ -9,15 +9,23 @@
 // the turn is already written and a refusal would only lose it.
 //
 //   runnable   a turn that ends while an arc THIS SESSION wrote still has rows ready to run, and no card
-//              is open; a row waiting on an open card is not ready
+//              is open; a row waiting on an open card is not ready. A reply that ends on a promise of the
+//              next step is sent back while a decided arc of the window has a ready row, moved or not
 //   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
 //              full there, once, and every card still open from an earlier reply named in one line; only
 //              cards this window raised, or that no window recorded, count (`raisedBy` in the card's record)
+//   reply-shape a Needs you item is never a card or a suggestion by its number alone, and a reply holds no
+//              working detail (`lib/working-detail.ts`)
+//   cards      a reply names no card the window's pages do not carry, one answered, or one of another workstream
 //   notes      a note, once: an answered card a preview shows, whose arc's notes did not move
 //   carried    a proposed arc never carries a review point to a later row of itself
-//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
-//              once while the rows stand, and names each open card in one line
-//   page-stale an arc this window wrote left its workstream's page behind the arcs
+//   handover   a reply that says a new window is needed carries the eight labelled lines, in one column,
+//              once while the rows stand, and names each open card in one line; a close or a handover
+//              never opens with a table, a heading or a count
+//   standing-grant, page-path  the reply's last asks and its page addresses, after the handover
+//   go-next    a go of the window with a part ready and not started, or a report waiting to be folded,
+//              and no card open, is told its next step
+//   page-stale an arc this window wrote left its workstream's page, or its preview's status, behind the arcs
 //   state      `workstream state check` fails for a workstream of this window: among its findings an arc
 //              the page does not carry, a workstream with no page, and a step running on an arc not decided
 //   migration  a migration the workspace's ledger lacks still finds old shapes, in any window
@@ -38,7 +46,7 @@
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RULE.DEVEX.WORKSPACE.244):
-// `needs-you`, `reply-shape`, `handover` and `welcome`. Every other finding is held, and the checks find
+// `needs-you`, `reply-shape`, `cards`, `handover`, `standing-grant`, `page-path` and `welcome`. Every other finding is held, and the checks find
 // it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -57,9 +65,12 @@ import { readFileSync, readdirSync, rmSync, statSync, mkdirSync, writeFileSync }
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
+import { checkStandingGrant } from "../checks/standing-grant.ts";
+import { checkPagePath } from "../checks/page-path.ts";
 import { checkWorkstream, heldByStop } from "../checks/workstream-state.ts";
-import { PREVIEW_FILE, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, readArc, readQuestions, readyRows, stateFileOf,
+import { PREVIEW_FILE, arcDataDir, arcStatus, stepsMayStart, arcIdsOf, leafRows, logLinesOf, notesDirOf, previewOf, readArc, readQuestions, readyRows, stateFileOf,
          workstreamsOf } from "../lib/workstream.ts";
+import { findWorkingDetail } from "../lib/working-detail.ts";
 import type { ArcData, LogLine, Question } from "../lib/workstream-schema.ts";
 import { applyLine, standings } from "../lib/migration.ts";
 import { MIGRATIONS } from "../lib/migrations/index.ts";
@@ -70,7 +81,7 @@ import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
-import { cacheState, welcome } from "./orientation.ts";
+import { cacheState, goStandings, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
 import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
@@ -78,12 +89,12 @@ import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstream
 type Warning = { check: string; message: string };
 
 // The labels the handover template carries (`templates/workstream/handover-template.md`), in its
-// order. Every handover owes all nine: a line that has nothing to say still says so (`no reload`,
+// order. Every handover owes all eight: a line that has nothing to say still says so (`no reload`,
 // `none`), because a label left out cannot be told from a label forgotten. A label counts only where
 // it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence
 // form (`Continue workstream …`, `Model: …`) names none of them and is refused as a block missing
-// all nine.
-const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when",
+// all eight. The state and the next steps are what `workstream go show` prints, so no label holds them.
+const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "live now", "done when",
   "do not touch", "open"];
 const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
@@ -532,6 +543,18 @@ function snapshotArcs(root: string): string[] {
 /** The workstream an arc's data folder sits in, by the workstream folder's name. */
 const workstreamOf = (arc: string): string => basename(homeOf(arc));
 
+// A PROMISE OF THE NEXT STEP, in the reply's last paragraph: the agent says what it will do instead of doing it.
+// A sentence that asks, or that waits on the developer (`if you`, `once you`), is an offer and no promise.
+const PROMISE = /\b(?:I(?:'ll|\s+will|\s+am going to|'m going to|\s+am about to|'m about to)|[Nn]ext,?\s+I\b|[Nn]ext up\b|will (?:now|next)\b)/;
+const WAITS_ON_YOU = /\b(?:if|once|when|after|until) you\b|\byour (?:go|answer|call|word)\b/i;
+
+/** Whether the reply's last paragraph, fences set aside, promises the next step rather than taking it. */
+export function endsOnPromise(reply: string): boolean {
+  const paragraphs = withoutFences(reply).split(/\n\s*\n/).map((one) => one.trim()).filter(Boolean);
+  const last = paragraphs.at(-1) ?? "";
+  return last.split(/(?<=[.!?])\s+/).some((sentence) => PROMISE.test(sentence) && !sentence.trim().endsWith("?") && !WAITS_ON_YOU.test(sentence));
+}
+
 /**
  * Arcs this session wrote that still have rows ready to run, with no card open to block them.
  *
@@ -540,10 +563,13 @@ const workstreamOf = (arc: string): string => basename(homeOf(arc));
  * @param touched  the arcs this window's own tool calls wrote since then, from the window's note;
  *                 `null` where that is not known, and then a `state.json` time newer than `since` stands in
  * @param mine     the workstreams this window works on; the others are read by nobody here
+ * @param reply    the reply that ends the turn; one that ends on a promise of the next step is sent back
+ *                 while a decided arc of the window has a ready row and no card is open, its rows moved or not
  */
 export function checkRunnable(root: string, since: number, stepsAt: Record<string, string>,
-                              touched: Set<string> | null, mine: Set<string>): Warning[] {
+                              touched: Set<string> | null, mine: Set<string>, reply = ""): Warning[] {
   const out: Warning[] = [];
+  const promises = endsOnPromise(reply);
 
   for (const ws of scoped(openWorkstreamFolders(root), mine)) {
     const questions = readQuestions(ws);
@@ -558,6 +584,16 @@ export function checkRunnable(root: string, since: number, stepsAt: Record<strin
       // AN ARC NOBODY AGREED, OR ONE HELD BY THE DEVELOPER'S WAIT, IS NOT RUNNABLE, whoever touched it: no step
       // starts until the arc is DECIDED with no wait (RULE.DEVEX.WORKSPACE.278).
       if (!stepsMayStart(data)) continue;
+      // A PROMISE IS NOT A STOP. A reply that ends on what it will do next, while this arc has a row ready and
+      // no card is open, is the stop the developer asked never to see; no baseline is needed to know it.
+      if (promises && !cards.length) {
+        const ready = readyRowsOf(arc, questions);
+        if (ready.length) {
+          out.push({ check: "runnable", message: named(basename(ws),
+            `This reply ends on what you will do next, and ${idOf(arc)} has ${ready[0]} ready with no card open. Do it in this turn.`) });
+          continue;
+        }
+      }
       // NO BASELINE MEANS NO INFERENCE. A session's first Stop has nothing of its own to compare
       // against, and a headless window has only a first Stop, so it stays quiet.
       if (!since) continue;
@@ -748,6 +784,49 @@ export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, 
   return out;
 }
 
+/** Every card each open workstream carries, on its pages or in `questions.jsonl`, with whether it is still open. */
+function cardsOfWorkstreams(root: string): Map<string, Map<string, boolean>> {
+  const out = new Map<string, Map<string, boolean>>();
+  for (const folder of openWorkstreamFolders(root)) {
+    const cards = new Map<string, boolean>();
+    for (const page of pagesOf(folder)) for (const card of cardsOf(page)) cards.set(card.number, !card.decided);
+    for (const one of readQuestions(folder)) cards.set(one.id.toUpperCase(), one.state === "open");
+    out.set(basename(folder), cards);
+  }
+  return out;
+}
+
+/**
+ * The cards check (RULE.DEVEX.WORKSPACE.147 and .197): a reply names no card that no page of this window's
+ * workstreams carries, none that belongs to another workstream it does not name, and its **Needs you** puts
+ * no card that is already answered. A window bound to no workstream is not read.
+ */
+export function checkCardsNamed(reply: string, root: string, mine: Set<string>): Warning[] {
+  if (!mine.size) return [];
+  const all = cardsOfWorkstreams(root);
+  const own = [...all].filter(([name]) => mine.has(name));
+  if (!own.length) return [];
+  const prose = unquoted(reply);
+  const named = [...new Set(prose.match(/\bQ\d+\b/g) ?? [])];
+  const part = needsYouPart(reply);
+  const out: Warning[] = [];
+  const ours = own.map(([name]) => name).join(", ");
+  for (const card of named) {
+    const home = own.find(([, cards]) => cards.has(card));
+    if (home) {
+      if (home[1].get(card) === false && namesCard(part, card))
+        out.push({ check: "cards", message: `Needs you names ${card}, and ${home[0]} has answered it. Leave a settled card out of Needs you.` });
+      continue;
+    }
+    const elsewhere = [...all].find(([name, cards]) => !mine.has(name) && cards.has(card));
+    if (elsewhere && (prose.includes(elsewhere[0]) || new RegExp(`\\b${elsewhere[0].slice(0, 3)}\\b`).test(prose))) continue;
+    out.push({ check: "cards", message: elsewhere
+      ? `This reply names ${card}, which belongs to ${elsewhere[0]}, not to ${ours}. Name the workstream it belongs to, or leave it out.`
+      : `This reply names ${card}, and no approach page of ${ours} carries it.` });
+  }
+  return out.slice(0, 3);
+}
+
 /**
  * Cards as a line that says which workstream each belongs to: `021-figma-design-standard: Q10 · Q8`.
  * A card the map does not place is listed bare, so a caller with no map still gets its numbers.
@@ -770,7 +849,7 @@ function handoverFences(reply: string): Fence[] {
 }
 
 /**
- * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
+ * Whether the reply holds a handover block that is filled in and carries all eight labels. The hook
  * keeps this, so the block is asked for once (RULE.DEVEX.WORKSPACE.189).
  */
 export function givesHandover(reply: string): boolean {
@@ -791,6 +870,21 @@ export function stepsMark(root: string, mine: Set<string>): string {
   return createHash("sha256").update(rows.join("\n")).digest("hex").slice(0, 12);
 }
 
+// A REPLY THAT CLOSES A WORKSTREAM: the command that closes one, or the words that say it closed.
+const CLOSES = /\bworkstream close\b|\b(?:closed|closes|closing) (?:the |this )?workstream\b|\bworkstream\s+(?:\d{3}[\w-]*\s+)?(?:is|was|now)\s+closed\b/i;
+
+/**
+ * What a reply opens with that a close or a handover may not: a table, a hash heading other than **Needs you**,
+ * or a count, named for the message; null where its first line is prose.
+ */
+export function openingOf(reply: string): string | null {
+  const first = reply.split("\n").find((line) => line.trim() !== "") ?? "";
+  if (/^\s*\|/.test(first)) return "a table";
+  if (/^[ \t]{0,3}#{1,6}[ \t]/.test(first) && !NEEDS_YOU.test(first)) return "a heading";
+  if (/^[ \t]{0,3}(?:[-*][ \t]+)?(?:\*\*)?\d[\d,]*(?:[ \t]+of[ \t]+\d+)?[ \t]+\p{L}/u.test(first)) return "a count";
+  return null;
+}
+
 /**
  * The handover check: a reply that passes work on carries the block, names each open card, and is
  * not sent while the installed plugins are behind their source.
@@ -799,10 +893,20 @@ export function stepsMark(root: string, mine: Set<string>): string {
  *               not moved since (`stepsMark`); a pass-on with no block then owes nothing
  */
 export function checkHandover(reply: string, root: string, mine: Set<string>, given = false): Warning[] {
-  if (!passingOn(reply)) return [];
+  const handing = passingOn(reply);
+  if (!handing && !CLOSES.test(unquoted(reply))) return [];
   // A REPLY THAT PUTS A WHOLE CARD ASKS A QUESTION, AND HANDS NOTHING OVER, also when it offers the
   // next window for after the answer.
   if (carriesCard(reply)) return [];
+
+  // A CLOSE OR A HANDOVER OPENS WITH WHAT WAS DELIVERED AND WHAT WAS LEARNED (RULE.DEVEX.WORKSPACE.206), in
+  // short paragraphs. A table, a heading or a count first is a status board the developer has to decode.
+  const opening = openingOf(reply);
+  if (opening)
+    return [{ check: "handover", message:
+      `This ${handing ? "handover" : "close"} opens with ${opening}. Open with what was delivered and what was learned, ` +
+      `in short paragraphs, then the ask (RULE.DEVEX.WORKSPACE.206).` }];
+  if (!handing) return [];
 
   // THE BLOCK IS OWED ONCE (RULE.DEVEX.WORKSPACE.189). A later reply names the handover in one line, and
   // so does the reply that answers a finding on the handover reply. A block printed again is still read.
@@ -1055,6 +1159,20 @@ export function needsYouPart(reply: string): string {
   return out.join("\n");
 }
 
+/**
+ * The cards and suggestions a **Needs you** part names by number alone: an item whose words, its markup and
+ * separators set aside, are only `Q<n>` and `S<n>`.
+ */
+export function numbersOnly(part: string): string[] {
+  const out: string[] = [];
+  for (const line of part.split("\n").slice(1)) {
+    const item = line.replace(/^[ \t]*(?:[-*+]|\d+[.)])[ \t]+/, "").replace(/[*_`]/g, "").trim();
+    if (!item || !/^(?:[QS]\d+)(?:[\s,;·&]+(?:and[\s]+)?[QS]\d+)*[.\s]*$/.test(item)) continue;
+    out.push(...(item.match(/[QS]\d+/g) ?? []));
+  }
+  return [...new Set(out)];
+}
+
 /** Whether a stretch of text puts card `card` in full: its number and a lettered options table. */
 function putsInFull(text: string, card: string): boolean {
   return namesCard(text, card) && TABLE.test(text) && LETTERED_ROW.test(text);
@@ -1117,6 +1235,19 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
         `name ${many(unnamed) ? "them" : "it"}. Add one line for each: its number, its question, and where it is; the full ` +
         `card stays on the approach page (RULE.DEVEX.WORKSPACE.189).` });
   }
+  // A NEEDS YOU ITEM CARRIES ITS QUESTION OR ITS TITLE IN WORDS (RULE.DEVEX.WORKSPACE.189): a number alone is
+  // the agent's handle, and the developer has to look it up.
+  const bare = numbersOnly(needsYouPart(reply));
+  if (bare.length)
+    out.push({ check: "reply-shape", message:
+      `Needs you names ${bare.join(" and ")} by number only. Write each one in words (RULE.DEVEX.WORKSPACE.189).` });
+  // THE REPLY SPEAKS IN GOALS AND THE DEVELOPER'S WORDS, never the agent's working: the one list the doc check reads too.
+  const detail = findWorkingDetail(withoutFences(reply));
+  if (detail.length)
+    out.push({ check: "reply-shape", message:
+      `This reply names the agent's own working detail, which the developer does not read: ` +
+      detail.slice(0, 3).map((one) => `${/^[aeiou]/.test(one.kind) ? "an" : "a"} ${one.kind} in "${one.sentence.slice(0, 160)}"`).join(" · ") +
+      `. Rewrite ${detail.length > 1 ? "each sentence" : "the sentence"} in the goal's words; an arc number, and a card's number beside its words, may stay.` });
   if (!asking(reply, older)) return out;
   const missing = missingParts(reply);
   if (!missing.length) return out;
@@ -1137,6 +1268,23 @@ export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
     `. A stop is an open item like any other, and a question the plan knows about while the page ` +
     `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
     `(refs/devex/workspace/docs/decision-cards.md).` }];
+}
+
+/**
+ * A go of this window's workstreams with a part ready and not started, or a report waiting to be folded,
+ * while no card is open: the turn is told the next step the plan gives. A note to the agent, never a block
+ * on the developer: with a card open the agent waits on the answer.
+ *
+ * @param cards  the cards open on this window's pages (`cardsWaiting`)
+ */
+export function checkGoNext(root: string, mine: Set<string>, cards: string[]): Warning[] {
+  if (cards.length || !mine.size) return [];
+  return goStandings(root, mine).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
+    `The go of ${go.workstream}/${go.lead} has ` +
+    [go.ready.length ? `${go.ready.length === 1 ? "a part" : `${go.ready.length} parts`} ready and not started (${go.ready.join(", ")})` : "",
+     go.unfolded.length ? `${go.unfolded.length === 1 ? "a report" : `${go.unfolded.length} reports`} waiting to be folded (${go.unfolded.join(", ")})` : ""]
+      .filter(Boolean).join(" and ") +
+    `, and no card is open. Next: ${go.next}` }));
 }
 
 // ---------------------------------------------------------------------------- the page and the arcs
@@ -1166,14 +1314,30 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     }
     if (parts.size) behind.push({ workstream: basename(folder), parts: [...parts] });
   }
-  if (!behind.length) return [];
-  return [{ check: "page-stale", message:
+  // A PREVIEW SHOWS ITS ARC'S STATUS (RULE.DEVEX.WORKSPACE.251), and the same command writes it.
+  const previews: Array<{ workstream: string; line: string }> = [];
+  for (const arc of [...touched].sort()) {
+    const data = dataOf(arc);
+    const shows = previewStatusOf(read(previewOf(homeOf(arc), idOf(arc))));
+    if (!data || !shows || exemptWorkstream(arc) || shows === arcStatus(data)) continue;
+    previews.push({ workstream: basename(homeOf(arc)), line: `The preview of ${idOf(arc)} reads ${shows} and its arc is ${arcStatus(data)}` });
+  }
+  const said = previews.map((one) =>
+    `${one.line}. Run \`spn-devex docs cycles write ${one.workstream}\`, which writes each preview's status from its arc ` +
+    `(RULE.DEVEX.WORKSPACE.251).`).join(" ");
+  if (!behind.length) return said ? [{ check: "page-stale", message: said }] : [];
+  return [{ check: "page-stale", message: (said ? `${said} ` : "") +
     `An arc you wrote this turn left its page behind — ` +
     behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
     `. The parts of a page that the arcs decide are produced, never typed (RULE.DEVEX.WORKSPACE.204). Run ` +
     behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
     `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
     `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
+}
+
+/** The status a preview's header shows, as its status badge reads it; null where it shows none. */
+export function previewStatusOf(text: string): string | null {
+  return /<span class="sds-state">[\s\S]*?<(?:a|span)\b[^>]*\bsds-status\b[^>]*>(?:[^<A-Z]*?)\s*([A-Z][A-Z_]+)\s*<\/(?:a|span)>/.exec(text)?.[1] ?? null;
 }
 
 // ---------------------------------------------------------------------------- the workstream kept as data
@@ -1325,7 +1489,7 @@ export function checkWelcome(firstTurn: string): Warning[] {
 
 // THE CHECKS WHOSE FINDING IS ABOUT THE REPLY ITSELF: a card it raised or a decision it put, a handover
 // block, and the welcome of a first reply. The developer is reading that reply, so the finding cannot wait.
-const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "handover", "welcome", "window"]);
+const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "cards", "handover", "standing-grant", "page-path", "welcome", "window"]);
 
 /**
  * The findings a turn end says now, and the ones it holds (RULE.DEVEX.WORKSPACE.244). While a row of this
@@ -1490,8 +1654,12 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "state" }, () => checkWorkstreamState(root, mine)),
     ...span({ group: "stop", action: "migration" }, () => checkMigrations(root)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
-    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),
+    ...span({ group: "stop", action: "cards" }, () => checkCardsNamed(reply, root, mine)),
+    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine, reply)),
+    ...span({ group: "stop", action: "go-next" }, () => checkGoNext(root, mine, waiting)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given)),
+    ...span({ group: "stop", action: "standing-grant" }, () => checkStandingGrant(withoutFences(reply), root)),
+    ...span({ group: "stop", action: "page-path" }, () => checkPagePath(withoutFences(reply))),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
     // A MAIN WINDOW ONLY, AND NOT WHERE THE TURN CONTINUES BECAUSE A HOOK SPOKE: the offer is made once.
