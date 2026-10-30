@@ -62,7 +62,7 @@ export const BLOCK_COMMENT = BLOCK;
 const SOURCE_LINE = /^.*Source of truth\s*:?\*{0,2}\s*:.*$|^.*\*\*Source of truth:\*\*.*$/gim;
 /**
  * An id's grammar: `RULE.<AREA>.<DOMAIN>.<NNN>` or `DEC.<AREA>.<DOMAIN>.<NNN>` — a kind, the place the
- * thing lives (the area and the domain in the book, a repository's token and its group elsewhere,
+ * thing lives (the area and the domain in the book, the domain a repository declares and its group elsewhere,
  * either may carry an underscore), then a three-digit number it keeps. A `RULE.` id sits on its
  * sentence in a chapter; a `DEC.` id is a register row's first cell. Exported so the other sites that
  * parse an id — `coherence.ts` and the two `restates/*` commands — read the same grammar rather than

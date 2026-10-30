@@ -97,7 +97,7 @@ This page answers what this plugin wires and where. It does not answer what a ho
 | --- | --- | --- |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | an edit to a wired script is live on its next run, while a change to `hooks.json` waits for a reinstall | MUST |
 | `RULE.DEVEX.UTILS.019` | the wiring names a script and carries no rule of its own | MUST |
-| `RULE.MARKETPLACE.DEVEX.008` | a plugin carries its own libraries and never reaches into a sibling at runtime, which is why the wired path is under this plugin's own root | MUST |
+| `RULE.CLAUDE_MARKETPLACE.DEVEX.008` | a plugin carries its own libraries and never reaches into a sibling at runtime, which is why the wired path is under this plugin's own root | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
 Try it: `node packages/plugin-spn-infra/tests/run.mjs`

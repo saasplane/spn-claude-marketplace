@@ -40,7 +40,7 @@
     {
       "repo": "spn-foundation",
       "row": "DEC.DEVEX.WORKSPACE.143",
-      "seen": "0db66b95"
+      "seen": "3f5365b8"
     }
   ]
 }
@@ -901,15 +901,15 @@ So a document routinely exists **before** the thing it describes, carrying 🔮 
 
 A rule lives in its chapter, with its id on it. A **governing node** carries `registers/` and keeps there only what a chapter cannot hold: a choice weighed against another, a reversal, and a conflict between the book and the code. The register **self-shrinks** — an open item is a card with a recommendation, and the moment it is decided the card compresses to a row.
 
-**Every id names its kind, the place it lives and its number**: `RULE.<AREA>.<DOMAIN>.<NNN>` for a rule the book states, `DEC.<AREA>.<DOMAIN>.<NNN>` for a register row, and `RULE.<SCOPE>.<GROUP>.<NNN>` for a repository's own rule. `RULE` and `DEC` share one number line for each place. In any other repository the scope token is the repository's folder name, in capitals with its separators as underscores, and the group is a folder of its own `docs/02-constructs/` tree, written in capitals and without its number — a register never invents a classification of its own.
+**Every id names its kind, the place it lives and its number**: `RULE.<AREA>.<DOMAIN>.<NNN>` for a rule the book states, `DEC.<AREA>.<DOMAIN>.<NNN>` for a register row, and `RULE.<DOMAIN>.<GROUP>.<NNN>` for a repository's own rule. `RULE` and `DEC` share one number line for each place. In any other repository the domain is the name the repository declares in `sprepo.json`, in capitals with its spaces as underscores, never its folder or its stack, and the group is a folder of its own `docs/02-constructs/` tree, written in capitals and without its number — a register never invents a classification of its own.
 
 | Repository | The place | Its ids | For example |
 | --- | --- | --- | --- |
 | The foundation | an area, a domain, then its number | `RULE` or `DEC`, area, domain, number | `RULE.DEVEX.AGENT.049`, `DEC.SUPPORT.APPS.034` |
-| Every other repository | its own scope token, then a group | `RULE`, scope token, group, number | `RULE.PLATFORM_TS.IAM.004`, `RULE.SUPPORT_TS.SERVER.009` |
+| Every other repository | the domain it declares, then a group | `RULE`, domain, group, number | `RULE.PLATFORM.IAM.004`, `RULE.SUPPORT.SERVER.009` |
 
 - **The place stops at the domain or the group, never the construct or the chapter.** A rule's id is written once, at the end of its sentence in its chapter, as `(rule RULE.<…>)`; everything else cites it bare, never as a link.
-- **The number is per place**, so places grow without colliding, and `spn-devex docs id next <AREA.DOMAIN>` prints the next one. **An id is never reused**, and gaps in a sequence are expected; a row holding none of the three cases is removed, and its number is never reissued.
+- **The number is per place**, so places grow without colliding, and `spn-devex docs id next <AREA.DOMAIN>` prints the next one. A place belongs to the repository whose chapters state its rules, and the command answers from that repository and refuses the place in any other. **An id is never reused**, and gaps in a sequence are expected; a row holding none of the three cases is removed, and its number is never reissued.
 - **A row states present truth, and never names what it replaced.** No supersession clause, no amendment notice, and no pointer to the row that used to answer.
 - **Update the row in place, at its own address.** A row is never annotated or struck through — it is rewritten so it states what is true now, and the old wording lives in git history. A standing row that says something no longer true is worse than no row.
 
