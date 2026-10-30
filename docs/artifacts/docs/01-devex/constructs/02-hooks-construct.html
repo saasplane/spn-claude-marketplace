@@ -181,7 +181,7 @@
   ] }
   -->
   <h3 id="the-dispatcher-s-own-refusal">The dispatcher's own refusal</h3>
-  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.MARKETPLACE.DEVEX.002).</p>
+  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read (rule RULE.CLAUDE_MARKETPLACE.DEVEX.002).</p>
   <h3 id="measuring-what-a-run-cost">Measuring what a run cost</h3>
   <p>Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded.</p>
   <h3 id="every-moment-exits-zero">Every moment exits zero</h3>
@@ -215,7 +215,7 @@
       <tr><td><p><code>RULE.DEVEX.AGENT.092</code></p><p>a hook shows the developer a refusal and gives its advice to the agent alone, and a soft finding is said once for a file in a window</p></td><td>MUST</td></tr>
       <tr><td><p><code>RULE.DEVEX.WORKSPACE.189</code></p><p>a reply opens with <em>Needs you</em> when it raises a card or when it waits, and a handover block is written once, in the reply that passes the work on</p></td><td>MUST</td></tr>
       <tr><td><p><code>RULE.DEVEX.WORKSPACE.244</code></p><p>while work runs, a finding at the end of a turn sends the agent back only when it is about the reply itself, and every other finding is held</p></td><td>MUST</td></tr>
-      <tr><td><p>RULE.MARKETPLACE.DEVEX.002</p><p>the dispatcher does refuse on its own account, through the generated-file guard it runs before the list</p></td><td>MUST</td></tr>
+      <tr><td><p>RULE.CLAUDE_MARKETPLACE.DEVEX.002</p><p>the dispatcher does refuse on its own account, through the generated-file guard it runs before the list</p></td><td>MUST</td></tr>
       <tr><td><p>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></p><p>a hook is the Event kind of script, run from a committed bundle a staleness test keeps current</p></td><td>MUST</td></tr>
     </tbody>
   </table></div>

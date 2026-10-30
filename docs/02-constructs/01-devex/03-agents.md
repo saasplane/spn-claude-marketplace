@@ -73,7 +73,7 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 ### Where a read-only promise is actually bound
 
-A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose (rule RULE.MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
+A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose (rule RULE.CLAUDE_MARKETPLACE.DEVEX.004). Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
 
 ### A fixed persona
 
@@ -125,6 +125,6 @@ This page answers what a brief is, how a persona is convened, what a viewpoint f
 | the foundation's Actors, Lenses and Panels construct | the viewpoint set is closed by a rule, and a reviewer blocks only where its own file says it may | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a brief edit needs an install and a fresh window before a convening can read it | MUST |
 | `RULE.DEVEX.WORKSPACE.118` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
-| RULE.MARKETPLACE.DEVEX.004 | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
+| RULE.CLAUDE_MARKETPLACE.DEVEX.004 | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
 
 Try it: `spn-devex restates check`
