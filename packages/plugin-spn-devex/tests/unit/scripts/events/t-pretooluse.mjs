@@ -248,6 +248,7 @@ console.log("\n=== pretooluse — a push waits for a whole run of its tree, and 
   writeFileSync(join(repo, "pkg", "spkind.json"), JSON.stringify({ kind: "SUPPORT_SERVER", name: "Pkg", config: { mtype: "SUPPORT_SERVER" } }));
   writeFileSync(join(repo, "pkg", "package.json"), JSON.stringify({ name: "pkg", private: true }));
   writeFileSync(join(repo, "pkg", "src", "a.ts"), "export const a = 1;\n");
+  writeFileSync(join(repo, "sprepo.json"), "{}\n");
   const git = (...args) => execFileSync("git", ["-C", repo, "-c", "user.name=t", "-c", "user.email=t@t", ...args], { stdio: "ignore" });
   git("init", "-q", "-b", "feat/001-x");
   git("add", "-A");

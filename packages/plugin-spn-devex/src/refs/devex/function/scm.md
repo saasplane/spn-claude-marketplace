@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "f7d50a90"
+      "seen": "ae9375a4"
     }
   ]
 }
@@ -71,7 +71,7 @@ Two different things live in that block, and confusing them is the mistake you w
 
 ## The branches every repository carries
 
-Every repository uses the same four permanent branches. Work flows strictly upward, and only by pull request. `spnutils repo create` sets up all four and their rules in every repository, and nothing declares which of them a team uses: no manifest key and no estate field. The path is chosen at each promotion, so `develop` to `main`, `develop` to `qa` to `main`, `develop` to `uat` to `main` and `develop` to `qa` to `uat` to `main` are all supported. A branch a team does not use stays, protected, and nothing passes through it.
+Every SaaS Plane repository uses the same four permanent branches. Work flows strictly upward, and only by pull request. A SaaS Plane repository is one whose root holds `sprepo.json`, and this standard binds only those. A git folder without one is not SaaS Plane's to govern, so nothing here applies to it. The workspace's own `.spndevex/` is such a folder: it is a local history with no remote and one branch, `main`, so that the agent can commit the files it manages and get an earlier version back (the workspace chapter, § *`.spndevex/` keeps its own history, and it never takes a remote*). `spnutils repo create` sets up all four and their rules in every repository, and nothing declares which of them a team uses: no manifest key and no estate field. The path is chosen at each promotion, so `develop` to `main`, `develop` to `qa` to `main`, `develop` to `uat` to `main` and `develop` to `qa` to `uat` to `main` are all supported. A branch a team does not use stays, protected, and nothing passes through it.
 
 ```text
 feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──►  uat  ──►  main
