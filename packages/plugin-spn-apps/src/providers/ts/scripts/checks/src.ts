@@ -24,6 +24,7 @@ import { resultingText } from "../../../../../../plugin-support-lib/src/lib/sour
 import { verdict as readVerbNaming, watched as readVerbWatched } from "./_src/read-verb-naming.ts";
 import { verdict as enablementGrammar, watched as enablementWatched } from "./_src/enablement-grammar.ts";
 import { verdict as awaitSequencing, watched as awaitWatched } from "./_src/await-sequencing.ts";
+import { verdict as appStyle, watched as appStyleWatched } from "./_src/app-style.ts";
 import { verdict as contractCycle, watched as contractCycleWatched } from "./_src/contract-cycle.ts";
 
 /** One rule in this subject: what it looks at, and what it says once the text is parsed. */
@@ -34,6 +35,7 @@ export const RULES: Bound[] = [
   { name: "enablement-grammar", watched: (path) => path.endsWith(".ts") && enablementWatched(path), verdict: enablementGrammar },
   { name: "await-sequencing", watched: awaitWatched, verdict: awaitSequencing },
   { name: "contract-cycle", watched: contractCycleWatched, verdict: contractCycle },
+  { name: "app-style", watched: appStyleWatched, verdict: appStyle },
 ];
 
 /**
