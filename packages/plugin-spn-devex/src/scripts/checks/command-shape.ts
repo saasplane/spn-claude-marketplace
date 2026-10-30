@@ -2,9 +2,10 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md § The three permission tiers
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// A hint, never a refusal: a Bash call the workspace's floor would send for approval only by its shape
-// is told which part, and the plain form of it. It reads the floor's rules and matches text, and it
-// starts no other program. The design is in the marketplace's hooks chapter, § A call that would
+// A refusal with the plain form: a Bash call the workspace's floor would send for approval only by its
+// shape is refused and told which part, and the plain form of it, so the developer is never asked to
+// approve a shape. It reads the floor's rules from both settings files, as the harness merges them, and
+// it matches text and starts no other program. The design is in the marketplace's hooks chapter, § A call that would
 // prompt only by its shape is told the plain form.
 
 import { readFileSync } from "node:fs";
@@ -19,11 +20,27 @@ export type Part = { text: string; background: boolean };
 
 const TIERS = ["allow", "ask", "deny"] as const;
 
-/** The workspace floor's `Bash(…)` rules by tier, read from `.claude/settings.json`; empty where none can be read. */
+/**
+ * The workspace's settings files, in the order the harness reads them: `settings.json`, which the floor writes,
+ * and `settings.local.json`, where the developer widens it for this machine.
+ */
+export const FLOOR_FILES = ["settings.json", "settings.local.json"] as const;
+
+/** The workspace floor's `Bash(…)` rules by tier, from both settings files, as the harness merges them. */
 export function readFloor(root: string): Floor {
   const floor: Floor = { allow: [], ask: [], deny: [] };
+  for (const file of FLOOR_FILES) {
+    const one = floorOf(join(root, ".claude", file));
+    for (const tier of TIERS) floor[tier].push(...one[tier]);
+  }
+  return floor;
+}
+
+/** One settings file's `Bash(…)` rules by tier; empty where the file cannot be read. */
+export function floorOf(path: string): Floor {
+  const floor: Floor = { allow: [], ask: [], deny: [] };
   try {
-    const settings = JSON.parse(readFileSync(join(root, ".claude", "settings.json"), "utf8")) as { permissions?: Record<string, unknown> };
+    const settings = JSON.parse(readFileSync(path, "utf8")) as { permissions?: Record<string, unknown> };
     for (const tier of TIERS) {
       const rules = settings.permissions?.[tier];
       if (!Array.isArray(rules)) continue;
@@ -186,7 +203,7 @@ export function checkCommandShape(payload: Payload): Verdict {
   const root = workspaceRoot(payload.cwd ?? process.cwd());
   if (!root) return null;
   const hint = shapeHint(readFloor(root), command);
-  return hint ? { note: hint } : null;
+  return hint ? { deny: hint } : null;
 }
 
 if (runAlone("command-shape.ts")) {

@@ -30,9 +30,11 @@ export type WindowNote = {
   told: Record<string, string>;
   /** The repositories (folder names under the workspace) this window has written under, by when it first did. */
   repos: Record<string, string>;
+  /** The command groups (`spn-devex workstream`) whose usage this window read, by when it first did, for usage-first. */
+  usage: Record<string, string>;
 };
 
-const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {} });
+const empty = (): WindowNote => ({ workstreams: {}, wrote: {}, told: {}, repos: {}, usage: {} });
 
 const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
 
@@ -55,7 +57,8 @@ export function readWindow(root: string, session: string | undefined): WindowNot
     return { workstreams: bound,
              wrote: held?.wrote && typeof held.wrote === "object" ? held.wrote : {},
              told: held?.told && typeof held.told === "object" ? held.told : {},
-             repos: held?.repos && typeof held.repos === "object" ? held.repos : {} };
+             repos: held?.repos && typeof held.repos === "object" ? held.repos : {},
+             usage: held?.usage && typeof held.usage === "object" ? held.usage : {} };
   } catch { return empty(); }
 }
 
@@ -195,6 +198,20 @@ export function recordWrites(root: string, session: string | undefined, cwd: str
     if (one.arc) { note.wrote[relative(root, one.arc)] = Date.now(); changed = true; }
   }
   if (changed) save(root, session, note);
+}
+
+/** Record that this window read a command group's usage (a bare or `--help` call of it), the first time only. */
+export function recordUsage(root: string, session: string | undefined, group: string): void {
+  if (!windowFile(root, session) || !group) return;
+  const note = readWindow(root, session);
+  if (note.usage[group]) return;
+  note.usage[group] = new Date().toISOString();
+  save(root, session, note);
+}
+
+/** Whether this window has read the usage of a command group. */
+export function usageRead(root: string, session: string | undefined, group: string): boolean {
+  return Boolean(readWindow(root, session).usage[group]);
 }
 
 /** The member repositories (folders with an `sprepo.json`) these paths sit under, by folder name. */
