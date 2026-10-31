@@ -182,7 +182,7 @@ const numberOf = (part: GoPart): number => Number(part.id.slice(part.id.lastInde
  * The plan of a go over the arcs of its scope, the first being the lead. Entries are grouped by repository, in the order of
  * the scope's release chain (a repository outside the chain last), then by pass, and each group is cut into parts of at most
  * its bound. A repository with code also gets a baseline and a full run, and the release comes last, one part to each line of
- * the scope's release chain. An entry a landed row holds is left out. Derived again after a change, the previous plan's landed
+ * the scope's release chain. An entry a landed row holds is left out, unless it changed after its part landed. Derived again after a change, the previous plan's landed
  * and running parts stay as they were and the entries they hold are left out, except a landed part's entry that changed, which
  * gets a follow-up part; every other part is cut anew.
  */
@@ -192,11 +192,14 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!chain.includes(repo)) chain.push(repo);
   const kept = (options.previous?.parts ?? []).filter((part) => part.state === "landed" || part.state === "running");
   const keptIds = new Set(kept.map((part) => part.id));
+  const moved = new Set<string>();
   const keptRefs = new Set(kept.flatMap((part) => {
-    const moved = part.state === "landed" ? new Set(changedEntries(part, scope)) : new Set<string>();
-    return part.entries.filter((ref) => !moved.has(ref));
+    const changed = part.state === "landed" ? changedEntries(part, scope) : [];
+    for (const ref of changed) moved.add(ref);
+    return part.entries.filter((ref) => !changed.includes(ref));
   }));
-  const done = landedRefs(scope);
+  // A landed row's entry is done, unless it changed after the part that held it landed: that one gets a follow-up part.
+  const done = new Set([...landedRefs(scope)].filter((ref) => !moved.has(ref)));
   const groups = new Map<string, { repo: string; pass: GoPass; refs: string[]; entries: SheetEntry[] }>();
   const repos: string[] = [];
   for (const { arc, sheet } of scope) {
@@ -292,6 +295,12 @@ export function changedEntries(part: GoPart, scope: readonly ScopeSheet[]): stri
     const entry = now.get(ref);
     return !entry || hashes[at] !== entryHash(entry);
   });
+}
+
+/** A part's changed entries that no later part of the plan carries: a follow-up part answers its landed part's change. */
+export function staleEntries(part: GoPart, plan: GoPlan, scope: readonly ScopeSheet[]): string[] {
+  const later = plan.parts.slice(plan.parts.indexOf(part) + 1).flatMap((one) => one.entries);
+  return changedEntries(part, scope).filter((ref) => !later.includes(ref));
 }
 
 /** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `ready` part with a wait open is waiting. */

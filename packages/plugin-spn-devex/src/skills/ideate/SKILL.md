@@ -41,6 +41,9 @@ description: Decide what a node IS, and design a requirement inside that shape -
 - **A sample is drawn from the page's own data and rules** (`RULE.DEVEX.WORKSPACE.427` · MUST · skill:spn-devex/ideate)
 - **The agent searches the decisions already taken before it proposes a shape** (`RULE.DEVEX.WORKSPACE.429` · MUST · skill:spn-devex/ideate)
 - **While you are still ideating, the agent talks it through in chat** (`RULE.DEVEX.WORKSPACE.443` · MUST · skill:spn-devex/ideate)
+- **Registering is optional, and the chain is complete without it.** (`RULE.LAUNCHPAD.CONTROL_PLANE.001` · MUST · skill:spn-devex/ideate)
+- **Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.** (`RULE.LAUNCHPAD.CONTROL_PLANE.002` · MUST · skill:spn-devex/ideate)
+- **Launchpad is a stage, not a sixth domain.** (`RULE.LAUNCHPAD.CONTROL_PLANE.003` · MUST · skill:spn-devex/ideate)
 
 **Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 

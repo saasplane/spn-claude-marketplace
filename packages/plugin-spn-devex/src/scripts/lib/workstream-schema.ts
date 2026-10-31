@@ -416,6 +416,7 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
   out.push(...fieldFaults(where, data, GO_FIELDS));
   if (!Array.isArray(data.parts)) { out.push(`${where}'s \`parts\` is not a list`); return out; }
   const ids = new Set<string>();
+  // An entry is open in one part at most; a landed part keeps its entries when a follow-up carries one again.
   const held = new Map<string, string>();
   for (const [at, part] of data.parts.entries()) {
     if (!isObject(part)) { out.push(`${where}'s part ${at + 1} is not an object`); continue; }
@@ -428,7 +429,7 @@ export function goFaults(data: unknown, where = "go.json"): string[] {
       if (typeof part.signature === "string" && hashes !== part.entries.length)
         out.push(`${label}'s \`signature\` holds ${hashes} hashes, and the part holds ${part.entries.length} entries`);
       for (const entry of part.entries) {
-        if (typeof entry !== "string") continue;
+        if (typeof entry !== "string" || part.state === "landed") continue;
         const other = held.get(entry);
         if (other && other !== label) out.push(`${entry} is held by ${other} and ${label}`);
         held.set(entry, label);

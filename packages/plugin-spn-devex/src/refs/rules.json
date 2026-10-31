@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "book": {
     "repository": "spn-foundation",
-    "commit": "dc52b270"
+    "commit": "a1a9dd39"
   },
   "rules": [
     {
@@ -10959,6 +10959,63 @@
       "restated": []
     },
     {
+      "id": "RULE.LAUNCHPAD.CONTROL_PLANE.001",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Registering is optional, and the chain is complete without it.",
+      "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
+      "heading": "A platform registers with the control plane; it never depends on it",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.LAUNCHPAD.CONTROL_PLANE.002",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Launchpad is built at the partner stage, on the same backbone and with the same stack every adopter gets. It consumes the published packages rather than reading around them.",
+      "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
+      "heading": "The stage is built the way a partner builds",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.LAUNCHPAD.CONTROL_PLANE.003",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-devex/ideate"
+      },
+      "class": "stated in a skill",
+      "sentence": "Launchpad is a stage, not a sixth domain.",
+      "chapter": "04-capabilities/04-launchpad/01-control-plane/01-control-plane.md",
+      "heading": "The stage is not a domain of the model",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-devex",
+          "path": "skills/ideate/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
       "id": "RULE.PLATFORM.CORE.001",
       "level": "MUST",
       "params": {
@@ -11957,6 +12014,614 @@
       "sentence": "A session's authentication requirement is read from the organization's own policy at every mint, and never resolved once and cached",
       "chapter": "04-capabilities/03-platform/01-core/02-identity/01-identity.md",
       "heading": "The organization decides, at every mint",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.001",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module reads the platform's countries, currencies, languages and base labels; it never declares its own.",
+      "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
+      "heading": "The base catalog is read, never restated",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.002",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A currency carries where its symbol sits, and a language carries which way it reads.",
+      "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
+      "heading": "How a value is written belongs to the value, not to the screen",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.003",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module registers its own entity types, and a registered type may opt only into capabilities the closed set names.",
+      "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
+      "heading": "The registry is open, and its capability set is closed",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.004",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Reference data depends on nothing else in the standard library, and nothing in the standard library may become a dependency of it.",
+      "chapter": "04-capabilities/03-platform/02-modules/01-reference-data/01-reference-data.md",
+      "heading": "The dependency direction is one-way, and it is what makes the catalog safe",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.005",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A label is translated once, for the whole platform. A record is translated by the organization that owns it.",
+      "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
+      "heading": "Who owns the words decides who may translate them",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.006",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An entity translation holds a flat map of attribute names to text, and a write replaces the map rather than merging into it.",
+      "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
+      "heading": "A translated map is replaced whole, never merged",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.007",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A translation names its language with a code from the platform's own language list.",
+      "chapter": "04-capabilities/03-platform/02-modules/02-translation/01-translation.md",
+      "heading": "A language is named from the catalog, never typed",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.008",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module triggers a catalog action; it does not compose a message.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "Every message comes from the catalog",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.009",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An organization's configuration is edited as a draft and takes effect only when published.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "A configuration is drafted, checked, then published",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.010",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An action the owning module locks serves the platform's own wording to everybody.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "Some actions are nobody's to reword",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.011",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The module reaches a channel through a vendor seam and never a vendor's own library.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "A channel sits behind a seam, and each one is on or off",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.012",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every message the platform decided to send is an event, and each step in its life is recorded.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "A send is answered rather than guessed at",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.013",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A recipient on the suppression list is not written to, and the reason is a closed set.",
+      "chapter": "04-capabilities/03-platform/02-modules/03-notifications/01-notifications.md",
+      "heading": "The suppression list refuses; it does not prefer",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.014",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A file's record is registered before its bytes exist, and the record's state says how far the transfer has got.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "An upload is a lifecycle, not a moment",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.015",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A file's record carries who created it and when, and nothing that carries who last changed it, because nothing changes it.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "The record is immutable, and different content is a different file",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.016",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A file carries a sensitivity from the platform's own classification vocabulary, and that is not the same fact as who may read it.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "Sensitivity and access are different questions",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.017",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A thumbnail, preview, smaller copy or converted format is generated from the original.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "Variants are generated, never uploaded",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.018",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A file's class is stamped at creation and never changes.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "The key leads with its access class, and the class never changes",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.019",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A module reading or writing a file never names the store it is in.",
+      "chapter": "04-capabilities/03-platform/02-modules/04-documents/01-documents.md",
+      "heading": "The store is reached through a seam, never named",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.020",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A record type says which cross-cutting patterns it accepts, in the entity-type registry, and never per pattern here.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "Opting in is declared once, in the registry",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.021",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A custom field definition and a value written against it are separate.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "A definition and a value are different things",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.022",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An AUTOCOMPLETE custom field's source is the code of a registered entity type that opted into `LOOKUP`.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "A field that picks from a list names a registered type",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.023",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An attachment is a link between a record and a file, carrying a description and an order.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "Attachments link, they do not store",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.024",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "An activity entry says one thing happened to a record, and the kinds are a closed vocabulary.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "Activity is a closed list, and it is not the audit trail",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.025",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A record grant gives one subject a named relation to one record, and it may expire on its own.",
+      "chapter": "04-capabilities/03-platform/02-modules/05-entities/01-entities.md",
+      "heading": "Sharing is a named relation, not a permission",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.026",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A schedule is either one-time, firing at an absolute moment, or recurring on a pattern with an optional first day, and the two are one shape rather than two models.",
+      "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
+      "heading": "Once, or on a pattern — one shape",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.027",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A destination is a web callback, an external queue, or the platform's own queue.",
+      "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
+      "heading": "A firing travels to its destinations, in order",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.028",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The retry policy sits on the destination.",
+      "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
+      "heading": "Retry belongs to the destination, never the schedule",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.029",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "Every firing is recorded as a run, and each destination of that firing records its own outcome beside it.",
+      "chapter": "04-capabilities/03-platform/02-modules/06-jobs/01-jobs.md",
+      "heading": "A run is what makes a schedule answerable",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.030",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "The append command carries the organization and the acting person explicitly, rather than reading them from the request's authorization context.",
+      "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
+      "heading": "A record names its actor rather than deriving one",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.031",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "A record carries a category, a severity and a result, each from a closed vocabulary.",
+      "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
+      "heading": "A trail is only useful if it can be searched",
+      "decision": null,
+      "restated": [
+        {
+          "plugin": "spn-apps",
+          "path": "skills/implement/SKILL.md",
+          "heading": "The rules this step holds"
+        }
+      ]
+    },
+    {
+      "id": "RULE.PLATFORM.MODULES.032",
+      "level": "MUST",
+      "params": {
+        "skill": "spn-apps/implement"
+      },
+      "class": "stated in a skill",
+      "sentence": "How long a record is kept is carried on the record rather than derived when somebody asks.",
+      "chapter": "04-capabilities/03-platform/02-modules/07-audit-log/01-audit-log.md",
+      "heading": "Retention sits on the record",
       "decision": null,
       "restated": [
         {

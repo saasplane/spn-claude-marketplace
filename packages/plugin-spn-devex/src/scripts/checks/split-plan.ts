@@ -49,7 +49,7 @@ import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS,
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
 import { logLinesOf, arcStatus as readArcStatus, readArc, readQuestions } from "../lib/workstream.ts";
-import { changedEntries, planScope, readGo, unheldEntries } from "../lib/go-plan.ts";
+import { planScope, readGo, staleEntries, unheldEntries } from "../lib/go-plan.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -1058,7 +1058,7 @@ function goFindings(folders: string[]): string[] {
       const scope = planScope(folder, plan);
       for (const ref of unheldEntries(plan, scope)) out.push(`${ref} is held by no part`);
       for (const part of plan.parts) {
-        const moved = changedEntries(part, scope);
+        const moved = staleEntries(part, plan, scope);
         if (moved.length) out.push(`part ${part.id}: entries ${moved.join(" and ")} changed after the plan was written`);
         if (part.state !== "landed") out.push(`part ${part.id} of ${arc} has not landed (${part.state})`);
       }

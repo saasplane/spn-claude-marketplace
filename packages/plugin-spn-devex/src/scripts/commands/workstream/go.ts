@@ -15,7 +15,7 @@ import { basename, join } from "node:path";
 import { type Action, FLAG, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isTestCommand } from "../../checks/test-run.ts";
 import {
-  changedEntries, deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, unheldEntries,
+  deriveGo, fullRunMinutes, goFileOf, landedEntries, landedMeasures, planScope, readGo, readyParts, ratesOf, staleEntries, unheldEntries,
   type ScopeSheet,
 } from "../../lib/go-plan.ts";
 import { logEvent, notesDirOf, readArc, readSheet, workspaceOf, writeWhole } from "../../lib/workstream.ts";
@@ -85,6 +85,10 @@ function brief(plan: GoPlan, part: GoPart, ws: string, root: string): string {
     ...part.entries.map((ref) => `- \`${ref}\`: \`workstream sheet show ${ref.split("/")[0]}\` prints it whole`), "",
     "## Acceptance", "",
     ...(part.tests.length ? part.tests.map((file) => `- \`node ${file}\`, run directly, never a whole suite`) : ["- the part names no test file of its own"]), "",
+    "## Report", "",
+    "Its front matter is what `workstream report write` folds into the plan:", "",
+    "```text", "---", `go: "${plan.lead}"`, `part: "${part.id}"`, "outcome: landed · stopped · needs-you",
+    'proof: "<what you ran, and what it printed>"', "commits: {}", "followUps: []", "cost: { tokens: <n>, minutes: <n> }", "---", "```", "",
   ];
   return `${lines.join("\n")}\n`;
 }
@@ -147,7 +151,7 @@ export function checkGo(args: string[]): number {
   const findings = unheldEntries(plan, scope).map((ref) => `${ref} is held by no part`);
   let marked = false;
   const parts = plan.parts.map((part) => {
-    const moved = changedEntries(part, scope);
+    const moved = staleEntries(part, plan, scope);
     if (!moved.length) return part;
     findings.push(`part ${part.id}${part.state === "ready" ? " is held" : ` (${part.state})`}: entries ${moved.join(" and ")} changed after the plan was written`);
     if (part.state !== "ready") return part;
