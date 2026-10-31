@@ -6,7 +6,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { check, parse, sectionText, seenHash } from "../../../../../src/scripts/lib/restates.ts";
-import { SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { POCKET, SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {
@@ -28,6 +28,9 @@ const write = (refPath) => {
 const workspace = join(BASE, "ws");
 mkdirSync(join(workspace, ".spndevex"), { recursive: true });
 mkdirSync(join(workspace, "spn-foundation", "docs", SEAT.constructs), { recursive: true });
+// The writer reads the nearest book up, and a book is a folder holding a decisions register.
+mkdirSync(join(workspace, "spn-foundation", "docs", POCKET.registers), { recursive: true });
+writeFileSync(join(workspace, "spn-foundation", "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
 
 const CHAPTER = join(workspace, "spn-foundation", "docs", SEAT.constructs, "thing.md");
 const chapterBody = [
@@ -134,13 +137,13 @@ console.log("\n=== a folder citation restamps by its tree hash, exactly as `chec
     check(refPath, workspace, block, ["docs"]).length, 0);
 }
 
-console.log("\n=== a ref outside every workspace is refused with exit 1, and its bytes stay");
+console.log("\n=== a ref beside no book is refused with exit 1, and its bytes stay");
 {
   const refPath = join(BASE, "outside.md");
   const body = '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/ghost.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# a ref\n';
   writeFileSync(refPath, body);
   const result = write(refPath);
-  one("a ref with no `.spndevex` above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("no workspace found")], (g) => g.join() === "1,true");
+  one("[MKT.SCRIPTS.208] a ref with no book above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("holds an spn-foundation with a decisions register")], (g) => g.join() === "1,true");
   one("and it is left byte-identical", readFileSync(refPath, "utf8"), body);
 }
 

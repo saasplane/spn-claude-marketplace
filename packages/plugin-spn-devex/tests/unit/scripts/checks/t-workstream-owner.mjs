@@ -63,9 +63,9 @@ console.log("\n=== a generated block is written only by its command");
   ok("red: an Edit inside the open block is refused", open === "deny");
   const [whole] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: text.replace(overall, "<p>typed</p>") } }, root);
   ok("red: a Write that changes a block is refused", whole === "deny");
-  const [outside] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"N001-what\">The probe</h4>", new_string: "<h4 id=\"c1\">The probe, renamed</h4>" } }, root);
+  const [outside] = hook({ tool_name: "Edit", cwd: root, tool_input: { file_path: page, old_string: "<h4 id=\"N001-what\">The probe</h4>", new_string: "<h4 id=\"c1\">The probe renamed</h4>" } }, root);
   ok("green: an Edit outside the blocks goes through", outside !== "deny");
-  const [rewrite] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: text.replace("The probe</h4>", "The probe, renamed</h4>") } }, root);
+  const [rewrite] = hook({ tool_name: "Write", cwd: root, tool_input: { file_path: page, content: text.replace("The probe</h4>", "The probe renamed</h4>") } }, root);
   ok("green: a Write that keeps every block as it is goes through", rewrite !== "deny");
 }
 

@@ -50,7 +50,7 @@ for another. Write one passage that both read the same way.
 ## The masthead follows a stricter rule
 
 **A page's masthead — its Title, its Subtitle and its Description — is held to the plain-language
-rule, and there the rules above change** (rules RULE.DEVEX.WORKSPACE.182 · RULE.DEVEX.WORKSPACE.187).
+rule, and there the rules above change** (`RULE.DEVEX.WORKSPACE.182` · MUST · check:doc-check) (`RULE.DEVEX.WORKSPACE.187` · MUST · check:doc-check).
 The Title is the `h1`. The Subtitle is the one sentence under it; in a construct seat it is the
 `subtitle` field of the `spn:doc` block. The Description is the one paragraph in the standfirst's
 place; in a construct seat it is the first lead paragraph.

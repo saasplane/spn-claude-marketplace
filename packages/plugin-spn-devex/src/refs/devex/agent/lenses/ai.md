@@ -8,12 +8,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/08-agent-surface/README.md",
-      "seen": "d4008a1e"
+      "seen": "dd7cd454"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
       "section": "What a partner follows, by what they build and deliver",
-      "seen": "2acae3b9"
+      "seen": "ddad3998"
     }
   ]
 }

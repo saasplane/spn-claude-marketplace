@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/07-comments.md",
-      "seen": "24c41c02"
+      "seen": "c93e28fc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/",
-      "seen": "db60c9a9"
+      "seen": "b451a2a5"
     }
   ]
 }
@@ -92,7 +92,7 @@ An implementation is not a repetition of its contract — it is a different fact
 
 | Required — a missing one is a defect | One plain line is enough | Never |
 | --- | --- | --- |
-| a service and each of its operations | a state, a type, a config binding whose name already carries it (`RULE.SUPPORT.APPS.137`) | a repository |
+| a service and each of its operations | a state, a type, a config binding whose name already carries it (`RULE.SUPPORT.APPS.137` · MUST · skill:spn-apps/implement) | a repository |
 | a component, a hook, a page | an enum whose members explain themselves — the enum's line, no member lines | a controller, a listener |
 | every error code and permission code member | | |
 | every Command member — these become tool input fields | | |

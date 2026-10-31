@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/11-delivery-library/",
-      "seen": "34ff0c4e"
+      "seen": "cf33327a"
     }
   ]
 }
@@ -16,10 +16,10 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 
 ## What the library draws, and what it does not
 
-- **The library draws the core units, which are the ones the book names** (`RULE.SUPPORT.SURFACE.082`). A change of the surface is stated in the book first, drawn in the library second and built in a stack third, and that order binds a core unit and its props. Heading: "Changing the library".
+- **The library draws the core units, which are the ones the book names** (`RULE.SUPPORT.SURFACE.082` · MUST · skill:spn-surface/design). A change of the surface is stated in the book first, drawn in the library second and built in a stack third, and that order binds a core unit and its props. Heading: "Changing the library".
 - **Never draw a unit that a stack provides on its own as a published component.** The book does not name it, so the library does not draw it, and the order does not bind it. Where an order asks for one, stop and report it. A stack's own unit that every stack should build joins the book first, and the library draws it then.
-- **Never put a page or a pattern into a library file** (`RULE.SUPPORT.SURFACE.099`). The library draws the core units with their properties and their cases, the icons, and the places of the layout, and nothing else. It holds no task pattern, no app pattern, no skeleton and no sample page. A pattern is built from units, so it is composed on request from the published library, in a file that is not a library file. Heading: "Three kinds of work".
-- **Name a unit so that its name says where it is placed** (`RULE.SUPPORT.SURFACE.229`). A suffix is `App`, `Layout`, `Container` or `Widget`. A component, a composite included, takes none, and no block carries a letter for its layer before its name. A name that belongs to a unit keeps the unit's whole name first: `DSFilterBarField` is the item of `DSFilterBar`, and `.DSDataTableEmpty` is a private part of `DSDataTable`.
+- **Never put a page or a pattern into a library file** (`RULE.SUPPORT.SURFACE.099` · MUST · skill:spn-surface/design). The library draws the core units with their properties and their cases, the icons, and the places of the layout, and nothing else. It holds no task pattern, no app pattern, no skeleton and no sample page. A pattern is built from units, so it is composed on request from the published library, in a file that is not a library file. Heading: "Three kinds of work".
+- **Name a unit so that its name says where it is placed** (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A suffix is `App`, `Layout`, `Container` or `Widget`. A component, a composite included, takes none, and no block carries a letter for its layer before its name. A name that belongs to a unit keeps the unit's whole name first: `DSFilterBarField` is the item of `DSFilterBar`, and `.DSDataTableEmpty` is a private part of `DSDataTable`.
 - **A core unit that is put together from other blocks, or that opens something the device draws, is drawn as the table under "Drawing a block" says.** An item of `DSToolbar` is an instance of `DSButton` in a slot, and a tag of `DSTagGroup` is an instance of `DSBadge` with its close action, so neither has a variant for what it holds. `DSCalendar` is drawn once, as the grid that `DSDatePicker` opens. `DSColorPicker` is the swatch and the field, with a colour, with none, and with a typed text that is no code, and the picker of the device is not drawn. `DSColorView` is the swatch and the value, the swatch alone, and the empty case. `DSProgressCircle` is the ring at each size, filled to a value and turning. `DSMark` holds `shape`, `variant`, `size` and `scaleSize` as properties, and `color` as a mode. `DSConfirmPopover` is its surface alone, with the question and the two actions, and the control that opens it is not part of the drawing. `DSConfirmDialog` is its surface alone, over `DSBackdrop`.
 
 ## The walk, in order
@@ -92,7 +92,7 @@ Read this walk when a unit has a spec (one JSON file for the unit: `unit`, `setI
 
 ## The measure and the pace
 
-- **A library is brought to the web by its properties, its values, its defaults and its states, and by nothing clipped or overlapping.** This is the book's own rule: "A property that changes what is visibly there MUST be drawn", and a state a unit can be in MUST be drawn (step 8). Anything finer than that is listed in the report and not drawn. The developer decided this on 2026-10-09.
+- **A library is brought to the web by its properties, its values, its defaults and its states, and by nothing clipped or overlapping.** This is the book's own rule: "A property that changes what is visibly there is drawn", and a state a unit can be in is drawn (step 8). Anything finer than that is listed in the report and not drawn. The developer decided this on 2026-10-09.
 - **One writer takes a page whole, and a page is scanned once, when it is finished.** Two agents never change one library file at once. Scanning after each set costs a read of the page each time and proves what the last set's proof already returned. A page that is changed in two rounds, by its specs and then by hand, is finished after the second: `align.js` and the scan run once then, and the first round is proven by the hash of each set and a picture of each changed section.
 - **The cost of a page is its calls, not its sets.** A writer writes each call's text out, so a script sent once for each set is paid for once for each set. Measured on DS 2-Components on 2026-10-09: a page sent set by set, with its alignment and scan, about 300 thousand tokens; the same work as bundled calls, with the alignment and the scan left to the page's end, about 100 thousand, in ten calls.
 - **Closing a page costs the same whatever the page holds, and composing costs by the line.** Closing a page (the alignment twice and the four scan parts, about 150 thousand characters sent whole) costs about 100 to 200 thousand tokens, so one agent composes a page and another closes it. A composed line or look costs 15 to 30 thousand tokens. Measured on DS 2-Components on 2026-10-10.

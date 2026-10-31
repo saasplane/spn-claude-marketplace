@@ -17,6 +17,7 @@ import { existsSync } from "node:fs";
 import { draw, type Spec } from "./draw.ts";
 import { sentenceColumn } from "./item-cells.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { RULE_ID_SRC, chipOf, parseFields } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 
 export type Finding = { message: string; line?: number };
 
@@ -77,6 +78,19 @@ export function hrefForPage(seat: string, out: string): (href: string) => string
   };
 }
 
+/**
+ * A rule's parenthesis shows as a chip: MUST and its class, or Guidance, with the id as its anchor so a citation can
+ * link to it, and the holder on hover. A parenthesis that does not read stays as written, and the book check names it.
+ */
+// nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- built from the parser's own constant
+const RULE_MARK = new RegExp(`\\(rule (${RULE_ID_SRC})((?: \u00b7 [^()]+)*)\\)`, "g");
+const chip = (whole: string, id: string, rest: string): string => {
+  const read = parseFields(rest);
+  if ("fault" in read || read.level === null) return whole;
+  const { label, anchor, title } = chipOf(id, read.level, read.params);
+  return `<a class="sds-badge" id="${anchor}" href="#${anchor}" title="${title}">${label}</a>`;
+};
+
 function inline(s: string): string {
   const SEP = String.fromCharCode(26);
   const code: string[] = [];
@@ -90,6 +104,7 @@ function inline(s: string): string {
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, h) => `<a href="${rewriteHref(h)}">${t}</a>`);
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   out = out.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
+  out = out.replace(RULE_MARK, chip);
   return out.replace(new RegExp(`${SEP}([a-z]+)${SEP}`, "g"), (_, k: string) => {
     let i = 0;
     for (const ch of k) i = i * 26 + (ch.charCodeAt(0) - 96);

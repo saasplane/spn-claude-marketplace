@@ -21,9 +21,10 @@
 // and the reading strip are all removed before anything is scored, because `proseOf` removes them. A
 // record keeps its form, and generated files are skipped by name.
 //
-// Three of the nine faults are left to a reader on purpose. A compressed claim, a rule with no
-// action, and an abstraction that is merely dull cannot be told from good prose by a pattern. The
-// report says so rather than implying the flagged set is the whole job.
+// Two of the nine faults are left to a reader on purpose. A rule with no action, and an abstraction
+// that is merely dull, cannot be told from good prose by a pattern. A compressed claim is read by its
+// two patterns that held up on the book's chapters, a bold lead with no verb and three clauses joined
+// by semicolons, and only outside the plugins' own files. The report says what it still cannot see.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -32,7 +33,7 @@ import { extname, join, resolve } from "node:path";
 import { isFile, read } from "../../lib/payload.ts";
 import { type Action, FLAG, OPTIONAL, REQUIRED, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { VARIANTS, readBlock } from "./_lib.ts";
-import { BLOCK_BREAK, IDIOM, MARKED, opening, proseOf, sentences, type Sentence } from "../../checks/doc-check.ts";
+import { BLOCK_BREAK, IDIOM, MARKED, compressedSentences, opening, proseOf, sentences, type Sentence } from "../../checks/doc-check.ts";
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
   "__pycache__", ".venv", "tool-results", ".pnpm-store"]);
@@ -159,7 +160,7 @@ const METAPHOR = /\b(?:fates?|degrade[sd]? into|centre of gravity|center of grav
 // is waived: an idiom inside a Boundary block is still an idiom.
 const MANDATED_OPENER = /^boundary$/i;
 
-const FAULTS = ["idiom", "opener", "abstract", "metaphor"];
+const FAULTS = ["idiom", "opener", "abstract", "metaphor", "compressed"];
 
 /**
  * Each `##` section of a document, with its heading.
@@ -235,6 +236,8 @@ export function score(block: string, sents: Sentence[], section = ""): Record<st
   if (abstract.length) found.abstract = [...new Set(abstract)].sort().join(" · ");
   const metaphor = METAPHOR.exec(clean);
   if (metaphor) found.metaphor = metaphor[0].toLowerCase();
+  const compressed = compressedSentences(block, false);
+  if (compressed.length) found.compressed = compressed.join(" · ");
   return found;
 }
 
@@ -339,8 +342,8 @@ function list(args: string[]): number {
     `— ${Math.floor((100 * flaggedParagraphs) / Math.max(totalParagraphs, 1))} % of paragraphs`);
   console.log(`  by fault       ` + FAULTS.map((fault) => `${fault} ${tally[fault]}`).join(" · "));
   console.log();
-  console.log("  A reader still owns the three faults no pattern can see: a claim compressed past");
-  console.log("  reading, a rule that never says what to do, and an abstraction that is merely dull.");
+  console.log("  A reader still owns the faults no pattern can see: a claim compressed in a shape the two");
+  console.log("  patterns miss, a rule that never says what to do, and an abstraction that is merely dull.");
   console.log("  So this narrows the reading. It does not replace it.");
 
   const record = words.value("record");
@@ -367,7 +370,7 @@ function printParagraphs(args: string[]): number {
   return 0;
 }
 
-export const describe = "the paragraphs worth rewriting — idiom, opener, abstraction and metaphor faults a pattern can see";
+export const describe = "the paragraphs worth rewriting — idiom, opener, abstraction, metaphor and compressed faults a pattern can see";
 
 export const actions: Record<string, Action> = {
   list: {

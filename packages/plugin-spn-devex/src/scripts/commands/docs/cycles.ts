@@ -31,7 +31,7 @@ import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { STATUSES, TERMINAL } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
-import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writePreviewStatus } from "../../lib/workstream.ts";
+import { NO_REPO, PREVIEW_FILE, approachOf, arcIdsOf, arcStatus, blockAt, previewHrefOf, readArc, stampsOn, workstreamWord, writeNameFile, writeOpenBlocks, writePreviewStatus } from "../../lib/workstream.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
@@ -594,6 +594,7 @@ export function refreshViews(folder: string): { views: string[]; skipped: string
   if (isClosed(folder)) return { views, skipped };
   writeNameFiles(folder);
   const previews = writePreviewStatus(folder);
+  const opened = writeOpenBlocks(folder);
   const page = approachOf(folder);
   if (page) {
     const text = read(page);
@@ -610,6 +611,7 @@ export function refreshViews(folder: string): { views: string[]; skipped: string
     }
   }
   if (previews.length) views.push("preview badge");
+  if (opened.wrote.length) views.push("open blocks");
   return { views, skipped };
 }
 
@@ -637,6 +639,8 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
   if (names.length) console.log(`${basename(folder)}: wrote the name file of ${names.join(", ")}`);
   const previews = writePreviewStatus(folder);
   if (previews.length) console.log(`${basename(folder)}: wrote the status of ${previews.join(", ")}`);
+  const opened = writeOpenBlocks(folder);
+  if (opened.wrote.length) console.log(`${basename(folder)}: wrote the Open block of ${opened.wrote.join(", ")}`);
   let code = 0;
   for (const page of pages) {
     const shown = relative(dirname(folder), page);

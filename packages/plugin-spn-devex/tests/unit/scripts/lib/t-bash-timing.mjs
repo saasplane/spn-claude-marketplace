@@ -26,7 +26,19 @@ const same = (label, got, expected) => {
 };
 
 const env = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
+// A window reads a group's usage before it writes to it (checks/usage-first.ts) and a refused call is not timed, so a
+// case reads each group's usage first, in a call with no id, which is never timed.
+const readUsage = (payload) => {
+  for (const [, program, group] of String(payload.tool_input?.command ?? "").matchAll(/\b(spnutils|spn-devex)\s+([a-z][a-z-]*)/g)) {
+    const { tool_use_id, ...bare } = payload;
+    try {
+      execFileSync("node", [join(EVENTS, "pretooluse.ts")], { input: JSON.stringify({ ...bare, tool_input: { command: `${program} ${group}` } }),
+        env: env(), encoding: "utf8", cwd: payload.cwd, stdio: ["pipe", "pipe", "pipe"] });
+    } catch { /* the reading is all that matters */ }
+  }
+};
 const hook = (entry, payload) => {
+  if (entry === "pretooluse") readUsage(payload);
   try {
     return execFileSync("node", [join(EVENTS, `${entry}.ts`)], { input: JSON.stringify(payload), env: env(), encoding: "utf8",
       cwd: payload.cwd, stdio: ["pipe", "pipe", "pipe"] });
@@ -74,7 +86,7 @@ console.log("=== a matched command, paired before and after");
 console.log("\n=== a failed call, read from PostToolUseFailure");
 {
   const root = workspace("2p-fail", ON);
-  const before = call(root, "toolu_fail", "cd /tmp && spnutils apps test journey service-platform-ts");
+  const before = call(root, "toolu_fail", "cd /tmp && spnutils apps check service-platform-ts");
   hook("pretooluse", { ...before, hook_event_name: "PreToolUse" });
   hook("closed", { ...before, hook_event_name: "PostToolUseFailure", error: "Exit code 3\nnx failed" });
   const line = commands(root)[0] ?? {};

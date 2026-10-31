@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/03-module.md",
-      "seen": "8a303873"
+      "seen": "fac73ef3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/",
-      "seen": "bcd5a1ee"
+      "seen": "dd44dfc2"
     }
   ]
 }
@@ -72,9 +72,9 @@ You model an entity at escalating richness so a consumer fetches exactly what it
 
 **Keep the extension chain strict** — a level that stops extending its parent breaks substitutability, and it breaks the one-mapper-per-level reuse the implementation is built on. Compose `Details` rather than extend it, because it aggregates; extending the state would force every sub-state into one inheritance chain.
 
-**The published specification keeps the ladder** (`RULE.SUPPORT.APPS.219`). It composes each read level from the one below, the reference to its base and its own fields joined by `allOf`, so a client reads `RoleInfo = RoleMeta & {…}` with the fields it had before and no caller changes. Every component stays open, and a place that uses a level, a response, a container or a branch of a union, closes it with `unevaluatedProperties: false`. A level that re-declares a field of its base stays flat, and so does a variant whose base holds only `mtype`.
+**The published specification keeps the ladder** (`RULE.SUPPORT.APPS.219` · MUST · skill:spn-apps/implement). It composes each read level from the one below, the reference to its base and its own fields joined by `allOf`, so a client reads `RoleInfo = RoleMeta & {…}` with the fields it had before and no caller changes. Every component stays open, and a place that uses a level, a response, a container or a branch of a union, closes it with `unevaluatedProperties: false`. A level that re-declares a field of its base stays flat, and so does a variant whose base holds only `mtype`.
 
-**A listing line that pairs entities is a `{Anchor}Summary`** (`RULE.SUPPORT.APPS.217`). The anchor's read model sits under the anchor's own name and is never null. Each related state sits under its own name, `null` when there is none and an array where there can be many, at the level the line needs. It is returned by `search{Anchor}Summaries` as a `{Anchor}SummarySearchResult`, and it maps to no table: the service builds each line from the bulk readers. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
+**A listing line that pairs entities is a `{Anchor}Summary`** (`RULE.SUPPORT.APPS.217` · MUST · skill:spn-apps/implement). The anchor's read model sits under the anchor's own name and is never null. Each related state sits under its own name, `null` when there is none and an array where there can be many, at the level the line needs. It is returned by `search{Anchor}Summaries` as a `{Anchor}SummarySearchResult`, and it maps to no table: the service builds each line from the bulk readers. Only the full state is universal — treat Meta, Info and Details as each optional, chosen independently, and never invent one to complete a set an entity genuinely lacks.
 
 ### Collection shapes — the plural is keyed, the List is ordered
 
@@ -136,9 +136,9 @@ Declare one discriminator, `mtype`, on a polymorphic family's base, typed as the
 
 **Route every write to a module's storage through the owning service** — that is what keeps authorization, invariants, cache invalidation, audit and events from being skipped. Never list a repository in a contract, and never call one from an entry or from another module — only the owning module's own services call it.
 
-**A handler is called for every transaction the framework closes — MUST** (`RULE.SUPPORT.APPS.224`). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. A handler runs inside the transaction before it commits, and its throw rolls the transaction back; work that must follow the outcome uses the transaction's hooks.
+**A handler is called for every transaction the framework closes** (`RULE.SUPPORT.APPS.224` · MUST · skill:spn-apps/implement). Work that belongs to every transaction, such as recording what changed, needs no call site: a module or the app registers handlers once, at boot, through `getTransactionHandlers`, and the framework calls them for every transaction it closes. Each module's handlers run in boot order, then the app's, so the app acts on what the modules left. A producer never names its handler: it collects what it wants handled under a typed key, and a handler takes what it handles from the transaction by that key, so a module mounted here, remote or absent changes no producer. A handler runs inside the transaction before it commits, and its throw rolls the transaction back; work that must follow the outcome uses the transaction's hooks.
 
-**A transaction of its own is for a write that must outlive its caller — SHOULD** (`RULE.SUPPORT.APPS.229`). It runs before the caller's transaction opens and never inside it, and a write that must never run inside a transaction declares `NEVER`.
+**A transaction of its own is for a write that must outlive its caller — SHOULD** (`RULE.SUPPORT.APPS.229` · MUST · skill:spn-apps/implement). It runs before the caller's transaction opens and never inside it, and a write that must never run inside a transaction declares `NEVER`.
 
 When you write a service method, compose the same seven steps, in order, each one declared line rather than hand-written control flow: gate → cached read or transaction open → repository work → cache invalidation → post-commit publish → audit → canonical re-read. Omit the steps a method does not need; never reorder them.
 
@@ -191,7 +191,7 @@ Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-ent
 
 **The API entry also serves a module's contract services to the other services of the platform, on the remote route.** It is the HTTP API and not a fourth entry. The module's manager lists its contract services (name, methods as data, what implements it), boot registers each, and the entry mounts one route for all of them, which reads the module, the service and the method from the request: `POST /remote` with the passport header and the calling service's credential header. The order **MUST** hold: check the calling service first, before the body is read; find the contract service among those registered; find the method among those the methods data lists; validate the command; build the execution context from the passport (a passport that cannot be read or is refused ends the call as unauthenticated, and no passport runs with no caller); run the method; validate the result. The route listens on a port of its own (`{CODE}_API_REMOTE_PORT`; no port, no listener), keeps no list of who may call what (authorization stays on the service method), answers as the public API does, and keeps the passport and the service credential out of logged headers. A contract may hold methods that have no controller, such as one that returns an opened secret to another module, so no public call can reach them. A person's address is counted from the right of the forwarded-address header, by the number of proxies in front of each listener (`{CODE}_API_TRUSTED_PROXIES`, `{CODE}_API_REMOTE_TRUSTED_PROXIES`), and a route's rate limit is counted in the service's shared cache, so it is one limit however many instances serve the route.
 
-A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to topics your module's migrations made. The migration runs first, as it does for a table, because nothing creates a missing topic: a subscribe or a publish to a topic that does not exist is an error that names the topic (RULE.SUPPORT.APPS.178).
+A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to topics your module's migrations made. The migration runs first, as it does for a table, because nothing creates a missing topic: a subscribe or a publish to a topic that does not exist is an error that names the topic (`RULE.SUPPORT.APPS.178` · MUST · skill:spn-apps/implement).
 
 A CLI controller declares one command per contract service method, its flags derived from the Command contract. Keep the run one-shot: it executes once, and the outcome becomes the process exit code.
 
@@ -201,7 +201,7 @@ Treat `migrations/` as the module's only schema-change path — never run DDL by
 
 ## Config is one namespace the module carries with it
 
-A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it. When your setting is a fact the estate publishes, the estate's key carries no module's name, and the application's own settings write your key as a `${…}` reference to it (`RULE.SUPPORT.INFRA.111`).
+A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it. When your setting is a fact the estate publishes, the estate's key carries no module's name, and the application's own settings write your key as a `${…}` reference to it (`RULE.SUPPORT.INFRA.111` · MUST · skill:spn-infra/implement).
 
 ## How one module reaches another
 
@@ -228,25 +228,25 @@ A web module carries the same three layers, but expect most modules to never ear
 
 A page owns one screen and is the only thing a route lands on. It reads the address, places containers, and carries no business logic. Hold a page to these rules. A rule marked proposed is one the developer has not confirmed.
 
-- **Declare a route once, as data, in the module that owns its page — MUST** (`RULE.SUPPORT.APPS.186`). A route is a key and a path. The key names the screen and carries the module's code. The app's router, a link and the app's menu all read that one declaration. A route holds no place in a menu, no older address and no router, so each app keeps its own router.
-- **A route also says which permissions and enablements it needs. Proposed** (`RULE.SUPPORT.APPS.187`).
-- **A module ships a default path for each route, and an app may replace a path by its key. Proposed** (`RULE.SUPPORT.APPS.188`).
-- **Build an address from a route and its values, by one function, and never write one as text — MUST** (`RULE.SUPPORT.APPS.189`). That a missing value is an error, and never an address, is proposed.
-- **The menu is the app's own list, and an entry names a route by its key — MUST** (`RULE.SUPPORT.APPS.190`). Its order, groups, labels and icons are the app's.
-- **The entry in view is the one whose address the current address is at or under — MUST** (`RULE.SUPPORT.APPS.191`). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
-- **Declare one route name for a web module, beside its code — MUST** (`RULE.SUPPORT.APPS.204`). The name is a plain word for the module's subject, in lower case, with a hyphen between words. Every address of the module begins with it. The name is fixed, and an app gives a module no other name.
+- **Declare a route once, as data, in the module that owns its page** (`RULE.SUPPORT.APPS.186` · MUST · skill:spn-apps/implement). A route is a key and a path. The key names the screen and carries the module's code. The app's router, a link and the app's menu all read that one declaration. A route holds no place in a menu, no older address and no router, so each app keeps its own router.
+- **A route also says which permissions and enablements it needs. Proposed** (`RULE.SUPPORT.APPS.187` · MUST · skill:spn-apps/implement).
+- **A module ships a default path for each route, and an app may replace a path by its key. Proposed** (`RULE.SUPPORT.APPS.188` · GUIDE).
+- **Build an address from a route and its values, by one function, and never write one as text** (`RULE.SUPPORT.APPS.189` · MUST · skill:spn-apps/implement). That a missing value is an error, and never an address, is proposed.
+- **The menu is the app's own list, and an entry names a route by its key** (`RULE.SUPPORT.APPS.190` · MUST · skill:spn-apps/implement). Its order, groups, labels and icons are the app's.
+- **The entry in view is the one whose address the current address is at or under** (`RULE.SUPPORT.APPS.191` · MUST · skill:spn-apps/implement). So the page of one record marks the entry of its list. That the longest address wins among several is proposed.
+- **Declare one route name for a web module, beside its code** (`RULE.SUPPORT.APPS.204` · MUST · skill:spn-apps/implement). The name is a plain word for the module's subject, in lower case, with a hyphen between words. Every address of the module begins with it. The name is fixed, and an app gives a module no other name.
 - **A route is one of two kinds, and the module declares which — MUST.** A page of work is one a person of the organization uses every day, and its address is `/<name>/<rest>`. A page of setup configures the module, and its address is `/settings/<name>/<rest>`. So a module named `identity` gives `/identity/orgs` and `/settings/identity/users`. The platform's module names are `identity` for IAM, `customers` for ORG, `masters` for MDM, `translations` for LNG, `entities` for ENT, `notifications` for NTF, `documents` for DOC, `compliance` for CMP and `jobs` for JOB.
 - **A route gives its kind and the rest of its path, and never a whole address — MUST.** The function that builds an address puts the name in front, and the word `settings` in front of that for a page of setup. `settings` is a fixed word, and no module takes it as its name.
 - **A check compares every address of a module with the name the module declares — MUST.** An app that joins two modules with one name is refused when it starts.
 - **An app's own page, such as Home, takes a plain word of the app's own.** It may not use the name of a module it has mounted, or `settings` followed by such a name.
-- **The first word of an address is the module's, and an address does not carry its place in the menu — MUST** (`RULE.SUPPORT.APPS.192`). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
-- **An address that changes answers with a redirect — MUST** (`RULE.SUPPORT.APPS.193`). The redirect is the app's own, in the router of the app that had the address.
-- **On a page of groups and their items, the swap of the items for the groups changes the address — MUST** (`RULE.SUPPORT.SURFACE.079`).
-- **An address has two parts — MUST** (`RULE.SUPPORT.APPS.194`). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
-- **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RULE.SUPPORT.APPS.197`).
-- **How a screen is shown is the choice of whoever builds the page, and nothing is configured for it — MUST** (`RULE.SUPPORT.APPS.198`). A page places a container on itself, or in a dialog or a sheet.
-- **Show an overlay through the overlay context, and never place one in the page's own tree — MUST** (`RULE.SUPPORT.APPS.195`). One host draws every overlay of the app.
-- **An overlay that has an address is shown while the address matches, and removed when it does not. Proposed** (`RULE.SUPPORT.APPS.196`). Closing it moves to the address of the page beneath. The app's own router says whether the address matches. Not every overlay needs an address: a confirmation opens by the page's own state.
+- **The first word of an address is the module's, and an address does not carry its place in the menu** (`RULE.SUPPORT.APPS.192` · MUST · skill:spn-apps/implement). An entry of the menu names a route by its key, so it may stand in any group. A menu can then be arranged again, and no address changes.
+- **An address that changes answers with a redirect** (`RULE.SUPPORT.APPS.193` · MUST · skill:spn-apps/implement). The redirect is the app's own, in the router of the app that had the address.
+- **On a page of groups and their items, the swap of the items for the groups changes the address** (`RULE.SUPPORT.SURFACE.079` · MUST · skill:spn-surface/design).
+- **An address has two parts** (`RULE.SUPPORT.APPS.194` · MUST · skill:spn-apps/implement). The path names the page. The part after `#` names an overlay any page can have, so a link to it works from every page. That part is never sent to a server.
+- **The app's navigation seam changes only the part after `#` where an address begins with `#`. Proposed** (`RULE.SUPPORT.APPS.197` · MUST · skill:spn-apps/implement).
+- **How a screen is shown is the choice of whoever builds the page, and nothing is configured for it** (`RULE.SUPPORT.APPS.198` · MUST · skill:spn-apps/implement). A page places a container on itself, or in a dialog or a sheet.
+- **Show an overlay through the overlay context, and never place one in the page's own tree** (`RULE.SUPPORT.APPS.195` · MUST · skill:spn-apps/implement). One host draws every overlay of the app.
+- **An overlay that has an address is shown while the address matches, and removed when it does not. Proposed** (`RULE.SUPPORT.APPS.196` · MUST · skill:spn-apps/implement). Closing it moves to the address of the page beneath. The app's own router says whether the address matches. Not every overlay needs an address: a confirmation opens by the page's own state.
 
 What a page knows and what a container takes, the four ways a partner builds on the web, and the provider a partner mounts are in `../shape.md` in this plugin.
 

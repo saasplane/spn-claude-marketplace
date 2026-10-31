@@ -30,7 +30,7 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, workstreams } from "../../../../src/scripts/events/orientation.ts";
+import { SESSION_START_CEILING, SESSION_START_NOTE, WELCOME_LEAD, fitSessionStart, orient, shortRules, workstreams } from "../../../../src/scripts/events/orientation.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -51,7 +51,10 @@ function compare(label, root, mustSay = [], mustNotSay = []) {
   const ts = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, root], root);
   const identical = py === null || py === ts;
   const says = mustSay.every((s) => ts.includes(s));
-  const quiet = mustNotSay.every((s) => !ts.includes(s));
+  // The short rules are the same lines in every start, day zero included (RULE.DEVEX.AGENT.089), so what a state
+  // must not say is judged on the rest of the start.
+  const stated = ts.replace(/## The short rules[\s\S]*?(?=\n## |$)/, "");
+  const quiet = mustNotSay.every((s) => !stated.includes(s));
   const ok = identical && says && quiet && !ts.startsWith("ERROR");
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}\n        identical ${identical}${mustSay.length ? ` · says what it must ${says}` : ""}${mustNotSay.length ? ` · silent where it must be ${quiet}` : ""}`);
@@ -87,7 +90,7 @@ const IN_WORKSPACE = existsSync(resolve(WORKSPACE, ".spndevex"));
 console.log(IN_WORKSPACE ? "\n=== orientation — the real workspace"
   : "\n=== orientation — the real workspace: not run, this copy sits outside one");
 if (IN_WORKSPACE) compare("this workspace, as a window actually sees it", `${WORKSPACE}`,
-  ["Welcome back to SaaS Plane!", "🧭 I work with you through", "The ground is read on asking", "So — what are we building?"],
+  ["Welcome back to SaaS Plane!", "🧭 I hold every stage to its own standards", "The ground is read on asking", "what are we building today?"],
   ["Your team's time belongs to your product.", "I am the DevEx agent"]);
 
 console.log("\n=== orientation — the states this workspace is not in");
@@ -100,7 +103,7 @@ compare("day zero: no sprepo.json anywhere, and workspace init already ran",
    "Would you like to start a new platform?", "lands in a file as you give it",
    "Say yes and I open a workstream to hold your answers",
    "act 1 has already run — `spnutils workspace init` minted this folder, so do not run it again"],
-  [WORKSTREAMS, "wired", "So — what are we building?", "I mint the workspace", "This folder is empty"]);
+  [WORKSTREAMS, "wired", "what are we building today?", "I mint the workspace", "This folder is empty"]);
 
 // THE BUILDER'S EMPTY FOLDER. Plugins installed at user scope reach a folder nobody minted, and there
 // act 1 is still owed — so the door offers it. `orient` is handed its root: with no `.spndevex/` to stop
@@ -128,7 +131,7 @@ compare("day zero resumed: a new-platform workstream is already open",
   }),
   ["You started a platform here and we did not finish", "001-new-platform",
    "Shall we carry on?", "Read its arc BEFORE you say anything"],
-  ["Would you like to start a new platform?", "So — what are we building?"]);
+  ["Would you like to start a new platform?", "what are we building today?"]);
 
 // A `.spndevex/` HOLDING NOTHING BUT `.debug/` IS NO WORKSPACE. A Stop hook once wrote its session notes
 // wherever a window stopped, so `/tmp` grew one, and every partner repository under it was told day 0.
@@ -145,7 +148,7 @@ compare("an estate-only workspace, rung 1",
     "spn-infra/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-infra@saasplane": true } }),
     ".spndevex/README.md": "state\n",
   }),
-  ["1 repo · rung 1: estate only — no APPS repo yet"], ["none yet"]);
+  ["1 repo\n", "Ground to act on, said only when the work reaches it: rung 1: estate only — no APPS repo yet."], ["none yet"]);
 
 compare("an APPS repo carrying no CONCEPT.md, rung 2",
   fixture("no-concept", {
@@ -153,7 +156,7 @@ compare("an APPS repo carrying no CONCEPT.md, rung 2",
     "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
     ".spndevex/README.md": "state\n",
   }),
-  ["1 repo · 1 unwired"], ["UNWIRED"]);
+  ["1 repo\n", "Ground to act on, said only when the work reaches it: 1 unwired"], ["UNWIRED"]);
 
 // EXACTLY ONE OPEN, NO OTHER SESSION — the standing offer. This workspace can never show it while
 // three other windows are live here, so it exists only as a fixture.
@@ -246,10 +249,12 @@ const left = compare("sets left behind: one for a closed workstream, one no work
   [".worktrees/031-in-use"]);
 {
   n += 1;
-  const status = left.split("\n").find((line) => line.includes("worktree sets left behind")) ?? "";
-  const ok = status.startsWith("1 repo · 1 workstream open (031)") && status.split("\n").length === 1;
+  // THEY ARE THE AGENT'S TO ACT ON, so they sit on its ground line and the developer's status line stays counts (DEC.DEVEX.AGENT.105).
+  const ground = left.split("\n").find((line) => line.includes("worktree sets left behind")) ?? "";
+  const ok = ground.startsWith("Ground to act on, said only when the work reaches it:")
+    && left.split("\n").includes("1 repo · 1 workstream open (031)");
   if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  and they sit on the one status line, after the workstreams${ok ? "" : ` — ${status}`}`);
+  console.log(`  ${ok ? "PASS" : "FAIL"}  and they sit on the agent's ground line, never the status line${ok ? "" : ` — ${ground}`}`);
 }
 compare("no set on disk: the status line says nothing about sets", fixture("sets-none", SETS({ ".worktrees/031-in-use/spn-app-ts/README.md": "a worktree\n" })),
   ["1 workstream open (031)"], ["worktree set", "left behind"]);
@@ -380,7 +385,7 @@ console.log("\n=== orientation — the closing question is asked only when nothi
   const text = run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, ground], ground);
 
   says("the ground still ends with the question, because the hook cannot see the first message",
-    text.includes("So — what are we building?"));
+    text.includes("what are we building today?"));
   says("and the note now makes asking it conditional",
     text.includes("Ask the closing question ONLY when the first message does not say what to do"));
   says("it names what replaces the question, rather than only forbidding it",
@@ -402,20 +407,22 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
   };
 
-  const BODY = [
+  // THE 🤖 LINE GREETS BY NAME AS THE HEADING DOES, so the body is built for the name a case runs under (DEC.DEVEX.AGENT.105).
+  const PARTNER_SENTENCE = "And I speak for every partner who builds on SaaS Plane, so nothing we change breaks them without a version and a way across.";
+  const body = (name = null, builder = false) => [
     "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
     "\n&nbsp;\n",
-    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    `🤖 **I'm your DevEx agent${name ? `, ${name}` : ""}.** Think of me as the teammate who has read every standard in this workspace, so your time goes to the product.`,
     "\n&nbsp;\n",
-    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    "🧭 I hold every stage to its own standards, and we prove each step together: **Start** (Bootstrap, Source control) · **Plan** (Ideate) · **Build** (Develop, Test) · **Ship** (Provision, Deliver) · **Run** (Operate).",
     "\n&nbsp;\n",
-    "👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). Tell me whose view you need, and I'll bring it.",
+    "👥 I bring every role's view to the table as we talk the work through: **Leadership** (Chief executive, Engineering leader) · **Engineering** (Architect, Backend, Web, Quality, DevOps / SRE, DevSecOps / Security) · **Product and design** (Product manager, UX, UI, Editor) · **Data and AI** · **Go-to-market** (Product marketer, Sales, Growth, Customer success) · **Finance and business**."
+      + (builder ? ` ${PARTNER_SENTENCE}` : ""),
   ].join("\n");
-  const PARTNER_SENTENCE = "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. ";
-  const BUILDER_BODY = BODY.replace("Tell me whose view", PARTNER_SENTENCE + "Tell me whose view");
-  /** The approved welcome under `heading`, then exactly one status line, and nothing else. */
-  const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`)
-    && message.slice(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`.length).split("\n").filter(Boolean).length === 1;
+  /** The approved welcome under `heading`, for `name`, then exactly one status line, and nothing else. */
+  const isWelcome = (message, heading, name = null) => message.startsWith(`${heading}\n\n${body(name)}\n\n&nbsp;\n\n`)
+    && message.slice(`${heading}\n\n${body(name)}\n\n&nbsp;\n\n`.length).split("\n").filter(Boolean).length === 1;
+  const GROUND = "Ground to act on, said only when the work reaches it: ";
   const statusOf = (message) => message.split("\n").filter(Boolean).at(-1);
 
   const home = (name) => {
@@ -450,21 +457,21 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   });
   const firstNamed = hook(first, "Dhruv");
   says("a first visit greets by name with the first-visit heading, then the approved welcome",
-    isWelcome(firstNamed.message, "# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!"));
+    isWelcome(firstNamed.message, "# 👋 Welcome to SaaS Plane, Dhruv. Let's build something great.", "Dhruv"));
   // THE TWO VARIANTS follow SPN_DEVEX_AGENT_WORKSPACE: set and naming this workspace is a builder's;
   // unset, or naming another place, is a partner's.
-  const HEADING = "# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!";
+  const HEADING = "# 👋 Welcome to SaaS Plane, Dhruv. Let's build something great.";
   const elsewhere = mkdtempSync(join(tmpdir(), "t-orientation-elsewhere-"));
   says("N023-85: the workspace the key names hears the partner sentence",
-    hook(first, "Dhruv", undefined, first).message.startsWith(`${HEADING}\n\n${BUILDER_BODY}\n\n&nbsp;\n\n`)
+    hook(first, "Dhruv", undefined, first).message.startsWith(`${HEADING}\n\n${body("Dhruv", true)}\n\n&nbsp;\n\n`)
     && hook(first, "Dhruv", undefined, first).message.includes(PARTNER_SENTENCE));
   says("N023-85: with the key unset, the partner variant omits it",
-    isWelcome(hook(first, "Dhruv").message, HEADING) && !hook(first, "Dhruv").message.includes("every partner who builds"));
+    isWelcome(hook(first, "Dhruv").message, HEADING, "Dhruv") && !hook(first, "Dhruv").message.includes("every partner who builds"));
   says("N023-85: with the key naming a different folder, the partner variant omits it",
-    isWelcome(hook(first, "Dhruv", undefined, elsewhere).message, HEADING)
+    isWelcome(hook(first, "Dhruv", undefined, elsewhere).message, HEADING, "Dhruv")
     && !hook(first, "Dhruv", undefined, elsewhere).message.includes("every partner who builds"));
   says("with no name, only the name's clause drops",
-    isWelcome(hook(first, null).message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+    isWelcome(hook(first, null).message, "# 👋 Welcome to SaaS Plane. Let's build something great."));
 
   const returning = fixture("returning", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
@@ -473,7 +480,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   });
   says("any workstream, even a closed one, makes it a returning visit",
-    isWelcome(hook(returning, "Dhruv").message, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!"));
+    isWelcome(hook(returning, "Dhruv").message, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!", "Dhruv"));
   says("a returning visit with no name drops only the name's clause",
     isWelcome(hook(returning, null).message, "# 👋 Good to see you again. Welcome back to SaaS Plane!"));
 
@@ -490,7 +497,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
       !text.includes("Your team's time belongs to your product.") && !text.includes("I am the DevEx agent")
       && !text.includes("Tell me what you want to build")));
 
-  // THE STATUS LINE: every part, each dropped at zero, and each clause on the same line.
+  // THE STATUS LINE: counts only, each dropped at zero. Every problem is a clause of the agent's ground line instead.
   const busy = fixture("status-busy", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
@@ -504,11 +511,14 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1/state.json`]: "{}\n",
   });
   const plain = hook(busy, "Dhruv");
-  // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected, and asserted apart.
+  // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected on the agent's ground line, never the status line.
   says("the status line names repos, open workstreams by number and the backlog; closed is not a part",
-    statusOf(plain.message) === "2 repos · 2 workstreams open (042, 044) · 1 in backlog · rung 3: concept present, very few nodes below it");
+    statusOf(plain.message) === "2 repos · 2 workstreams open (042, 044) · 1 in backlog"
+    && plain.context.includes(`${GROUND}rung 3: concept present, very few nodes below it.`));
   says("a part at zero is dropped, and one of each reads in the singular",
-    statusOf(hook(returning, null).message) === "1 repo · rung 3: concept present, very few nodes below it");
+    statusOf(hook(returning, null).message) === "1 repo");
+  says("the closing question greets the developer by name, and drops the name's clause without one",
+    plain.context.includes("So, Dhruv — what are we building today?") && hook(returning, null).context.includes("So — what are we building today?"));
 
   const nodes = {};
   for (const node of ["a", "b", "c"]) nodes[`spn-app-ts/apps/${node}/spkind.json`] = "{}";
@@ -530,8 +540,9 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     ".spndevex/README.md": "state\n",
   });
   const unwiredOut = hook(unwired, null);
-  says("an unwired repository adds a clause to the same line",
-    statusOf(unwiredOut.message) === "1 repo · 1 unwired" && isWelcome(unwiredOut.message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+  says("an unwired repository is a clause of the agent's ground line, and the status line stays counts",
+    statusOf(unwiredOut.message) === "1 repo" && unwiredOut.context.includes(`${GROUND}1 unwired.`)
+    && isWelcome(unwiredOut.message, "# 👋 Welcome to SaaS Plane. Let's build something great."));
   says("the stack claim selects no plugin: an APPS repo loading spn-surface and spn-apps is wired",
     !statusOf(hook(ordinary, null).message).includes("unwired"));
   const appsAlone = fixture("status-apps-without-surface", {
@@ -540,7 +551,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     ".spndevex/README.md": "state\n",
   });
   says("an APPS repo loading spn-apps without spn-surface is unwired (DEC.DEVEX.AGENT.039)",
-    statusOf(hook(appsAlone, null).message).includes("1 unwired"));
+    hook(appsAlone, null).context.includes(`${GROUND}1 unwired`));
 
   const lower = fixture("status-lower-rung", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
@@ -548,9 +559,9 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     ".spndevex/README.md": "state\n",
   });
   const lowerOut = hook(lower, null);
-  says("a lower rung adds a clause, never a line",
-    statusOf(lowerOut.message) === "1 repo · rung 2: an APPS repo carries no CONCEPT.md — spn-app-ts"
-    && isWelcome(lowerOut.message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+  says("a lower rung is a clause of the agent's ground line, never the status line",
+    statusOf(lowerOut.message) === "1 repo" && lowerOut.context.includes(`${GROUND}rung 2: an APPS repo carries no CONCEPT.md — spn-app-ts.`)
+    && isWelcome(lowerOut.message, "# 👋 Welcome to SaaS Plane. Let's build something great."));
 
   // A STALE PLUGIN: a marketplace source whose bytes differ from the newest cached copy.
   const stale = fixture("status-stale", {
@@ -570,20 +581,21 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   mkdirSync(cached, { recursive: true });
   writeFileSync(join(cached, "a.ts"), "the install\n", "utf8");
   const staleOut = hook(stale, "Stale");
-  says("a stale plugin adds a clause to the same line",
-    statusOf(staleOut.message) === "1 repo · cache stale — spn-devex"
-    && isWelcome(staleOut.message, "# 👋 Welcome to SaaS Plane, Stale. Glad you're here!"));
+  says("a stale plugin is a clause of the agent's ground line",
+    statusOf(staleOut.message) === "1 repo" && staleOut.context.includes(`${GROUND}cache stale — spn-devex`)
+    && isWelcome(staleOut.message, "# 👋 Welcome to SaaS Plane, Stale. Let's build something great.", "Stale"));
 
   // A WINDOW BEHIND THE NEWEST INSTALL: the copy made by the case above, run as the hook.
   const behindCopy = join(BASE, "pc", "plugins", "cache", "saasplane", "spn-devex", "0.0.1", "scripts", "events", "orientation.ts");
   const behindOut = hook(ordinary, null, behindCopy);
-  says("a window running an older install adds a clause, and the full warning stays with the agent",
-    statusOf(behindOut.message) === "1 repo · 1 workstream open (042) · this window runs spn-devex 0.0.1, 9.9.9 is installed"
+  says("a window running an older install is a clause of the agent's ground line, and the full warning stays with the agent",
+    statusOf(behindOut.message) === "1 repo · 1 workstream open (042)"
+    && behindOut.context.includes(`${GROUND}this window runs spn-devex 0.0.1, 9.9.9 is installed`)
     && behindOut.context.includes("take a fresh window") && !behindOut.message.includes("take a fresh window"));
 
   // THE TABLES ARE FOR WHEN YOU ASK: in the agent's context, never in the developer's pane.
   const tables = ["## The ground", "### Repositories", "| Repo | Law |", "### Workstreams"];
-  const closing = ["So — what are we building?", "Or ask me to continue 042 widget-pricing"];
+  const closing = ["So — what are we building today?", "Or ask me to continue 042 widget-pricing"];
   const offer = hook(ordinary, null);
   says("the developer's pane carries the welcome and the status line and no table",
     [...tables, ...closing].every((t) => !offer.message.includes(t)));
@@ -636,7 +648,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // Day zero opens on the same welcome, and its door follows.
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
   says("day zero opens on the first-visit welcome, then the door, and no status line",
-    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nYour workspace is set up`)
+    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Let's build something great.\n\n${body("Dhruv")}\n\n&nbsp;\n\nYour workspace is set up`)
     && zero.context.startsWith(`${WELCOME_LEAD}\n\n${zero.message}`)
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
@@ -663,23 +675,39 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
       return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
     } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
   };
-  const ordinary = hook(fixture("short-rules", {
-    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
-    "spn-app-ts/CONCEPT.md": "# concept\n",
-    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1/state.json`]: "{}\n",
-  }));
+  // THE LINES COME FROM THE RULES INDEX THE BUILD WRITES FROM THE BOOK, never from words typed in the hook. A fixture
+  // index stands in for it: one entry for each `short` rule, with the sentence its ref restates it with.
+  const entry = (id, text, ref, heading, short = true) =>
+    ({ id, level: "MUST", params: short ? { short: true } : { check: "x" }, class: short ? "stated" : "checked",
+      ...(short ? { line: { text, ref, heading } } : {}) });
+  const A = "refs/devex/agent/agent.md", L = "refs/devex/agent/lenses.md", W = "refs/devex/workspace/workstream.md";
+  const index = { schemaVersion: 1, book: { repository: "spn-foundation", commit: "abc" }, rules: [
+    entry("RULE.DEVEX.AGENT.001", "Lenses take part in any discussion about a shape, mid-run too.", A, "One agent, and the lenses take part as views"),
+    entry("RULE.DEVEX.AGENT.002", "Three signs set how many views speak: it crosses a repository, changes what a partner builds on, or sets a pattern.", L, "Which views speak, and how many"),
+    entry("RULE.DEVEX.AGENT.003", "No sign: the owning view, one sentence. One: the architect's and the owner's. Two or more: the starting group with product and partner, each a fresh agent.", L, "How a view is made"),
+    entry("RULE.DEVEX.AGENT.004", "Each view speaks in its own voice, as a colleague, never a slogan; on a card, one or two sentences, no option by letter.", L, "A view is shown in its own voice"),
+    entry("RULE.DEVEX.AGENT.005", "Reply as one person to another: full sentences, tables only for facts, one meaning-icon first; a failure opens straight.", A, "A reply speaks as a teammate: the moment chooses its register, its icon and its shape"),
+    entry("RULE.DEVEX.AGENT.006", "A decision setting a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it.", A, "Every prompt is read before anything moves"),
+    entry("RULE.DEVEX.AGENT.007", "Structure before content: show the units, names and grouping first.", "refs/devex/function/ideate.md", "Structure comes before content, and outside knowledge is marked"),
+    entry("RULE.DEVEX.AGENT.008", "**Needs you** opens a reply only to raise a card (in full, once) or to end or stop the work (a line per open card).", W, "The reply while work runs shows what needs you, then what moved"),
+    entry("RULE.DEVEX.AGENT.009", "Arcs are yours to manage; a new workstream is the developer's call.", W, "A new subject: another arc, or a workstream of its own"),
+    entry("RULE.DEVEX.AGENT.010", "No script flags a discussion about a shape; you judge.", A, "The rules of a reply reach you at session start, in short form"),
+    entry("RULE.DEVEX.AGENT.011", "A checked rule is held by its check, so it has no line.", A, "x", false),
+  ] };
   const HEADING = "## The short rules";
-  const at = ordinary.context.indexOf(HEADING);
-  const block = at < 0 ? "" : ordinary.context.slice(at);
+  const block = shortRules(index);
   const lines = block.split("\n").filter((line) => line.startsWith("- "));
 
-  says("the agent's context holds the short rules, after the note",
-    at > ordinary.context.indexOf("The ground is read on asking") && ordinary.context.indexOf("The ground is read on asking") > 0);
-  says("the developer's pane does not show them", !ordinary.message.includes(HEADING) && !ordinary.message.includes("in its own voice"));
-  says("they are about ten lines: the heading and no more than ten rules",
-    lines.length >= 7 && lines.length <= 10, `got ${lines.length} rule lines`);
+  says("[MKT.HOOKS.90] the block opens with the heading", block.startsWith(HEADING));
+  says("[MKT.HOOKS.90] it is one line for each `short` rule, and a rule held by a check has none",
+    lines.length === 10, `got ${lines.length} rule lines`);
+  // A LINE ENDS ON ITS RULE'S NUMBER, never its section heading: the heading cost three times the room (DEC.DEVEX.AGENT.105).
+  says("[MKT.HOOKS.90] each ref's path stands once above the lines it holds, and each line ends on its rule's number",
+    (block.match(/^\*\*`refs\/[^`]+\.md`\*\*$/gm) ?? []).length === 4
+    && lines.every((line) => / \((AGENT|WORKSPACE|FUNCTION)\.\d{3}\)$/.test(line)) && !lines.some((line) => line.includes(" § ")));
   says("known-bad: no line asks for a person at the table, the wording the developer's correction replaced",
     block.length > 0 && !block.includes("person at the table") && !block.includes("one or two plain sentences"));
+  says("[MKT.HOOKS.90] without an index there is no block, and the window still starts", shortRules(null) === "");
 
   for (const [what, words] of [
     ["lenses take part in any discussion about a shape, mid-run too",
@@ -706,35 +734,44 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     ["no script judges whether a prompt is such a discussion", ["No script flags a discussion about a shape"]],
   ]) {
     const missing = words.filter((word) => !block.includes(word));
-    says(`a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
+    says(`[MKT.HOOKS.90] a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
   }
 
-  // EACH LINE POINTS AT A REFERENCE THAT EXISTS, AND AT A SECTION THAT FILE REALLY HAS.
-  const pointer = /→ `(refs\/[^`]+\.md)` § (.+)$/;
-  const unpointed = lines.filter((line) => !pointer.test(line));
-  says("every line ends with the path of its reference and the section that holds the rule",
-    lines.length > 0 && unpointed.length === 0, `no pointer: ${unpointed.map((line) => line.slice(0, 60)).join(" | ")}`);
+  // EVERY SECTION A LINE NAMES IS A HEADING THE REF REALLY HAS.
   const broken = [];
-  for (const line of lines) {
-    const found = pointer.exec(line);
-    if (!found) continue;
-    const file = resolve(HOOKS, "src", found[1]);
+  for (const rule of index.rules.filter((one) => one.line)) {
     let text = "";
-    try { text = readFileSync(file, "utf8"); } catch { broken.push(`${found[1]} is not a file`); continue; }
-    if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === found[2].trim()))
-      broken.push(`${found[1]} has no section "${found[2]}"`);
+    try { text = readFileSync(resolve(HOOKS, "src", rule.line.ref), "utf8"); } catch { broken.push(`${rule.line.ref} is not a file`); continue; }
+    if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
+      broken.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
   }
-  says("every reference named is a file of the plugin, and every section named is a heading in it",
-    lines.length > 0 && broken.length === 0, broken.join(" | "));
+  says("[MKT.HOOKS.90] every reference named is a file of the plugin, and every section named is a heading in it", broken.length === 0, broken.join(" | "));
 
-  // KNOWN-BAD: the same reader must reject a line that points nowhere.
-  says("known-bad: a line with no reference fails the pointer test", !pointer.test("- Show each view in its own voice."));
+  // THE INDEX THE BUILD WRITES IS HELD TO THE SAME READER, where this checkout has one: a `short` entry with no line fails.
+  const written = join(HOOKS, "src", "refs", "rules.json");
+  if (existsSync(written)) {
+    const real = JSON.parse(readFileSync(written, "utf8"));
+    const unlined = real.rules.filter((rule) => rule.params.short && !rule.line).map((rule) => rule.id);
+    says("[MKT.HOOKS.90] every `short` rule in the written index has a line", unlined.length === 0, `no line: ${unlined.join(" | ")}`);
+    const lost = [];
+    for (const rule of real.rules.filter((one) => one.line)) {
+      let text = "";
+      try { text = readFileSync(resolve(HOOKS, "src", rule.line.ref), "utf8"); } catch { lost.push(`${rule.line.ref} is not a file`); continue; }
+      if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === rule.line.heading.trim()))
+        lost.push(`${rule.line.ref} has no section "${rule.line.heading}"`);
+    }
+    says("[MKT.HOOKS.90] and every heading it names exists in its ref", lost.length === 0, lost.join(" | "));
+  }
+  const noLine = { ...index, rules: [{ id: "RULE.DEVEX.AGENT.099", level: "MUST", params: { short: true }, class: "stated" }] };
+  says("[MKT.HOOKS.90] known-bad: a `short` entry with no line is found by the reader the index is held to",
+    noLine.rules.filter((rule) => rule.params.short && !rule.line).length === 1 && shortRules(noLine) === "");
 
-  const zero = hook(fixture("short-rules-day-zero", { ".spndevex/README.md": "state\n" }));
-  says("day zero carries the same rules, after its note",
-    zero.context.includes(HEADING) && zero.context.indexOf(HEADING) > zero.context.indexOf("Day-0 mode") && !zero.message.includes(HEADING));
-  says("the by-hand form prints them too, since it prints what the agent reads",
-    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE).includes(HEADING) || !IN_WORKSPACE);
+  // THE START STAYS UNDER ITS CEILING WITH THIRTY-TWO LINES.
+  const many = { ...index, rules: Array.from({ length: 32 }, (_, at) =>
+    entry(`RULE.DEVEX.AGENT.${String(200 + at)}`, `${"A short sentence that stands alone and says what to do. ".repeat(3).trim()}`, `refs/devex/agent/r${at % 8}.md`, "Heading")) };
+  const full = fitSessionStart("H".repeat(2500), [{ text: shortRules(many), rank: 1, readAt: "the short rules" }]);
+  says(`[MKT.HOOKS.90] a fixture start with thirty-two short lines stays under ${SESSION_START_CEILING} characters (${full.length})`,
+    full.length <= SESSION_START_CEILING && full.includes("A short sentence"));
 }
 
 // ── the plugin's migrations (RULE.DEVEX.AGENT.094) ──
@@ -769,7 +806,7 @@ console.log("\n=== orientation — a pending plugin migration is the agent's fir
   says("red: an arc kept as Markdown and an empty ledger — the agent is told 001 is pending, with its steps",
     pending.context.includes(HEADING) && /- \*\*001\*\* \(spn-devex /.test(pending.context) && pending.context.includes("open/042-widget-pricing: 1 arc(s) kept as Markdown"),
     pending.context.slice(pending.context.indexOf("### Plugin"), pending.context.indexOf("### Plugin") + 400));
-  says("it comes before the closing question", pending.context.indexOf(HEADING) < pending.context.indexOf("So — what are we building?"));
+  says("it comes before the closing question", pending.context.indexOf(HEADING) < pending.context.indexOf("what are we building today?"));
   says("the developer's pane does not show it", !pending.message.includes(HEADING) && !pending.message.includes("migration"));
   writeFileSync(join(old, ".spndevex", "migrations.jsonl"),
     `${JSON.stringify({ plugin: "spn-devex", id: "001", version: "0.40.0", at: "2026-10-18T10:20+05:30", by: "t", how: "agent" })}\n`);
@@ -799,6 +836,8 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
     return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext, ms: Date.now() - started };
   };
   const statusOf = (message) => message.split("\n").filter(Boolean).at(-1);
+  // A CHECKOUT BEHIND IS THE AGENT'S TO ACT ON, so its clause is read from the agent's ground line (DEC.DEVEX.AGENT.105).
+  const groundOf = (context) => context.split("\n").find((line) => line.startsWith("Ground to act on")) ?? "";
 
   // A bare origin holding develop, a member cloned from it on a workstream's branch, and a second clone that
   // moves develop on by one commit: the member is one behind only once the session start has fetched.
@@ -819,14 +858,23 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   writeFileSync(join(other, "b.txt"), "b\n");
   git(other, "add", "-A"); git(other, "commit", "-q", "-m", "ahead"); git(other, "push", "-q", "origin", "develop");
   const late = hookIn(root);
-  says("a member's branch behind origin/develop is named in the status line, after a fetch the window made",
-    statusOf(late.message).includes("1 branch behind origin/develop, rebase before the next push: spn-x feat/031-x by 1"), statusOf(late.message));
-  says("the status stays one line, and the welcome is whole above it", late.message.split("\n").filter(Boolean).at(-1) === statusOf(late.message) && late.message.includes("🧭 I work with you through"));
+  says("[MKT.HOOKS.145] a member's branch behind origin/develop is named on the agent's ground line, after a fetch the window made",
+    groundOf(late.context).includes("1 branch behind origin/develop, rebase before the next push: spn-x feat/031-x by 1")
+      && !groundOf(late.context).includes("pull before reading the book"), groundOf(late.context));
+  says("the status line stays counts, and the welcome is whole above it",
+    statusOf(late.message) === "1 repo" && !late.message.includes("behind origin") && late.message.includes("🧭 I hold every stage to its own standards"));
   git(member, "checkout", "-q", "develop");
-  says("a permanent branch is never told to rebase", !statusOf(hookIn(root).message).includes("behind origin"));
+  const onDevelop = groundOf(hookIn(root).context);
+  says("[MKT.HOOKS.144] a member on develop one commit behind origin/develop is told how far, and to pull before reading the book",
+    onDevelop.includes("1 member on develop behind origin/develop, pull before reading the book: spn-x by 1"), onDevelop);
+  says("[MKT.HOOKS.144] and develop is never told to rebase", !onDevelop.includes("rebase"), onDevelop);
+  git(member, "checkout", "-q", "-b", "main");
+  says("another permanent branch says nothing, as today", !hookIn(root).context.includes("behind origin"));
+  git(member, "checkout", "-q", "develop"); git(member, "pull", "-q", "--ff-only");
+  says("[MKT.HOOKS.144] a develop that is current says nothing", !hookIn(root).context.includes("behind origin"));
   git(member, "checkout", "-q", "feat/031-x"); git(member, "config", "branch.feat/031-x.spnBase", "main");
   says("a branch whose git config records another base is measured from that base, which here is not behind",
-    !statusOf(hookIn(root).message).includes("behind origin"));
+    !hookIn(root).context.includes("behind origin"));
 
   // MANY BRANCHES BEHIND: a worktree set holds a member per worktree, so the late list grows with the workspace.
   // The rebase sentence is said once, the three most behind are named, and the rest are a count and the command.
@@ -841,7 +889,7 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
     git(join(crowded, name), "checkout", "-q", "-b", `feat/0${at}-a-rather-long-workstream-subject`, "HEAD~1");
   }
   const crowdedHook = hookIn(crowded);
-  const lateMany = statusOf(crowdedHook.message);
+  const lateMany = groundOf(crowdedHook.context);
   says("sixteen branches behind say the rebase once, name three, and count the rest with the command that lists them",
     lateMany.includes("16 branches behind origin/develop, rebase before the next push: ")
       && (lateMany.match(/rebase before the next push/g) ?? []).length === 1
@@ -858,7 +906,7 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   writeFileSync(join(slow, "spn-slow", "sprepo.json"), repo("APPS", { stack: "TS" }));
   const waited = hookIn(slow, { GIT_SSH_COMMAND: "sh -c 'sleep 30' sh" });
   says("a remote that never answers is given up on within the five-second budget, and the window still opens",
-    waited.ms < 9000 && waited.ms >= 4000 && waited.message.includes("🧭 I work with you through"), `${waited.ms} ms`);
+    waited.ms < 9000 && waited.ms >= 4000 && waited.message.includes("🧭 I hold every stage to its own standards"), `${waited.ms} ms`);
   const parallel = fixture("fetch-parallel", { ".spndevex/README.md": "state\n" });
   for (const name of ["spn-a", "spn-b", "spn-c"]) {
     mkdirSync(join(parallel, name), { recursive: true });
@@ -933,6 +981,40 @@ console.log("\n=== orientation — the fetch, the behind-develop clause and the 
   says("and they sit right after the pointer line to `refs/commands.md`",
     big.context.includes("read it before a window's first write of a command.\n\n" + treeDebug.join("\n") + "\n\n"));
   says("and no other command line is carried", !big.context.includes("spn-devex workstream ") && !big.context.includes("spn-devex docs "));
+}
+
+// ── the session start names each running go: its parts running, held and ready, and the next step (036 N009) ──
+console.log("\n=== orientation — the running go at the session start");
+{
+  const says = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 400)}`}`); };
+  const part = (id, state, entry) => ({ id, repo: "spn-x", pass: "CODE", entries: [entry], tests: [], minutes: null, measuredFrom: null,
+    waitsOn: [], model: "opus", signature: "abc12345", state });
+  const plan = (parts) => `${JSON.stringify({ schemaVersion: 1, lead: "N001", scope: ["N001"], writtenAt: "2026-10-31T00:00:00Z", parts }, null, 2)}\n`;
+  const member = {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+  };
+  const going = (name, count, parts) => {
+    const files = { ...member };
+    for (let at = 0; at < count; at += 1) {
+      const ws = `.spndevex/${WORKSTREAMS}/open/${String(50 + at).padStart(3, "0")}-probe-${at}`;
+      files[`${ws}/arcs/N001/state.json`] = "{}\n";
+      files[`${ws}/arcs/N001/go.json`] = plan(parts);
+    }
+    return fixture(name, files);
+  };
+  const orientAt = (root) => orient(root, root);
+  const [, context] = orientAt(going("go-running", 1, [part("code-spn-x-1", "running", "N001/E1"), part("code-spn-x-2", "held", "N001/E2"),
+    part("code-spn-x-3", "ready", "N001/E3"), part("docs-spn-x-1", "landed", "N001/E4")]));
+  says("[MKT.HOOKS.304] the session start names the running go, its parts running, held and ready, and the next step",
+    context.includes("Go 050-probe-0/N001: running code-spn-x-1 · held code-spn-x-2 · ready code-spn-x-3. Next: derive the plan again"), context.slice(-1200));
+  const [, landed] = orientAt(going("go-landed", 1, [part("code-spn-x-1", "landed", "N001/E1")]));
+  says("[MKT.HOOKS.304] a go whose every part landed is not named", !landed.includes("Go 050-probe-0"));
+  const [, many] = orientAt(going("go-many", 6, [part("code-spn-x-1", "ready", "N001/E1")]));
+  const goes = many.split("\n").filter((line) => line.startsWith("Go "));
+  says("[MKT.HOOKS.304] six gos stay inside the session start's limit: three named, the rest counted",
+    goes.length === 3 && many.includes("And 3 more running") && many.length <= SESSION_START_CEILING, `${goes.length} · ${many.length}`);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

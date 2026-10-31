@@ -53,7 +53,9 @@
   <div class="sds-section-head"><h2>Today</h2></div>
   <p class="sds-standfirst">{{The thing as it is, in one line. Then its subsections, each with the block that fits.}}</p>
 
-  <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
+  <h3 id="s2a">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What the diagram shows.}}</p>
   <figure>
   <svg class="sds-drawing" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{What the diagram shows, in words.}}">
@@ -67,12 +69,16 @@
   <figcaption>{{What to notice.}}</figcaption>
   </figure>
 
-  <h3 id="s2b">{{A subsection shown as a folder tree}}</h3>
+  <h3 id="s2b">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <pre>{{folder/
 &#x251C;&#x2500;&#x2500; what is added      +
 &#x2514;&#x2500;&#x2500; what is removed    &minus;}}</pre>
 
-  <h3 id="s2c">{{A subsection shown as code changes}}</h3>
+  <h3 id="s2c">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <!-- A code block that shows one file is framed: the path is its title, the language its badge. -->
   <figure class="sds-file">
     <figcaption><span class="sds-file-path">{{path of the file that changes}}</span><span class="sds-file-lang">diff</span></figcaption>
@@ -85,7 +91,9 @@
   <div class="sds-section-head"><h2>Proposed</h2></div>
   <p class="sds-standfirst">{{The thing as it will be, in one line. Where a decision is still open, its options sit side by side.}}</p>
 
-  <h3 id="s3a">{{A subsection shown as a table}}</h3>
+  <h3 id="s3a">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Thing}}</th><th>{{Today}}</th><th>{{Proposed}}</th></tr></thead>
     <tbody>
@@ -93,7 +101,9 @@
     </tbody>
   </table></div>
 
-  <h3 id="s3b">{{A subsection shown as options, side by side}}</h3>
+  <h3 id="s3b">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Used where a decision is still open. One column for each option, and one row for each thing a reader compares. The question itself is asked on the approach page.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{What is compared}}</th><th>{{Option A}}</th><th>{{Option B}}</th></tr></thead>
@@ -102,7 +112,9 @@
     </tbody>
   </table></div>
 
-  <h3 id="s3c">{{A subsection shown as a drawing}}</h3>
+  <h3 id="s3c">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What the drawing shows. A figure is drawn by <code>docs figure draw</code> from its specification, and pasted here whole.}}</p>
   <figure>
   <svg class="sds-drawing" viewBox="18 18 660 84" width="660" height="84" role="img" aria-label="{{What the drawing shows, in words.}}">
@@ -117,7 +129,9 @@
        for anything visual (s3g); the public shapes as code for a new or changed state, enum, contract, service
        interface, route, table and its migration, event or topic, component props, token or command option (s3e). Delete the forms a preview does not use. -->
 
-  <h3 id="s3e">{{A subsection that shows the public shapes}}</h3>
+  <h3 id="s3e">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{The declarations a developer builds against, in full: a contract state or enum, a service interface&rsquo;s methods, a route, a table and its migration, an event or a topic, a component&rsquo;s props, a token, a command&rsquo;s options. Declarations only, never bodies; a <code>+</code>/<code>&minus;</code> diff where the shape exists today. An order points to this block and never copies it.}}</p>
   <!-- A code block that shows one file is framed: the path is its title, the language its badge. -->
   <figure class="sds-file">
@@ -129,14 +143,18 @@
   }</pre>
   </figure>
 
-  <h3 id="s3f">{{A subsection that shows a screen as a skeleton}}</h3>
+  <h3 id="s3f">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Where a screen or a layout is the subject: its skeleton, one view for each screen class it changes (desktop, tablet, mobile), drawn by the plugin from a skeleton spec and pasted here whole.}}</p>
   <figure>
   {{the skeleton the plugin drew, one view for each screen class}}
   <figcaption>{{What to notice.}}</figcaption>
   </figure>
 
-  <h3 id="s3g">{{A subsection that shows the thing itself}}</h3>
+  <h3 id="s3g">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Where the subject is visual (a size scale, a tint, a badge, a head, a control): the thing rendered on the page, light and dark side by side, with real values, as a reader will see it. Use the page&rsquo;s own markup and styles; never a screenshot where the thing can be drawn. A look is changed here first, as often as the developer likes, with no test, and built once in one order after the go.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Light}}</th><th>{{Dark}}</th></tr></thead>
@@ -145,7 +163,9 @@
     </tbody>
   </table></div>
 
-  <h3 id="s3h">{{A subsection that shows each behaviour row the arc changes}}</h3>
+  <h3 id="s3h">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Every behaviour row the arc changes, before and after, in the words of the person it is for. The sheet's <code>docs</code> line for the row points at this section, so a decision about what someone sees is made here.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Behaviour row, as the person it is for would say it}}</th></tr></thead>
@@ -154,7 +174,9 @@
     </tbody>
   </table></div>
 
-  <h3 id="s3d">{{A subsection that shows a sample of the real thing}}</h3>
+  <h3 id="s3d">{{A topic name, at most five words, no comma}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{What the sample is: a row, a file&rsquo;s first lines, a command&rsquo;s output, with real values. The page shows it with its own blocks and never in a frame.}}</p>
   <pre>{{the sample, as the real thing prints it}}</pre>
   <p>{{Where the thing is a whole file: }}<a href="samples/{{the-sample-file}}">{{open the sample &rarr;}}</a></p>
@@ -165,6 +187,8 @@
   <p class="sds-standfirst">{{What changes in each repository, in one line, in the order the work runs.}}</p>
 
   <h3 id="s4a">{{Every change, by repository, in the order the work runs}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{Each repository is drawn as its own folder tree. The note on the right says whether the entry is new or changed, and what the change is. A folder with no note only holds the entries under it. Where the preview is still proposed, say here which folders and files are not known yet.}}</p>
   <!-- One repository is one line, its tree, and then the blocks that explain its changes. Repeat the three for each
        repository, in the order the work runs. The tree is always drawn: one folder or file on each line, a deep path
@@ -193,6 +217,8 @@
     └── {{file}}   changed  {{what the change is}}</pre>
 
   <h3 id="s4b">{{What proves it}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{The tests by tier, each repository and node named. A tier the change owes nothing at says "None" and why.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Each tier, and the tests that prove it}}</th></tr></thead>
@@ -203,6 +229,8 @@
   </table></div>
 
   <h3 id="s4c">{{How it ships}}</h3>
+
+  <p class="sds-standfirst">{{What the heading would have said, as one sentence: the statement this subsection makes.}}</p>
   <p>{{The release chain, in order: what merges and releases, and what each step waits on.}}</p>
   <div class="sds-scroll"><table>
     <thead><tr><th>{{Each step, in order}}</th></tr></thead>

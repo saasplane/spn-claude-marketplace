@@ -6,15 +6,19 @@
 // Walked, never listed by hand, so a fourth package's suite runs the moment its `tests/run.mjs`
 // exists. Each runner already prints its own suites and cases; this only sequences them and turns
 // one runner's non-zero into the whole command's non-zero. A run name is handed to every runner, and
-// a runner that writes what its run proved writes it under that name.
+// each runner adds what its package proved to the one run file under that name: the file is cleared
+// once here, so a reused name never keeps an older run's results.
 
 import { execFileSync } from "node:child_process";
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { APPEND, runFilePath, runNameOf } from "../packages/plugin-support-lib/tests/helpers/run-file.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const PACKAGES = join(ROOT, "packages");
+const runName = runNameOf(process.argv.slice(2));
+if (runName !== null) rmSync(runFilePath(ROOT, "UNIT", runName), { force: true });
 
 function isDir(path) { try { return statSync(path).isDirectory(); } catch { return false; } }
 function isFile(path) { try { return statSync(path).isFile(); } catch { return false; } }
@@ -30,7 +34,8 @@ for (const runner of runners) {
   const label = runner.slice(PACKAGES.length + 1, -"/tests/run.mjs".length);
   console.log(`\n── ${label} ──────────────────────────────────────────`);
   try {
-    execFileSync(process.execPath, [runner, ...process.argv.slice(2)], { stdio: "inherit" });
+    execFileSync(process.execPath, [runner, ...process.argv.slice(2)],
+      { stdio: "inherit", env: { ...process.env, [APPEND]: runName === null ? "" : "1" } });
   } catch {
     failed += 1;
   }

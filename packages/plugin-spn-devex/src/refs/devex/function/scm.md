@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md",
-      "seen": "9c999d7f"
+      "seen": "451c0af5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
-      "seen": "ae9375a4"
+      "seen": "29b8a0ac"
     }
   ]
 }
@@ -92,10 +92,10 @@ feat/NNN-subject · fix/* · chore/*  ──►  develop  ──►  qa  ──�
 ### How a change moves up
 
 1. Open the worktree set. `spnutils workspace worktree add <NNN>` cuts the workstream's branch, `feat/<NNN>-<subject>`, from `origin/develop` in each repository the workstream's rows name. The set lives at `.worktrees/<NNN>-<subject>/` in the workspace, and the main checkouts stay on `develop`.
-2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RULE.DEVEX.FUNCTION.069`): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
-3. Take `develop`, then push. The branch takes `origin/develop` at the start of each pass (the agent fetches, and rebases where `develop` moved) and again before each push and each pull request, so the pull request merges clean (`RULE.DEVEX.FUNCTION.071`). After a rebase the owed tiers run again only where it changed a node's content, as the stamp's content hash says. The agent's push is checked for the offline test tiers of each node it carries and, in a TypeScript repository, for the formatting of every file it adds or changes: the repository's own pinned Prettier runs `--check`, and a failure names the files and `pnpm exec prettier --write <files>`.
+2. Commit on the workstream's branch. Every arc of the workstream commits there, by path. A commit on `develop`, `qa`, `uat` or `main` is refused. A commit subject, a pull request title and a pull request body are written for a developer reviewing on GitHub (`RULE.DEVEX.FUNCTION.069` · MUST · check:stop · due:036/N008): they say what changed for someone using the code (the feature, the behaviour, the upgrade and the proof), in the words of the approach page and the preview, and they name no workstream, arc, row, order or card number. A commit already pushed is not rewritten to fit this.
+3. Take `develop`, then push. The branch takes `origin/develop` at the start of each pass (the agent fetches, and rebases where `develop` moved) and again before each push and each pull request, so the pull request merges clean (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm). After a rebase the owed tiers run again only where it changed a node's content, as the stamp's content hash says. The agent's push is checked for the offline test tiers of each node it carries and, in a TypeScript repository, for the formatting of every file it adds or changes: the repository's own pinned Prettier runs `--check`, and a failure names the files and `pnpm exec prettier --write <files>`.
 4. Open the pull request into `develop`. The first push opens one pull request for the repository, and it stays open for the workstream. At least one approval is required, and new commits dismiss stale approvals. Every check the repository's world requires runs on the pull request, and it cannot merge while one fails.
-5. Merge, and let the environment that watches `develop` take it. The pull request is rebase-merged each time an arc lands a group of rows, so each row's commit stays as it was written. The environment that watches `develop` is named in the estate's declaration, never in your repository. After the merge, the merging window writes one line into every open workstream whose set holds the repository, naming what changed; a breaking contract change names its cutover, what must land with it and in what order (`RULE.DEVEX.FUNCTION.071`).
+5. Merge, and let the environment that watches `develop` take it. The pull request is rebase-merged each time an arc lands a group of rows, so each row's commit stays as it was written. The environment that watches `develop` is named in the estate's declaration, never in your repository. After the merge, the merging window writes one line into every open workstream whose set holds the repository, naming what changed; a breaking contract change names its cutover, what must land with it and in what order (`RULE.DEVEX.FUNCTION.071` · MUST · skill:spn-devex/scm).
 6. Choose the path, and promote with one command. `spnutils repo promote <to> [--from <branch>]` opens one pull request from `<from>` to `<to>` and merges it by a merge commit once its required checks are met. `<to>` is `qa`, `uat` or `main`, and `--from` is `develop` unless you name another permanent branch below `<to>`. So `develop` to `main` is `repo promote main`; `develop` to `qa` to `main` is `repo promote qa`, then `repo promote main --from qa`; the paths through `uat` run the same way. Quality engineering holds the `qa` gate and the business decides at `uat`, for the teams whose path goes through them. A promotion reruns no check, because its head is a commit that passed its checks on `develop`, and the command checks that the files merged equal that tested commit. A job skips on a pull request into `qa`, `uat` or `main` only where the head is a permanent branch of the same repository; any other head runs every job, and `promotion-source` refuses it, so a green check never stands for jobs that did not run. The agent names the path before it promotes, and asks which branch a change goes to when you have not said, because where a change goes is a release decision and it is the developer's.
 7. Cut a release from `main`, and promote the built artifact into production from the environment that proved it. A release is cut only from a clean tree at `origin/main`.
 8. Remove the set. `spnutils workspace worktree remove <NNN>` removes the worktree set once the work is on origin.
@@ -202,7 +202,7 @@ Some work belongs to one repository and nowhere else: the scripted release its p
 | The task opens with what it is — purpose, invocation, arguments, gates, and what it changes — so a reader or an agent chooses it without reading the body | MUST |
 | Gates run before anything changes: build, test and validation first | MUST |
 | A destructive step asks for confirmation, with an explicit approval flag as the only way past it, and the run reports what it did | MUST |
-| A task can be run again — safe to repeat, or it refuses and says why | SHOULD |
+| A task can be run again where it can be — safe to repeat, or it refuses and says why | MUST |
 | The repository's own agent instructions name each task and when it applies; an unlisted task is invisible, and an agent that rebuilds a task's steps instead of invoking it has bypassed every gate inside it | MUST |
 | A task is created by a person's decision, never an agent's initiative. Propose what you would do, what you would gate on and what you would change, and create it only once that is approved | MUST |
 

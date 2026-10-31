@@ -12,7 +12,7 @@
 // `row add` takes the arc's next number and prints it; the rules for a started step and a landed arc are RULE.DEVEX.WORKSPACE.278 and .261.
 
 import { type Action, FLAG, VALUE, UsageFault, readWords, type Words } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { arcStatus, doneOf, landingFault, logEvent, readArc, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
+import { arcStatus, doneOf, landingFault, logEvent, readArc, readSheet, stateOfRow, stepsMayStart, writeArc } from "../../lib/workstream.ts";
 import { ALTITUDES, ROW_ID, ROW_KINDS, ROW_STATES, parentIds, type ArcData, type ArcRow } from "../../lib/workstream-schema.ts";
 import { ARC_FLAGS, afterWrite, arcNamed, arcSignatures, listOf, refreshIfMoved, refuseFlags, typed } from "./_shared.ts";
 import { stepRowFindings } from "../../checks/workstream-state.ts";
@@ -119,6 +119,8 @@ function add(args: string[]): number {
   const statusBefore = arcStatus(data);
   if (statusBefore === "LANDED" || statusBefore === "CARRIED" || statusBefore === "DROPPED")
     throw new UsageFault(`keeps ${arc} as it is: it is ${statusBefore}, and a landed arc is never reopened — a fix to it is a step on the review-fixes arc, naming ${arc}; new scope is a new arc (RULE.DEVEX.WORKSPACE.261).`);
+  if ((readSheet(ws, arc)?.entries.length ?? 0) > 0)
+    throw new UsageFault(`keeps ${arc}'s steps as its sheet derives them: \`sheet write ${arc} --file <sheet.json>\` adds one for each repository and kind of change, so a step is never added by hand to an arc that keeps a sheet.`);
   const parent = words.value("parent");
   if (parent !== null && !data.rows.some((row) => row.id === parent)) throw new UsageFault(`finds no row ${parent} in ${arc} to put the row under.`);
   const rowId = nextId(data.rows, parent);
@@ -270,8 +272,8 @@ export const actions: Record<string, Action> = {
     run: note,
   },
   edit: {
-    describe: "change the fields of a row the arc holds; a row it lacks is refused, and `row add` is named",
-    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …]",
+    describe: "change the fields of a row the arc holds; --proof names a carried row's successor; a row it lacks is refused, and `row add` is named",
+    usage: "<workstream>/N<nnn> <row> [--title …] [--kind …] [--repo …] [--altitude …] [--model …] [--blocked-by …] [--touches …] [--entries E1,E2] [--position …] [--proof …]",
     run: edit,
   },
   discard: {

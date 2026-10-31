@@ -4,7 +4,10 @@
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that
 // never does, wearing the other sign. The set is stated once, in `arc-status.ts`, and what holds an arc to it is the
 // schema the `workstream` commands run, and the owner check that refuses a hand write under `arcs/`.
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { cli, dataWorkspace } from "../../../helpers/workstream-fixture.mjs";
+import { workspace } from "../../../helpers/fixture.mjs";
 
 const { STATUSES, STORED_STATUSES } = await import("../../../../src/scripts/checks/arc-status.ts");
 const { arcFaults } = await import("../../../../src/scripts/lib/workstream-schema.ts");
@@ -71,6 +74,32 @@ console.log("\n=== which statuses are past DECIDED, in the order of the set");
   for (const [word, expected] of [["PROPOSED", false], ["DECIDED", false], ["RUNNING", true], ["LANDED", true],
     ["CARRIED", true], ["DROPPED", true], ["OPEN", false], [null, false]])
     ok(`[MKT.HOOKS.40] ${word ?? "an arc with no status"} is ${expected ? "" : "not "}past DECIDED`, pastDecided(word) === expected);
+}
+
+console.log("\n=== a go carries the developer's own words: the words are in a prompt of this window or a log line of the workstream");
+{
+  const { checkArcStatus } = await import("../../../../src/scripts/checks/arc-status.ts");
+  const logged = JSON.stringify({ kind: "status", note: "PROPOSED → DECIDED · build the check as shown" });
+  const root = workspace("arc-status-go", {
+    ".spndevex/workstreams/open/020-x/arcs/N001/state.json": "{}\n",
+    ".spndevex/workstreams/open/020-x/arcs/N001/log.jsonl": `${logged}\n`,
+  });
+  const line = (content) => JSON.stringify({ type: "user", message: { role: "user", content } });
+  const transcript_path = join(root, "t.jsonl");
+  writeFileSync(transcript_path, [line("show me the plan"), line([{ type: "text", text: "Yes, go ahead with all of it" }]),
+    JSON.stringify({ type: "assistant", message: { role: "assistant", content: "all good" } })].join("\n") + "\n", "utf8");
+  const edit = (note, extra = "--status DECIDED") => ({ tool_name: "Bash", cwd: root, transcript_path,
+    tool_input: { command: `spn-devex workstream arc edit 020/N001 ${extra} --note "${note}"` } });
+  const kind = (verdict) => (verdict?.deny ? "deny" : "silent");
+  const refused = checkArcStatus(edit("the developer: all good"));
+  ok("[MKT.HOOKS.102] a go quoting words nobody typed is refused", kind(refused) === "deny", JSON.stringify(refused));
+  ok("[MKT.HOOKS.102] the refusal names the words and the arc", /all good/.test(refused?.deny ?? "") && /N001/.test(refused?.deny ?? ""), refused?.deny);
+  ok("[MKT.HOOKS.102] words only the assistant wrote are not the developer's", kind(checkArcStatus(edit("all good"))) === "deny");
+  ok("[MKT.HOOKS.103] the developer's typed words pass", kind(checkArcStatus(edit("Yes, go ahead with all of it"))) === "silent");
+  ok("[MKT.HOOKS.103] a quoted piece of what they typed passes", kind(checkArcStatus(edit("the developer said 'go ahead'"))) === "silent");
+  ok("[MKT.HOOKS.103] words a log line of the workstream holds pass", kind(checkArcStatus(edit("build the check as shown"))) === "silent");
+  ok("[MKT.HOOKS.103] a move to another status is not judged", kind(checkArcStatus(edit("all good", "--status CARRIED"))) === "silent");
+  ok("[MKT.HOOKS.103] a window with no transcript is not a finding", kind(checkArcStatus({ ...edit("all good"), transcript_path: undefined })) === "silent");
 }
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);

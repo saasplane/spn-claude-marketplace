@@ -47,8 +47,10 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { emit, readPayload, runAlone, unescape, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 import { sentenceColumn } from "../lib/item-cells.ts";
+import { findWorkingDetail } from "../lib/working-detail.ts";
+import { bookClassFaults, knownHolders, ownMarketplace } from "./book-classes.ts";
 import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
          artifactDocsPathOf, decisionsRegister, inArtifacts, workstreamPrefixSource, isApproachPage, isRegister as inRegisters, pagePlaceOf,
          workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -567,6 +569,75 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   return out;
 }
 
+// ---------------------------------------------------------------------------- what the template leaves behind
+
+/** The plugin's copy of the workstream templates, found up from this file in source or in a bundle; null where absent. */
+function workstreamTemplates(): string | null {
+  for (let dir = dirname(fileURLToPath(import.meta.url)); dirname(dir) !== dir; dir = dirname(dir)) {
+    const found = join(dir, PLUGIN_TEMPLATES, "workstream");
+    if (exists(found)) return found;
+  }
+  return null;
+}
+
+/** An arc's preview, by its fixed name in `notes/N<nnn>/`. */
+const isArcPreview = (path: string): boolean => /[\\/]notes[\\/]N\d+[a-z]?[\\/]preview\.html$/.test(path);
+
+// A comment every page keeps: the restated chapter, the page's `spn:doc` block, and the markers of a generated block.
+const KEPT_COMMENT = /^\s*(?:RESTATES:|spn:doc\b|\/?spn:generated\b)/;
+const commentsOf = (text: string): string[] =>
+  [...text.matchAll(/<!--([\s\S]*?)-->/g)].map((m) => m[1].replace(/\s+/g, " ").trim()).filter((one) => !KEPT_COMMENT.test(one));
+
+/**
+ * What an approach page or a preview keeps of its template (RULE.DEVEX.WORKSPACE.187, .228, .233, .238): a `{{…}}`
+ * slot or one of the template's own comments left in, a section the template does not have, or a table in
+ * Overview, all in one finding. An approach page's sections are `approachShape`'s; a page whose template
+ * cannot be read is judged on its slots and its Overview alone.
+ *
+ * @param template  the template's text; read from the plugin's references where not given
+ */
+export function templateShape(path: string, text: string, template: string | null = null): Finding[] {
+  const preview = isArcPreview(path);
+  if (!preview && !isApproachPage(path)) return [];
+  let model = template;
+  if (model === null) {
+    const dir = workstreamTemplates();
+    try { model = dir ? readFileSync(join(dir, preview ? "approach-preview-template.html" : "approach-template.html"), "utf8") : ""; }
+    catch { model = ""; }
+  }
+  const parts: string[] = [];
+  const slots = (text.replace(/<!--[\s\S]*?-->/g, " ").match(/\{\{[^{}\n]*\}\}/g) ?? []).length;
+  if (slots) parts.push(`still holds ${slots} template slot${slots === 1 ? "" : "s"}`);
+  const theirs = new Set(commentsOf(model));
+  const kept = commentsOf(text).filter((one) => theirs.has(one)).length;
+  if (kept) parts.push(`keeps ${kept} of the template's comment${kept === 1 ? "" : "s"}`);
+  if (preview && model) {
+    const allowed = new Set(headings(model));
+    const extra = [...new Set(headings(text).filter((one) => !allowed.has(one)))];
+    if (extra.length) parts.push(`carries ${extra.join(" + ")}, a section its template does not have`);
+  }
+  const overview = section(text, "Overview");
+  if (overview !== null && /<table\b/i.test(overview)) parts.push("its Overview holds a table");
+  if (!parts.length) return [];
+  return [["RULE", `${basename(dirname(dirname(path))) === "notes" ? `notes/${basename(dirname(path))}/${basename(path)}` : basename(path)} ` +
+    `${parts.join(", and ")} (RULE.DEVEX.WORKSPACE.187, .228, .233, .238) · fill every slot, drop the template's comments, ` +
+    "keep to the template's sections, and say Overview in prose"]];
+}
+
+/**
+ * The agent's working detail on an approach page or a preview, by the list the turn's end reads too
+ * (`lib/working-detail.ts`): each sentence that names a row or order number, an order's file, a bare suggestion
+ * number, a rule id or a check's file name is flagged with the sentence to rewrite. A code block, a table, a
+ * heading and a file's frame title are not read.
+ */
+export function workingDetail(path: string, text: string): Finding[] {
+  if (!isArcPreview(path) && !isApproachPage(path)) return [];
+  const prose = proseOf(text.replace(/<figcaption\b[\s\S]*?<\/figcaption>/gi, " "), true);
+  return findWorkingDetail(prose).slice(0, 4).map((one) => ["SOFT",
+    `names the agent's working detail, ${/^[aeiou]/.test(one.kind) ? "an" : "a"} ${one.kind}, in "${one.sentence.slice(0, 160)}" · say it in the goal's words and the ` +
+    "developer's; an arc number, and a card's number beside its words, may stay"] as Finding);
+}
+
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
 export function overviewShape(text: string): Finding[] {
   const organs = headings(text).filter((h) => h === "open" || h === "deferred");
@@ -852,6 +923,65 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   // under-counts is a verdict nobody can act on. It stays in the rates table at the foot of a run,
   // where a share is read across a corpus and compared against its bar, which is what a share is for.
   return out;
+}
+
+// ---------------------------------------------------------------------------- compressed sentences
+
+// A verb in its base form or a regular form of it, or a word that only a verb phrase carries. An imperative is a
+// sentence, so "Lead by example." passes.
+const BASE_VERBS = ("accept act add agree allow answer apply arrive ask assign become begin belong bind block break bring " +
+  "build call carry catch change check choose cite claim close come compare count cover create cross cut decide declare define " +
+  "delete deliver depend derive describe design do drop earn edit end enter exist expect explain fail fall feel fill find finish " +
+  "differ die govern match nest launch select capture validate draw demand admit gate store " +
+  "fit fix flag follow forget gain get give go grant grow hand happen have hear help hide hold keep know land lead learn leave let " +
+  "lift link list live load look lose make mark matter mean meet merge miss move name need note open order own parse pass pay pick " +
+  "place point post print promote propose prove publish pull push put raise reach read record refuse release remove render replace " +
+  "report require rest restate return reuse review rewrite rise rule run say see seem sell send serve set settle share ship show sit " +
+  "skip sort speak split stand start state stay stop suit take talk teach tell test think touch treat try turn use wait walk want warn " +
+  "win work wrap write").split(" ");
+const IRREGULAR_VERBS = ("is are was were be been being am has had does did done made said told took taken gave given went gone came " +
+  "saw seen knew known wrote written ran held kept left led lost met paid shown sent spent stood thought understood won built bought " +
+  "brought caught chose chosen fell felt found got grew grown heard laid meant rose sat sold spoke spoken taught can could will would " +
+  "shall should may might must").split(" ");
+const VERB_FORMS = new Set(IRREGULAR_VERBS);
+for (const verb of BASE_VERBS)
+  for (const form of [verb, `${verb}s`, `${verb}es`, `${verb}ed`, `${verb}d`, `${verb}ing`, verb.replace(/y$/, "ies"), verb.replace(/y$/, "ied")])
+    VERB_FORMS.add(form);
+// A word ending in -s after a noun reads as a verb ("The tree folds."), and after a determiner or a number as a plural
+// ("The limits across a view."). Short of a parser, that one distinction carries most of what the list misses.
+const NOUN_BEFORE = new Set(("the a an this that these those each every one two three four five no some any its their our your " +
+  "of in on at by for with to from per across under over and or both all").split(" "));
+const hasVerb = (text: string): boolean => {
+  if (/\b(?:don't|doesn't|never|not)\b/i.test(text)) return true;
+  const words = text.toLowerCase().match(/[a-z'-]+/g) ?? [];
+  return words.some((word, at) => VERB_FORMS.has(word)
+    || (at > 0 && /[^su']s$/.test(word) && !NOUN_BEFORE.has(words[at - 1])));
+};
+
+/** A paragraph that opens with a bold run ending its own sentence, in markdown or on a page. */
+const BOLD_LEAD_MD = /^(?:[-*] |\d+\. )?\*\*([^*\n]+?[.!?])\*\*/gm;
+const BOLD_LEAD_HTML = /<(?:p|li|td)[^>]*>\s*<strong>([^<]+?[.!?])<\/strong>/g;
+
+/**
+ * The compressed sentences of one page (RULE.DEVEX.WORKSPACE.096): a bold lead that holds no verb, and three or more
+ * clauses joined by semicolons. Semicolons that follow a colon separate a list's items, and are not counted.
+ */
+export function compressedSentences(text: string, isHtml: boolean): string[] {
+  const out: string[] = [];
+  for (const [, lead] of text.matchAll(isHtml ? BOLD_LEAD_HTML : BOLD_LEAD_MD))
+    if (!hasVerb(lead.replace(/`[^`]*`/g, " "))) out.push(`a bold lead with no verb, "${lead.trim()}"`);
+  for (const [sentence] of sentences(proseOf(text, isHtml)))
+    if ((sentence.match(/;/g) ?? []).length >= 2 && !sentence.split(";")[0].includes(":"))
+      out.push(`three clauses joined by semicolons, "${opening(sentence, 8)}"`);
+  return out;
+}
+
+/** The compressed fault as one finding, on a page a person reads. It notes and refuses nothing. */
+export function compressedRule(text: string, isHtml: boolean): Finding[] {
+  const found = compressedSentences(text, isHtml);
+  if (!found.length) return [];
+  return [["SOFT", `${found.length} compressed sentence(s) — RULE.DEVEX.WORKSPACE.096 talks to the reader in whole sentences: ` +
+    `${found.slice(0, 3).join(" · ")} · give the lead its verb, and join one clause to the next with a word`]];
 }
 
 // ---------------------------------------------------------------------------- registers
@@ -1157,13 +1287,24 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   }
   // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
   if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
+  // What the template left in, on the whole page; the working detail in whatever is written.
+  if (isHtml && !exemptWorkstream(path) && !inClosedWorkstream(path)) {
+    if (!fragment) out.push(...templateShape(path, text));
+    out.push(...workingDetail(path, text));
+  }
   if (isHtml && itemCellPage(path) && !inClosedWorkstream(path)) out.push(...columnRule(text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));
+  // A plugin file is the agent's to act on, and the compressed fault reads only the places a person reads.
+  if (!isOperative(path) && !isRegister(path)) out.push(...compressedRule(text, isHtml));
   if (isRegister(path)) out.push(...rows(text)[0]);
+  if (inBook(path)) out.push(...bookClassFaults(text, knownHolders(ownMarketplace(), workspaceRoot(dirname(path)))).map((f) => ["RULE", f] as Finding));
   return out;
 }
+
+/** A book chapter: a markdown file under a folder named `spn-foundation/docs/`. */
+const inBook = (path: string): boolean => path.endsWith(".md") && slashes(path).includes("/spn-foundation/docs/");
 
 // ---------------------------------------------------------------------------- a column nobody reads down
 

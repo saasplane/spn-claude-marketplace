@@ -3,7 +3,7 @@
 // reader is always told which run to read (the book's RULE.DEVEX.UTILS.071). This file lives once, in
 // the shared support-lib folder; spn-devex and spn-apps each import it by relative path.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
 
 /** A file's text, or null. A file that cannot be read is never a finding. */
@@ -26,6 +26,36 @@ export const RUN_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 
 /** The folder a tier's run files sit in: `tests/.output/<tier>/runs/`. */
 export const RUNS_FOLDER = "runs";
+
+/** How many run files each tier keeps. */
+export const RUNS_KEPT = 20;
+
+/** The run file a named run of one tier writes under a repository. */
+export const runFilePath = (repo: string, tier: string, run: string): string =>
+  join(repo, "tests", ".output", tier.toLowerCase(), RUNS_FOLDER, `${run}.json`);
+
+/**
+ * Writes one run's file, in the shape every stack's runner writes, and prunes the tier's folder to its newest
+ * `RUNS_KEPT`. A name that cannot be a file name is refused rather than written somewhere nobody would look. With
+ * `append`, the results join those a file of the same run already holds; without it a reused name replaces the file.
+ */
+export function writeRunFile(repo: string, run: string, tier: string, results: Result[], append = false): string {
+  if (!RUN_NAME.test(run)) {
+    throw new Error(`'${run}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores`);
+  }
+  const file = runFilePath(repo, tier, run);
+  mkdirSync(dirname(file), { recursive: true });
+  const before: Result[] = append && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")).results ?? [] : [];
+  const ranAt = `${new Date().toISOString().slice(0, 19)}Z`;
+  writeFileSync(file, `${JSON.stringify({ run, tier, phase: null, ranAt, env: "local", results: [...before, ...results] }, null, 2)}\n`, "utf8");
+  const older = readdirSync(dirname(file))
+    .filter((name) => name.endsWith(".json"))
+    .map((name) => join(dirname(file), name))
+    .filter((path) => path !== file)
+    .sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs);
+  for (const stale of older.slice(RUNS_KEPT - 1)) rmSync(stale, { force: true });
+  return file;
+}
 
 export type Result = { id: string; tier: string; status: string; title: string; detail?: string | null };
 

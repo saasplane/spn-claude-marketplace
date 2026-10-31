@@ -65,6 +65,12 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 **What** — `implement` closes with the suites and then hands the change to `review` in its contract mode, rather than leaving the gate to whoever remembers it.
 **How** — the hand-off is named in the description, so the match happens even when the developer does not ask for it. `packages/plugin-spn-apps/src/skills/implement/SKILL.md`.
 
+### A step opens with the rules its skill holds
+
+**Why** — *a skill that names a rule only where its author remembered to leaves the rest to memory*, and a step is the moment a rule matters.
+**What** — each step that does a skill's work opens with a generated block of the rules that skill holds, each with the level the book gives it. A reader sees how strongly a rule binds without opening the book.
+**How** — the plugins build writes the block from the rules index that spn-devex builds from the book (`refs/rules.json`), so a skill step in spn-apps restates nothing by hand. A rule changed in the book changes the block at the next build.
+
 ## Between modules
 
 | Direction | With | What | Why |

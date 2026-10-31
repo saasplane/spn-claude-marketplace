@@ -8,11 +8,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/03-module/01-server/README.md",
-      "seen": "056b619a"
+      "seen": "c8ffabd9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/07-comments/README.md",
-      "seen": "ed86c6a1"
+      "seen": "57e8804a"
     }
   ]
 }

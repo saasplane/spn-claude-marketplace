@@ -35,9 +35,12 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let n = 0, failed = 0;
 
+// A PASSING CASE IS PRINTED TOO: the runner records a case's id only from its PASS line, so a suite that
+// printed failures alone proved nothing to a named run, and a row its ids cover could never land.
 function one(label, ok) {
   n += 1;
-  if (!ok) { failed += 1; console.log(`  FAIL  ${label}`); }
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
 }
 
 /** One `docs coherence check` of a path through the entry, with what follows the path. A refusal's text is handed back with the rest. */
@@ -125,6 +128,21 @@ one("an RD id is reported, whatever the workspace holds", run(retired).includes(
   one("a RULE id the book states resolves from a sibling repository, and one nothing states does not",
     /CITATION\s+1 id\(s\)/.test(crossOut) && crossOut.includes("RULE.SUPPORT.SURFACE.999 — resolves nowhere")
       && !crossOut.includes("RULE.SUPPORT.SURFACE.075 —"));
+}
+
+{
+  // The marked parenthesis `(rule ID · LEVEL · short)` is the id's place, the same as the bare form.
+  const ws = join(BASE, "marked");
+  const book = join(ws, "spn-foundation");
+  mk(book, `docs/${SEAT.constructs}/b.md`, "# B\n\n## Marked\n\nA rule MUST hold (rule RULE.SUPPORT.SURFACE.075 · MUST · short).\n\nA second MUST hold (rule RULE.SUPPORT.SURFACE.076).\n");
+  mk(book, "sprepo.json", '{"type":"FOUNDATION","name":"spn-foundation","config":null}');
+  const marketplace = join(ws, "spn-claude-marketplace");
+  mk(marketplace, "sprepo.json", '{"type":"GENERAL","name":"m","config":null}');
+  mk(marketplace, `docs/${SEAT.constructs}/a.md`, "# A\n\nIt cites RULE.SUPPORT.SURFACE.075.\n");
+  WORKSPACE = ws;
+  const markedOut = run(marketplace);
+  WORKSPACE = null;
+  one("[MKT.SCRIPTS.203] a RULE id the book marks as `(rule ID · MUST · short)` resolves", !markedOut.includes("RULE.SUPPORT.SURFACE.075 —"));
 }
 
 // 1 — every citation resolves, so the check says nothing at all.

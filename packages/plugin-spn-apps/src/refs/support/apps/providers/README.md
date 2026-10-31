@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/10-providers.md",
-      "seen": "03fe3e6d"
+      "seen": "23790713"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/10-providers/",
-      "seen": "1b7c46fb"
+      "seen": "e86d2c57"
     }
   ]
 }
@@ -43,7 +43,7 @@
 
 **Every stack carries the seven rules of a call between services.** A server module has two faces, its contract and its implementation; the contract face loads without the implementation; a module offers a runtime manager and a remote manager from one base; a module's inner services are reachable in the same process only; each contract interface has its methods as data, produced and never written; one service calls another's contract through the API entry's remote route, with the caller's signed passport and the calling service's own credential; and only the identity module says whose token it is. Whether a stack publishes the contract face as a second door of one package or as a package of its own is that stack's choice.
 
-**A stack names the units of a web module in its own form.** In TypeScript every unit of a web module ends in the word for where it is placed or what it is, and only a plain component needs none (`RULE.SUPPORT.APPS.202`, amended by `RULE.SUPPORT.SURFACE.229`). A module's route keys as one enum and its routes as one constant are proposed (`RULE.SUPPORT.APPS.203`). A unit with many props groups them in named interfaces built from the owner's props with `Omit` or `Pick` (`RULE.SUPPORT.APPS.213`), and a props shape shared by many units that is a unit of its own is held as one attribute and named with no `Props` (`RULE.SUPPORT.APPS.215`). Its units of a web module also follow the naming of states, enums and design-system blocks (`RULE.SUPPORT.APPS.205`, `RULE.SUPPORT.APPS.206`, `RULE.SUPPORT.APPS.207`). [`ts/02-naming.md`](ts/02-naming.md) states both, and [`ts/08-web.md`](ts/08-web.md) names a route, an overlay with an address and the provider a partner mounts.
+**A stack names the units of a web module in its own form.** In TypeScript every unit of a web module ends in the word for where it is placed or what it is, and only a plain component needs none (`RULE.SUPPORT.APPS.202` · MUST · skill:spn-apps/implement), amended by (`RULE.SUPPORT.SURFACE.229` · MUST · skill:spn-surface/design). A module's route keys as one enum and its routes as one constant are proposed (`RULE.SUPPORT.APPS.203` · MUST · skill:spn-apps/implement). A unit with many props groups them in named interfaces built from the owner's props with `Omit` or `Pick` (`RULE.SUPPORT.APPS.213` · MUST · skill:spn-apps/implement), and a props shape shared by many units that is a unit of its own is held as one attribute and named with no `Props` (`RULE.SUPPORT.APPS.215` · MUST · skill:spn-apps/implement). Its units of a web module also follow the naming of states, enums and design-system blocks (`RULE.SUPPORT.APPS.205` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.APPS.206` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.APPS.207` · MUST · skill:spn-apps/implement). [`ts/02-naming.md`](ts/02-naming.md) states both, and [`ts/08-web.md`](ts/08-web.md) names a route, an overlay with an address and the provider a partner mounts.
 
 **A stack declares which runtimes it realizes**, and answers *out of coverage* for a kind it does not have — rather than quietly skipping it. A platform composes one server-covering stack with one web-covering stack, and the contract chain artifacts are the only coupling between them. **No stack may answer *what kinds exist* differently from any other.**
 

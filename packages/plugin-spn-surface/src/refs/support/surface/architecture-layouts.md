@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/09-architecture-layouts.md",
-      "seen": "15de920d"
+      "seen": "242edcbd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/09-architecture-layouts/",
-      "seen": "4b61c951"
+      "seen": "94f9832a"
     }
   ]
 }
@@ -48,7 +48,7 @@ Read this before you choose a layout for an app, or before you build or draw a l
 
 **The library draws `DSLayout`:** each `DSLayoutType` (`RAIL`, `DOCK`, `TOPNAV`, `CANVAS`) once, and on a narrow screen once; `footerNode` as a swap; and, as its usage, an app's page, its rail, its bar and the content.
 
-- **A layout is chosen by the job of the app, as the table says, and not by how it looks** (`RULE.SUPPORT.SURFACE.206`, advice). The page chooses its layout, and the theme does not. One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
+- **A layout is chosen by the job of the app, as the table says, and not by how it looks** (`RULE.SUPPORT.SURFACE.206` · GUIDE). The page chooses its layout, and the theme does not. One app may hold two: an admin app in `RAIL` signs a person in on `CANVAS` and opens their profile in `DOCK`.
 
 A layout names no routing library — it moves between pages through the navigation seam, and the app's own router decides which page a route shows. The layout type is not a choice of the theme: every theme works with every layout.
 
@@ -64,19 +64,19 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | Navigation | its fill, its line, its shadow, whether it meets the window's edge, and whether the top bar stays while the page scrolls | `RAIL` · `DOCK` · `TOPNAV` |
 | Content | its fill, its line, its shadow, and whether it is a box at the body's width that meets the navigation | `RAIL` · `DOCK` · `TOPNAV` |
 
-- **A layout MUST have three parts, the body, the navigation and the content, and each MUST own only what the table gives it** (`RULE.SUPPORT.SURFACE.200`). The width and the fill behind everything are the body's, and the content owns nothing inside its area (`RULE.SUPPORT.APPS.146`).
-- **Each part that draws a fill MUST give its surface** (`RULE.SUPPORT.SURFACE.199`): the body for what stands straight on it, the navigation for its entries, and the content for the page.
-- **The page's fill is `page-fill`, and the colour of the body sets it** (`RULE.SUPPORT.APPS.160`, `RULE.SUPPORT.SURFACE.200`). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. That no page and no story sets a fill of its own is advice.
-- **A navigation's colour stays in the navigation** (`RULE.SUPPORT.SURFACE.226`). The bar, the rail, the dock's column and the phone's bar and drawer carry the navigation's surface; the body and the content each carry their own, `BASE` by default or the theme's colour, so a tile, a card or a text box in the page never takes the navigation's tint. A unit in the navigation, such as an item card in the rail, may take the navigation's tint; a unit in the content takes the content's.
+- **A layout MUST have three parts, the body, the navigation and the content, and each MUST own only what the table gives it** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). The width and the fill behind everything are the body's, and the content owns nothing inside its area (`RULE.SUPPORT.APPS.146` · MUST · skill:spn-apps/implement).
+- **Each part that draws a fill MUST give its surface** (`RULE.SUPPORT.SURFACE.199` · MUST · skill:spn-surface/design): the body for what stands straight on it, the navigation for its entries, and the content for the page.
+- **The page's fill is `page-fill`, and the colour of the body sets it** (`RULE.SUPPORT.APPS.160` · MUST · skill:spn-apps/implement) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). The default theme's body colour is `BASE`, so the page is white in light and 0.22 in dark under a navigation of `DEFAULT` at `SUBTLE`. Nothing works the colour out from the containers. That no page and no story sets a fill of its own is advice.
+- **A navigation's colour stays in the navigation** (`RULE.SUPPORT.SURFACE.226` · MUST · skill:spn-surface/design). The bar, the rail, the dock's column and the phone's bar and drawer carry the navigation's surface; the body and the content each carry their own, `BASE` by default or the theme's colour, so a tile, a card or a text box in the page never takes the navigation's tint. A unit in the navigation, such as an item card in the rail, may take the navigation's tint; a unit in the content takes the content's.
 - **The content MUST fill from its own colour and strength**, `BASE` where the app left it out. Its `bordered` and `raised` are its own: they follow neither the navigation's nor each other's.
-- **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RULE.SUPPORT.SURFACE.139`). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RULE.SUPPORT.SURFACE.161`). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `SUBTLE`, and the content flat, at the whole width.
+- **A layout MUST draw its three parts by the layout look of the theme, and the theme holds no setting for one layout type** (`RULE.SUPPORT.SURFACE.139` · MUST · skill:spn-surface/design). A field the app left out holds the default theme's value, so a layout keeps no fallback of its own (`RULE.SUPPORT.SURFACE.161` · MUST · skill:spn-surface/design). With no choice at all, `RAIL`, `DOCK` and `TOPNAV` draw a white page, a navigation of the neutral hue at `SUBTLE` with a line and a shadow that meets the window, the open entry `SUBTLE`, and the content flat, at the whole width.
 - **The three parts take one surface scale**: a colour and a strength give the same fill on every part, so contrast between parts is a choice of values. The default sets the navigation (`DEFAULT` at `SUBTLE`) apart from a `BASE` body and content; a body one step stronger than the parts on it makes floating parts stand out; the same pair on two parts makes them one; all at `BASE` with floating on reads only through borders and shadows.
-- **A look comes from the theme, and a page's config changes it field by field** (`RULE.SUPPORT.SURFACE.156`). The layouts alone read the theme and hand each look down: the navigation goes to its bar as `look`, and the bar hands it to its list. A config gives `body`, and for `RAIL`, `DOCK` and `TOPNAV` also `navigation` and `content`; `CANVAS` takes the body alone and refuses the others by its `mtype`. What an app chooses once sits in the theme, and what the code supplies sits in the config.
-- **The navigation holds no colour of its own: each part of its look points at a token** (`RULE.SUPPORT.SURFACE.163`).
+- **A look comes from the theme, and a page's config changes it field by field** (`RULE.SUPPORT.SURFACE.156` · MUST · skill:spn-surface/design). The layouts alone read the theme and hand each look down: the navigation goes to its bar as `look`, and the bar hands it to its list. A config gives `body`, and for `RAIL`, `DOCK` and `TOPNAV` also `navigation` and `content`; `CANVAS` takes the body alone and refuses the others by its `mtype`. What an app chooses once sits in the theme, and what the code supplies sits in the config.
+- **The navigation holds no colour of its own: each part of its look points at a token** (`RULE.SUPPORT.SURFACE.163` · MUST · skill:spn-surface/design).
 
 ## The width, on the body — 🔮
 
-- **The width is the body's, and the navigation and the content stand in its box** (`RULE.SUPPORT.SURFACE.158`, `RULE.SUPPORT.SURFACE.200`). The box is the width, centred. `width` takes five steps, and `maxWidth` stays for a page whose width no step names. The theme gives every app `FULL`. A width only bounds: on a screen narrower than its step, the box is the screen less the layout's space.
+- **The width is the body's, and the navigation and the content stand in its box** (`RULE.SUPPORT.SURFACE.158` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). The box is the width, centred. `width` takes five steps, and `maxWidth` stays for a page whose width no step names. The theme gives every app `FULL`. A width only bounds: on a screen narrower than its step, the box is the screen less the layout's space.
 
 | Width | At most | What it fits |
 | --- | --- | --- |
@@ -87,7 +87,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 | `FULL` | the screen | a canvas, a map, a board that uses every pixel |
 
 - **A page that wants a column narrower than the box sets that width on its own block.** What stands inside the content is the page's.
-- **The bar's items and the page's content stand in one box in every layout type, at every width** (`RULE.SUPPORT.SURFACE.172`). The box is the body's, and the content keeps `--layout-space` as its padding, so the bar's first item starts where the content starts and its last item ends where it ends.
+- **The bar's items and the page's content stand in one box in every layout type, at every width** (`RULE.SUPPORT.SURFACE.172` · MUST · skill:spn-surface/design). The box is the body's, and the content keeps `--layout-space` as its padding, so the bar's first item starts where the content starts and its last item ends where it ends.
 
 ## Attached and sticky — 🔮
 
@@ -96,18 +96,18 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 - **`sticky` governs the top bar alone, the bar of `TOPNAV` and of `DOCK`**, and the default is sticky. A rail always stays at the height of the window, and the column of a dock always stays beside the page; `sticky` governs neither. Sticky and attached stand apart, so each of their four combinations is drawn.
 - **A page that opens on a section MUST start the section's fill at the top of its place, and one that closes on a section MUST end the fill at the place's end.** The layout's page space stands above the first block and below the last only where that block is not a section, so a section's fill meets the bar and the footer with no band of the page between. The footer still keeps the layout's space above its own words. `DOCK` keeps its page space, because its column lines up with the page's first block.
 - **Where the content draws a line at a side, the line MUST stand within the layout's space at that side**, so the page's words still start where the bar's, the header's and the footer's start.
-- **A top navigation takes no `overlay`, and nothing stands over the content** (`RULE.SUPPORT.SURFACE.200`). The content starts under the bar, or under the header. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
-- **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RULE.SUPPORT.SURFACE.170`). The edge line of a rail follows the `bordered` of the navigation (`RULE.SUPPORT.SURFACE.165`).
+- **A top navigation takes no `overlay`, and nothing stands over the content** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). The content starts under the bar, or under the header. A marketing page that wants its hero to read as one with the bar gives the body the hero's colour and lets the bar float.
+- **A part of the navigation draws its line and its shadow only at the sides that face the page** (`RULE.SUPPORT.SURFACE.170` · MUST · skill:spn-surface/design). The edge line of a rail follows the `bordered` of the navigation (`RULE.SUPPORT.SURFACE.165` · MUST · skill:spn-surface/design).
 - **A translucent navigation shows only where content passes behind it:** a top bar that stays in view, a panel of navigation, and a navigation drawn raised over the content. The fill stays mostly opaque, with a blur behind it. Where the system of the person asks for less transparency, and where the browser cannot blur, it draws opaque.
-- **A panel of entries of the navigation belongs to the navigation** (`RULE.SUPPORT.SURFACE.140`). The panel of a group under a top bar and the flyout of a shut rail take the fill and the opacity of the navigation, a line where it is `bordered`, and a shadow where it is `raised`. A menu of actions, such as the menu of the account, does not take the look of the navigation.
+- **A panel of entries of the navigation belongs to the navigation** (`RULE.SUPPORT.SURFACE.140` · MUST · skill:spn-surface/design). The panel of a group under a top bar and the flyout of a shut rail take the fill and the opacity of the navigation, a line where it is `bordered`, and a shadow where it is `raised`. A menu of actions, such as the menu of the account, does not take the look of the navigation.
 
 ## The spacing — 🔮
 
-- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RULE.SUPPORT.SURFACE.200`). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
+- **The layout keeps one spacing, `--layout-space`, from the theme's `size`, with no setting of its own** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). It is 16 px at `XS` and `SM`, 24 at `MD`, 32 at `LG` and `XL`, and 16 on a phone at every size. There is no gutter type and no gutter.
 - **`--layout-space` is the page's padding and every gap of the layout:** the padding inside the content, the gap between a floating navigation and the window and the content, the gap around a floating content, the gap between the dock's column and the page, and the gap above the header under a floating bar.
 - **Where two parts both float, the space between them is one `--layout-space`, never two.**
-- **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RULE.SUPPORT.SURFACE.173`). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
-- **The layout's measures are named in the scale**: the rail open (one value for each size step: 224, 240, 256, 288 and 320 px, `XS` to `XL`, by the rail's `size`), shut and in the drawer, the room above and below the brand in the head of the rail (the padding one step below the rail's `size`, `XS` keeping its own: 8, 8, 12, 16 and 20 px), the height of a bar (`layout-bar`, 48, 56, 56, 64 and 72 px by the layout's `size`), the width of the dock's column (`layout-dock-column`, 224, 240, 256, 288 and 320 px by the dock's `size`), the widest body at `XWIDE`, `WIDE`, `MEDIUM` and `NARROW` (`layout-xwide`, `layout-shell`, `layout-medium`, `layout-narrow`), and `layout-space`. No layout holds one as a number (`RULE.SUPPORT.APPS.152`).
+- **A top navigation holds the few entries that fit, on one line, and moves none of them** (`RULE.SUPPORT.SURFACE.173` · MUST · skill:spn-surface/design). `DSNavBarTop` keeps every label to one line, and its start node, its list and its end node never shrink. An app with many sections takes `RAIL` or `DOCK`. Below `md` the entries stand in the drawer.
+- **The layout's measures are named in the scale**: the rail open (one value for each size step: 224, 240, 256, 288 and 320 px, `XS` to `XL`, by the rail's `size`), shut and in the drawer, the room above and below the brand in the head of the rail (the padding one step below the rail's `size`, `XS` keeping its own: 8, 8, 12, 16 and 20 px), the height of a bar (`layout-bar`, 48, 56, 56, 64 and 72 px by the layout's `size`), the width of the dock's column (`layout-dock-column`, 224, 240, 256, 288 and 320 px by the dock's `size`), the widest body at `XWIDE`, `WIDE`, `MEDIUM` and `NARROW` (`layout-xwide`, `layout-shell`, `layout-medium`, `layout-narrow`), and `layout-space`. No layout holds one as a number (`RULE.SUPPORT.APPS.152` · MUST · skill:spn-apps/implement).
 
 ## The places — 🔮
 
@@ -123,7 +123,7 @@ A layout has three parts for its look, whatever its type. Each part owns one thi
 
 A place has a short form for where its room is short: `startNodeCollapsed`, `actionsNodeCollapsed` and `endNodeCollapsed`.
 
-- **A place MUST be named by where it stands, and never by what it holds** (`RULE.SUPPORT.SURFACE.157`). A brand, an account or a search is what a page puts in a place.
+- **A place MUST be named by where it stands, and never by what it holds** (`RULE.SUPPORT.SURFACE.157` · MUST · skill:spn-surface/design). A brand, an account or a search is what a page puts in a place.
 - **The places of the navigation sit in the config of a layout type that has a navigation, and the `mtype` of the config decides them.** So `CANVAS` refuses a place of the navigation by its type. Every type with a navigation takes the same places, so a page moves between them with nothing in its content changing.
 - **The footer is an optional place that closes the page, and every layout type places it the same way, at the end of the page, as the top bar is at its start.** It runs the window's width, and beside a rail the width of the area beside it; what it holds stands in the body's box, with the same layout space as the header and the bar, so it lines up with the bar's items and the page. It stands under the content's box, so its own fill or line runs the full width. Where the content is short it stands at the window's bottom, where long after the content. The layout draws no fill or line for it and pads it by the layout space above and below. At `FULL` the box is the window less the layout space; on a phone, the screen's width.
 
@@ -138,20 +138,20 @@ A place has a short form for where its room is short: `startNodeCollapsed`, `act
 
 - **A layout MUST build its navigation from the navigation units** (`architecture-components.md`, `RULE.SUPPORT.SURFACE.157`).
 - **A rail has a fixed head, entries that scroll, and a fixed foot, and no strip over the content.** The page draws its own head, trail, title and actions in its first block.
-- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RULE.SUPPORT.SURFACE.157`, `RULE.SUPPORT.SURFACE.199`). With the content attached, the column stands inside the box at its left, on the content's fill, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the column stands on the body beside the sheet wearing the navigation's whole look. The header is above both.
-- **The header MUST stand directly under the bar, and what it holds MUST stand in the body's box, as the footer's does** (`RULE.SUPPORT.SURFACE.258`). It belongs to `TOPNAV` and `DOCK`, and a rail and a canvas take none. The place runs the window's width and scrolls with the page; it is not sticky. Under a floating bar it starts one `--layout-space` below it. The layout draws no fill, line or padding for it. A hero that needs the whole window is a section placed in it, with `flush` or `mediaNode`: the section's fill reaches the window's edges and its words stay in the box, so a section behaves the same in the header, the page and the footer.
+- **The column of a dock is a rounded panel beside the page, as tall as its entries, with its top edge on the same line as the page's first block** (`RULE.SUPPORT.SURFACE.157` · MUST · skill:spn-surface/design) (`RULE.SUPPORT.SURFACE.199` · MUST · skill:spn-surface/design). With the content attached, the column stands inside the box at its left, on the content's fill, wearing the navigation's whole look, its fill, line and shadow. With the content floating, the column stands on the body beside the sheet wearing the navigation's whole look. The header is above both.
+- **The header MUST stand directly under the bar, and what it holds MUST stand in the body's box, as the footer's does** (`RULE.SUPPORT.SURFACE.258` · MUST · skill:spn-surface/design). It belongs to `TOPNAV` and `DOCK`, and a rail and a canvas take none. The place runs the window's width and scrolls with the page; it is not sticky. Under a floating bar it starts one `--layout-space` below it. The layout draws no fill, line or padding for it. A hero that needs the whole window is a section placed in it, with `flush` or `mediaNode`: the section's fill reaches the window's edges and its words stay in the box, so a section behaves the same in the header, the page and the footer.
 - **The bar of a dock is drawn only when it holds `startNode`, `actionsNode` or `endNode`;** on a phone a bar is still drawn. A top nav always draws its bar.
 
 ## The bar's width and the navigation's size — 🔮
 
 A website's bar often stands wider than its page, and a dense app wants smaller entries than a site does. Both are props of the layout's config, not looks of the theme. The navigation look is shared by `RAIL`, `DOCK` and `TOPNAV`, so a field only one of them reads does not belong in it, and an app on `TOPNAV` that sets neither keeps the bar it has.
 
-- **`TOPNAV` and `DOCK` MUST take the width of the bar's items as `barWidth` in their config, and the theme MUST hold none** (`RULE.SUPPORT.SURFACE.257`). `barWidth` takes `DSLayoutWidthType`. Left out, or narrower than the body's width, it is the body's width, so the bar's items and the page stand in one box. Wider, the bar's items stand in the wider box and the page keeps the body's: a bar at `FULL` over a page at `WIDE`. A floating bar stands on the edges of the bar's box.
-- **`RAIL`, `DOCK` and `TOPNAV` MUST take the size of the navigation's entries as `size` in their config, of every step `XS` to `XL`** (`RULE.SUPPORT.SURFACE.257`). Left out, it is the size of the scope above, the theme's where nothing sets one. The layout hands it to its bar, and the bar to its list. A top nav's `size` sets its entries and the bar's height, a dock's sets its column's entries, the column's width and the height of its bar, and a rail's sets its entries and the open rail's width. `architecture-components.md` states the values of each step.
+- **`TOPNAV` and `DOCK` MUST take the width of the bar's items as `barWidth` in their config, and the theme MUST hold none** (`RULE.SUPPORT.SURFACE.257` · MUST · skill:spn-surface/design). `barWidth` takes `DSLayoutWidthType`. Left out, or narrower than the body's width, it is the body's width, so the bar's items and the page stand in one box. Wider, the bar's items stand in the wider box and the page keeps the body's: a bar at `FULL` over a page at `WIDE`. A floating bar stands on the edges of the bar's box.
+- **`RAIL`, `DOCK` and `TOPNAV` MUST take the size of the navigation's entries as `size` in their config, of every step `XS` to `XL`** (`RULE.SUPPORT.SURFACE.257` · MUST · skill:spn-surface/design). Left out, it is the size of the scope above, the theme's where nothing sets one. The layout hands it to its bar, and the bar to its list. A top nav's `size` sets its entries and the bar's height, a dock's sets its column's entries, the column's width and the height of its bar, and a rail's sets its entries and the open rail's width. `architecture-components.md` states the values of each step.
 
 ## The place a section reaches — 🔮
 
-A section reaches the edges of its place and no further (`RULE.SUPPORT.SURFACE.254`). The layout says which element that place is, so a section asks nothing about the layout it stands in.
+A section reaches the edges of its place and no further (`RULE.SUPPORT.SURFACE.254` · MUST · skill:spn-surface/design). The layout says which element that place is, so a section asks nothing about the layout it stands in.
 
 | Layout type | A section in the page reaches | A section in the header or the footer reaches |
 | --- | --- | --- |
@@ -160,14 +160,14 @@ A section reaches the edges of its place and no further (`RULE.SUPPORT.SURFACE.2
 | `RAIL` | the content part, and never under the rail | the area beside the rail, in the footer |
 | `DOCK` | the content part, and never under the column | the window |
 
-- **Each layout MUST mark one element for each place a section can stand in as a size container, and the marked element MUST carry no padding at its sides** (`RULE.SUPPORT.SURFACE.255`). The marked element is the window's root in `TOPNAV` and `CANVAS` (in `TOPNAV` the content, where the content is bordered, raised or floating), the header and the footer in every layout that has them, and the content part in `RAIL` and `DOCK`. On the web it takes `container-type: inline-size`, so `100cqw` inside it is the width of the place.
+- **Each layout MUST mark one element for each place a section can stand in as a size container, and the marked element MUST carry no padding at its sides** (`RULE.SUPPORT.SURFACE.255` · MUST · skill:spn-surface/design). The marked element is the window's root in `TOPNAV` and `CANVAS` (in `TOPNAV` the content, where the content is bordered, raised or floating), the header and the footer in every layout that has them, and the content part in `RAIL` and `DOCK`. On the web it takes `container-type: inline-size`, so `100cqw` inside it is the width of the place.
 - **No size container MUST stand between a place and a section in it.** A section reads the nearest one, so a size container of any other block would become the section's place.
 - **A section MUST NOT stand in the nav column, a panel, a card or an overlay.** The nav column is the navigation's, and the others frame what they hold. `architecture-containers.md` states the section.
 
 ## The phone and the tablet — 🔮
 
 - **On a phone everything attaches, and `--layout-space` is 16 px.** Each layout draws a bar: the menu at its start, the nodes the page places there, and the account's avatar at its end.
-- **One drawer serves all three layouts on a phone, and it replaces the pop-up menu of the top nav and of the dock** (`RULE.SUPPORT.SURFACE.200`). It opens from the left, `layout-rail-narrow` wide, over a dimmed page. The dock's drawer starts with the way back, then the column's entries. It closes on a press of an entry that navigates, and a group that only opens stays open. Shut, the foot's actions stand in a column above the person, each with its tooltip, and past three the rest are behind a "⋯" menu. The bar's start is the menu that opens the drawer, or the way back where the dock has `backTo`.
+- **One drawer serves all three layouts on a phone, and it replaces the pop-up menu of the top nav and of the dock** (`RULE.SUPPORT.SURFACE.200` · MUST · skill:spn-surface/design). It opens from the left, `layout-rail-narrow` wide, over a dimmed page. The dock's drawer starts with the way back, then the column's entries. It closes on a press of an entry that navigates, and a group that only opens stays open. Shut, the foot's actions stand in a column above the person, each with its tooltip, and past three the rest are behind a "⋯" menu. The bar's start is the menu that opens the drawer, or the way back where the dock has `backTo`.
 - **Each node takes a place on a phone, with a default, by `DSLayoutPhonePlaceType`:** `BAR`, `DRAWER` or `BOTH`. The config's `phone` places `startNode` (default `BOTH`), `actionsNode` (default `DRAWER`) and `endNode` (default `BAR`). A node in the bar draws its collapsed form when the page gives one.
 - **On a tablet floating applies.** The rail is shut to icons by default, and the top nav puts its entries in the drawer.
 - **The bar is at least `layout-bar` high, every tap target at least 44 px, and the bar and the drawer keep clear of the safe areas.** Tabs along the bottom of a phone are not a feature of the layout.
@@ -184,7 +184,7 @@ An entry of the navigation is drawn by the kind its look names, `entry`. Each ki
 | `LINE` | a line in the brand colour, and no fill | its text stays full | no fill, and its text turns full |
 | `PLAIN` | stronger text, and no fill | its text stays full | no fill, and its text turns full |
 
-- **An open entry MUST never be mistaken for an entry under the pointer** (`RULE.SUPPORT.SURFACE.155`). Under `SUBTLE`, `LINE` and `PLAIN` another entry draws no fill under the pointer, and only its text turns full.
+- **An open entry MUST never be mistaken for an entry under the pointer** (`RULE.SUPPORT.SURFACE.155` · MUST · skill:spn-surface/design). Under `SUBTLE`, `LINE` and `PLAIN` another entry draws no fill under the pointer, and only its text turns full.
 - **Under `LINE` and `PLAIN` an entry MUST keep no inset.** Its icon and its words start where the start of the bar starts.
 - **A list or a menu standing alone MUST pad its own fill as a bar does**, so an entry with no fill never stands on the edge of the fill.
 - **A group's child MUST line up with the group's words, under every entry kind**, in a list, a rail, a dock and a pop-up.

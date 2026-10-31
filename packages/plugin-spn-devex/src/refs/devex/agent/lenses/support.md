@@ -8,11 +8,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "5856fbb7"
+      "seen": "198b3bd7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/01-data.md",
-      "seen": "68c36e9f"
+      "seen": "edd08fdd"
     }
   ]
 }

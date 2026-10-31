@@ -6,7 +6,8 @@
 //   spn-devex workstream suggestion edit <workstream> <sN> [--title …] [--preview …]         change its title or its preview
 
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
-import { readJsonl, suggestionsFileOf, writeJsonl } from "../../lib/workstream.ts";
+import { precedentLines } from "../../lib/precedent.ts";
+import { readJsonl, suggestionsFileOf, workspaceOf, writeJsonl } from "../../lib/workstream.ts";
 import { SUGGESTION_ID, SUGGESTION_STATES, suggestionFaults, type Suggestion } from "../../lib/workstream-schema.ts";
 import { refuseFlags, workstreamNamed } from "./_shared.ts";
 
@@ -50,7 +51,9 @@ function add(args: string[]): number {
   const next = Math.max(0, ...records.map((one) => Number(/^s(\d+)$/.exec(one.id)?.[1] ?? 0))) + 1;
   const record: Suggestion = { id: `s${next}`, title, state: "raised", preview: words.value("preview"), words: null };
   records.push(record);
-  return save(file, records, record);
+  const saved = save(file, records, record);
+  for (const line of precedentLines(workspaceOf(), title)) console.log(line);
+  return saved;
 }
 
 function state(args: string[]): number {
@@ -104,7 +107,7 @@ function write(args: string[]): number {
 }
 
 export const actions: Record<string, Action> = {
-  add: { describe: "raise a suggestion: the next number, raised", usage: "<workstream> \"<title>\" [--preview …]", run: add },
+  add: { describe: "raise a suggestion: the next number, raised; it also prints the decisions and rules that already speak to its title", usage: "<workstream> \"<title>\" [--preview …]", run: add },
   state: { describe: "move it on: shaped, decided, parked or dropped, with the words beside the move", usage: "<workstream> <sN> <state> [--words \"…\"]", run: state },
   edit: { describe: "change its title or its preview, never its state", usage: "<workstream> <sN> [--title …] [--preview …]", run: edit },
   write: { describe: "retired: refuses, and names the command that fits what it was typed with", usage: "<workstream> [<sN>] …", hidden: true, run: write },

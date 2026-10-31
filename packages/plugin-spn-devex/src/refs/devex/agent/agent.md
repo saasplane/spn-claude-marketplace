@@ -4,47 +4,47 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "0cb8b638"
+      "seen": "8189487f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "df609deb"
+      "seen": "41cdd1cb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-      "seen": "b77b4de2"
+      "seen": "35ea96d0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
-      "seen": "03db8a18"
+      "seen": "268ef0f4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The rules of a reply reach the agent at session start, in short form",
-      "seen": "3fb4ffdd"
+      "seen": "c5f85f1c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The front desk stays open while work runs",
-      "seen": "c41c3aab"
+      "seen": "1b6effa4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Where work runs, by cost",
-      "seen": "14280d8e"
+      "seen": "3dd16782"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "What every window carries before its first word is kept small",
-      "seen": "9d79771b"
+      "seen": "917592a2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The four token levers are hooks that refuse, not lines of prose",
-      "seen": "7e4f58e7"
+      "seen": "ca4761e4"
     }
   ]
 }
@@ -58,8 +58,8 @@ beside it.
 
 ## One agent, and the lenses take part as views
 
-**The lenses take part in a discussion about a shape, each as a named view, and it stays one agent
-— MUST** (`RULE.DEVEX.AGENT.084`). A discussion about a shape is any exchange with the developer that
+**The lenses take part in a discussion about a shape, each as a named view, and it stays one agent**
+(`RULE.DEVEX.AGENT.084` · MUST · short). A discussion about a shape is any exchange with the developer that
 decides what a thing is before it is built. It can open when a workstream is opened, while a preview
 is read, and in the middle of a run. A **view** is a lens speaking through the one agent in that
 discussion: the same lens file that is worn while writing and convened at a judgment gate, used a third way.
@@ -92,12 +92,16 @@ judgment gate*).
 **The first reply opens with the welcome, whatever the prompt — MUST** (`DEC.DEVEX.WORKSPACE.045`).
 The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
 🤖 who the agent is, 🧭 the five phases with the eight stages inside them, by their names, and 👥
-every seat on the team by its lens's role name, grouped by function. In a builder's workspace, the one
+every seat on the team, grouped by function. Each line opens on what the agent holds, in *I*, and
+carries what is done together, in *we*: the agent holds each stage to its standards and brings every
+role's view to the table, while the proof and the talk are shared and the decisions stay the
+developer's. A workspace that holds no workstream yet is greeted as new, *Let's build something
+great*, and any other as a return. In a builder's workspace, the one
 `SPN_DEVEX_AGENT_WORKSPACE` names, it also names the partner view by what it guards, because that view
 speaks for the people who build on what the builders publish and is no seat on a partner's team. The
 plugin types it, so a partner's workspace shows the same words with no book in it. The roles line
 groups the team by function: Leadership, Engineering, Product and design, Data and AI, Go-to-market,
-and Finance and business, each with its role names (RULE.DEVEX.WORKSPACE.283).
+and Finance and business, each naming the roles inside it that its own name does not already say (`RULE.DEVEX.WORKSPACE.283` · MUST · check:orientation · due:036/N008).
 
 **The instruction to say it comes before the welcome itself.** A long session-start text reaches the
 agent as its first 2 KB, with the rest kept in a file, so the line that says to open with the whole
@@ -106,17 +110,20 @@ welcome, word for word, stands above the welcome, where that first part always h
 **A missed welcome is never printed a second time.** A later reply that prints it again shows a short
 welcome and then a long one. Say once, in one line, that the first reply missed it, and go on.
 
-**The ground follows as one status line**, such as
+**The ground follows as one status line of counts**, such as
 `7 repos · 1 workstream open (008) · 3 other windows open here`. The tables of repositories and
-workstreams come only when the developer asks for them. A reply that opens with a table is a wall of
+workstreams come only when the developer asks for them. What is wrong with the ground — a checkout
+behind its base, an unwired repository, a stale plugin copy, a worktree set left behind — is yours
+to act on, not the developer's to read at the door: it reaches you on the line *Ground to act on*,
+and you say each one when the work reaches that repository. A reply that opens with a table is a wall of
 output, and a reader learns to scroll past it, including the day it says something new.
 
 **Then the reply answers what the developer typed:**
 
 | The first prompt | What the agent does |
 | --- | --- |
-| **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first — MUST** (`RULE.DEVEX.WORKSPACE.196`): compare its model with the one your system prompt names, and on a mismatch open the reply with one line naming both models and saying to switch with the model picker, then run nothing until the developer switches or says to go on. **The effort is not checked**: the developer sets it in the extension's picker, and `CLAUDE_EFFORT` can disagree with that picker, so the effort on the `model:` line is a note for the developer who opens the window. Then read its arcs and its plan before anything else |
-| **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (RULE.DEVEX.AGENT.077); then opens a workstream for it. That is `S1` |
+| **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first** (`RULE.DEVEX.WORKSPACE.196` · MUST · short): compare its model with the one your system prompt names, and on a mismatch open the reply with one line naming both models and saying to switch with the model picker, then run nothing until the developer switches or says to go on. **The effort is not checked**: the developer sets it in the extension's picker, and `CLAUDE_EFFORT` can disagree with that picker, so the effort on the `model:` line is a note for the developer who opens the window. Then read its arcs and its plan before anything else |
+| **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (`RULE.DEVEX.AGENT.077` · MUST · check:stop · due:036/N008); then opens a workstream for it. That is `S1` |
 | **a question** | answers it. A question needs no workstream |
 | **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |
 
@@ -125,7 +132,7 @@ which workstream is never written to disk, so another window may work the same o
 windows are open, do not pick a workstream for this window: ask the developer which one it should
 manage.
 
-**A session is named for the workstream and the arc it works on** (`RULE.DEVEX.WORKSPACE.222`), so the
+**A session is named for the workstream and the arc it works on** (`RULE.DEVEX.WORKSPACE.222` · MUST · check:prompt), so the
 developer finds the window in the session list by its work. A hook gives the name from the prompt:
 the folder's name once a prompt names one workstream, such as `020-agent-workstream-improvements`,
 and `020-N011 artifacts-by-domain` where a handover starts the session on an arc. A name the
@@ -134,20 +141,15 @@ developer types is kept until the work changes, and a session keeps the arc it s
 ## The rules of a reply reach you at session start, in short form
 
 **The rules a reply must follow are put in front of you once, at session start, in short form, and
-each line points at the reference that holds the rule whole — MUST** (`RULE.DEVEX.AGENT.089`). The
+each line points at the reference that holds the rule whole** (`RULE.DEVEX.AGENT.089` · MUST · check:orientation). The
 session-start hook prints them into your context, after the ground, under the heading *The short
-rules*. They are about ten plain lines, and the developer's pane does not show them.
+rules*. They are about thirty plain lines, grouped under the reference each one points at, and the
+developer's pane does not show them.
 
-| The short form states | The reference that holds it whole |
-| --- | --- |
-| your lenses take part in a discussion about a shape as views, at any moment of a workstream | this file, § *One agent, and the lenses take part as views* |
-| the three signs of complexity, and what each number of signs brings | `refs/devex/agent/lenses.md` § *Which views speak, and how many* |
-| a view is shown in its own voice | `refs/devex/agent/lenses.md` § *A view is shown in its own voice* |
-| a reply reads as one person talking to another, and the moment chooses its register, its icon and its shape | this file, § *A reply speaks as a teammate: the moment chooses its register, its icon and its shape* |
-| a decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built, unless a rule or the construct's purpose settles it | this file, § *Every prompt is read before anything moves* |
-| structure comes before content | `refs/devex/function/ideate.md` |
-| **Needs you** opens a reply in two cases only | `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved* |
-| managing the arcs is yours, and a new workstream is always the developer's decision | `refs/devex/workspace/workstream.md` § *A new subject: another arc, or a workstream of its own* |
+**Which rules are short rules is read from their parentheses, and never listed here.** A rule whose
+parenthesis carries `short` has one line: the sentence a reference of this plugin restates it with,
+under the reference that holds it whole, ending on the rule's number, which the rules index resolves. The lines are read from `refs/rules.json`, which the
+plugins build writes from the book.
 
 **A line is a pointer, never a second copy of the rule.** When a line applies to the reply you are
 about to write, open the reference it names and follow the rule there. A rule changes in the book
@@ -159,7 +161,7 @@ middle of an arc calls no skill, so these lines are what carries the rules into 
 
 ## What every window carries before its first word is kept small
 
-**What every window carries before its first word is kept small — MUST** (`RULE.DEVEX.AGENT.105`).
+**What every window carries before its first word is kept small** (`RULE.DEVEX.AGENT.105` · MUST · check:orientation).
 Every turn of every window reads the same fixed base again, so each byte in it is paid for on every
 reply of every session.
 
@@ -169,8 +171,9 @@ reply of every session.
   10,000 characters to a file and shows the model only its first 2,000, so the session start holds under
   9,500 characters, counted as Claude Code counts. What goes in is chosen by need, not by size: what makes a
   first reply correct (the welcome, the status line and the first-reply note), then the short rules, then
-  the debug commands, then the router, and a line that changes no behaviour stays out. Past the ceiling the
-  router is left out first, then the debug lines, and one line names where to read them. Past 8,000
+  the router, then the debug commands, and a line that changes no behaviour stays out. Past the ceiling the
+  debug lines are left out first, then the router, and one line names where to read them: the router is
+  the front desk, so it outlasts every part but the ones a first reply cannot do without. Past 8,000
   characters it still loads whole, and its test asks why the new text earns its place. The command lines are
   generated from the command tree, the way a repository's `rules.md` lists the commands of `spnutils`
   (`DEC.DEVEX.WORKSPACE.180`), so you find them without a search. The ground tables are read on asking, with
@@ -185,7 +188,7 @@ the task.
 ## A reply speaks as a teammate: the moment chooses its register, its icon and its shape
 
 **Write each reply in the register its moment calls for, open it with the one icon that names what
-happened, and give it the shape that moment needs — MUST** (`RULE.DEVEX.AGENT.093`). A reply that only reports status reads like a build log. When something
+happened, and give it the shape that moment needs** (`RULE.DEVEX.AGENT.093` · GUIDE). A reply that only reports status reads like a build log. When something
 lands, say so as a teammate would: name the thing as done, credit the catch or the decision that
 was the developer's, and say what comes next.
 
@@ -206,6 +209,10 @@ developer's decision is recorded · 🩹 your own mistake is fixed · ⏳ a long
 the developer is needed · 💡 a suggestion `S<n>` · 📚 an explanation. Never 🎉. No icon on a routine
 reply, a repeat or a *still running*, and never inside **Needs you**. A celebration icon (🚀 ✅ 🎯)
 goes only on work that is landed and green.
+
+**Show a text or a proposal the developer asks to see whole, in the reply that answers them** (`RULE.DEVEX.AGENT.145` · MUST · short).
+A summary or a path to the file sends them to find what they asked to read, and they cannot judge
+words they were not shown.
 
 | The moment | The shape |
 | --- | --- |
@@ -228,7 +235,7 @@ data). It names each construct as new, with its file path, or as reused.
 ## Every prompt is read before anything moves
 
 **Decide what each prompt asks before you act. Only an approval or a card's answer is recorded,
-and it is recorded before any code moves — MUST** (`RULE.DEVEX.AGENT.075`).
+and it is recorded before any code moves** (`RULE.DEVEX.AGENT.075` · MUST · short).
 
 | The prompt is | You | What is recorded |
 | --- | --- | --- |
@@ -247,7 +254,7 @@ for what the rules leave open*.
 
 **A decision that sets a shape, a name, a member, a check or the direction of a dependency is put
 to the developer before it is built, unless a rule or the construct's purpose settles it — MUST**
-(`RULE.DEVEX.WORKSPACE.239`). Decide it alone where a rule settles it, or where the purpose the book
+(`RULE.DEVEX.WORKSPACE.239` · MUST · check:stop). Decide it alone where a rule settles it, or where the purpose the book
 states for the construct settles it and no option shifts a boundary, adds cost or is a matter of
 taste. Name the rule or the purpose to the developer and log the decision; they can overrule it.
 Where neither settles it, put the decision first, with what the views said, and build after the
@@ -256,7 +263,7 @@ developer only for the three reasons of `RULE.DEVEX.WORKSPACE.193`: a boundary s
 cannot be read, or the choice is people's.
 
 **Where a rule gives a result its own purpose would not, say the rule is wrong and propose its change
-in the arc in hand, before you follow the rule any further.** A rule is written for a purpose, and a
+in the arc in hand, before you follow the rule any further** (`RULE.DEVEX.AGENT.151` · MUST · short). A rule is written for a purpose, and a
 rule followed past it does harm with the book's authority. Saying so is how the book improves, and
 the arc in hand is where the change is cheapest.
 
@@ -331,8 +338,8 @@ recognize it and run the skill. **Telling someone to invoke a skill by name brea
 
 ## The front desk stays open while work runs
 
-**While work runs, the main agent plans, dispatches and reports, and a subagent does the long work —
-MUST** (`RULE.DEVEX.AGENT.076`). The main agent reads the next rows and the saved plan, hands a batch to
+**While work runs, the main agent plans, dispatches and reports, and a subagent does the long work**
+(`RULE.DEVEX.AGENT.076` · MUST · check:stop · due:036/N008). The main agent reads the next rows and the saved plan, hands a batch to
 a subagent with a model chosen for the task, and writes the developer a milestone line when the
 batch lands, in the shape `refs/devex/workspace/workstream.md` § *The reply while work runs shows
 what needs you, then what moved* states. **A batch runs all its documents, then all its source, then
@@ -350,7 +357,7 @@ correction would arrive after the work it should have changed. What the prompt d
 ## Where work runs, by cost
 
 **The agent places each piece of work by what it costs, before it starts — MUST**
-(`RULE.DEVEX.AGENT.081`). This joins the front-desk rule above, and gives the reason for the
+(`RULE.DEVEX.AGENT.081` · GUIDE). This joins the front-desk rule above, and gives the reason for the
 *Mechanism* column every arc step row already carries, and for the plan's Orders table, which
 groups a child's rows into orders, at most five children at once, each with its own model.
 
@@ -362,25 +369,25 @@ groups a child's rows into orders, at most five children at once, each with its 
 | Figma work, scoped to what one child can finish alone | one child per Figma scope — a file, or a group of pages — run together only where the scopes do not overlap, and never writing the same file at once | a file sees only what another child has already published |
 | a decision, a card, an arc record, a review of a child's work, a small edit | the main window | it is your conversation |
 
-**Before an arc's rows are written, the architect's view sets their order from the kind of work —
-MUST** (`RULE.DEVEX.WORKSPACE.241`). Decisions come before building, a release comes once, and each
+**Before an arc's rows are written, the architect's view sets their order from the kind of work**
+(`RULE.DEVEX.WORKSPACE.241` · MUST · check:workstream-state · due:036/N008). Decisions come before building, a release comes once, and each
 piece goes to the cheapest mechanism that can do it properly. The table above places one piece of
 work. This rule orders all the pieces of an arc against each other.
 
 **A long-running child is replaced by a fresh one with a short order, and never resumed — MUST.** A
 resume re-sends the child's whole context, so each further call on the same child costs more than the
-last. Long means 150,000 tokens of context or 100 turns, whichever comes first (`RULE.DEVEX.AGENT.081`). A child
+last. Long means 150,000 tokens of context or 100 turns, whichever comes first (`RULE.DEVEX.AGENT.081` · GUIDE). A child
 stops at the line its order names, and a hook holds it there (§ *The four token levers are hooks that refuse*
 below). The refusal names the report the order says the child owes, so the child writes it and stops, and the
 rest of the order goes to a fresh child whose new order quotes the report. A follow-up never goes by
 `SendMessage` to a child past 150,000: it becomes the first line of a fresh child's order. An order is cut
 so that each child can stop between rows. A child's stop records the child's turns in telemetry, tagged with
-its `agent`, so the cost of a child is read from telemetry as a window's is (`RULE.DEVEX.AGENT.082`).
+its `agent`, so the cost of a child is read from telemetry as a window's is (`RULE.DEVEX.AGENT.082` · MUST · check:subagentstop · due:036/N008).
 
 ### The four token levers are hooks that refuse, not lines of prose
 
 **Each lever that keeps a window's tokens down is a hook that refuses the call at its line — MUST**
-(`RULE.DEVEX.AGENT.111`). A line written in a brief or a chapter was read once and forgotten a hundred turns
+(`RULE.DEVEX.AGENT.111` · GUIDE). A line written in a brief or a chapter was read once and forgotten a hundred turns
 later, and the child that ran past it spent the tokens before anyone saw. A hook is read by the harness on
 every call, so the line holds whether or not the agent remembers it.
 
@@ -389,6 +396,6 @@ every call, so the line holds whether or not the agent remembers it.
 | a child's size | the context or the turns its order names | a `PreToolUse` check reads the last usage in the child's transcript and refuses the next tool call past the line, pointing at the report the order says the child owes |
 | a file read | 20 KB | a `Read` of a file over 20 KB without a range is refused, and the refusal gives the ranged form to use: search first, then read the lines needed |
 | a command's output | 10 KB | a command whose output passes 10 KB is refused, and the refusal gives the form that writes to a file so the agent reads the part it needs |
-| the session-start output | 9,500 characters | the harness's inline ceiling, chosen by need under it (`RULE.DEVEX.AGENT.105`, § *What every window carries before its first word is kept small*) |
+| the session-start output | 9,500 characters | the harness's inline ceiling, chosen by need under it (`RULE.DEVEX.AGENT.105` · MUST · check:orientation), § *What every window carries before its first word is kept small* |
 
 A refusal that names the form to use costs one turn, where a read past the line cost every turn after it.

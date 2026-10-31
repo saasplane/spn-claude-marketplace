@@ -281,6 +281,16 @@ ${linesFor("1.0.0").script}
     ok("[MKT.SCRIPTS.79] with no card open the heading reads `Open — no card is open`",
       readFileSync(join(quiet, "approach.html"), "utf8").includes("<h2>Open &mdash; no card is open</h2>"));
 
+    // A page whose Open is a generated block with no card raised: `write` fills the block with the heading the doc check asks for.
+    const blockPage = PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + OLD_TABLE })
+      .replace(/<section id="s4">[\s\S]*?<\/section>/, `<section id="s4">\n<!-- spn:generated open -->\n<!-- /spn:generated -->\n</section>`);
+    const blank = build("open", "057-no-card", blockPage);
+    const blankWrote = await capture(["docs", "cycles", "write", blank], { SPN_WORKSPACE: TMP });
+    const blankText = readFileSync(join(blank, "approach.html"), "utf8");
+    ok("[MKT.SCRIPTS.233] `write` on a page with no card writes `Open — no card is open` into its open block",
+      blankWrote.code === 0 && blankText.includes("<h2>Open &mdash; no card is open</h2>") && openHeadingRule(join(blank, "approach.html"), blankText).length === 0,
+      `${blankWrote.code} ${blankWrote.out} ${blankWrote.err}`);
+
     // The rows keep the order the page lists them in: N2 first here, and its stale status is what is written.
     const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
       `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);

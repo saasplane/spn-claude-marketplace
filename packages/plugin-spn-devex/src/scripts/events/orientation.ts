@@ -20,9 +20,10 @@
 //   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
 //      stages and every role. The heading has two forms: a returning visit, and a first visit, which
 //      is a workspace with no workstream in any state.
-//   2. ONE status line — the repositories, the open workstreams, the backlog, and the other windows
-//      open here, each part dropped when it is zero. Unwired repositories, a stale plugin or a rung
-//      below an ordinary session add a clause to the same line, never a second line.
+//   2. ONE status line of counts — the repositories, the open workstreams, the backlog, and the other
+//      windows open here, each part dropped when it is zero. Checkouts behind their base, unwired
+//      repositories, a stale plugin or a rung below an ordinary session go on a line only the agent
+//      reads, and the agent says each one when the work reaches it.
 //   3. the tables, for when you ask — the members, the law each carries, the wiring, and every
 //      workstream — then ONE open question, never a typed list of options. Beside it, and only when
 //      exactly one workstream is open and no second session is live under this root, a standing
@@ -30,7 +31,7 @@
 //
 // `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
 // reads, carries all three, the note that says how to use them, and the short rules a reply must
-// follow (RULE.DEVEX.AGENT.089), each with the reference that holds it whole.
+// follow (RULE.DEVEX.AGENT.089), each under the reference that holds it whole, ending on its number.
 //
 // A workstream carries its state in its parent folder, so the three are read and shown together:
 // `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -54,7 +55,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { arcIdsOf } from "../lib/workstream.ts";
+import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
+import { readGo, readyParts } from "../lib/go-plan.ts";
+import type { RulesIndex } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { sweepSessions } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { windowStartLines } from "../lib/migration.ts";
@@ -506,16 +509,16 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
   const name = who ? `, ${who}` : "";
   return [
     firstVisit
-      ? `# 👋 Welcome to SaaS Plane${name}. Glad you're here!`
+      ? `# 👋 Welcome to SaaS Plane${name}. Let's build something great.`
       : `# 👋 Good to see you again${name}. Welcome back to SaaS Plane!`,
     "",
     "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
     WELCOME_SPACER,
-    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    `🤖 **I'm your DevEx agent${name}.** Think of me as the teammate who has read every standard in this workspace, so your time goes to the product.`,
     WELCOME_SPACER,
-    "🧭 I work with you through the whole software lifecycle, five phases and the eight stages inside them: **Start** (Bootstrap, Source control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    "🧭 I hold every stage to its own standards, and we prove each step together: **Start** (Bootstrap, Source control) · **Plan** (Ideate) · **Build** (Develop, Test) · **Ship** (Provision, Deliver) · **Run** (Operate).",
     WELCOME_SPACER,
-    `👥 I look at the work through every role on your team: **Leadership** (Chief executive, Engineering leader), **Engineering** (Architect, Backend developer, Web developer, Quality engineer, DevOps / SRE, DevSecOps / Security), **Product and design** (Product manager, UX designer, UI designer, Editor), **Data and AI** (Data lead, AI lead), **Go-to-market** (Product marketer, Sales lead, Growth lead, Customer success lead) and **Finance and business** (Finance lead, Business manager). ${builder ? "And I speak for every partner who builds on SaaS Plane, so a change of ours never breaks them without a version and a way across. " : ""}Tell me whose view you need, and I'll bring it.`,
+    `👥 I bring every role's view to the table as we talk the work through: **Leadership** (Chief executive, Engineering leader) · **Engineering** (Architect, Backend, Web, Quality, DevOps / SRE, DevSecOps / Security) · **Product and design** (Product manager, UX, UI, Editor) · **Data and AI** · **Go-to-market** (Product marketer, Sales, Growth, Customer success) · **Finance and business**.${builder ? " And I speak for every partner who builds on SaaS Plane, so nothing we change breaks them without a version and a way across." : ""}`,
   ];
 }
 
@@ -526,27 +529,20 @@ export function welcome(who: string | null, firstVisit: boolean, builder = false
  * A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So a
  * rule held only in a reference does not reach that reply. These lines are what carries it there.
  *
- * EACH LINE IS A POINTER, NEVER A SECOND COPY. It says what to do in one or two sentences and ends with
- * `→`, the path of its reference from the plugin's root, `§`, and the heading that holds the rule whole.
- * The test opens every file and looks for every heading, so a renamed section fails there.
+ * THE LINES ARE READ FROM THE RULES INDEX, NEVER TYPED HERE. A rule whose parenthesis carries `short` has one
+ * line: the sentence its devex ref restates it with, then `§` and the heading that holds it whole, under the
+ * ref's path. The build writes `refs/rules.json` from the book, and the restates check holds each ref to the
+ * book, so a line follows the book. A missing index costs the block and never the window.
  *
- * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to
- * judge, and the last line says so.
+ * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to judge.
  */
 export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply; each line points at its rule in full";
 
-export const SHORT_RULES: string[] = [
-  "Lenses take part in any discussion about a shape, mid-run too. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
-  "Three signs set how many views speak: it crosses a repository, changes what a partner builds on, or sets a pattern. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
-  "No sign: the owning view, one sentence. One: the architect's and the owner's. Two or more: the starting group with product and partner, each a fresh agent. → `refs/devex/agent/lenses.md` § How a view is made",
-  "Each view speaks in its own voice, as a colleague, never a slogan; on a card, one or two sentences, no option by letter. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
-  "Reply as one person to another: full sentences, tables only for facts, one meaning-icon first; a failure opens straight. → `refs/devex/agent/agent.md` § A reply speaks as a teammate: the moment chooses its register, its icon and its shape",
-  "A decision setting a shape, a name, a member, a check or a dependency's direction goes to the developer before it is built, unless a rule settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
-  "Structure before content: show the units, names and grouping first. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
-  "**Needs you** opens a reply only to raise a card (in full, once) or to end or stop the work (a line per open card). → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
-  "Arcs are yours to manage; a new workstream is the developer's call. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
-  "No script flags a discussion about a shape; you judge. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
-];
+/** The index the build writes from the book, or null where it is missing or does not parse. */
+export function rulesIndex(): RulesIndex | null {
+  try { return JSON.parse(read(fileURLToPath(new URL("../../refs/rules.json", import.meta.url)))) as RulesIndex; }
+  catch { return null; }
+}
 
 /**
  * THE CEILING IS THE HARNESS'S. Claude Code saves any hook output string past 10,000 characters to a file and shows
@@ -563,7 +559,7 @@ type StartPart = { text: string; rank: number; readAt: string };
 /**
  * The session start in its priority order (RULE.DEVEX.AGENT.105). The head (the welcome, the status and the first-reply
  * note) always goes whole. The parts keep their order on the page, and past the ceiling the highest rank is left out
- * first (the router, then the debug lines), with one line naming where to read what went.
+ * first (the debug lines, then the router, which is the front desk), with one line naming where to read what went.
  */
 export function fitSessionStart(head: string, parts: StartPart[]): string {
   const kept = [...parts];
@@ -581,15 +577,25 @@ export function fitSessionStart(head: string, parts: StartPart[]): string {
 /** The parts below the head, in page order, each ranked by how much a first reply needs it. */
 function startParts(): StartPart[] {
   return [
-    { text: commandsRefBlock(), rank: 2, readAt: "`refs/commands.md`" },
-    { text: wayIndex(), rank: 3, readAt: "`refs/devex/agent/way.md`" },
+    { text: commandsRefBlock(), rank: 3, readAt: "`refs/commands.md`" },
+    { text: wayIndex(), rank: 2, readAt: "`refs/devex/agent/way.md`" },
     { text: shortRules(), rank: 1, readAt: "the short rules in `refs/devex/agent/agent.md`" },
   ];
 }
 
-/** The short rules as the block the agent reads: the heading, then one list line for each rule. */
-export function shortRules(): string {
-  return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
+/** The short rules as the block the agent reads: the heading, then each ref's path and a list line for each of its rules. */
+export function shortRules(index: RulesIndex | null = rulesIndex()): string {
+  const groups = new Map<string, string[]>();
+  for (const rule of index?.rules ?? []) {
+    if (!rule.params.short || !rule.line) continue;
+    const lines = groups.get(rule.line.ref) ?? [];
+    // A LINE POINTS BY ITS RULE'S NUMBER, which the rules index resolves: the section heading said the same
+    // thing at three times the length, and that length is what pushed the router out (DEC.DEVEX.AGENT.105).
+    lines.push(`- ${rule.line.text} (${rule.id.replace(/^RULE\.DEVEX\./, "")})`);
+    groups.set(rule.line.ref, lines);
+  }
+  if (!groups.size) return "";
+  return [SHORT_RULES_HEADING, "", ...[...groups].flatMap(([ref, lines]) => [`**\`${ref}\`**`, ...lines])].join("\n") + "\n";
 }
 
 /**
@@ -679,18 +685,31 @@ function setsLeftBehind(root: string, streams: Workstream[]): string[] {
   return [...closed, ...unnamed];
 }
 
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
 /**
- * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
- * adds a clause to the same line — a second line is how a status line turns back into a dump.
+ * The ground in one line of counts, which the developer reads. A part that is zero is dropped rather
+ * than printed as `0`. A problem never joins it: what is wrong with the ground is the agent's to act
+ * on, so it goes on the agent's line (`groundLine`), and a status line that names branches turns back
+ * into a dump (DEC.DEVEX.AGENT.105).
  */
 export function statusLine(s: Status): string {
-  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const parts = [plural(s.repos, "repo", "repos")];
   if (s.open.length)
     parts.push(`${plural(s.open.length, "workstream")} open `
       + `(${s.open.map((w) => w.number || w.subject).join(", ")})`);
   if (s.backlog) parts.push(`${s.backlog} in backlog`);
   if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
+  return parts.join(" · ");
+}
+
+/**
+ * What is wrong with the ground, as one line only the agent reads: the checkouts behind their base, the
+ * unwired repositories, a stale plugin copy, the worktree sets left behind and a rung short of building.
+ * The agent says each one when the work reaches it. Empty where nothing is wrong.
+ */
+export function groundLine(s: Status): string {
+  const parts: string[] = [];
   if (s.unwired) parts.push(`${s.unwired} unwired`);
   if (s.stale) parts.push(s.stale);
   if (s.behind) parts.push(s.behind);
@@ -698,7 +717,7 @@ export function statusLine(s: Status): string {
   if (s.left.length)
     parts.push(`${plural(s.left.length, "worktree set")} left behind, remove ${s.left.length === 1 ? "it" : "each"}: ${s.left.join(", ")}`);
   if (s.rung) parts.push(s.rung);
-  return parts.join(" · ");
+  return parts.length ? `Ground to act on, said only when the work reaches it: ${parts.join(" · ")}.` : "";
 }
 
 /**
@@ -765,8 +784,8 @@ function sessionsHere(root: string): number {
  * one workstream is how an approach page grows two authors, and a cheap check is worth more than the
  * convenience it costs.
  */
-function closingLines(streams: Workstream[], others: number): string[] {
-  const ask = "So — what are we building?";
+function closingLines(streams: Workstream[], others: number, who: string | null = null): string[] {
+  const ask = `So${who ? `, ${who}` : ""} — what are we building today?`;
   const openNow = streams.filter((w) => w.state === "open");
   if (openNow.length !== 1) return ["", ask, ""];
   const only = openNow[0];
@@ -793,6 +812,64 @@ export function migrationLines(root: string): string[] {
   return [MIGRATIONS_HEADING, "",
     "Each one runs before anything the prompt asks, in id order. Say so in one line under the status line, then apply it.", "",
     ...found, ""];
+}
+
+/**
+ * Each go of the open workstreams that has a part not landed, read from the lead arc's `go.json`: its parts
+ * running, held and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
+ * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out.
+ */
+export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string;
+  running: string[]; held: string[]; ready: string[]; unfolded: string[]; next: string }> {
+  const out: ReturnType<typeof goStandings> = [];
+  const open = workstreamsDir(root, "open");
+  for (const name of listdir(open).sort()) {
+    const ws = join(open, name);
+    if (!isDir(ws) || (only && !only.has(name))) continue;
+    for (const lead of arcIdsOf(ws)) {
+      let plan;
+      try { plan = readGo(ws, lead); } catch { continue; }
+      if (!plan || plan.parts.every((part) => part.state === "landed")) continue;
+      const orders = join(notesDirOf(ws, lead), "orders");
+      const ids = (state: string) => plan.parts.filter((part) => part.state === state).map((part) => part.id);
+      const running = ids("running");
+      const unfolded = running.filter((id) => isFile(join(orders, `${id}.report.md`)));
+      const launchable = readyParts(plan);
+      const ref = `${name}/${lead}`;
+      const first = launchable[0];
+      const next = unfolded.length
+        ? `fold the report of ${unfolded[0]}: \`spn-devex workstream report write ${name} notes/${lead}/orders/${unfolded[0]}.report.md\`.`
+        : ids("held").length
+          ? `derive the plan again with \`spn-devex workstream go write ${ref} --scope ${plan.scope.join(",")}\`.`
+          : first && (first.pass === "BASELINE" || first.pass === "FULL_RUN")
+            ? `\`spn-devex workstream go start ${ref} ${first.id}\`, then run the repository's whole suite.`
+            : first && first.pass === "RELEASE"
+              ? `release ${first.repo}.`
+              : first
+                ? `launch the brief of ${first.id}: \`notes/${lead}/orders/${first.id}.md\`.`
+                : running.length
+                  ? `wait for ${running.join(", ")}, then fold each report with \`spn-devex workstream report write\`.`
+                  : `\`spn-devex workstream go show ${ref}\`.`;
+      out.push({ workstream: name, lead, running, held: ids("held"), ready: launchable.map((part) => part.id), unfolded, next });
+    }
+  }
+  return out;
+}
+
+/** How many running gos the session start names one line each; the rest are a count and the command that lists them. */
+export const GOS_NAMED = 3;
+
+/** The session start's lines for the running gos: one for each, inside the session start's limit. */
+export function goLines(root: string): string[] {
+  let gos: ReturnType<typeof goStandings> = [];
+  try { gos = goStandings(root); } catch { return []; }
+  if (!gos.length) return [];
+  const listed = (label: string, ids: string[]) => (ids.length ? `${label} ${ids.slice(0, 4).join(", ")}${ids.length > 4 ? ` and ${ids.length - 4} more` : ""}` : "");
+  const lines = gos.slice(0, GOS_NAMED).map((go) => `Go ${go.workstream}/${go.lead}: ` +
+    ([listed("running", go.running), listed("held", go.held), listed("ready", go.ready)].filter(Boolean).join(" · ") || "nothing ready yet") +
+    `. Next: ${go.next}`);
+  if (gos.length > GOS_NAMED) lines.push(`And ${gos.length - GOS_NAMED} more running, each shown by \`spn-devex workstream go show\`.`);
+  return [...lines, ""];
 }
 
 /**
@@ -869,7 +946,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
   const cache = plugins.length ? cacheState(root, plugins) : null;
   const behind = loadedBehind();
   const others = sessionsHere(root);
-  const status = statusLine({
+  const ground: Status = {
     repos: repos.length,
     open: streams.filter((w) => w.state === "open"),
     backlog: streams.filter((w) => w.state === "backlog").length,
@@ -881,19 +958,22 @@ export function orient(root: string, cwd: string): [message: string, context: st
     left: setsLeftBehind(root, streams),
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
-  });
-  const message = clean([...greeting, WELCOME_SPACER, status]);
+  };
+  const message = clean([...greeting, WELCOME_SPACER, statusLine(ground)]);
 
   // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
   // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
   // reply needs and nothing else (RULE.DEVEX.AGENT.105).
   const lines: string[] = [];
+  const problems = groundLine(ground);
+  if (problems) lines.push(problems, "");
   if (behind)
     lines.push(`⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
       "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
   if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
-  lines.push(...closingLines(streams, others));
+  lines.push(...goLines(root));
+  lines.push(...closingLines(streams, others, who));
   const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
     "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
     "or any named next step replaces it — under the status line, one line: *Picking up N<nn> — <the arc's title>, " +
@@ -927,14 +1007,15 @@ export type LateBranch = { name: string; branch: string; count: number; base: st
 
 /**
  * A member's branch that is behind its base, or null. The base is `origin/develop` unless the branch's
- * git config records another in `spnBase`. A permanent branch, a detached HEAD and a branch that is not
+ * git config records another in `spnBase`. A checked-out `develop` is counted against `origin/develop`,
+ * because the book is read from it. Another permanent branch, a detached HEAD and a branch that is not
  * behind say nothing.
  */
 export function lateBranch(name: string, path: string): LateBranch | null {
   if (!isCheckout(path)) return null;
   const branch = gitIn(path, ["branch", "--show-current"]);
-  if (!branch || PERMANENT.includes(branch)) return null;
-  const base = `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
+  if (!branch || (PERMANENT.includes(branch) && branch !== "develop")) return null;
+  const base = branch === "develop" ? "origin/develop" : `origin/${gitIn(path, ["config", "--get", `branch.${branch}.spnBase`]) || "develop"}`;
   const count = Number(gitIn(path, ["rev-list", "--count", `HEAD..${base}`]));
   return count > 0 ? { name, branch, count, base } : null;
 }
@@ -954,15 +1035,22 @@ export const LATE_NAMED = 3;
  * that lists them all, which is where the ground is read on asking.
  */
 export function lateClauses(late: LateBranch[]): string[] {
-  const bases = [...new Set(late.map((l) => l.base))].sort();
-  return bases.map((base) => {
-    const behind = late.filter((l) => l.base === base)
-      .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const order = (a: LateBranch, b: LateBranch) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+  const more = (count: number) => (count > LATE_NAMED ? ` and ${count - LATE_NAMED} more, listed by \`spnutils workspace status\`` : "");
+  // A MEMBER ON DEVELOP IS PULLED, NEVER REBASED, and before the book is read: its rule ids may be ones origin has changed.
+  const develop = late.filter((l) => l.branch === "develop").sort(order);
+  const pull = develop.length
+    ? [`${develop.length} ${develop.length === 1 ? "member" : "members"} on develop behind origin/develop, pull before reading the book: ` +
+       develop.slice(0, LATE_NAMED).map((l) => `${l.name} by ${l.count}`).join(", ") + more(develop.length)]
+    : [];
+  const branches = late.filter((l) => l.branch !== "develop");
+  const bases = [...new Set(branches.map((l) => l.base))].sort();
+  return [...pull, ...bases.map((base) => {
+    const behind = branches.filter((l) => l.base === base).sort(order);
     const named = behind.slice(0, LATE_NAMED).map((l) => `${l.name} ${l.branch} by ${l.count}`).join(", ");
-    const more = behind.length - LATE_NAMED;
     return `${behind.length} ${behind.length === 1 ? "branch" : "branches"} behind ${base}, rebase before the next push: ${named}`
-      + (more > 0 ? ` and ${more} more, listed by \`spnutils workspace status\`` : "");
-  });
+      + more(behind.length);
+  })];
 }
 
 /** The longest the session start waits for the members' remotes. */

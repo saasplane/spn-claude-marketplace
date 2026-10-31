@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "44c80d89"
+      "seen": "c110978c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md",
-      "seen": "277a7690"
+      "seen": "93a12f56"
     }
   ]
 }
@@ -24,7 +24,13 @@
 
 **So two skills with nearly the same description compete**, and the matching gets worse as the pair grows. A skill answering several close asks keeps one description and routes inside itself.
 
-**A match needs the description in front of the session, so a `SKILL.md` opens with its frontmatter** (`RULE.DEVEX.AGENT.108`). Its first line is `---`, then `name` and `description`; the `spn:restates` stamp and anything else come after it. The runtime reads frontmatter only at the start of the file, and a skill that opens with anything else is still a command you can type, but the session is never offered it, so no ask in plain words reaches it. A check in the marketplace refuses one of its own plugins' `SKILL.md` files whose first line is not `---`, and reads no partner's file.
+**A match needs the description in front of the session, so a `SKILL.md` opens with its frontmatter** (`RULE.DEVEX.AGENT.108` · MUST · check:restates · due:036/N008). Its first line is `---`, then `name` and `description`; the `spn:restates` stamp and anything else come after it. The runtime reads frontmatter only at the start of the file, and a skill that opens with anything else is still a command you can type, but the session is never offered it, so no ask in plain words reaches it. A check in the marketplace refuses one of its own plugins' `SKILL.md` files whose first line is not `---`, and reads no partner's file.
+
+**A skill's description names every job the skill walks** (`RULE.DEVEX.AGENT.150` · GUIDE). The session chooses a skill by its description before it reads a single step, and a job the description leaves out is one it does without the skill.
+
+## The execute skill fires when the developer gives the go
+
+**The moment the developer gives the go on one arc or several, the `execute` skill carries it out, so the plan is never left to memory** (`RULE.DEVEX.AGENT.158` · MUST · skill:spn-devex/execute). Its description names the job: it derives the plan from the change sheets, briefs every helper from it, runs the full suites once per repository, and releases in chain order. It walks eight steps in this order: the scope (every arc decided, its sheet read whole); drift (`workstream state check --facts`, then `sheet edit` for each entry whose fact moved); the plan (`workstream go write`, then `go show`); baselines (`go start` for each repository); the parts (each brief launched one pass at a time and folded with `report write`; a mid-run change lets what runs finish, then `go check` holds the parts it touches, and `go write` runs again before they do); the full runs; the generated files and then the release chain in the order the sheets set; and the close (`go check` prints nothing and every row of the scope is landed). The skill states no rule of its own: the rules it follows stay in the chapters that own them.
 
 ## A value spells its owner, and a folder never does
 
@@ -39,13 +45,13 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 **Four plugins shipping into one flat vocabulary would collide**, and nothing in a bare value would say who answers for it. Deriving the prefix keeps the fact in one place; bare folders keep each plugin's tree readable on its own terms.
 
-**Conformance is a three-way check: the folder, the value derived from it, and the plugin that ships it must agree.** A value with no folder, or a folder with no value, is a defect a listing finds — and it has been found in a plugin every repository installs. The check runs across every plugin together, never one plugin at a time (`RULE.DEVEX.AGENT.055`).
+**Conformance is a three-way check: the folder, the value derived from it, and the plugin that ships it must agree.** A value with no folder, or a folder with no value, is a defect a listing finds — and it has been found in a plugin every repository installs. The check runs across every plugin together, never one plugin at a time (`RULE.DEVEX.AGENT.055` · MUST · check:restates · due:036/N008).
 
 ## The vocabulary is the inventory
 
-**The values are one fixed list, and the set is closed.** Devex reads in stage order with the two stage-less ones last. Apps and infra share six words, so a reader who has learned one domain's surface has learned the other's. The surface plugin ships one more, `SURFACE_DESIGN` (folder `design`), because what a person sees and touches is the same for every stack: it designs a page or a flow from the blocks of the design system and draws it in Figma or as skeletons, so it serves `IDEATE`.
+**The values are one fixed list, and the set is closed.** Devex reads in stage order with the three stage-less ones last: `DEVEX_CHECK`, `DEVEX_REPORT` and `DEVEX_EXECUTE`. Apps and infra share six words, so a reader who has learned one domain's surface has learned the other's. The surface plugin ships one more, `SURFACE_DESIGN` (folder `design`), because what a person sees and touches is the same for every stack: it designs a page or a flow from the blocks of the design system and draws it in Figma or as skeletons, so it serves `IDEATE`.
 
-**A skill is mapped to a stage, never named after one.** Proving a claim against the code is something every phase does, so `DEVEX_CHECK` belongs to no single phase — and naming every skill after a phase leaves that one nowhere to sit. Each provider skill serves one stage: `NEW` serves `SCM`, `VERIFY` serves `TEST`, and `IMPLEMENT`, `REVIEW` and `RUN` serve `DEVELOP`, which is what makes the standards for a request derivable from the skill invoked (`RULE.DEVEX.AGENT.017`). The gain is that each list changes on its own clock.
+**A skill is mapped to a stage, never named after one.** Proving a claim against the code is something every phase does, so `DEVEX_CHECK` belongs to no single phase, and neither do `DEVEX_REPORT` and `DEVEX_EXECUTE`: the first renders a report from a named template, the second crosses the build, the proof and the release of whatever the go covers — and naming every skill after a phase leaves that one nowhere to sit. Each provider skill serves one stage: `NEW` serves `SCM`, `VERIFY` serves `TEST`, and `IMPLEMENT`, `REVIEW` and `RUN` serve `DEVELOP`, which is what makes the standards for a request derivable from the skill invoked (`RULE.DEVEX.AGENT.017` · MUST · check:restates · due:036/N008). The gain is that each list changes on its own clock.
 
 ## What a skill may never do
 
@@ -55,4 +61,4 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 **No plugin may name another plugin's file path.** A cross-plugin address is a name, never a path — a partner's install has no sibling directory to reach into.
 
-**A path written in a plugin file names a file the installed plugins carry — MUST** (`RULE.DEVEX.AGENT.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.
+**A path written in a plugin file names a file the installed plugins carry** (`RULE.DEVEX.AGENT.070` · MUST · check:restates · due:036/N008). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.

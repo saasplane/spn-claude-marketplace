@@ -153,8 +153,8 @@ console.log("\n=== the book is the workspace's own spn-foundation, and the first
   const none = workspace("ws-none", ["aaa-foundation-copy"]);
   const m3 = marketIn(none, "spn-claude-marketplace");
   const refused = run([], m3);
-  one("[MKT.SCRIPTS.192] with no spn-foundation and no path it is refused by name, naming the workspace",
-    refused.out.includes("holds no spn-foundation") && refused.out.includes(none) && !refused.out.startsWith("book  "));
+  one("[MKT.SCRIPTS.192] with no spn-foundation and no path it is refused by name, naming where the walk began",
+    refused.out.includes("holds an spn-foundation with a decisions register") && refused.out.includes(none) && !refused.out.startsWith("book  "));
   one("and it reads nothing from the sibling that carries a register", !refused.out.includes("DRIFT"));
 
   // A second marketplace checkout beside the one that runs.

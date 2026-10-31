@@ -162,7 +162,7 @@ const templatesCopyIndex = (from: string, rows: string[]): string[] => [
     "that has fallen behind, so a builder's edit reaches every partner with the next plugin release",
     "rather than being discovered by somebody's first session going wrong.",
     "",
-    "**The stamp above names the folder, not each file** (`RULE.DEVEX.AGENT.072`). One citation per template",
+    "**The stamp above names the folder, not each file** (`RULE.DEVEX.AGENT.072` · MUST · check:corpus · due:036/N008). One citation per template",
     "would report every edit and miss every addition — a template nobody cited has nothing to compare",
     "against, and *the book grew a shape a partner does not have* is what this copy exists to prevent.",
     "A folder hash covers added, removed, renamed and edited at once.",

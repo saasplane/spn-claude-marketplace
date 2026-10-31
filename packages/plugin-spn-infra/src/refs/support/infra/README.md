@@ -3,23 +3,23 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-infra/06-modules.md",
-      "section": "The rungs, and what a path may be",
-      "seen": "80cf3ac6"
+      "section": "The rungs",
+      "seen": "3dcae51d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Intent and resolved state",
-      "seen": "69544d52"
+      "seen": "ee4a7d32"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "Providers are a pattern, at both scopes",
-      "seen": "c5c17c66"
+      "seen": "8a3bd6ce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/02-packages/01-manifests.md",
       "section": "One packages declaration; the registry derives",
-      "seen": "2a316266"
+      "seen": "bbc5a5d4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-infra/04-resources/02-vendors.md",
@@ -36,7 +36,7 @@
 
 ## 1 · Machines write the environment rung only
 
-The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (RULE.SUPPORT.INFRA.043) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (RULE.SUPPORT.INFRA.054), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
+The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (`RULE.SUPPORT.INFRA.043` · MUST · skill:spn-infra/implement) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (`RULE.SUPPORT.INFRA.054` · MUST · skill:spn-infra/implement), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
 
 ```text
 /organization/vars
@@ -48,7 +48,7 @@ The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE
 /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
 
-The app plane — an application's own rung and the deployment seats beneath it — is **dev-authored; nothing lands there by machine**, with one composed exception: the deploy render supplies the published health-port default into the composition (RULE.SUPPORT.INFRA.048).
+The app plane — an application's own rung and the deployment seats beneath it — is **dev-authored; nothing lands there by machine**, with one composed exception: the deploy render supplies the published health-port default into the composition (`RULE.SUPPORT.INFRA.048` · MUST · skill:spn-infra/implement).
 
 > Defect: a machine write outside the environment rung, or into the app plane past the render's composed defaults — the writer split broke, and a team's value can be silently replaced by an apply.
 
@@ -56,7 +56,7 @@ The app plane — an application's own rung and the deployment seats beneath it 
 
 Nothing long-lived exists to store. Every provider-assigned value is **discovered** by the tool holding the credential and recorded as resolved state. A value copied from a console is a defect, and that includes the ones a day-zero runbook would have transcribed. Keep credentials in the config plane's stores, whose only readers are the apply and the deploy — never in a manifest, an env file, or a doc.
 
-**A provider resource name is refused at every path, with one exception** (RULE.SUPPORT.INFRA.123): S3's resource-name form with an empty region and an empty account, which names only a bucket the same file already names. A MinIO policy has to name its resource in that form, and a name with nothing to copy in carries nothing to leak. Every other provider's resource name, any name of that form carrying a region or an account, and any account id stay refused at every path.
+**A provider resource name is refused at every path, with one exception** (`RULE.SUPPORT.INFRA.123` · MUST · skill:spn-infra/release): S3's resource-name form with an empty region and an empty account, which names only a bucket the same file already names. A MinIO policy has to name its resource in that form, and a name with nothing to copy in carries nothing to leak. Every other provider's resource name, any name of that form carrying a region or an account, and any account id stay refused at every path.
 
 > Defect: a credential in a manifest or env file — the plane was bypassed, and the value now lives wherever that file went. An ARN or account id anywhere — an identifier was typed, and the estate stopped being reproducible.
 
@@ -64,7 +64,7 @@ Nothing long-lived exists to store. Every provider-assigned value is **discovere
 
 Put **coordinates and intent** in a manifest: codes, regions, address index values (append-only, never reused), environments, sizes, hosting, deploy triggers, rows. Everything else is either **derived** (names, addresses) or **discovered** (identifiers) — written by tools, reviewed by nobody, regenerable at any moment.
 
-An environment states its `setup` and its `region` and stops there. It declares **neither its composed `{env}` name nor the cloud provider's own region string** (RULE.SUPPORT.INFRA.098): a stored copy of a computed value is a second source for one fact, and a published estate carrying `env: "in-prod"` beside `setup: "dev"` resolved as production with nothing to object.
+An environment states its `setup` and its `region` and stops there. It declares **neither its composed `{env}` name nor the cloud provider's own region string** (`RULE.SUPPORT.INFRA.098` · MUST · skill:spn-infra/implement): a stored copy of a computed value is a second source for one fact, and a published estate carrying `env: "in-prod"` beside `setup: "dev"` resolved as production with nothing to object.
 
 > Defect: a derived name or discovered identifier typed into a reviewed file — it will drift the first time the derivation runs.
 

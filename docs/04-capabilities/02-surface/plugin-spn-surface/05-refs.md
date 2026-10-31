@@ -35,6 +35,12 @@ A partner holding this plugin has no checkout of the foundation book beside it, 
 **What** — `spn-devex restates files write` copies the book's two spec folders into `refs/support/surface/`, and `restates files check` reports a copy that is behind.
 **How** — the command finds the copies in this plugin beside the core plugin in the marketplace. `packages/plugin-spn-devex/src/scripts/commands/restates/files.ts`.
 
+### A parenthesis restates the rule whole
+
+**Why** — *a ref that names a rule without its level lets the sentence around it soften the rule*, and nothing compared the two.
+**What** — every parenthesis a ref writes after a sentence restates the book's mark: the rule's id, its level and the check, skill or arc that holds it, as the book states them. A ref that drops a MUST is a finding.
+**How** — `spn-devex restates check` compares each parenthesis with the book's, one finding per field that differs. `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts`.
+
 ## Between modules
 
 | Direction | With | What | Why |

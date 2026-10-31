@@ -14,7 +14,7 @@
 // levels the command's own telemetry line carries. `PLUGIN_SUBJECTS` names each subject, and a case
 // in the suite compares it with the command files.
 //
-// THE FILTER. `DEFAULT_PROGRAMS` names `spnutils`, the three plugin CLIs, `nx`, `git` and `docker`.
+// THE FILTER. `DEFAULT_PROGRAMS` names `spnutils`, the three plugin CLIs, `nx`, `git`, `docker` and the test runners.
 // A workspace may add or remove programs in `.spndevex/.debug/workspace/filter.json`:
 //
 //     { "add":    [{ "program": "make", "levels": 1, "valued": ["f", "C"] }],
@@ -68,16 +68,26 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
   "spn-devex": {
     behaviours: ["coverage", "ids", "stamp"],
     debug: ["cost", "hooks", "store", "switch", "window"],
-    docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "id", "index", "page", "parity", "prose", "sds", "status", "topics"],
+    docs: ["audit", "book", "coherence", "cycles", "face", "figure", "guide", "id", "index", "page", "parity", "prose", "sds", "status", "topics"],
     plugin: ["migration", "partner", "paths"],
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],
-    workstream: ["arc", "fact", "progress", "question", "report", "row", "rows", "sheet", "state", "suggestion"],
+    workstream: ["arc", "fact", "go", "progress", "question", "report", "row", "rows", "sheet", "state", "suggestion"],
   },
   "spn-surface": {},
   "spn-apps": { library: ["catalogue"] },
   "spn-infra": {},
 };
+
+/**
+ * The test runners a run is timed for, besides `spnutils` and `nx`: the test frameworks' own CLIs, and the two
+ * scripts a repository runs its whole suite by. `DEFAULT_PROGRAMS` reads each of them as a program, and the test-run
+ * check asks `isRunnerRun` of the same list, so a runner is timed exactly when the check counts it.
+ */
+export const TEST_RUNNERS: readonly string[] = ["vitest", "jest", "mocha", "playwright", "pytest", "run.mjs", "test-all.mjs"];
+
+/** Whether a program a command ran is one of `TEST_RUNNERS`. */
+export const isRunnerRun = (found: Pick<Reading, "script">): boolean => TEST_RUNNERS.includes(found.script);
 
 export const DEFAULT_PROGRAMS: Program[] = [
   { script: "spnutils", matches: named("spnutils"), levels: 2,
@@ -96,6 +106,7 @@ export const DEFAULT_PROGRAMS: Program[] = [
     deeper: Object.fromEntries(DOCKER_GROUPS.map((group) => [group, true as const])),
     valued: ["context", "H", "host", "config", "l", "log-level", "f", "file", "p", "project-name", "env-file", "profile",
              "project-directory"] },
+  ...TEST_RUNNERS.map((name): Program => ({ script: name, matches: named(name), levels: 1 })),
 ];
 
 type Filter = { add?: unknown; remove?: unknown };

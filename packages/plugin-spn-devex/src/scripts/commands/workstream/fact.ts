@@ -3,11 +3,12 @@
 //
 //   spn-devex workstream fact write <workstream>/N<nnn> --source <repository>/<path>[:<line>] --fact "…" [--used-by q59,57]
 //
-// One fact, read while ideating, pinned to the source repository's current commit, which `git` gives
-// so the agent never types a commit.
+// One fact, read while ideating, pinned to the source repository's current commit (the workstream's own branch where it has one),
+// which `git` gives so the agent never types a commit.
 
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
+import { basename, join } from "node:path";
 import { type Action, VALUE, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { appendJsonl, factsFileOf, logEvent, now, readJsonl, workspaceOf } from "../../lib/workstream.ts";
 import { factFaults, type Fact } from "../../lib/workstream-schema.ts";
@@ -37,7 +38,9 @@ function write(args: string[]): number {
   if (!source || !text) throw new UsageFault("needs `--source <repository>/<path>` and `--fact \"…\"`.");
   const repository = source.split("/")[0];
   const root = workspaceOf(ws);
-  const commit = root ? headOf(join(root, repository)) : null;
+  // Where the workstream has a branch of its own in the worktree set, the fact is pinned to that branch's commit.
+  const own = root ? join(root, ".worktrees", basename(ws), repository) : null;
+  const commit = root ? (own && existsSync(own) ? headOf(own) : null) ?? headOf(join(root, repository)) : null;
   if (!commit) throw new UsageFault(`finds no checkout \`${repository}\` beside the workspace — the source starts with its repository.`);
   const file = factsFileOf(ws, arc);
   const fact: Fact = { id: nextFactId(readJsonl(file)), fact: text, source, commit, readAt: now(), usedBy: listOf(words, "used-by") ?? [] };

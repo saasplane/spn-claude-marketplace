@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-surface/02-standards-interaction.md",
-      "seen": "c4876132"
+      "seen": "f1314ff7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-surface/02-standards-interaction/",
-      "seen": "f839820b"
+      "seen": "e024c534"
     }
   ]
 }
@@ -51,7 +51,7 @@ A task state says where a task stands. There are six, and a task is in exactly o
 
 A block drawn from data, such as a table or a list, shows every one of the six. An action, such as a button, shows working, and then done or failed.
 
-**The task state has one name in the design system, `DSTaskStateType`: `IDLE` · `WORKING` · `DONE` · `FAILED` · `EMPTY` · `DENIED`** (`RULE.SUPPORT.SURFACE.309`). A step of `DSStepper` takes four of them, `IDLE`, `WORKING`, `DONE` and `FAILED`: pending is `IDLE` and in progress is `WORKING`, and the stepper invents no state beside them. `EMPTY` and `DENIED` belong to a block's data, never to a step.
+**The task state has one name in the design system, `DSTaskStateType`: `IDLE` · `WORKING` · `DONE` · `FAILED` · `EMPTY` · `DENIED`** (`RULE.SUPPORT.SURFACE.309` · MUST · skill:spn-surface/design). A step of `DSStepper` takes four of them, `IDLE`, `WORKING`, `DONE` and `FAILED`: pending is `IDLE` and in progress is `WORKING`, and the stepper invents no state beside them. `EMPTY` and `DENIED` belong to a block's data, never to a step.
 
 **A task state is not a control state.** A task state belongs to one pattern (idle · working · done · failed · empty · denied); a control state belongs to one block (rest · hover · focus · pressed · disabled · error · selected), stated in `architecture-names.md`. A table that draws its rows well and shows nothing when its data fails has every control state and is missing a task state.
 

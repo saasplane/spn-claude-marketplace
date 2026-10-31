@@ -23,25 +23,27 @@
 // Nothing else counts, because nothing else is written down. A conversation is not a record: the
 // window ends and the go ends with it, which is exactly the state this hook exists to make visible.
 //
-// WHEN IT FIRES. On the first write into a MEMBER REPOSITORY — never on `.spndevex/` itself, because
-// writing the plan is how a session earns the go. One workstream open with no go, one warning.
+// WHEN IT FIRES. On every write into a MEMBER REPOSITORY — never on `.spndevex/` itself, because
+// writing the plan is how a session earns the go.
 //
-// AND IT DOES NOT NAG. A warning repeated on every write is a warning nobody reads, and it would fire
-// several times inside one turn. The session is remembered in its own folder under `.spndevex/.debug/sessions/`, the container
-// the workspace already keeps for what its machinery says about itself, so a second write is silent.
+// THE GO THAT COUNTS IS THE ONE ON THE ARC THAT NAMES THE REPOSITORY. An arc names the repositories it
+// changes, in its `repos` and on its rows. A write into `spn-support-ts` is covered by a go on an arc
+// that names `spn-support-ts`, and a go on an arc that builds something else covers nothing here.
+// Where no arc of the window's workstreams names the repository, a go on any of them covers the write.
+//
+// IT REFUSES, ON EVERY SUCH WRITE. A refusal is an answer: the write waits until the go is recorded, so
+// nothing is built on an arc that is still PROPOSED.
 //
 // PORTED FROM `hooks/scripts/confirmed.py`, WHICH HAD NEVER SPOKEN. The Python printed its warning as
 // plain text; the dispatcher kept only stdout it could parse as JSON, so every one of its 147 recorded
 // fires was discarded. The port returns a verdict rather than printing one, which is why the same
 // mistake cannot be made again — there is no round trip to lose it in. Finding F9 in this arc.
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { windowWorkstreams } from "../lib/window.ts";
-import { arcIdsOf, logLinesOf, moveOf, readArc } from "../lib/workstream.ts";
+import { arcIdsOf, arcRepos, logLinesOf, moveOf, readArc } from "../lib/workstream.ts";
 import type { LogLine } from "../lib/workstream-schema.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { emit, isDir, listdir, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
 
@@ -131,9 +133,16 @@ function openWorkstreams(root: string): string[] {
   return listdir(folder).map((name) => join(folder, name)).filter(isDir);
 }
 
-/** Whether any arc of this workstream holds the developer's go, read from its `state.json` and `log.jsonl`. */
-function hasGo(workstream: string): boolean {
-  return arcIdsOf(workstream).some((arc) => arcHoldsGo(readArc(workstream, arc)?.status, logLinesOf(workstream, arc)));
+/** One arc of an open workstream as this check reads it: where it is, its status, its log, and the repositories it names. */
+type ArcRead = { workstream: string; arc: string; status: unknown; lines: readonly unknown[]; repos: string[] };
+
+/** Every arc of these workstreams, each read once from its `state.json` and `log.jsonl`. */
+function arcsOf(workstreams: readonly string[]): ArcRead[] {
+  return workstreams.flatMap((workstream) => arcIdsOf(workstream).map((arc) => {
+    const data = readArc(workstream, arc);
+    const repos = data && Array.isArray(data.rows) ? arcRepos(data) : [];
+    return { workstream, arc, status: data?.status, lines: logLinesOf(workstream, arc), repos };
+  }));
 }
 
 /**
@@ -150,22 +159,15 @@ function isRepoWrite(root: string, path: string): boolean {
   return head !== "" && head !== "." && head !== DEVEX && head !== ".claude";
 }
 
+/** The member repository a write lands in: the first folder of its path from the workspace. */
+function repoOfWrite(root: string, path: string): string {
+  return relative(root, path).split(/[\\/]/)[0];
+}
+
 // The tools whose `file_path` names a file they change.
 const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
-/** One warning per session, remembered where the workspace keeps its own machinery's state. */
-function alreadyWarned(root: string, session: string | undefined): boolean {
-  if (!session) return false;
-  const marker = join(sessionDir(root, session), "confirmed.json");
-  try {
-    if (existsSync(marker)) return true;
-    mkdirSync(dirname(marker), { recursive: true });
-    writeFileSync(marker, "{\"warned\":true}\n", "utf8");
-    return false;
-  } catch { return false; }
-}
-
-/** Warn once when a repository write happens and no open workstream records a go. */
+/** Refuse a repository write that no go covers: the go on the arc that names the repository, or on any arc where none names it. */
 export function checkConfirmed(payload: Payload): Verdict {
   try {
     const written = payload.tool_input?.file_path;
@@ -175,28 +177,35 @@ export function checkConfirmed(payload: Payload): Verdict {
     const cwd = payload.cwd ?? process.cwd();
     const root = workspaceRoot(cwd);
     if (!root) return null;
-    if (!isRepoWrite(root, resolve(cwd, written))) return null;
+    const target = resolve(cwd, written);
+    if (!isRepoWrite(root, target)) return null;
     // THE GO MUST BE IN A WORKSTREAM THIS WINDOW WORKS ON (RULE.DEVEX.WORKSPACE.236). A go in another
     // window's workstream licenses nothing here. A window that works on none has no workstream to
-    // name, so it is asked about the workspace as a whole and the note names no workstream.
+    // name, so it is asked about the workspace as a whole and the refusal names no workstream.
     const own = new Set(windowWorkstreams(root, payload.session_id));
     const open = openWorkstreams(root);
     const workstreams = own.size ? open.filter((folder) => own.has(basename(folder))) : open;
     if (!workstreams.length) return null;
-    if (workstreams.some(hasGo)) return null;
-    if (alreadyWarned(root, payload.session_id)) return null;
+    const repo = repoOfWrite(root, target);
+    const arcs = arcsOf(workstreams);
+    const naming = arcs.filter((one) => one.repos.includes(repo));
+    if ((naming.length ? naming : arcs).some((one) => arcHoldsGo(one.status, one.lines))) return null;
+    const waiting = naming.map((one) => `${basename(one.workstream)}/${one.arc}`);
     const names = own.size ? workstreams.map((w) => basename(w)).join(" · ") : "";
+    const which = waiting.length
+      ? `${waiting.join(" · ")}, the ${waiting.length === 1 ? "arc that names it, holds" : "arcs that name it, hold"} no go`
+      : own.size ? `no workstream of this window records a go — ${names}` : "no open workstream records a go";
     return {
-      note:
-        `This is a repository write and ${own.size ? "no workstream of this window records a go — " + names : "no open workstream records a go"}. ` +
-        `Execution is confirmed rather than assumed: show the plan, ask, and record the ` +
-        `developer's answer as the go — \`workstream arc edit <arc> --status DECIDED --note "<the developer's words>"\`. ` +
+      deny:
+        `This write goes into ${repo}, and ${which}. Nothing is built on an arc before the developer's go: ` +
+        `show its preview, ask, and record their answer as the go — ` +
+        `\`workstream arc edit <arc> --status DECIDED --note "<the developer's words>"\`. ` +
         `An arc holds a go when it reads DECIDED, RUNNING or LANDED and its log holds that line. ` +
         `A go held only in the conversation ends with the window, and the next session cannot tell ` +
-        `a plan from an agreement (refs/devex/workspace/workstream.md, S3).`,
+        `a plan from an agreement (RULE.DEVEX.WORKSPACE.239, RULE.DEVEX.WORKSPACE.278).`,
     };
   } catch {
-    return null;                                    // never fail a gate over a warning
+    return null;                                    // a check that throws is skipped, never fatal
   }
 }
 

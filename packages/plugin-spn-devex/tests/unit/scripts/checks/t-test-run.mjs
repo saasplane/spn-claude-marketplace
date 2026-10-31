@@ -122,5 +122,62 @@ console.log("\n=== which commands are a test run, and which repository each is f
   ok("[MKT.HOOKS.32] a command that names neither folder does not apply", applies("", "git status --short") === false && applies("", "ls srcs testsuite") === false);
 }
 
+console.log("\n=== a whole suite runs only while a baseline or full run of the go is running");
+{
+  // A go plan in the lead arc's folder, `go.json`, holding one full run of `spn-x` at `state`.
+  const OPEN = ".spndevex/workstreams/open/036-probe";
+  const goFiles = (state) => ({
+    [`${OPEN}/arcs/N004/state.json`]: `${JSON.stringify({ schemaVersion: 2, arc: "N004", subject: "probe", title: "t", goal: null, status: "DECIDED", reason: null, preview: "preview.html", rows: [] })}\n`,
+    [`${OPEN}/arcs/N004/go.json`]: `${JSON.stringify({ schemaVersion: 1, lead: "N004", scope: ["N004"], writtenAt: "2026-10-31T09:00+05:30", parts: [
+      { id: "full-spn-x", repo: "spn-x", pass: "FULL_RUN", entries: [], tests: [], minutes: null, measuredFrom: null, waitsOn: [], model: "sonnet", signature: "", state },
+    ] })}\n`,
+  });
+  const at = (name, files = {}) => workspace(name, { "spn-x/README.md": "x\n", "spn-y/README.md": "y\n", ...files });
+  const bash = (root, command, dir = "spn-x") => ({ tool_name: "Bash", cwd: join(root, dir), tool_input: { command } });
+  const WHOLE = [
+    ["the repository's own runner", "node packages/plugin-spn-devex/tests/run.mjs"],
+    ["the repository's runner of every package", "node scripts/test-all.mjs"],
+    ["`nx run-many -t test`", "npx nx run-many -t test"],
+    ["`spnutils apps test` with no selection", "spnutils apps test unit r1 api"],
+    ["`spnutils infra test` with no selection", "spnutils infra test r1"],
+  ];
+
+  const none = at("test-run-whole-no-go");
+  for (const [what, command] of WHOLE)
+    ok(`[MKT.HOOKS.122] a whole suite by ${what} is refused while no full run is running`,
+      verdictOf(checkTestRun(bash(none, command), NOW)) === "deny", JSON.stringify(checkTestRun(bash(none, command), NOW)));
+  const told = checkTestRun(bash(none, "node packages/plugin-spn-devex/tests/run.mjs"), NOW)?.deny ?? "";
+  ok("[MKT.HOOKS.122] the refusal quotes the command, and names the part's own files and `workstream go start`",
+    told.includes("`node packages/plugin-spn-devex/tests/run.mjs` runs the whole suite") && told.includes("own test files") && told.includes("workstream go start"), told);
+  ok("[MKT.HOOKS.122] a compound command is read for the whole suite inside it",
+    verdictOf(checkTestRun(bash(none, `cd ${join(none, "spn-x")} && node packages/plugin-spn-devex/tests/run.mjs unit`, "."), NOW)) === "deny");
+  ok("[MKT.HOOKS.122] the dispatcher's fast path: a command naming a runner applies",
+    applies("", "npx nx run-many -t test") && applies("", "spnutils apps test unit r1 api") && applies("", "node scripts/test-all.mjs"));
+
+  for (const [what, command] of [
+    ["one suite file, run directly", "node packages/plugin-spn-devex/tests/unit/scripts/checks/t-test-run.mjs"],
+    ["`spnutils apps test` with a selection after `--`", "spnutils apps test unit r1 api -- tests/unit/a.test.ts"],
+    ["`nx test` of one project", "npx nx test api"],
+    ["a command that runs no tests", "git status --short"],
+  ]) ok(`[MKT.HOOKS.123] ${what} passes while no full run is running`, checkTestRun(bash(none, command), NOW) === null);
+
+  const ready = at("test-run-whole-ready", goFiles("ready"));
+  for (const [what, command] of [WHOLE[0], WHOLE[2]])
+    ok(`[MKT.HOOKS.301] a whole suite by ${what} is refused while the go's full run is only ready`,
+      verdictOf(checkTestRun(bash(ready, command), NOW)) === "deny");
+  const named = checkTestRun(bash(ready, "node packages/plugin-spn-devex/tests/run.mjs"), NOW)?.deny ?? "";
+  ok("[MKT.HOOKS.301] the refusal names the go and the part that starts the full run",
+    named.includes("no full run of 036's go is running") && named.includes("`workstream go start 036/N004 full-spn-x`"), named);
+
+  const running = at("test-run-whole-running", goFiles("running"));
+  for (const [what, command] of WHOLE)
+    ok(`[MKT.HOOKS.123] a whole suite by ${what} passes while the go's full run is running`,
+      checkTestRun(bash(running, command), NOW) === null);
+  ok("[MKT.HOOKS.301] a full run of another repository does not count for this one",
+    verdictOf(checkTestRun(bash(running, "node scripts/test-all.mjs", "spn-y"), NOW)) === "deny");
+  ok("[MKT.HOOKS.31] a repository's own runner is a test command, so the edits wait while it runs",
+    isTestCommand(reading("run.mjs", null, null, null)) && isTestCommand(reading("test-all.mjs", null, null, null)));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — test-run` : `\n  all ${total} passed — test-run`);
 process.exit(failed ? 1 : 0);

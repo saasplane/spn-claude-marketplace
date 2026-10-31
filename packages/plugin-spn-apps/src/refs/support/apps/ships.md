@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-apps/09-ships.md",
-      "seen": "0de6aa31"
+      "seen": "d42f51c1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-apps/09-ships/",
-      "seen": "8b4fdde4"
+      "seen": "03ded52c"
     }
   ]
 }
@@ -105,7 +105,7 @@ The same capability is described at four altitudes on its way from an idea to so
 - **A capability chapter holds only what a package does off the pattern**, never the pseudologic of every operation.
 - **Own, do not restate.** A rule lives at exactly one link. Read a document that explains what a gate *does* as a copy of the seam's own entry, drifting already, rather than as a second source to trust.
 - **Name only the seams a node's own dependencies publish** — that turns *is this document allowed to say that* into a check rather than a judgment call, and it is a check worth running before citing a seam a node does not depend on.
-- **The phrase is advisory and the citation is enforced; proof belongs to the behaviours seat at every link.** Nothing fails when a node reaches for different wording, as long as it cites the right seam, and a capability chapter names no test (RULE.SUPPORT.APPS.024).
+- **The phrase is advisory and the citation is enforced; proof belongs to the behaviours seat at every link.** Nothing fails when a node reaches for different wording, as long as it cites the right seam, and a capability chapter names no test (`RULE.SUPPORT.APPS.024` · MUST · skill:spn-apps/implement).
 - **A refusal is a form.** Where a flow departs from a published phrase, it names the phrase it is not using and why — usually the most valuable sentence in the document, and the one to write rather than skip when a flow genuinely diverges.
 
 ## The stage this one sits in

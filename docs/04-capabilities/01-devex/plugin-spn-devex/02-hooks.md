@@ -180,7 +180,7 @@
 **Where the line lands.** The agent writes it, with the plugin's own workstream command, as one `note` line on the log of each running arc of those workstreams: `spn-devex workstream arc edit <arc> --note "…"`, which is the only writer of a log line. A workstream with no running arc is told nothing, because no arc is working on anything the merge could move. The hook only reminds, and the agent writes, because what changed is judgement and a script reads no diff.
 **How** — the reminder is a check of the same shape as the one above: it reads the workspace's open workstream folders, their worktree sets and each arc's status, which `arcs/N<nnn>/state.json` already carries.
 
-### A turn that ends warns and never refuses
+### A turn that ends warns, and refuses only what the developer reads
 
 **Why** — *the turn is already written*, and a refusal at that point would only lose it. A warning makes the agent reply again, so a check speaks once in a turn and only about the session's own work (RULE.DEVEX.WORKSPACE.197 · RULE.DEVEX.WORKSPACE.198).
 **What** — warnings for a reply that puts a decision with the card's shape incomplete, a reply that owes **Needs you** at its top and does not open with it — a reply that raises a card holds it there in full once, and a reply that waits names every card open from an earlier reply in one line, while a progress reply owes nothing (RULE.DEVEX.WORKSPACE.189) — an answer logged in an arc whose notes (spec, plan, previews, samples) did not move in the same turn, a proposed arc carrying a review point to a later step of itself (RULE.DEVEX.WORKSPACE.193), an arc *this session* wrote to that still has runnable rows and no card open, a reply that passes work on and leaves an open card unnamed or carries a handover block that lacks a label, and the corpus questions a whole-tree read still owes. A page left stale, an arc that landed with a row undecided, and a handover whose values start in different columns each have a section below.
@@ -201,7 +201,7 @@
 ### A page left stale is named before the turn ends
 
 **Why** — *the parts of a page that the arcs decide are produced, never typed* (the book's RULE.DEVEX.WORKSPACE.204). A page read `PLANNING` after arcs had landed, and its table showed arcs as proposed while they ran. The write-time check sees a page only when the whole page is written. So an arc that moves leaves the page stale, and nothing says so.
-**What** — when the session's own tool calls wrote an arc this turn, the page of that arc's workstream is compared with its arcs. The comparison covers the Cycles table, the header's status and the heading of `Open`. Where any of them differs, one warning names the workstream and the command that writes all of them, `spn-devex docs cycles write <workstream>`. A turn that wrote no arc gets no warning, and neither does a workstream another session wrote.
+**What** — when the session's own tool calls wrote an arc this turn, the page of that arc's workstream is compared with its arcs. The comparison covers the Cycles table, the header's status, each preview's status against its arc's (RULE.DEVEX.WORKSPACE.251 · MUST) and the heading of `Open`. The command the warning names writes every part it asks for, the heading of `Open` included, so a page with no card ends the turn once it is written. Where any of them differs, one warning names the workstream and the command that writes all of them, `spn-devex docs cycles write <workstream>`. A turn that wrote no arc gets no warning, and neither does a workstream another session wrote.
 **How** — the check reads `touched`, the arcs this window wrote since its last Stop (from the window's note), so a first Stop with no baseline compares nothing. For each workstream it calls `cyclesRule` and the header rule that `doc-check` applies when a whole page is written. The header's status follows the arcs: `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes. `packages/plugin-spn-devex/src/scripts/events/stop.ts`, beside `checkArcToPage`, proven in `packages/plugin-spn-devex/tests/unit/scripts/events/t-stop.mjs`.
 
 ### An arc that lands is given the close gate's report
@@ -219,13 +219,133 @@
 ### A call that would prompt only by its shape is told the plain form
 
 **Why** — *an agent that joins two allowed commands costs the developer an approval nothing needed* (the book's delivery chapter, § The three permission tiers). The harness matches each part of a joined call on its own, so a `cd`, a pipe, a loop or a program's path sends for approval a call whose every command the floor allows.
-**What** — a Bash call is split as the harness splits it, at `|`, `||`, `&&`, `;`, a lone `&` and a line break, with each `$( … )` read as a part of its own, and each part is matched against the floor's `Bash(…)` rules alone. Where every part is allowed and they are joined, or where each part no rule allows is a shape with a plain form and every other part is allowed, the agent is told the part and the plain form: `git -C <repo>` or the tool's own path option for a `cd`, one command per call, the program by its name for a path, and `run_in_background` for a trailing `&`. A plain allowed command, a part an `ask` or `deny` rule names, and a part no rule allows for what it runs hear nothing, because then the prompt is about what the call does. It is a note and never a refusal.
-**How** — the floor is the workspace's `.claude/settings.json`, the workspace found as every hook finds it, by the folder holding `.spndevex/`; a rule `x:*` names `x` and what goes on after a space, `*` stands for any text, and any other rule is the command exactly. The check reads that one file and matches text, and it starts no other program. `packages/plugin-spn-devex/src/scripts/checks/command-shape.ts`, an entry in the `CHECKS` list of `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-command-shape.mjs`.
+**What** — a Bash call is split as the harness splits it, at `|`, `||`, `&&`, `;`, a lone `&` and a line break, with each `$( … )` read as a part of its own, and each part is matched against the floor's `Bash(…)` rules alone. Where every part is allowed and they are joined, or where each part no rule allows is a shape with a plain form and every other part is allowed, the agent is told the part and the plain form: `git -C <repo>` or the tool's own path option for a `cd`, one command per call, the program by its name for a path, and `run_in_background` for a trailing `&`. A plain allowed command, a part an `ask` or `deny` rule names, and a part no rule allows for what it runs hear nothing, because then the prompt is about what the call does. It is a refusal that names the plain form (RULE.DEVEX.WORKSPACE.318 · MUST).
+**How** — the floor is the workspace's `.claude/settings.json` and its `.claude/settings.local.json`, both read as the harness reads them, the workspace found as every hook finds it, by the folder holding `.spndevex/`; a rule `x:*` names `x` and what goes on after a space, `*` stands for any text, and any other rule is the command exactly. The check reads those two files and matches text, and it starts no other program. `packages/plugin-spn-devex/src/scripts/checks/command-shape.ts`, an entry in the `CHECKS` list of `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-command-shape.mjs`.
+
+### A move to DECIDED must quote words the developer typed
+
+**Why** — *a go that quotes words nobody typed is the agent deciding for the developer* (RULE.DEVEX.WORKSPACE.058 · MUST, RULE.DEVEX.WORKSPACE.307 · MUST).
+**What** — a call that moves an arc to `DECIDED` is refused when the words it quotes appear in no prompt of this window and in no log line of the workstream. The message names the arc and the quoted words, and asks for the developer's own, as they wrote them.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/arc-status.ts`, an entry in the `CHECKS` list of `pretooluse.ts`.
+
+### An ask for leave the developer already gave is refused
+
+**Why** — *a reply that asks leave for an act a grant allows costs the developer a turn for nothing* (RULE.DEVEX.WORKSPACE.069 · MUST).
+**What** — at the turn's end, a reply that closes by asking leave for a merge, a push, a commit, a pull request or a minor release is refused when a rule of the floor already allows that act. The message names the rule and the settings file it sits in, and says to do the act now.
+**How** — the allow rules are read from `.claude/settings.json` and `.claude/settings.local.json`. `packages/plugin-spn-devex/src/scripts/checks/standing-grant.ts`, a check of the turn's end in `stop.ts`.
+
+### A page is handed over as its whole `file:///` address
+
+**Why** — *a bare name or a relative path cannot be pasted into a browser* (RULE.DEVEX.AGENT.113 · MUST, RULE.DEVEX.WORKSPACE.117 · MUST).
+**What** — at the turn's end, a reply that hands over a page as a bare name, a relative path or a link whose text hides the address is refused, and the message says to write the whole `file:///` address.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/page-path.ts`, a check of the turn's end in `stop.ts`.
+
+### A test result is never hidden
+
+**Why** — *a result piped into `tail`, or an error sent to `/dev/null`, loses the exit status the proof stands on*, and an nx run replayed from its cache proves nothing about the tree.
+**What** — a test or check command is refused when its output goes through `tail` or `head`, when its errors go to `/dev/null`, or, inside a proving row, when it is an nx run replayed from its cache. The message says to run it alone and read its status.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/proof-run.ts`, an entry in the `CHECKS` list of `pretooluse.ts`, reading the command with `lib/command-reader.ts`.
+
+### Plugins are installed by `spnutils workspace agent-sync`
+
+**Why** — *a raw `claude plugin install` leaves the workspace's plugins at versions nobody chose* (RULE.DEVEX.AGENT.034 · MUST).
+**What** — a `claude plugin install` or `claude plugin update` is refused, and the message names `spnutils workspace agent-sync`, run in this window, and says to read its plugin actions.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/plugin-sync.ts`.
+
+### The developer's own browser profile is never opened
+
+**Why** — *a launch on the developer's profile drives their signed-in sessions* (RULE.DEVEX.UTILS.074 · MUST).
+**What** — a Chrome or Playwright launch that names the developer's own profile is refused, and the message names `spn-devex docs look` on the tool's own profile.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/browser-profile.ts`.
+
+### A command group is run bare before its first write in a window
+
+**Why** — *an agent that has not read a group's usage guesses its options*.
+**What** — the first writing call of an `spnutils` or `spn-devex` command group in a window is refused until the group has been run bare and its usage read. The message names the group.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/usage-first.ts`.
+
+### A page states what is true now
+
+**Why** — *a page that tells its own history is read as if the history still held* (RULE.DEVEX.WORKSPACE.247 · MUST, with RULE.DEVEX.WORKSPACE.142 · MUST for code).
+**What** — a write of the book, a ref, a repository's docs or a workstream page is refused when it holds "formerly", "renamed from", "moved from", "replaced by" or "legacy". Logs and registers keep history, so this check never reads them. `comment-check` shares the finding for code.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/no-history.ts`.
+
+### A drawing keeps the spacing the figure contract sets
+
+**Why** — *a label that touches its box is read as part of it*.
+**What** — a page write that carries a drawing is measured with the measure `docs figure` already uses, and a drawing below the spacing contract is refused. The message names the label and its clearance.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/figure-spacing.ts`, reading `lib/figures.ts`.
+
+### A guide names the `spnutils` command
+
+**Why** — *a guide that runs `npx` or `pnpm` teaches a path the paved road does not take*.
+**What** — a write of a guide that holds an `npx` or `pnpm` command is refused, and the message names the `spnutils` command that does the job.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/guide-commands.ts`.
+
+### A page title is a topic name
+
+**Why** — *a heading that runs on is a sentence that belongs under it*.
+**What** — a write of a page whose subsection heading runs past five words or holds a comma is refused, and the message names the lead line the sentence moves to. A card keeps its question as its heading. `workstream arc edit` applies the same rule to an arc title (see the scripts doc).
+**How** — `packages/plugin-spn-devex/src/scripts/checks/page-title.ts`.
+
+### The plugin's copy of a template is changed in the book first
+
+**Why** — *the plugin's copy is written from the book, and a direct edit is lost at the next write* (RULE.DEVEX.WORKSPACE.229 · MUST).
+**What** — a direct write to the plugin's copy of the book's templates is refused, and the message names the book's template and `spn-devex restates files write`.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/restates-first.ts`.
+
+### A report is written only when somebody asks
+
+**Why** — *a report nobody asked for costs a window to write and another to read* (RULE.DEVEX.WORKSPACE.212 · MUST).
+**What** — a write of a report is refused when no prompt of this window asks for one.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/report-asked.ts`.
+
+### A write into a repository needs the go of the arc that names it
+
+**Why** — *a go on one arc does not cover another repository's code* (RULE.DEVEX.WORKSPACE.239 · MUST).
+**What** — `confirmed` refuses every write into a repository that no go covers. The go that counts is the one on the arc that names the repository, and the message names both. A read is never refused.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/confirmed.ts`.
+
+### Documents land before the code of their repository
+
+**Why** — *the documents say what the code is built to* (RULE.DEVEX.WORKSPACE.320 · MUST).
+**What** — `documents-first` reads the arc's own rows and refuses a write under `src/` or `tests/` while that repository's documents row has not landed. The message names the row.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/split-plan.ts`.
+
+### A whole suite runs only in the proving row
+
+**Why** — *a whole suite after every row costs minutes each time, and the proof is one run at the end* (RULE.DEVEX.WORKSPACE.207 · MUST).
+**What** — `test-run` also refuses a whole tier, a full app run, and a whole suite by any runner a repository declares, such as `node packages/<p>/tests/run.mjs`, unless a proving row of the arc is in progress or the go's plan has started a full run (the section below). While work is under way, only the tests of what changed run, and an order's test commands are the tests its row's entries name.
+**How** — `packages/plugin-spn-devex/src/scripts/checks/test-run.ts`, with the runners it knows kept in one list that the timing reads too.
+
+### A helper starts only from a part of the plan
+
+**Why** — *an order cut by hand drifts from the sheet it was meant to carry out*.
+**What** — once a go has a plan, the launch check refuses an order that names no part of it, and prints `workstream go show` and says to launch the part's own brief. `test-run` refuses a whole suite in the middle of a pass and names `workstream go start <part>`, which marks a baseline or full run as running so the suite may run.
+**How** — the plan is the lead arc's `go.json`, read by `lib/workstream.ts`. `packages/plugin-spn-devex/src/scripts/checks/test-run.ts`, and the launch check beside it in the dispatcher.
+
+### Each moment of the loop names the go's next step
+
+**Why** — *a plan the agent has to remember is a plan it forgets*.
+**What** — the session start names each running go in one line: its parts running, held and ready, and the next step. The prompt adds a reminder to the agent while a go has a part running or ready: read the message for what it changes, and follow the steps of a change mid-run if it changes running work. The turn's end tells the agent the next step when a part is ready and not started, or a helper's report waits to be folded, with no question open to the developer. It is a note and never a block on the developer. The close gate also refuses while `workstream go check` finds anything or a part has not landed.
+**How** — `packages/plugin-spn-devex/src/scripts/events/orientation.ts`, `prompt.ts` and `stop.ts`, and `checks/split-plan.ts` for the close gate.
+
+### The turn's end sends the agent back on what the developer reads
+
+**Why** — *the developer reads the reply, and a rule that only warns about it is a rule nothing keeps* (RULE.DEVEX.WORKSPACE.189 · MUST, RULE.DEVEX.WORKSPACE.197 · MUST).
+**What** — four checks of the turn's end refuse in this section and not warn. `runnable` refuses a reply that ends on a promise of the next step while an arc this window works on is decided, has a ready row and no open card. `reply-shape` also refuses a **Needs you** part that names a card or a suggestion by its number alone, and a reply that names a row or order number, an order's file, a bare suggestion number, a rule id or a check's file name: it is flagged back with the sentence to rewrite. An arc number, and a card's number beside its words, pass. `cards` refuses a reply that names a question card no page of this window's workstream carries, one already answered, or one of another workstream. `handover` also refuses a close or a handover that opens with a table, a hash heading or a count, or that has no paragraph on what was delivered and what was learned (RULE.DEVEX.WORKSPACE.206 · MUST). The doc check takes the same list of working detail for a write to an approach page or a preview.
+**How** — the four checks sit in `packages/plugin-spn-devex/src/scripts/events/stop.ts` and `checks/questions.ts`.
+
+### A page is judged by the template and by the book
+
+**Why** — *the page template and the book's chapters are the standard, and a check that reads neither lets a page drift* (RULE.DEVEX.WORKSPACE.187 · MUST, RULE.DEVEX.WORKSPACE.228 · MUST, RULE.DEVEX.WORKSPACE.233 · MUST, RULE.DEVEX.WORKSPACE.238 · MUST).
+**What** — `doc-check` refuses an approach page or preview that keeps a `{{…}}` slot or a template comment, holds a section its template does not, or puts a table in Overview. On a write to a book chapter it also runs the book's own check, and it names a compressed sentence as a note. For `comment-check`, an old name kept beside the new one in code, whether an alias export, a re-export under the old name or a `@deprecated` tag, is refused, because a rename changes every place at once (RULE.DEVEX.WORKSPACE.142 · MUST).
+**How** — `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts` and `checks/comment-check.ts`.
 
 ### Measuring is free; writing is the cost
 
 **Why** — *telemetry must not make the gate slower*, and a gate that fails because timing failed is worse than a number nobody recorded.
-**What** — every run is timed, and so is each Bash command the agent runs through a program the filter names. Every line has one shape — the program or plugin, up to three levels below it, the arguments, the time, the exit code, the repository and a UTC time — and names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
+**What** — every run is timed, every test runner the `test-run` check knows is timed, a repository's own included, so the plan prices a full run from real times, and so is each Bash command the agent runs through a program the filter names. Every line has one shape — the program or plugin, up to three levels below it, the arguments, the time, the exit code, the repository and a UTC time — and names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
 **How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. **The tags carry forward** (RULE.DEVEX.WORKSPACE.185): per session and agent, the last tagged call's tags sit in `telemetry/tags.json`, written only while the switch is on; a call that touches no workstream path inherits them, a call inside the same work keeps what it does not name, and a call that names other work replaces them. **A Bash command is paired on its `tool_use_id`**: `PreToolUse` writes `telemetry/pending/<tool_use_id>.json` for a matched command while the switch is on, and `PostToolUse` or `PostToolUseFailure` reads it, writes one line for the call with its time and exit code, and removes it. The line names the first program the filter matches, and its `programs` key holds how many programs the call ran, so a call's time is summed once. A failed call writes its `events › closed` line too, under `PostToolUseFailure`. A start file older than 600,000 ms is removed when the next one is written, because no foreground call runs longer. The programs are `spnutils`, the plugin CLIs, `nx`, `git` and `docker`, and `.spndevex/.debug/telemetry/filter.json` adds or removes them. `packages/plugin-support-lib/src/lib/timing.ts`, `carryTags`; `packages/plugin-spn-devex/src/scripts/lib/bash-timing.ts`.
 
 ## Between modules
