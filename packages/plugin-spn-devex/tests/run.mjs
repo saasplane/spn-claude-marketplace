@@ -19,7 +19,7 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
-import { RUN_NAME, writeRunFile } from "./helpers/run-file.mjs";
+import { recordRun, resultsOf, runNameOf, takeAppend } from "../../plugin-support-lib/tests/helpers/run-file.mjs";
 
 // Every hook a case launches inherits this, so a test run never writes into the workspace's
 // telemetry log, where its records would read as the developer's own tool calls.
@@ -43,11 +43,8 @@ const suites = walk(HERE)
   .sort();
 const writeStatus = process.argv.includes("--write-status");
 // The run's name, chosen by the caller: the first word that is not an option.
-const runName = process.argv.slice(2).find((arg) => !arg.startsWith("--")) ?? null;
-if (runName !== null && !RUN_NAME.test(runName)) {
-  console.error(`'${runName}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores.`);
-  process.exit(2);
-}
+const runName = runNameOf(process.argv.slice(2));
+const append = takeAppend();
 if (writeStatus && runName === null) {
   console.error("--write-status stamps the rows from a named run. Usage: node run.mjs <run> --write-status");
   process.exit(2);
@@ -56,7 +53,6 @@ if (writeStatus && runName === null) {
 // The tier these suites run at. They exercise one unit — a check, a drawer, a renderer — against a
 // fixture, with no service and no browser, so they speak for `UNIT` rows and for nothing else.
 const TIER = "UNIT";
-const ID = /\[([A-Z][A-Z0-9]*(?:\.[A-Z0-9]+){2})\]/;
 
 // A suite that skips cases says so on a line of its own, `SKIP <n> <reason>`, anywhere in its output
 // (`skipped()` in helpers/harness.mjs). The runner counts those wherever they fall, so a run that
@@ -83,13 +79,7 @@ for (const suite of suites) {
   } catch (error) { out = String(error.stdout ?? ""); code = error.status ?? 1; }
   const tail = out.trimEnd().split("\n").at(-1).trim() || "CRASHED";
 
-  for (const line of out.split("\n")) {
-    const verdict = /^\s*(PASS|FAIL)\s+(.*)$/.exec(line);
-    if (!verdict) continue;
-    const id = ID.exec(verdict[2]);
-    if (!id) continue;
-    results.push({ id: id[1], tier: TIER, status: verdict[1] === "PASS" ? "SUCCESS" : "FAILED", title: verdict[2].trim() });
-  }
+  results.push(...resultsOf(out, TIER));
 
   const skips = out.split("\n").map((line) => SKIP_LINE.exec(line)).filter((found) => found !== null);
   const skippedHere = skips.reduce((sum, found) => sum + Number(found[1]), 0);
@@ -111,12 +101,7 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 // about the run — the register then says PLANNED for rows this tier covers and nothing named, which is
 // true and is what a reader needs. It lives where every other stack's runner puts one, beside the
 // pocket and never in it (RULE.DEVEX.WORKSPACE.149): a file rewritten by every run is not a document.
-if (runName !== null) {
-  const file = writeRunFile(REPO, runName, TIER, results);
-  console.log(`  ${results.length} case(s) carry a behaviour id -> ${file.slice(REPO.length + 1)}`);
-} else {
-  console.log("  no run name given, so no run file was written — name one to leave what this run proved: node run.mjs <run>");
-}
+recordRun(REPO, runName, TIER, results, append);
 
 if (writeStatus) {
   // This run is the whole of its tier here, so a row no case named any more goes back to PLANNED.

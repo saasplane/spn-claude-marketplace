@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Every suite in this folder, in one command.
 //
-//     node run.mjs
+//     node run.mjs [<run>]
 //
 // A suite is a file named `t-<name>.mjs`, found by walking this folder, and its last line says how many
 // cases passed. The exit code is the verdict.
@@ -9,12 +9,20 @@
 import { execFileSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { recordRun, resultsOf, runNameOf, takeAppend } from "../../plugin-support-lib/tests/helpers/run-file.mjs";
 
 // Every hook a case launches inherits this, so a test run never writes into the workspace's
 // telemetry log, where its records would read as the developer's own tool calls.
 process.env.SPN_TELEMETRY = "off";
 
 const HERE = import.meta.dirname;
+const REPO = resolve(HERE, "..", "..", "..");
+// A NAMED RUN WRITES DOWN WHAT IT PROVED, into the one run file every package's runner writes (RULE.DEVEX.UTILS.071):
+// a row whose proof sits in this package lands only on a run that recorded it.
+const runName = runNameOf(process.argv.slice(2));
+const append = takeAppend();
+const TIER = "UNIT";
+const results = [];
 // THE SUITES ARE WALKED, NOT LISTED, and they mirror `src/`: a test for a provider's rule sits at
 // the path that rule sits at. A runner that globbed one folder made a rule test, a structural test
 // and a tool test indistinguishable, and it is why moving a rule used to move its test nowhere.
@@ -57,6 +65,7 @@ for (const suite of suites) {
   const skips = out.split("\n").map((line) => SKIP_LINE.exec(line)).filter((found) => found !== null);
   const skippedHere = skips.reduce((sum, found) => sum + Number(found[1]), 0);
   const reasons = [...new Set(skips.map((found) => found[2].trim()).filter(Boolean))].join("; ");
+  results.push(...resultsOf(out, TIER));
 
   const counted = /\b(\d+) passed\b/.exec(tail);
   const ok = code === 0 && counted !== null;
@@ -69,4 +78,5 @@ for (const suite of suites) {
 console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
   (skipped ? ` passed · ${skipped} skipped in ${skippingSuites} suite(s)` : "") +
   (failed ? ` · ${failed} SUITE(S) FAILING` : skipped ? "" : " · all passing"));
+recordRun(REPO, runName, TIER, results, append);
 process.exit(failed ? 1 : 0);
