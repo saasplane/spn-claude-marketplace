@@ -26,19 +26,7 @@ const same = (label, got, expected) => {
 };
 
 const env = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
-// A window reads a group's usage before it writes to it (checks/usage-first.ts) and a refused call is not timed, so a
-// case reads each group's usage first, in a call with no id, which is never timed.
-const readUsage = (payload) => {
-  for (const [, program, group] of String(payload.tool_input?.command ?? "").matchAll(/\b(spnutils|spn-devex)\s+([a-z][a-z-]*)/g)) {
-    const { tool_use_id, ...bare } = payload;
-    try {
-      execFileSync("node", [join(EVENTS, "pretooluse.ts")], { input: JSON.stringify({ ...bare, tool_input: { command: `${program} ${group}` } }),
-        env: env(), encoding: "utf8", cwd: payload.cwd, stdio: ["pipe", "pipe", "pipe"] });
-    } catch { /* the reading is all that matters */ }
-  }
-};
 const hook = (entry, payload) => {
-  if (entry === "pretooluse") readUsage(payload);
   try {
     return execFileSync("node", [join(EVENTS, `${entry}.ts`)], { input: JSON.stringify(payload), env: env(), encoding: "utf8",
       cwd: payload.cwd, stdio: ["pipe", "pipe", "pipe"] });
@@ -174,6 +162,18 @@ console.log("\n=== a secret, a background call, and a compound command");
   hook("pretooluse", { ...call(root, "toolu_fresh", "git status"), hook_event_name: "PreToolUse" });
   same("[MKT.HOOKS.43] a start file older than ten minutes is left where it is when the next one is written",
     readdirSync(pendingOf(root)).sort(), ["toolu_fresh.json", "toolu_refused.json"]);
+}
+
+console.log("\n=== usage-first no longer stands in the way");
+{
+  const root = workspace("2p-no-usage-first", ON);
+  // The first call of a group, with no bare call before it: it was refused and never timed while usage-first stood.
+  const first = call(root, "toolu_first", "spnutils infra platform up dmo --apply");
+  const out = hook("pretooluse", { ...first, hook_event_name: "PreToolUse" });
+  same("[MKT.HOOKS.325] a first write of a command group is not refused", out.includes("permissionDecision"), false);
+  same("[MKT.HOOKS.325] and it is timed: its start file is written", existsSync(join(pendingOf(root), "toolu_first.json")), true);
+  hook("closed", { ...first, hook_event_name: "PostToolUse", tool_response: {} });
+  same("[MKT.HOOKS.325] and its line is written", commands(root).map((one) => one.action), ["up"]);
 }
 
 console.log("\n=== the workspace filter file");

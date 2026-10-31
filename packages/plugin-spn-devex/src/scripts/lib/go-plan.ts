@@ -238,9 +238,16 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
     const hasCode = groups.has(`${repo}|CODE`) || kept.some((one) => one.repo === repo && one.pass === "CODE");
     for (const pass of PASS_ORDER) {
       if (pass === "BASELINE" || pass === "FULL_RUN") {
-        const id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
+        let id = `${pass === "BASELINE" ? "baseline" : "full"}-${repo}`;
         // A proof still owed needs the repository's full run once its code has landed; a baseline needs code to compare.
-        const runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
+        let runs = hasCode || (pass === "FULL_RUN" && owed.has(repo));
+        if (pass === "FULL_RUN") {
+          // A new code part in a repository whose full run has landed opens the next full run, full-<repo>-2.
+          const fulls = kept.filter((one) => one.repo === repo && one.pass === "FULL_RUN");
+          const landedN = Math.max(0, ...fulls.filter((one) => one.state === "landed").map((one) => numberOf(one) || 1));
+          if (fulls.some((one) => one.state === "running")) runs = false;
+          else if (landedN > 0) { if (groups.has(`${repo}|CODE`)) id = `${id}-${landedN + 1}`; else runs = false; }
+        }
         if (runs && !keptIds.has(id)) fresh.push(part(id, repo, pass, [], [], {
           minutes: full, measuredFrom: full === null ? null : "last 3 full runs",
         }));
@@ -277,6 +284,19 @@ export function deriveGo(scope: readonly ScopeSheet[], options: DeriveOptions = 
       one.waitsOn = prior ? parts.filter((other) => other.repo === prior && other.pass === "DOCS").map((other) => other.id) : [];
     }
   }
+  // A repository's first pass waits on the release that ships a command it needs, which another go or window cuts: the part
+  // is `waiting`, and it waits on no part of this plan, because the release it waits on is not one of them (s23).
+  for (const { sheet } of scope) {
+    for (const need of (Array.isArray(sheet.needsRelease) ? sheet.needsRelease : []) as { repo?: string; release?: string; command?: string }[]) {
+      const first = parts.find((one) => one.repo === need.repo && one.pass !== "RELEASE" && !keptIds.has(one.id));
+      if (first && need.release && !first.waitingOn) { first.state = "waiting"; first.waitingOn = `the release of ${need.release} that ships ${need.command ?? "a command it needs"}`; }
+    }
+  }
+  // A wait marked by hand outlives a new derivation.
+  for (const one of parts) {
+    const old = (options.previous?.parts ?? []).find((was) => was.id === one.id);
+    if (old?.state === "waiting" && !keptIds.has(one.id) && !one.waitingOn) { one.state = "waiting"; one.waitingOn = old.waitingOn; }
+  }
   const ending = parts.filter((one) => one.pass === "GENERATED" || one.pass === "FULL_RUN").map((one) => one.id);
   const releases: string[] = [];
   for (const { sheet } of scope) for (const repo of sheet.releaseChain ?? []) if (!releases.includes(repo)) releases.push(repo);
@@ -307,7 +327,19 @@ export function staleEntries(part: GoPart, plan: GoPlan, scope: readonly ScopeSh
   return changedEntries(part, scope).filter((ref) => !later.includes(ref));
 }
 
-/** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `ready` part with a wait open is waiting. */
+/**
+ * The plan with one part marked `waiting` on a reason (`go wait <part> --on "…"`): a release, a sign-in, another window's
+ * hold. The plan given is not changed. A landed or running part, or a part not in the plan, is refused.
+ */
+export function markWaiting(plan: GoPlan, partId: string, reason: string): GoPlan {
+  const one = plan.parts.find((part) => part.id === partId);
+  if (!one) throw new Error(`${partId} is not a part of the plan`);
+  if (one.state === "landed" || one.state === "running") throw new Error(`${partId} is ${one.state}, so it cannot be marked waiting`);
+  if (!reason.trim()) throw new Error(`${partId} needs the reason it waits, in plain words`);
+  return { ...plan, parts: plan.parts.map((part) => (part.id === partId ? { ...part, state: "waiting", waitingOn: reason.trim() } : part)) };
+}
+
+/** The parts a helper may be launched for: `ready`, and every part they wait on landed. A `waiting` part is never one. */
 export function readyParts(plan: GoPlan): GoPart[] {
   const landed = new Set(plan.parts.filter((one) => one.state === "landed").map((one) => one.id));
   return plan.parts.filter((one) => one.state === "ready" && one.waitsOn.every((id) => landed.has(id)));

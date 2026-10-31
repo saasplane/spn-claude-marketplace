@@ -375,8 +375,8 @@ export function sheetFaults(data: unknown, where = "sheet.json"): string[] {
 export const GO_SCHEMA_VERSION = 1;
 /** The passes of a go, in the order they run inside a repository (the release comes last, after every repository). */
 export const GO_PASSES = ["BASELINE", "DOCS", "CODE", "FULL_RUN", "GENERATED", "RELEASE"] as const;
-/** Where a part of a go stands. */
-export const GO_PART_STATES = ["ready", "running", "held", "landed"] as const;
+/** Where a part of a go stands. `waiting` is a part that waits on something outside the window, named in its `waitingOn`. */
+export const GO_PART_STATES = ["ready", "running", "held", "landed", "waiting"] as const;
 /** A part's id: its pass in lower case, its repository and its number, `code-spn-claude-marketplace-2`; a baseline or full run has no number. */
 export const GO_PART_ID = /^(baseline|docs|code|full|generated|release)-\S+$/;
 /** An entry as a go names it: its arc and its id, `N009/E14`. */
@@ -391,6 +391,8 @@ export type GoPart = {
   id: string; repo: string; pass: GoPass; entries: string[]; tests: string[];
   minutes: number | null; measuredFrom: string | null; waitsOn: string[]; model: string; signature: string;
   state: (typeof GO_PART_STATES)[number];
+  /** What a `waiting` part waits on, in plain words: a release, a sign-in, another window's hold. */
+  waitingOn?: string | null;
 };
 /** The plan of a go, written only by `go write` into the lead arc's folder: the arcs it covers and its parts in build order. */
 export type GoPlan = { schemaVersion: number; lead: string; scope: string[]; writtenAt: string; parts: GoPart[] };
@@ -406,6 +408,7 @@ const GO_PART_FIELDS: Record<string, Rule> = {
   minutes: { kind: "number", required: true, nullable: true }, measuredFrom: { kind: "text", required: true },
   waitsOn: { kind: "strings", required: true }, model: { kind: "string", required: true },
   signature: { kind: "text", required: true }, state: { kind: "enum", required: true, values: GO_PART_STATES },
+  waitingOn: { kind: "text", required: false },
 };
 
 /** Every fault of a go plan, read as JSON already. Empty where it holds to the schema. */

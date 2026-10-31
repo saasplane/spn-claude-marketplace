@@ -55,7 +55,6 @@ import { checkArcStatus } from "../checks/arc-status.ts";
 import { checkProofRun } from "../checks/proof-run.ts";
 import { checkPluginSync } from "../checks/plugin-sync.ts";
 import { checkBrowserProfile } from "../checks/browser-profile.ts";
-import { checkUsageFirst } from "../checks/usage-first.ts";
 import { applies as noHistoryApplies, checkNoHistory } from "../checks/no-history.ts";
 import { checkFigureSpacing } from "../checks/figure-spacing.ts";
 import { applies as guideCommandsApply, checkGuideCommands } from "../checks/guide-commands.ts";
@@ -163,8 +162,6 @@ const CHECKS: Check[] = [
   // the plain form. Its fast path is one regular expression over the command; past it, one settings read.
   { name: { group: "command-shape", action: "command-shape" }, run: checkCommandShape, needs: ["command"],
     applies: (path, command) => commandShapeApplies(path, command) },
-  // It reads the command into its command groups, then the window's note once.
-  { name: { group: "usage-first", action: "usage-first" }, run: checkUsageFirst, needs: ["command"], applies: () => true },
   // It reads the transcript, so its fast path is two words a move to DECIDED always carries.
   { name: { group: "arc-status", action: "arc-status" }, run: checkArcStatus, needs: ["command"],
     applies: (_path, command) => command.includes("workstream") && command.includes("DECIDED") },
@@ -374,10 +371,25 @@ function docFindingHeard(payload: Payload, path: string, finding: string): boole
 /** The three model families an order and a launch are compared by. */
 const FAMILY = /opus|sonnet|haiku/i;
 
+/** The model family the first order a launch's prompt names puts on its `model:` line, or null where no order names one. */
+export function orderModel(payload: Payload): string | null {
+  const input = (payload.tool_input ?? {}) as { prompt?: string };
+  const cwd = payload.cwd ?? process.cwd();
+  for (const named of (input.prompt ?? "").matchAll(/[^\s'"`()]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()]+\.md/g)) {
+    try {
+      const front = /^---\n([\s\S]*?)\n---/.exec(readFileSync(resolve(cwd, named[0]), "utf8"))?.[1] ?? "";
+      const wanted = FAMILY.exec(/^model:\s*(.*)$/m.exec(front)?.[1] ?? "")?.[0].toLowerCase();
+      if (wanted) return wanted;
+    } catch { /* an order that cannot be read names nothing */ }
+  }
+  return null;
+}
+
 /**
  * THE AGENT-MODEL CHECK: a launch of a helper agent names its model, and a launch of an order runs on the
- * model the order's own `model:` line names. A fork takes no model, since it runs on the window's own with
- * the window's whole context, so a fork is refused. Returns null where the launch is fine.
+ * model the order's own `model:` line names. A launch that names none but an order takes the order's (the hook
+ * puts it in). A fork takes no model, since it runs on the window's own with the window's whole context, so a
+ * fork is refused. Returns null where the launch is fine.
  */
 export function checkAgentModel(payload: Payload): Verdict {
   const input = (payload.tool_input ?? {}) as { model?: string; subagent_type?: string; prompt?: string };
@@ -386,6 +398,7 @@ export function checkAgentModel(payload: Payload): Verdict {
   }
   const launched = FAMILY.exec(input.model ?? "")?.[0].toLowerCase();
   if (!input.model) {
+    if (orderModel(payload)) return null;
     return { deny: "This launch names no `model`. Add `model` to the call: the one the order's `model:` line names (sonnet for a written order, opus for design)." };
   }
   const cwd = payload.cwd ?? process.cwd();
@@ -602,5 +615,13 @@ try { verdict = dispatch(payload); } catch { verdict = null; }   // never take t
 // refused call never runs, so it gets none.
 if (!verdict?.deny) startCommand(payload);
 end();
-emit(verdict);
+const launched = payload.tool_name === "Agent" || payload.tool_name === "Task";
+const taken = !verdict?.deny && launched && !(payload.tool_input as { model?: string } | undefined)?.model ? orderModel(payload) : null;
+if (taken) {
+  // A launch with no model takes the order's `model:` line, so the call runs instead of being refused and retried.
+  const specific: Record<string, unknown> = { hookEventName: "PreToolUse", permissionDecision: "allow",
+    updatedInput: { ...payload.tool_input, model: taken } };
+  if (verdict?.note) specific.additionalContext = verdict.note;
+  console.log(JSON.stringify({ hookSpecificOutput: specific }));
+} else emit(verdict);
 process.exit(0);

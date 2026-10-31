@@ -81,9 +81,9 @@ import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { sessionDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
+import { appendLog, sessionDir, telemetryFolder } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { cacheState, goStandings, welcome } from "./orientation.ts";
-import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, span, end, tagsOf, telemetryDir, utcNow } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage, windowSize } from "../lib/usage.ts";
 import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
 
@@ -365,7 +365,9 @@ export type Baseline = { at: number; steps: Record<string, string>; fired?: stri
                          /** The pages this session was already told hold their own copy of the styles. */
                          ownCopy?: string[];
                          /** `stepsMark` as it read when this session wrote a whole handover block. */
-                         handover?: string };
+                         handover?: string;
+                         /** The findings said and not yet gone, by check, as the hash of their words: an identical one is not said again. */
+                         told?: Record<string, string> };
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: how many lines its
@@ -1322,12 +1324,15 @@ export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
  */
 export function checkGoNext(root: string, mine: Set<string>, cards: string[]): Warning[] {
   if (cards.length || !mine.size) return [];
+  // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS SAID AS WAITING AND NEVER AS NEXT, and only beside a step that can be taken.
   return goStandings(root, mine).filter((go) => go.ready.length || go.unfolded.length).map((go) => ({ check: "go-next", message:
     `The go of ${go.workstream}/${go.lead} has ` +
     [go.ready.length ? `${go.ready.length === 1 ? "a part" : `${go.ready.length} parts`} ready and not started (${go.ready.join(", ")})` : "",
      go.unfolded.length ? `${go.unfolded.length === 1 ? "a report" : `${go.unfolded.length} reports`} waiting to be folded (${go.unfolded.join(", ")})` : ""]
       .filter(Boolean).join(" and ") +
-    `, and no card is open. Next: ${go.next}` }));
+    `, and no card is open. ` +
+    (go.waiting.length ? `${go.waiting.map((one) => `${one.id} is waiting on ${one.on}`).join("; ")}, so it is not the next step. ` : "") +
+    `Next: ${go.next}` }));
 }
 
 // ---------------------------------------------------------------------------- the page and the arcs
@@ -1583,24 +1588,54 @@ export function splitFindings(found: Warning[], running: boolean): { said: Warni
            held: found.filter((warning) => !ABOUT_THE_REPLY.has(warning.check)) };
 }
 
+/**
+ * A finding names only the workstreams of this window. One that names an open workstream of another window belongs to
+ * that window, and nobody here can act on it. A finding about the reply is kept: it names another workstream to say it is
+ * not this window's. The migration finding is the workspace's, and names the folders its ledger lacks.
+ */
+export function ownOnly(found: Warning[], root: string, mine: Set<string>): Warning[] {
+  let open: string[] = [];
+  try { open = readdirSync(workstreamsDir(root, "open")); } catch { /* none open */ }
+  const others = open.filter((name) => !mine.has(name));
+  return found.filter((warning) => ABOUT_THE_REPLY.has(warning.check) || warning.check === "migration" || !others.some((name) => warning.message.includes(name)));
+}
+
+/**
+ * An identical finding is said once, until its state changes. `told` holds each check's finding as a hash of its words;
+ * a finding whose words are the same is left out, and a check that finds nothing is forgotten, so it is said again if it
+ * returns. A finding about the reply is a new reply's own and is said every time.
+ *
+ * @param told  what the window's baseline holds from the turn ends before
+ */
+export function sayOnce(found: Warning[], told: Record<string, string>): { said: Warning[]; told: Record<string, string> } {
+  const now: Record<string, string> = {};
+  const said: Warning[] = [];
+  for (const warning of found) {
+    if (ABOUT_THE_REPLY.has(warning.check)) { said.push(warning); continue; }
+    const mark = createHash("sha1").update(warning.message).digest("hex").slice(0, 12);
+    now[warning.check] = mark;
+    if (told[warning.check] !== mark) said.push(warning);
+  }
+  return { said, told: now };
+}
+
 // ---------------------------------------------------------------------------- the window's size
 
 // WHEN A NEW WINDOW IS OFFERED, in tokens of context, all three in this one place, in any phase of the
-// arc: at a clean point from CLEAN_POINT, always from ALWAYS_POINT. After an offer the next one waits for
-// the window to grow by STEP.
+// arc: at a clean point from CLEAN_POINT, always from ALWAYS_POINT. The offer is made once per window, and
+// never while a helper runs.
 const CLEAN_POINT = 200_000;
 const ALWAYS_POINT = 450_000;
-const STEP = 50_000;
 
 /**
  * THE WINDOW CHECK (RULE.DEVEX.AGENT.103): from 200k, at a clean point and in any phase, the turn is told to
  * offer a new window; past 450k it is told always. Clean is what can be computed: no row of this window's arcs
  * runs, no helper launched in the background is out, and `workstream state check` finds nothing for the
  * window's workstreams. That every open point is written first cannot be computed, so the message asks for it.
- * It reads the transcript and keeps no state, and asks again only after the window has grown by STEP.
+ * It reads the transcript and keeps no state: the offer is made once per window, and never while a helper runs.
  *
  * @param mine     the workstreams this window works on
- * @param running  whether a row of this window's arcs is in progress (`workRuns`)
+ * @param running  whether a row of this window's arcs is in progress (`workRuns`): the offer then waits
  */
 export function checkWindow(root: string, transcript: string, mine: Set<string>, running: boolean): Warning[] {
   const lines = transcript.split("\n");
@@ -1619,29 +1654,28 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
       if (entry.type === "user" && told) offered = Number(told[1]) * 1000;
     } catch { /* a torn line is skipped */ }
   }
-  if (offered && size < offered + STEP) return [];
+  // ONCE PER WINDOW: the offer was made, and the developer has it. A reply that ignored it is not asked again.
+  if (offered) return [];
+  // NEVER WHILE A HELPER RUNS: a row of the window's arcs in progress, or a background helper that has not handed back.
+  if (running) return [];
   const always = size >= ALWAYS_POINT;
-  if (!always) {
-    // A BACKGROUND HELPER THAT HAS NOT HANDED BACK HOLDS THE POINT: it has no clean point yet.
-    if (running) return [];
-    const launched = new Map<string, number>();
-    lines.forEach((line, at) => {
-      if (!line.includes('"Agent"') || !line.includes("run_in_background")) return;
-      try {
-        const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
-        if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) return;
-        for (const block of entry.message!.content as Array<Record<string, unknown>>) {
-          const input = (block.input ?? {}) as Record<string, unknown>;
-          if (block.type === "tool_use" && block.name === "Agent" && input.run_in_background === true) launched.set(String(block.id), at);
-        }
-      } catch { /* a torn line is skipped */ }
-    });
-    for (const [id, at] of launched) {
-      const handed = `<tool-use-id>${id}</tool-use-id>`;
-      if (!lines.slice(at + 1).some((line) => line.includes(handed))) return [];
-    }
-    if (checkWorkstreamState(root, mine).length) return [];
+  const launched = new Map<string, number>();
+  lines.forEach((line, at) => {
+    if (!line.includes('"Agent"') || !line.includes("run_in_background")) return;
+    try {
+      const entry = JSON.parse(line) as { type?: string; message?: { content?: unknown } };
+      if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) return;
+      for (const block of entry.message!.content as Array<Record<string, unknown>>) {
+        const input = (block.input ?? {}) as Record<string, unknown>;
+        if (block.type === "tool_use" && block.name === "Agent" && input.run_in_background === true) launched.set(String(block.id), at);
+      }
+    } catch { /* a torn line is skipped */ }
+  });
+  for (const [id, at] of launched) {
+    const handed = `<tool-use-id>${id}</tool-use-id>`;
+    if (!lines.slice(at + 1).some((line) => line.includes(handed))) return [];
   }
+  if (!always && checkWorkstreamState(root, mine).length) return [];
   const written = "Write every open point first: a suggestion as S<n>, a question as a card, decided work as a row. ";
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK (01-workstream.md § The agent offers a new window):
   // a partner holds no book, so the reply says why, what is kept and how, in the person's words.
@@ -1655,6 +1689,46 @@ export function checkWindow(root: string, transcript: string, mine: Set<string>,
     ? `This window is at ${size / 1000}k, past ${ALWAYS_POINT / 1000}k. ${written}Then say that the work moves to a new window, with its handover, whatever is running. ${person}${small}`
     : `This window is at ${size / 1000}k, past ${CLEAN_POINT / 1000}k, and the point is clean: no order running, \`workstream state check\` whole. ${written}Then end your reply with the offer of a new window and its handover. ${person}${small}`;
   return [{ check: "window", message }];
+}
+
+// ---------------------------------------------------------------------------- the send-backs
+
+/**
+ * Each check's send-backs in a transcript, and how many were followed by no tool call. A send-back is the hook's own
+ * feedback entry, tagged `[check]`; it was acted on if the assistant called a tool before the next prompt or feedback.
+ */
+export function sendBackStats(transcript: string): Record<string, { sent: number; idle: number }> {
+  const out: Record<string, { sent: number; idle: number }> = {};
+  const lines = transcript.split("\n");
+  const entries = lines.map((line) => { try { return line.includes("{") ? JSON.parse(line) as { type?: string; message?: { content?: unknown } } : null; } catch { return null; } });
+  const textOf = (content: unknown): string => typeof content === "string" ? content
+    : Array.isArray(content) ? content.map((part) => (part as { text?: string }).text ?? "").join("\n") : "";
+  entries.forEach((entry, at) => {
+    if (entry?.type !== "user") return;
+    const text = textOf(entry.message?.content);
+    if (!text.startsWith("Stop hook feedback:")) return;
+    let acted = false;
+    for (const next of entries.slice(at + 1)) {
+      if (!next) continue;
+      if (next.type === "assistant" && Array.isArray(next.message?.content) && (next.message!.content as Array<{ type?: string }>).some((block) => block.type === "tool_use")) { acted = true; break; }
+      if (next.type === "user" && !(Array.isArray(next.message?.content) && (next.message!.content as Array<{ type?: string }>).every((block) => block.type === "tool_result"))) break;
+    }
+    for (const check of new Set([...text.matchAll(/(?:^|\n|\]: )\[([a-z][a-z-]*)\] /g)].map((one) => one[1]))) {
+      const held = out[check] ?? { sent: 0, idle: 0 };
+      out[check] = { sent: held.sent + 1, idle: held.idle + (acted ? 0 : 1) };
+    }
+  });
+  return out;
+}
+
+/** The session's send-back counts so far, one cumulative line in `sendbacks.jsonl` beside the other turn-end telemetry; a no-op while recording is off. */
+export function recordSendBacks(root: string | null, facts: { session?: string | null; agent?: string | null }, transcript: string | undefined): void {
+  try {
+    if (!root || !transcript || !facts.session || !telemetryDir(root)) return;
+    const checks = sendBackStats(readFileSync(transcript, "utf8"));
+    if (!Object.keys(checks).length) return;
+    appendLog(join(telemetryFolder(root), "sendbacks.jsonl"), JSON.stringify({ at: utcNow(), session: facts.session, agent: facts.agent ?? null, checks }));
+  } catch { /* a check never fails because telemetry did */ }
 }
 
 // ---------------------------------------------------------------------------- the hook
@@ -1686,6 +1760,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   begin(facts, root);
   // WHAT THE TURNS COST, written beside the timing log while recording is on, for `debug cost show`.
   recordUsage(root, facts, event.transcript_path);
+  recordSendBacks(root, facts, event.transcript_path);
   // THIS SESSION'S OWN BASELINE, and the workstreams and arcs its own writes bound it to. Both come from
   // the window's note (`lib/window.ts`), which PreToolUse and the prompt hook write from the PATH of a
   // write, a prompt or a handover and never from text. The baseline's own old `workstreams` list is not
@@ -1750,7 +1825,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     }),
   ];
   // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RULE.DEVEX.WORKSPACE.244).
-  const { said, held } = splitFindings(found.filter((warning) => !spoken.has(warning.check)), running);
+  // AND A FINDING NAMES ONLY THIS WINDOW'S WORKSTREAMS, AND AN IDENTICAL ONE IS SAID ONCE UNTIL ITS STATE CHANGES.
+  const split = splitFindings(ownOnly(found, root, mine).filter((warning) => !spoken.has(warning.check)), running);
+  const once = sayOnce(split.said, baseline?.told ?? {});
+  const said = once.said, held = split.held;
   // A page is named once in a session, so the pages named now join the ones named before.
   const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
     ...(said.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
@@ -1769,6 +1847,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
                                  cards: waiting,
                                  arcs: kept ? { ...arcMarks(root), ...(kept.arcs ?? {}) } : arcMarks(root),
                                  ownCopy: ownCopyTold,
+                                 told: { ...Object.fromEntries(Object.entries(baseline?.told ?? {}).filter(([check]) => held.some((warning) => warning.check === check))), ...once.told },
                                  handover: givesHandover(reply) ? rowsNow : given ? baseline?.handover : undefined }, event.agent_id ?? null);
   if (said.length) {
     console.error(said.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));

@@ -6,7 +6,7 @@ import { BASE, bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.m
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { CARD as DATA_CARD, PREVIEW, cli, dataWorkspace, put } from "../../../helpers/workstream-fixture.mjs";
-import { bindNamed, recordWrites } from "../../../../src/scripts/lib/window.ts";
+import { bindNamed, recordWrites, windowSet } from "../../../../src/scripts/lib/window.ts";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -966,7 +966,8 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
     wroteTo(root, "kept", `${B}/arcs/N001/state.json`);
     run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done" }, root);
     const later = run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done" }, root);
-    check("a workstream the window wrote to in an earlier turn is still its own", /\[state\]/.test(later));
+    // THE SAME FINDING IS SAID ONCE (MKT.HOOKS.322), so the later turn is silent about it; the workstream is still the window's own.
+    check("a workstream the window wrote to in an earlier turn is still its own", windowSet(root, "kept").has("002-b-subject") && !/\[state\]/.test(later), later.slice(0, 200));
   }
   // AN OLD BASELINE THAT BOUND A WINDOW BY A NAME FOUND IN TEXT IS HARMLESS: its list is never read.
   {
@@ -1533,7 +1534,7 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
   const found = await hear({ broken: true, kilo: 210 });
   check("a state finding at 210k: no offer", !asks(found) && /\[state\]/.test(found), found);
   const always = await hear({ status: "RUNNING", running: true, kilo: 460 });
-  check("a child running at 460k: the always-message", asks(always) && /past 450k/.test(always) && /Write every open point first/.test(always) && /whatever is running/.test(always), always);
+  check("[MKT.HOOKS.322] a child running at 460k: no offer, the always-message too waits for it", !asks(always), always);
   // THE OFFER IS WHERE A PERSON LEARNS HOW WINDOWS WORK: a partner holds no book, so the note asks the
   // turn to say why a new window helps, that nothing is lost, and how to open one, in the person's words.
   const forThePerson = (out) => /one or two plain sentences/.test(out) && /never this note's/.test(out)
@@ -1542,11 +1543,14 @@ console.log("\n=== window — a new window is offered from 200k at a clean point
     && /a new chat at the workspace root, in the editor they use, with the handover pasted as its first message/.test(out)
     && /no token count/.test(out) && /"clean point"/.test(out);
   check("clean: the note asks the turn to tell the person why, that nothing is lost, and how to open one", forThePerson(clean), clean);
-  check("past 450k: the always-message asks for the same three things", forThePerson(always), always);
-  check("does not ask again until the window grows 50k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
-  check("asks again once the window has grown 50k", asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
+  const alwaysClean = await hear({ kilo: 460 });
+  check("past 450k with no helper: the always-message asks for the same three things", asks(alwaysClean) && /past 450k/.test(alwaysClean) && /Write every open point first/.test(alwaysClean) && forThePerson(alwaysClean), alwaysClean);
+  check("[MKT.HOOKS.322] the offer is said once per window: not again 28k later", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 240 })));
+  check("[MKT.HOOKS.322] the offer is said once per window: not again once the window has grown 50k", !asks(await hear({ parts: [lines["bash-row-write"], sized(212, "msg_first"), feedback(212)], kilo: 265 })));
   const waiting = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 220 });
   check("waits while a background Agent has no notification", !asks(waiting), waiting);
+  const waitingAlways = await hear({ parts: [lines["bash-row-write"], lines["agent-background-pending"]], kilo: 470 });
+  check("[MKT.HOOKS.322] and past 450k too: never while a helper runs", !asks(waitingAlways), waitingAlways);
   check("asks when every background Agent has its notification",
     asks(await hear({ parts: [lines["bash-row-write"], lines["agent-background-notified"], lines["notification"]], kilo: 220 })));
   check("silent for a subagent's stop (agent_id)", !asks(await hear({ kilo: 220, extra: { agent_id: "a1" } })));
@@ -1794,6 +1798,47 @@ console.log("\n=== stop — the checks the first round fixed or wired, and the g
       unfolded.length === 1 && unfolded[0].message.includes("a report waiting to be folded (code-spn-x-1)")
         && unfolded[0].message.includes("`spn-devex workstream report write 031-probe notes/N001/orders/code-spn-x-1.report.md`"), JSON.stringify(unfolded));
     check("[MKT.HOOKS.306] a workstream that is not this window's is not read", call("checkGoNext", root, new Set(), []).length === 0);
+    // A PART THAT WAITS ON SOMETHING OUTSIDE THE WINDOW IS NEVER THE NEXT STEP: it is said once, as waiting, with what it waits on.
+    planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" }), part("code-spn-x-2", "ready", { entries: ["N001/E2"] })]);
+    const mixed = call("checkGoNext", root, everyone(root), []);
+    check("[MKT.HOOKS.321] known-bad: a part waiting on a release is said as waiting with its reason, and never named as next",
+      mixed.length === 1 && mixed[0].message.includes("a part ready and not started (code-spn-x-2)")
+        && mixed[0].message.includes("code-spn-x-1 is waiting on the release of spn-y that ships spnutils x run")
+        && mixed[0].message.includes("Next: launch the brief of code-spn-x-2") && !mixed[0].message.includes("launch the brief of code-spn-x-1"), JSON.stringify(mixed));
+    planWith([part("code-spn-x-1", "waiting", { waitingOn: "the release of spn-y that ships spnutils x run" })]);
+    check("[MKT.HOOKS.321] a go with only a waiting part sends the turn nowhere", call("checkGoNext", root, everyone(root), []).length === 0);
+    // A FINDING NAMES ONLY THE WINDOW'S OWN WORKSTREAMS.
+    mkdirSync(join(root, ".spndevex", WORKSTREAMS, "open", "032-other"), { recursive: true });
+    const aboutOther = [{ check: "state", message: "032-other has a row without its notes." }, { check: "cards", message: "Q1 belongs to 032-other, not to 031-probe." }, { check: "state", message: "031-probe has a row without its notes." }];
+    check("[MKT.HOOKS.322] known-bad: a finding about another window's workstream is not said here, and the window's own and a finding about the reply are",
+      JSON.stringify(call("ownOnly", aboutOther, root, new Set(["031-probe"])).map((w) => w.message.slice(0, 5))) === JSON.stringify(["Q1 be", "031-p"]), JSON.stringify(call("ownOnly", aboutOther, root, new Set(["031-probe"]))));
+    // AN IDENTICAL FINDING IS SAID ONCE UNTIL ITS STATE CHANGES.
+    const finding = [{ check: "page-stale", message: "the page is behind." }];
+    const first = stopModule.sayOnce ? stopModule.sayOnce(finding, {}) : { said: [], told: {} };
+    const again = stopModule.sayOnce ? stopModule.sayOnce(finding, first.told) : { said: finding, told: {} };
+    const changedMsg = stopModule.sayOnce ? stopModule.sayOnce([{ check: "page-stale", message: "the page is two rows behind." }], first.told) : { said: [], told: {} };
+    const gone = stopModule.sayOnce ? stopModule.sayOnce([], first.told) : { said: [], told: first.told };
+    const back = stopModule.sayOnce ? stopModule.sayOnce(finding, gone.told) : { said: [], told: {} };
+    check("[MKT.HOOKS.322] known-bad: an identical finding is said once, and again when its words change or after it went away",
+      [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join() === "1,0,1,1", [first.said.length, again.said.length, changedMsg.said.length, back.said.length].join());
+    check("[MKT.HOOKS.322] a finding about the reply is said every time it is found",
+      (stopModule.sayOnce ? stopModule.sayOnce([{ check: "handover", message: "x" }], { handover: "x" }) : { said: [] }).said.length === 1);
+    // EACH CHECK'S SEND-BACKS ARE COUNTED, and how many were followed by no tool call (RULE c12).
+    const entry = (type, content) => JSON.stringify({ type, message: { role: type === "user" ? "user" : "assistant", content } });
+    const sent = (check) => entry("user", `Stop hook feedback:\n[node stop.mjs]: [${check}] words.`);
+    const act = entry("assistant", [{ type: "tool_use", id: "t1", name: "Bash", input: {} }]);
+    const talk = entry("assistant", [{ type: "text", text: "I can't." }]);
+    const log = [entry("user", "go"), talk, sent("state"), act, entry("user", [{ type: "tool_result", tool_use_id: "t1", content: "ok" }]), talk,
+      sent("state"), talk, sent("go-next"), talk].join("\n");
+    check("[MKT.HOOKS.326] known-bad: send-backs are counted for each check, and the ones followed by no tool call",
+      JSON.stringify(call("sendBackStats", log)) === JSON.stringify({ state: { sent: 2, idle: 1 }, "go-next": { sent: 1, idle: 1 } }), JSON.stringify(call("sendBackStats", log)));
+    const { writeSwitch, telemetryFolder } = await import("../../../../../plugin-support-lib/src/lib/debug-store.ts");
+    const { root: telRoot } = await dataWorkspace("n011-sendbacks");
+    writeSwitch(telRoot, "telemetry", true);
+    writeFileSync(join(telRoot, "t.jsonl"), `${log}\n`);
+    if (stopModule.recordSendBacks) stopModule.recordSendBacks(telRoot, { script: "spn-devex", event: "Stop", session: "s1" }, join(telRoot, "t.jsonl"));
+    const written = existsSync(join(telemetryFolder(telRoot), "sendbacks.jsonl")) ? JSON.parse(readFileSync(join(telemetryFolder(telRoot), "sendbacks.jsonl"), "utf8").trim().split("\n").pop()) : null;
+    check("[MKT.HOOKS.326] the counts are written to the turn-end telemetry, one cumulative line for the session", written?.session === "s1" && written?.checks?.state?.idle === 1 && written?.checks?.["go-next"]?.sent === 1, JSON.stringify(written));
   }
 }
 

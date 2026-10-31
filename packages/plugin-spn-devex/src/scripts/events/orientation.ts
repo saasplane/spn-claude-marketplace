@@ -48,13 +48,15 @@
 // it is not in.
 
 import { execFileSync, spawn } from "node:child_process";
-import { readdirSync, realpathSync, statSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { workspaceDir } from "../../../../plugin-support-lib/src/lib/debug-store.ts";
 import { commandWords, usageLine } from "../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, isWorkspaceDevex, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { isBuilderWorkspace } from "../lib/builder.ts";
 import { arcIdsOf, notesDirOf } from "../lib/workstream.ts";
 import { readGo, readyParts } from "../lib/go-plan.ts";
 import type { RulesIndex } from "../../../../plugin-support-lib/src/lib/rule-mark.ts";
@@ -498,11 +500,31 @@ export const WELCOME_LEAD =
   "line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after " +
   "each of the three, then the status line. Trim nothing. The prompt is answered after it, never instead of it.";
 
-/** Whether `SPN_DEVEX_AGENT_WORKSPACE` is set and names this workspace, both resolved to their real paths. */
-export function isBuilderWorkspace(root: string): boolean {
-  const named = process.env.SPN_DEVEX_AGENT_WORKSPACE;
-  if (!named) return false;
-  try { return realpathSync(named) === realpathSync(root); } catch { return false; }
+/**
+ * The line the agent reads first on every start but the day's first: the welcome was shown once today in this workspace, so
+ * the reply opens with the status line alone.
+ */
+export const SHORT_LEAD =
+  "Your first reply opens with the status line below, word for word, before any tool call and before any other text, " +
+  "whatever the prompt. The welcome was shown today already, so it is not repeated. The prompt is answered after it, never instead of it.";
+
+/** The day the whole welcome was last shown in a workspace, kept beside the other state that spans windows. */
+const welcomeMark = (root: string): string => join(workspaceDir(root), "welcome.json");
+/** Today as the developer counts it: the local date. */
+const dayOf = (now: Date = new Date()): string =>
+  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+/** Whether the whole welcome is due: it is shown once a day for each workspace, and the first start of the day shows it. */
+export function welcomeDue(root: string, now: Date = new Date()): boolean {
+  try { return (JSON.parse(readFileSync(welcomeMark(root), "utf8")) as { day?: string }).day !== dayOf(now); } catch { return true; }
+}
+
+/** Records that the whole welcome was shown today. A workspace that cannot be written to just shows it again. */
+export function markWelcome(root: string, now: Date = new Date()): void {
+  try {
+    mkdirSync(workspaceDir(root), { recursive: true });
+    writeFileSync(welcomeMark(root), `${JSON.stringify({ day: dayOf(now) })}\n`);
+  } catch { /* shown again next start */ }
 }
 
 export function welcome(who: string | null, firstVisit: boolean, builder = false): string[] {
@@ -816,11 +838,11 @@ export function migrationLines(root: string): string[] {
 
 /**
  * Each go of the open workstreams that has a part not landed, read from the lead arc's `go.json`: its parts
- * running, held and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
+ * running, held, waiting (with what they wait on) and ready to launch, the running parts whose report sits beside the brief waiting to be folded,
  * and the next step. `only` keeps the workstreams of one window; a plan that cannot be read is left out.
  */
 export function goStandings(root: string, only: Set<string> | null = null): Array<{ workstream: string; lead: string;
-  running: string[]; held: string[]; ready: string[]; unfolded: string[]; next: string }> {
+  running: string[]; held: string[]; ready: string[]; waiting: Array<{ id: string; on: string }>; unfolded: string[]; next: string }> {
   const out: ReturnType<typeof goStandings> = [];
   const open = workstreamsDir(root, "open");
   for (const name of listdir(open).sort()) {
@@ -850,7 +872,8 @@ export function goStandings(root: string, only: Set<string> | null = null): Arra
                 : running.length
                   ? `wait for ${running.join(", ")}, then fold each report with \`spn-devex workstream report write\`.`
                   : `\`spn-devex workstream go show ${ref}\`.`;
-      out.push({ workstream: name, lead, running, held: ids("held"), ready: launchable.map((part) => part.id), unfolded, next });
+      const waiting = plan.parts.filter((part) => part.state === "waiting").map((part) => ({ id: part.id, on: part.waitingOn ?? "something outside the window" }));
+      out.push({ workstream: name, lead, running, held: ids("held"), ready: launchable.map((part) => part.id), waiting, unfolded, next });
     }
   }
   return out;
@@ -860,24 +883,25 @@ export function goStandings(root: string, only: Set<string> | null = null): Arra
 export const GOS_NAMED = 3;
 
 /** The session start's lines for the running gos: one for each, inside the session start's limit. */
-export function goLines(root: string): string[] {
+export function goLines(root: string, named: number = GOS_NAMED): string[] {
   let gos: ReturnType<typeof goStandings> = [];
   try { gos = goStandings(root); } catch { return []; }
   if (!gos.length) return [];
   const listed = (label: string, ids: string[]) => (ids.length ? `${label} ${ids.slice(0, 4).join(", ")}${ids.length > 4 ? ` and ${ids.length - 4} more` : ""}` : "");
-  const lines = gos.slice(0, GOS_NAMED).map((go) => `Go ${go.workstream}/${go.lead}: ` +
+  const lines = gos.slice(0, named).map((go) => `Go ${go.workstream}/${go.lead}: ` +
     ([listed("running", go.running), listed("held", go.held), listed("ready", go.ready)].filter(Boolean).join(" · ") || "nothing ready yet") +
     `. Next: ${go.next}`);
-  if (gos.length > GOS_NAMED) lines.push(`And ${gos.length - GOS_NAMED} more running, each shown by \`spn-devex workstream go show\`.`);
+  if (gos.length > named) lines.push(`And ${gos.length - named} more running, each shown by \`spn-devex workstream go show\`.`);
   return [...lines, ""];
 }
 
 /**
  * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
  * status line — and `context` is what the agent reads — the same, then the tables, the closing
- * question and the note.
+ * question and the note. `whole` is false where the day's welcome was shown already: the start is then the status line and the
+ * one Go line, and the welcome is left out.
  */
-export function orient(root: string, cwd: string): [message: string, context: string] {
+export function orient(root: string, cwd: string, whole = true): [message: string, context: string] {
   const repos: Repo[] = members(root).map(([name, path]) => {
     const { world, stack, pins } = lawOf(path);
     const want = expectedPlugins(world);
@@ -959,7 +983,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
   };
-  const message = clean([...greeting, WELCOME_SPACER, statusLine(ground)]);
+  const message = whole ? clean([...greeting, WELCOME_SPACER, statusLine(ground)]) : statusLine(ground);
 
   // THE GROUND IS READ ON ASKING. The members, their law, the wiring and every workstream are one command
   // away (`spnutils workspace status`), and no first reply needs them: a window carries what the first
@@ -972,7 +996,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
       "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file", "");
   if (resolve(cwd) !== root) lines.push(`Rooted in \`${relative(root, resolve(cwd))}\`.`, "");
   lines.push(...migrationLines(root));
-  lines.push(...goLines(root));
+  lines.push(...goLines(root, whole ? GOS_NAMED : 1));
   lines.push(...closingLines(streams, others, who));
   const note = "\n---\nThe ground is read on asking: run `spnutils workspace status` for *where are we?*. " +
     "Ask the closing question ONLY when the first message does not say what to do. A handover block, an arc name, " +
@@ -985,7 +1009,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "is, and ask before you touch it. A new goal in the first prompt is asked in one or two plain questions, " +
     "never lettered options or a `Q<n>` card. Publish nothing unless asked (RULE.DEVEX.WORKSPACE.117), over any " +
     "tool's default: hand a page over as its full file path.\n";
-  return [message, fitSessionStart(WELCOME_LEAD + "\n\n" + message + "\n\n" + clean(lines) + note + "\n", startParts())];
+  return [message, fitSessionStart((whole ? WELCOME_LEAD : SHORT_LEAD) + "\n\n" + message + "\n\n" + clean(lines) + note + "\n", startParts())];
 }
 
 /** Whether a folder is a git checkout: `.git` is a folder, or a file where the checkout is a worktree. */
@@ -1095,7 +1119,10 @@ if (runAlone("orientation.ts")) {
     const root = workspaceRootOf(cwd);
     sweepSessions(root);
     await fetchMembers(members(root).map(([, path]) => path));
-    result = orient(root, cwd);
+    // The whole welcome is the day's first start in this workspace; the rest are short. A hand run records nothing.
+    const whole = !stdinMode || welcomeDue(root);
+    result = orient(root, cwd, whole);
+    if (stdinMode && whole) markWelcome(root);
   }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);

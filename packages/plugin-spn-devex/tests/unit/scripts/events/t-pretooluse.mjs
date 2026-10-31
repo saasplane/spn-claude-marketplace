@@ -186,7 +186,6 @@ function onceForAFile(shown) {
   const edit = (note) => ({ tool_name: "Bash", cwd: root, session_id: "arc-status", transcript_path: transcript,
     tool_input: { command: `spn-devex workstream arc edit 001-a-subject/N001 --status DECIDED --note "the developer: '${note}'"` } });
   const waived = { parity: false, why: "the Python dispatcher never carried this check" };
-  // The window reads the group's usage first, so usage-first, earlier in the chain, has nothing to say.
   one("the window reads the `workstream` usage", { tool_name: "Bash", cwd: root, session_id: "arc-status", tool_input: { command: "spn-devex workstream" } },
     "silent", { cwd: root, ...waived });
   one("[MKT.HOOKS.102] arc-status's refusal survives the chain", edit("all good"), "deny", { says: "quotes 'all good'", cwd: root, ...waived });
@@ -196,11 +195,11 @@ function onceForAFile(shown) {
 {
   // command-shape: each part is allowed on its own, and joined they would be sent for approval by their shape.
   const root = workspace("dispatch-command-shape", {
-    ".claude/settings.json": `${JSON.stringify({ permissions: { allow: ["Bash(git status:*)", "Bash(ls:*)"] } })}\n`,
+    ".claude/settings.json": `${JSON.stringify({ permissions: { allow: ["Bash(git status:*)", "Bash(ls:*)"], ask: ["Bash(git commit:*)"] } })}\n`,
   });
   const waived = { parity: false, why: "the Python dispatcher never carried this check" };
   one("[MKT.HOOKS.121] command-shape's refusal survives the chain",
-    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short && ls" } }, "deny", { says: "Run one command per call", cwd: root, ...waived });
+    { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short && git commit -m x" } }, "deny", { says: "Run a write as a call of its own", cwd: root, ...waived });
   one("[MKT.HOOKS.121] one plain command passes the chain",
     { tool_name: "Bash", cwd: root, tool_input: { command: "git status --short" } }, "silent", { cwd: root, ...waived });
 }
@@ -436,6 +435,30 @@ console.log("\n=== pretooluse — a launch of a helper agent names its model, an
   one("agent-model: a full model name in the same family is allowed",
     launch({ model: "claude-sonnet-5-5", prompt: `Carry out the order at ${order} exactly.` }), "silent", waived);
   one("agent-model: a prompt naming no order, with a model, is allowed", launch({ model: "haiku" }), "silent", waived);
+  // A LAUNCH WITH NO MODEL TAKES THE ORDER'S `model:` LINE: the hook puts it in the call rather than refusing it.
+  const raw = (payload) => {
+    const out = execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`], { input: JSON.stringify(payload), encoding: "utf8", cwd: WORKSPACE }).trim();
+    return out ? JSON.parse(out.split("\n").filter(Boolean).at(-1)).hookSpecificOutput ?? {} : {};
+  };
+  const taken = raw(launch({ subagent_type: "general-purpose", prompt: `Carry out the order at ${order} exactly.` }));
+  for (const [label, ok] of [
+    ["[MKT.HOOKS.325] agent-model: a launch of an order with no model is not refused", taken.permissionDecision !== "deny"],
+    ["[MKT.HOOKS.325] agent-model: it takes the order's model: line", taken.updatedInput?.model === "sonnet"],
+    ["[MKT.HOOKS.325] agent-model: and keeps the rest of the call", taken.updatedInput?.subagent_type === "general-purpose" && String(taken.updatedInput?.prompt).includes(order)],
+    ["[MKT.HOOKS.325] agent-model: a launch that names a model is left as it is", raw(launch({ model: "sonnet", prompt: `Carry out the order at ${order} exactly.` })).updatedInput === undefined],
+  ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        ${JSON.stringify(taken)}`}`); }
+}
+
+console.log("\n=== pretooluse — usage-first is unwired: the first write of a command group is not refused for its shape");
+{
+  const root = workspace("dispatch-no-usage-first", { ...arcAt("001-a-subject", "PROPOSED", false) });
+  const waived = { parity: false, why: "the Python dispatcher never carried this check" };
+  one("[MKT.HOOKS.325] a first `workstream` write, with no usage read before it, is not refused",
+    { tool_name: "Bash", cwd: root, session_id: "no-usage-first", tool_input: { command: "spn-devex workstream arc edit 001-a-subject/N001 --title x" } },
+    "silent", { cwd: root, ...waived });
+  one("[MKT.HOOKS.325] nor a first `spnutils` write of another group",
+    { tool_name: "Bash", cwd: root, session_id: "no-usage-first-2", tool_input: { command: "spnutils workspace status" } },
+    "silent", { cwd: root, ...waived });
 }
 
 console.log("\n=== pretooluse — a launch of an order is read through its row to the sheet's entries");
