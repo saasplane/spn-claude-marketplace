@@ -15,10 +15,26 @@ const ORDER_PATH = /[^\s'"`()<>]*notes\/N\d+[a-z]?\/orders\/[^\s'"`()<>]+\.md/g;
 const HEAD_BYTES = 64 * 1024;
 const WRITERS = new Set(["Write", "Edit", "MultiEdit"]);
 
-/** The line an order sets, from its `Stop at …` sentence: tokens of context and turns, either of which may be absent. */
+/** What one entry of the part costs a helper, and the least a part is given. */
+const PER_ENTRY = { context: 20_000, turns: 12 };
+const LEAST = { context: 60_000, turns: 30 };
+
+/** How many entries an order's front matter lists: `entries: ["N011/E13", …]`. */
+export function entriesIn(order: string): number {
+  const list = /^entries:\s*\[([^\]]*)\]/m.exec(order)?.[1] ?? "";
+  return list.split(",").filter((one) => one.trim()).length;
+}
+
+/**
+ * The line an order sets: its `Stop at …` sentence (tokens of context and turns, either of which may be absent),
+ * and where it has none, a line sized from the entries the helper's part holds.
+ */
 export function stopLine(order: string): { context: number | null; turns: number | null } | null {
   const line = order.split("\n").find((one) => /\bstop at\b/i.test(one));
-  if (!line) return null;
+  if (!line) {
+    const entries = entriesIn(order);
+    return entries ? { context: Math.max(LEAST.context, entries * PER_ENTRY.context), turns: Math.max(LEAST.turns, entries * PER_ENTRY.turns) } : null;
+  }
   const sentence = line.slice(line.search(/\bstop at\b/i));
   const context = /(\d[\d,.]*)\s*k\b[^.\n]{0,24}\bcontext/i.exec(sentence)?.[1];
   const turns = /(\d[\d,]*)\s+turns\b/i.exec(sentence)?.[1];

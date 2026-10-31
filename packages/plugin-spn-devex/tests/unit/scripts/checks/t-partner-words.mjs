@@ -1,7 +1,7 @@
 // `checks/partner-words.ts` — outside the builder's workspace a reply names what the partner can open. The failing
 // replies are shaped on ones that named the book, a rule id of ours or a hook to a partner; the passing ones are the
 // partner's own ids, their files, SaaS Plane by name, a code block, and a reply to a prompt that named the book.
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { CHECKS } from "../../../helpers/harness.mjs";
@@ -64,6 +64,14 @@ inside();
 {
   ok("[MKT.HOOKS.313] the same book, rule id and hook pass in the builder's workspace",
     say("The book, RULE.DEVEX.WORKSPACE.467 and the stop hook conflict with the rules.").length === 0);
+}
+
+console.log("\n=== the builder test comes from the builder library, not from the session-start source");
+{
+  const source = readFileSync(join(CHECKS, "partner-words.ts"), "utf8");
+  ok("[MKT.HOOKS.326] partner-words imports the builder test from lib/builder.ts", /from "\.\.\/lib\/builder\.ts"/.test(source) && !/events\/orientation/.test(source));
+  const bundle = readFileSync(join(CHECKS, "..", "..", "dist", "events", "pretooluse.mjs"), "utf8");
+  ok("[MKT.HOOKS.326] the tool-call hook's bundle carries no session-start source", !/SESSION_START_CEILING|The short rules — they hold/.test(bundle));
 }
 
 if (saved === undefined) delete process.env.SPN_DEVEX_AGENT_WORKSPACE; else process.env.SPN_DEVEX_AGENT_WORKSPACE = saved;

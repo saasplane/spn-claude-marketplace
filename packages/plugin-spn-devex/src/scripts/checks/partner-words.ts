@@ -9,7 +9,7 @@
 //
 //   called by: events/stop.ts, on the turn's last reply; checks/doc-check.ts, on an approach page and a preview (the same list)
 
-import { isBuilderWorkspace } from "../events/orientation.ts";
+import { isBuilderWorkspace } from "../lib/builder.ts";
 
 /** A finding about the reply, in the shape every Stop check returns. */
 export type PartnerFinding = { check: string; message: string };

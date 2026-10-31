@@ -207,6 +207,24 @@ export function under(file: string, paths: readonly string[]): boolean {
   });
 }
 
+// ---------------------------------------------------------------------------- the address
+
+/** What an address names: the workstream (null where the id stands alone) and the id of an arc, a question or a suggestion. */
+export type Address = { workstream: string | null; id: string };
+
+/**
+ * Reads the one form every command takes for a thing inside a workstream: `036/N010`, `036/q11`,
+ * `036/s24`, or the bare id where the window has one workstream. The workstream is the words before
+ * the last slash, and finding it on disk is the caller's.
+ */
+export function readAddress(ref: string): Address {
+  const slash = ref.lastIndexOf("/");
+  if (slash < 0) return { workstream: null, id: ref };
+  const workstream = ref.slice(0, slash), id = ref.slice(slash + 1);
+  if (!workstream || !id) throw new UsageFault(`reads \`${ref}\` as no address — type \`<workstream>/<id>\`, such as \`036/N010\`.`);
+  return { workstream, id };
+}
+
 // ---------------------------------------------------------------------------- the usage
 
 /** The words a command is typed with, after the plugin's name: `docs face check`. */
@@ -228,6 +246,11 @@ export function usageLine(plugin: string, words: string, usage: string): string 
 export function usageOf(plugin: string, group: string, subject: string, actions: Record<string, Action>): string {
   return usageText(Object.entries(actions).filter(([, action]) => !action.hidden).map(([name, action]) =>
     usageLine(plugin, commandWords(group, subject, name), action.usage)));
+}
+
+/** What a group typed alone prints: its usage and the files it holds. The run is no fault, so the exit code is 0. */
+export function groupUsage(plugin: string, group: string, files: string[]): string {
+  return `usage: ${plugin} ${group} [<subject>] <action> […] — \`${group}\` holds: ${files.join(" · ")}`;
 }
 
 /**

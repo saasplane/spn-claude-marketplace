@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// A `Read` with no range of a file over 20 KB is refused, naming the ranged form to use instead.
+// A `Read` with no range of a file over 20 KB passes with a one-line note naming its size and the ranged form.
 // The file's size is known before the call, so nothing is read.
 
 import { statSync } from "node:fs";
@@ -18,5 +18,5 @@ export function checkReadSize(payload: Payload): Verdict {
   let size = 0;
   try { size = statSync(resolve(payload.cwd ?? process.cwd(), input.file_path)).size; } catch { return null; }
   if (size <= READ_LIMIT) return null;
-  return { deny: `${input.file_path} is ${Math.round(size / 1024)} KB, over the 20 KB a whole read may take. Search it first (Grep for the heading or the name you need), then Read it with \`offset\` and \`limit\` for the lines wanted.` };
+  return { note: `${input.file_path} is ${Math.round(size / 1024)} KB, over the 20 KB a whole read may take. Search it first, then Read it with \`offset\` and \`limit\` for the lines wanted.` };
 }

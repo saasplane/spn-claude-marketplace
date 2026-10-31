@@ -25,7 +25,7 @@
 import { readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { type CommandFile, actionOwed, commandWords, isSubject, runCommand, usageLine, usageOf } from "../../../plugin-support-lib/src/lib/command.ts";
+import { type CommandFile, actionOwed, commandWords, groupUsage, isSubject, runCommand, usageLine, usageOf } from "../../../plugin-support-lib/src/lib/command.ts";
 
 const PLUGIN_NAME = "spn-apps";
 // FROM SOURCE, `commands/<group>/<file>.ts` beside this file; BUNDLED, `dist/commands/<group>/<file>.mjs`
@@ -141,10 +141,12 @@ export async function main(argv: string[]): Promise<number> {
     console.error(`\`${group} ${second}\` is no command — the command words come first and the subject after them: \`${PLUGIN_NAME} ${group} ${rest.slice(0, 2).filter((word) => !word.startsWith("--")).join(" ")} ${second} …\``);
     return 2;
   }
-  if (second === undefined || !exported) {
-    console.error(second === undefined
-      ? `usage: ${PLUGIN_NAME} ${group} [<subject>] <action> […] — \`${group}\` holds: ${files.join(" · ")}`
-      : `unknown command \`${group} ${second}\` — \`${group}\` holds: ${files.join(" · ")}`);
+  if (second === undefined) {
+    console.log(groupUsage(PLUGIN_NAME, group, files));
+    return 0;
+  }
+  if (!exported) {
+    console.error(`unknown command \`${group} ${second}\` — \`${group}\` holds: ${files.join(" · ")}`);
     return 2;
   }
 
