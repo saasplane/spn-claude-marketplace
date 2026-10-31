@@ -16,7 +16,7 @@ spn-devex browser probe <url> --select <css> [--select <css> …] [--props <p,�
 
 spn-devex coverage measure [<path>] [--json] — the coverage report's measurement — written, built and proved, and the gaps, per package, app, domain and repository
 
-spn-devex debug cost show <target> [--json] — what a target cost, a line for each part its breakdown names
+spn-devex debug cost show <target> [--from <time>] [--to <time>] [--lead] [--json] — what a target cost, a line for each part its breakdown names
 
 spn-devex debug hooks show [--json] — every hook check's, then every event's, runs, time and bytes
 
@@ -142,6 +142,10 @@ spn-devex workstream go check <workstream>/N<nnn> — read the plan against the 
 
 spn-devex workstream go start <workstream>/N<nnn> <part> — mark a baseline or full run as running, so the test-run check lets the whole suite run
 
+spn-devex workstream go wait <workstream>/N<nnn> <part> (--on "…" | --clear) — mark a part waiting on something outside the plan (a release, a sign-in, another window's hold), with the reason in plain words; `--clear` takes the wait off, and the part reads ready when what it waits on in the plan has landed
+
+spn-devex workstream handover <workstream> [--continue "…"] [--do-not-touch "…"] — the handover block, written from the rows, the cards, the live orders and the pins into the arc's log, and printed
+
 spn-devex workstream open --file <block.json> --note "<the developer's words>" [--backlog "<the blocker>"] — open a workstream from the six-things block: the next number, its folder, its approach page and its first arc
 
 spn-devex workstream progress write <workstream> — regenerate the progress block in the approach page's Cycles
@@ -150,7 +154,7 @@ spn-devex workstream question raise <workstream>/N<nnn> --file card.json — rai
 
 spn-devex workstream question show <qN> --in <notes/N<nnn>/preview.html> — show an open card on an arc's preview, in its Open
 
-spn-devex workstream question answer <qN> --key <option> --words "…" — answer a card in your words; it leaves every Open
+spn-devex workstream question answer <qN> --key <option> --words "…" [--entries E7,E9] — answer a card in your words; it leaves every Open; with --entries, folded into the What, cited, and the go written again
 
 spn-devex workstream question withdraw <qN> --words "…" — withdraw a card in your words; it leaves every Open
 
