@@ -1591,12 +1591,15 @@ export function splitFindings(found: Warning[], running: boolean): { said: Warni
 /**
  * A finding names only the workstreams of this window. One that names an open workstream of another window belongs to
  * that window, and nobody here can act on it. A finding about the reply is kept: it names another workstream to say it is
- * not this window's. The migration finding is the workspace's, and names the folders its ledger lacks.
+ * not this window's. The migration finding is the workspace's, and names the folders its ledger lacks. A workstream the
+ * window visits is its own here too: the notes rule speaks for an arc the window changed there.
+ *
+ * @param visits  the workstreams the window only visits
  */
-export function ownOnly(found: Warning[], root: string, mine: Set<string>): Warning[] {
+export function ownOnly(found: Warning[], root: string, mine: Set<string>, visits: Set<string> = new Set()): Warning[] {
   let open: string[] = [];
   try { open = readdirSync(workstreamsDir(root, "open")); } catch { /* none open */ }
-  const others = open.filter((name) => !mine.has(name));
+  const others = open.filter((name) => !mine.has(name) && !visits.has(name));
   return found.filter((warning) => ABOUT_THE_REPLY.has(warning.check) || warning.check === "migration" || !others.some((name) => warning.message.includes(name)));
 }
 
@@ -1826,7 +1829,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   ];
   // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RULE.DEVEX.WORKSPACE.244).
   // AND A FINDING NAMES ONLY THIS WINDOW'S WORKSTREAMS, AND AN IDENTICAL ONE IS SAID ONCE UNTIL ITS STATE CHANGES.
-  const split = splitFindings(ownOnly(found, root, mine).filter((warning) => !spoken.has(warning.check)), running);
+  const split = splitFindings(ownOnly(found, root, mine, visits).filter((warning) => !spoken.has(warning.check)), running);
   const once = sayOnce(split.said, baseline?.told ?? {});
   const said = once.said, held = split.held;
   // A page is named once in a session, so the pages named now join the ones named before.
